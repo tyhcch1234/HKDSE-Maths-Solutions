@@ -76,39 +76,7 @@
 
   <!-- ============ VISUAL DEMO ============ -->
   <section class="bg-white rounded-2xl shadow-md p-5 sm:p-7 mt-6">
-    <h2 class="text-lg font-bold text-slate-900 mb-1">Visual Insight — The Difference of Two Squares</h2>
-    <p class="text-sm text-slate-600 mb-4">The blue square has area $(2m)^2 = 4m^2$; the red square has area $(5n)^2 = 25n^2$. Adjust the sliders to see how $4m^2 - 25n^2$ equals the shaded L-shape, which factorizes as $(2m-5n)(2m+5n)$.</p>
-
-    <div class="flex justify-center">
-      <canvas id="squareCanvas" width="360" height="360" class="bg-slate-50 rounded-xl border border-slate-200"></canvas>
-    </div>
-
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-5">
-      <div>
-        <label class="block text-sm font-semibold text-slate-700 mb-1">2m = <span id="mVal" class="text-indigo-600">6</span></label>
-        <input id="mSlider" type="range" min="3" max="9" step="1" value="6" class="w-full accent-indigo-600">
-      </div>
-      <div>
-        <label class="block text-sm font-semibold text-slate-700 mb-1">5n = <span id="nVal" class="text-rose-600">3</span></label>
-        <input id="nSlider" type="range" min="1" max="5" step="1" value="3" class="w-full accent-rose-600">
-      </div>
-    </div>
-
-    <div class="mt-4 grid grid-cols-3 gap-2 text-center">
-      <div class="bg-blue-50 rounded-lg p-3">
-        <p class="text-xs text-slate-500">$4m^2$</p>
-        <p id="areaA" class="font-bold text-blue-700"></p>
-      </div>
-      <div class="bg-rose-50 rounded-lg p-3">
-        <p class="text-xs text-slate-500">$25n^2$</p>
-        <p id="areaB" class="font-bold text-rose-700"></p>
-      </div>
-      <div class="bg-emerald-50 rounded-lg p-3">
-        <p class="text-xs text-slate-500">Difference</p>
-        <p id="areaDiff" class="font-bold text-emerald-700"></p>
-      </div>
-    </div>
-  </section>
+    </section>
 
   <!-- ============ STEP BY STEP ============ -->
   <section class="mt-8">
@@ -288,83 +256,7 @@ document.getElementById('resetBtn').addEventListener('click', () => {
   document.querySelector('section.mt-8').scrollIntoView({behavior:'smooth'});
 });
 
-/* ---------------- CANVAS VISUAL ---------------- */
-const canvas = document.getElementById('squareCanvas');
-const ctx = canvas.getContext('2d');
-const mSlider = document.getElementById('mSlider');
-const nSlider = document.getElementById('nSlider');
 
-function draw() {
-  const dpr = window.devicePixelRatio || 1;
-  const cssW = Math.min(360, window.innerWidth - 80);
-  const cssH = cssW;
-  canvas.width = cssW * dpr;
-  canvas.height = cssH * dpr;
-  canvas.style.width = cssW + 'px';
-  canvas.style.height = cssH + 'px';
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-  const a = parseInt(mSlider.value); // 2m
-  const b = parseInt(nSlider.value); // 5n
-  document.getElementById('mVal').textContent = a;
-  document.getElementById('nVal').textContent = b;
-
-  const pad = 34;
-  const maxSide = Math.max(a, b);
-  const scale = (cssW - pad * 2) / maxSide;
-
-  const bluePx = a * scale;
-  const redPx  = b * scale;
-  const x0 = pad, y0 = pad;
-
-  ctx.clearRect(0, 0, cssW, cssH);
-
-  // Blue square
-  ctx.fillStyle = '#93c5fd';
-  ctx.fillRect(x0, y0, bluePx, bluePx);
-  ctx.strokeStyle = '#1d4ed8';
-  ctx.lineWidth = 2;
-  ctx.strokeRect(x0, y0, bluePx, bluePx);
-
-  // Red square (removed part) — top-left overlap
-  ctx.fillStyle = '#cbd5e1';
-  ctx.fillRect(x0, y0, redPx, redPx);
-  ctx.strokeStyle = '#ef4444';
-  ctx.setLineDash([5,4]);
-  ctx.strokeRect(x0, y0, redPx, redPx);
-  ctx.setLineDash([]);
-
-  // Labels
-  ctx.fillStyle = '#1e3a8a';
-  ctx.font = 'bold 14px system-ui';
-  ctx.fillText('(2m)²', x0 + 6, y0 + 20);
-  ctx.fillStyle = '#991b1b';
-  ctx.fillText('(5n)²', x0 + redPx + 6, y0 + redPx + 16);
-
-  // Dimensions labels
-  ctx.fillStyle = '#475569';
-  ctx.font = '12px system-ui';
-  ctx.fillText(a + 'u', x0 + bluePx / 2 - 6, y0 + bluePx + 16);
-  ctx.save();
-  ctx.translate(x0 - 12, y0 + bluePx / 2 + 4);
-  ctx.rotate(-Math.PI / 2);
-  ctx.fillText(a + 'u', 0, 0);
-  ctx.restore();
-
-  // Areas
-  document.getElementById('areaA').textContent = (a * a);
-  document.getElementById('areaB').textContent = (b * b);
-  document.getElementById('areaDiff').textContent = (a * a - b * b);
-}
-
-mSlider.addEventListener('input', draw);
-nSlider.addEventListener('input', draw);
-
-/* ---------------- INIT ---------------- */
-buildSteps();
-draw();
-window.addEventListener('resize', draw);
-</script>
 
 </body>
 </html>

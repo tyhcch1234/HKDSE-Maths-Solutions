@@ -280,35 +280,7 @@
     <section class="card">
       <div class="card-head">
         <div class="num">✎</div>
-        <h2>Explore the Idea First</h2>
-        <span class="marks">Interactive</span>
-      </div>
-      <p>
-        The expression \(f(1+\beta)-f(1-\beta)\) compares the function values at two points
-        symmetric about \(x=1\). Use the slider to change \(\beta\) and see how the gap
-        between the two red points changes on the parabola \(y = 3x^2 - x - 2\).
-      </p>
-
-      <div class="canvas-wrap">
-        <canvas id="exploreCanvas" width="900" height="540"></canvas>
-        <div class="controls">
-          <label>
-            \(\beta\) =
-            <input type="range" id="betaSlider" min="-2" max="2" step="0.05" value="0.8">
-            <span class="readout" id="betaOut">0.80</span>
-          </label>
-          <label>
-            <input type="checkbox" id="showChord" checked>
-            Show chord / gap
-          </label>
-          <span class="readout" id="gapOut">f(1+β) − f(1−β) = 8.00</span>
-        </div>
-      </div>
-
-      <div class="hint">
-        <strong>Observe:</strong> The gap always equals \(10\beta\). When \(\beta=0\), both points coincide and the gap is \(0\) — consistent with choice <strong>B</strong>.
-      </div>
-    </section>
+        </section>
 
     <!-- ============ PART A ============ -->
     <section class="card" data-steps>
@@ -515,155 +487,7 @@ function revealNext(btn) {
    ============================================================ */
 const f = x => 3 * x * x - x - 2;
 
-/* ============================================================
-   CANVAS 1 — Explorer
-   ============================================================ */
-(function () {
-  const canvas = document.getElementById('exploreCanvas');
-  const ctx = canvas.getContext('2d');
-  const W = canvas.width, H = canvas.height;
-
-  const slider = document.getElementById('betaSlider');
-  const betaOut = document.getElementById('betaOut');
-  const gapOut = document.getElementById('gapOut');
-  const showChord = document.getElementById('showChord');
-
-  // world-to-screen mapping
-  const xMin = -2.2, xMax = 4.2, yMin = -6.5, yMax = 13;
-  const pad = 46;
-  const sx = x => pad + (x - xMin) / (xMax - xMin) * (W - 2 * pad);
-  const sy = y => H - pad - (y - yMin) / (yMax - yMin) * (H - 2 * pad);
-
-  function drawGrid() {
-    ctx.clearRect(0, 0, W, H);
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, W, H);
-
-    // grid
-    ctx.strokeStyle = '#e2e8f0';
-    ctx.lineWidth = 1;
-    for (let x = Math.ceil(xMin); x <= xMax; x++) {
-      ctx.beginPath(); ctx.moveTo(sx(x), sy(yMin)); ctx.lineTo(sx(x), sy(yMax)); ctx.stroke();
-    }
-    for (let y = Math.ceil(yMin); y <= yMax; y++) {
-      ctx.beginPath(); ctx.moveTo(sx(xMin), sy(y)); ctx.lineTo(sx(xMax), sy(y)); ctx.stroke();
-    }
-
-    // axes
-    ctx.strokeStyle = '#334155';
-    ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(sx(xMin), sy(0)); ctx.lineTo(sx(xMax), sy(0)); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(sx(0), sy(yMin)); ctx.lineTo(sx(0), sy(yMax)); ctx.stroke();
-
-    // axis labels
-    ctx.fillStyle = '#334155';
-    ctx.font = 'bold 14px Segoe UI, sans-serif';
-    ctx.fillText('x', sx(xMax) - 16, sy(0) - 10);
-    ctx.fillText('y', sx(0) + 10, sy(yMax) + 16);
-
-    // tick labels
-    ctx.font = '11px Segoe UI, sans-serif';
-    ctx.fillStyle = '#64748b';
-    for (let x = Math.ceil(xMin); x <= xMax; x++) {
-      if (x === 0) continue;
-      ctx.fillText(x, sx(x) - 4, sy(0) + 16);
-    }
-    for (let y = Math.ceil(yMin); y <= yMax; y++) {
-      if (y === 0) continue;
-      ctx.fillText(y, sx(0) - 20, sy(y) + 4);
-    }
-    ctx.fillText('O', sx(0) - 14, sy(0) + 16);
-
-    // symmetry axis x = 1
-    ctx.setLineDash([6, 5]);
-    ctx.strokeStyle = '#94a3b8';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.moveTo(sx(1), sy(yMin)); ctx.lineTo(sx(1), sy(yMax)); ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.fillStyle = '#64748b';
-    ctx.font = 'italic 13px Segoe UI, sans-serif';
-    ctx.fillText('x = 1', sx(1) + 6, sy(yMax) + 16);
-  }
-
-  function drawParabola() {
-    ctx.beginPath();
-    ctx.strokeStyle = '#2563eb';
-    ctx.lineWidth = 3;
-    let first = true;
-    for (let px = 0; px <= W; px++) {
-      const x = xMin + (px - pad) / (W - 2 * pad) * (xMax - xMin);
-      const y = f(x);
-      const py = sy(y);
-      if (first) { ctx.moveTo(px, py); first = false; }
-      else ctx.lineTo(px, py);
-    }
-    ctx.stroke();
-  }
-
-  function drawPoint(x, y, color, label) {
-    ctx.beginPath();
-    ctx.arc(sx(x), sy(y), 7, 0, Math.PI * 2);
-    ctx.fillStyle = color;
-    ctx.fill();
-    ctx.strokeStyle = '#fff';
-    ctx.lineWidth = 2.5;
-    ctx.stroke();
-
-    ctx.fillStyle = color;
-    ctx.font = 'bold 13px Segoe UI, sans-serif';
-    ctx.fillText(label, sx(x) + 11, sy(y) - 10);
-  }
-
-  function render() {
-    const beta = parseFloat(slider.value);
-    betaOut.textContent = beta.toFixed(2);
-    const gap = f(1 + beta) - f(1 - beta);
-    gapOut.textContent = 'f(1+β) − f(1−β) = ' + gap.toFixed(2);
-
-    drawGrid();
-    drawParabola();
-
-    const x1 = 1 + beta, y1 = f(x1);
-    const x2 = 1 - beta, y2 = f(x2);
-
-    // chord / vertical gap
-    if (showChord.checked && Math.abs(beta) > 0.01) {
-      ctx.setLineDash([5, 4]);
-      ctx.strokeStyle = '#f43f5e';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(sx(x1), sy(y1));
-      ctx.lineTo(sx(x2), sy(y2));
-      ctx.stroke();
-      ctx.setLineDash([]);
-
-      // vertical guide lines
-      ctx.strokeStyle = 'rgba(244,63,94,.35)';
-      ctx.lineWidth = 1.5;
-      ctx.beginPath(); ctx.moveTo(sx(x1), sy(0)); ctx.lineTo(sx(x1), sy(y1)); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(sx(x2), sy(0)); ctx.lineTo(sx(x2), sy(y2)); ctx.stroke();
-
-      // gap label
-      const midX = (x1 + x2) / 2, midY = (y1 + y2) / 2;
-      ctx.fillStyle = '#f43f5e';
-      ctx.font = 'bold 14px Segoe UI, sans-serif';
-      ctx.fillText('gap = ' + gap.toFixed(2), sx(midX) + 12, sy(midY) - 6);
-    }
-
-    drawPoint(x1, y1, '#f43f5e', '(1+β, ' + y1.toFixed(2) + ')');
-    drawPoint(x2, y2, '#f59e0b', '(1−β, ' + y2.toFixed(2) + ')');
-
-    // vertex (1, f(1))
-    drawPoint(1, f(1), '#10b981', 'min (1, −2.33)');
-  }
-
-  slider.addEventListener('input', render);
-  showChord.addEventListener('change', render);
-  render();
-})();
-
-/* ============================================================
-   CANVAS 2 — Symmetry proof
+ — Symmetry proof
    ============================================================ */
 (function () {
   const canvas = document.getElementById('symmetryCanvas');
@@ -773,26 +597,6 @@ const f = x => 3 * x * x - x - 2;
     ctx.fillText('= 10β', sx(1) + 16, sy((y1 + y2) / 2) + 10);
   }
 
-  // drag on canvas to change beta
-  function handlePointer(e) {
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const px = (e.clientX - rect.left) * scaleX;
-    const x = xMin + (px - pad) / (W - 2 * pad) * (xMax - xMin);
-    let b = x - 1;
-    b = Math.max(-2, Math.min(2, b));
-    beta = b;
-    render();
-  }
 
-  canvas.addEventListener('pointerdown', e => { dragging = true; handlePointer(e); });
-  canvas.addEventListener('pointermove', e => { if (dragging) handlePointer(e); });
-  window.addEventListener('pointerup', () => { dragging = false; });
-
-  showAxis.addEventListener('change', render);
-  showLabels.addEventListener('change', render);
-  render();
-})();
-</script>
 </body>
 </html>
