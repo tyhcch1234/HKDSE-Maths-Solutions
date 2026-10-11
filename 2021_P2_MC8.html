@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE Math 2021 Paper 2 Q8 — Polynomials</title>
+<script>
+  MathJax = { tex: { inlineMath: [['$','$'],['\(','\)']] }, svg: { fontCache: 'global' } };
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  :root{
+    --primary:#2563eb;
+    --primary-dark:#1e40af;
+    --accent:#059669;
+    --accent-light:#d1fae5;
+    --bg:#f1f5f9;
+    --card:#ffffff;
+    --text:#1e293b;
+    --muted:#64748b;
+    --border:#e2e8f0;
+    --warn:#f59e0b;
+    --warn-light:#fef3c7;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{
+    margin:0;padding:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    line-height:1.65;font-size:16px;
+  }
+  .wrap{max-width:840px;margin:0 auto;padding:16px 14px 60px;}
+
+  /* Header */
+  .top-bar{
+    background:linear-gradient(135deg,#1e40af,#2563eb 55%,#3b82f6);
+    color:#fff;border-radius:18px;padding:20px 18px;box-shadow:0 8px 22px rgba(37,99,235,.28);
+  }
+  .top-bar .tag-q{
+    display:inline-block;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.35);
+    padding:3px 12px;border-radius:999px;font-size:.78rem;letter-spacing:.5px;font-weight:600;
+  }
+  .top-bar h1{margin:10px 0 4px;font-size:1.22rem;line-height:1.35;font-weight:700;}
+  .top-bar p{margin:0;font-size:.86rem;opacity:.9;}
+
+  /* Concept tags */
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 6px;}
+  .chip{
+    font-size:.75rem;font-weight:600;padding:5px 12px;border-radius:999px;
+    background:#dbeafe;color:#1e40af;border:1px solid #bfdbfe;
+  }
+  .chip.green{background:var(--accent-light);color:#065f46;border-color:#a7f3d0;}
+  .chip.amber{background:var(--warn-light);color:#92400e;border-color:#fde68a;}
+
+  /* Cards */
+  .card{
+    background:var(--card);border-radius:16px;padding:18px 16px;margin-top:16px;
+    box-shadow:0 2px 10px rgba(15,23,42,.06);border:1px solid var(--border);
+  }
+  .card h2{
+    margin:0 0 12px;font-size:1rem;display:flex;align-items:center;gap:8px;
+    color:var(--primary-dark);
+  }
+  .card h2 .num{
+    background:var(--primary);color:#fff;width:24px;height:24px;border-radius:50%;
+    display:inline-flex;align-items:center;justify-content:center;font-size:.78rem;flex:0 0 auto;
+  }
+
+  /* Question */
+  .q-text{font-size:1.02rem;}
+  .q-text p{margin:.55em 0;}
+  .boxed{background:#f8fafc;border-left:4px solid var(--primary);padding:10px 12px;border-radius:0 8px 8px 0;margin:.6em 0;}
+
+  /* Options */
+  .options{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
+  @media(max-width:520px){.options{grid-template-columns:1fr;}}
+  .opt{
+    border:2px solid var(--border);border-radius:12px;padding:11px 13px;cursor:pointer;
+    background:#fff;transition:.18s;display:flex;align-items:center;gap:10px;font-size:.98rem;
+    user-select:none;
+  }
+  .opt:hover{border-color:#93c5fd;background:#f0f7ff;}
+  .opt .key{
+    font-weight:700;color:var(--primary);background:#eff6ff;border-radius:8px;
+    width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;
+  }
+  .opt.correct{border-color:var(--accent);background:var(--accent-light);}
+  .opt.correct .key{background:var(--accent);color:#fff;}
+  .opt.wrong{border-color:#ef4444;background:#fee2e2;}
+  .opt.wrong .key{background:#ef4444;color:#fff;}
+  .opt.locked{pointer-events:none;}
+  .feedback{margin-top:12px;font-size:.9rem;font-weight:600;min-height:1.2em;}
+  .feedback.ok{color:#065f46;}
+  .feedback.no{color:#b91c1c;}
+
+  /* Accordion steps */
+  .step{
+    border:1px solid var(--border);border-radius:14px;margin-bottom:10px;overflow:hidden;
+    background:#fff;
+  }
+  .step-head{
+    display:flex;align-items:center;gap:10px;padding:13px 14px;cursor:pointer;
+    background:#f8fafc;font-weight:600;font-size:.95rem;transition:.15s;
+  }
+  .step-head:hover{background:#eff6ff;}
+  .step-head .badge{
+    background:var(--primary);color:#fff;font-size:.72rem;font-weight:700;
+    padding:3px 9px;border-radius:999px;flex:0 0 auto;
+  }
+  .step-head .arrow{margin-left:auto;transition:transform .25s;color:var(--muted);font-size:.9rem;}
+  .step.open .step-head{background:#eff6ff;}
+  .step.open .arrow{transform:rotate(90deg);}
+  .step-body{
+    max-height:0;overflow:hidden;transition:max-height .35s ease;padding:0 14px;
+    border-top:0 solid var(--border);
+  }
+  .step.open .step-body{max-height:900px;padding:14px;border-top:1px solid var(--border);}
+  .step-body p{margin:.5em 0;}
+  .mathline{
+    background:#f8fafc;border-radius:8px;padding:8px 10px;margin:.55em 0;overflow-x:auto;
+  }
+
+  /* Hint */
+  .hint-btn{
+    display:inline-flex;align-items:center;gap:6px;background:var(--warn-light);color:#92400e;
+    border:1px solid #fde68a;border-radius:10px;padding:7px 13px;font-size:.84rem;font-weight:600;
+    cursor:pointer;margin-top:8px;transition:.15s;
+  }
+  .hint-btn:hover{background:#fde9b0;}
+  .hint-panel{
+    max-height:0;overflow:hidden;transition:max-height .3s ease;
+    background:#fffbeb;border-radius:10px;margin-top:8px;
+  }
+  .hint-panel.show{max-height:520px;}
+  .hint-inner{padding:12px 14px;font-size:.88rem;border:1px solid #fde68a;border-radius:10px;}
+  .hint-inner b{color:#92400e;}
+
+  /* Controls */
+  .nav-row{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;}
+  .btn{
+    border:none;border-radius:12px;padding:12px 18px;font-size:.92rem;font-weight:700;
+    cursor:pointer;transition:.16s;flex:1 1 auto;min-height:46px;
+  }
+  .btn-primary{background:var(--primary);color:#fff;box-shadow:0 4px 12px rgba(37,99,235,.3);}
+  .btn-primary:hover{background:var(--primary-dark);}
+  .btn-primary:disabled{background:#cbd5e1;box-shadow:none;cursor:not-allowed;}
+  .btn-ghost{background:#fff;color:var(--primary);border:2px solid var(--primary);}
+  .btn-ghost:hover{background:#eff6ff;}
+
+  /* Interactive canvas */
+  .canvas-box{
+    background:#0f172a;border-radius:14px;padding:12px;margin-top:10px;
+  }
+  canvas{width:100%;height:auto;display:block;border-radius:8px;background:#f8fafc;}
+  .slider-row{
+    display:flex;align-items:center;gap:12px;margin-top:12px;flex-wrap:wrap;
+  }
+  .slider-row label{font-size:.85rem;font-weight:600;min-width:150px;}
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;flex:1 1 150px;height:6px;border-radius:999px;
+    background:#dbeafe;outline:none;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;appearance:none;width:20px;height:20px;border-radius:50%;
+    background:var(--primary);cursor:pointer;box-shadow:0 2px 6px rgba(37,99,235,.5);
+  }
+  input[type=range]::-moz-range-thumb{
+    width:20px;height:20px;border-radius:50%;background:var(--primary);cursor:pointer;border:none;
+  }
+  .val-pill{
+    background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;border-radius:8px;
+    padding:3px 10px;font-size:.82rem;font-weight:700;min-width:60px;text-align:center;
+  }
+
+  /* Table for division */
+  .divtable{
+    width:100%;border-collapse:collapse;margin-top:10px;font-size:.88rem;
+  }
+  .divtable th,.divtable td{
+    border:1px solid var(--border);padding:8px 10px;text-align:center;
+  }
+  .divtable th{background:#eff6ff;color:var(--primary-dark);font-size:.82rem;}
+
+  .summary-final{
+    background:linear-gradient(135deg,#ecfdf5,#d1fae5);border:1px solid #a7f3d0;
+    border-radius:14px;padding:16px;margin-top:16px;text-align:center;
+  }
+  .summary-final .ans{font-size:1.15rem;font-weight:800;color:#065f46;margin-top:6px;}
+  .footer{text-align:center;font-size:.78rem;color:var(--muted);margin-top:28px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ===== Header ===== -->
+  <div class="top-bar">
+    <span class="tag-q">HKDSE MATH 2021 · PAPER 2 · Q8</span>
+    <h1>Polynomials — Remainder Theorem</h1>
+    <p>Find the remainder when $p(x)$ is divided by $x^{2}-1$.</p>
+  </div>
+
+  <div class="chips">
+    <span class="chip">Remainder Theorem</span>
+    <span class="chip green">Factor Theorem</span>
+    <span class="chip amber">Degree of Remainder</span>
+    <span class="chip">Simultaneous Equations</span>
+  </div>
+
+  <!-- ===== Question Overview ===== -->
+  <div class="card">
+    <h2><span class="num">Q</span> Question</h2>
+    <div class="q-text">
+      <p>Let $p(x)$ be a polynomial. When $p(x)$ is divided by $x+1$, the remainder is $-2$. If $p(x)$ is divisible by $x-1$, find the remainder when $p(x)$ is divided by $x^{2}-1$.</p>
+      <div class="boxed">
+        <p style="margin:0"><b>Choose the correct answer:</b></p>
+      </div>
+      <div class="options" id="options">
+        <div class="opt" data-key="A"><span class="key">A</span> $x+1$</div>
+        <div class="opt" data-key="B"><span class="key">B</span> $x-1$</div>
+        <div class="opt" data-key="C"><span class="key">C</span> $-x+1$</div>
+        <div class="opt" data-key="D"><span class="key">D</span> $-x-1$</div>
+      </div>
+      <div class="feedback" id="feedback"></div>
+    </div>
+  </div>
+
+  <!-- ===== Core idea card ===== -->
+  <div class="card">
+    <h2><span class="num">1</span> Core Idea — What is being tested?</h2>
+    <p style="margin-top:0">Two classic polynomial tools are combined here:</p>
+    <p><b>(a) Remainder Theorem:</b> the remainder when $p(x)$ is divided by $(x-a)$ equals $p(a)$.</p>
+    <p><b>(b) Factor Theorem:</b> if $p(a)=0$, then $(x-a)$ is a factor of $p(x)$ — equivalently the remainder is $0$.</p>
+    <div class="mathline">
+      $p(x)=(x-1)Q_1(x)+0 \quad\Rightarrow\quad p(1)=0$
+    </div>
+    <p style="margin-bottom:0">We are given $p(-1)=-2$ and $p(1)=0$. We must reconstruct the remainder upon division by the <b>quadratic</b> $x^{2}-1$.</p>
+  </div>
+
+  <!-- ===== Accordion Steps ===== -->
+  <div class="card">
+    <h2><span class="num">2</span> Step-by-Step Solution</h2>
+
+    <!-- Step 1 -->
+    <div class="step" id="s1">
+      <div class="step-head" onclick="toggleStep('s1')">
+        <span class="badge">Step 1</span>
+        <span>Identify the degree of the remainder</span>
+        <span class="arrow">▶</span>
+      </div>
+      <div class="step-body">
+        <p>When a polynomial $p(x)$ is divided by a divisor $D(x)$, the remainder has degree strictly less than $\deg D(x)$.</p>
+        <p>Here $D(x)=x^{2}-1$ has degree $2$, so the remainder must be of the form:</p>
+        <div class="mathline">$ax+b$ &nbsp;&nbsp; (degree $0$ or $1$; $a,b$ constants)</div>
+        <p style="margin-bottom:0">We therefore write the division identity:</p>
+        <div class="mathline">$p(x)=(x^{2}-1)q(x)+(ax+b)$</div>
+        <button class="hint-btn" onclick="toggleHint('h1')">💡 Hint — Why is the remainder at most degree 1?</button>
+        <div class="hint-panel" id="h1">
+          <div class="hint-inner">
+            <b>General rule:</b> If $\deg(\text{divisor})=n$, then $\deg(\text{remainder}) \le n-1$.<br>
+            Dividing by $x-1$ (degree 1) gives a <b>constant</b> remainder.<br>
+            Dividing by $x^{2}-1$ (degree 2) gives a remainder of the form $ax+b$ — <b>two</b> unknowns $a$ and $b$, so we need <b>two</b> conditions.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step" id="s2">
+      <div class="step-head" onclick="toggleStep('s2')">
+        <span class="badge">Step 2</span>
+        <span>Translate "divisible by $x-1$" into $p(1)=0$</span>
+        <span class="arrow">▶</span>
+      </div>
+      <div class="step-body">
+        <p>If $p(x)$ is divisible by $x-1$, the remainder is $0$. By the Remainder Theorem (with $a=1$):</p>
+        <div class="mathline">$p(1)=0$ &nbsp;&nbsp; …… (condition 1)</div>
+        <button class="hint-btn" onclick="toggleHint('h2')">💡 Hint — Substitute $x=1$ into the identity</button>
+        <div class="hint-panel" id="h2">
+          <div class="hint-inner">
+            Using $p(x)=(x^{2}-1)q(x)+(ax+b)$, put $x=1$:<br>
+            $\;p(1)=((1)^{2}-1)q(1)+(a\cdot 1+b)=0\cdot q(1)+a+b=a+b$.<br>
+            Since $p(1)=0$, we get $\;a+b=0$.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="step" id="s3">
+      <div class="step-head" onclick="toggleStep('s3')">
+        <span class="badge">Step 3</span>
+        <span>Translate "remainder $-2$ upon division by $x+1$" into $p(-1)=-2$</span>
+        <span class="arrow">▶</span>
+      </div>
+      <div class="step-body">
+        <p>By the Remainder Theorem with $a=-1$:</p>
+        <div class="mathline">$p(-1)=-2$ &nbsp;&nbsp; …… (condition 2)</div>
+        <button class="hint-btn" onclick="toggleHint('h3')">💡 Hint — Substitute $x=-1$ into the identity</button>
+        <div class="hint-panel" id="h3">
+          <div class="hint-inner">
+            Put $x=-1$ in $p(x)=(x^{2}-1)q(x)+(ax+b)$:<br>
+            $\;p(-1)=((-1)^{2}-1)q(-1)+(a(-1)+b)=0\cdot q(-1)-a+b=\;-a+b$.<br>
+            Since $p(-1)=-2$, we get $\;-a+b=-2$.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="step" id="s4">
+      <div class="step-head" onclick="toggleStep('s4')">
+        <span class="badge">Step 4</span>
+        <span>Solve the simultaneous equations</span>
+        <span class="arrow">▶</span>
+      </div>
+      <div class="step-body">
+        <p>We now have a simple linear system:</p>
+        <div class="mathline">$\begin{cases} a+b=0 & \text{…… (1)}\\ -a+b=-2 & \text{…… (2)}\end{cases}$</div>
+        <p><b>Elimination:</b> subtract (2) from (1):</p>
+        <div class="mathline">$(a+b)-(-a+b)=0-(-2)\;\Rightarrow\;2a=2\;\Rightarrow\;a=1$</div>
+        <p>Substitute $a=1$ into (1):</p>
+        <div class="mathline">$1+b=0\;\Rightarrow\;b=-1$</div>
+        <button class="hint-btn" onclick="toggleHint('h4')">💡 Hint — Check the subtraction carefully</button>
+        <div class="hint-panel" id="h4">
+          <div class="hint-inner">
+            <b>Watch the signs:</b> $(a+b)-(-a+b) = a+b+a-b = 2a$ (the $b$'s cancel).<br>
+            Right side: $0-(-2)=+2$. So $2a=2 \Rightarrow a=1$.<br>
+            Then $b=-1$. Both are quick to verify: $1+(-1)=0$ ✓ and $-1+(-1)=-2$ ✓.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 5 -->
+    <div class="step" id="s5">
+      <div class="step-head" onclick="toggleStep('s5')">
+        <span class="badge">Step 5</span>
+        <span>Write the answer</span>
+        <span class="arrow">▶</span>
+      </div>
+      <div class="step-body">
+        <p>Substituting $a=1,\;b=-1$ back into the remainder $ax+b$:</p>
+        <div class="mathline">$p(x)=(x^{2}-1)q(x)+(x-1)$</div>
+        <p>Hence the remainder when $p(x)$ is divided by $x^{2}-1$ is:</p>
+        <div class="mathline" style="background:#ecfdf5;border:1px solid #a7f3d0;"><b>Remainder $=x-1$</b> &nbsp;→&nbsp; <b>Answer: B</b></div>
+        <p style="margin-bottom:0"><i>Sanity check:</i> Does $x-1$ give $p(1)=0$? Yes: $1-1=0$ ✓. Does it give $p(-1)=-2$? Yes: $-1-1=-2$ ✓.</p>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-primary" id="nextBtn" onclick="nextStep()">Show Next Step ▶</button>
+      <button class="btn btn-ghost" onclick="openAll()">Expand All</button>
+      <button class="btn btn-ghost" onclick="closeAll()">Collapse All</button>
+    </div>
+  </div>
+
+  <!-- ===== Visual demo ===== -->
+  <div class="card">
+    <h2><span class="num">3</span> Visualisation — Choose $a$ and $b$</h2>
+    <p style="margin-top:0">The remainder is forced to pass through the two points $(1,\,0)$ and $(-1,\,-2)$. Adjust the sliders to see which line $y=ax+b$ satisfies <b>both</b> conditions.</p>
+
+    <div class="canvas-box">
+      <canvas id="graph" width="720" height="420"></canvas>
+    </div>
+
+    <div class="slider-row">
+      <label>Slope $a$ = <span class="val-pill" id="aVal">0</span></label>
+      <input type="range" id="aSlider" min="-3" max="3" step="0.5" value="0">
+    </div>
+    <div class="slider-row">
+      <label>Intercept $b$ = <span class="val-pill" id="bVal">0</span></label>
+      <input type="range" id="bSlider" min="-3" max="3" step="0.5" value="0">
+    </div>
+
+    <table class="divtable">
+      <tr><th>Condition</th><th>Required</th><th>Your line gives</th><th>Status</th></tr>
+      <tr>
+        <td>$p(1)=0$</td><td>$a+b=0$</td><td id="c1">$0$</td><td id="k1">—</td>
+      </tr>
+      <tr>
+        <td>$p(-1)=-2$</td><td>$-a+b=-2$</td><td id="c2">$0$</td><td id="k2">—</td>
+      </tr>
+    </table>
+
+    <div class="feedback" id="visFeedback"></div>
+    <button class="btn btn-ghost" style="width:100%;margin-top:12px;" onclick="setSolution()">Jump to the Correct Line ($a=1,\;b=-1$)</button>
+  </div>
+
+  <!-- ===== Final summary ===== -->
+  <div class="summary-final">
+    <div style="font-size:.85rem;font-weight:600;color:#065f46;">FINAL ANSWER</div>
+    <div class="ans">$x-1$ &nbsp; (Option B)</div>
+  </div>
+
+  <div class="footer">HKDSE Mathematics 2021 · Paper 2 · Question 8 &nbsp;|&nbsp; Interactive Solution</div>
+
+</div>
+
+<script>
+/* ---------------- Accordion / Steps ---------------- */
+const steps = ['s1','s2','s3','s4','s5'];
+let currentStep = -1;   // none open yet
+
+function toggleStep(id){
+  const el = document.getElementById(id);
+  el.classList.toggle('open');
+  if(el.classList.contains('open')){
+    const idx = steps.indexOf(id);
+    if(idx > currentStep) currentStep = idx;
+    updateNextBtn();
+  }
+}
+function nextStep(){
+  const nextIdx = currentStep + 1;
+  if(nextIdx < steps.length){
+    document.getElementById(steps[nextIdx]).classList.add('open');
+    currentStep = nextIdx;
+    document.getElementById(steps[nextIdx]).scrollIntoView({behavior:'smooth',block:'center'});
+    updateNextBtn();
+  }
+}
+function updateNextBtn(){
+  const btn = document.getElementById('nextBtn');
+  if(currentStep >= steps.length - 1){
+    btn.disabled = true;
+    btn.textContent = 'All Steps Shown ✓';
+  } else {
+    btn.disabled = false;
+    btn.textContent = 'Show Next Step ▶';
+  }
+}
+function openAll(){
+  steps.forEach(s=>document.getElementById(s).classList.add('open'));
+  currentStep = steps.length - 1;
+  updateNextBtn();
+}
+function closeAll(){
+  steps.forEach(s=>document.getElementById(s).classList.remove('open'));
+  currentStep = -1;
+  updateNextBtn();
+}
+
+/* ---------------- Hint panels ---------------- */
+function toggleHint(id){
+  document.getElementById(id).classList.toggle('show');
+}
+
+/* ---------------- MCQ selection ---------------- */
+const correctKey = 'B';
+document.querySelectorAll('#options .opt').forEach(opt=>{
+  opt.addEventListener('click', ()=>{
+    const key = opt.dataset.key;
+    document.querySelectorAll('#options .opt').forEach(o=>o.classList.add('locked'));
+    const fb = document.getElementById('feedback');
+    if(key === correctKey){
+      opt.classList.add('correct');
+      fb.textContent = '✅ Correct! The remainder has the form $ax+b$ with $a+b=0$ and $-a+b=-2$, giving $a=1,\\ b=-1$, i.e. $x-1$.';
+      fb.className = 'feedback ok';
+    } else {
+      opt.classList.add('wrong');
+      document.querySelector('#options .opt[data-key="'+correctKey+'"]').classList.add('correct');
+      fb.textContent = '❌ Not quite. The correct answer is B. Use $p(1)=0$ and $p(-1)=-2$ to fix the remainder $ax+b$.';
+      fb.className = 'feedback no';
+    }
+    if(window.MathJax && MathJax.typesetPromise){ MathJax.typesetPromise([fb]); }
+  });
+});
+
+/* ---------------- Canvas visualisation ---------------- */
+const canvas = document.getElementById('graph');
+const ctx = canvas.getContext('2d');
+const aSlider = document.getElementById('aSlider');
+const bSlider = document.getElementById('bSlider');
+
+// world-to-screen mapping: x in [-3,3], y in [-4,4]
+const W = canvas.width, H = canvas.height;
+const xmin=-3, xmax=3, ymin=-4.5, ymax=4.5;
+function sx(x){ return (x - xmin)/(xmax - xmin) * W; }
+function sy(y){ return H - (y - ymin)/(ymax - ymin) * H; }
+
+function drawGrid(){
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = '#f8fafc';
+  ctx.fillRect(0,0,W,H);
+
+  // grid lines
+  ctx.strokeStyle = '#e2e8f0';
+  ctx.lineWidth = 1;
+  for(let x=Math.ceil(xmin); x<=Math.floor(xmax); x++){
+    ctx.beginPath(); ctx.moveTo(sx(x),0); ctx.lineTo(sx(x),H); ctx.stroke();
+  }
+  for(let y=Math.ceil(ymin); y<=Math.floor(ymax); y++){
+    ctx.beginPath(); ctx.moveTo(0,sy(y)); ctx.lineTo(W,sy(y)); ctx.stroke();
+  }
+
+  // axes
+  ctx.strokeStyle = '#94a3b8';
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(0,sy(0)); ctx.lineTo(W,sy(0)); ctx.stroke(); // x-axis
+  ctx.beginPath(); ctx.moveTo(sx(0),0); ctx.lineTo(sx(0),H); ctx.stroke(); // y-axis
+
+  // labels
+  ctx.fillStyle = '#64748b';
+  ctx.font = '13px sans-serif';
+  ctx.fillText('x', W-16, sy(0)-8);
+  ctx.fillText('y', sx(0)+8, 16);
+}
+
+function drawPoint(x,y,color,label){
+  ctx.beginPath();
+  ctx.arc(sx(x), sy(y), 7, 0, Math.PI*2);
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+  ctx.fillStyle = '#334155';
+  ctx.font = 'bold 13px sans-serif';
+  ctx.fillText(label, sx(x)+11, sy(y)-10);
+}
+
+function drawLine(a,b){
+  const x1 = xmin, x2 = xmax;
+  const y1 = a*x1 + b, y2 = a*x2 + b;
+  ctx.beginPath();
+  ctx.moveTo(sx(x1), sy(y1));
+  ctx.lineTo(sx(x2), sy(y2));
+  ctx.strokeStyle = '#2563eb';
+  ctx.lineWidth = 3.5;
+  ctx.stroke();
+}
+
+function update(){
+  const a = parseFloat(aSlider.value);
+  const b = parseFloat(bSlider.value);
+
+  document.getElementById('aVal').textContent = a;
+  document.getElementById('bVal').textContent = b;
+
+  drawGrid();
+
+  // target points
+  drawPoint(1, 0, '#059669', 'p(1)=0');
+  drawPoint(-1, -2, '#dc2626', 'p(-1)=-2');
+
+  // dashed horizontal guides
+  ctx.setLineDash([5,5]);
+  ctx.strokeStyle = '#cbd5e1';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(0, sy(0)); ctx.lineTo(sx(1), sy(0)); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(sx(1), 0); ctx.lineTo(sx(1), sy(0)); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(0, sy(-2)); ctx.lineTo(sx(-1), sy(-2)); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(sx(-1), H); ctx.lineTo(sx(-1), sy(-2)); ctx.stroke();
+  ctx.setLineDash([]);
+
+  drawLine(a,b);
+
+  // line equation label
+  const sign = b >= 0 ? '+' : '−';
+  ctx.fillStyle = '#1e40af';
+  ctx.font = 'bold 15px sans-serif';
+  ctx.fillText('remainder ≈ y = ' + a + 'x ' + sign + ' ' + Math.abs(b), 18, 28);
+
+  // condition checks
+  const c1val = a + b;          // should be 0
+  const c2val = -a + b;         // should be -2
+  document.getElementById('c1').textContent = 'a + b = ' + c1val;
+  document.getElementById('c2').textContent = '−a + b = ' + c2val;
+
+  const ok1 = Math.abs(c1val - 0) < 1e-9;
+  const ok2 = Math.abs(c2val - (-2)) < 1e-9;
+
+  const k1 = document.getElementById('k1');
+  const k2 = document.getElementById('k2');
+  k1.textContent = ok1 ? '✓' : '✗';
+  k1.style.color = ok1 ? '#059669' : '#dc2626';
+  k1.style.fontWeight = '700';
+  k2.textContent = ok2 ? '✓' : '✗';
+  k2.style.color = ok2 ? '#059669' : '#dc2626';
+  k2.style.fontWeight = '700';
+
+  const vf = document.getElementById('visFeedback');
+  if(ok1 && ok2){
+    vf.textContent = '🎯 Both conditions satisfied — this is the required remainder ax+b.';
+    vf.className = 'feedback ok';
+  } else if(ok1){
+    vf.textContent = 'Passes through (1, 0) but not through (−1, −2). Keep adjusting.';
+    vf.className = 'feedback no';
+  } else if(ok2){
+    vf.textContent = 'Passes through (−1, −2) but not through (1, 0). Keep adjusting.';
+    vf.className = 'feedback no';
+  } else {
+    vf.textContent = 'This line misses both target points.';
+    vf.className = 'feedback no';
+  }
+}
+
+aSlider.addEventListener('input', update);
+bSlider.addEventListener('input', update);
+
+function setSolution(){
+  aSlider.value = 1;
+  bSlider.value = -1;
+  update();
+}
+
+/* init */
+update();
+</script>
+</body>
+</html>

@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2019 Paper 2 Q30 — Statistics</title>
+<script>
+  MathJax = {
+    tex: { inlineMath: [['\\(', '\\)'], ['$', '$']], displayMath: [['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  :root{
+    --blue:#2563eb; --blue-d:#1e3a8a; --amber:#f59e0b; --amber-l:#fef3c7;
+    --emerald:#059669; --emerald-l:#d1fae5; --rose:#e11d48; --slate:#334155;
+    --bg:#f1f5f9; --card:#ffffff; --ink:#0f172a;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg); color:var(--ink); line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  /* ---------- HERO ---------- */
+  .hero{
+    background:linear-gradient(135deg,#1e3a8a 0%,#2563eb 45%,#0ea5e9 100%);
+    color:#fff; padding:44px 20px 54px; text-align:center; position:relative; overflow:hidden;
+  }
+  .hero::after{
+    content:""; position:absolute; inset:0;
+    background:radial-gradient(circle at 15% 20%, rgba(255,255,255,.16) 0, transparent 42%),
+               radial-gradient(circle at 85% 80%, rgba(245,158,11,.28) 0, transparent 45%);
+    pointer-events:none;
+  }
+  .hero .eyebrow{font-size:.8rem; letter-spacing:.16em; text-transform:uppercase; opacity:.86; margin:0 0 10px;}
+  .hero h1{margin:0 0 6px; font-size:clamp(1.5rem,4.4vw,2.3rem); font-weight:800; letter-spacing:-.02em;}
+  .hero .sub{opacity:.92; font-size:clamp(.9rem,2.6vw,1.05rem); margin:0 0 18px;}
+  .pills{display:flex; flex-wrap:wrap; gap:9px; justify-content:center; position:relative; z-index:2;}
+  .pill{
+    background:rgba(255,255,255,.17); border:1px solid rgba(255,255,255,.42);
+    padding:6px 14px; border-radius:999px; font-size:.78rem; font-weight:600; backdrop-filter:blur(4px);
+  }
+  /* ---------- LAYOUT ---------- */
+  .wrap{max-width:900px; margin:-30px auto 0; padding:0 16px 60px; position:relative; z-index:3;}
+  .card{
+    background:var(--card); border-radius:18px; padding:22px 22px 24px;
+    box-shadow:0 10px 30px -12px rgba(15,23,42,.22), 0 2px 6px rgba(15,23,42,.05);
+    margin-bottom:24px; border:1px solid #e2e8f0;
+  }
+  .card h2{
+    margin:0 0 14px; font-size:1.12rem; font-weight:800; color:var(--blue-d);
+    display:flex; align-items:center; gap:10px; border-bottom:2px solid #eff6ff; padding-bottom:10px;
+  }
+  .card h2 .dot{width:11px; height:11px; border-radius:50%; background:var(--amber); flex:none;}
+  .qtext{font-size:1rem;}
+  .qtext ol{padding-left:22px;}
+  .marks{color:var(--rose); font-weight:700; font-size:.85rem;}
+  /* ---------- TABLE ---------- */
+  table.dist{border-collapse:collapse; width:100%; margin:16px 0; font-size:.92rem; overflow:hidden; border-radius:10px;}
+  table.dist th, table.dist td{border:1px solid #cbd5e1; padding:9px 6px; text-align:center;}
+  table.dist th{background:#eff6ff; color:var(--blue-d); font-weight:700;}
+  table.dist td.hl{background:var(--amber-l); font-weight:700; color:#92400e;}
+  table.dist tbody tr:nth-child(even) td{background:#f8fafc;}
+  table.dist tbody tr:nth-child(even) td.hl{background:var(--amber-l);}
+  /* ---------- OPTIONS ---------- */
+  .opts{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px;}
+  @media(max-width:560px){.opts{grid-template-columns:1fr;}}
+  .opt{
+    border:2px solid #e2e8f0; border-radius:12px; padding:11px 14px; font-size:.93rem;
+    display:flex; gap:10px; align-items:flex-start; transition:.25s; background:#fff;
+  }
+  .opt .letter{
+    font-weight:800; color:#fff; background:var(--slate); border-radius:8px;
+    width:26px; height:26px; display:grid; place-items:center; flex:none; font-size:.85rem;
+  }
+  .opt.good{border-color:var(--emerald); background:var(--emerald-l);}
+  .opt.good .letter{background:var(--emerald);}
+  .opt.bad{border-color:#fecdd3; background:#fff1f2; opacity:.95;}
+  .opt.bad .letter{background:var(--rose);}
+  /* ---------- CANVAS ---------- */
+  .canvas-box{
+    background:#f8fafc; border:1px solid #e2e8f0; border-radius:14px; padding:12px; margin:14px 0;
+  }
+  canvas{width:100%; height:auto; display:block; border-radius:10px; background:#fff;}
+  .controls{display:flex; flex-wrap:wrap; gap:14px; align-items:center; margin-top:12px; font-size:.86rem;}
+  .ctrl{display:flex; align-items:center; gap:8px; background:#fff; border:1px solid #e2e8f0; padding:8px 12px; border-radius:10px;}
+  input[type=range]{width:150px; accent-color:var(--blue);}
+  input[type=checkbox]{width:17px; height:17px; accent-color:var(--blue);}
+  .readout{
+    display:flex; flex-wrap:wrap; gap:10px; margin-top:12px;
+  }
+  .chip{
+    background:#eff6ff; border:1px solid #bfdbfe; color:var(--blue-d);
+    padding:7px 12px; border-radius:9px; font-size:.83rem; font-weight:600;
+  }
+  .chip.amber{background:var(--amber-l); border-color:#fcd34d; color:#92400e;}
+  .chip.green{background:var(--emerald-l); border-color:#6ee7b7; color:#065f46;}
+  .chip.rose{background:#ffe4e6; border-color:#fda4af; color:#9f1239;}
+  /* ---------- STEPS ---------- */
+  .step{
+    display:none; border-left:4px solid var(--blue); background:#f8fafc;
+    border-radius:0 12px 12px 0; padding:14px 16px; margin:12px 0; animation:slide .35s ease;
+  }
+  .step.show{display:block;}
+  @keyframes slide{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);}}
+  .step-head{display:flex; align-items:center; gap:9px; margin-bottom:8px; flex-wrap:wrap;}
+  .badge{
+    background:var(--blue); color:#fff; font-weight:700; font-size:.76rem;
+    padding:3px 10px; border-radius:999px;
+  }
+  .mbadge{
+    background:var(--amber); color:#fff; font-weight:700; font-size:.72rem;
+    padding:3px 9px; border-radius:6px; letter-spacing:.03em;
+  }
+  .hint{
+    background:var(--amber-l); border-left:4px solid var(--amber);
+    padding:9px 13px; border-radius:0 9px 9px 0; margin-top:10px; font-size:.88rem; color:#78350f;
+  }
+  .hint b{color:#92400e;}
+  .ansbox{
+    background:var(--emerald-l); border-left:4px solid var(--emerald);
+    padding:10px 13px; border-radius:0 9px 9px 0; margin-top:10px; color:#065f46; font-weight:600;
+  }
+  .btnrow{display:flex; align-items:center; gap:14px; margin-top:16px; flex-wrap:wrap;}
+  .btn{
+    background:linear-gradient(135deg,var(--blue),#0ea5e9); color:#fff; border:none;
+    padding:11px 22px; border-radius:11px; font-weight:700; font-size:.9rem; cursor:pointer;
+    box-shadow:0 6px 16px -6px rgba(37,99,235,.7); transition:.2s;
+  }
+  .btn:hover:not(:disabled){transform:translateY(-2px); box-shadow:0 10px 20px -8px rgba(37,99,235,.8);}
+  .btn:disabled{background:#94a3b8; box-shadow:none; cursor:not-allowed; transform:none;}
+  .counter{font-size:.84rem; font-weight:700; color:var(--slate); background:#e2e8f0; padding:4px 12px; border-radius:999px;}
+  /* ---------- SUMMARY ---------- */
+  .summary{background:linear-gradient(135deg,#0f172a,#1e293b); color:#e2e8f0; border:none;}
+  .summary h2{color:#fff; border-bottom-color:#334155;}
+  .summary ul{list-style:none; padding:0; margin:0;}
+  .summary li{
+    padding:10px 0 10px 30px; position:relative; border-bottom:1px solid #1e293b; font-size:.94rem;
+  }
+  .summary li:last-child{border-bottom:none;}
+  .summary li::before{
+    content:"✓"; position:absolute; left:4px; color:var(--emerald); font-weight:800;
+  }
+  .summary .anskey{color:#fbbf24; font-weight:800;}
+  footer{text-align:center; color:#64748b; font-size:.82rem; padding:0 20px 40px;}
+</style>
+</head>
+<body>
+
+<!-- ================= HERO ================= -->
+<header class="hero">
+  <p class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</p>
+  <h1>2019 Paper 2 · Question 30</h1>
+  <p class="sub">Statistics — Mode, Median &amp; Quartiles of a Frequency Distribution</p>
+  <div class="pills">
+    <span class="pill">Grouped Data</span>
+    <span class="pill">Mode</span>
+    <span class="pill">Median</span>
+    <span class="pill">Quartiles</span>
+    <span class="pill">Cumulative Frequency</span>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ================= QUESTION CARD ================= -->
+  <section class="card">
+    <h2><span class="dot"></span>Question</h2>
+    <div class="qtext">
+      <p>The table below shows the distribution of the numbers of merits obtained by some students in a year.</p>
+
+      <table class="dist">
+        <thead>
+          <tr>
+            <th>Number of merits obtained</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>Number of students</b></td>
+            <td class="hl">32</td><td class="hl">36</td><td class="hl">28</td><td class="hl">18</td><td class="hl">2</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>Which of the following is true?</p>
+      <ol type="A">
+        <li>The mode of the distribution is 36.</li>
+        <li>The median of the distribution is 8.</li>
+        <li>The lower quartile of the distribution is 6.</li>
+        <li>The upper quartile of the distribution is 10.</li>
+      </ol>
+    </div>
+
+    <div class="opts">
+      <div class="opt bad" id="optA"><span class="letter">A</span><span>Mode \(=36\) &nbsp;✗</span></div>
+      <div class="opt bad" id="optB"><span class="letter">B</span><span>Median \(=8\) &nbsp;✗</span></div>
+      <div class="opt good" id="optC"><span class="letter">C</span><span>Lower quartile \(=6\) &nbsp;✓</span></div>
+      <div class="opt bad" id="optD"><span class="letter">D</span><span>Upper quartile \(=10\) &nbsp;✗</span></div>
+    </div>
+  </section>
+
+  <!-- ================= PART A : MODE ================= -->
+  <section class="card">
+    <h2><span class="dot"></span>Option A — The Mode</h2>
+
+    <div class="canvas-box">
+      <canvas id="cvMode" width="820" height="360"></canvas>
+      <div class="controls">
+        <div class="ctrl">
+          <label for="sldMode">Highlight number of merits:</label>
+          <input type="range" id="sldMode" min="6" max="10" step="1" value="7">
+          <b id="modeVal" style="color:var(--blue-d); min-width:22px;">7</b>
+        </div>
+        <div class="ctrl">
+          <label><input type="checkbox" id="chkModePeak" checked> Show frequency labels</label>
+        </div>
+      </div>
+      <div class="readout">
+        <span class="chip" id="rdFreq">Frequency at 7 = 36</span>
+        <span class="chip amber" id="rdMax">Maximum frequency = 36 (at 7 merits)</span>
+        <span class="chip green">Mode = 7 (the value with the highest frequency)</span>
+      </div>
+    </div>
+
+    <div class="step" data-step>
+      <div class="step-head"><span class="badge">Step 1</span><span class="mbadge">1M</span></div>
+      <p>Recall: the <b>mode</b> is the data value that occurs most frequently (largest frequency), <b>not</b> the frequency itself.</p>
+      <div class="hint"><b>Hint:</b> Many students wrongly answer "36". 36 is the <i>number of students</i> who got 7 merits — it is a frequency, not the mode.</div>
+    </div>
+
+    <div class="step" data-step>
+      <div class="step-head"><span class="badge">Step 2</span><span class="mbadge">1A</span></div>
+      <p>Read the frequencies from the table:</p>
+      \[
+      \begin{array}{c|ccccc}
+      \text{Merits} & 6 & 7 & 8 & 9 & 10 \\
+      \hline
+      \text{Students} & 32 & 36 & 28 & 18 & 2
+      \end{array}
+      \]
+      <p>The largest frequency is \(36\), which corresponds to \(\boxed{7}\) merits. Hence the mode is \(7\), so option A is <b>false</b>.</p>
+      <div class="hint"><b>Hint:</b> Always match the biggest frequency back to its <i>value</i> — don't stop at the frequency.</div>
+    </div>
+
+    <div class="btnrow">
+      <button class="btn" data-next>Next step →</button>
+      <span class="counter">0 / 2</span>
+    </div>
+  </section>
+
+  <!-- ================= PART B : MEDIAN ================= -->
+  <section class="card">
+    <h2><span class="dot"></span>Option B — The Median</h2>
+
+    <div class="canvas-box">
+      <canvas id="cvMed" width="820" height="380"></canvas>
+      <div class="controls">
+        <div class="ctrl">
+          <label for="sldMed">Show the \(k\)-th ordered data:</label>
+          <input type="range" id="sldMed" min="1" max="116" step="1" value="58">
+          <b id="medVal" style="color:var(--blue-d); min-width:34px;">58</b>
+        </div>
+        <div class="ctrl">
+          <label><input type="checkbox" id="chkMedMid"> Highlight middle positions 58 &amp; 59</label>
+        </div>
+      </div>
+      <div class="readout">
+        <span class="chip">Total data \(n=32+36+28+18+2=116\)</span>
+        <span class="chip amber" id="rdMedRank">Position 58 → value 7</span>
+        <span class="chip green" id="rdMedAns">Median = (7 + 7) ÷ 2 = 7</span>
+      </div>
+    </div>
+
+    <div class="step" data-step>
+      <div class="step-head"><span class="badge">Step 1</span><span class="mbadge">1M</span></div>
+      <p>Find the total number of data (students):</p>
+      \[ n = 32 + 36 + 28 + 18 + 2 = 116 \]
+      <div class="hint"><b>Hint:</b> \(n\) is <b>even</b>, so the median is the mean of the \(\tfrac{n}{2}\)-th and \((\tfrac{n}{2}+1)\)-th ordered data — i.e. the <b>58th and 59th</b> values.</div>
+    </div>
+
+    <div class="step" data-step>
+      <div class="step-head"><span class="badge">Step 2</span><span class="mbadge">1M</span></div>
+      <p>Build the cumulative frequency to locate the 58th and 59th positions:</p>
+      \[
+      \begin{array}{c|c|c}
+      \text{Merits} & \text{Frequency} & \text{Cumulative freq.} \\
+      \hline
+      6 & 32 & 32 \\
+      7 & 36 & 68 \\
+      8 & 28 & 96 \\
+      9 & 18 & 114 \\
+      10 & 2 & 116
+      \end{array}
+      \]
+      <p>Positions \(33\)–\(68\) all take the value \(7\). Since \(58\) and \(59\) lie in this range, both the 58th and 59th data are \(7\).</p>
+      <div class="hint"><b>Hint:</b> Cumulative frequency tells you the <i>range of positions</i> occupied by each value — a fast way to find any quantile.</div>
+    </div>
+
+    <div class="step" data-step>
+      <div class="step-head"><span class="badge">Step 3</span><span class="mbadge">1A</span></div>
+      <p>Median \(=\) mean of the 58th and 59th ordered data:</p>
+      \[ \text{Median} = (7 + 7) \div 2 = 7 \]
+      <div class="ansbox">Median \(= 7 \ne 8\), so option B is <b>false</b>.</div>
+    </div>
+
+    <div class="btnrow">
+      <button class="btn" data-next>Next step →</button>
+      <span class="counter">0 / 3</span>
+    </div>
+  </section>
+
+  <!-- ================= PART C : LOWER QUARTILE ================= -->
+  <section class="card">
+    <h2><span class="dot"></span>Option C — The Lower Quartile</h2>
+
+    <div class="canvas-box">
+      <canvas id="cvQuart" width="820" height="430"></canvas>
+      <div class="controls">
+        <div class="ctrl">
+          <label for="sldQ">Move the position marker:</label>
+          <input type="range" id="sldQ" min="1" max="116" step="1" value="29">
+          <b id="qVal" style="color:var(--blue-d); min-width:34px;">29</b>
+        </div>
+        <div class="ctrl">
+          <label><input type="checkbox" id="chkQ1" checked> Show \(Q_1\) block (positions 1–29)</label>
+        </div>
+        <div class="ctrl">
+          <label><input type="checkbox" id="chkQ3" checked> Show \(Q_3\) block (positions 87–88)</label>
+        </div>
+      </div>
+      <div class="readout">
+        <span class="chip amber" id="rdPos">Position 29 → value 6</span>
+        <span class="chip">Lower quartile uses positions \(\tfrac{n}{4}=29\) and \(30\)</span>
+        <span class="chip green" id="rdQ1">Q₁ = (6 + 6) ÷ 2 = 6</span>
+        <span class="chip rose" id="rdQ3">Q₃ = (8 + 8) ÷ 2 = 8</span>
+      </div>
+    </div>
+
+    <div class="step" data-step>
+      <div class="step-head"><span class="badge">Step 1</span><span class="mbadge">1M</span></div>
+      <p>There are \(n = 116\) data. Locate the quartile positions:</p>
+      \[
+      \frac{n}{4} = \frac{116}{4} = 29, \qquad \frac{3n}{4} = \frac{348}{4} = 87
+      \]
+      <p>So the <b>lower quartile</b> is the mean of the <b>29th and 30th</b> ordered data, and the <b>upper quartile</b> is the mean of the <b>87th and 88th</b> ordered data.</p>
+      <div class="hint"><b>Hint:</b> For the lower quartile with even \(n\), use the \(\tfrac{n}{4}\)-th and \((\tfrac{n}{4}+1)\)-th positions. Here that is 29 and 30.</div>
+    </div>
+
+    <div class="step" data-step>
+      <div class="step-head"><span class="badge">Step 2</span><span class="mbadge">1M</span></div>
+      <p>Use the cumulative frequency table:</p>
+      \[
+      \begin{array}{c|c|c}
+      \text{Merits} & \text{Freq.} & \text{Cum. freq.} \\
+      \hline
+      6 & 32 & 32 \\
+      7 & 36 & 68 \\
+      8 & 28 & 96 \\
+      9 & 18 & 114 \\
+      10 & 2 & 116
+      \end{array}
+      \]
+      <p>Since the first 32 data all equal \(6\), <b>both positions 29 and 30 fall in the value 6</b>.</p>
+      <div class="hint"><b>Hint:</b> Positions \(1\)–\(32\) are all \(6\). So any position from 1 to 32 gives the value \(6\).</div>
+    </div>
+
+    <div class="step" data-step>
+      <div class="step-head"><span class="badge">Step 3</span><span class="mbadge">1A</span></div>
+      <p>Lower quartile:</p>
+      \[ Q_1 = (6 + 6) \div 2 = 6 \]
+      <div class="ansbox">Lower quartile \(= 6\) ✓ &nbsp;— option C is <b>true</b>.</div>
+      <div class="hint"><b>Hint:</b> Also check option D while you are here: positions \(87\) and \(88\) both fall in the "8" block (positions \(69\)–\(96\)), so \(Q_3 = (8+8)\div2 = 8 \ne 10\). Option D is <b>false</b>.</div>
+    </div>
+
+    <div class="btnrow">
+      <button class="btn" data-next>Next step →</button>
+      <span class="counter">0 / 3</span>
+    </div>
+  </section>
+
+  <!-- ================= PART D : UPPER QUARTILE ================= -->
+  <section class="card">
+    <h2><span class="dot"></span>Option D — The Upper Quartile</h2>
+
+    <div class="canvas-box">
+      <canvas id="cvBox" width="820" height="300"></canvas>
+      <div class="controls">
+        <div class="ctrl">
+          <label><input type="checkbox" id="chkWhisker" checked> Show box-and-whisker plot</label>
+        </div>
+        <div class="ctrl">
+          <label><input type="checkbox" id="chkLabels" checked> Show value labels</label>
+        </div>
+      </div>
+      <div class="readout">
+        <span class="chip">Min \(=6\), &nbsp; \(Q_1=6\)</span>
+        <span class="chip amber">Median \(=7\)</span>
+        <span class="chip">\(Q_3=8\), &nbsp; Max \(=10\)</span>
+        <span class="chip green">Five-number summary: 6, 6, 7, 8, 10</span>
+      </div>
+    </div>
+
+    <div class="step" data-step>
+      <div class="step-head"><span class="badge">Step 1</span><span class="mbadge">1M</span></div>
+      <p>We found in Part C that \(\tfrac{3n}{4}=87\), so the upper quartile is the mean of the 87th and 88th ordered data.</p>
+      <div class="hint"><b>Hint:</b> Do not confuse the <i>maximum value</i> (10) with the <i>upper quartile</i>. The upper quartile is the value below which about 75% of data lie.</div>
+    </div>
+
+    <div class="step" data-step>
+      <div class="step-head"><span class="badge">Step 2</span><span class="mbadge">1A</span></div>
+      <p>From the cumulative frequency table, positions \(69\)–\(96\) all take the value \(8\). Both \(87\) and \(88\) lie in this range, so:</p>
+      \[ Q_3 = (8 + 8) \div 2 = 8 \]
+      <div class="ansbox">Upper quartile \(= 8 \ne 10\), so option D is <b>false</b>.</div>
+      <div class="hint"><b>Hint:</b> The full five-number summary is \(\;6,\;6,\;7,\;8,\;10\). Only the lower-quartile claim (option C) matches.</div>
+    </div>
+
+    <div class="btnrow">
+      <button class="btn" data-next>Next step →</button>
+      <span class="counter">0 / 2</span>
+    </div>
+  </section>
+
+  <!-- ================= SUMMARY ================= -->
+  <section class="card summary">
+    <h2><span class="dot"></span>Summary — Answers at a Glance</h2>
+    <ul>
+      <li>Total number of data: \(n = 116\)</li>
+      <li>Mode \(= 7\) &nbsp; (largest frequency is 36, at 7 merits) &nbsp;→ A is <b>false</b></li>
+      <li>Median \(= (7+7)\div2 = 7\) &nbsp; (58th &amp; 59th data) &nbsp;→ B is <b>false</b></li>
+      <li>Lower quartile \(= (6+6)\div2 = 6\) &nbsp; (29th &amp; 30th data) &nbsp;→ C is <b>true</b></li>
+      <li>Upper quartile \(= (8+8)\div2 = 8\) &nbsp; (87th &amp; 88th data) &nbsp;→ D is <b>false</b></li>
+      <li>Five-number summary: \(\;6,\;6,\;7,\;8,\;10\)</li>
+      <li><span class="anskey">Correct answer: &nbsp; C</span></li>
+    </ul>
+  </section>
+
+  <footer>
+    HKDSE Mathematics (Compulsory Part) · Paper 2 · 2019 Q30 &nbsp;|&nbsp; Interactive Solution &nbsp;·&nbsp; Statistics
+  </footer>
+</div>
+
+<script>
+/* ============================================================
+   SHARED DATA
+   ============================================================ */
+const VALUES = [6, 7, 8, 9, 10];
+const FREQS  = [32, 36, 28, 18, 2];
+const N      = FREQS.reduce((a, b) => a + b, 0);   // 116
+const CUM    = (() => { let s = 0; return FREQS.map(f => s += f); })(); // [32,68,96,114,116]
+const COLORS = ['#2563eb', '#f59e0b', '#059669', '#8b5cf6', '#e11d48'];
+
+/* helper: which value does ordered position k (1-based) have? */
+function valueAt(k) {
+  for (let i = 0; i < CUM.length; i++) if (k <= CUM[i]) return VALUES[i];
+  return VALUES[VALUES.length - 1];
+}
+
+/* ============================================================
+   HIGH-DPI CANVAS SETUP
+   ============================================================ */
+function setupCanvas(id) {
+  const cv = document.getElementById(id);
+  const ratio = window.devicePixelRatio || 1;
+  const cssW = cv.clientWidth || cv.width;
+  const cssH = cv.getAttribute('height') * (cssW / cv.getAttribute('width'));
+  cv.style.height = cssH + 'px';
+  cv.width = cssW * ratio;
+  cv.height = cssH * ratio;
+  const ctx = cv.getContext('2d');
+  ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+  return { ctx, W: cssW, H: cssH };
+}
+
+/* ============================================================
+   DIAGRAM 1 — MODE (bar chart with highlight)
+   ============================================================ */
+const cvModeSrc = document.getElementById('cvMode');
+const cvModeH   = +cvModeSrc.getAttribute('height');
+let M1 = setupCanvas('cvMode');
+
+function drawMode() {
+  const { ctx, W, H } = M1;
+  ctx.clearRect(0, 0, W, H);
+
+  const padL = 58, padR = 26, padT = 34, padB = 52;
+  const plotW = W - padL - padR;
+  const plotH = H - padT - padB;
+
+  const maxF = 40;
+  const barGap = plotW / VALUES.length;
+  const barW = barGap * 0.56;
+
+  const hi = +document.getElementById('sldMode').value;
+  const showPeak = document.getElementById('chkModePeak').checked;
+
+  /* gridlines */
+  ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1;
+  ctx.fillStyle = '#94a3b8'; ctx.font = '11px sans-serif'; ctx.textAlign = 'right';
+  for (let f = 0; f <= maxF; f += 8) {
+    const y = padT + plotH - (f / maxF) * plotH;
+    ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(padL + plotW, y); ctx.stroke();
+    ctx.fillText(f, padL - 8, y + 4);
+  }
+
+  /* axes */
+  ctx.strokeStyle = '#475569'; ctx.lineWidth = 1.6;
+  ctx.beginPath();
+  ctx.moveTo(padL, padT); ctx.lineTo(padL, padT + plotH); ctx.lineTo(padL + plotW, padT + plotH);
+  ctx.stroke();
+
+  /* bars */
+  VALUES.forEach((v, i) => {
+    const x = padL + i * barGap + (barGap - barW) / 2;
+    const h = (FREQS[i] / maxF) * plotH;
+    const y = padT + plotH - h;
+    const isHi = (v === hi);
+
+    const grad = ctx.createLinearGradient(0, y, 0, y + h);
+    if (isHi) { grad.addColorStop(0, '#fbbf24'); grad.addColorStop(1, '#d97706'); }
+    else      { grad.addColorStop(0, '#93c5fd'); grad.addColorStop(1, '#3b82f6'); }
+
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    const r = 7;
+    ctx.moveTo(x, y + h);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.lineTo(x + barW - r, y);
+    ctx.quadraticCurveTo(x + barW, y, x + barW, y + r);
+    ctx.lineTo(x + barW, y + h);
+    ctx.closePath();
+    ctx.fill();
+
+    if (isHi) {
+      ctx.strokeStyle = '#b45309'; ctx.lineWidth = 2.5; ctx.stroke();
+    }
+
+    /* x label */
+    ctx.fillStyle = '#0f172a'; ctx.font = 'bold 15px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(v, x + barW / 2, padT + plotH + 24);
+
+    /* frequency above bar */
+    if (showPeak) {
+      ctx.fillStyle = isHi ? '#b45309' : '#334155';
+      ctx.font = (isHi ? 'bold ' : '') + '13px sans-serif';
+      ctx.fillText(FREQS[i], x + barW / 2, y - 8);
+    }
+  });
+
+  /* axis titles */
+  ctx.fillStyle = '#475569'; ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText('Number of merits obtained', padL + plotW / 2, H - 10);
+  ctx.save();
+  ctx.translate(15, padT + plotH / 2); ctx.rotate(-Math.PI / 2);
+  ctx.fillText('Number of students', 0, 0);
+  ctx.restore();
+
+  /* peak callout */
+  const iMax = FREQS.indexOf(Math.max(...FREQS));
+  const xMax = padL + iMax * barGap + barGap / 2;
+  const yMax = padT + plotH - (FREQS[iMax] / maxF) * plotH;
+  ctx.strokeStyle = '#e11d48'; ctx.lineWidth = 2; ctx.setLineDash([5, 4]);
+  ctx.beginPath(); ctx.moveTo(xMax, yMax - 14); ctx.lineTo(xMax, padT + 8); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = '#e11d48'; ctx.font = 'bold 13px sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText('highest frequency', xMax, padT + 2);
+
+  /* live readouts */
+  const f = FREQS[VALUES.indexOf(hi)];
+  document.getElementById('modeVal').textContent = hi;
+  document.getElementById('rdFreq').textContent = 'Frequency at ' + hi + ' = ' + f;
+  document.getElementById('rdMax').textContent = 'Maximum frequency = ' + Math.max(...FREQS) + ' (at ' + VALUES[iMax] + ' merits)';
+}
+
+document.getElementById('sldMode').addEventListener('input', drawMode);
+document.getElementById('chkModePeak').addEventListener('change', drawMode);
+
+/* ============================================================
+   DIAGRAM 2 — MEDIAN (cumulative frequency step chart)
+   ============================================================ */
+const cvMedSrc = document.getElementById('cvMed');
+let M2 = setupCanvas('cvMed');
+
+function drawMed() {
+  const { ctx, W, H } = M2;
+  ctx.clearRect(0, 0, W, H);
+
+  const padL = 58, padR = 30, padT = 34, padB = 56;
+  const plotW = W - padL - padR;
+  const plotH = H - padT - padB;
+  const maxX = 6 + VALUES.length;      // x from 6 to 11
+  const maxY = 120;
+
+  const X = v => padL + ((v - 6.4) / (11 - 6.4)) * plotW;
+  const Y = c => padT + plotH - (c / maxY) * plotH;
+
+  /* grid */
+  ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1;
+  ctx.fillStyle = '#94a3b8'; ctx.font = '11px sans-serif'; ctx.textAlign = 'right';
+  for (let c = 0; c <= maxY; c += 20) {
+    const y = Y(c);
+    ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(padL + plotW, y); ctx.stroke();
+    ctx.fillText(c, padL - 8, y + 4);
+  }
+
+  /* axes */
+  ctx.strokeStyle = '#475569'; ctx.lineWidth = 1.6;
+  ctx.beginPath();
+  ctx.moveTo(padL, padT); ctx.lineTo(padL, padT + plotH); ctx.lineTo(padL + plotW, padT + plotH);
+  ctx.stroke();
+
+  /* step curve (cumulative frequency) */
+  let prevY = Y(0);
+  ctx.strokeStyle = '#2563eb'; ctx.lineWidth = 3; ctx.beginPath();
+  VALUES.forEach((v, i) => {
+    const x0 = X(v), x1 = X(v + 1), y = Y(CUM[i]);
+    ctx.moveTo(x0, prevY);
+    ctx.lineTo(x1, prevY);
+    ctx.lineTo(x1, y);
+    prevY = y;
+  });
+  ctx.stroke();
+
+  /* point plot */
+  VALUES.forEach((v, i) => {
+    const cx = X(v + 1), cy = Y(CUM[i]);
+    ctx.fillStyle = '#2563eb';
+    ctx.beginPath(); ctx.arc(cx, cy, 4.5, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#1e3a8a'; ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'left';
+    ctx.fillText(CUM[i], cx + 7, cy + 4);
+  });
+
+  /* x ticks */
+  ctx.fillStyle = '#0f172a'; ctx.font = 'bold 13px sans-serif'; ctx.textAlign = 'center';
+  VALUES.forEach(v => {
+    ctx.fillText(v, (X(v) + X(v + 1)) / 2, padT + plotH + 24);
+  });
+
+  /* median marker */
+  const rank = +document.getElementById('sldMed').value;
+  const vMed = valueAt(rank);
+  const cyMed = Y(vMed);
+  ctx.strokeStyle = '#e11d48'; ctx.lineWidth = 2; ctx.setLineDash([6, 4]);
+  ctx.beginPath(); ctx.moveTo(padL, cyMed); ctx.lineTo(X(11), cyMed); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = '#e11d48'; ctx.font = 'bold 13px sans-serif'; ctx.textAlign = 'left';
+  ctx.fillText('median level = 7', padL + 8, cyMed - 8);
+
+  /* highlight middle positions 58 & 59 */
+  const showMid = document.getElementById('chkMedMid').checked;
+  if (showMid) {
+    [58, 59].forEach(k => {
+      const v = valueAt(k);
+      ctx.fillStyle = 'rgba(245,158,11,.85)';
+      ctx.beginPath();
+      ctx.arc(padL + plotW * 0.52, Y(0) + (58 - k) * 0, 0, 0, 1);
+      ctx.fill();
+      /* draw small vertical marker along an imaginary position axis */
+      const xk = padL + ((k / N) * 0.9 + 0.05) * 0;
+      ctx.fillStyle = 'rgba(245,158,11,.9)';
+      ctx.fillRect(padL + plotW * 0.42 + (k - 58) * 16, padT + plotH - 14, 12, 12);
+      ctx.fillStyle = '#78350f'; ctx.font = 'bold 10px sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText(k, padL + plotW * 0.42 + (k - 58) * 16 + 6, padT + plotH - 4);
+    });
+    ctx.fillStyle = '#b45309'; ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'left';
+    ctx.fillText('58th & 59th data both = 7', padL + plotW * 0.42 - 10, padT + plotH - 22);
+  }
+
+  /* axis titles */
+  ctx.fillStyle = '#475569'; ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText('Number of merits obtained', padL + plotW / 2, H - 12);
+  ctx.save();
+  ctx.translate(15, padT + plotH / 2); ctx.rotate(-Math.PI / 2);
+  ctx.fillText('Cumulative frequency', 0, 0);
+  ctx.restore();
+
+  /* readouts */
+  document.getElementById('medVal').textContent = rank;
+  document.getElementById('rdMedRank').textContent = 'Position ' + rank + ' → value ' + valueAt(rank);
+  const a = valueAt(58), b = valueAt(59);
+  document.getElementById('rdMedAns').textContent = 'Median = (' + a + ' + ' + b + ') ÷ 2 = ' + ((a + b) / 2);
+}
+
+document.getElementById('sldMed').addEventListener('input', drawMed);
+document.getElementById('chkMedMid').addEventListener('change', drawMed);
+
+/* ============================================================
+   DIAGRAM 3 — QUARTILES (position strip)
+   ============================================================ */
+const cvQSrc = document.getElementById('cvQuart');
+let M3 = setupCanvas('cvQuart');
+
+function drawQuart() {
+  const { ctx, W, H } = M3;
+  ctx.clearRect(0, 0, W, H);
+
+  const padL = 40, padR = 30, padT = 40;
+  const stripY = padT + 70;
+  const stripH = 52;
+  const stripW = W - padL - padR;
+  const pos = +document.getElementById('sldQ').value;
+  const showQ1 = document.getElementById('chkQ1').checked;
+  const showQ3 = document.getElementById('chkQ3').checked;
+
+  /* scale: position -> x */
+  const Xp = k => padL + (k / N) * stripW;
+
+  /* title */
+  ctx.fillStyle = '#0f172a'; ctx.font = 'bold 14px sans-serif'; ctx.textAlign = 'left';
+  ctx.fillText('Ordered data positions (1 … 116)', padL, padT - 14);
+
+  /* blocks for each value */
+  let start = 1;
+  VALUES.forEach((v, i) => {
+    const end = CUM[i];
+    const x0 = Xp(start - 1), x1 = Xp(end);
+    ctx.fillStyle = COLORS[i] + '22';
+    ctx.fillRect(x0, stripY, x1 - x0, stripH);
+    ctx.strokeStyle = COLORS[i]; ctx.lineWidth = 1.6;
+    ctx.strokeRect(x0, stripY, x1 - x0, stripH);
+
+    if (x1 - x0 > 26) {
+      ctx.fillStyle = COLORS[i]; ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText('value ' + v, (x0 + x1) / 2, stripY + stripH + 18);
+      ctx.fillStyle = '#334155'; ctx.font = '10px sans-serif';
+      ctx.fillText(start + '–' + end, (x0 + x1) / 2, stripY + stripH / 2 + 4);
+    }
+    start = end + 1;
+  });
+
+  /* Q1 block highlight */
+  if (showQ1) {
+    const x0 = Xp(0), x1 = Xp(32);
+    ctx.strokeStyle = '#059669'; ctx.lineWidth = 3; ctx.setLineDash([6, 3]);
+    ctx.strokeRect(x0, stripY - 6, x1 - x0, stripH + 12);
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#059669'; ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'left';
+    ctx.fillText('Lower quartile region', x0, stripY - 14);
+  }
+
+  /* Q3 markers at 87,88 */
+  if (showQ3) {
+    [87, 88].forEach(k => {
+      const x = Xp(k);
+      ctx.strokeStyle = '#8b5cf6'; ctx.lineWidth = 2.5;
+      ctx.beginPath(); ctx.moveTo(x, stripY - 8); ctx.lineTo(x, stripY + stripH + 8); ctx.stroke();
+    });
+    ctx.fillStyle = '#8b5cf6'; ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('87 & 88 both in "8" block ⇒ Q₃ = 8', Xp(87), stripY + stripH + 38);
+  }
+
+  /* position marker */
+  const xMark = Xp(pos);
+  ctx.strokeStyle = '#e11d48'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(xMark, stripY - 22); ctx.lineTo(xMark, stripY + stripH + 12); ctx.stroke();
+  ctx.fillStyle = '#e11d48';
+  ctx.beginPath();
+  ctx.moveTo(xMark, stripY - 22);
+  ctx.lineTo(xMark - 7, stripY - 32);
+  ctx.lineTo(xMark + 7, stripY - 32);
+  ctx.closePath(); ctx.fill();
+
+  ctx.font = 'bold 13px sans-serif'; ctx.textAlign = 'center';
+  ctx.fillStyle = '#e11d48';
+  ctx.fillText('pos ' + pos + ' → value ' + valueAt(pos), xMark, stripY - 40);
+
+  /* axis ticks */
+  ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1;
+  ctx.fillStyle = '#64748b'; ctx.font = '10px sans-serif';
+  for (let k = 0; k <= 116; k += 20) {
+    const x = Xp(k);
+    ctx.beginPath(); ctx.moveTo(x, stripY + stripH); ctx.lineTo(x, stripY + stripH + 6); ctx.stroke();
+    ctx.fillText(k === 0 ? '1' : k, x, stripY + stripH + 20);
+  }
+
+  /* readouts */
+  document.getElementById('qVal').textContent = pos;
+  document.getElementById('rdPos').textContent = 'Position ' + pos + ' → value ' + valueAt(pos);
+  const q1a = valueAt(29), q1b = valueAt(30);
+  const q3a = valueAt(87), q3b = valueAt(88);
+  document.getElementById('rdQ1').textContent = 'Q₁ = (' + q1a + ' + ' + q1b + ') ÷ 2 = ' + ((q1a + q1b) / 2);
+  document.getElementById('rdQ3').textContent = 'Q₃ = (' + q3a + ' + ' + q3b + ') ÷ 2 = ' + ((q3a + q3b) / 2);
+}
+
+document.getElementById('sldQ').addEventListener('input', drawQuart);
+document.getElementById('chkQ1').addEventListener('change', drawQuart);
+document.getElementById('chkQ3').addEventListener('change', drawQuart);
+
+/* ============================================================
+   DIAGRAM 4 — BOX-AND-WHISKER PLOT
+   ============================================================ */
+const cvBSrc = document.getElementById('cvBox');
+let M4 = setupCanvas('cvBox');
+
+function drawBox() {
+  const { ctx, W, H } = M4;
+  ctx.clearRect(0, 0, W, H);
+
+  const padL = 56, padR = 40, padT = 60, padB = 70;
+  const plotW = W - padL - padR;
+  const lineY = padT + 40;
+  const boxH = 56;
+
+  const lo = 5.4, hi = 10.6;
+  const X = v => padL + ((v - lo) / (hi - lo)) * plotW;
+
+  const showWhisker = document.getElementById('chkWhisker').checked;
+  const showLabels  = document.getElementById('chkLabels').checked;
+
+  const min = 6, q1 = 6, med = 7, q3 = 8, max = 10;
+
+  /* baseline axis */
+  ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(padL, lineY + boxH + 40); ctx.lineTo(padL + plotW, lineY + boxH + 40); ctx.stroke();
+
+  /* axis ticks */
+  ctx.fillStyle = '#64748b'; ctx.font = '12px sans-serif'; ctx.textAlign = 'center';
+  for (let v = 6; v <= 10; v++) {
+    const x = X(v);
+    ctx.strokeStyle = '#cbd5e1'; ctx.beginPath();
+    ctx.moveTo(x, lineY + boxH + 40); ctx.lineTo(x, lineY + boxH + 46); ctx.stroke();
+    ctx.fillText(v, x, lineY + boxH + 62);
+  }
+
+  if (!showWhisker) {
+    ctx.fillStyle = '#94a3b8'; ctx.font = 'bold 14px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('Box-and-whisker plot hidden', W / 2, lineY + 20);
+    return;
+  }
+
+  /* box (Q1 to Q3) */
+  const bx0 = X(q1), bx1 = X(q3);
+  const grad = ctx.createLinearGradient(bx0, 0, bx1, 0);
+  grad.addColorStop(0, '#bfdbfe');
+  grad.addColorStop(1, '#93c5fd');
+  ctx.fillStyle = grad;
+  ctx.fillRect(bx0, lineY, bx1 - bx0, boxH);
+  ctx.strokeStyle = '#2563eb'; ctx.lineWidth = 2.5;
+  ctx.strokeRect(bx0, lineY, bx1 - bx0, boxH);
+
+  /* median line */
+  const mX = X(med);
+  ctx.strokeStyle = '#e11d48'; ctx.lineWidth = 3.5;
+  ctx.beginPath(); ctx.moveTo(mX, lineY); ctx.lineTo(mX, lineY + boxH); ctx.stroke();
+
+  /* whiskers */
+  ctx.strokeStyle = '#334155'; ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(X(min), lineY + boxH / 2); ctx.lineTo(bx0, lineY + boxH / 2);
+  ctx.moveTo(bx1, lineY + boxH / 2); ctx.lineTo(X(max), lineY + boxH / 2);
+  ctx.stroke();
+
+  /* caps */
+  [min, max].forEach(v => {
+    const x = X(v);
+    ctx.beginPath(); ctx.moveTo(x, lineY + boxH / 2 - 14); ctx.lineTo(x, lineY + boxH / 2 + 14); ctx.stroke();
+  });
+
+  /* point labels */
+  if (showLabels) {
+    const marks = [
+      { v: min, t: 'Min = 6',   c: '#334155', up: true },
+      { v: q1,  t: 'Q₁ = 6',    c: '#059669', up: false },
+      { v: med, t: 'Med = 7',   c: '#e11d48', up: true },
+      { v: q3,  t: 'Q₃ = 8',    c: '#2563eb', up: false },
+      { v: max, t: 'Max = 10',  c: '#334155', up: true }
+    ];
+    const used = [];
+    marks.forEach(m => {
+      const x = X(m.v);
+      let y = m.up ? lineY - 12 : lineY + boxH + 18;
+      /* stagger if overlapping */
+      while (used.some(u => Math.abs(u.x - x) < 52 && u.y === y)) y += (m.up ? -17 : 17);
+      used.push({ x, y });
+
+      ctx.fillStyle = m.c; ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText(m.t, x, y);
+    });
+  }
+
+  /* title */
+  ctx.fillStyle = '#0f172a'; ctx.font = 'bold 14px sans-serif'; ctx.textAlign = 'left';
+  ctx.fillText('Five-number summary of the distribution (n = 116)', padL, 28);
+}
+
+document.getElementById('chkWhisker').addEventListener('change', drawBox);
+document.getElementById('chkLabels').addEventListener('change', drawBox);
+
+/* ============================================================
+   STEP-BY-STEP REVEAL
+   ============================================================ */
+document.querySelectorAll('.card').forEach(card => {
+  const steps = card.querySelectorAll('.step');
+  const btn = card.querySelector('[data-next]');
+  const counter = card.querySelector('.counter');
+  if (!steps.length || !btn) return;
+
+  let idx = 0;
+  const total = steps.length;
+  counter.textContent = '0 / ' + total;
+
+  btn.addEventListener('click', () => {
+    if (idx >= total) return;
+    steps[idx].classList.add('show');
+    steps[idx].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    idx++;
+    counter.textContent = idx + ' / ' + total;
+    if (idx === total) {
+      btn.disabled = true;
+      btn.textContent = 'All steps revealed ✓';
+    }
+  });
+});
+
+/* ============================================================
+   DRAW ALL + RESPONSIVE
+   ============================================================ */
+function drawAll() {
+  M1 = setupCanvas('cvMode');
+  M2 = setupCanvas('cvMed');
+  M3 = setupCanvas('cvQuart');
+  M4 = setupCanvas('cvBox');
+  drawMode();
+  drawMed();
+  drawQuart();
+  drawBox();
+}
+
+window.addEventListener('load', drawAll);
+let t;
+window.addEventListener('resize', () => {
+  clearTimeout(t);
+  t = setTimeout(drawAll, 140);
+});
+
+/* initial render (before images/load) */
+drawMode(); drawMed(); drawQuart(); drawBox();
+</script>
+</body>
+</html>

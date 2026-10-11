@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HKDSE Math 2022 Paper 1 Q2 – Interactive Solution</title>
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+            onload="renderMathInElement(document.body, { delimiters: [{left: '$$', right: '$$', display: true},{left: '\[', right: '\]', display: true}, {left: '$', right: '$', display: false},{left: '\(', right: '\)', display: false}] });"></script>
+    <!-- Tailwind via CDN (lightweight) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: #f8fafc;
+            display: flex;
+            justify-content: center;
+            padding: 16px;
+        }
+        .card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.02);
+            max-width: 900px;
+            width: 100%;
+            padding: 24px;
+            margin-bottom: 24px;
+            transition: all 0.2s;
+        }
+        .step-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out, opacity 0.3s ease-in;
+            opacity: 0;
+        }
+        .step-content.open {
+            max-height: 800px;
+            opacity: 1;
+        }
+        .step-header {
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .step-header:last-child {
+            border-bottom: none;
+        }
+        .badge {
+            background: #e0f2fe;
+            color: #0369a1;
+            border-radius: 9999px;
+            padding: 4px 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-right: 6px;
+            margin-bottom: 6px;
+        }
+        .math-block {
+            font-size: 1.15rem;
+        }
+        .hint-box {
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 12px 16px;
+            border-radius: 0 12px 12px 0;
+            margin: 12px 0;
+            font-size: 0.95rem;
+        }
+        canvas {
+            max-width: 100%;
+            height: auto;
+            background: #f1f5f9;
+            border-radius: 16px;
+            touch-action: none;
+        }
+        .btn-primary {
+            background: #4f46e5;
+            color: white;
+            border-radius: 9999px;
+            padding: 10px 24px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        .btn-primary:hover {
+            background: #4338ca;
+        }
+        .btn-primary:disabled {
+            background: #a5b4fc;
+            cursor: not-allowed;
+        }
+        .toggle-icon {
+            transition: transform 0.3s;
+        }
+        .toggle-icon.rotate {
+            transform: rotate(180deg);
+        }
+    </style>
+</head>
+<body>
+<div class="card space-y-6">
+    <!-- Question heading -->
+    <div class="flex flex-wrap items-center justify-between gap-4">
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-800">HKDSE Math 2022 Paper 1 <span class="text-indigo-600">Q2</span></h1>
+        <div class="badge">Simultaneous Equations</div>
+        <div class="badge">Substitution</div>
+        <div class="badge">Algebra</div>
+    </div>
+
+    <!-- Question statement -->
+    <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200">
+        <p class="text-gray-700 text-lg leading-relaxed">
+            Let \(x\) and \(y\) be two numbers. The sum of \(x\) and \(y\) is 456 while the product of 7 and \(x\) is \(y\). Find \(x\). <span class="text-sm font-semibold text-indigo-500 ml-2">[3 marks]</span>
+        </p>
+    </div>
+
+    <!-- Key concepts hint (always visible) -->
+    <div class="flex flex-wrap gap-2">
+        <span class="badge">Forming equations from words</span>
+        <span class="badge">Substitution method</span>
+        <span class="badge">Solving linear equations</span>
+    </div>
+
+    <!-- Step-by-step guided solution -->
+    <h2 class="text-xl font-bold text-gray-800 mt-4">Step-by-step Solution</h2>
+    <div id="stepsContainer" class="space-y-2">
+        <!-- Step 1 -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm">
+            <div class="step-header" data-step="1">
+                <div class="flex items-center gap-3">
+                    <span class="w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-sm font-bold">1</span>
+                    <span class="font-semibold text-gray-800">Translate the word problem into equations</span>
+                </div>
+                <svg class="toggle-icon w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </div>
+            <div id="content1" class="step-content px-4 pb-4">
+                <div class="hint-box">
+                    <strong>💡 Hint:</strong> The sum of \(x\) and \(y\) is 456 → \(x + y = 456\).<br>
+                    The product of 7 and \(x\) is \(y\) → \(7x = y\).
+                </div>
+                <div class="space-y-2 mt-3">
+                    <p><span class="font-medium">Equation (1):</span> \(x + y = 456\)</p>
+                    <p><span class="font-medium">Equation (2):</span> \(7x = y\)</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm">
+            <div class="step-header" data-step="2">
+                <div class="flex items-center gap-3">
+                    <span class="w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-sm font-bold">2</span>
+                    <span class="font-semibold text-gray-800">Substitute equation (2) into equation (1)</span>
+                </div>
+                <svg class="toggle-icon w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </div>
+            <div id="content2" class="step-content px-4 pb-4">
+                <div class="hint-box">
+                    <strong>💡 Hint:</strong> Since \(y = 7x\), replace \(y\) in \(x + y = 456\) with \(7x\).
+                </div>
+                <div class="math-block mt-3">
+                    \[
+                    \begin{aligned}
+                    x + \color{red}{y} &= 456 \\
+                    x + \color{red}{7x} &= 456
+                    \end{aligned}
+                    \]
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm">
+            <div class="step-header" data-step="3">
+                <div class="flex items-center gap-3">
+                    <span class="w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-sm font-bold">3</span>
+                    <span class="font-semibold text-gray-800">Simplify and solve for \(x\)</span>
+                </div>
+                <svg class="toggle-icon w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </div>
+            <div id="content3" class="step-content px-4 pb-4">
+                <div class="hint-box">
+                    <strong>💡 Hint:</strong> Combine like terms: \(x + 7x = 8x\). Then divide both sides by 8.
+                </div>
+                <div class="math-block mt-3 space-y-2">
+                    <p>\[ x + 7x = 456 \]</p>
+                    <p>\[ 8x = 456 \]</p>
+                    <p>\[ x = \frac{456}{8} \]</p>
+                    <p class="text-2xl font-bold text-indigo-700 mt-3">\[ x = 57 \]</p>
+                </div>
+                <div class="hint-box mt-4">
+                    <strong>✅ Final answer:</strong> \(x = 57\)
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interactive Visualisation -->
+    <h2 class="text-xl font-bold text-gray-800 mt-6">Interactive Visualisation</h2>
+    <p class="text-gray-600 text-sm mb-3">Move the slider to change the value of \(x\) and see how \(y = 7x\) and the sum \(x + y\) compare to 456.</p>
+    <div class="bg-slate-50 p-4 rounded-2xl">
+        <div class="flex flex-col md:flex-row items-center gap-6">
+            <canvas id="balanceCanvas" width="400" height="220" class="w-full max-w-[400px] rounded-xl bg-white border border-slate-200"></canvas>
+            <div class="flex-1 space-y-4 w-full">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Value of \(x\):</label>
+                    <input type="range" id="xSlider" min="0" max="100" value="0" step="1" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+                </div>
+                <div class="grid grid-cols-2 gap-3 text-center">
+                    <div class="bg-white p-3 rounded-xl shadow-sm border border-slate-100">
+                        <span class="text-xs text-gray-500">\(x\)</span>
+                        <p id="displayX" class="text-lg font-bold text-indigo-700">0</p>
+                    </div>
+                    <div class="bg-white p-3 rounded-xl shadow-sm border border-slate-100">
+                        <span class="text-xs text-gray-500">\(y = 7x\)</span>
+                        <p id="displayY" class="text-lg font-bold text-indigo-700">0</p>
+                    </div>
+                    <div class="bg-white p-3 rounded-xl shadow-sm border border-slate-100 col-span-2">
+                        <span class="text-xs text-gray-500">\(x + y\)</span>
+                        <p id="displaySum" class="text-lg font-bold text-indigo-700">0</p>
+                    </div>
+                </div>
+                <div id="feedbackMessage" class="text-center text-sm font-semibold text-gray-500 min-h-[24px]"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Marking scheme summary (optional, discreet) -->
+    <details class="text-sm text-gray-500 mt-4">
+        <summary class="cursor-pointer hover:text-indigo-600 font-medium">📝 Marking Scheme Reference</summary>
+        <div class="mt-2 p-3 bg-slate-50 rounded-xl">
+            <p>1A: \(x+y=456\) and \(7x=y\)</p>
+            <p>1M: \(x+7x=456\)</p>
+            <p>1A: \(x=57\)</p>
+        </div>
+    </details>
+
+    <!-- Next button to reveal all steps sequentially -->
+    <div class="flex justify-end mt-4">
+        <button id="nextStepBtn" class="btn-primary text-sm shadow-md">Reveal Next Step</button>
+    </div>
+</div>
+
+<script>
+    // ---------- Accordion + Next Step Logic ----------
+    const stepHeaders = document.querySelectorAll('.step-header');
+    const stepContents = document.querySelectorAll('.step-content');
+    const nextBtn = document.getElementById('nextStepBtn');
+    const totalSteps = stepHeaders.length;
+    let currentStep = 0; // 0 means none open
+
+    // Toggle individual step on header click
+    stepHeaders.forEach((header, index) => {
+        header.addEventListener('click', () => {
+            const contentId = 'content' + (index + 1);
+            const content = document.getElementById(contentId);
+            const icon = header.querySelector('.toggle-icon');
+            const isOpen = content.classList.contains('open');
+            // Close all others (accordion style: only one open at a time)
+            stepContents.forEach((c, i) => {
+                if (i !== index) {
+                    c.classList.remove('open');
+                    const otherIcon = stepHeaders[i].querySelector('.toggle-icon');
+                    if (otherIcon) otherIcon.classList.remove('rotate');
+                }
+            });
+            // Toggle current
+            if (isOpen) {
+                content.classList.remove('open');
+                icon.classList.remove('rotate');
+                currentStep = 0;
+            } else {
+                content.classList.add('open');
+                icon.classList.add('rotate');
+                currentStep = index + 1;
+            }
+            updateButtonState();
+        });
+    });
+
+    // Next step button: open the next closed step sequentially
+    nextBtn.addEventListener('click', () => {
+        // Find first closed step
+        let nextIndex = -1;
+        for (let i = 0; i < totalSteps; i++) {
+            const content = stepContents[i];
+            if (!content.classList.contains('open')) {
+                nextIndex = i;
+                break;
+            }
+        }
+        if (nextIndex !== -1) {
+            // Close all first (accordion)
+            stepContents.forEach((c, i) => {
+                c.classList.remove('open');
+                const icon = stepHeaders[i].querySelector('.toggle-icon');
+                if (icon) icon.classList.remove('rotate');
+            });
+            // Open the found step
+            const content = stepContents[nextIndex];
+            content.classList.add('open');
+            const icon = stepHeaders[nextIndex].querySelector('.toggle-icon');
+            if (icon) icon.classList.add('rotate');
+            // Scroll into view
+            stepHeaders[nextIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+            currentStep = nextIndex + 1;
+        }
+        updateButtonState();
+    });
+
+    function updateButtonState() {
+        const anyClosed = Array.from(stepContents).some(c => !c.classList.contains('open'));
+        nextBtn.disabled = !anyClosed;
+        nextBtn.textContent = anyClosed ? 'Reveal Next Step' : 'All Steps Revealed';
+    }
+    updateButtonState(); // Initial state: all closed, button enabled
+
+    // ---------- Interactive Canvas + Slider ----------
+    const canvas = document.getElementById('balanceCanvas');
+    const ctx = canvas.getContext('2d');
+    const xSlider = document.getElementById('xSlider');
+    const displayX = document.getElementById('displayX');
+    const displayY = document.getElementById('displayY');
+    const displaySum = document.getElementById('displaySum');
+    const feedback = document.getElementById('feedbackMessage');
+
+    // Fixed target sum
+    const TARGET_SUM = 456;
+
+    function drawScene(xVal) {
+        const w = canvas.width;
+        const h = canvas.height;
+        ctx.clearRect(0, 0, w, h);
+
+        // Draw a simple bar visualisation: x (blue), y (teal), sum as total length vs target
+        const totalLength = xVal + 7 * xVal; // x + y = 8x
+        const maxVal = Math.max(456, totalLength, 1);
+        const scale = (w - 80) / maxVal;
+
+        const barY = 70;
+        const barHeight = 30;
+
+        // Background target bar
+        ctx.fillStyle = '#e2e8f0';
+        ctx.beginPath();
+        ctx.roundRect(40, barY, TARGET_SUM * scale, barHeight, 8);
+        ctx.fill();
+
+        // Actual x+y bar
+        ctx.fillStyle = totalLength === TARGET_SUM ? '#22c55e' : '#f59e0b';
+        ctx.beginPath();
+        ctx.roundRect(40, barY, totalLength * scale, barHeight, 8);
+        ctx.fill();
+
+        // Draw x part
+        ctx.fillStyle = '#6366f1';
+        ctx.beginPath();
+        ctx.roundRect(40, barY + barHeight + 8, xVal * scale, barHeight, 8);
+        ctx.fill();
+
+        // Draw y part
+        ctx.fillStyle = '#14b8a6';
+        ctx.beginPath();
+        ctx.roundRect(40 + xVal * scale, barY + barHeight + 8, 7 * xVal * scale, barHeight, 8);
+        ctx.fill();
+
+        // Labels
+        ctx.font = '12px Inter, sans-serif';
+        ctx.fillStyle = '#334155';
+        // Target label
+        ctx.fillText('Target sum = 456', 40, barY - 8);
+        // Sum label
+        ctx.fillText('x + y = ' + totalLength, 40, barY + barHeight + 60);
+        // x label
+        ctx.fillStyle = '#6366f1';
+        ctx.fillText('x = ' + xVal, 40, barY + barHeight + 100);
+        ctx.fillStyle = '#14b8a6';
+        ctx.fillText('y = 7x = ' + (7 * xVal), 40 + xVal * scale, barY + barHeight + 100);
+
+        // Draw tick / indicator when exactly matches
+        if (totalLength === TARGET_SUM) {
+            ctx.fillStyle = '#22c55e';
+            ctx.font = 'bold 14px Inter, sans-serif';
+            ctx.fillText('✓ Matches!', w - 120, barY + barHeight/2 + 5);
+        }
+    }
+
+    // Helper for rounded rect
+    CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+        if (w < 2 * r) r = w / 2;
+        if (h < 2 * r) r = h / 2;
+        this.moveTo(x + r, y);
+        this.lineTo(x + w - r, y);
+        this.quadraticCurveTo(x + w, y, x + w, y + r);
+        this.lineTo(x + w, y + h - r);
+        this.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+        this.lineTo(x + r, y + h);
+        this.quadraticCurveTo(x, y + h, x, y + h - r);
+        this.lineTo(x, y + r);
+        this.quadraticCurveTo(x, y, x + r, y);
+        return this;
+    };
+
+    function updateFromSlider() {
+        const xVal = parseFloat(xSlider.value);
+        const yVal = 7 * xVal;
+        const sum = xVal + yVal;
+
+        displayX.textContent = xVal;
+        displayY.textContent = yVal;
+        displaySum.textContent = sum;
+
+        if (sum === TARGET_SUM) {
+            feedback.textContent = '🎉 Correct! x + 7x = 456, so x = 57.';
+            feedback.className = 'text-center text-sm font-semibold text-green-600 min-h-[24px]';
+        } else {
+            feedback.textContent = sum < TARGET_SUM ? 'Sum is too small. Increase x.' : 'Sum is too large. Decrease x.';
+            feedback.className = 'text-center text-sm font-semibold text-amber-600 min-h-[24px]';
+        }
+
+        drawScene(xVal);
+    }
+
+    // Initialize
+    xSlider.value = 0;
+    updateFromSlider();
+
+    // Slider event
+    xSlider.addEventListener('input', updateFromSlider);
+
+    // Initial draw
+    window.addEventListener('load', () => {
+        drawScene(parseFloat(xSlider.value));
+        if (window.renderMathInElement) {
+            renderMathInElement(document.body, { delimiters: [{left: '$$', right: '$$', display: true},{left: '\[', right: '\]', display: true}, {left: '$', right: '$', display: false},{left: '\(', right: '\)', display: false}] });
+        }
+    });
+
+    // Also draw on resize for crispness (though canvas size fixed)
+    window.addEventListener('resize', () => {
+        drawScene(parseFloat(xSlider.value));
+    });
+</script>
+</body>
+</html>

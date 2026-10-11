@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2014 Paper 2 Q5 — Quadratic Graph</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[','\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<style>
+  :root{
+    --blue:#1d4ed8; --blue-dark:#1e3a8a; --amber:#f59e0b; --amber-lt:#fef3c7;
+    --emerald:#059669; --emerald-lt:#d1fae5; --slate:#0f172a; --slate-soft:#334155;
+    --line:#e2e8f0; --bg:#f1f5f9;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--slate);
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:900px; margin:0 auto; padding:0 16px 56px;}
+
+  /* ---------- Hero ---------- */
+  .hero{
+    background:linear-gradient(135deg,#1e3a8a 0%,#1d4ed8 45%,#3b82f6 100%);
+    color:#fff; padding:40px 16px 48px; text-align:center;
+    border-radius:0 0 28px 28px; box-shadow:0 12px 30px -12px rgba(30,58,138,.6);
+  }
+  .hero .eyebrow{font-size:.78rem; letter-spacing:.16em; text-transform:uppercase; opacity:.85; margin:0 0 8px;}
+  .hero h1{margin:0; font-size:clamp(1.5rem,4.5vw,2.2rem); font-weight:800; letter-spacing:.5px;}
+  .hero .sub{margin:10px 0 20px; opacity:.92; font-size:1rem;}
+  .pills{display:flex; flex-wrap:wrap; gap:8px; justify-content:center;}
+  .pill{
+    background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35);
+    padding:5px 13px; border-radius:999px; font-size:.78rem; font-weight:600; backdrop-filter:blur(4px);
+  }
+
+  /* ---------- Cards ---------- */
+  .card{
+    background:#fff; border-radius:18px; padding:22px 22px 24px; margin-top:22px;
+    box-shadow:0 4px 16px -6px rgba(15,23,42,.14); border:1px solid var(--line);
+  }
+  .card h2{
+    margin:0 0 4px; font-size:1.15rem; color:var(--blue-dark);
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  }
+  .card h2 .tag{
+    font-size:.7rem; background:var(--amber-lt); color:#92400e;
+    border-radius:999px; padding:3px 10px; font-weight:700; letter-spacing:.04em;
+  }
+  .stemsub{font-size:.86rem; color:var(--slate-soft); margin:0 0 14px;}
+
+  /* question */
+  .qbox{
+    background:linear-gradient(180deg,#f8fafc,#eef2ff);
+    border-left:5px solid var(--blue); border-radius:12px; padding:16px 18px; margin-top:12px;
+  }
+  .qbox p{margin:0 0 10px;}
+  .opts{display:grid; grid-template-columns:1fr 1fr; gap:6px 14px; margin-top:8px; padding:0; list-style:none;}
+  @media(max-width:560px){ .opts{grid-template-columns:1fr;} }
+  .opts li{font-size:.95rem;}
+
+  /* ---------- Canvas ---------- */
+  .canvas-wrap{
+    background:#fbfdff; border:1px solid var(--line); border-radius:14px;
+    padding:10px; margin:14px 0;
+  }
+  canvas{width:100%; height:auto; display:block; border-radius:10px; background:#fff;}
+  .readout{
+    display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;
+  }
+  .chip{
+    font-size:.8rem; font-weight:700; padding:5px 12px; border-radius:8px;
+    background:#eff6ff; color:#1e40af; border:1px solid #dbeafe; font-variant-numeric:tabular-nums;
+  }
+  .chip.pos{background:var(--emerald-lt); color:#065f46; border-color:#a7f3d0;}
+  .chip.neg{background:#fee2e2; color:#991b1b; border-color:#fecaca;}
+
+  /* controls */
+  .controls{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:14px; margin:6px 0 4px;
+  }
+  .ctrl{background:#f8fafc; border:1px solid var(--line); border-radius:12px; padding:10px 14px;}
+  .ctrl label{font-size:.82rem; font-weight:700; color:var(--slate-soft); display:flex; justify-content:space-between;}
+  .ctrl label span{color:var(--blue); font-variant-numeric:tabular-nums;}
+  input[type=range]{width:100%; margin-top:6px; accent-color:var(--blue);}
+  .toggles{display:flex; flex-wrap:wrap; gap:14px; margin-top:8px;}
+  .toggles label{font-size:.85rem; font-weight:600; color:var(--slate-soft); display:flex; align-items:center; gap:6px; cursor:pointer;}
+  input[type=checkbox]{accent-color:var(--emerald); width:16px; height:16px;}
+
+  /* ---------- Steps ---------- */
+  .step{
+    display:none; opacity:0; transform:translateY(8px);
+    transition:opacity .35s ease, transform .35s ease;
+    background:#f8fafc; border:1px solid var(--line); border-left:5px solid var(--amber);
+    border-radius:12px; padding:14px 16px; margin-top:12px;
+  }
+  .step.show{display:block; opacity:1; transform:none;}
+  .step-head{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:8px;}
+  .badge{
+    background:var(--blue); color:#fff; font-size:.74rem; font-weight:800;
+    border-radius:999px; padding:3px 11px; letter-spacing:.03em;
+  }
+  .mark{
+    background:#fde68a; color:#78350f; font-size:.72rem; font-weight:800;
+    border-radius:6px; padding:2px 9px; letter-spacing:.05em;
+  }
+  .step p{margin:6px 0;}
+  .hint{
+    background:var(--amber-lt); border-left:4px solid var(--amber);
+    border-radius:8px; padding:9px 13px; font-size:.88rem; margin-top:10px; color:#78350f;
+  }
+  .hint b{color:#92400e;}
+  .answer{
+    background:var(--emerald-lt); border-left:4px solid var(--emerald);
+    border-radius:8px; padding:9px 13px; font-size:.9rem; margin-top:10px; color:#065f46; font-weight:600;
+  }
+  .answer b{color:#065f46;}
+
+  .btn-row{display:flex; align-items:center; gap:14px; margin-top:16px; flex-wrap:wrap;}
+  button.next{
+    background:linear-gradient(135deg,#1d4ed8,#3b82f6); color:#fff; border:none;
+    padding:11px 22px; border-radius:999px; font-size:.92rem; font-weight:700;
+    cursor:pointer; box-shadow:0 6px 16px -6px rgba(29,78,216,.7); transition:transform .15s, filter .15s;
+  }
+  button.next:hover:not(:disabled){transform:translateY(-2px); filter:brightness(1.06);}
+  button.next:disabled{
+    background:#cbd5e1; color:#475569; cursor:default; box-shadow:none; transform:none;
+  }
+  .counter{font-size:.82rem; font-weight:700; color:var(--slate-soft); font-variant-numeric:tabular-nums;}
+
+  /* summary */
+  .summary{background:linear-gradient(135deg,#0f172a,#1e293b); color:#e2e8f0; border:none;}
+  .summary h2{color:#fff;}
+  .summary ul{margin:12px 0 0; padding-left:20px;}
+  .summary li{margin:7px 0; font-size:.98rem;}
+  .summary li b{color:#fbbf24;}
+
+  footer{text-align:center; font-size:.8rem; color:#64748b; margin-top:26px;}
+</style>
+</head>
+<body>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <p class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</p>
+  <h1>2014 Paper 2 · Question 5</h1>
+  <p class="sub">Quadratic Graphs — reading the signs of the coefficients</p>
+  <div class="pills">
+    <span class="pill">Quadratic Function</span>
+    <span class="pill">Graph of \(y=mx^2+x+n\)</span>
+    <span class="pill">Opening Direction</span>
+    <span class="pill">\(y\)-intercept</span>
+    <span class="pill">MC · 1 mark</span>
+  </div>
+</header>
+
+<div class="wrap">
+
+<!-- ============ QUESTION ============ -->
+<section class="card">
+  <h2>Question 5 <span class="tag">Multiple Choice</span></h2>
+  <p class="stemsub">The figure shows the graph of \(y=mx^2+x+n\), where \(m\) and \(n\) are constants. Which of the following is true?</p>
+
+  <div class="qbox">
+    <p>\[ y = mx^2 + x + n \]</p>
+    <p>The graph is a parabola that <b>opens upwards</b> and its \(y\)-intercept is <b>below</b> the \(x\)-axis.</p>
+    <ul class="opts">
+      <li>A. \(\;m&lt;0\) and \(n&lt;0\)</li>
+      <li>B. \(\;m&lt;0\) and \(n&gt;0\)</li>
+      <li>C. \(\;m&gt;0\) and \(n&lt;0\)</li>
+      <li>D. \(\;m&gt;0\) and \(n&gt;0\)</li>
+    </ul>
+  </div>
+
+  <div class="canvas-wrap">
+    <canvas id="cvQ" width="840" height="480"></canvas>
+    <div class="readout">
+      <span class="chip" id="chipM">m = ?</span>
+      <span class="chip" id="chipN">n = ?</span>
+      <span class="chip" id="chipShape">shape: ?</span>
+    </div>
+    <div class="controls">
+      <div class="ctrl">
+        <label>Choose the shape of the shown graph <span id="lblShape">upwards</span></label>
+        <input type="range" id="slShape" min="0" max="1" step="1" value="0">
+      </div>
+      <div class="ctrl">
+        <label>Drag the \(y\)-intercept \(n\) <span id="lblN">n = -2.0</span></label>
+        <input type="range" id="slN" min="-4" max="4" step="0.1" value="-2">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PART (a) ============ -->
+<section class="card">
+  <h2>Part (a) — Reading the opening direction <span class="tag">Shape of the parabola</span></h2>
+  <p class="stemsub">The coefficient of \(x^2\) decides whether the parabola opens upwards or downwards.</p>
+
+  <div class="canvas-wrap">
+    <canvas id="cvA" width="840" height="480"></canvas>
+    <div class="readout">
+      <span class="chip" id="chipMa">sign of \(m\): ?</span>
+      <span class="chip" id="chipPara">opens: ?</span>
+    </div>
+    <div class="controls">
+      <div class="ctrl">
+        <label>\(m\) <span id="lblMA">m = 1.0</span></label>
+        <input type="range" id="slMA" min="-2" max="2" step="0.05" value="1">
+      </div>
+      <div class="toggles">
+        <label><input type="checkbox" id="ckAxisA" checked> show axis of symmetry</label>
+      </div>
+    </div>
+  </div>
+
+  <div class="step" id="a1">
+    <div class="step-head"><span class="badge">Step 1</span><span class="mark">1M</span></div>
+    <p>Look at the shape of the curve in the given figure.</p>
+    <p>\[ \text{The parabola opens \textbf{upwards}.} \]</p>
+    <div class="hint"><b>Hint:</b> For \(y=ax^2+bx+c\), the graph opens upwards when \(a&gt;0\) and downwards when \(a&lt;0\). Here the coefficient of \(x^2\) is \(m\).</div>
+  </div>
+
+  <div class="step" id="a2">
+    <div class="step-head"><span class="badge">Step 2</span><span class="mark">1A</span></div>
+    <p>Since the graph opens upwards, the coefficient of \(x^2\) must be positive:</p>
+    <p>\[ m &gt; 0. \]</p>
+    <div class="answer"><b>Result:</b> \(\;m&gt;0\) &nbsp;⟹&nbsp; options A and B are eliminated.</div>
+  </div>
+
+  <div class="btn-row">
+    <button class="next" data-target="a">Next step →</button>
+    <span class="counter" id="cntA">0 / 2</span>
+  </div>
+</section>
+
+<!-- ============ PART (b) ============ -->
+<section class="card">
+  <h2>Part (b) — Reading the \(y\)-intercept <span class="tag">Constant term</span></h2>
+  <p class="stemsub">Put \(x=0\) to find where the curve cuts the \(y\)-axis.</p>
+
+  <div class="canvas-wrap">
+    <canvas id="cvB" width="840" height="480"></canvas>
+    <div class="readout">
+      <span class="chip" id="chipNb">sign of \(n\): ?</span>
+      <span class="chip" id="chipYint">y-intercept = ?</span>
+    </div>
+    <div class="controls">
+      <div class="ctrl">
+        <label>\(n\) (the \(y\)-intercept) <span id="lblNB">n = -2.0</span></label>
+        <input type="range" id="slNB" min="-4" max="4" step="0.1" value="-2">
+      </div>
+      <div class="toggles">
+        <label><input type="checkbox" id="ckInterB" checked> mark \(y\)-intercept</label>
+        <label><input type="checkbox" id="ckRootsB"> show \(x\)-intercepts</label>
+      </div>
+    </div>
+  </div>
+
+  <div class="step" id="b1">
+    <div class="step-head"><span class="badge">Step 1</span><span class="mark">1M</span></div>
+    <p>Substitute \(x=0\) into \(y=mx^2+x+n\):</p>
+    <p>\[ y = m(0)^2 + 0 + n = n. \]</p>
+    <p>So the \(y\)-intercept of the graph is exactly \(n\).</p>
+    <div class="hint"><b>Hint:</b> The \(y\)-intercept of \(y=ax^2+bx+c\) is always the constant term \(c\).</div>
+  </div>
+
+  <div class="step" id="b2">
+    <div class="step-head"><span class="badge">Step 2</span><span class="mark">1A</span></div>
+    <p>From the figure, the curve cuts the \(y\)-axis <b>below</b> the origin, so the \(y\)-intercept is negative:</p>
+    <p>\[ \text{intercept} = n &lt; 0. \]</p>
+    <div class="answer"><b>Result:</b> \(\;n&lt;0\) &nbsp;⟹&nbsp; option D is eliminated.</div>
+  </div>
+
+  <div class="btn-row">
+    <button class="next" data-target="b">Next step →</button>
+    <span class="counter" id="cntB">0 / 2</span>
+  </div>
+</section>
+
+<!-- ============ PART (c) ============ -->
+<section class="card">
+  <h2>Part (c) — Combining both clues <span class="tag">Choose the answer</span></h2>
+  <p class="stemsub">Put the two signs together and match with the four options.</p>
+
+  <div class="canvas-wrap">
+    <canvas id="cvC" width="840" height="480"></canvas>
+    <div class="readout">
+      <span class="chip" id="chipMc">m = ?</span>
+      <span class="chip" id="chipNc">n = ?</span>
+      <span class="chip" id="chipVerdict">verdict: ?</span>
+    </div>
+    <div class="controls">
+      <div class="ctrl">
+        <label>\(m\) <span id="lblMC">m = 1.0</span></label>
+        <input type="range" id="slMC" min="-2" max="2" step="0.1" value="1">
+      </div>
+      <div class="ctrl">
+        <label>\(n\) <span id="lblNC">n = -2.0</span></label>
+        <input type="range" id="slNC" min="-4" max="4" step="0.1" value="-2">
+      </div>
+      <div class="ctrl" style="grid-column:1/-1;">
+        <label>Jump to a preset</label>
+        <div class="toggles" style="margin-top:6px;">
+          <button class="next" id="btnGood" style="padding:8px 16px; font-size:.82rem;">m&gt;0, n&lt;0 (correct)</button>
+          <button class="next" id="btnBad" style="padding:8px 16px; font-size:.82rem; background:linear-gradient(135deg,#b91c1c,#ef4444); box-shadow:none;">m&lt;0, n&gt;0 (wrong)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step" id="c1">
+    <div class="step-head"><span class="badge">Step 1</span><span class="mark">1M</span></div>
+    <p>Collect the two facts obtained:</p>
+    <p>\[ \text{opens upwards} \Rightarrow m&gt;0, \qquad \text{y-intercept below } O \Rightarrow n&lt;0. \]</p>
+    <div class="hint"><b>Hint:</b> The coefficient of \(x\) (which is \(1\)) only shifts the vertex horizontally — it does not change the opening direction or the \(y\)-intercept.</div>
+  </div>
+
+  <div class="step" id="c2">
+    <div class="step-head"><span class="badge">Step 2</span><span class="mark">1A</span></div>
+    <p>Compare with the options:</p>
+    <p>A. \(m&lt;0,\;n&lt;0\) — ✗ (wrong sign of \(m\))<br>
+       B. \(m&lt;0,\;n&gt;0\) — ✗<br>
+       C. \(m&gt;0,\;n&lt;0\) — ✓<br>
+       D. \(m&gt;0,\;n&gt;0\) — ✗ (wrong sign of \(n\))</p>
+    <div class="answer"><b>Answer:</b> \(\;C\;\) &nbsp;(\(m&gt;0\) and \(n&lt;0\))</div>
+  </div>
+
+  <div class="btn-row">
+    <button class="next" data-target="c">Next step →</button>
+    <span class="counter" id="cntC">0 / 2</span>
+  </div>
+</section>
+
+<!-- ============ SUMMARY ============ -->
+<section class="card summary">
+  <h2>Summary — Answers at a glance</h2>
+  <ul>
+    <li>Curve opens <b>upwards</b> \(\Rightarrow\) coefficient of \(x^2\) is positive: <b>\(m&gt;0\)</b>.</li>
+    <li>\(y\)-intercept of \(y=mx^2+x+n\) is <b>\(n\)</b>; it lies <b>below</b> the \(x\)-axis \(\Rightarrow\) <b>\(n&lt;0\)</b>.</li>
+    <li>Therefore <b>\(m&gt;0\) and \(n&lt;0\)</b>.</li>
+    <li>Correct option: <b>C</b>.</li>
+    <li><i>Quick tip:</i> The middle term \(x\) (coefficient \(1\)) does not affect the opening direction nor the \(y\)-intercept, so it can be ignored when reading \(m\) and \(n\) from a graph.</li>
+  </ul>
+</section>
+
+<footer>HKDSE Mathematics (Compulsory Part) · Paper 2 · 2014 Q5 — Interactive Solution</footer>
+</div>
+
+<script>
+/* ============================================================
+   Shared canvas helpers
+   ============================================================ */
+function setupCanvas(cv){
+  const dpr = window.devicePixelRatio || 1;
+  const cssW = cv.clientWidth || 840;
+  const cssH = 480;
+  cv.width  = Math.round(cssW * dpr);
+  cv.height = Math.round(cssH * dpr);
+  cv.style.height = cssH + 'px';
+  const ctx = cv.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  return {ctx, W: cssW, H: cssH};
+}
+
+/* A world→screen mapper.  World x in [-6,6], y in [-6,6] typical */
+function mapper(W,H, xmin,xmax,ymin,ymax){
+  const pad = 26;
+  const sx = (W - 2*pad)/(xmax-xmin);
+  const sy = (H - 2*pad)/(ymax-ymin);
+  return {
+    X: x => pad + (x - xmin)*sx,
+    Y: y => H - pad - (y - ymin)*sy,
+    sx, sy, pad, xmin, xmax, ymin, ymax
+  };
+}
+
+function drawGrid(ctx, M, step){
+  ctx.save();
+  ctx.strokeStyle = '#eef2f7';
+  ctx.lineWidth = 1;
+  for(let x = Math.ceil(M.xmin); x <= Math.floor(M.xmax); x += step){
+    ctx.beginPath(); ctx.moveTo(M.X(x), M.Y(M.ymin)); ctx.lineTo(M.X(x), M.Y(M.ymax)); ctx.stroke();
+  }
+  for(let y = Math.ceil(M.ymin); y <= Math.floor(M.ymax); y += step){
+    ctx.beginPath(); ctx.moveTo(M.X(M.xmin), M.Y(y)); ctx.lineTo(M.X(M.xmax), M.Y(y)); ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawAxes(ctx, M, labelX='x', labelY='y'){
+  ctx.save();
+  ctx.strokeStyle = '#334155';
+  ctx.lineWidth = 2;
+  // x-axis
+  ctx.beginPath(); ctx.moveTo(M.X(M.xmin), M.Y(0)); ctx.lineTo(M.X(M.xmax), M.Y(0)); ctx.stroke();
+  // y-axis
+  ctx.beginPath(); ctx.moveTo(M.X(0), M.Y(M.ymin)); ctx.lineTo(M.X(0), M.Y(M.ymax)); ctx.stroke();
+
+  // arrow heads
+  ctx.fillStyle = '#334155';
+  ctx.beginPath();
+  ctx.moveTo(M.X(M.xmax), M.Y(0));
+  ctx.lineTo(M.X(M.xmax)-10, M.Y(0)-5);
+  ctx.lineTo(M.X(M.xmax)-10, M.Y(0)+5);
+  ctx.closePath(); ctx.fill();
+
+  ctx.beginPath();
+  ctx.moveTo(M.X(0), M.Y(M.ymax));
+  ctx.lineTo(M.X(0)-5, M.Y(M.ymax)+10);
+  ctx.lineTo(M.X(0)+5, M.Y(M.ymax)+10);
+  ctx.closePath(); ctx.fill();
+
+  // tick labels
+  ctx.fillStyle = '#64748b';
+  ctx.font = '12px "Segoe UI", sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  for(let x = Math.ceil(M.xmin); x <= Math.floor(M.xmax); x++){
+    if(x===0) continue;
+    ctx.beginPath(); ctx.moveTo(M.X(x), M.Y(0)-4); ctx.lineTo(M.X(x), M.Y(0)+4);
+    ctx.strokeStyle='#64748b'; ctx.lineWidth=1.4; ctx.stroke();
+    ctx.fillText(x, M.X(x), M.Y(0)+7);
+  }
+  ctx.textAlign = 'right'; ctx.textBaseline='middle';
+  for(let y = Math.ceil(M.ymin); y <= Math.floor(M.ymax); y++){
+    if(y===0) continue;
+    ctx.beginPath(); ctx.moveTo(M.X(0)-4, M.Y(y)); ctx.lineTo(M.X(0)+4, M.Y(y));
+    ctx.strokeStyle='#64748b'; ctx.lineWidth=1.4; ctx.stroke();
+    ctx.fillText(y, M.X(0)-8, M.Y(y));
+  }
+  ctx.fillStyle='#0f172a';
+  ctx.font = 'italic 15px Georgia, serif';
+  ctx.textAlign='right'; ctx.textBaseline='bottom'; ctx.fillText(labelX, M.X(M.xmax)-4, M.Y(0)-6);
+  ctx.textAlign='left'; ctx.textBaseline='top'; ctx.fillText(labelY, M.X(0)+8, M.Y(M.ymax)+2);
+
+  // origin label
+  ctx.fillStyle='#0f172a';
+  ctx.font='italic 14px Georgia, serif';
+  ctx.textAlign='right'; ctx.textBaseline='top';
+  ctx.fillText('O', M.X(0)-5, M.Y(0)+4);
+  ctx.restore();
+}
+
+function drawQuadratic(ctx, M, m, n, color){
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  let started = false;
+  for(let px = 0; px <= M.W; px += 1){
+    const xw = M.xmin + (px - M.pad) / M.sx;
+    const yw = m*xw*xw + xw + n;
+    const py = M.Y(yw);
+    if(!started){ ctx.moveTo(px, py); started = true; }
+    else ctx.lineTo(px, py);
+  }
+  ctx.stroke();
+  ctx.restore();
+}
+
+/* ============================================================
+   1) Question diagram — shows the graph with chosen signs
+   ============================================================ */
+(function(){
+  const cv = document.getElementById('cvQ');
+  const slShape = document.getElementById('slShape');
+  const slN = document.getElementById('slN');
+  const lblShape = document.getElementById('lblShape');
+  const lblN = document.getElementById('lblN');
+  const chipM = document.getElementById('chipM');
+  const chipN = document.getElementById('chipN');
+  const chipShape = document.getElementById('chipShape');
+
+  function draw(){
+    const {ctx, W, H} = setupCanvas(cv);
+    const M = mapper(W,H,-6,6,-6,6);
+    drawGrid(ctx,M,1);
+    drawAxes(ctx,M);
+
+    const upwards = parseInt(slShape.value) === 0;
+    const n = parseFloat(slN.value);
+    const m = upwards ? 1 : -1;
+
+    lblShape.textContent = upwards ? 'upwards' : 'downwards';
+    lblN.textContent = 'n = ' + n.toFixed(1);
+
+    drawQuadratic(ctx, M, m, n, upwards ? '#1d4ed8' : '#dc2626');
+
+    // mark y-intercept
+    const yInt = n;
+    ctx.save();
+    ctx.fillStyle = '#059669';
+    ctx.beginPath(); ctx.arc(M.X(0), M.Y(yInt), 6, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = '#059669'; ctx.lineWidth = 1.4;
+    ctx.setLineDash([4,4]);
+    ctx.beginPath(); ctx.moveTo(M.X(0), M.Y(yInt)); ctx.lineTo(M.X(0), M.Y(0)); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#065f46';
+    ctx.font = 'bold 13px "Segoe UI", sans-serif';
+    ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    ctx.fillText('(0, n)  n = ' + n.toFixed(1), M.X(0)+10, M.Y(yInt));
+    ctx.restore();
+
+    // equation label
+    ctx.save();
+    ctx.fillStyle = '#1e3a8a';
+    ctx.font = 'bold 15px "Segoe UI", sans-serif';
+    ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+    ctx.fillText('y = mx² + x + n', M.pad + 8, M.pad + 6);
+    ctx.restore();
+
+    chipM.textContent = 'm ' + (m>0 ? '> 0' : '< 0');
+    chipM.className = 'chip ' + (m>0 ? 'pos':'neg');
+    chipN.textContent = 'n ' + (n>0 ? '> 0' : n<0 ? '< 0' : '= 0');
+    chipN.className = 'chip ' + (n>0 ? 'pos': n<0 ? 'neg' : '');
+    chipShape.textContent = 'opens ' + (upwards ? 'upwards' : 'downwards');
+  }
+  slShape.addEventListener('input', draw);
+  slN.addEventListener('input', draw);
+  window.addEventListener('resize', draw);
+  draw();
+})();
+
+/* ============================================================
+   2) Part (a) — effect of m on the opening direction
+   ============================================================ */
+(function(){
+  const cv = document.getElementById('cvA');
+  const sl = document.getElementById('slMA');
+  const lbl = document.getElementById('lblMA');
+  const chipMa = document.getElementById('chipMa');
+  const chipPara = document.getElementById('chipPara');
+  const ck = document.getElementById('ckAxisA');
+
+  function draw(){
+    const {ctx, W, H} = setupCanvas(cv);
+    const M = mapper(W,H,-6,6,-6,6);
+    drawGrid(ctx,M,1);
+    drawAxes(ctx,M);
+
+    let m = parseFloat(sl.value);
+    if(Math.abs(m) < 0.15) m = (m>=0? 0.15 : -0.15); // avoid flat line
+    const n = -2;
+
+    lbl.textContent = 'm = ' + parseFloat(sl.value).toFixed(2);
+
+    // the special "given" case m>0 in bold
+    drawQuadratic(ctx, M, m, n, m>0 ? '#1d4ed8' : '#dc2626');
+
+    // axis of symmetry x = -1/(2m)
+    const xv = -1/(2*m);
+    const yv = m*xv*xv + xv + n;
+    if(ck.checked){
+      ctx.save();
+      ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 1.8; ctx.setLineDash([6,5]);
+      ctx.beginPath(); ctx.moveTo(M.X(xv), M.Y(M.ymin)); ctx.lineTo(M.X(xv), M.Y(M.ymax)); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle='#b45309'; ctx.font='bold 12px "Segoe UI",sans-serif';
+      ctx.textAlign='left'; ctx.textBaseline='top';
+      ctx.fillText('axis x = -1/(2m)', M.X(xv)+6, M.pad+26);
+      ctx.restore();
+    }
+
+    // vertex dot
+    ctx.save();
+    ctx.fillStyle = '#7c3aed';
+    ctx.beginPath(); ctx.arc(M.X(xv), M.Y(yv), 5.5, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#5b21b6'; ctx.font='bold 12.5px "Segoe UI",sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='bottom';
+    ctx.fillText('vertex', M.X(xv), M.Y(yv)-8);
+    ctx.restore();
+
+    // y-intercept
+    ctx.save();
+    ctx.fillStyle='#059669';
+    ctx.beginPath(); ctx.arc(M.X(0), M.Y(n), 5.5, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle='#065f46'; ctx.font='bold 12.5px "Segoe UI",sans-serif';
+    ctx.textAlign='left'; ctx.textBaseline='middle';
+    ctx.fillText('(0, -2)', M.X(0)+10, M.Y(n));
+    ctx.restore();
+
+    chipMa.textContent = 'sign of m: ' + (m>0 ? 'positive (+)' : 'negative (−)');
+    chipMa.className = 'chip ' + (m>0?'pos':'neg');
+    chipPara.textContent = 'parabola opens ' + (m>0?'upwards':'downwards');
+    chipPara.className = 'chip ' + (m>0?'pos':'neg');
+  }
+  sl.addEventListener('input', draw);
+  ck.addEventListener('change', draw);
+  window.addEventListener('resize', draw);
+  draw();
+})();
+
+/* ============================================================
+   3) Part (b) — y-intercept = n
+   ============================================================ */
+(function(){
+  const cv = document.getElementById('cvB');
+  const sl = document.getElementById('slNB');
+  const lbl = document.getElementById('lblNB');
+  const chipNb = document.getElementById('chipNb');
+  const chipYint = document.getElementById('chipYint');
+  const ckInt = document.getElementById('ckInterB');
+  const ckRoots = document.getElementById('ckRootsB');
+
+  function draw(){
+    const {ctx, W, H} = setupCanvas(cv);
+    const M = mapper(W,H,-6,6,-6,6);
+    drawGrid(ctx,M,1);
+    drawAxes(ctx,M);
+
+    const n = parseFloat(sl.value);
+    const m = 1; // given: opens upwards
+
+    lbl.textContent = 'n = ' + n.toFixed(1);
+    drawQuadratic(ctx, M, m, n, '#1d4ed8');
+
+    // y-intercept guide
+    if(ckInt.checked){
+      ctx.save();
+      ctx.strokeStyle = '#059669'; ctx.lineWidth = 1.6; ctx.setLineDash([5,4]);
+      ctx.beginPath(); ctx.moveTo(M.X(M.xmin), M.Y(n)); ctx.lineTo(M.X(0), M.Y(n)); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#059669';
+      ctx.beginPath(); ctx.arc(M.X(0), M.Y(n), 6.5, 0, Math.PI*2); ctx.fill();
+      ctx.strokeStyle='#fff'; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.arc(M.X(0), M.Y(n), 6.5, 0, Math.PI*2); ctx.stroke();
+      ctx.fillStyle = '#065f46'; ctx.font='bold 13px "Segoe UI",sans-serif';
+      ctx.textAlign='left'; ctx.textBaseline='middle';
+      ctx.fillText('(0, n) with n = ' + n.toFixed(1), M.X(0)+12, M.Y(n));
+      // vertical drop line
+      ctx.strokeStyle='#94a3b8'; ctx.lineWidth=1.2; ctx.setLineDash([3,3]);
+      ctx.beginPath(); ctx.moveTo(M.X(0), M.Y(n)); ctx.lineTo(M.X(0), M.Y(0)); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.restore();
+    }
+
+    // roots
+    if(ckRoots.checked){
+      const disc = 1 - 4*m*n;
+      ctx.save();
+      ctx.font='bold 12.5px "Segoe UI",sans-serif';
+      if(disc > 0){
+        const r1 = (-1 + Math.sqrt(disc))/(2*m);
+        const r2 = (-1 - Math.sqrt(disc))/(2*m);
+        [r1,r2].forEach(r=>{
+          ctx.fillStyle='#db2777';
+          ctx.beginPath(); ctx.arc(M.X(r), M.Y(0), 5.5, 0, Math.PI*2); ctx.fill();
+          ctx.fillStyle='#9d174d';
+          ctx.textAlign='center'; ctx.textBaseline='top';
+          ctx.fillText(r.toFixed(2), M.X(r), M.Y(0)+8);
+        });
+        ctx.fillStyle='#9d174d';
+        ctx.textAlign='left'; ctx.textBaseline='bottom';
+        ctx.fillText('two roots', M.pad+8, M.Y(0)-8);
+      } else if(Math.abs(disc) < 1e-9){
+        const r = -1/(2*m);
+        ctx.fillStyle='#db2777';
+        ctx.beginPath(); ctx.arc(M.X(r), M.Y(0), 6, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle='#9d174d';
+        ctx.textAlign='center'; ctx.textBaseline='top';
+        ctx.fillText('double root ' + r.toFixed(2), M.X(r), M.Y(0)+8);
+      } else {
+        ctx.fillStyle='#9d174d';
+        ctx.textAlign='left'; ctx.textBaseline='bottom';
+        ctx.fillText('no real roots (disc < 0)', M.pad+8, M.Y(0)-8);
+      }
+      ctx.restore();
+    }
+
+    // equation
+    ctx.save();
+    ctx.fillStyle='#1e3a8a'; ctx.font='bold 15px "Segoe UI",sans-serif';
+    ctx.textAlign='left'; ctx.textBaseline='top';
+    ctx.fillText('y = x² + x + n', M.pad+8, M.pad+6);
+    ctx.restore();
+
+    chipNb.textContent = 'sign of n: ' + (n>0 ? 'positive (+)' : n<0 ? 'negative (−)' : 'zero');
+    chipNb.className = 'chip ' + (n>0?'pos':n<0?'neg':'');
+    chipYint.textContent = 'y-intercept = ' + n.toFixed(1);
+  }
+  sl.addEventListener('input', draw);
+  ckInt.addEventListener('change', draw);
+  ckRoots.addEventListener('change', draw);
+  window.addEventListener('resize', draw);
+  draw();
+})();
+
+/* ============================================================
+   4) Part (c) — combine m and n
+   ============================================================ */
+(function(){
+  const cv = document.getElementById('cvC');
+  const slM = document.getElementById('slMC');
+  const slN = document.getElementById('slNC');
+  const lblM = document.getElementById('lblMC');
+  const lblN = document.getElementById('lblNC');
+  const chipMc = document.getElementById('chipMc');
+  const chipNc = document.getElementById('chipNc');
+  const chipVerdict = document.getElementById('chipVerdict');
+  const btnGood = document.getElementById('btnGood');
+  const btnBad = document.getElementById('btnBad');
+
+  function draw(){
+    const {ctx, W, H} = setupCanvas(cv);
+    const M = mapper(W,H,-6,6,-6,6);
+    drawGrid(ctx,M,1);
+    drawAxes(ctx,M);
+
+    let m = parseFloat(slM.value);
+    if(Math.abs(m) < 0.15) m = (m>=0? 0.15 : -0.15);
+    const n = parseFloat(slN.value);
+
+    lblM.textContent = 'm = ' + parseFloat(slM.value).toFixed(2);
+    lblN.textContent = 'n = ' + n.toFixed(1);
+
+    // shading of the half-plane y<0 to show the intercept is below axis
+    ctx.save();
+    ctx.fillStyle = 'rgba(219,39,119,.06)';
+    ctx.fillRect(M.X(M.xmin), M.Y(0), M.X(M.xmax)-M.X(M.xmin), M.Y(M.ymin)-M.Y(0));
+    ctx.restore();
+
+    drawQuadratic(ctx, M, m, n, m>0 ? '#1d4ed8' : '#dc2626');
+
+    // y-intercept
+    ctx.save();
+    ctx.fillStyle = n>=0 ? '#059669' : '#dc2626';
+    ctx.beginPath(); ctx.arc(M.X(0), M.Y(n), 6.5, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = n>=0 ? '#065f46' : '#991b1b';
+    ctx.font='bold 13px "Segoe UI",sans-serif';
+    ctx.textAlign='left'; ctx.textBaseline='middle';
+    ctx.fillText('(0, ' + n.toFixed(1) + ')', M.X(0)+12, M.Y(n));
+    ctx.restore();
+
+    // equation
+    ctx.save();
+    ctx.fillStyle='#1e3a8a'; ctx.font='bold 15px "Segoe UI",sans-serif';
+    ctx.textAlign='left'; ctx.textBaseline='top';
+    ctx.fillText('y = mx² + x + n', M.pad+8, M.pad+6);
+    ctx.restore();
+
+    // match with the "given" figure: opens upwards AND n<0
+    chipMc.textContent = 'm ' + (m>0 ? '> 0' : '< 0');
+    chipMc.className = 'chip ' + (m>0?'pos':'neg');
+    chipNc.textContent = 'n ' + (n>0 ? '> 0' : n<0 ? '< 0' : '= 0');
+    chipNc.className = 'chip ' + (n>0?'pos': n<0?'neg':'');
+
+    const matches = (m>0 && n<0);
+    chipVerdict.textContent = matches ? 'matches the figure ✓ (option C)' : 'does NOT match the figure ✗';
+    chipVerdict.className = 'chip ' + (matches ? 'pos' : 'neg');
+  }
+
+  slM.addEventListener('input', draw);
+  slN.addEventListener('input', draw);
+
+  btnGood.addEventListener('click', ()=>{
+    slM.value = 1; slN.value = -2; draw();
+  });
+  btnBad.addEventListener('click', ()=>{
+    slM.value = -1; slN.value = 2; draw();
+  });
+
+  window.addEventListener('resize', draw);
+  draw();
+})();
+
+/* ============================================================
+   5) Step-by-step reveal
+   ============================================================ */
+document.querySelectorAll('.btn-row .next').forEach(btn=>{
+  const key = btn.dataset.target;
+  const steps = Array.from(document.querySelectorAll('.step')).filter(s=>s.id.startsWith(key));
+  const counter = document.getElementById('cnt'+key.toUpperCase());
+  let idx = 0;
+
+  function refresh(){
+    steps.forEach((s,i)=>{
+      if(i < idx) s.classList.add('show');
+      else s.classList.remove('show');
+    });
+    counter.textContent = idx + ' / ' + steps.length;
+    if(idx >= steps.length){
+      btn.disabled = true;
+      btn.textContent = 'All steps revealed ✓';
+    } else {
+      btn.disabled = false;
+      btn.textContent = (idx === 0 ? 'Next step →' : 'Next step → (' + idx + ')');
+    }
+  }
+
+  btn.addEventListener('click', ()=>{
+    if(idx < steps.length){ idx++; refresh(); }
+  });
+  refresh();
+});
+</script>
+</body>
+</html>

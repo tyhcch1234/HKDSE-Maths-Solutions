@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HKDSE 2019 Paper 2 Q14 – Dot Pattern Sequence</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- MathJax for LaTeX -->
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+  <style>
+    /* Custom smooth transitions and dot styling */
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background-color: #3b82f6; /* blue-500 */
+      display: inline-block;
+      margin: 2px;
+    }
+    .dot-orange {
+      background-color: #f97316; /* orange-500 */
+    }
+    .pattern-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 4px;
+      min-height: 40px;
+      margin: 6px 0;
+    }
+    .pattern-container {
+      background: #f8fafc;
+      border-radius: 16px;
+      padding: 16px;
+      border: 1px solid #e2e8f0;
+      transition: all 0.2s;
+    }
+    .step-card {
+      transition: all 0.3s ease;
+    }
+    .step-card.hidden {
+      display: none;
+    }
+    /* responsive dot sizing */
+    @media (max-width: 480px) {
+      .dot { width: 9px; height: 9px; margin: 1.5px; }
+      .pattern-row { gap: 2px; }
+    }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="bg-white border-b border-gray-200 sticky top-0 z-10 shadow-sm">
+    <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
+      <h1 class="text-lg sm:text-xl font-bold text-blue-700">HKDSE Math 2019 Paper 2 Q14</h1>
+      <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-1 rounded-full">Sequences</span>
+    </div>
+  </header>
+
+  <main class="max-w-3xl mx-auto px-4 py-6 flex-1 w-full">
+
+    <!-- Question Overview -->
+    <section class="bg-white rounded-2xl shadow-md p-5 sm:p-6 mb-6">
+      <div class="flex flex-wrap gap-2 mb-3">
+        <span class="bg-indigo-100 text-indigo-800 text-xs font-medium px-3 py-1 rounded-full">Arithmetic Sequence</span>
+        <span class="bg-emerald-100 text-emerald-800 text-xs font-medium px-3 py-1 rounded-full">Recurrence Relation</span>
+        <span class="bg-amber-100 text-amber-800 text-xs font-medium px-3 py-1 rounded-full">Pattern Recognition</span>
+      </div>
+      <p class="text-base sm:text-lg leading-relaxed">
+        In the figure, the 1st pattern consists of <strong>6</strong> dots. For any positive integer \(n\), the \((n+1)\)th pattern is formed by adding <strong>4</strong> dots to the \(n\)th pattern. Find the number of dots in the 9th pattern.
+      </p>
+
+      <!-- Interactive Pattern Visualiser -->
+      <div class="mt-5">
+        <div class="flex items-center justify-between mb-2">
+          <label for="patternSlider" class="text-sm font-semibold text-gray-600">
+            Pattern number: <span id="patternLabel" class="text-blue-600 font-bold">1</span>
+          </label>
+          <span class="text-xs text-gray-400">Drag to see more patterns</span>
+        </div>
+        <input type="range" id="patternSlider" min="1" max="9" value="1" step="1"
+               class="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+        <div class="mt-3 pattern-container" id="patternDisplay">
+          <!-- Dots rendered via JS -->
+        </div>
+        <div class="mt-2 text-center text-sm text-gray-500">
+          \(T(n)\) = <span id="dotCountLabel" class="font-bold text-blue-700">6</span> dots
+        </div>
+      </div>
+    </section>
+
+    <!-- Step-by-Step Guided Solution -->
+    <section class="space-y-4">
+      <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+        </svg>
+        Step-by-Step Solution
+      </h2>
+
+      <!-- Step 1 -->
+      <div class="step-card bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <button class="step-toggle w-full flex justify-between items-center px-5 py-4 text-left focus:outline-none hover:bg-gray-50 transition">
+          <span class="font-semibold text-gray-800">Step 1: Define the sequence</span>
+          <svg class="w-5 h-5 text-gray-500 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+        </button>
+        <div class="step-content px-5 pb-5 hidden">
+          <p class="text-gray-700">Let \(T(n)\) be the number of dots in the \(n\)th pattern.</p>
+          <div class="mt-3 bg-blue-50 border-l-4 border-blue-400 p-3 rounded-r-lg">
+            <p class="text-sm text-blue-800"><strong>Hint:</strong> We need to find \(T(9)\).</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step-card bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <button class="step-toggle w-full flex justify-between items-center px-5 py-4 text-left focus:outline-none hover:bg-gray-50 transition">
+          <span class="font-semibold text-gray-800">Step 2: Write the first term and recurrence relation</span>
+          <svg class="w-5 h-5 text-gray-500 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+        </button>
+        <div class="step-content px-5 pb-5 hidden">
+          <p class="text-gray-700">From the problem statement:</p>
+          <ul class="list-disc list-inside text-gray-700 mt-2 space-y-1">
+            <li>1st pattern: \(T(1) = 6\)</li>
+            <li>Each next pattern adds 4 dots: \(T(n+1) = T(n) + 4\)</li>
+          </ul>
+          <div class="mt-3 bg-blue-50 border-l-4 border-blue-400 p-3 rounded-r-lg">
+            <p class="text-sm text-blue-800"><strong>Hint:</strong> This is an arithmetic sequence with first term \(a = 6\) and common difference \(d = 4\).</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="step-card bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <button class="step-toggle w-full flex justify-between items-center px-5 py-4 text-left focus:outline-none hover:bg-gray-50 transition">
+          <span class="font-semibold text-gray-800">Step 3: Work backwards or use the formula</span>
+          <svg class="w-5 h-5 text-gray-500 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+        </button>
+        <div class="step-content px-5 pb-5 hidden">
+          <p class="text-gray-700">We can find \(T(9)\) by repeatedly applying the recurrence:</p>
+          <div class="mt-3 overflow-x-auto">
+            <div class="bg-gray-50 p-3 rounded-lg font-mono text-sm text-gray-800 leading-relaxed whitespace-nowrap">
+              \[
+              \begin{aligned}
+              T(9) &= T(8) + 4 \\
+                   &= T(7) + 4 + 4 \\
+                   &\;\;\vdots \\
+                   &= T(1) + \underbrace{4 + 4 + \cdots + 4}_{8 \text{ times}} \\
+                   &= 6 + (8 \times 4) \\
+                   &= 6 + 32 \\
+                   &= 38
+              \end{aligned}
+              \]
+            </div>
+          </div>
+          <div class="mt-3 bg-blue-50 border-l-4 border-blue-400 p-3 rounded-r-lg">
+            <p class="text-sm text-blue-800"><strong>Alternative Hint:</strong> Use the arithmetic sequence formula: \(T(n) = a + (n-1)d\).</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="step-card bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <button class="step-toggle w-full flex justify-between items-center px-5 py-4 text-left focus:outline-none hover:bg-gray-50 transition">
+          <span class="font-semibold text-gray-800">Step 4: Conclusion</span>
+          <svg class="w-5 h-5 text-gray-500 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+        </button>
+        <div class="step-content px-5 pb-5 hidden">
+          <p class="text-gray-700">The number of dots in the 9th pattern is <strong class="text-blue-700 text-lg">38</strong>.</p>
+          <div class="mt-3 bg-green-50 border border-green-200 p-4 rounded-lg text-center">
+            <p class="text-green-800 font-semibold">Correct answer: C. 38</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="text-center text-xs text-gray-400 py-6 border-t border-gray-200 mt-4">
+    HKDSE 2019 Paper 2 Q14 – Interactive Solution
+  </footer>
+
+  <script>
+    (function() {
+      // ---------- Accordion toggle ----------
+      const toggles = document.querySelectorAll('.step-toggle');
+      toggles.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const content = btn.nextElementSibling;
+          const icon = btn.querySelector('svg');
+          if (content.classList.contains('hidden')) {
+            content.classList.remove('hidden');
+            icon.style.transform = 'rotate(180deg)';
+          } else {
+            content.classList.add('hidden');
+            icon.style.transform = 'rotate(0deg)';
+          }
+        });
+      });
+
+      // Optionally open first step by default? Let's keep all collapsed for guided discovery.
+      // But we can open step 1 to give a hint. We'll leave all collapsed as requested.
+
+      // ---------- Dot pattern visualiser ----------
+      const slider = document.getElementById('patternSlider');
+      const patternLabel = document.getElementById('patternLabel');
+      const dotCountLabel = document.getElementById('dotCountLabel');
+      const patternDisplay = document.getElementById('patternDisplay');
+
+      function renderPattern(n) {
+        // n = pattern number (1 to 9)
+        const totalDots = 6 + (n - 1) * 4; // T(n) = 6 + 4(n-1)
+        patternLabel.textContent = n;
+        dotCountLabel.textContent = totalDots;
+
+        // We'll build a visual that roughly resembles the dot patterns:
+        // Base row: 6 dots always (the original pattern's horizontal line)
+        // Plus additional dots arranged in a "staircase" or column.
+        // To keep it clean and responsive, we'll represent:
+        // - A base row of 6 dots (always present)
+        // - Then for each additional 4 dots, we add a new smaller row above or below,
+        //   or a column on the right. For visual clarity and consistency with the figure,
+        //   we'll draw a horizontal line of 6 dots, then for each step extra 4 dots,
+        //   we add a vertical column of 4 dots stacked to the right (or left).
+        // Actually the figure shows: 1st pattern: 6 dots in a line.
+        // 2nd pattern: 6 dots in a line + a 4-dot shape underneath/above?
+        // Let's simplify: base 6 dots in a row. Extra dots: we add a new row above
+        // with 4 dots for each additional pattern? That would overlap.
+        // Better approach: We draw the base horizontal line of 6. Then for each
+        // additional pattern step, we add a vertical column of 4 dots to the right
+        // of the base line, stacked. But for n=2, that's 4 dots column; n=3, two columns
+        // of 4 dots? That doubles count. Actually T(n) = 6 + 4(n-1). So for n=2: 10 dots total.
+        // 6 base + 4 extra. So one column of 4 dots.
+        // For n=3: 6 + 8 = 14. So two columns of 4 dots each.
+        // For n=9: 6 + 32 = 38. So 8 columns of 4 dots each.
+        // That's visually clear: a base row of 6, plus (n-1) vertical columns of 4 dots.
+        // But 8 columns of 4 might be tall/wide. Let's arrange columns horizontally
+        // side by side, each column has 4 dots stacked vertically.
+        // So total dots = 6 (bottom row) + 4*(n-1).
+        // We'll render: a bottom row of 6 dots, then above each of the last (n-1)
+        // dots of the bottom row? No, that would overlap. Instead, place columns
+        // to the right of the base row. So the whole pattern looks like a horizontal
+        // base with vertical bars on the right. That's a bit lopsided but fine for visual.
+        // Alternatively, we can draw a more symmetric shape: a horizontal line,
+        // and above/below we add dots. But ensuring exactly 6+4(n-1) dots is tricky.
+        // Given time, we'll draw a clear representation: a base row of 6 dots,
+        // and then for each increment, a separate small group of 4 dots shown below.
+        // But that may not look like the figure. Let's do a simple "growing" shape:
+        // For pattern n, we draw a central horizontal row of 6 dots.
+        // Then we add (n-1) "arms" of 4 dots each, placed symmetrically?
+        // Actually, for an interactive visual, it's fine if it's schematic.
+        // I'll draw: a horizontal line of 6 dots (always). Then for each step,
+        // I add a small cross/plus of 4 dots? No.
+        // Let's just create a grid representation: 
+        // n=1: 6 dots in a row.
+        // n=2: 6 dots in a row, plus 4 dots in a row below (but shifted).
+        // n=3: 6 dots row, 4 dots below, 4 dots below that? That would be 6+4+4=14, correct.
+        // So we can stack rows of 4 dots below the initial 6-dot row.
+        // That matches: T(n) = 6 + 4*(n-1).
+        // Visually: row 0: 6 dots. row 1: 4 dots. row 2: 4 dots. ... up to row n-1: 4 dots.
+        // But the figure shows dots added in a more complex way. But for counting,
+        // this is perfectly valid and easy to understand.
+        // Let's do that: a main row of 6 dots, then (n-1) rows of 4 dots below it.
+        // This clearly shows the addition of 4 dots per step.
+        // However, the original figure shows dots added in a cross-like shape.
+        // To stay closer to the figure, I'll draw a central horizontal line of 6 dots,
+        // and then for each increment, I'll add a vertical line of 4 dots below the center?
+        // But that would increase count by 4 each time, and for n=9, we'd have 6 + 4*8 = 38.
+        // But visually, 8 vertical lines of 4 dots below would be very tall.
+        // Instead, I'll place the 4-dot groups in a compact arrangement:
+        // a base row of 6, and then a growing "mountain" of dots above.
+        // To keep it simple and correct for counting, I'll draw:
+        // - A base row of 6 dots.
+        // - Then (n-1) additional rows of 4 dots, each row centered above the previous.
+        // This will form a pyramid-like shape, which is visually appealing and
+        // clearly shows the total count.
+        // Let's implement that.
+
+        let html = '';
+        // Base row of 6 dots
+        html += '<div class="pattern-row">';
+        for (let i = 0; i < 6; i++) {
+          html += '<span class="dot"></span>';
+        }
+        html += '</div>';
+
+        // Additional rows: (n-1) rows of 4 dots
+        for (let r = 1; r < n; r++) {
+          html += '<div class="pattern-row">';
+          // Add some horizontal offset to center them? Not necessary, but let's
+          // add a small margin or padding. We'll just render them.
+          for (let i = 0; i < 4; i++) {
+            html += '<span class="dot dot-orange"></span>';
+          }
+          html += '</div>';
+        }
+
+        // If n=1, only base row, no extra rows. That matches T(1)=6.
+        // For n=9, we'll have 8 extra rows of 4 dots each, total 6+32=38.
+        // The container might become tall, but it's fine.
+        // We'll make the dots smaller if there are many rows to keep it compact.
+        // But we can adjust CSS dynamically? Let's keep fixed, but add a class for compact.
+        patternDisplay.innerHTML = html;
+
+        // Adjust dot size for high n to prevent overflow
+        const dotElements = patternDisplay.querySelectorAll('.dot');
+        if (n > 5) {
+          dotElements.forEach(d => {
+            d.style.width = '8px';
+            d.style.height = '8px';
+            d.style.margin = '1px';
+          });
+        } else {
+          dotElements.forEach(d => {
+            d.style.width = '12px';
+            d.style.height = '12px';
+            d.style.margin = '2px';
+          });
+        }
+      }
+
+      // Initial render
+      renderPattern(1);
+
+      // Slider event
+      slider.addEventListener('input', (e) => {
+        const n = parseInt(e.target.value, 10);
+        renderPattern(n);
+      });
+
+      // Also update pattern label on page load
+      // Ensure MathJax re-renders if needed? Not necessary for dynamic content.
+
+    })();
+  </script>
+</body>
+</html>

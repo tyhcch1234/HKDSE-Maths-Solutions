@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2021 Paper 2 Q25 — Locus of a Moving Point</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<style>
+  :root{
+    --bg:#f4f7fb;
+    --card:#ffffff;
+    --ink:#12263f;
+    --muted:#5b7292;
+    --blue:#2563eb;
+    --blue-soft:#e0ecff;
+    --amber:#f59e0b;
+    --amber-soft:#fff6e0;
+    --emerald:#059669;
+    --emerald-soft:#e3f8ef;
+    --violet:#7c3aed;
+    --shadow:0 10px 30px rgba(18,38,63,.08);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:960px;margin:0 auto;padding:0 16px 48px;}
+
+  /* HERO */
+  .hero{
+    background:linear-gradient(135deg,#1e3a8a 0%,#2563eb 45%,#0ea5e9 100%);
+    color:#fff;
+    padding:38px 16px 34px;
+    box-shadow:0 12px 34px rgba(30,58,138,.28);
+    margin-bottom:26px;
+  }
+  .hero-inner{max-width:960px;margin:0 auto;}
+  .eyebrow{
+    text-transform:uppercase;
+    letter-spacing:.14em;
+    font-size:.72rem;
+    font-weight:700;
+    opacity:.85;
+    margin:0 0 6px;
+  }
+  .hero h1{
+    font-size:clamp(1.5rem,4.2vw,2.25rem);
+    margin:0 0 6px;
+    font-weight:800;
+    letter-spacing:-.01em;
+  }
+  .hero .sub{margin:0 0 16px;font-size:1rem;opacity:.92;}
+  .pills{display:flex;flex-wrap:wrap;gap:8px;}
+  .pill{
+    background:rgba(255,255,255,.18);
+    border:1px solid rgba(255,255,255,.35);
+    padding:4px 12px;
+    border-radius:999px;
+    font-size:.76rem;
+    font-weight:600;
+    backdrop-filter:blur(4px);
+  }
+
+  /* CARDS */
+  .card{
+    background:var(--card);
+    border-radius:18px;
+    box-shadow:var(--shadow);
+    padding:22px 22px 24px;
+    margin-bottom:22px;
+    border:1px solid #e8eef7;
+  }
+  .card h2{
+    font-size:1.16rem;
+    margin:0 0 4px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-weight:800;
+  }
+  .card h2 .dot{
+    width:10px;height:10px;border-radius:50%;
+    background:var(--blue);
+    flex:none;
+    box-shadow:0 0 0 4px var(--blue-soft);
+  }
+  .card .lead{color:var(--muted);font-size:.9rem;margin:0 0 14px;}
+
+  .qtext{
+    background:var(--blue-soft);
+    border-left:5px solid var(--blue);
+    border-radius:0 12px 12px 0;
+    padding:14px 16px;
+    font-size:.98rem;
+  }
+  .marks{
+    display:inline-block;
+    background:#12263f;
+    color:#fff;
+    font-size:.72rem;
+    font-weight:700;
+    padding:2px 9px;
+    border-radius:999px;
+    margin-left:6px;
+    vertical-align:middle;
+  }
+  .options{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+    gap:10px;
+    margin-top:14px;
+  }
+  .opt{
+    background:#f8fbff;
+    border:1px solid #dbe7f7;
+    border-radius:12px;
+    padding:9px 13px;
+    font-size:.94rem;
+  }
+  .opt b{color:var(--blue);}
+
+  /* CANVAS */
+  .canvas-box{
+    position:relative;
+    background:#fbfdff;
+    border:1px solid #e2ebf7;
+    border-radius:14px;
+    padding:10px;
+    margin:14px 0;
+  }
+  canvas{
+    width:100%;
+    height:auto;
+    display:block;
+    border-radius:10px;
+    touch-action:none;
+  }
+  .controls{
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px 22px;
+    align-items:center;
+    padding:12px 14px;
+    background:#f7fafe;
+    border:1px dashed #cfdff3;
+    border-radius:12px;
+    margin-top:10px;
+    font-size:.86rem;
+  }
+  .ctrl{display:flex;align-items:center;gap:9px;}
+  .ctrl label{font-weight:600;color:var(--muted);white-space:nowrap;}
+  input[type=range]{
+    width:150px;
+    accent-color:var(--blue);
+  }
+  .val{
+    display:inline-block;
+    min-width:56px;
+    text-align:center;
+    background:#12263f;
+    color:#fff;
+    border-radius:7px;
+    font-weight:700;
+    font-size:.8rem;
+    padding:2px 7px;
+    font-variant-numeric:tabular-nums;
+  }
+  .readout{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:10px;
+  }
+  .chip{
+    background:var(--emerald-soft);
+    border:1px solid #bfeadb;
+    color:#065f46;
+    border-radius:10px;
+    padding:6px 12px;
+    font-size:.82rem;
+    font-weight:700;
+    font-variant-numeric:tabular-nums;
+  }
+  .chip.amber{background:var(--amber-soft);border-color:#fce3ab;color:#92400e;}
+  .chip.blue{background:var(--blue-soft);border-color:#c7ddff;color:#1e40af;}
+  .toggle{
+    display:flex;align-items:center;gap:7px;
+    font-weight:600;color:var(--ink);cursor:pointer;
+    user-select:none;
+  }
+  .toggle input{accent-color:var(--emerald);width:16px;height:16px;}
+
+  /* STEPS */
+  .step{
+    display:none;
+    border-left:4px solid var(--blue);
+    background:#f8fbff;
+    border-radius:0 12px 12px 0;
+    padding:13px 16px 14px;
+    margin-top:14px;
+    animation:fade .35s ease;
+  }
+  .step.show{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+  .step-head{
+    display:flex;align-items:center;gap:10px;
+    margin-bottom:8px;
+    flex-wrap:wrap;
+  }
+  .badge{
+    background:var(--blue);
+    color:#fff;
+    font-weight:700;
+    font-size:.74rem;
+    padding:3px 10px;
+    border-radius:999px;
+    letter-spacing:.02em;
+  }
+  .mbadge{
+    background:var(--amber);
+    color:#3b2400;
+    font-weight:800;
+    font-size:.7rem;
+    padding:3px 8px;
+    border-radius:7px;
+  }
+  .hint{
+    background:var(--amber-soft);
+    border-left:4px solid var(--amber);
+    border-radius:0 9px 9px 0;
+    padding:9px 12px;
+    margin-top:10px;
+    font-size:.88rem;
+  }
+  .hint b{color:#92400e;}
+  .answer{
+    background:var(--emerald-soft);
+    border-left:4px solid var(--emerald);
+    border-radius:0 9px 9px 0;
+    padding:9px 12px;
+    margin-top:10px;
+    font-size:.92rem;
+    font-weight:600;
+  }
+  .answer b{color:#065f46;}
+
+  .btnrow{
+    display:flex;align-items:center;gap:14px;
+    margin-top:16px;flex-wrap:wrap;
+  }
+  button.next{
+    background:linear-gradient(135deg,#2563eb,#0ea5e9);
+    color:#fff;
+    border:none;
+    border-radius:11px;
+    padding:11px 22px;
+    font-size:.92rem;
+    font-weight:700;
+    cursor:pointer;
+    box-shadow:0 6px 16px rgba(37,99,235,.32);
+    transition:transform .15s, box-shadow .15s, opacity .2s;
+  }
+  button.next:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 9px 22px rgba(37,99,235,.4);}
+  button.next:disabled{
+    background:#c3d3e6;color:#5b7292;cursor:not-allowed;
+    box-shadow:none;transform:none;
+  }
+  .counter{
+    font-weight:700;color:var(--muted);font-size:.86rem;
+    font-variant-numeric:tabular-nums;
+  }
+
+  /* SUMMARY */
+  .summary{
+    background:linear-gradient(135deg,#0f172a,#1e293b 60%,#172554);
+    color:#e6eefb;
+    border:none;
+  }
+  .summary h2{color:#fff;}
+  .summary h2 .dot{background:#3ddc97;box-shadow:0 0 0 4px rgba(61,220,151,.2);}
+  .summary ul{margin:10px 0 0;padding-left:20px;}
+  .summary li{margin-bottom:8px;}
+  .summary .k{color:#93c5fd;font-weight:700;}
+
+  footer{
+    text-align:center;
+    color:var(--muted);
+    font-size:.82rem;
+    padding:10px 0 0;
+  }
+  .katex{font-size:1em;}
+  @media(max-width:560px){
+    .card{padding:18px 15px 20px;border-radius:15px;}
+    input[type=range]{width:110px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <p class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</p>
+    <h1>2021 Paper 2 · Question 25</h1>
+    <p class="sub">Coordinate Geometry — the locus of a point equidistant from two fixed points</p>
+    <div class="pills">
+      <span class="pill">Distance Formula</span>
+      <span class="pill">Locus</span>
+      <span class="pill">Equation of a Circle</span>
+      <span class="pill">Perpendicular Bisector</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- QUESTION -->
+  <section class="card">
+    <h2><span class="dot"></span>Question</h2>
+    <p class="lead">Multiple-choice question from HKDSE 2021 Paper 2, Question 25.</p>
+    <div class="qtext">
+      The coordinates of the points \(M\) and \(N\) are \((5,7)\) and \((6,8)\) respectively. Let \(P\) be a moving point in the rectangular coordinate plane such that \(PM = MN\). Find the equation of the locus of \(P\).
+    </div>
+    <div class="options">
+      <div class="opt"><b>A.</b> \(x - y + 2 = 0\)</div>
+      <div class="opt"><b>B.</b> \(x + y - 13 = 0\)</div>
+      <div class="opt"><b>C.</b> \(x^{2} + y^{2} - 10x - 14y + 72 = 0\)</div>
+      <div class="opt"><b>D.</b> \(x^{2} + y^{2} - 12x - 16y + 98 = 0\)</div>
+    </div>
+  </section>
+
+  <!-- PART A -->
+  <section class="card">
+    <h2><span class="dot"></span>Part (a) — Interpret the condition \(PM = MN\)</h2>
+    <p class="lead">Let \(P=(u,v)\). Start by translating the geometric condition into algebra.</p>
+
+    <div class="canvas-box">
+      <canvas id="cv1" width="880" height="520"></canvas>
+    </div>
+    <div class="controls">
+      <div class="ctrl">
+        <label for="ang1">Angle of \(P\) about \(M\):</label>
+        <input type="range" id="ang1" min="0" max="360" value="115" step="1">
+        <span class="val" id="ang1v">115°</span>
+      </div>
+      <label class="toggle"><input type="checkbox" id="circ1" checked> Show circle \(PM=MN\)</label>
+      <label class="toggle"><input type="checkbox" id="grid1" checked> Show grid</label>
+    </div>
+    <div class="readout">
+      <span class="chip blue">\(MN = \) <span id="mnv">1.414</span></span>
+      <span class="chip">\(PM = \) <span id="pmv">1.414</span></span>
+      <span class="chip amber">\(P = (<span id="pv">4.44, 8.28</span>)\)</span>
+    </div>
+
+    <div class="step" data-step>
+      <div class="step-head"><span class="badge">Step 1</span><span class="mbadge">1M</span></div>
+      <p>Let the moving point be \(P=(u,v)\). The condition of the locus is</p>
+      \[ PM = MN. \]
+      <div class="hint"><b>Hint:</b> Squaring both sides removes the square roots and gives an equivalent condition, since both distances are non-negative.</div>
+    </div>
+
+    <div class="step" data-step>
+      <div class="step-head"><span class="badge">Step 2</span><span class="mbadge">1M</span></div>
+      <p>Compute the fixed distance \(MN\):</p>
+      \[ MN^{2} = (6-5)^{2} + (8-7)^{2} = 1^{2}+1^{2} = 2, \qquad MN=\sqrt{2}. \]
+      <div class="hint"><b>Hint:</b> \(MN\) is a constant, so \(PM = MN\) means \(P\) is always the same distance \(\sqrt{2}\) from the fixed point \(M\) — a circle!</div>
+      <div class="answer"><b>Answer:</b> \(MN = \sqrt{2}\), so the locus of \(P\) is a circle with centre \(M(5,7)\) and radius \(\sqrt{2}\).</div>
+    </div>
+
+    <div class="btnrow">
+      <button class="next">Next step →</button>
+      <span class="counter">0 / 2</span>
+    </div>
+  </section>
+
+  <!-- PART B -->
+  <section class="card">
+    <h2><span class="dot"></span>Part (b)(i) — Set up the equation of the locus</h2>
+    <p class="lead">Write the distance condition in terms of \(u\) and \(v\).</p>
+
+    <div class="canvas-box">
+      <canvas id="cv2" width="880" height="520"></canvas>
+    </div>
+    <div class="controls">
+      <div class="ctrl">
+        <label for="ang2">Position of \(P\) on the locus:</label>
+        <input type="range" id="ang2" min="0" max="360" value="200" step="1">
+        <span class="val" id="ang2v">200°</span>
+      </div>
+      <label class="toggle"><input type="checkbox" id="perp2"> Show perpendicular bisector of \(MN\)</label>
+      <label class="toggle"><input type="checkbox" id="val2" checked> Show \(PM\) and \(MN\) stubs</label>
+    </div>
+    <div class="readout">
+      <span class="chip blue">Condition: \(PM = MN\)</span>
+      <span class="chip">Centre \(M(5,7)\), radius \(r=\sqrt{2}\approx 1.414\)</span>
+    </div>
+
+    <div class="step" data-step>
+      <div class="step-head"><span class="badge">Step 1</span><span class="mbadge">1M</span></div>
+      <p>The condition \(PM = MN\) can be written using the distance formula. Squaring both sides:</p>
+      \[ PM^{2} = MN^{2}. \]
+      <div class="hint"><b>Hint:</b> \(PM^{2} = (u-5)^{2}+(v-7)^{2}\), while \(MN^{2}=2\) from Part (a).</div>
+    </div>
+
+    <div class="step" data-step>
+      <div class="step-head"><span class="badge">Step 2</span><span class="mbadge">1A</span></div>
+      <p>Substitute the coordinates of \(M(5,7)\) and \(N(6,8)\):</p>
+      \[ (u-5)^{2}+(v-7)^{2} = (6-5)^{2}+(8-7)^{2}. \]
+      \[ (5-u)^{2}+(7-v)^{2} = 2. \]
+      <div class="hint"><b>Hint:</b> Either order \((u-5)^2 = (5-u)^2\) gives the same value — the textbook solution uses \((5-u)^2+(7-v)^2=2\).</div>
+      <div class="answer"><b>Equation so far:</b> \((u-5)^2 + (v-7)^2 = 2\).</div>
+    </div>
+
+    <div class="btnrow">
+      <button class="next">Next step →</button>
+      <span class="counter">0 / 2</span>
+    </div>
+  </section>
+
+  <!-- PART C -->
+  <section class="card">
+    <h2><span class="dot"></span>Part (b)(ii) — Expand and simplify to the general form</h2>
+    <p class="lead">Expand the squares and collect terms to match one of the options.</p>
+
+    <div class="step" data-step>
+      <div class="step-head"><span class="badge">Step 1</span><span class="mbadge">1M</span></div>
+      <p>Expand each squared bracket:</p>
+      \[ (25 - 10u + u^{2}) + (49 - 14v + v^{2}) = 2. \]
+      <div class="hint"><b>Hint:</b> \((5-u)^2 = 25-10u+u^2\) and \((7-v)^2 = 49-14v+v^2\).</div>
+    </div>
+
+    <div class="step" data-step>
+      <div class="step-head"><span class="badge">Step 2</span><span class="mbadge">1A</span></div>
+      <p>Collect like terms and bring everything to one side:</p>
+      \[ 25 + 49 - 2 - 10u - 14v + u^{2} + v^{2} = 0, \]
+      \[ u^{2} + v^{2} - 10u - 14v + 72 = 0. \]
+      <div class="hint"><b>Hint:</b> Compare with the options. Option&nbsp;C is exactly \(x^{2}+y^{2}-10x-14y+72=0\).</div>
+      <div class="answer"><b>Answer:</b> The equation of the locus of \(P\) is
+      \[ x^{2}+y^{2}-10x-14y+72=0. \]
+      This is option <b>C</b>.</div>
+    </div>
+
+    <div class="btnrow">
+      <button class="next">Next step →</button>
+      <span class="counter">0 / 2</span>
+    </div>
+  </section>
+
+  <!-- SUMMARY -->
+  <section class="card summary">
+    <h2><span class="dot"></span>Summary of Answers</h2>
+    <ul>
+      <li><span class="k">Fixed length:</span> \(MN = \sqrt{2}\), so \(PM^{2}=MN^{2}=2\).</li>
+      <li><span class="k">Locus condition:</span> \((u-5)^{2}+(v-7)^{2}=2\) — a circle of centre \(M(5,7)\) and radius \(\sqrt{2}\).</li>
+      <li><span class="k">Expanded locus:</span> \(x^{2}+y^{2}-10x-14y+72=0\).</li>
+      <li><span class="k">Correct option:</span> <b>C</b>.</li>
+    </ul>
+  </section>
+
+  <footer>HKDSE 2021 Paper 2 Q25 · Interactive Coordinate Geometry Solution</footer>
+</div>
+
+<script>
+/* ============================================================
+   SHARED HELPERS
+   ============================================================ */
+function makeTransform(canvas, xmin, xmax, ymin, ymax, pad){
+  const W = canvas.width, H = canvas.height;
+  const sx = (W - 2*pad) / (xmax - xmin);
+  const sy = (H - 2*pad) / (ymax - ymin);
+  return {
+    X: x => pad + (x - xmin) * sx,
+    Y: y => H - pad - (y - ymin) * sy,
+    sx, sy, W, H, pad, xmin, xmax, ymin, ymax
+  };
+}
+
+function drawGrid(ctx, t, step){
+  ctx.save();
+  ctx.strokeStyle = "#e6eefa";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  for(let x = Math.ceil(t.xmin); x <= t.xmax; x += step){
+    ctx.moveTo(t.X(x), t.Y(t.ymin));
+    ctx.lineTo(t.X(x), t.Y(t.ymax));
+  }
+  for(let y = Math.ceil(t.ymin); y <= t.ymax; y += step){
+    ctx.moveTo(t.X(t.xmin), t.Y(y));
+    ctx.lineTo(t.X(t.xmax), t.Y(y));
+  }
+  ctx.stroke();
+
+  // axes
+  ctx.strokeStyle = "#93a9c6";
+  ctx.lineWidth = 1.6;
+  ctx.beginPath();
+  if(t.ymin <= 0 && t.ymax >= 0){
+    ctx.moveTo(t.X(t.xmin), t.Y(0));
+    ctx.lineTo(t.X(t.xmax), t.Y(0));
+  } else {
+    ctx.moveTo(t.X(t.xmin), t.Y(t.ymin));
+    ctx.lineTo(t.X(t.xmax), t.Y(t.ymin));
+  }
+  if(t.xmin <= 0 && t.xmax >= 0){
+    ctx.moveTo(t.X(0), t.Y(t.ymin));
+    ctx.lineTo(t.X(0), t.Y(t.ymax));
+  } else {
+    ctx.moveTo(t.X(t.xmin), t.Y(t.ymin));
+    ctx.lineTo(t.X(t.xmin), t.Y(t.ymax));
+  }
+  ctx.stroke();
+
+  // ticks / labels
+  ctx.fillStyle = "#7c93b1";
+  ctx.font = "600 12px 'Segoe UI',sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "top";
+  const y0 = (t.ymin <= 0 && t.ymax >= 0) ? t.Y(0) : t.Y(t.ymin);
+  for(let x = Math.ceil(t.xmin); x <= t.xmax; x += step){
+    if(x === 0) continue;
+    ctx.beginPath();
+    ctx.moveTo(t.X(x), y0 - 3);
+    ctx.lineTo(t.X(x), y0 + 3);
+    ctx.strokeStyle = "#93a9c6";
+    ctx.stroke();
+    ctx.fillText(x, t.X(x), y0 + 6);
+  }
+  ctx.textAlign = "right";
+  ctx.textBaseline = "middle";
+  const x0 = (t.xmin <= 0 && t.xmax >= 0) ? t.X(0) : t.X(t.xmin);
+  for(let y = Math.ceil(t.ymin); y <= t.ymax; y += step){
+    if(y === 0) continue;
+    ctx.beginPath();
+    ctx.moveTo(x0 - 3, t.Y(y));
+    ctx.lineTo(x0 + 3, t.Y(y));
+    ctx.strokeStyle = "#93a9c6";
+    ctx.stroke();
+    ctx.fillText(y, x0 - 7, t.Y(y));
+  }
+  ctx.textAlign = "left";
+  ctx.textBaseline = "top";
+  if(t.xmin <= 0 && t.xmax >= 0 && t.ymin <= 0 && t.ymax >= 0){
+    ctx.fillStyle = "#7c93b1";
+    ctx.fillText("O", x0 + 6, y0 + 6);
+  }
+  ctx.restore();
+}
+
+function drawPoint(ctx, t, x, y, color, label, dx, dy){
+  const px = t.X(x), py = t.Y(y);
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(px, py, 6.5, 0, Math.PI*2);
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.lineWidth = 2.5;
+  ctx.strokeStyle = "#fff";
+  ctx.stroke();
+  if(label){
+    ctx.font = "700 15px 'Segoe UI',sans-serif";
+    ctx.fillStyle = color;
+    ctx.textAlign = "left";
+    ctx.textBaseline = "middle";
+    ctx.fillText(label, px + (dx||10), py + (dy||-12));
+  }
+  ctx.restore();
+}
+
+function drawCirclePath(ctx, t, cx, cy, r, color, lw, dash){
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(t.X(cx), t.Y(cy), r * t.sx, 0, Math.PI*2);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = lw || 2.6;
+  if(dash) ctx.setLineDash(dash);
+  ctx.stroke();
+  ctx.restore();
+}
+
+/* ============================================================
+   DIAGRAM 1 — PM = MN  (Part a)
+   ============================================================ */
+(function(){
+  const cv = document.getElementById('cv1');
+  const ctx = cv.getContext('2d');
+  const t = makeTransform(cv, 1.4, 9.6, 4.2, 11.2, 46);
+  const M = {x:5, y:7};
+  const N = {x:6, y:8};
+  const MN = Math.hypot(N.x-M.x, N.y-M.y);
+
+  const angEl = document.getElementById('ang1');
+  const angV  = document.getElementById('ang1v');
+  const circEl= document.getElementById('circ1');
+  const gridEl= document.getElementById('grid1');
+  const pmv   = document.getElementById('pmv');
+  const pv    = document.getElementById('pv');
+
+  function draw(){
+    const a = (+angEl.value) * Math.PI/180;
+    const P = { x: M.x + MN*Math.cos(a), y: M.y + MN*Math.sin(a) };
+
+    ctx.clearRect(0,0,cv.width,cv.height);
+    if(gridEl.checked) drawGrid(ctx, t, 1);
+
+    // locus circle
+    if(circEl.checked){
+      drawCirclePath(ctx, t, M.x, M.y, MN, "rgba(37,99,235,.85)", 2.6, [7,5]);
+    }
+
+    // segments
+    ctx.save();
+    ctx.strokeStyle = "#f59e0b";
+    ctx.lineWidth = 2.6;
+    ctx.beginPath(); ctx.moveTo(t.X(M.x), t.Y(M.y)); ctx.lineTo(t.X(N.x), t.Y(N.y)); ctx.stroke();
+
+    ctx.strokeStyle = "#059669";
+    ctx.lineWidth = 2.6;
+    ctx.beginPath(); ctx.moveTo(t.X(M.x), t.Y(M.y)); ctx.lineTo(t.X(P.x), t.Y(P.y)); ctx.stroke();
+    ctx.restore();
+
+    // equal-length ticks
+    function ticks(A, B, color, n){
+      const mx=(A.x+B.x)/2, my=(A.y+B.y)/2;
+      const dx=B.x-A.x, dy=B.y-A.y, L=Math.hypot(dx,dy)||1;
+      const nx=-dy/L, ny=dx/L;
+      ctx.save();
+      ctx.strokeStyle=color; ctx.lineWidth=2.4;
+      for(let i=0;i<n;i++){
+        const off=(i-(n-1)/2)*0.09;
+        const bx=mx+nx*off, by=my+ny*off;
+        ctx.beginPath();
+        ctx.moveTo(t.X(bx-ny*0.10), t.Y(by+nx*0.10));
+        ctx.lineTo(t.X(bx+ny*0.10), t.Y(by-nx*0.10));
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+    ticks(M,N,"#b45309",1);
+    ticks(M,P,"#047857",1);
+
+    drawPoint(ctx, t, N.x, N.y, "#f59e0b", "N(6, 8)", 11, -14);
+    drawPoint(ctx, t, M.x, M.y, "#2563eb", "M(5, 7)", 11, -14);
+    drawPoint(ctx, t, P.x, P.y, "#059669", "P(u, v)", 11, 8);
+
+    // legend
+    ctx.save();
+    ctx.font = "600 13px 'Segoe UI',sans-serif";
+    ctx.fillStyle = "#334e68";
+    ctx.fillText("Locus of P: circle, centre M, radius MN = √2", 16, 22);
+    ctx.restore();
+
+    // readouts
+    pmv.textContent = MN.toFixed(3);
+    pv.textContent  = P.x.toFixed(2) + ", " + P.y.toFixed(2);
+    angV.textContent = angEl.value + "°";
+  }
+
+  angEl.addEventListener('input', draw);
+  circEl.addEventListener('change', draw);
+  gridEl.addEventListener('change', draw);
+  draw();
+})();
+
+/* ============================================================
+   DIAGRAM 2 — Circle with centre & radius  (Part b)
+   ============================================================ */
+(function(){
+  const cv = document.getElementById('cv2');
+  const ctx = cv.getContext('2d');
+  const t = makeTransform(cv, 1.0, 11.5, 3.0, 12.5, 46);
+  const M = {x:5, y:7};
+  const N = {x:6, y:8};
+  const R = Math.hypot(N.x-M.x, N.y-M.y);
+
+  const angEl = document.getElementById('ang2');
+  const angV  = document.getElementById('ang2v');
+  const perp  = document.getElementById('perp2');
+  const val   = document.getElementById('val2');
+
+  function draw(){
+    const a = (+angEl.value) * Math.PI/180;
+    const P = { x: M.x + R*Math.cos(a), y: M.y + R*Math.sin(a) };
+
+    ctx.clearRect(0,0,cv.width,cv.height);
+    drawGrid(ctx, t, 1);
+
+    // perpendicular bisector of MN: line through (5.5,7.5) with slope -1
+    if(perp.checked){
+      ctx.save();
+      ctx.setLineDash([8,6]);
+      ctx.strokeStyle = "#7c3aed";
+      ctx.lineWidth = 2.4;
+      const x1 = t.xmin, y1 = 7.5 + (5.5 - x1);   // slope -1
+      const x2 = t.xmax, y2 = 7.5 + (5.5 - x2);
+      ctx.beginPath();
+      ctx.moveTo(t.X(x1), t.Y(y1));
+      ctx.lineTo(t.X(x2), t.Y(y2));
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // dotted radius from M to P
+    ctx.save();
+    ctx.setLineDash([6,5]);
+    ctx.strokeStyle = "#059669";
+    ctx.lineWidth = 2.4;
+    ctx.beginPath(); ctx.moveTo(t.X(M.x), t.Y(M.y)); ctx.lineTo(t.X(P.x), t.Y(P.y)); ctx.stroke();
+    ctx.restore();
+
+    // the locus circle
+    drawCirclePath(ctx, t, M.x, M.y, R, "#2563eb", 3, null);
+
+    // chord MN
+    if(val.checked){
+      ctx.save();
+      ctx.strokeStyle = "#f59e0b";
+      ctx.lineWidth = 2.8;
+      ctx.beginPath(); ctx.moveTo(t.X(M.x), t.Y(M.y)); ctx.lineTo(t.X(N.x), t.Y(N.y)); ctx.stroke();
+      ctx.restore();
+    }
+
+    // centre + radius line to N annotation
+    ctx.save();
+    ctx.strokeStyle = "rgba(37,99,235,.55)";
+    ctx.lineWidth = 1.6;
+    ctx.setLineDash([4,4]);
+    ctx.beginPath(); ctx.moveTo(t.X(M.x), t.Y(M.y)); ctx.lineTo(t.X(M.x)+22, t.Y(M.y)); ctx.stroke();
+    ctx.restore();
+
+    drawPoint(ctx, t, M.x, M.y, "#2563eb", "M(5, 7)", 12, -14);
+    drawPoint(ctx, t, N.x, N.y, "#f59e0b", "N(6, 8)", 12, -14);
+    drawPoint(ctx, t, P.x, P.y, "#059669", "P", 12, 8);
+
+    // radius label
+    ctx.save();
+    ctx.font = "700 13px 'Segoe UI',sans-serif";
+    ctx.fillStyle = "#1e40af";
+    ctx.textAlign = "left";
+    ctx.fillText("r = √2", t.X(M.x)+16, t.Y(M.y)-22);
+
+    ctx.fillStyle = "#334e68";
+    ctx.font = "600 13px 'Segoe UI',sans-serif";
+    ctx.fillText("(u − 5)² + (v − 7)² = 2", 16, 22);
+    ctx.restore();
+
+    angV.textContent = angEl.value + "°";
+  }
+
+  angEl.addEventListener('input', draw);
+  perp.addEventListener('change', draw);
+  val.addEventListener('change', draw);
+  draw();
+})();
+
+/* ============================================================
+   STEP REVEAL
+   ============================================================ */
+document.querySelectorAll('.card').forEach(card => {
+  const steps = card.querySelectorAll('.step');
+  const btn = card.querySelector('.next');
+  const counter = card.querySelector('.counter');
+  if(!steps.length || !btn) return;
+
+  let shown = 0;
+  const total = steps.length;
+
+  function refresh(){
+    counter.textContent = shown + " / " + total;
+    if(shown >= total){
+      btn.disabled = true;
+      btn.textContent = "All steps revealed ✓";
+    } else {
+      btn.disabled = false;
+      btn.textContent = "Next step →";
+    }
+  }
+
+  btn.addEventListener('click', () => {
+    if(shown >= total) return;
+    steps[shown].classList.add('show');
+    shown++;
+    refresh();
+    if(window.MathJax && MathJax.typesetPromise){
+      MathJax.typesetPromise([steps[shown-1]]).catch(()=>{});
+    }
+    const y = steps[shown-1].getBoundingClientRect().top + window.scrollY - 90;
+    window.scrollTo({top:y, behavior:'smooth'});
+  });
+
+  refresh();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE Math 2024 Paper 2 Q17 · Interactive Solution</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(', '\\)'], ['$', '$']], displayMath: [['\\[', '\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<style>
+  :root{
+    --blue:#1d4ed8; --blue-l:#3b82f6; --amber:#f59e0b; --emerald:#059669;
+    --ink:#0f172a; --muted:#64748b; --bg:#f1f5f9; --card:#ffffff;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Segoe UI',system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.6;
+  }
+  /* ---------- HERO ---------- */
+  .hero{
+    background:linear-gradient(135deg,#0f172a 0%,#1d4ed8 45%,#3b82f6 100%);
+    color:#fff; padding:42px 22px 54px; position:relative; overflow:hidden;
+  }
+  .hero::after{
+    content:""; position:absolute; right:-90px; top:-90px; width:320px; height:320px;
+    background:radial-gradient(circle,rgba(245,158,11,.45),transparent 65%); border-radius:50%;
+  }
+  .hero-inner{max-width:1000px; margin:0 auto; position:relative; z-index:2;}
+  .eyebrow{
+    text-transform:uppercase; letter-spacing:.18em; font-size:.72rem; font-weight:700;
+    color:#bfdbfe; margin-bottom:8px;
+  }
+  .hero h1{font-size:clamp(1.5rem,4vw,2.2rem); margin:.1em 0 .2em; font-weight:800;}
+  .hero .sub{color:#dbeafe; font-size:1rem; margin-bottom:18px;}
+  .pills{display:flex; flex-wrap:wrap; gap:8px;}
+  .pill{
+    background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.3);
+    padding:4px 13px; border-radius:999px; font-size:.78rem; font-weight:600; backdrop-filter:blur(4px);
+  }
+  /* ---------- LAYOUT ---------- */
+  .wrap{max-width:1000px; margin:-30px auto 0; padding:0 18px 60px; position:relative; z-index:3;}
+  .card{
+    background:var(--card); border-radius:16px; padding:24px 26px; margin-bottom:24px;
+    box-shadow:0 6px 24px rgba(15,23,42,.08); border:1px solid #e2e8f0;
+  }
+  .card h2{
+    font-size:1.18rem; margin:0 0 14px; color:var(--blue); font-weight:800;
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  }
+  .card h2 .mk{
+    background:#dbeafe; color:#1e40af; font-size:.72rem; padding:2px 10px; border-radius:999px; font-weight:700;
+  }
+  .qtext{
+    background:#f8fafc; border-left:5px solid var(--amber); border-radius:10px; padding:16px 18px;
+    font-size:1.02rem;
+  }
+  .choices{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:10px; margin-top:14px;}
+  .choice{
+    background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:10px 14px;
+    font-weight:600; color:#334155; box-shadow:0 1px 3px rgba(0,0,0,.04);
+  }
+  .choice.correct{border-color:var(--emerald); background:#ecfdf5; color:#065f46;}
+  /* ---------- CANVAS ---------- */
+  .canvas-box{background:#fbfdff; border:1px solid #e2e8f0; border-radius:12px; padding:12px; margin:14px 0;}
+  canvas{width:100%; display:block; border-radius:8px; background:#fff; touch-action:none;}
+  .readouts{
+    display:flex; flex-wrap:wrap; gap:10px; margin-top:10px;
+  }
+  .ro{
+    background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:6px 12px;
+    font-size:.82rem; font-weight:700; color:#1e3a8a; font-variant-numeric:tabular-nums;
+  }
+  .ro.green{background:#ecfdf5; border-color:#a7f3d0; color:#065f46;}
+  .ro.amber{background:#fffbeb; border-color:#fde68a; color:#92400e;}
+  /* ---------- CONTROLS ---------- */
+  .controls{display:flex; flex-wrap:wrap; gap:18px; align-items:center; margin:10px 0 4px;}
+  .ctrl{display:flex; align-items:center; gap:9px; font-size:.85rem; font-weight:700; color:#334155;}
+  input[type=range]{width:150px; accent-color:var(--blue);}
+  input[type=checkbox]{width:17px; height:17px; accent-color:var(--emerald);}
+  /* ---------- STEPS ---------- */
+  .step{
+    display:none; background:#f8fafc; border:1px solid #e2e8f0; border-left:4px solid var(--blue-l);
+    border-radius:10px; padding:14px 16px; margin-top:14px; animation:fade .35s ease;
+  }
+  .step.show{display:block;}
+  @keyframes fade{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;}}
+  .step-head{display:flex; align-items:center; gap:10px; margin-bottom:8px; flex-wrap:wrap;}
+  .badge{
+    background:var(--blue); color:#fff; width:26px; height:26px; border-radius:50%;
+    display:inline-flex; align-items:center; justify-content:center; font-size:.8rem; font-weight:800; flex:none;
+  }
+  .mark{
+    background:#fef3c7; color:#92400e; font-size:.7rem; font-weight:800; padding:2px 9px; border-radius:999px;
+    border:1px solid #fcd34d;
+  }
+  .step-title{font-weight:800; color:#0f172a; font-size:.95rem;}
+  .hint{
+    background:#fffbeb; border-left:4px solid var(--amber); border-radius:8px;
+    padding:9px 13px; margin-top:10px; font-size:.88rem; color:#78350f;
+  }
+  .hint b{color:#b45309;}
+  .answer{
+    background:#ecfdf5; border-left:4px solid var(--emerald); border-radius:8px;
+    padding:9px 13px; margin-top:10px; font-size:.9rem; color:#065f46; font-weight:600;
+  }
+  .btn{
+    background:var(--blue); color:#fff; border:none; border-radius:9px; padding:10px 20px;
+    font-size:.9rem; font-weight:700; cursor:pointer; transition:.2s; margin-top:14px;
+  }
+  .btn:hover:not(:disabled){background:#1e40af; transform:translateY(-1px);}
+  .btn:disabled{background:#94a3b8; cursor:default; opacity:.75;}
+  .counter{font-size:.82rem; color:var(--muted); font-weight:700; margin-left:12px;}
+  /* ---------- SUMMARY ---------- */
+  .summary{background:linear-gradient(135deg,#0f172a,#1e293b); color:#e2e8f0; border:none;}
+  .summary h2{color:#93c5fd;}
+  .summary ul{list-style:none; padding:0; margin:0;}
+  .summary li{
+    padding:10px 0 10px 30px; position:relative; border-bottom:1px solid rgba(255,255,255,.08); font-size:.95rem;
+  }
+  .summary li:last-child{border-bottom:none;}
+  .summary li::before{
+    content:"✓"; position:absolute; left:0; top:10px; color:#34d399; font-weight:800;
+  }
+  .summary b{color:#fbbf24;}
+  footer{text-align:center; padding:26px 18px 40px; color:var(--muted); font-size:.82rem;}
+  @media(max-width:520px){
+    .card{padding:18px 16px;}
+    .hero{padding:30px 16px 44px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= HERO ================= -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</div>
+    <h1>2024 Paper 2 · Question 17</h1>
+    <div class="sub">Plane Geometry — Similar Triangles &amp; Areas of Trapeziums</div>
+    <div class="pills">
+      <span class="pill">Square &amp; Parallel Lines</span>
+      <span class="pill">Similar Triangles</span>
+      <span class="pill">Area Ratio</span>
+      <span class="pill">Trapezium</span>
+      <span class="pill">Multiple Choice</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ================= QUESTION ================= -->
+  <div class="card">
+    <h2>Question <span class="mk">Multiple Choice</span></h2>
+    <div class="qtext">
+      <p>In the figure, \(ABCD\) is a square. Let \(M\) be the mid-point of \(BC\). \(E\) is a point lying on \(AD\) such that \(AE = 3ED\), \(F\) is a point lying on \(BC\) produced such that \(CF = ED\), \(AF\) and \(ME\) intersect at the point \(H\), while \(ME\) and \(DF\) intersect at the point \(G\). If the area of \(\triangle BHM\) is \(4\text{ cm}^2\), then the area of the trapezium \(AEGH\) is</p>
+      <div class="choices">
+        <div class="choice">A. \(30\text{ cm}^2\)</div>
+        <div class="choice">B. \(33\text{ cm}^2\)</div>
+        <div class="choice correct">C. \(39\text{ cm}^2\) ✓</div>
+        <div class="choice">D. \(45\text{ cm}^2\)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= PART (a) ================= -->
+  <div class="card">
+    <h2>Part (a) — Set up lengths &amp; similarity ratios <span class="mk">2M</span></h2>
+
+    <div class="canvas-box">
+      <canvas id="cv1" width="900" height="620"></canvas>
+      <div class="controls">
+        <label class="ctrl">\(ED = k\) (cm): <input type="range" id="s1" min="0.5" max="4" step="0.1" value="2"></label>
+        <label class="ctrl"><input type="checkbox" id="c1a" checked> Show hidden \(BH\)</label>
+        <label class="ctrl"><input type="checkbox" id="c1b" checked> Shade \(\triangle BHM\)</label>
+      </div>
+      <div class="readouts">
+        <span class="ro" id="ro1a">AE = 3k</span>
+        <span class="ro" id="ro1b">BM = MC = 2k</span>
+        <span class="ro" id="ro1c">CF = k</span>
+        <span class="ro green" id="ro1d">HM / GF = 2/5</span>
+      </div>
+    </div>
+
+    <p>Notice the parallel structure: \(BMFC\) lie on one straight line, and the whole square gives us a very clean set of similar triangles.</p>
+
+    <div class="step" id="a1">
+      <div class="step-head"><span class="badge">1</span><span class="mark">1M</span><span class="step-title">Assign \(ED = k\) and read off every length</span></div>
+      <p>Let \(ED = k\). Then because \(AE = 3ED\),</p>
+      \[ AE = 3k,\qquad AD = 4k .\]
+      <p>As \(ABCD\) is a square, \(BC = 4k\). Since \(M\) is the mid-point of \(BC\) and \(CF = ED = k\):</p>
+      \[ BM = MC = 2k,\qquad CF = k,\qquad BF = BC + CF = 5k .\]
+      <div class="hint"><b>Hint:</b> Always reduce the picture to one unknown \(k\). Here every single segment becomes a multiple of \(k\), which is exactly what the markscheme does.</div>
+    </div>
+
+    <div class="step" id="a2">
+      <div class="step-head"><span class="badge">2</span><span class="mark">1M</span><span class="step-title">Spot \(\triangle BHM \sim \triangle BGF\)</span></div>
+      <p>In \(\triangle BHM\) and \(\triangle BGF\):</p>
+      <ul>
+        <li>\(\angle BHM = \angle BGF\) (vertically opposite angles, since \(H\), \(M\), \(G\), \(F\) are collinear),</li>
+        <li>\(\angle HBM = \angle GBF\) (common angle).</li>
+      </ul>
+      <p>So the two triangles are similar (AA), giving</p>
+      \[ \frac{HM}{GF} = \frac{BM}{BF} = \frac{2k}{2k+2k+k} = \frac{2k}{5k} = \frac{2}{5}. \]
+      <div class="hint"><b>Hint:</b> \(M\) lies <em>between</em> \(B\) and \(F\), so \(BF\) is the <em>sum</em> \(BM + MC + CF\), not merely \(BM + CF\).</div>
+      <div class="answer">Similarity ratio \(\triangle BHM : \triangle BGF = 2 : 5\)</div>
+    </div>
+
+    <button class="btn" data-target="a" data-total="2">Next step →</button><span class="counter" id="cnt-a">0 / 2</span>
+  </div>
+
+  <!-- ================= PART (b) ================= -->
+  <div class="card">
+    <h2>Part (b) — Areas of the triangles <span class="mk">3M</span></h2>
+
+    <div class="canvas-box">
+      <canvas id="cv2" width="900" height="620"></canvas>
+      <div class="controls">
+        <label class="ctrl">\([\,\triangle BHM] = 4\text{ cm}^2\) <input type="range" id="s2" min="1" max="16" step="0.5" value="4"></label>
+        <label class="ctrl"><input type="checkbox" id="c2a" checked> Shade \(\triangle BGF\)</label>
+        <label class="ctrl"><input type="checkbox" id="c2b" checked> Shade \(\triangle DEG\), \(\triangle CFG\)</label>
+      </div>
+      <div class="readouts">
+        <span class="ro amber" id="ro2a">[BHM] = 4 cm²</span>
+        <span class="ro" id="ro2b">[BGF] = 25 cm²</span>
+        <span class="ro green" id="ro2c">[FGHM] = 21 cm²</span>
+        <span class="ro" id="ro2d">EG : GF = 1 : 1</span>
+      </div>
+    </div>
+
+    <div class="step" id="b1">
+      <div class="step-head"><span class="badge">1</span><span class="mark">1M</span><span class="step-title">Area ratio from the length ratio</span></div>
+      <p>For similar figures, areas are in the <em>square</em> of the linear ratio:</p>
+      \[ \frac{[\triangle BGF]}{[\triangle BHM]} = \left(\frac{GF}{HM}\right)^{2} = \left(\frac{5}{2}\right)^{2} = \frac{25}{4}. \]
+      <p>Given \([\triangle BHM] = 4\text{ cm}^2\):</p>
+      \[ [\triangle BGF] = 4 \times \frac{25}{4} = 25\text{ cm}^2 . \]
+      <div class="hint"><b>Hint:</b> Be careful — the ratio \(5/2\) is <em>length</em>. Squaring it is the step that most candidates lose a mark for.</div>
+    </div>
+
+    <div class="step" id="b2">
+      <div class="step-head"><span class="badge">2</span><span class="mark">1M</span><span class="step-title">Subtract to get the trapezium \(FGHM\)</span></div>
+      <p>Since \(\triangle BHM\) lies inside \(\triangle BGF\) (sharing vertex \(B\) and cut off by line \(ME\)):</p>
+      \[ [FGHM] = [\triangle BGF] - [\triangle BHM] = 25 - 4 = 21\text{ cm}^2 . \]
+      <div class="answer">Area of trapezium \(FGHM = 21\text{ cm}^2\)</div>
+      <div class="hint"><b>Hint:</b> This is the “remainder” trapezium. We will use it as the reference area for Part (c).</div>
+    </div>
+
+    <div class="step" id="b3">
+      <div class="step-head"><span class="badge">3</span><span class="mark">1M</span><span class="step-title">Show \(EG = GF\) and get \(HM, AH\)</span></div>
+      <p>Since \(AE \parallel DF\) (both on the square's parallel sides), and \(AD \parallel BC\), the quadrilateral \(AMFE\) is a parallelogram — so \(AF\) and \(ME\) bisect each other. Hence</p>
+      \[ EG = GF = 5x \quad \text{say, and}\quad HM = 2x . \]
+      <p>Then on the straight line \(ME\):</p>
+      \[ AH = AF - HF \quad\Longrightarrow\quad AH = 8x, \qquad \text{so } HM = 2x,\; AH = 8x .\]
+      <div class="hint"><b>Hint:</b> The mid-point property comes from the parallelogram: diagonals bisect each other. The ratio \(AH : HM = 4 : 1\) mirrors \(AE : BM\).</div>
+      <div class="answer">\(EG = GF = 5x\), \(HM = 2x\), \(AH = 8x\)</div>
+    </div>
+
+    <button class="btn" data-target="b" data-total="3">Next step →</button><span class="counter" id="cnt-b">0 / 3</span>
+  </div>
+
+  <!-- ================= PART (c) ================= -->
+  <div class="card">
+    <h2>Part (c) — Area of trapezium \(AEGH\) <span class="mk">2M</span></h2>
+
+    <div class="canvas-box">
+      <canvas id="cv3" width="900" height="620"></canvas>
+      <div class="controls">
+        <label class="ctrl">\(ED = k\): <input type="range" id="s3" min="0.5" max="4" step="0.1" value="2"></label>
+        <label class="ctrl"><input type="checkbox" id="c3a" checked> Shade \(AEGH\)</label>
+        <label class="ctrl"><input type="checkbox" id="c3b" checked> Shade \(FGHM\)</label>
+      </div>
+      <div class="readouts">
+        <span class="ro" id="ro3a">parallel sides 8x &amp; 5x</span>
+        <span class="ro green" id="ro3b">[AEGH] / [FGHM] = 13/7</span>
+        <span class="ro amber" id="ro3c">[AEGH] = 39 cm²</span>
+      </div>
+    </div>
+
+    <div class="step" id="c1">
+      <div class="step-head"><span class="badge">1</span><span class="mark">1M</span><span class="step-title">Common height → ratio of parallel sides</span></div>
+      <p>Both trapeziums \(AEGH\) and \(FGHM\) have the same height \(h\) measured between the parallel lines \(AD\) and \(BF\):</p>
+      \[ [AEGH] = \frac{(AH + EG)\,h}{2}, \qquad [FGHM] = \frac{(HM + GF)\,h}{2}. \]
+      <p>Using \(AH = 8x,\; EG = GF = 5x,\; HM = 2x\):</p>
+      \[ \frac{[AEGH]}{[FGHM]} = \frac{(8x + 5x)h/2}{(2x + 5x)h/2} = \frac{13x}{7x} = \frac{13}{7}. \]
+      <div class="hint"><b>Hint:</b> In trapeziums with the same height, the area ratio is simply the ratio of the sums of parallel sides — the \(h/2\) cancels completely.</div>
+    </div>
+
+    <div class="step" id="c2">
+      <div class="step-head"><span class="badge">2</span><span class="mark">1A</span><span class="step-title">Substitute the known area</span></div>
+      <p>From Part (b), \([FGHM] = 21\text{ cm}^2\). Therefore</p>
+      \[ [AEGH] = 21 \times \frac{13}{7} = 3 \times 13 = 39\text{ cm}^2 . \]
+      <div class="answer">Area of trapezium \(AEGH = \boxed{39\text{ cm}^2}\) → Answer <b>C</b></div>
+      <div class="hint"><b>Check:</b> \(39\) is larger than the trapezium \(FGHM = 21\), consistent with \(AEGH\) having longer parallel sides (\(13x\) vs \(7x\)).</div>
+    </div>
+
+    <button class="btn" data-target="c" data-total="2">Next step →</button><span class="counter" id="cnt-c">0 / 2</span>
+  </div>
+
+  <!-- ================= SUMMARY ================= -->
+  <div class="card summary">
+    <h2>Summary of Results</h2>
+    <ul>
+      <li>Set \(ED = k\) ⇒ \(AE = 3k\), \(BM = MC = 2k\), \(CF = k\), \(BF = 5k\).</li>
+      <li>\(\triangle BHM \sim \triangle BGF\) with \(\dfrac{HM}{GF} = \dfrac{2}{5}\).</li>
+      <li>\(\dfrac{[\triangle BGF]}{[\triangle BHM]} = \left(\dfrac{5}{2}\right)^2 = \dfrac{25}{4}\) ⇒ \([\triangle BGF] = \mathbf{25\text{ cm}^2}\).</li>
+      <li>Trapezium \([FGHM] = 25 - 4 = \mathbf{21\text{ cm}^2}\).</li>
+      <li>\(EG = GF = 5x\), \(HM = 2x\), \(AH = 8x\) ⇒ \(\dfrac{[AEGH]}{[FGHM]} = \dfrac{13}{7}\).</li>
+      <li>Therefore \([AEGH] = 21 \times \dfrac{13}{7} = \mathbf{39\text{ cm}^2}\) — <b>Answer C</b>.</li>
+    </ul>
+  </div>
+
+</div>
+
+<footer>HKDSE Mathematics (Compulsory Part) · 2024 Paper 2 Question 17 · Interactive Solution</footer>
+
+<script>
+/* ============================================================
+   GEOMETRY MODEL
+   Square ABCD side (in "k" units) = 4.  A(0,0) B(4,0) C(4,4) D(0,4)
+   E on AD with AE = 3k -> E(0,3k).  M mid of BC -> M(4,2k).
+   F on BC produced, CF = k -> F(4, 4+k).
+   Scale: 1 unit = P pixels.
+   ============================================================ */
+const S = 92;            // pixels per unit (k = 1 default scale reference)
+const ORIGIN = {x: 110, y: 540};
+
+function toPx(p, k){
+  // p given in square units (0..4 horizontally / vertically), multiplied by k/... 
+  // We fix the square side = 4 units (k-independent drawing frame),
+  // and place E,M,F using normalized coords so the picture always fits.
+  return { x: ORIGIN.x + p.x * S, y: ORIGIN.y - p.y * S };
+}
+
+/* Normalized coordinates in the fixed 4x4 frame (k cancels). */
+const A = {x:0, y:0};
+const B = {x:4, y:0};
+const C = {x:4, y:4};
+const D = {x:0, y:4};
+const E = {x:0, y:3};      // AE = 3 of 4
+const M = {x:4, y:2};      // mid of BC
+const F = {x:4, y:5};      // CF = 1
+
+/* line intersection helper */
+function inter(p1,p2,p3,p4){
+  const d = (p1.x-p2.x)*(p3.y-p4.y) - (p1.y-p2.y)*(p3.x-p4.x);
+  if(Math.abs(d) < 1e-9) return null;
+  const a = p1.x*p2.y - p1.y*p2.x;
+  const b = p3.x*p4.y - p3.y*p4.x;
+  return {
+    x: (a*(p3.x-p4.x) - (p1.x-p2.x)*b)/d,
+    y: (a*(p3.y-p4.y) - (p1.y-p2.y)*b)/d
+  };
+}
+const H = inter(A,F, M,E);   // AF ∩ ME
+const G = inter(M,E, D,F);   // ME ∩ DF
+
+/* ---------- drawing helpers ---------- */
+function seg(ctx,p,q,color,width,dash){
+  const P=toPx(p), Q=toPx(q);
+  ctx.save();
+  ctx.strokeStyle=color; ctx.lineWidth=width||2;
+  if(dash) ctx.setLineDash(dash);
+  ctx.beginPath(); ctx.moveTo(P.x,P.y); ctx.lineTo(Q.x,Q.y); ctx.stroke();
+  ctx.restore();
+}
+function label(ctx,p,txt,color,dx,dy,size){
+  const P=toPx(p);
+  ctx.save();
+  ctx.fillStyle=color||'#0f172a';
+  ctx.font='bold '+(size||17)+'px Segoe UI, sans-serif';
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(txt, P.x+(dx||0), P.y+(dy||0));
+  ctx.restore();
+}
+function dot(ctx,p,color,r){
+  const P=toPx(p);
+  ctx.save();
+  ctx.fillStyle=color||'#1d4ed8';
+  ctx.beginPath(); ctx.arc(P.x,P.y,r||5,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+}
+function poly(ctx,pts,fill,stroke,alpha){
+  ctx.save();
+  if(alpha) ctx.globalAlpha=alpha;
+  ctx.beginPath();
+  pts.forEach((p,i)=>{
+    const P=toPx(p);
+    i?ctx.lineTo(P.x,P.y):ctx.moveTo(P.x,P.y);
+  });
+  ctx.closePath();
+  if(fill){ctx.fillStyle=fill; ctx.fill();}
+  if(stroke){ctx.strokeStyle=stroke; ctx.lineWidth=2; ctx.stroke();}
+  ctx.restore();
+}
+function tick(ctx,p,q,color){
+  const P=toPx(p), Q=toPx(q);
+  const mx=(P.x+Q.x)/2, my=(P.y+Q.y)/2;
+  ctx.save();
+  ctx.fillStyle=color||'#0f172a';
+  ctx.beginPath(); ctx.arc(mx,my,3,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+}
+
+/* ============================================================
+   CANVAS 1 : Part (a) — similar triangles BHM ~ BGF
+   ============================================================ */
+const cv1=document.getElementById('cv1'), x1=cv1.getContext('2d');
+function draw1(){
+  const k=parseFloat(document.getElementById('s1').value);
+  const showBH=document.getElementById('c1a').checked;
+  const shade=document.getElementById('c1b').checked;
+
+  x1.clearRect(0,0,cv1.width,cv1.height);
+
+  // ---- background grid (subtle) ----
+  x1.save();
+  x1.strokeStyle='#e8eef7'; x1.lineWidth=1;
+  for(let g=0; g<=480; g+=46){
+    x1.beginPath(); x1.moveTo(ORIGIN.x+g*0.5, ORIGIN.y-460); x1.lineTo(ORIGIN.x+g*0.5, ORIGIN.y); x1.stroke();
+    x1.beginPath(); x1.moveTo(ORIGIN.x-10, ORIGIN.y-g*0.5); x1.lineTo(ORIGIN.x+480, ORIGIN.y-g*0.5); x1.stroke();
+  }
+  x1.restore();
+
+  // ---- shaded triangle BHM ----
+  if(shade) poly(x1,[B,H,M],'#fde68a',null,0.55);
+  // ---- shaded triangle BGF outline ----
+  poly(x1,[B,G,F],'rgba(59,130,246,0.12)','#3b82f6');
+
+  // ---- the extended horizontal line B-M-C-F ----
+  seg(x1,B,F,'#94a3b8',2,[6,5]);
+
+  // ---- square ABCD ----
+  poly(x1,[A,B,C,D],null,'#0f172a',1);
+  x1.save(); x1.lineWidth=3; x1.strokeStyle='#0f172a';
+  seg(x1,A,B,'#0f172a',3); seg(x1,B,C,'#0f172a',3);
+  seg(x1,C,D,'#0f172a',3); seg(x1,D,A,'#0f172a',3);
+  x1.restore();
+
+  // ---- key segments ----
+  seg(x1,A,F,'#dc2626',2.5);   // AF
+  seg(x1,M,E,'#059669',2.5);   // ME
+  seg(x1,D,F,'#7c3aed',2.5);   // DF
+  if(showBH) seg(x1,B,H,'#f59e0b',2,[5,4]);
+
+  // ---- fixed 4x4 frame ticks showing k ----
+  label(x1,A,'A','#0f172a',-22,-14,20);
+  label(x1,B,'B','#0f172a',-8,26,20);
+  label(x1,C,'C','#0f172a',26,26,20);
+  label(x1,D,'D','#0f172a',-8,-18,20);
+  label(x1,E,'E','#dc2626',-24,-10,19);
+  label(x1,M,'M','#059669',12,26,19);
+  label(x1,F,'F','#7c3aed',26,22,19);
+  label(x1,H,'H','#b45309',-22,14,19);
+  label(x1,G,'G','#7c3aed',24,-8,19);
+
+  dot(x1,H,'#b45309',6); dot(x1,G,'#7c3aed',6);
+
+  // ---- scale readouts on segment labels (k values) ----
+  const kk=k;
+  // AE = 3k, ED = k along the top
+  label(x1,{x:1.5,y:4.12},'AE = 3k','#334155',0,0,15);
+  label(x1,{x:3.5,y:4.12},'ED = k','#334155',0,0,15);
+  // BM = 2k, MC = 2k, CF = k along the bottom
+  label(x1,{x:2,y:-0.30},'BM = 2k','#334155',0,0,15);
+  label(x1,{x:3,y:-0.30},'MC = 2k','#334155',0,0,15);
+  label(x1,{x:4.55,y:-0.30},'CF = k','#334155',0,0,15);
+  label(x1,{x:0.5,y:3.22},'3k','#334155',0,0,15);
+  label(x1,{x:4.18,y:2.55},'2k','#334155',0,0,15);
+  label(x1,{x:4.22,y:0.85},'2k','#334155',0,0,15);
+  label(x1,{x:4.55,y:4.55},'k','#334155',0,0,15);
+
+  // BH : HF length markers on AF (using ratio AH:HF = 8:2 = 4:1)
+  label(x1,{x:1.0,y:1.30},'AH = 8x','#b91c1c',0,0,16);
+  label(x1,{x:2.3,y:1.55},'HM = 2x','#b45309',0,0,16);
+  label(x1,{x:2.55,y:0.28},'HM = 2x','#b45309',0,0,15);
+  label(x1,{x:3.6,y:0.95},'GF = 5x','#6d28d9',0,0,16);
+
+  // ---- ratio box ----
+  x1.save();
+  x1.fillStyle='rgba(255,255,255,.92)';
+  x1.strokeStyle='#3b82f6'; x1.lineWidth=2;
+  x1.beginPath(); x1.roundRect(28,28,300,78,12); x1.fill(); x1.stroke();
+  x1.fillStyle='#1e3a8a'; x1.font='bold 19px Segoe UI, sans-serif';
+  x1.fillText('ΔBHM ~ ΔBGF',46,60);
+  x1.font='bold 17px Segoe UI, sans-serif'; x1.fillStyle='#b45309';
+  x1.fillText('HM : GF = BM : BF = 2k : 5k = 2 : 5',46,88);
+  x1.restore();
+
+  // readouts
+  document.getElementById('ro1a').textContent='AE = 3k';
+  document.getElementById('ro1b').textContent='BM = MC = 2k';
+  document.getElementById('ro1c').textContent='CF = k';
+  document.getElementById('ro1d').textContent='HM / GF = 2 / 5';
+}
+
+/* ============================================================
+   CANVAS 2 : Part (b) — area of BGF and trapezium FGHM
+   ============================================================ */
+const cv2=document.getElementById('cv2'), x2=cv2.getContext('2d');
+function draw2(){
+  const areaBHM=parseFloat(document.getElementById('s2').value);
+  const showBGF=document.getElementById('c2a').checked;
+  const showDEG=document.getElementById('c2b').checked;
+
+  x2.clearRect(0,0,cv2.width,cv2.height);
+
+  // grid
+  x2.save(); x2.strokeStyle='#e8eef7'; x2.lineWidth=1;
+  for(let g=0;g<=480;g+=46){
+    x2.beginPath(); x2.moveTo(ORIGIN.x+g*0.5,ORIGIN.y-460); x2.lineTo(ORIGIN.x+g*0.5,ORIGIN.y); x2.stroke();
+    x2.beginPath(); x2.moveTo(ORIGIN.x-10,ORIGIN.y-g*0.5); x2.lineTo(ORIGIN.x+480,ORIGIN.y-g*0.5); x2.stroke();
+  }
+  x2.restore();
+
+  if(showBGF) poly(x2,[B,G,F],'rgba(59,130,246,0.22)','#2563eb');
+  poly(x2,[B,H,M],'#fde68a',null,0.7);
+  poly(x2,[F,G,H,M],'#a7f3d0',null,0.55);
+  if(showDEG){
+    poly(x2,[D,E,G],'rgba(124,58,237,0.18)','#7c3aed');
+    poly(x2,[C,F,G],'rgba(124,58,237,0.18)','#7c3aed');
+  }
+
+  // square
+  seg(x2,A,B,'#0f172a',3); seg(x2,B,C,'#0f172a',3);
+  seg(x2,C,D,'#0f172a',3); seg(x2,D,A,'#0f172a',3);
+  seg(x2,B,F,'#94a3b8',2,[6,5]);
+
+  // key lines
+  seg(x2,A,F,'#dc2626',2.5);
+  seg(x2,M,E,'#059669',2.5);
+  seg(x2,D,F,'#7c3aed',2.5);
+
+  // labels
+  label(x2,A,'A','#0f172a',-22,-14,20);
+  label(x2,B,'B','#0f172a',-8,26,20);
+  label(x2,C,'C','#0f172a',26,26,20);
+  label(x2,D,'D','#0f172a',-8,-18,20);
+  label(x2,E,'E','#dc2626',-24,-10,19);
+  label(x2,M,'M','#059669',12,26,19);
+  label(x2,F,'F','#7c3aed',26,22,19);
+  label(x2,H,'H','#b45309',-22,14,19);
+  label(x2,G,'G','#7c3aed',24,-8,19);
+  dot(x2,H,'#b45309',6); dot(x2,G,'#7c3aed',6);
+
+  // area labels
+  label(x2,{x:2.55,y:0.75},'ΔBHM','#b45309',0,0,16);
+  label(x2,{x:3.05,y:2.4},'Trapezium','#065f46',0,-14,15);
+  label(x2,{x:3.05,y:2.4},'FGHM','#065f46',0,4,15);
+  label(x2,{x:1.35,y:2.85},'ΔDEG','#6d28d9',0,0,14);
+  label(x2,{x:4.35,y:3.62},'ΔCFG','#6d28d9',0,0,14);
+  label(x2,{x:1.9,y:1.35},'ΔBGF','#1d4ed8',0,0,16);
+
+  // ratio markers
+  label(x2,{x:2.35,y:1.6},'HM = 2x','#b45309',0,0,15);
+  label(x2,{x:3.6,y:0.98},'GF = 5x','#6d28d9',0,0,15);
+
+  const areaBGF = areaBHM*25/4;
+  const areaFGHM = areaBGF - areaBHM;
+
+  // info box
+  x2.save();
+  x2.fillStyle='rgba(255,255,255,.94)';
+  x2.strokeStyle='#2563eb'; x2.lineWidth=2;
+  x2.beginPath(); x2.roundRect(28,28,352,104,12); x2.fill(); x2.stroke();
+  x2.fillStyle='#1e3a8a'; x2.font='bold 18px Segoe UI, sans-serif';
+  x2.fillText('[ΔBGF] / [ΔBHM] = (5/2)² = 25/4',46,60);
+  x2.fillStyle='#b45309';
+  x2.fillText('[ΔBHM] = '+areaBHM.toFixed(1)+' cm²',46,88);
+  x2.fillStyle='#065f46';
+  x2.fillText('[ΔBGF] = '+areaBGF.toFixed(2)+' cm²',46,116);
+  x2.restore();
+
+  document.getElementById('ro2a').textContent='[BHM] = '+areaBHM.toFixed(1)+' cm²';
+  document.getElementById('ro2b').textContent='[BGF] = '+areaBGF.toFixed(2)+' cm²';
+  document.getElementById('ro2c').textContent='[FGHM] = '+areaFGHM.toFixed(2)+' cm²';
+  document.getElementById('ro2d').textContent='EG : GF = 1 : 1';
+}
+
+/* ============================================================
+   CANVAS 3 : Part (c) — trapeziums AEGH and FGHM same height
+   ============================================================ */
+const cv3=document.getElementById('cv3'), x3=cv3.getContext('2d');
+function draw3(){
+  const k=parseFloat(document.getElementById('s3').value);
+  const shA=document.getElementById('c3a').checked;
+  const shF=document.getElementById('c3b').checked;
+
+  x3.clearRect(0,0,cv3.width,cv3.height);
+
+  // grid
+  x3.save(); x3.strokeStyle='#e8eef7'; x3.lineWidth=1;
+  for(let g=0;g<=480;g+=46){
+    x3.beginPath(); x3.moveTo(ORIGIN.x+g*0.5,ORIGIN.y-460); x3.lineTo(ORIGIN.x+g*0.5,ORIGIN.y); x3.stroke();
+    x3.beginPath(); x3.moveTo(ORIGIN.x-10,ORIGIN.y-g*0.5); x3.lineTo(ORIGIN.x+480,ORIGIN.y-g*0.5); x3.stroke();
+  }
+  x3.restore();
+
+  // shading
+  if(shA) poly(x3,[A,E,G,H],'#fde68a',null,0.7);
+  if(shF) poly(x3,[F,G,H,M],'#a7f3d0',null,0.6);
+
+  // outlines
+  poly(x3,[A,E,G,H],null,'#d97706',2.5);
+  poly(x3,[F,G,H,M],null,'#059669',2.5);
+
+  // square + extended line
+  seg(x3,A,B,'#0f172a',3); seg(x3,B,C,'#0f172a',3);
+  seg(x3,C,D,'#0f172a',3); seg(x3,D,A,'#0f172a',3);
+  seg(x3,B,F,'#94a3b8',2,[6,5]);
+
+  // key lines
+  seg(x3,A,F,'#dc2626',2.5);
+  seg(x3,M,E,'#059669',2.5);
+  seg(x3,D,F,'#7c3aed',2.5);
+
+  // labels
+  label(x3,A,'A','#0f172a',-22,-14,20);
+  label(x3,B,'B','#0f172a',-8,26,20);
+  label(x3,C,'C','#0f172a',26,26,20);
+  label(x3,D,'D','#0f172a',-8,-18,20);
+  label(x3,E,'E','#dc2626',-24,-10,19);
+  label(x3,M,'M','#059669',12,26,19);
+  label(x3,F,'F','#7c3aed',26,22,19);
+  label(x3,H,'H','#b45309',-22,14,19);
+  label(x3,G,'G','#7c3aed',24,-8,19);
+  dot(x3,H,'#b45309',6); dot(x3,G,'#7c3aed',6);
+
+  // parallel side lengths
+  label(x3,{x:1.15,y:2.35},'AH = 8x','#b45309',0,0,16);
+  label(x3,{x:1.75,y:3.5},'EG = 5x','#d97706',0,0,16);
+  label(x3,{x:2.35,y:1.72},'HM = 2x','#b45309',0,0,15);
+  label(x3,{x:3.55,y:1.05},'GF = 5x','#059669',0,0,15);
+
+  // height indicator
+  x3.save();
+  x3.strokeStyle='#2563eb'; x3.lineWidth=1.8; x3.setLineDash([4,4]);
+  const hp=toPx({x:0.72,y:0}), hq=toPx({x:0.72,y:2});
+  x3.beginPath(); x3.moveTo(hp.x,hp.y); x3.lineTo(hq.x,hq.y); x3.stroke();
+  x3.setLineDash([]);
+  x3.fillStyle='#2563eb'; x3.font='bold 15px Segoe UI, sans-serif';
+  x3.fillText('common height h',hp.x+6,(hp.y+hq.y)/2);
+  x3.restore();
+
+  // info box
+  x3.save();
+  x3.fillStyle='rgba(255,255,255,.94)';
+  x3.strokeStyle='#059669'; x3.lineWidth=2;
+  x3.beginPath(); x3.roundRect(28,28,384,104,12); x3.fill(); x3.stroke();
+  x3.fillStyle='#065f46'; x3.font='bold 18px Segoe UI, sans-serif';
+  x3.fillText('[AEGH] / [FGHM] = (8x+5x)/(2x+5x) = 13/7',46,60);
+  x3.fillStyle='#b45309';
+  x3.fillText('[FGHM] = 21 cm²',46,88);
+  x3.fillStyle='#059669';
+  x3.fillText('[AEGH] = 21 × 13/7 = 39 cm²',46,116);
+  x3.restore();
+
+  document.getElementById('ro3a').textContent='parallel sides 8x & 5x';
+  document.getElementById('ro3b').textContent='[AEGH] / [FGHM] = 13/7';
+  document.getElementById('ro3c').textContent='[AEGH] = 39 cm²';
+}
+
+/* ============================================================
+   STEP REVEAL LOGIC
+   ============================================================ */
+document.querySelectorAll('.btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const tgt=btn.dataset.target;
+    const total=parseInt(btn.dataset.total);
+    const steps=[...document.querySelectorAll('.step')].filter(s=>s.id.startsWith(tgt));
+    const next=steps.find(s=>!s.classList.contains('show'));
+    if(next){
+      next.classList.add('show');
+    }
+    const shown=steps.filter(s=>s.classList.contains('show')).length;
+    document.getElementById('cnt-'+tgt).textContent=shown+' / '+total;
+    if(shown>=total){
+      btn.disabled=true;
+      btn.textContent='All steps revealed ✓';
+    }
+  });
+});
+
+/* ============================================================
+   INIT
+   ============================================================ */
+document.getElementById('s1').addEventListener('input',draw1);
+document.getElementById('c1a').addEventListener('change',draw1);
+document.getElementById('c1b').addEventListener('change',draw1);
+
+document.getElementById('s2').addEventListener('input',draw2);
+document.getElementById('c2a').addEventListener('change',draw2);
+document.getElementById('c2b').addEventListener('change',draw2);
+
+document.getElementById('s3').addEventListener('input',draw3);
+document.getElementById('c3a').addEventListener('change',draw3);
+document.getElementById('c3b').addEventListener('change',draw3);
+
+draw1(); draw2(); draw3();
+
+window.addEventListener('resize',()=>{draw1();draw2();draw3();});
+</script>
+</body>
+</html>

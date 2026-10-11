@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HKDSE Math 2017 Paper 1 Q8 — Interactive Solution</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root {
+    --bg: #f4f7fb;
+    --card: #ffffff;
+    --ink: #1f2937;
+    --muted: #6b7280;
+    --line: #e5e7eb;
+    --primary: #2563eb;
+    --primary-soft: #dbeafe;
+    --accent: #0d9488;
+    --accent-soft: #ccfbf1;
+    --warn: #b45309;
+    --warn-soft: #fef3c7;
+    --radius: 16px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Arial, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 20px 16px 64px; }
+
+  /* ---------- Header ---------- */
+  header.hero {
+    background: linear-gradient(135deg, #1e3a8a, #2563eb 55%, #0d9488);
+    color: #fff;
+    border-radius: var(--radius);
+    padding: 22px 20px;
+    box-shadow: 0 10px 26px rgba(37, 99, 235, .22);
+  }
+  header.hero .tag {
+    display: inline-block;
+    background: rgba(255,255,255,.16);
+    border: 1px solid rgba(255,255,255,.32);
+    border-radius: 999px;
+    padding: 3px 12px;
+    font-size: .74rem;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+  header.hero h1 { margin: 12px 0 4px; font-size: 1.45rem; line-height: 1.3; }
+  header.hero p { margin: 0; font-size: .92rem; opacity: .92; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .chip {
+    background: rgba(255,255,255,.15);
+    border: 1px solid rgba(255,255,255,.3);
+    color: #fff;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: .78rem;
+    font-weight: 600;
+  }
+
+  /* ---------- Cards ---------- */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-top: 18px;
+    box-shadow: 0 3px 14px rgba(17, 24, 39, .05);
+  }
+  .card h2 {
+    margin: 0 0 10px;
+    font-size: 1.06rem;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+  .card h2 .dot {
+    width: 9px; height: 9px; border-radius: 50%;
+    background: var(--primary);
+    flex: 0 0 auto;
+  }
+  .qtext { font-size: 1rem; }
+  .qtext ol { padding-left: 20px; margin: 10px 0 0; }
+  .qtext ol li { margin-bottom: 6px; }
+  .marks {
+    display: inline-block;
+    background: var(--primary-soft);
+    color: #1d4ed8;
+    border-radius: 8px;
+    padding: 2px 9px;
+    font-size: .78rem;
+    font-weight: 700;
+  }
+
+  /* ---------- Steps ---------- */
+  .stepper-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .progress-track {
+    height: 7px; background: var(--line); border-radius: 999px;
+    overflow: hidden; margin: 12px 0 4px;
+  }
+  .progress-fill {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    border-radius: 999px;
+    transition: width .35s ease;
+  }
+  .step {
+    border: 1px solid var(--line);
+    border-left: 5px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-top: 14px;
+    background: #fcfdff;
+    opacity: .55;
+    transition: opacity .3s ease, border-color .3s ease, box-shadow .3s ease;
+  }
+  .step.active { opacity: 1; border-left-color: var(--primary); box-shadow: 0 3px 12px rgba(37,99,235,.10); }
+  .step.done { opacity: 1; border-left-color: var(--accent); }
+  .step .step-title {
+    display: flex; align-items: flex-start; gap: 10px;
+    font-weight: 800; font-size: .97rem;
+  }
+  .step .num {
+    background: var(--primary); color: #fff;
+    min-width: 24px; height: 24px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: .8rem; flex: 0 0 auto; margin-top: 2px;
+  }
+  .step.done .num { background: var(--accent); }
+  .step .body { margin-top: 10px; display: none; }
+  .step.revealed .body { display: block; }
+
+  .hint {
+    background: var(--warn-soft);
+    border: 1px solid #fcd34d;
+    color: #7c2d12;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: .89rem;
+    margin-top: 10px;
+  }
+  .hint b { color: var(--warn); }
+  .ansbox {
+    background: var(--accent-soft);
+    border: 1px solid #5eead4;
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-top: 10px;
+    font-size: .95rem;
+    font-weight: 700;
+    color: #115e59;
+  }
+
+  /* ---------- Buttons ---------- */
+  .btnrow { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+  button {
+    font: inherit;
+    font-weight: 700;
+    border-radius: 11px;
+    padding: 11px 18px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: transform .12s ease, background .2s ease, box-shadow .2s ease;
+    min-height: 44px;
+  }
+  button:active { transform: scale(.98); }
+  .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 4px 12px rgba(37,99,235,.28); }
+  .btn-primary:hover { background: #1d4ed8; }
+  .btn-ghost { background: #fff; color: var(--ink); border-color: var(--line); }
+  .btn-ghost:hover { background: #f3f4f6; }
+  button:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
+
+  /* ---------- Interactive graph ---------- */
+  .graph-grid { display: grid; grid-template-columns: 1fr; gap: 18px; }
+  @media (min-width: 720px) { .graph-grid { grid-template-columns: 1.25fr .95fr; align-items: start; } }
+  canvas { width: 100%; height: auto; display: block; border-radius: 12px; background: #fff; }
+  .readout {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px;
+  }
+  .stat {
+    background: #f8fafc; border: 1px solid var(--line); border-radius: 11px;
+    padding: 9px 12px; text-align: center;
+  }
+  .stat .k { font-size: .74rem; color: var(--muted); font-weight: 700; letter-spacing: .03em; text-transform: uppercase; }
+  .stat .v { font-size: 1.12rem; font-weight: 800; color: var(--primary); }
+  .stat.hi .v { color: var(--accent); }
+
+  label.slider-label { font-size: .86rem; font-weight: 700; color: var(--muted); display: block; margin-top: 16px; }
+  input[type="range"] {
+    width: 100%; margin-top: 8px; accent-color: var(--primary); height: 30px;
+  }
+  .quick { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .quick button { padding: 8px 13px; font-size: .83rem; min-height: 40px; }
+
+  /* ---------- Check ---------- */
+  .check-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .check-row input {
+    font: inherit; padding: 11px 13px; border: 1px solid var(--line);
+    border-radius: 11px; width: 140px; min-height: 44px;
+  }
+  .feedback { margin-top: 10px; font-weight: 700; font-size: .92rem; }
+  .ok { color: #047857; }
+  .no { color: #b91c1c; }
+
+  table.sol { border-collapse: collapse; width: 100%; margin-top: 12px; font-size: .93rem; }
+  table.sol th, table.sol td { border: 1px solid var(--line); padding: 9px 11px; text-align: left; }
+  table.sol th { background: #f1f5f9; font-size: .84rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+
+  footer { text-align: center; color: var(--muted); font-size: .8rem; margin-top: 26px; }
+  .katex-fix { overflow-x: auto; overflow-y: hidden; padding: 2px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ================= HEADER ================= -->
+  <header class="hero">
+    <span class="tag">HKDSE Math 2017 · Paper 1 · Q8</span>
+    <h1>Inverse Variation with a Square Root</h1>
+    <p>Topic 2 — Rate, Ratio and Variations &nbsp;|&nbsp; 5 marks</p>
+    <div class="chips">
+      <span class="chip">Inverse Variation</span>
+      <span class="chip">Proportionality Constant \(k\)</span>
+      <span class="chip">Surds &amp; Roots</span>
+      <span class="chip">Change in Value</span>
+    </div>
+  </header>
+
+  <!-- ================= QUESTION ================= -->
+  <section class="card">
+    <h2><span class="dot"></span>Question</h2>
+    <div class="qtext">
+      <p style="margin:0 0 6px;">
+        It is given that \(y\) varies inversely as \(\sqrt{x}\). When \(x = 144\), \(y = 81\).
+      </p>
+      <ol type="a">
+        <li>Express \(y\) in terms of \(x\).</li>
+        <li>If the value of \(x\) is increased from \(144\) to \(324\), find the change in the value of \(y\).</li>
+      </ol>
+      <p style="margin:10px 0 0;"><span class="marks">5 marks</span></p>
+    </div>
+  </section>
+
+  <!-- ================= GUIDED SOLUTION ================= -->
+  <section class="card">
+    <div class="stepper-head">
+      <h2 style="margin:0;"><span class="dot"></span>Step-by-Step Guided Solution</h2>
+      <span id="stepCounter" style="font-size:.85rem;color:var(--muted);font-weight:700;">Step 0 / 5</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+
+    <!-- Step 1 -->
+    <div class="step" data-step="1">
+      <div class="step-title"><span class="num">1</span>
+        <span>Translate "varies inversely as \(\sqrt{x}\)" into an equation</span>
+      </div>
+      <div class="body">
+        <p>When \(y\) varies inversely as \(\sqrt{x}\), \(y\) is equal to a constant divided by \(\sqrt{x}\):</p>
+        <div class="katex-fix">\[ y = \frac{k}{\sqrt{x}} \]</div>
+        <p>where \(k\) is a non-zero constant (the <em>variation constant</em>).</p>
+        <div class="hint">
+          <b>Hint — form of variation:</b> "varies inversely as" means the variable goes in the <em>denominator</em>.
+          So \(y \propto \dfrac{1}{\sqrt{x}}\), which becomes \(y = \dfrac{k}{\sqrt{x}}\).
+          Here \(k\) is the fixed number we must find from the given data.
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step" data-step="2">
+      <div class="step-title"><span class="num">2</span>
+        <span>Substitute the given values to find the constant \(k\)</span>
+      </div>
+      <div class="body">
+        <p>Substitute \(x = 144\) and \(y = 81\) into \(y = \dfrac{k}{\sqrt{x}}\):</p>
+        <div class="katex-fix">\[ 81 = \frac{k}{\sqrt{144}} \]</div>
+        <div class="hint">
+          <b>Hint — evaluate the root first:</b> \(\sqrt{144} = 12\), so the equation becomes \(81 = \dfrac{k}{12}\).
+          Multiply both sides by \(12\) to isolate \(k\).
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="step" data-step="3">
+      <div class="step-title"><span class="num">3</span>
+        <span>Solve for \(k\) and write down the answer for (a)</span>
+      </div>
+      <div class="body">
+        <div class="katex-fix">\[ k = 81 \times \sqrt{144} = 81 \times 12 = 972 \]</div>
+        <p>Therefore, expressing \(y\) in terms of \(x\):</p>
+        <div class="ansbox">(a) &nbsp; \( y = \dfrac{972}{\sqrt{x}} \)</div>
+        <div class="hint">
+          <b>Hint — why this is worth full marks:</b> An "express in terms of \(x\)" answer must contain only the variable \(x\).
+          Leaving \(k\) in the formula would lose the mark.
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="step" data-step="4">
+      <div class="step-title"><span class="num">4</span>
+        <span>Part (b): find the new value of \(y\) when \(x = 324\)</span>
+      </div>
+      <div class="body">
+        <p>Use the result from part (a) with \(x = 324\):</p>
+        <div class="katex-fix">\[ y = \frac{972}{\sqrt{324}} = \frac{972}{18} = 54 \]</div>
+        <div class="hint">
+          <b>Hint:</b> \(324 = 18^2\), so \(\sqrt{324} = 18\). (Check: \(18^2 = 324\). ✓)
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 5 -->
+    <div class="step" data-step="5">
+      <div class="step-title"><span class="num">5</span>
+        <span>Find the change in \(y\)</span>
+      </div>
+      <div class="body">
+        <p>The initial value of \(y\) (when \(x = 144\)) is \(81\). The new value (when \(x = 324\)) is \(54\).</p>
+        <div class="katex-fix">\[ \text{Change} = 81 - 54 = 27 \]</div>
+        <p>Since the value has gone down, \(y\) <strong>decreases by \(27\)</strong>.</p>
+        <div class="ansbox">(b) &nbsp; The value of \(y\) decreases by \(27\).</div>
+        <div class="hint">
+          <b>Hint — sign matters:</b> The question asks for the <em>change</em>. State the direction ("decrease by") or give \(-27\);
+          a bare "27" without direction is ambiguous.
+        </div>
+      </div>
+    </div>
+
+    <div class="btnrow">
+      <button class="btn-primary" id="btnNext">Next Step ▸</button>
+      <button class="btn-ghost" id="btnAll">Show All Steps</button>
+      <button class="btn-ghost" id="btnReset">Reset</button>
+    </div>
+  </section>
+
+  <!-- ================= INTERACTIVE GRAPH ================= -->
+  <section class="card">
+    <h2><span class="dot" style="background:var(--accent);"></span>Explore: \(y = \dfrac{972}{\sqrt{x}}\)</h2>
+    <p style="margin:0 0 6px;font-size:.92rem;color:var(--muted);">
+      Drag the slider to change \(x\) and watch how \(y\) changes. Notice that as \(x\) increases, \(y\) decreases —
+      that is what "inverse variation" means.
+    </p>
+    <div class="graph-grid">
+      <div>
+        <canvas id="graph" width="640" height="420" aria-label="Graph of y equals 972 over square root of x"></canvas>
+      </div>
+      <div>
+        <label class="slider-label" for="xSlider">Current \(x\): <span id="xLabel" style="color:var(--primary);">144</span></label>
+        <input type="range" id="xSlider" min="36" max="400" step="1" value="144" />
+        <div class="quick">
+          <button class="btn-ghost" data-x="144">\(x=144\)</button>
+          <button class="btn-ghost" data-x="324">\(x=324\)</button>
+        </div>
+        <div class="readout">
+          <div class="stat"><div class="k">\(\sqrt{x}\)</div><div class="v" id="rootOut">12.00</div></div>
+          <div class="stat"><div class="k">\(y = 972/\sqrt{x}\)</div><div class="v" id="yOut">81.00</div></div>
+          <div class="stat hi"><div class="k">Change in \(y\) from \(x=144\)</div><div class="v" id="changeOut">0.00</div></div>
+          <div class="stat"><div class="k">Constant \(k\)</div><div class="v" style="color:var(--warn);">972</div></div>
+        </div>
+        <p style="font-size:.83rem;color:var(--muted);margin-top:12px;">
+          At the two values in the question: \(x = 144 \Rightarrow y = 81\); \(x = 324 \Rightarrow y = 54\); difference \(= 27\).
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SELF CHECK ================= -->
+  <section class="card">
+    <h2><span class="dot" style="background:var(--warn);"></span>Quick Self-Check</h2>
+    <p style="margin-top:0;font-size:.94rem;">If \(x = 324\), what is the value of \(y\)? (Give your answer correct to the nearest integer.)</p>
+    <div class="check-row">
+      <input type="text" id="answerInput" inputmode="numeric" placeholder="e.g. 54" aria-label="Your answer" />
+      <button class="btn-primary" id="btnCheck">Check</button>
+      <button class="btn-ghost" id="btnShowAns">Show Answer</button>
+    </div>
+    <div class="feedback" id="feedback"></div>
+
+    <table class="sol">
+      <thead><tr><th>Quantity</th><th>Value</th></tr></thead>
+      <tbody>
+        <tr><td>Variation constant \(k\)</td><td>\(972\)</td></tr>
+        <tr><td>Formula</td><td>\(y = \dfrac{972}{\sqrt{x}}\)</td></tr>
+        <tr><td>\(y\) when \(x = 144\)</td><td>\(81\)</td></tr>
+        <tr><td>\(y\) when \(x = 324\)</td><td>\(54\)</td></tr>
+        <tr><td>Change in \(y\)</td><td>Decrease by \(27\)</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <footer>HKDSE Mathematics (Compulsory Part) · Paper 1 Question 8 · Interactive Solution</footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ============================================================
+     1. STEP-BY-STEP REVEAL
+     ============================================================ */
+  const steps = Array.from(document.querySelectorAll(".step"));
+  const total = steps.length;
+  let revealed = 0;
+
+  const progressFill = document.getElementById("progressFill");
+  const stepCounter = document.getElementById("stepCounter");
+  const btnNext = document.getElementById("btnNext");
+  const btnAll = document.getElementById("btnAll");
+  const btnReset = document.getElementById("btnReset");
+
+  function updateUI() {
+    steps.forEach(function (el, i) {
+      if (i < revealed) {
+        el.classList.add("revealed");
+        el.classList.add(i < revealed - 1 ? "done" : "active");
+      } else {
+        el.classList.remove("revealed", "done", "active");
+      }
+    });
+    if (revealed > 0) steps[revealed - 1].classList.add("active");
+
+    progressFill.style.width = (revealed / total) * 100 + "%";
+    stepCounter.textContent = "Step " + revealed + " / " + total;
+
+    btnNext.disabled = revealed >= total;
+    btnNext.textContent = revealed >= total ? "All Steps Shown ✓" : "Next Step ▸";
+
+    if (window.MathJax && window.MathJax.typesetPromise) {
+      window.MathJax.typesetPromise();
+    }
+  }
+
+  btnNext.addEventListener("click", function () {
+    if (revealed < total) {
+      revealed++;
+      updateUI();
+      const target = steps[revealed - 1];
+      if (target && window.innerWidth < 720) {
+        target.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }
+  });
+
+  btnAll.addEventListener("click", function () {
+    revealed = total;
+    updateUI();
+  });
+
+  btnReset.addEventListener("click", function () {
+    revealed = 0;
+    updateUI();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+
+  updateUI();
+
+  /* ============================================================
+     2. INTERACTIVE GRAPH  y = 972 / sqrt(x)
+     ============================================================ */
+  const K = 972;
+  const canvas = document.getElementById("graph");
+  const ctx = canvas.getContext("2d");
+  const xSlider = document.getElementById("xSlider");
+  const xLabel = document.getElementById("xLabel");
+  const rootOut = document.getElementById("rootOut");
+  const yOut = document.getElementById("yOut");
+  const changeOut = document.getElementById("changeOut");
+
+  const X_MIN = 20, X_MAX = 420;
+  const Y_MIN = 0,  Y_MAX = 180;
+
+  function yOf(x) { return K / Math.sqrt(x); }
+
+  /* Canvas sizing with devicePixelRatio for crisp rendering */
+  let CW = 640, CH = 420;
+  function resizeCanvas() {
+    const parentWidth = canvas.parentElement.clientWidth;
+    const cssWidth = Math.max(260, Math.min(680, parentWidth));
+    const cssHeight = Math.round(cssWidth * 0.66);
+    const dpr = window.devicePixelRatio || 1;
+    canvas.style.width = cssWidth + "px";
+    canvas.style.height = cssHeight + "px";
+    canvas.width = Math.round(cssWidth * dpr);
+    canvas.height = Math.round(cssHeight * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    CW = cssWidth; CH = cssHeight;
+    draw();
+  }
+
+  const PAD = { l: 52, r: 18, t: 18, b: 42 };
+  function px(x) {
+    return PAD.l + ((x - X_MIN) / (X_MAX - X_MIN)) * (CW - PAD.l - PAD.r);
+  }
+  function py(y) {
+    return (CH - PAD.b) - ((y - Y_MIN) / (Y_MAX - Y_MIN)) * (CH - PAD.t - PAD.b);
+  }
+
+  function drawAxes() {
+    ctx.clearRect(0, 0, CW, CH);
+    ctx.font = "12px -apple-system, Segoe UI, Arial, sans-serif";
+
+    /* grid */
+    ctx.strokeStyle = "#eef2f7";
+    ctx.lineWidth = 1;
+    for (let x = 50; x <= X_MAX; x += 50) {
+      ctx.beginPath();
+      ctx.moveTo(px(x), py(Y_MIN));
+      ctx.lineTo(px(x), py(Y_MAX));
+      ctx.stroke();
+    }
+    for (let y = 20; y <= Y_MAX; y += 20) {
+      ctx.beginPath();
+      ctx.moveTo(px(X_MIN), py(y));
+      ctx.lineTo(px(X_MAX), py(y));
+      ctx.stroke();
+    }
+
+    /* axes */
+    ctx.strokeStyle = "#94a3b8";
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    ctx.moveTo(px(X_MIN), py(Y_MIN));
+    ctx.lineTo(px(X_MAX), py(Y_MIN));
+    ctx.moveTo(px(X_MIN), py(Y_MIN));
+    ctx.lineTo(px(X_MIN), py(Y_MAX));
+    ctx.stroke();
+
+    /* tick labels */
+    ctx.fillStyle = "#64748b";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "top";
+    for (let x = 50; x <= X_MAX; x += 100) {
+      ctx.fillText(String(x), px(x), py(Y_MIN) + 7);
+    }
+    ctx.textAlign = "right";
+    ctx.textBaseline = "middle";
+    for (let y = 0; y <= Y_MAX; y += 45) {
+      ctx.fillText(String(y), px(X_MIN) - 7, py(y));
+    }
+
+    /* axis names */
+    ctx.fillStyle = "#475569";
+    ctx.textAlign = "left";
+    ctx.textBaseline = "bottom";
+    ctx.font = "bold 13px -apple-system, Segoe UI, Arial, sans-serif";
+    ctx.fillText("x", px(X_MAX) - 4, py(Y_MIN) - 6);
+    ctx.fillText("y", px(X_MIN) + 12, py(Y_MAX) + 4);
+    ctx.font = "12px -apple-system, Segoe UI, Arial, sans-serif";
+  }
+
+  function drawCurve() {
+    ctx.beginPath();
+    ctx.strokeStyle = "#2563eb";
+    ctx.lineWidth = 2.6;
+    let started = false;
+    for (let x = X_MIN + 0.5; x <= X_MAX; x += 1) {
+      const y = yOf(x);
+      if (y > Y_MAX) { started = false; continue; }
+      const X = px(x), Y = py(y);
+      if (!started) { ctx.moveTo(X, Y); started = true; }
+      else { ctx.lineTo(X, Y); }
+    }
+    ctx.stroke();
+  }
+
+  function drawPoint(xv, color, label, labelAbove) {
+    const yv = yOf(xv);
+    const X = px(xv), Y = py(yv);
+    if (yv > Y_MAX) return;
+
+    /* guide lines */
+    ctx.setLineDash([4, 4]);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.moveTo(X, py(Y_MIN));
+    ctx.lineTo(X, Y);
+    ctx.lineTo(px(X_MIN), Y);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    /* marker */
+    ctx.beginPath();
+    ctx.fillStyle = color;
+    ctx.arc(X, Y, 6, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = "#fff";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    /* label */
+    ctx.fillStyle = color;
+    ctx.font = "bold 12px -apple-system, Segoe UI, Arial, sans-serif";
+    ctx.textAlign = "left";
+    ctx.textBaseline = labelAbove ? "bottom" : "top";
+    ctx.fillText(label, X + 9, Y + (labelAbove ? -8 : 8));
+  }
+
+  function drawLegend() {
+    ctx.fillStyle = "#1f2937";
+    ctx.font = "bold 13px -apple-system, Segoe UI, Arial, sans-serif";
+    ctx.textAlign = "left";
+    ctx.textBaseline = "top";
+    ctx.fillText("y = 972 / √x", px(X_MIN) + 10, py(Y_MAX) + 6);
+    ctx.font = "12px -apple-system, Segoe UI, Arial, sans-serif";
+    ctx.fillStyle = "#64748b";
+    ctx.fillText("inverse variation curve", px(X_MIN) + 10, py(Y_MAX) + 24);
+  }
+
+  let currentX = 144;
+
+  function draw() {
+    drawAxes();
+    drawCurve();
+    /* fixed reference point x = 144 -> y = 81 */
+    drawPoint(144, "#0d9488", "(144, 81)", true);
+    /* the slider-controlled point */
+    if (Math.abs(currentX - 144) > 0.5) {
+      drawPoint(currentX, "#dc2626", "(" + currentX + ", " + yOf(currentX).toFixed(1) + ")", false);
+    }
+    drawLegend();
+  }
+
+  function updateReadout() {
+    currentX = Number(xSlider.value);
+    const y = yOf(currentX);
+    xLabel.textContent = currentX;
+    rootOut.textContent = Math.sqrt(currentX).toFixed(2);
+    yOut.textContent = y.toFixed(2);
+
+    const diff = y - 81;
+    if (Math.abs(diff) < 0.005) {
+      changeOut.textContent = "0.00";
+    } else {
+      changeOut.textContent = (diff > 0 ? "+" : "") + diff.toFixed(2);
+    }
+    draw();
+  }
+
+  xSlider.addEventListener("input", updateReadout);
+
+  Array.prototype.forEach.call(document.querySelectorAll(".quick button"), function (b) {
+    b.addEventListener("click", function () {
+      xSlider.value = b.getAttribute("data-x");
+      updateReadout();
+    });
+  });
+
+  window.addEventListener("resize", function () {
+    window.clearTimeout(window.__rz);
+    window.__rz = window.setTimeout(resizeCanvas, 120);
+  });
+
+  /* initial paint (after layout so widths are correct) */
+  window.addEventListener("load", function () {
+    resizeCanvas();
+    updateReadout();
+  });
+  setTimeout(function () { resizeCanvas(); updateReadout(); }, 60);
+
+  /* ============================================================
+     3. SELF-CHECK
+     ============================================================ */
+  const answerInput = document.getElementById("answerInput");
+  const feedback = document.getElementById("feedback");
+  const btnCheck = document.getElementById("btnCheck");
+  const btnShowAns = document.getElementById("btnShowAns");
+
+  btnCheck.addEventListener("click", function () {
+    const raw = answerInput.value.trim();
+    const num = parseFloat(raw);
+    if (isNaN(num)) {
+      feedback.className = "feedback no";
+      feedback.textContent = "Please type a number first.";
+      return;
+    }
+    if (Math.abs(num - 54) < 0.5) {
+      feedback.className = "feedback ok";
+      feedback.textContent = "Correct! y = 972 / √324 = 972 / 18 = 54.";
+    } else {
+      feedback.className = "feedback no";
+      feedback.textContent = "Not quite. Reminder: first find √324, then divide 972 by it. Try again.";
+    }
+  });
+
+  answerInput.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") btnCheck.click();
+  });
+
+  btnShowAns.addEventListener("click", function () {
+    answerInput.value = "54";
+    feedback.className = "feedback ok";
+    feedback.textContent = "y = 972 / √324 = 972 / 18 = 54.";
+  });
+})();
+</script>
+</body>
+</html>

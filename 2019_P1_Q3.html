@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HKDSE Math 2019 Paper 1 Q3 · Interactive Solution</title>
+  <!-- MathJax for LaTeX rendering -->
+  <script>
+    MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Custom scroll & transition smoothing */
+    html { scroll-behavior: smooth; }
+    body { background: #f8fafc; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+    .card-shadow { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.02); }
+    .step-enter { animation: fadeSlide 0.4s ease-out; }
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .hint-box { background: #fef9c3; border-left: 5px solid #eab308; }
+    .badge { background: #dbeafe; color: #1e40af; font-weight: 600; }
+    /* Slider styling */
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 8px;
+      border-radius: 9999px;
+      background: #e2e8f0;
+      outline: none;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #3b82f6;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(59,130,246,0.5);
+      transition: transform 0.15s ease;
+    }
+    input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+    input[type=range]::-moz-range-thumb {
+      width: 24px; height: 24px; border-radius: 50%; background: #3b82f6; cursor: pointer; border: none;
+    }
+    .rect-svg .diag { stroke: #ef4444; stroke-width: 3; stroke-dasharray: 6 3; }
+    .rect-svg .side { stroke: #3b82f6; stroke-width: 3; }
+    .rect-svg text { font-size: 14px; font-weight: 600; fill: #1e293b; }
+  </style>
+</head>
+<body class="min-h-screen py-6 px-4 md:py-10">
+
+  <div class="max-w-3xl mx-auto">
+
+    <!-- HEADER -->
+    <header class="mb-8">
+      <div class="flex flex-wrap items-center gap-3 mb-2">
+        <span class="text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-100 px-3 py-1 rounded-full">HKDSE 2019 · Paper 1</span>
+        <span class="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full">Q3 · 3 marks</span>
+      </div>
+      <h1 class="text-2xl md:text-3xl font-extrabold text-slate-800 tracking-tight">Pythagoras' Theorem &amp; Quadratic Equation</h1>
+    </header>
+
+    <!-- QUESTION CARD -->
+    <section class="bg-white rounded-2xl p-5 md:p-6 card-shadow mb-6 border border-slate-100">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="badge text-sm px-3 py-1 rounded-full">📘 Question</span>
+        <span class="text-xs text-slate-400 font-medium">Topic: Equations</span>
+      </div>
+      <p class="text-slate-700 leading-relaxed text-[15px] md:text-base">
+        The length and the breadth of a rectangle are <strong>24 cm</strong> and <strong>\((13 + r)\) cm</strong> respectively.
+        If the length of a diagonal of the rectangle is <strong>\((17 - 3r)\) cm</strong>, find the value of <strong>\(r\)</strong>.
+      </p>
+      <div class="mt-4 flex flex-wrap gap-2">
+        <span class="text-xs font-semibold bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full">Pythagoras' Theorem</span>
+        <span class="text-xs font-semibold bg-rose-50 text-rose-700 px-3 py-1 rounded-full">Quadratic Equation</span>
+        <span class="text-xs font-semibold bg-amber-50 text-amber-700 px-3 py-1 rounded-full">Factorisation</span>
+        <span class="text-xs font-semibold bg-teal-50 text-teal-700 px-3 py-1 rounded-full">Reject Invalid Root</span>
+      </div>
+    </section>
+
+    <!-- VISUALISATION -->
+    <section class="bg-white rounded-2xl p-5 md:p-6 card-shadow mb-6 border border-slate-100">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="font-bold text-slate-800 flex items-center gap-2">
+          <span class="text-lg">📐</span> Interactive Diagram
+        </h2>
+        <span class="text-xs text-slate-400 font-medium">Drag the slider to explore</span>
+      </div>
+
+      <!-- SVG Diagram -->
+      <div class="flex justify-center mb-4">
+        <svg viewBox="0 0 340 260" class="w-full max-w-[340px] rect-svg" role="img" aria-label="Rectangle with sides 24, 13+r and diagonal 17-3r">
+          <!-- Rectangle -->
+          <rect id="rectShape" x="40" y="40" width="240" height="160" rx="4" fill="#eff6ff" stroke="#3b82f6" stroke-width="2.5" />
+          <!-- Diagonal -->
+          <line id="diagLine" x1="40" y1="40" x2="280" y2="200" class="diag" stroke-linecap="round"/>
+          <!-- Right angle at corner -->
+          <path d="M 40 60 L 60 60 L 60 40" fill="none" stroke="#cbd5e1" stroke-width="2"/>
+          <!-- Labels -->
+          <text x="160" y="30" text-anchor="middle" id="labelLength">24 cm</text>
+          <text x="20" y="125" text-anchor="middle" transform="rotate(-90,20,125)" id="labelBreadth">13 + r</text>
+          <text x="175" y="135" text-anchor="middle" id="labelDiag" fill="#dc2626">17 − 3r</text>
+        </svg>
+      </div>
+
+      <!-- Slider -->
+      <div class="mt-2">
+        <label for="rSlider" class="block text-sm font-semibold text-slate-600 mb-1">
+          Value of \( r \) = <span id="rDisplay" class="text-blue-600 font-bold">2</span>
+        </label>
+        <input type="range" id="rSlider" min="-2" max="12" step="0.5" value="2" />
+        <div class="flex justify-between text-xs text-slate-400 mt-1">
+          <span>−2</span><span>0</span><span>2</span><span>4</span><span>6</span><span>8</span><span>10</span><span>12</span>
+        </div>
+      </div>
+
+      <!-- Live feedback -->
+      <div class="mt-3 grid grid-cols-3 gap-2 text-center text-xs md:text-sm">
+        <div class="bg-slate-50 rounded-lg p-2">
+          <div class="text-slate-400 font-medium">Breadth</div>
+          <div id="liveBreadth" class="font-bold text-slate-700">15 cm</div>
+        </div>
+        <div class="bg-slate-50 rounded-lg p-2">
+          <div class="text-slate-400 font-medium">Diagonal</div>
+          <div id="liveDiag" class="font-bold text-slate-700">11 cm</div>
+        </div>
+        <div class="bg-slate-50 rounded-lg p-2">
+          <div class="text-slate-400 font-medium">Check</div>
+          <div id="liveCheck" class="font-bold text-rose-500">Check fails</div>
+        </div>
+      </div>
+      <p class="text-xs text-slate-400 mt-2 text-center">Only when \( r = -3 \) does the diagonal match the formula \( (17 - 3r) \).</p>
+    </section>
+
+    <!-- STEP BY STEP SOLUTION -->
+    <section class="bg-white rounded-2xl p-5 md:p-6 card-shadow mb-6 border border-slate-100">
+      <h2 class="font-bold text-slate-800 flex items-center gap-2 mb-4">
+        <span class="text-lg">🧩</span> Step-by-Step Solution
+      </h2>
+
+      <!-- Step 1 -->
+      <div class="step-enter mb-4 border border-slate-200 rounded-xl overflow-hidden">
+        <button class="w-full text-left px-4 py-3 bg-slate-50 hover:bg-slate-100 transition flex justify-between items-center step-toggle" data-step="1">
+          <span class="font-semibold text-slate-700"><span class="text-blue-600 mr-1">1.</span> Set up the equation</span>
+          <span class="text-slate-400 toggle-icon text-lg">▼</span>
+        </button>
+        <div class="step-content hidden px-4 py-3 bg-white border-t border-slate-100">
+          <p class="text-slate-600 text-sm mb-2">Draw the rectangle. The diagonal is the hypotenuse of the right-angled triangle formed by the length and breadth.</p>
+          <div class="hint-box p-3 rounded-lg text-sm mb-2">
+            <strong>💡 Hint – Pythagoras' Theorem:</strong><br>
+            \( a^2 + b^2 = c^2 \) where \(a\) and \(b\) are the two shorter sides, and \(c\) is the hypotenuse (diagonal).
+          </div>
+          <p class="text-slate-700 text-sm">Substitute the given values:</p>
+          <p class="text-center font-mono text-base my-2 text-blue-800">\[ 24^2 + (13 + r)^2 = (17 - 3r)^2 \]</p>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step-enter mb-4 border border-slate-200 rounded-xl overflow-hidden">
+        <button class="w-full text-left px-4 py-3 bg-slate-50 hover:bg-slate-100 transition flex justify-between items-center step-toggle" data-step="2">
+          <span class="font-semibold text-slate-700"><span class="text-blue-600 mr-1">2.</span> Expand both sides</span>
+          <span class="text-slate-400 toggle-icon text-lg">▼</span>
+        </button>
+        <div class="step-content hidden px-4 py-3 bg-white border-t border-slate-100">
+          <p class="text-slate-600 text-sm mb-2">Expand using \((a+b)^2 = a^2 + 2ab + b^2\) and \((a-b)^2 = a^2 - 2ab + b^2\).</p>
+          <div class="bg-slate-50 p-2 rounded-lg text-center font-mono text-sm md:text-base my-2 text-slate-700">
+            \[ 576 + 169 + 26r + r^2 = 289 - 102r + 9r^2 \]
+          </div>
+          <p class="text-slate-600 text-sm">Combine like terms on the left:</p>
+          <div class="bg-slate-50 p-2 rounded-lg text-center font-mono text-sm md:text-base my-2 text-slate-700">
+            \[ 745 + 26r + r^2 = 289 - 102r + 9r^2 \]
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="step-enter mb-4 border border-slate-200 rounded-xl overflow-hidden">
+        <button class="w-full text-left px-4 py-3 bg-slate-50 hover:bg-slate-100 transition flex justify-between items-center step-toggle" data-step="3">
+          <span class="font-semibold text-slate-700"><span class="text-blue-600 mr-1">3.</span> Rearrange into standard form</span>
+          <span class="text-slate-400 toggle-icon text-lg">▼</span>
+        </button>
+        <div class="step-content hidden px-4 py-3 bg-white border-t border-slate-100">
+          <p class="text-slate-600 text-sm mb-2">Move all terms to one side to get a quadratic equation \(ax^2 + bx + c = 0\).</p>
+          <div class="bg-slate-50 p-2 rounded-lg text-center font-mono text-sm md:text-base my-2 text-slate-700">
+            \[ 8r^2 - 128r - 456 = 0 \]
+          </div>
+          <p class="text-slate-600 text-sm">Divide every term by 8 to simplify:</p>
+          <div class="bg-slate-50 p-2 rounded-lg text-center font-mono text-sm md:text-base my-2 text-emerald-700 font-bold">
+            \[ r^2 - 16r - 57 = 0 \]
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="step-enter mb-4 border border-slate-200 rounded-xl overflow-hidden">
+        <button class="w-full text-left px-4 py-3 bg-slate-50 hover:bg-slate-100 transition flex justify-between items-center step-toggle" data-step="4">
+          <span class="font-semibold text-slate-700"><span class="text-blue-600 mr-1">4.</span> Solve by factorisation</span>
+          <span class="text-slate-400 toggle-icon text-lg">▼</span>
+        </button>
+        <div class="step-content hidden px-4 py-3 bg-white border-t border-slate-100">
+          <div class="hint-box p-3 rounded-lg text-sm mb-3">
+            <strong>💡 Hint – Factorisation:</strong><br>
+            Find two numbers that multiply to \(-57\) and add to \(-16\).<br>
+            Those numbers are \(-19\) and \(+3\).
+          </div>
+          <div class="bg-slate-50 p-2 rounded-lg text-center font-mono text-sm md:text-base my-2 text-slate-700">
+            \[ (r + 3)(r - 19) = 0 \]
+          </div>
+          <p class="text-slate-700 text-center font-mono text-base my-2 text-blue-800">
+            \[ r = -3 \quad \text{or} \quad r = 19 \]
+          </p>
+        </div>
+      </div>
+
+      <!-- Step 5 -->
+      <div class="step-enter mb-4 border border-slate-200 rounded-xl overflow-hidden">
+        <button class="w-full text-left px-4 py-3 bg-slate-50 hover:bg-slate-100 transition flex justify-between items-center step-toggle" data-step="5">
+          <span class="font-semibold text-slate-700"><span class="text-blue-600 mr-1">5.</span> Check validity &amp; reject</span>
+          <span class="text-slate-400 toggle-icon text-lg">▼</span>
+        </button>
+        <div class="step-content hidden px-4 py-3 bg-white border-t border-slate-100">
+          <p class="text-slate-600 text-sm mb-2">A physical length must be <strong>positive</strong>. Test each root:</p>
+          <div class="grid grid-cols-2 gap-3 mt-2">
+            <div class="bg-red-50 border border-red-200 rounded-lg p-3 text-center">
+              <div class="font-bold text-red-700">\( r = 19 \)</div>
+              <div class="text-xs text-red-600 mt-1">Breadth = \(13+19=32\) cm</div>
+              <div class="text-xs text-red-600">Diagonal = \(17-3(19)=-40\) cm</div>
+              <div class="text-xs font-bold text-red-700 mt-1">✗ Negative diagonal → rejected</div>
+            </div>
+            <div class="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
+              <div class="font-bold text-green-700">\( r = -3 \)</div>
+              <div class="text-xs text-green-600 mt-1">Breadth = \(13-3=10\) cm</div>
+              <div class="text-xs text-green-600">Diagonal = \(17-3(-3)=26\) cm</div>
+              <div class="text-xs font-bold text-green-700 mt-1">✓ Both positive</div>
+            </div>
+          </div>
+          <p class="text-slate-700 text-sm mt-3 font-semibold">Verify: \(24^2 + 10^2 = 576 + 100 = 676 = 26^2\) ✓</p>
+          <div class="mt-3 p-3 bg-blue-50 rounded-lg text-center font-bold text-blue-800">
+            Therefore, \( r = -3 \).
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FINAL ANSWER -->
+    <section class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-5 md:p-6 mb-6 text-white card-shadow">
+      <div class="flex items-center gap-2 mb-1">
+        <span class="text-lg">🎯</span>
+        <span class="text-sm font-semibold uppercase tracking-wide opacity-90">Final Answer</span>
+      </div>
+      <p class="text-2xl md:text-3xl font-extrabold tracking-tight">\( r = -3 \)</p>
+      <p class="text-sm opacity-80 mt-1">The value \(r = 19\) is rejected because it gives a negative diagonal length.</p>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="text-center text-xs text-slate-400 py-4">
+      HKDSE Mathematics 2019 Paper 1 · Question 3 · Interactive Solution
+    </footer>
+
+  </div>
+
+  <!-- JAVASCRIPT -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // ---- Accordion toggles ----
+      const toggles = document.querySelectorAll('.step-toggle');
+      toggles.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          const content = this.nextElementSibling;
+          const icon = this.querySelector('.toggle-icon');
+          const isOpen = !content.classList.contains('hidden');
+          // Collapse all
+          document.querySelectorAll('.step-content').forEach(function (c) { c.classList.add('hidden'); });
+          document.querySelectorAll('.toggle-icon').forEach(function (i) { i.textContent = '▼'; });
+          // Open clicked if it was closed
+          if (!isOpen) {
+            content.classList.remove('hidden');
+            icon.textContent = '▲';
+            content.classList.add('step-enter');
+          }
+        });
+      });
+
+      // ---- Live diagram & slider ----
+      const slider = document.getElementById('rSlider');
+      const rDisplay = document.getElementById('rDisplay');
+      const liveBreadth = document.getElementById('liveBreadth');
+      const liveDiag = document.getElementById('liveDiag');
+      const liveCheck = document.getElementById('liveCheck');
+
+      const rectShape = document.getElementById('rectShape');
+      const diagLine = document.getElementById('diagLine');
+      const labelLength = document.getElementById('labelLength');
+      const labelBreadth = document.getElementById('labelBreadth');
+      const labelDiag = document.getElementById('labelDiag');
+
+      // Base coordinates for rectangle drawing (fixed aspect for visual)
+      // We'll map breadth (13+r) to a visual height, keeping width fixed at 240.
+      // Actual rectangle: width=24, height=13+r, diagonal=17-3r.
+      // For visual, use a fixed width 24 → SVG width 240 (scale 10).
+      // Height in SVG = (13+r) * (240/24) = (13+r)*10. Max r=12 → 250px, might overflow; cap visual height.
+      // Better: map breadth to pixels relative to 24cm width.
+      // Use a fixed width of 240; height = breadth * 10.
+      // To keep within SVG viewBox (260 height), we limit the visual height to 180.
+      // We'll calculate a visual scale that fits nicely: height px = min(breadth*10, 180).
+
+      function updateDiagram() {
+        const r = parseFloat(slider.value);
+        rDisplay.textContent = r;
+
+        const breadth = 13 + r;       // in cm
+        const diagonal = 17 - 3 * r;  // in cm
+
+        // Update live texts
+        liveBreadth.textContent = breadth + ' cm';
+        liveDiag.textContent = diagonal + ' cm';
+
+        // Check if actual diagonal matches 17-3r via Pythagoras
+        const calcDiag = Math.sqrt(24*24 + breadth*breadth);
+        const diff = Math.abs(calcDiag - diagonal);
+        const valid = diff < 0.01 && breadth > 0 && diagonal > 0;
+
+        if (valid) {
+          liveCheck.textContent = '✓ Correct';
+          liveCheck.className = 'font-bold text-green-600';
+        } else {
+          liveCheck.textContent = '✗ Invalid';
+          liveCheck.className = 'font-bold text-rose-500';
+        }
+
+        // ---- Visual scaling ----
+        // Keep width fixed at 240 px, height = breadth * (240/24) = breadth * 10
+        // But cap height to 180 px to avoid overflow
+        const widthCm = 24;
+        const widthPx = 240;
+        const scale = widthPx / widthCm; // 10
+        let heightPx = breadth * scale;
+        // Cap visual height
+        const maxHeightPx = 180;
+        if (heightPx > maxHeightPx) {
+          heightPx = maxHeightPx;
+        }
+        // Ensure minimum height
+        if (heightPx < 20) heightPx = 20;
+
+        const x0 = 40;
+        const y0 = 40;
+
+        // Update rectangle
+        rectShape.setAttribute('x', x0);
+        rectShape.setAttribute('y', y0);
+        rectShape.setAttribute('width', widthPx);
+        rectShape.setAttribute('height', heightPx);
+
+        // Update diagonal line
+        diagLine.setAttribute('x1', x0);
+        diagLine.setAttribute('y1', y0);
+        diagLine.setAttribute('x2', x0 + widthPx);
+        diagLine.setAttribute('y2', y0 + heightPx);
+
+        // Update labels
+        labelLength.setAttribute('x', x0 + widthPx / 2);
+        labelLength.setAttribute('y', y0 - 8);
+
+        labelBreadth.setAttribute('x', x0 - 12);
+        labelBreadth.setAttribute('y', y0 + heightPx / 2);
+        labelBreadth.setAttribute('transform', `rotate(-90,${x0 - 12},${y0 + heightPx / 2})`);
+
+        labelDiag.setAttribute('x', x0 + widthPx * 0.55);
+        labelDiag.setAttribute('y', y0 + heightPx * 0.45);
+
+        // Update label texts
+        labelBreadth.textContent = '13 + r';
+        labelDiag.textContent = '17 − 3r';
+
+        // Update label color if invalid
+        if (breadth <= 0 || diagonal <= 0) {
+          labelBreadth.setAttribute('fill', '#dc2626');
+          labelDiag.setAttribute('fill', '#dc2626');
+        } else {
+          labelBreadth.setAttribute('fill', '#1e293b');
+          labelDiag.setAttribute('fill', '#dc2626');
+        }
+      }
+
+      slider.addEventListener('input', updateDiagram);
+      // Initialize
+      updateDiagram();
+
+      // Open first step by default for better UX
+      const firstToggle = document.querySelector('.step-toggle');
+      if (firstToggle) {
+        firstToggle.click();
+      }
+    });
+  </script>
+</body>
+</html>

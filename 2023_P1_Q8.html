@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2023 Paper 1 Q8 — Similar Triangles</title>
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[','\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<style>
+  :root{
+    --blue:#1d4ed8; --blue-l:#3b82f6; --amber:#f59e0b; --amber-l:#fef3c7;
+    --emerald:#059669; --emerald-l:#d1fae5; --ink:#0f172a; --muted:#64748b;
+    --card:#ffffff; --bg:#f1f5f9; --line:#e2e8f0;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  /* ---------- HERO ---------- */
+  .hero{
+    background:linear-gradient(135deg,#0f2557 0%,#1d4ed8 45%,#3b82f6 100%);
+    color:#fff; padding:38px 22px 46px; position:relative; overflow:hidden;
+  }
+  .hero::after{
+    content:""; position:absolute; right:-90px; top:-90px; width:320px; height:320px;
+    border-radius:50%; background:rgba(255,255,255,.08);
+  }
+  .hero::before{
+    content:""; position:absolute; left:-70px; bottom:-120px; width:260px; height:260px;
+    border-radius:50%; background:rgba(245,158,11,.18);
+  }
+  .hero-inner{max-width:960px;margin:0 auto;position:relative;z-index:2}
+  .eyebrow{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;opacity:.85;font-weight:600}
+  .hero h1{margin:.25em 0 .15em;font-size:clamp(1.5rem,4.6vw,2.3rem);line-height:1.2}
+  .hero .sub{opacity:.92;font-size:1rem;margin:0 0 16px}
+  .pills{display:flex;flex-wrap:wrap;gap:8px}
+  .pill{
+    background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);
+    padding:5px 13px;border-radius:999px;font-size:.78rem;font-weight:600;backdrop-filter:blur(4px);
+  }
+  /* ---------- LAYOUT ---------- */
+  main{max-width:960px;margin:0 auto;padding:22px 16px 60px}
+  .card{
+    background:var(--card);border-radius:18px;padding:22px 22px 24px;margin:20px 0;
+    box-shadow:0 4px 18px rgba(15,23,42,.07);border:1px solid var(--line);
+  }
+  .card h2{
+    margin:0 0 6px;font-size:1.18rem;color:var(--blue);
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  }
+  .card h2 .tag{
+    font-size:.7rem;background:var(--amber-l);color:#92400e;border-radius:6px;
+    padding:2px 8px;font-weight:700;letter-spacing:.03em;
+  }
+  .qtext{background:#f8fafc;border-left:5px solid var(--blue-l);border-radius:10px;padding:14px 16px;margin:12px 0}
+  .marks{font-weight:700;color:#b45309}
+  /* ---------- CANVAS ---------- */
+  .canvas-wrap{
+    background:#fbfdff;border:1px dashed #cbd5e1;border-radius:14px;
+    padding:10px;margin:14px 0;
+  }
+  canvas{display:block;width:100%;height:auto;border-radius:10px;background:#fff;touch-action:manipulation}
+  .controls{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-top:10px;font-size:.85rem;color:#334155}
+  .ctl{display:flex;align-items:center;gap:8px;background:#f1f5f9;border-radius:10px;padding:6px 12px;border:1px solid var(--line)}
+  input[type=range]{width:120px;accent-color:var(--blue)}
+  .readout{
+    display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;
+  }
+  .chip{
+    background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:4px 10px;
+    font-size:.82rem;font-family:ui-monospace,Menlo,Consolas,monospace;color:#1e3a8a;
+  }
+  .chip.warn{background:#fff7ed;border-color:#fed7aa;color:#9a3412}
+  .chip.good{background:var(--emerald-l);border-color:#6ee7b7;color:#065f46}
+  /* ---------- STEPS ---------- */
+  .steps{margin-top:6px}
+  .step{
+    display:none;border-left:4px solid var(--amber);background:#fffdf5;
+    border-radius:0 12px 12px 0;padding:12px 16px;margin:12px 0;
+    animation:fade .35s ease;
+  }
+  .step.on{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .step-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+  .badge{
+    background:var(--blue);color:#fff;border-radius:999px;font-size:.72rem;font-weight:700;
+    padding:3px 10px;letter-spacing:.02em;
+  }
+  .mbadge{
+    background:#fde68a;color:#78350f;border-radius:6px;font-size:.72rem;font-weight:800;
+    padding:2px 8px;border:1px solid #fcd34d;
+  }
+  .hint{
+    background:var(--amber-l);border:1px solid #fcd34d;border-radius:10px;
+    padding:9px 13px;margin:10px 0 0;font-size:.9rem;color:#78350f;
+  }
+  .hint b{color:#92400e}
+  .ansbox{
+    background:var(--emerald-l);border:1px solid #6ee7b7;border-radius:10px;
+    padding:10px 14px;margin:10px 0 0;color:#065f46;font-weight:600;font-size:.95rem;
+  }
+  .btnbar{display:flex;align-items:center;gap:14px;margin-top:14px;flex-wrap:wrap}
+  button{
+    background:linear-gradient(135deg,var(--blue),var(--blue-l));color:#fff;border:0;
+    border-radius:11px;padding:10px 20px;font-size:.92rem;font-weight:700;cursor:pointer;
+    box-shadow:0 4px 12px rgba(29,78,216,.28);transition:.2s;
+  }
+  button:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 7px 18px rgba(29,78,216,.36)}
+  button:disabled{background:#cbd5e1;cursor:not-allowed;box-shadow:none;color:#64748b}
+  .counter{font-size:.85rem;color:var(--muted);font-weight:600}
+  .reset{background:#fff;color:var(--blue);border:1.5px solid var(--blue);box-shadow:none}
+  .reset:hover{background:#eff6ff;transform:translateY(-2px)}
+  /* ---------- SUMMARY ---------- */
+  .summary{
+    background:linear-gradient(135deg,#0f172a,#1e293b);color:#e2e8f0;
+    border-radius:18px;padding:24px;margin:22px 0;box-shadow:0 10px 28px rgba(15,23,42,.25);
+  }
+  .summary h2{color:#fff;margin:0 0 12px;font-size:1.15rem}
+  .summary ul{margin:0;padding-left:20px}
+  .summary li{margin:8px 0}
+  .summary code{
+    background:rgba(255,255,255,.12);padding:1px 7px;border-radius:6px;font-size:.9em;color:#fde68a;
+  }
+  footer{text-align:center;color:var(--muted);font-size:.82rem;padding:26px 12px 40px}
+  .grid2{display:grid;grid-template-columns:1fr;gap:14px}
+  @media(min-width:820px){ .grid2{grid-template-columns:1fr 1fr} }
+  .note{font-size:.86rem;color:var(--muted);margin-top:8px}
+</style>
+</head>
+<body>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 1</div>
+    <h1>2023 Paper 1 · Question 8</h1>
+    <p class="sub">Similar Triangles from Parallel Lines — then testing a Right-angled Triangle</p>
+    <div class="pills">
+      <span class="pill">Similar Triangles (A.A.A.)</span>
+      <span class="pill">Corresponding Sides</span>
+      <span class="pill">Converse of Pythagoras</span>
+      <span class="pill">Angles: alt. ∠s / vert. opp. ∠s</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ============ QUESTION ============ -->
+  <section class="card">
+    <h2>Question <span class="tag">5 marks</span></h2>
+    <div class="qtext">
+      <p>In Figure 2, \(AB\) and \(CD\) intersect at the point \(E\). It is given that \(AC \parallel DB\).</p>
+      <p><b>(a)</b> Prove that \(\Delta ACE \sim \Delta BDE\). <span class="marks">[2 marks]</span></p>
+      <p><b>(b)</b> Suppose that \(AB = 20\text{ cm}\), \(AC = 10\text{ cm}\), \(BD = 15\text{ cm}\) and \(CE = 7\text{ cm}\). Is \(\Delta BDE\) a right-angled triangle? Explain your answer. <span class="marks">[3 marks]</span></p>
+    </div>
+    <p class="note">The two triangles share vertex \(E\) and look like an “hourglass”. The parallel sides \(AC\) and \(DB\) give the equal angles that make the triangles similar.</p>
+  </section>
+
+  <!-- ============ PART (a) ============ -->
+  <section class="card">
+    <h2>Part (a) — Prove \(\Delta ACE \sim \Delta BDE\) <span class="tag">2 marks</span></h2>
+
+    <div class="canvas-wrap">
+      <canvas id="cvA" width="900" height="520"></canvas>
+      <div class="controls">
+        <label class="ctl">
+          <span>Angle of line AB</span>
+          <input type="range" id="angA" min="30" max="70" value="52" step="1">
+        </label>
+        <label class="ctl">
+          <input type="checkbox" id="showAng" checked> Show equal angles
+        </label>
+        <label class="ctl">
+          <input type="checkbox" id="showArc"> Highlight color-coded pairs
+        </label>
+      </div>
+      <div class="readout">
+        <span class="chip" id="roA1">∠CAE = ∠BDE</span>
+        <span class="chip" id="roA2">∠AEC = ∠BED</span>
+        <span class="chip" id="roA3">∠ACE = ∠DBE</span>
+      </div>
+    </div>
+
+    <div class="steps" id="stepsA">
+      <div class="step">
+        <div class="step-head"><span class="badge">Step 1</span><span class="mbadge">1M</span></div>
+        <p>Since \(AC \parallel DB\) and \(AB\) is a transversal, the alternate angles are equal:</p>
+        \[ \angle CAE = \angle BDE \qquad (\text{alt. } \angle\text{s},\ AC \parallel DB) \]
+        <div class="hint"><b>Hint:</b> Look at the “Z-shape” formed by the parallel lines \(AC\), \(DB\) and the transversal \(AB\).</div>
+      </div>
+
+      <div class="step">
+        <div class="step-head"><span class="badge">Step 2</span><span class="mbadge">1M</span></div>
+        <p>\(AB\) and \(CD\) intersect at \(E\), so the vertically opposite angles are equal:</p>
+        \[ \angle AEC = \angle BED \qquad (\text{vert. opp. } \angle\text{s}) \]
+        <div class="hint"><b>Hint:</b> The vertical angles at the “crossing point” \(E\) are always equal — no parallel lines needed for this one.</div>
+      </div>
+
+      <div class="step">
+        <div class="step-head"><span class="badge">Step 3</span><span class="mbadge">1A</span></div>
+        <p>In \(\Delta ACE\), the angle sum is \(180^\circ\):</p>
+        \[ \angle ACE = 180^\circ - \angle CAE - \angle AEC \]
+        <p>In \(\Delta BDE\):</p>
+        \[ \angle DBE = 180^\circ - \angle BDE - \angle BED \]
+        <p>Since the two angles on the right are equal by Steps 1 and 2, the third angles are also equal:</p>
+        \[ \angle ACE = \angle DBE \qquad (\angle\text{ sum of } \Delta) \]
+        <div class="hint"><b>Hint:</b> Two pairs of equal angles force the third pair to be equal — a two-angle statement is already enough, but writing the third makes the A.A.A. complete.</div>
+      </div>
+
+      <div class="step">
+        <div class="step-head"><span class="badge">Step 4</span><span class="mbadge">1A</span></div>
+        <p>All three pairs of corresponding angles are equal, therefore the triangles are similar:</p>
+        \[ \boxed{\Delta ACE \sim \Delta BDE \qquad (\text{A.A.A.})} \]
+        <div class="ansbox">Conclusion: \(\Delta ACE \sim \Delta BDE\) (A.A.A.)</div>
+      </div>
+    </div>
+
+    <div class="btnbar">
+      <button id="nextA">Next step →</button>
+      <button class="reset" id="resetA">Reset</button>
+      <span class="counter" id="cntA">0 / 4 steps</span>
+    </div>
+  </section>
+
+  <!-- ============ PART (b) ============ -->
+  <section class="card">
+    <h2>Part (b) — Is \(\Delta BDE\) right-angled? <span class="tag">3 marks</span></h2>
+
+    <div class="canvas-wrap">
+      <canvas id="cvB" width="900" height="520"></canvas>
+      <div class="controls">
+        <label class="ctl">
+          <input type="checkbox" id="showCirc" checked> Show circle on \(AC\) (diameter test)
+        </label>
+        <label class="ctl">
+          <input type="checkbox" id="showTicks" checked> Show side-length labels
+        </label>
+        <label class="ctl">
+          <span>Drag slider to change \(AE\)</span>
+          <input type="range" id="aeSlider" min="2" max="14" value="8" step="0.5">
+        </label>
+      </div>
+      <div class="readout">
+        <span class="chip" id="roB1">AE = 8 cm</span>
+        <span class="chip" id="roB2">BE = 12 cm</span>
+        <span class="chip" id="roB3">CE = 7 cm</span>
+        <span class="chip" id="roB4">DE = 4.67 cm</span>
+        <span class="chip warn" id="roB5">AE² + CE² = 113</span>
+        <span class="chip warn" id="roB6">AC² = 100</span>
+      </div>
+      <p class="note">Move the slider: only when \(AE = 8\) do we get the given \(AC = 10,\ AB=20\) data. Notice the right angle does <b>not</b> appear — so \(\Delta ACE\) is not right-angled, and neither is \(\Delta BDE\).</p>
+    </div>
+
+    <div class="steps" id="stepsB">
+      <div class="step">
+        <div class="step-head"><span class="badge">Step 1</span><span class="mbadge">1M</span></div>
+        <p>By (a), \(\Delta ACE \sim \Delta BDE\), so corresponding sides are proportional:</p>
+        \[ \frac{BE}{BD} = \frac{AE}{AC} \]
+        <div class="hint"><b>Hint:</b> Write the ratio with the correct matching vertices — \(A \leftrightarrow B\), \(C \leftrightarrow D\), \(E \leftrightarrow E\).</div>
+      </div>
+
+      <div class="step">
+        <div class="step-head"><span class="badge">Step 2</span><span class="mbadge">1M</span></div>
+        <p>\(E\) lies on segment \(AB\), so \(BE = AB - AE = 20 - AE\). Substituting the data:</p>
+        \[ \frac{20 - AE}{15} = \frac{AE}{10} \]
+        \[ 10(20 - AE) = 15\,AE \]
+        \[ 200 - 10\,AE = 15\,AE \]
+        \[ 200 = 25\,AE \]
+        \[ AE = 8 \text{ cm} \]
+        <div class="hint"><b>Hint:</b> The key step is realising \(BE = AB - AE\); \(E\) is between \(A\) and \(B\).</div>
+      </div>
+
+      <div class="step">
+        <div class="step-head"><span class="badge">Step 3</span><span class="mbadge">1M</span></div>
+        <p>To test whether \(\Delta ACE\) is right-angled, compare the square of the longest side with the sum of squares of the other two. Note \(AC &gt; AE &gt; CE\), so \(AC\) would be the hypotenuse if it were right-angled.</p>
+        \[ AC^2 = 10^2 = 100 \]
+        \[ AE^2 + CE^2 = 8^2 + 7^2 = 64 + 49 = 113 \]
+        <p>Since</p>
+        \[ AE^2 + CE^2 \neq AC^2, \]
+        <p>by the converse of the Pythagoras’ Theorem, \(\Delta ACE\) is <b>not</b> a right-angled triangle.</p>
+        <div class="hint"><b>Hint:</b> \(113 \neq 100\) — the numbers are close but not equal, so the triangle is <em>not</em> right-angled. A common trap is to guess “yes” from the picture.</div>
+      </div>
+
+      <div class="step">
+        <div class="step-head"><span class="badge">Step 4</span><span class="mbadge">1A</span></div>
+        <p>Since \(\Delta ACE \sim \Delta BDE\) from part (a), similar triangles have the same shape — if one is not right-angled, the other is not either. Therefore:</p>
+        \[ \boxed{\Delta BDE \text{ is \textbf{not} a right-angled triangle.}} \]
+        <div class="ansbox">Answer: No — \(\Delta ACE\) is not right-angled (\(AE^2 + CE^2 \neq AC^2\)), so \(\Delta BDE \sim \Delta ACE\) is also not right-angled.</div>
+      </div>
+    </div>
+
+    <div class="btnbar">
+      <button id="nextB">Next step →</button>
+      <button class="reset" id="resetB">Reset</button>
+      <span class="counter" id="cntB">0 / 4 steps</span>
+    </div>
+  </section>
+
+  <!-- ============ SUMMARY ============ -->
+  <section class="summary">
+    <h2>Summary of Answers</h2>
+    <ul>
+      <li><b>(a)</b> \(\angle CAE = \angle BDE\) (alt. ∠s, \(AC \parallel DB\)); \(\angle AEC = \angle BED\) (vert. opp. ∠s); therefore \(\Delta ACE \sim \Delta BDE\) (A.A.A.).</li>
+      <li><b>(b)</b> \(\dfrac{BE}{BD} = \dfrac{AE}{AC} \Rightarrow \dfrac{20 - AE}{15} = \dfrac{AE}{10} \Rightarrow AE = 8\text{ cm}\).</li>
+      <li><b>(b)</b> \(AC^2 = 100\), but \(AE^2 + CE^2 = 8^2 + 7^2 = 113 \neq 100\).</li>
+      <li><b>(b)</b> By the converse of Pythagoras’ Theorem, \(\Delta ACE\) is <b>not</b> right-angled; hence by similarity, <b>\(\Delta BDE\) is not a right-angled triangle</b>.</li>
+    </ul>
+  </section>
+
+</main>
+
+<footer>HKDSE 2023 Paper 1 · Question 8 — Interactive Solution</footer>
+
+<script>
+/* =====================================================
+   STEP REVEAL LOGIC
+   ===================================================== */
+function setupSteps(prefix, count){
+  const steps = document.querySelectorAll('#'+prefix+' .step');
+  const btn   = document.getElementById('next'+prefix[prefix.length-1].toUpperCase());
+  const cnt   = document.getElementById('cnt'+prefix[prefix.length-1].toUpperCase());
+  let i = 0;
+  btn.addEventListener('click', ()=>{
+    if(i < steps.length){
+      steps[i].classList.add('on');
+      i++;
+      cnt.textContent = i + ' / ' + steps.length + ' steps';
+      if(i === steps.length){
+        btn.disabled = true;
+        btn.textContent = 'All steps revealed ✓';
+      }
+    }
+  });
+}
+/* map prefix strings to button ids */
+document.getElementById('nextA').addEventListener('click', ()=>{});
+document.getElementById('nextB').addEventListener('click', ()=>{});
+
+function initReveal(cardIndex){
+  const cards = document.querySelectorAll('main .card');
+  const card  = cards[cardIndex];
+  const steps = card.querySelectorAll('.step');
+  const btnId = cardIndex === 1 ? 'nextA' : 'nextB';
+  const cntId = cardIndex === 1 ? 'cntA'  : 'cntB';
+  const resetId = cardIndex === 1 ? 'resetA' : 'resetB';
+  const btn = document.getElementById(btnId);
+  const cnt = document.getElementById(cntId);
+  const reset = document.getElementById(resetId);
+  let i = 0;
+  btn.addEventListener('click', ()=>{
+    if(i < steps.length){
+      steps[i].classList.add('on');
+      i++;
+      cnt.textContent = i + ' / ' + steps.length + ' steps';
+      if(i === steps.length){ btn.disabled = true; btn.textContent = 'All steps revealed ✓'; }
+    }
+  });
+  reset.addEventListener('click', ()=>{
+    steps.forEach(s=>s.classList.remove('on'));
+    i = 0;
+    cnt.textContent = '0 / ' + steps.length + ' steps';
+    btn.disabled = false;
+    btn.textContent = 'Next step →';
+  });
+}
+initReveal(1); // Part (a) card
+initReveal(2); // Part (b) card
+
+/* =====================================================
+   CANVAS FOR PART (a)
+   ===================================================== */
+const cvA = document.getElementById('cvA');
+const ctxA = cvA.getContext('2d');
+const angASlider = document.getElementById('angA');
+const showAng = document.getElementById('showAng');
+const showArc = document.getElementById('showArc');
+
+function drawA(){
+  const W = cvA.width, H = cvA.height;
+  ctxA.clearRect(0,0,W,H);
+
+  // ---- build geometry: an hourglass with AC // DB ----
+  // Place E at center.  Let the "transversal" AB pass through E with angle theta.
+  const theta = parseFloat(angASlider.value) * Math.PI/180; // angle of line AB from horizontal
+  const cx = W/2, cy = H/2 + 20;
+
+  // Along direction AB: unit vector (cos, sin)
+  const ux = Math.cos(theta), uy = -Math.sin(theta);   // screen y is down
+  // AE = 8 units, EB = 12 units (ratio 8:12 = 2:3 scale, matching AE:BE = 10:15)
+  const AE = 8, BE = 12;
+  // scale: 1 cm -> 22 px
+  const s = 22;
+  const Ax = cx - AE*s*ux, Ay = cy - AE*s*uy;
+  const Bx = cx + BE*s*ux, By = cy + BE*s*uy;
+
+  // CD direction: choose so that AC // DB.
+  // D lies "below-left", C lies "above-right" of E.
+  // Let C = E + t*CE*d and D = E + t*(-DE)*d where d has some angle.
+  // We simply pick a direction and lengths: CE = 7 cm -> 154 px, DE = 4.667 cm -> ~102.7 px
+  const CE = 7, DE = CE * (BE/AE) * (10/15); // similar ratio maintained
+  const psi = theta + 2.35;   // direction of line CD from horizontal (screen down)
+  const dx = Math.cos(psi), dy = -Math.sin(psi);
+  const Cx = cx + CE*s*dx,  Cy = cy + CE*s*dy;
+  const Dx = cx - DE*s*dx,  Dy = cy - DE*s*dy;
+
+  // ---- background grid ----
+  ctxA.strokeStyle = '#eef2f7'; ctxA.lineWidth = 1;
+  for(let x=0;x<W;x+=30){ ctxA.beginPath(); ctxA.moveTo(x,0); ctxA.lineTo(x,H); ctxA.stroke(); }
+  for(let y=0;y<H;y+=30){ ctxA.beginPath(); ctxA.moveTo(0,y); ctxA.lineTo(W,y); ctxA.stroke(); }
+
+  // ---- triangle ACE fill (blue) ----
+  ctxA.beginPath();
+  ctxA.moveTo(Ax,Ay); ctxA.lineTo(Cx,Cy); ctxA.lineTo(cx,cy); ctxA.closePath();
+  ctxA.fillStyle = showArc.checked ? 'rgba(59,130,246,.16)' : 'rgba(59,130,246,.10)';
+  ctxA.fill();
+
+  // ---- triangle BDE fill (amber) ----
+  ctxA.beginPath();
+  ctxA.moveTo(Bx,By); ctxA.lineTo(Dx,Dy); ctxA.lineTo(cx,cy); ctxA.closePath();
+  ctxA.fillStyle = showArc.checked ? 'rgba(245,158,11,.18)' : 'rgba(245,158,11,.10)';
+  ctxA.fill();
+
+  // ---- draw lines ----
+  // AB
+  ctxA.strokeStyle = '#334155'; ctxA.lineWidth = 3;
+  ctxA.beginPath(); ctxA.moveTo(Ax,Ay); ctxA.lineTo(Bx,By); ctxA.stroke();
+  // CD
+  ctxA.beginPath(); ctxA.moveTo(Cx,Cy); ctxA.lineTo(Dx,Dy); ctxA.stroke();
+  // AC
+  ctxA.strokeStyle = '#2563eb'; ctxA.lineWidth = 3.5;
+  ctxA.beginPath(); ctxA.moveTo(Ax,Ay); ctxA.lineTo(Cx,Cy); ctxA.stroke();
+  // DB
+  ctxA.strokeStyle = '#d97706'; ctxA.lineWidth = 3.5;
+  ctxA.beginPath(); ctxA.moveTo(Dx,Dy); ctxA.lineTo(Bx,By); ctxA.stroke();
+
+  // ---- parallel markers on AC and DB ----
+  function arrow(x,y,ang){
+    ctxA.save(); ctxA.translate(x,y); ctxA.rotate(ang);
+    ctxA.strokeStyle='#475569'; ctxA.lineWidth=2;
+    ctxA.beginPath(); ctxA.moveTo(-6,0); ctxA.lineTo(6,0);
+    ctxA.moveTo(6,0); ctxA.lineTo(2,-4); ctxA.moveTo(6,0); ctxA.lineTo(2,4); ctxA.stroke();
+    ctxA.restore();
+  }
+  const angAC = Math.atan2(Cy-Ay, Cx-Ax);
+  const angDB = Math.atan2(By-Dy, Bx-Dx);
+  arrow((Ax+Cx)/2,(Ay+Cy)/2, angAC);
+  arrow((Dx+Bx)/2,(Dy+By)/2, angDB);
+
+  // ---- angle arcs if requested ----
+  function drawArc(P, Q, R, radius, color, label, frac){
+    // angle at P between vectors PQ and PR
+    const a1 = Math.atan2(Q->0, 0);
+  }
+  // helper to draw angle arc at vertex between two points
+  function angleArc(V, P1, P2, r, color, text){
+    const a1 = Math.atan2(P1.y - V.y, P1.x - V.x);
+    const a2 = Math.atan2(P2.y - V.y, P2.x - V.x);
+    ctxA.beginPath();
+    ctxA.arc(V.x, V.y, r, a1, a2, false);
+    ctxA.strokeStyle = color; ctxA.lineWidth = 3; ctxA.stroke();
+    // label
+    let mid = (a1+a2)/2;
+    if(Math.abs(a1-a2) > Math.PI){
+      // adjust for wrap-around
+      mid = (a1 + a2 + 2*Math.PI)/2;
+    }
+    ctxA.fillStyle = color; ctxA.font = 'bold 15px Segoe UI';
+    ctxA.fillText(text, V.x + (r+16)*Math.cos(mid), V.y + (r+16)*Math.sin(mid));
+  }
+
+  if(showAng.checked){
+    // ∠CAE at A between AC and AE(=AB direction)
+    angleArc({x:Ax,y:Ay}, {x:Cx,y:Cy}, {x:Bx,y:By}, 44, '#2563eb', '•');
+    // ∠BDE at D between DB and DE(=DC direction)
+    angleArc({x:Dx,y:Dy}, {x:Bx,y:By}, {x:Cx,y:Cy}, 44, '#2563eb', '•');
+    // ∠AEC at E between EA and EC
+    angleArc({x:cx,y:cy}, {x:Ax,y:Ay}, {x:Cx,y:Cy}, 34, '#dc2626', '◦');
+    // ∠BED at E between EB and ED
+    angleArc({x:cx,y:cy}, {x:Bx,y:By}, {x:Dx,y:Dy}, 34, '#dc2626', '◦');
+    // ∠ACE at C and ∠DBE at B
+    angleArc({x:Cx,y:Cy}, {x:Ax,y:Ay}, {x:cx,y:cy}, 26, '#059669', '×');
+    angleArc({x:Bx,y:By}, {x:Dx,y:Dy}, {x:cx,y:cy}, 26, '#059669', '×');
+  }
+
+  // ---- points & labels ----
+  function dot(x,y,color,name,ox,oy){
+    ctxA.beginPath(); ctxA.arc(x,y,6,0,Math.PI*2);
+    ctxA.fillStyle = color; ctxA.fill();
+    ctxA.strokeStyle='#fff'; ctxA.lineWidth=2; ctxA.stroke();
+    ctxA.fillStyle = '#0f172a'; ctxA.font = 'bold 19px Georgia, serif';
+    ctxA.fillText(name, x+ox, y+oy);
+  }
+  dot(Ax,Ay,'#1e40af','A',-24,-12);
+  dot(Bx,By,'#1e40af','B', 14, 20);
+  dot(Cx,Cy,'#b45309','C', 14,-14);
+  dot(Dx,Dy,'#b45309','D',-26, 22);
+  dot(cx,cy,'#dc2626','E', 12, -8);
+
+  // ---- readouts ----
+  document.getElementById('roA1').textContent = '∠CAE = ∠BDE (alt. ∠s)';
+  document.getElementById('roA2').textContent = '∠AEC = ∠BED (vert. opp. ∠s)';
+  document.getElementById('roA3').textContent = '∠ACE = ∠DBE (∠ sum of Δ)';
+
+  // legend
+  ctxA.font='13px Segoe UI';
+  ctxA.fillStyle='#2563eb'; ctxA.fillRect(20,18,16,10);
+  ctxA.fillStyle='#0f172a'; ctxA.fillText('ΔACE',42,28);
+  ctxA.fillStyle='#d97706'; ctxA.fillRect(110,18,16,10);
+  ctxA.fillStyle='#0f172a'; ctxA.fillText('ΔBDE',132,28);
+}
+angASlider.addEventListener('input', drawA);
+showAng.addEventListener('change', drawA);
+showArc.addEventListener('change', drawA);
+drawA();
+
+/* =====================================================
+   CANVAS FOR PART (b)
+   ===================================================== */
+const cvB = document.getElementById('cvB');
+const ctxB = cvB.getContext('2d');
+const aeSlider = document.getElementById('aeSlider');
+const showCirc = document.getElementById('showCirc');
+const showTicks = document.getElementById('showTicks');
+
+function drawB(){
+  const W = cvB.width, H = cvB.height;
+  ctxB.clearRect(0,0,W,H);
+
+  // ---- geometry of triangle ACE ----
+  // Let AC be horizontal from A to C?  Better: place AC as base, A left, C right.
+  // AC = 10, AE = slider value, CE = 7 (given).
+  const AC = 10, CE = 7;
+  const AE = parseFloat(aeSlider.value);
+
+  // Check if a triangle with sides AC=10, CE=7, AE exists
+  const valid = (AE > Math.abs(AC-CE)) && (AE < AC+CE);
+
+  // Place A and C on a horizontal line
+  const s = 32; // px per cm
+  const Ax = 170, Ay = 400;
+  const Cx = Ax + AC*s, Cy = 400;
+
+  // Now solve for E:  AE distance from A, CE distance from C.
+  let Ex, Ey;
+  if(valid){
+    // circle intersection
+    const d = AC;
+    const a = (AE*AE - CE*CE + d*d) / (2*d);
+    const h2 = AE*AE - a*a;
+    const h = Math.sqrt(Math.max(h2,0));
+    Ex = Ax + a*s;
+    Ey = Ay - h*s;
+  } else {
+    // degenerate fallback
+    Ex = Ax + AC*s/2;
+    Ey = Ay - 60;
+  }
+
+  // ---- grid ----
+  ctxB.strokeStyle = '#eef2f7'; ctxB.lineWidth = 1;
+  for(let x=0;x<W;x+=30){ ctxB.beginPath(); ctxB.moveTo(x,0); ctxB.lineTo(x,H); ctxB.stroke(); }
+  for(let y=0;y<H;y+=30){ ctxB.beginPath(); ctxB.moveTo(0,y); ctxB.lineTo(W,y); ctxB.stroke(); }
+
+  // ---- triangle ACE ----
+  ctxB.beginPath();
+  ctxB.moveTo(Ax,Ay); ctxB.lineTo(Cx,Cy); ctxB.lineTo(Ex,Ey); ctxB.closePath();
+  ctxB.fillStyle = valid ? 'rgba(59,130,246,.16)' : 'rgba(239,68,68,.15)';
+  ctxB.fill();
+
+  // ---- triangle BDE built on the similarity ----
+  // Similarity ratio AE:BE = AC:BD = 10:15 = 2:3, so BE = 1.5*AE, DE = 1.5*CE, BD = 15.
+  const ratio = 1.5;
+  // E is common; B is along direction E->A extended?  Actually in the hourglass,
+  // B lies on ray EA (opposite side of E from A) at distance BE = 1.5*AE.
+  const dxEA = Ax - Ex, dyEA = Ay - Ey;
+  const lenEA = Math.hypot(dxEA, dyEA) || 1;
+  const Bx = Ex - ratio * (dxEA/lenEA) * AE * s;
+  const By = Ey - ratio * (dyEA/lenEA) * AE * s;
+
+  // D lies on ray EC opposite side from C, at DE = 1.5*CE.
+  const dxEC = Cx - Ex, dyEC = Cy - Ey;
+  const lenEC = Math.hypot(dxEC, dyEC) || 1;
+  const Dx = Ex - ratio * (dxEC/lenEC) * CE * s;
+  const Dy = Ey - ratio * (dyEC/lenEC) * CE * s;
+
+  // ---- draw triangle BDE ----
+  ctxB.beginPath();
+  ctxB.moveTo(Bx,By); ctxB.lineTo(Dx,Dy); ctxB.lineTo(Ex,Ey); ctxB.closePath();
+  ctxB.fillStyle = 'rgba(245,158,11,.18)';
+  ctxB.fill();
+
+  // ---- draw sides ----
+  // AC (the side we test as potential hypotenuse)
+  ctxB.strokeStyle = '#2563eb'; ctxB.lineWidth = 4;
+  ctxB.beginPath(); ctxB.moveTo(Ax,Ay); ctxB.lineTo(Cx,Cy); ctxB.stroke();
+  // CE
+  ctxB.strokeStyle = '#7c3aed'; ctxB.lineWidth = 4;
+  ctxB.beginPath(); ctxB.moveTo(Cx,Cy); ctxB.lineTo(Ex,Ey); ctxB.stroke();
+  // EA
+  ctxB.strokeStyle = '#059669'; ctxB.lineWidth = 4;
+  ctxB.beginPath(); ctxB.moveTo(Ax,Ay); ctxB.lineTo(Ex,Ey); ctxB.stroke();
+
+  // BD
+  ctxB.strokeStyle = '#d97706'; ctxB.lineWidth = 3;
+  ctxB.beginPath(); ctxB.moveTo(Bx,By); ctxB.lineTo(Dx,Dy); ctxB.stroke();
+  // DB extended
+  ctxB.strokeStyle = '#94a3b8'; ctxB.lineWidth = 2; ctxB.setLineDash([6,5]);
+  ctxB.beginPath(); ctxB.moveTo(Dx,Dy); ctxB.lineTo(Bx,By); ctxB.stroke();
+  ctxB.setLineDash([]);
+
+  // EB
+  ctxB.strokeStyle = '#f59e0b'; ctxB.lineWidth = 3;
+  ctxB.beginPath(); ctxB.moveTo(Ex,Ey); ctxB.lineTo(Bx,By); ctxB.stroke();
+  // ED
+  ctxB.beginPath(); ctxB.moveTo(Ex,Ey); ctxB.lineTo(Dx,Dy); ctxB.stroke();
+
+  // ---- circle with AC as diameter (Thales test) ----
+  if(showCirc.checked){
+    const mx = (Ax+Cx)/2, my = (Ay+Cy)/2, r = (AC*s)/2;
+    ctxB.beginPath(); ctxB.arc(mx,my,r,0,Math.PI*2);
+    ctxB.strokeStyle = 'rgba(220,38,38,.55)'; ctxB.lineWidth = 2; ctxB.setLineDash([7,6]); ctxB.stroke();
+    ctxB.setLineDash([]);
+    // label
+    ctxB.fillStyle = '#dc2626'; ctxB.font = '13px Segoe UI';
+    ctxB.fillText('circle on AC as diameter', mx - 82, my + r + 20);
+    // Is E on it?
+    const distE = Math.hypot(Ex-mx, Ey-my);
+    const onCircle = Math.abs(distE - r) < 2;
+    ctxB.fillStyle = onCircle ? '#059669' : '#dc2626';
+    ctxB.font = 'bold 13px Segoe UI';
+    ctxB.fillText(onCircle ? 'E lies on circle → 90°' : 'E does NOT lie on circle → not 90°', mx - 105, my - r - 10);
+  }
+
+  // ---- right-angle marker if actually right ----
+  const AC2 = AC*AC, AE2 = AE*AE, CE2 = CE*CE;
+  const isRight = Math.abs(AE2 + CE2 - AC2) < 0.001;
+  if(isRight){
+    ctxB.strokeStyle = '#059669'; ctxB.lineWidth = 2.5;
+    const d1 = Math.atan2(Ay-Ey, Ax-Ex);
+    const d2 = Math.atan2(Cy-Ey, Cx-Ex);
+    const p1 = {x: Ex + 20*Math.cos(d1), y: Ey + 20*Math.sin(d1)};
+    const p2 = {x: Ex + 20*Math.cos(d2), y: Ey + 20*Math.sin(d2)};
+    ctxB.beginPath();
+    ctxB.moveTo(p1.x,p1.y);
+    ctxB.lineTo(p1.x + d2>0?0:0, 0);
+    ctxB.stroke();
+    // simple square marker
+    ctxB.beginPath();
+    ctxB.moveTo(p1.x, p1.y);
+    ctxB.lineTo(p1.x + (p2.x-p1.x), p1.y + (p2.y-p1.y));
+    ctxB.lineTo(p2.x, p2.y);
+    ctxB.stroke();
+  }
+
+  // ---- side labels ----
+  if(showTicks.checked){
+    ctxB.font = 'bold 15px Segoe UI';
+    ctxB.fillStyle = '#1e3a8a';
+    ctxB.fillText('AC = 10 cm', (Ax+Cx)/2 - 40, Ay + 26);
+    ctxB.fillStyle = '#6d28d9';
+    ctxB.fillText('CE = 7 cm', (Cx+Ex)/2 + 8, (Cy+Ey)/2);
+    ctxB.fillStyle = '#065f46';
+    ctxB.fillText('AE = ' + AE.toFixed(1) + ' cm', (Ax+Ex)/2 - 78, (Ay+Ey)/2);
+    ctxB.fillStyle = '#b45309';
+    ctxB.fillText('BD = 15 cm', (Dx+Bx)/2 - 42, (Dy+By)/2 + 24);
+  }
+
+  // ---- vertices ----
+  function dot(x,y,color,name,ox,oy){
+    ctxB.beginPath(); ctxB.arc(x,y,6,0,Math.PI*2);
+    ctxB.fillStyle = color; ctxB.fill();
+    ctxB.strokeStyle='#fff'; ctxB.lineWidth=2; ctxB.stroke();
+    ctxB.fillStyle = '#0f172a'; ctxB.font = 'bold 19px Georgia, serif';
+    ctxB.fillText(name, x+ox, y+oy);
+  }
+  dot(Ax,Ay,'#1e40af','A',-26, 22);
+  dot(Cx,Cy,'#b45309','C', 12, 22);
+  dot(Ex,Ey,'#dc2626','E', 14, -10);
+  dot(Bx,By,'#92400e','B', 12, 20);
+  dot(Dx,Dy,'#92400e','D',-26, 20);
+
+  // ---- readouts ----
+  const BE = ratio * AE, DE = ratio * CE;
+  document.getElementById('roB1').textContent = 'AE = ' + AE.toFixed(2) + ' cm';
+  document.getElementById('roB2').textContent = 'BE = ' + BE.toFixed(2) + ' cm';
+  document.getElementById('roB3').textContent = 'CE = 7.00 cm';
+  document.getElementById('roB4').textContent = 'DE = ' + DE.toFixed(2) + ' cm';
+  const sum = AE2 + CE2;
+  document.getElementById('roB5').textContent = 'AE² + CE² = ' + sum.toFixed(2);
+  document.getElementById('roB5').className = 'chip ' + (Math.abs(sum - AC2) < 0.01 ? 'good' : 'warn');
+  document.getElementById('roB6').textContent = 'AC² = ' + AC2.toFixed(2);
+  document.getElementById('roB6').className = 'chip ' + (Math.abs(sum - AC2) < 0.01 ? 'good' : 'warn');
+
+  // title
+  ctxB.fillStyle = '#0f172a'; ctxB.font = 'bold 16px Segoe UI';
+  ctxB.fillText('Part (b): Triangle ACE tested with Pythagoras', 20, 30);
+  ctxB.font = '13px Segoe UI'; ctxB.fillStyle = '#64748b';
+  ctxB.fillText('(slider changes AE; correct value is AE = 8 cm)', 20, 52);
+}
+aeSlider.addEventListener('input', drawB);
+showCirc.addEventListener('change', drawB);
+showTicks.addEventListener('change', drawB);
+drawB();
+
+/* redraw on resize for crispness */
+window.addEventListener('resize', ()=>{ drawA(); drawB(); });
+</script>
+</body>
+</html>

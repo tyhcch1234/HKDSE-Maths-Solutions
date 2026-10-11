@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2012 Paper 1 Q7 — Box-and-Whisker Diagram</title>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<style>
+  :root{
+    --blue:#1e3a8a; --blue2:#2563eb; --amber:#f59e0b; --amber-bg:#fffbeb;
+    --emerald:#059669; --emerald-bg:#ecfdf5; --ink:#0f172a; --muted:#64748b;
+    --card:#ffffff; --bg:#f1f5f9; --line:#e2e8f0;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;
+    background:var(--bg); color:var(--ink); line-height:1.6;
+  }
+  /* ---------- HERO ---------- */
+  header.hero{
+    background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 45%,#2563eb 100%);
+    color:#fff; padding:42px 20px 38px; text-align:center;
+    box-shadow:0 6px 26px rgba(15,23,42,.28);
+  }
+  .eyebrow{font-size:.78rem; letter-spacing:.16em; text-transform:uppercase; opacity:.78; margin:0 0 8px;}
+  .hero h1{margin:0; font-size:clamp(1.5rem,4.2vw,2.3rem); font-weight:800; letter-spacing:.01em;}
+  .hero .sub{margin:10px 0 0; font-size:1rem; opacity:.9;}
+  .pills{margin-top:18px; display:flex; flex-wrap:wrap; gap:8px; justify-content:center;}
+  .pill{
+    background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.32);
+    padding:5px 13px; border-radius:999px; font-size:.78rem; font-weight:600;
+    backdrop-filter:blur(4px);
+  }
+  /* ---------- LAYOUT ---------- */
+  main{max-width:940px; margin:0 auto; padding:26px 16px 60px;}
+  section.card{
+    background:var(--card); border-radius:16px; padding:24px 22px; margin-bottom:24px;
+    box-shadow:0 4px 18px rgba(15,23,42,.08); border:1px solid var(--line);
+  }
+  .card h2{
+    margin:0 0 14px; font-size:1.22rem; color:var(--blue); font-weight:800;
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  }
+  .card h2 .tag{
+    font-size:.7rem; background:var(--blue2); color:#fff; padding:3px 10px;
+    border-radius:999px; font-weight:700; letter-spacing:.03em;
+  }
+  .qtext{font-size:1.02rem;}
+  .marks{
+    display:inline-block; background:#e0e7ff; color:#3730a3; border-radius:6px;
+    padding:1px 9px; font-size:.82rem; font-weight:700; margin-left:4px;
+  }
+  /* ---------- CANVAS BOX ---------- */
+  .canvas-wrap{
+    background:#f8fafc; border:1px dashed #cbd5e1; border-radius:12px;
+    padding:12px; margin:16px 0;
+  }
+  canvas{width:100%; height:auto; display:block; border-radius:8px; background:#fff;}
+  .controls{
+    display:flex; flex-wrap:wrap; gap:16px; align-items:center;
+    margin-top:12px; font-size:.88rem;
+  }
+  .ctrl{display:flex; align-items:center; gap:8px; background:#fff; border:1px solid var(--line);
+        border-radius:10px; padding:7px 12px; box-shadow:0 1px 4px rgba(15,23,42,.05);}
+  input[type=range]{width:132px; accent-color:var(--blue2); cursor:pointer;}
+  label.chk{display:flex; align-items:center; gap:7px; cursor:pointer; user-select:none;}
+  .readout{
+    font-family:"SF Mono",Consolas,monospace; background:#0f172a; color:#7dd3fc;
+    border-radius:8px; padding:6px 12px; font-size:.84rem;
+  }
+  /* ---------- STEPS ---------- */
+  .step{
+    display:none; border-left:4px solid var(--blue2); background:#f8fafc;
+    border-radius:0 10px 10px 0; padding:14px 16px; margin:12px 0;
+    animation:fade .35s ease;
+  }
+  .step.show{display:block;}
+  @keyframes fade{from{opacity:0; transform:translateY(-6px);} to{opacity:1; transform:none;}}
+  .step-head{display:flex; align-items:center; gap:10px; margin-bottom:8px; flex-wrap:wrap;}
+  .badge-n{
+    width:26px; height:26px; border-radius:50%; background:var(--blue2); color:#fff;
+    display:flex; align-items:center; justify-content:center; font-size:.8rem; font-weight:800;
+  }
+  .badge-m{
+    background:#fef3c7; color:#92400e; border:1px solid #fcd34d; border-radius:6px;
+    font-size:.72rem; font-weight:800; padding:2px 8px;
+  }
+  .hint{
+    background:var(--amber-bg); border-left:4px solid var(--amber); border-radius:0 8px 8px 0;
+    padding:9px 13px; margin-top:10px; font-size:.9rem; color:#78350f;
+  }
+  .hint b{color:#92400e;}
+  .answer{
+    background:var(--emerald-bg); border-left:4px solid var(--emerald); border-radius:0 8px 8px 0;
+    padding:9px 13px; margin-top:10px; font-size:.92rem; color:#065f46; font-weight:600;
+  }
+  .btn{
+    background:linear-gradient(135deg,var(--blue2),#1d4ed8); color:#fff; border:none;
+    border-radius:10px; padding:11px 22px; font-size:.92rem; font-weight:700; cursor:pointer;
+    box-shadow:0 3px 12px rgba(37,99,235,.34); transition:.18s;
+  }
+  .btn:hover:not(:disabled){transform:translateY(-2px); box-shadow:0 6px 18px rgba(37,99,235,.42);}
+  .btn:disabled{background:#cbd5e1; color:#64748b; box-shadow:none; cursor:default;}
+  .counter{font-size:.84rem; color:var(--muted); margin-left:12px; font-weight:600;}
+  .btnrow{display:flex; align-items:center; margin-top:14px; flex-wrap:wrap;}
+  /* ---------- SUMMARY ---------- */
+  .summary{
+    background:linear-gradient(135deg,#0f172a,#1e293b); color:#e2e8f0;
+    border-radius:16px; padding:26px 24px; box-shadow:0 8px 26px rgba(15,23,42,.3);
+  }
+  .summary h2{color:#7dd3fc; margin:0 0 16px; font-size:1.2rem; font-weight:800;}
+  .summary ul{margin:0; padding-left:20px;}
+  .summary li{margin-bottom:10px;}
+  .summary .key{color:#fbbf24; font-weight:700;}
+  footer{
+    text-align:center; color:var(--muted); font-size:.82rem; padding:22px 16px 34px;
+  }
+  .note{font-size:.86rem; color:var(--muted);}
+  @media (max-width:520px){
+    section.card{padding:18px 14px;}
+    input[type=range]{width:96px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <p class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 1</p>
+  <h1>2012 Paper 1 · Question 7</h1>
+  <p class="sub">Statistics — Box-and-Whisker Diagram, Quartiles &amp; Range</p>
+  <div class="pills">
+    <span class="pill">Box-and-Whisker Diagram</span>
+    <span class="pill">Inter-quartile Range</span>
+    <span class="pill">Range</span>
+    <span class="pill">Quartiles &amp; Percentiles</span>
+  </div>
+</header>
+
+<main>
+
+  <!-- ================= QUESTION ================= -->
+  <section class="card">
+    <h2>Question <span class="tag">4 marks</span></h2>
+    <div class="qtext">
+      <p>The box-and-whisker diagram below shows the distribution of the times taken by a large group of students of an athletic club to finish a \(100\text{ m}\) race:</p>
+
+      <p style="text-align:center; font-family:monospace; font-size:.95rem; color:#334155;">
+        ├────┤ │ 12.1 │ 13.2 │ ├────┤ 18.1
+      </p>
+      <p style="text-align:center; font-size:.85rem; color:var(--muted);">
+        (lower whisker end = \(a\), box edges at \(12.1\) and \(13.2\), median inside, upper whisker end = \(18.1\), time in s)
+      </p>
+
+      <p>The inter-quartile range and the range of the distribution are \(3.2\text{ s}\) and \(6.8\text{ s}\) respectively.</p>
+
+      <p><b>(a)</b> Find \(a\) and \(b\). <span class="marks">2 marks</span></p>
+
+      <p><b>(b)</b> The students join a training program. It is found that the longest time taken by the students to finish a \(100\text{ m}\) race after the training is \(2.9\text{ s}\) less than that before the training. The trainer claims that at least \(25\%\) of the students show improvement in the time taken to finish a \(100\text{ m}\) race after the training. Do you agree? Explain your answer. <span class="marks">2 marks</span></p>
+    </div>
+  </section>
+
+  <!-- ================= PART (a) ================= -->
+  <section class="card">
+    <h2>Part (a) — Finding \(a\) and \(b\) <span class="tag">2 marks</span></h2>
+
+    <p>In a box-and-whisker diagram:</p>
+    <ul>
+      <li>the <b>box</b> spans from \(Q_1\) to \(Q_3\),</li>
+      <li>the <b>whiskers</b> run from the minimum to \(Q_1\), and from \(Q_3\) to the maximum.</li>
+    </ul>
+    <p>From the diagram, the upper whisker ends at the maximum, i.e. \(18.1\). So \(b\) is the upper quartile \(Q_3\) and \(a\) is the lower whisker end / minimum.</p>
+
+    <div class="canvas-wrap">
+      <canvas id="cvA" width="880" height="230"></canvas>
+      <div class="controls">
+        <div class="ctrl">
+          <label for="sldA">Slide IQR check:</label>
+          <input type="range" id="sldA" min="0" max="2" step="0.1" value="1">
+        </div>
+        <div class="readout" id="outA">IQR = 3.2 s</div>
+      </div>
+      <p class="note" style="margin-top:8px;">The diagram shows the box-and-whisker plot with \(a\), \(Q_1=12.1\), \(Q_3=b\), and the maximum \(=18.1\). The IQR \(=Q_3-Q_1=3.2\) and the range \(=\text{max}-\text{min}=6.8\).</p>
+    </div>
+
+    <div class="step" data-step>
+      <div class="step-head"><span class="badge-n">1</span><span class="badge-m">1M</span><b>Use the range to find \(a\).</b></div>
+      <p>Range \(= \text{maximum} - \text{minimum}\)</p>
+      \[ 6.8 = 18.1 - a \]
+      \[ a = 18.1 - 6.8 = 11.3 \]
+      <div class="hint"><b>Hint:</b> The largest time is the right end of the upper whisker, \(18.1\). Subtract the range to get the smallest time \(a\).</div>
+      <div class="answer">\(a = 11.3\)</div>
+    </div>
+
+    <div class="step" data-step>
+      <div class="step-head"><span class="badge-n">2</span><span class="badge-m">1A</span><b>Use the inter-quartile range to find \(b\).</b></div>
+      <p>Inter-quartile range \(= Q_3 - Q_1\)</p>
+      \[ 3.2 = b - 12.1 \]
+      \[ b = 12.1 + 3.2 = 15.3 \]
+      <div class="hint"><b>Hint:</b> \(b\) is the upper quartile \(Q_3\), the right edge of the box. The lower quartile \(Q_1 = 12.1\) is the left edge.</div>
+      <div class="answer">\(b = 15.3\)</div>
+    </div>
+
+    <div class="btnrow">
+      <button class="btn" data-next>Next step →</button>
+      <span class="counter">0 / 2</span>
+    </div>
+  </section>
+
+  <!-- ================= PART (b) ================= -->
+  <section class="card">
+    <h2>Part (b) — The trainer's claim <span class="tag">2 marks</span></h2>
+
+    <p>Before training the maximum time is \(18.1\text{ s}\). After training the longest time is \(2.9\text{ s}\) less, so the new maximum is</p>
+    \[ 18.1 - 2.9 = 15.2\text{ s}. \]
+
+    <p>We must decide whether <b>at least \(25\%\)</b> of students improved, i.e. whether at least the top \(25\%\) of the class beat their previous time.</p>
+
+    <div class="canvas-wrap">
+      <canvas id="cvB" width="880" height="260"></canvas>
+      <div class="controls">
+        <div class="ctrl">
+          <label for="sldB">New maximum time:</label>
+          <input type="range" id="sldB" min="14.5" max="18.1" step="0.1" value="15.2">
+        </div>
+        <label class="chk"><input type="checkbox" id="chkQ3" checked> Show \(Q_3 = 15.3\) line</label>
+        <div class="readout" id="outB">New max = 15.2 s &lt; Q₃ = 15.3 s</div>
+      </div>
+      <p class="note" style="margin-top:8px;">Drag the slider to change the new longest time. The key comparison is between the new maximum and the old upper quartile \(Q_3 = 15.3\text{ s}\).</p>
+    </div>
+
+    <div class="step" data-step>
+      <div class="step-head"><span class="badge-n">1</span><span class="badge-m">1M</span><b>Compare the new longest time with the old \(Q_3\).</b></div>
+      <p>New longest time after training \(= 18.1 - 2.9 = 15.2\text{ s}\).</p>
+      <p>The old upper quartile is \(Q_3 = b = 15.3\text{ s}\). Since</p>
+      \[ 15.2 < 15.3, \]
+      <p>the new longest time is less than the upper quartile of the original distribution.</p>
+      <div class="hint"><b>Hint:</b> The top \(25\%\) of the original distribution had times <b>greater than</b> \(Q_3 = 15.3\text{ s}\). A student who previously took more than \(15.3\text{ s}\) must have improved, because the new maximum is only \(15.2\text{ s}\).</div>
+      <div class="answer">Since \(15.2 < 15.3\), at least \(25\%\) of the students improved.</div>
+    </div>
+
+    <div class="step" data-step>
+      <div class="step-head"><span class="badge-n">2</span><span class="badge-m">1A</span><b>State the conclusion with the reason.</b></div>
+      <p>At least \(25\%\) of the students originally took longer than \(15.3\text{ s}\) to finish the race. In the new result, <b>all</b> students finished within \(15.2\text{ s}\). Hence every one of those slowest \(25\%\) must have improved.</p>
+      <div class="hint"><b>Hint:</b> "At least \(25\%\)" comes from the fact that the top quarter of the original distribution lies beyond \(Q_3\), and the new maximum is below \(Q_3\).</div>
+      <div class="answer">Yes, the claim is agreed.</div>
+    </div>
+
+    <div class="btnrow">
+      <button class="btn" data-next>Next step →</button>
+      <span class="counter">0 / 2</span>
+    </div>
+  </section>
+
+  <!-- ================= SUMMARY ================= -->
+  <section class="summary">
+    <h2>Summary of Answers</h2>
+    <ul>
+      <li><span class="key">(a)</span> &nbsp; \(a = 18.1 - 6.8 = 11.3\)</li>
+      <li><span class="key">(a)</span> &nbsp; \(b = 12.1 + 3.2 = 15.3\)</li>
+      <li><span class="key">(b)</span> &nbsp; New longest time \(= 18.1 - 2.9 = 15.2\text{ s}\), which is less than \(Q_3 = 15.3\text{ s}\).</li>
+      <li><span class="key">(b)</span> &nbsp; Therefore at least \(25\%\) of the students improved — <b>Yes, the claim is agreed.</b></li>
+    </ul>
+  </section>
+
+  <footer>
+    HKDSE Mathematics (Compulsory Part) · 2012 Paper 1 · Question 7 &nbsp;|&nbsp; Interactive Solution
+  </footer>
+</main>
+
+<script>
+/* ============================================================
+   PART (a) CANVAS — box-and-whisker
+   ============================================================ */
+const cvA = document.getElementById('cvA');
+const ctxA = cvA.getContext('2d');
+let sldA = document.getElementById('sldA');
+let outA = document.getElementById('outA');
+
+// scale: value -> x
+const A_MIN = 10.8, A_MAX = 18.6;
+function axA(v){ return 70 + (v - A_MIN) / (A_MAX - A_MIN) * (880 - 140); }
+
+function drawA(){
+  const W = 880, H = 230;
+  ctxA.clearRect(0,0,W,H);
+  ctxA.fillStyle = "#ffffff"; ctxA.fillRect(0,0,W,H);
+
+  const yTop = 130, yBox = 130, hBox = 46;
+
+  // axis line
+  ctxA.strokeStyle = "#94a3b8"; ctxA.lineWidth = 1.5;
+  ctxA.beginPath(); ctxA.moveTo(50, yTop + hBox/2 + 46); ctxA.lineTo(840, yTop + hBox/2 + 46); ctxA.stroke();
+
+  // ticks
+  const ticks = [11.3, 12.1, 13.2, 15.3, 18.1];
+  ctxA.font = "13px Segoe UI"; ctxA.textAlign = "center";
+  ticks.forEach(t=>{
+    const x = axA(t);
+    ctxA.strokeStyle = "#cbd5e1";
+    ctxA.beginPath(); ctxA.moveTo(x, yTop + hBox/2 + 40); ctxA.lineTo(x, yTop + hBox/2 + 52); ctxA.stroke();
+    ctxA.fillStyle = "#475569";
+    ctxA.fillText(t.toFixed(1), x, yTop + hBox/2 + 70);
+  });
+  ctxA.fillStyle = "#475569";
+  ctxA.fillText("Time (s)", 800, yTop + hBox/2 + 40);
+
+  // lower whisker (a -> 12.1)
+  ctxA.strokeStyle = "#1d4ed8"; ctxA.lineWidth = 2.5;
+  ctxA.beginPath(); ctxA.moveTo(axA(11.3), yTop + hBox/2); ctxA.lineTo(axA(12.1), yTop + hBox/2); ctxA.stroke();
+  // box (12.1 -> b)
+  ctxA.strokeRect(axA(12.1), yTop, axA(15.3) - axA(12.1), hBox);
+  // upper whisker (b -> 18.1)
+  ctxA.beginPath(); ctxA.moveTo(axA(15.3), yTop + hBox/2); ctxA.lineTo(axA(18.1), yTop + hBox/2); ctxA.stroke();
+
+  // ends
+  ctxA.lineWidth = 3;
+  ctxA.beginPath(); ctxA.moveTo(axA(11.3), yTop + 8); ctxA.lineTo(axA(11.3), yTop + hBox - 8); ctxA.stroke();
+  ctxA.beginPath(); ctxA.moveTo(axA(18.1), yTop + 8); ctxA.lineTo(axA(18.1), yTop + hBox - 8); ctxA.stroke();
+  // median
+  ctxA.strokeStyle = "#059669";
+  ctxA.beginPath(); ctxA.moveTo(axA(13.2), yTop + 5); ctxA.lineTo(axA(13.2), yTop + hBox - 5); ctxA.stroke();
+
+  // labels
+  ctxA.font = "bold 14px Segoe UI"; ctxA.textAlign = "center";
+  ctxA.fillStyle = "#1d4ed8";
+  ctxA.fillText("a = 11.3", axA(11.3), yTop - 14);
+  ctxA.fillStyle = "#475569"; ctxA.fillText("Q₁ = 12.1", axA(12.1), yTop - 14);
+  ctxA.fillStyle = "#059669"; ctxA.fillText("median = 13.2", axA(13.2), yTop - 34);
+  ctxA.fillStyle = "#1d4ed8"; ctxA.fillText("b = Q₃ = 15.3", axA(15.3), yTop - 14);
+  ctxA.fillStyle = "#475569"; ctxA.fillText("max = 18.1", axA(18.1), yTop - 14);
+
+  // bracket for IQR
+  const bx1 = axA(12.1), bx2 = axA(15.3);
+  ctxA.strokeStyle = "#f59e0b"; ctxA.lineWidth = 1.6;
+  ctxA.beginPath(); ctxA.moveTo(bx1, yTop + hBox + 14); ctxA.lineTo(bx2, yTop + hBox + 14); ctxA.stroke();
+  ctxA.beginPath(); ctxA.moveTo(bx1, yTop + hBox + 9); ctxA.lineTo(bx1, yTop + hBox + 19); ctxA.stroke();
+  ctxA.beginPath(); ctxA.moveTo(bx2, yTop + hBox + 9); ctxA.lineTo(bx2, yTop + hBox + 19); ctxA.stroke();
+  ctxA.fillStyle = "#b45309";
+  ctxA.fillText("IQR = 3.2 s", (bx1+bx2)/2, yTop + hBox + 32);
+
+  // range bracket
+  const rx1 = axA(11.3), rx2 = axA(18.1);
+  ctxA.strokeStyle = "#0ea5e9";
+  ctxA.beginPath(); ctxA.moveTo(rx1, yTop - 58); ctxA.lineTo(rx2, yTop - 58); ctxA.stroke();
+  ctxA.beginPath(); ctxA.moveTo(rx1, yTop - 63); ctxA.lineTo(rx1, yTop - 53); ctxA.stroke();
+  ctxA.beginPath(); ctxA.moveTo(rx2, yTop - 63); ctxA.lineTo(rx2, yTop - 53); ctxA.stroke();
+  ctxA.fillStyle = "#0369a1";
+  ctxA.fillText("Range = 6.8 s", (rx1+rx2)/2, yTop - 66);
+
+  // readout computation
+  const iqr = 15.3 - 12.1;
+  outA.textContent = "IQR = Q₃ − Q₁ = 15.3 − 12.1 = " + iqr.toFixed(1) + " s  |  Range = 18.1 − 11.3 = 6.8 s";
+}
+
+/* ============================================================
+   PART (b) CANVAS — compare new max with Q3
+   ============================================================ */
+const cvB = document.getElementById('cvB');
+const ctxB = cvB.getContext('2d');
+const sldB = document.getElementById('sldB');
+const chkQ3 = document.getElementById('chkQ3');
+const outB = document.getElementById('outB');
+
+const B_MIN = 11.0, B_MAX = 18.6;
+function axB(v){ return 70 + (v - B_MIN) / (B_MAX - B_MIN) * (880 - 140); }
+
+function drawB(){
+  const W = 880, H = 260;
+  ctxB.clearRect(0,0,W,H);
+  ctxB.fillStyle = "#ffffff"; ctxB.fillRect(0,0,W,H);
+
+  const newMax = parseFloat(sldB.value);
+  const yTop = 150, hBox = 40;
+
+  // axis
+  ctxB.strokeStyle = "#94a3b8"; ctxB.lineWidth = 1.5;
+  ctxB.beginPath(); ctxB.moveTo(50, yTop + hBox/2 + 46); ctxB.lineTo(840, yTop + hBox/2 + 46); ctxB.stroke();
+
+  // ticks
+  ctxB.font = "12.5px Segoe UI"; ctxB.textAlign = "center";
+  [11.3, 12.1, 13.2, 15.3, 18.1].forEach(t=>{
+    const x = axB(t);
+    ctxB.strokeStyle = "#cbd5e1";
+    ctxB.beginPath(); ctxB.moveTo(x, yTop + hBox/2 + 40); ctxB.lineTo(x, yTop + hBox/2 + 52); ctxB.stroke();
+    ctxB.fillStyle = "#475569";
+    ctxB.fillText(t.toFixed(1), x, yTop + hBox/2 + 70);
+  });
+  ctxB.fillStyle = "#475569";
+  ctxB.fillText("Time (s)", 800, yTop + hBox/2 + 40);
+
+  // ---- Before-training box plot (light) ----
+  ctxB.save();
+  ctxB.globalAlpha = 0.45;
+  ctxB.strokeStyle = "#64748b"; ctxB.lineWidth = 2;
+  ctxB.beginPath(); ctxB.moveTo(axB(11.3), yTop + hBox/2); ctxB.lineTo(axB(12.1), yTop + hBox/2); ctxB.stroke();
+  ctxB.strokeRect(axB(12.1), yTop, axB(15.3) - axB(12.1), hBox);
+  ctxB.beginPath(); ctxB.moveTo(axB(15.3), yTop + hBox/2); ctxB.lineTo(axB(18.1), yTop + hBox/2); ctxB.stroke();
+  ctxB.restore();
+  ctxB.font = "11.5px Segoe UI"; ctxB.fillStyle = "#64748b"; ctxB.textAlign = "left";
+  ctxB.fillText("Before training", axB(11.3) - 4, yTop - 12);
+
+  // ---- After-training box plot (colored) ----
+  const yB2 = yTop + hBox + 60;
+  ctxB.strokeStyle = "#1d4ed8"; ctxB.lineWidth = 2.5;
+  // lower whisker a -> Q1
+  ctxB.beginPath(); ctxB.moveTo(axB(11.3), yB2 + hBox/2); ctxB.lineTo(axB(12.1), yB2 + hBox/2); ctxB.stroke();
+  // box Q1 -> Q3
+  ctxB.strokeRect(axB(12.1), yB2, axB(15.3) - axB(12.1), hBox);
+  // upper whisker Q3 -> newMax
+  ctxB.beginPath(); ctxB.moveTo(axB(15.3), yB2 + hBox/2); ctxB.lineTo(axB(newMax), yB2 + hBox/2); ctxB.stroke();
+  // ends
+  ctxB.lineWidth = 3;
+  ctxB.beginPath(); ctxB.moveTo(axB(11.3), yB2 + 6); ctxB.lineTo(axB(11.3), yB2 + hBox - 6); ctxB.stroke();
+  ctxB.beginPath(); ctxB.moveTo(axB(newMax), yB2 + 6); ctxB.lineTo(axB(newMax), yB2 + hBox - 6); ctxB.stroke();
+  // median
+  ctxB.strokeStyle = "#059669";
+  ctxB.beginPath(); ctxB.moveTo(axB(13.2), yB2 + 5); ctxB.lineTo(axB(13.2), yB2 + hBox - 5); ctxB.stroke();
+
+  // labels
+  ctxB.font = "bold 13px Segoe UI"; ctxB.textAlign = "center";
+  ctxB.fillStyle = "#1d4ed8";
+  ctxB.fillText("new longest = " + newMax.toFixed(1) + " s", axB(newMax), yB2 - 12);
+  ctxB.fillStyle = "#475569";
+  ctxB.fillText("Q₁ = 12.1", axB(12.1), yB2 - 12);
+  ctxB.fillStyle = "#059669";
+  ctxB.fillText("median = 13.2", axB(13.2), yB2 - 30);
+  ctxB.fillStyle = "#475569";
+  ctxB.fillText("Q₃ = 15.3", axB(15.3), yB2 - 12);
+  ctxB.font = "11.5px Segoe UI"; ctxB.fillStyle = "#1d4ed8"; ctxB.textAlign = "left";
+  ctxB.fillText("After training", axB(11.3) - 4, yB2 - 30);
+
+  // ---- Q3 vertical line ----
+  if (chkQ3.checked){
+    const xQ3 = axB(15.3);
+    ctxB.save();
+    ctxB.setLineDash([7,6]);
+    ctxB.strokeStyle = "#f59e0b"; ctxB.lineWidth = 2.2;
+    ctxB.beginPath(); ctxB.moveTo(xQ3, 40); ctxB.lineTo(xQ3, yB2 + hBox + 14); ctxB.stroke();
+    ctxB.restore();
+    ctxB.fillStyle = "#b45309"; ctxB.font = "bold 12.5px Segoe UI"; ctxB.textAlign = "center";
+    ctxB.fillText("Q₃ = 15.3 s", xQ3, 32);
+  }
+
+  // ---- highlight region where improvement is certain ----
+  const xEnd = axB(newMax);
+  const xStart = axB(15.3);
+  if (newMax < 15.3){
+    ctxB.save();
+    ctxB.fillStyle = "rgba(16,185,129,.16)";
+    ctxB.fillRect(xStart, 40, xEnd - xStart, yB2 + hBox + 8 - 40);
+    ctxB.restore();
+    ctxB.fillStyle = "#047857"; ctxB.font = "bold 12px Segoe UI"; ctxB.textAlign = "center";
+    ctxB.fillText("slowest 25% all improved", (xStart + xEnd)/2, yB2 + hBox + 32);
+  }
+
+  // header info
+  // area between newMax and 18.1 originally had the slowest students
+  outB.textContent = (newMax < 15.3)
+      ? "New max = " + newMax.toFixed(1) + " s < Q₃ = 15.3 s → at least 25% improved"
+      : "New max = " + newMax.toFixed(1) + " s ≥ Q₃ = 15.3 s → cannot conclude";
+}
+
+/* ============================================================
+   STEP-BY-STEP REVEAL
+   ============================================================ */
+document.querySelectorAll('.card').forEach(card=>{
+  const steps = card.querySelectorAll('.step');
+  const btn = card.querySelector('[data-next]');
+  const counter = card.querySelector('.counter');
+  if (!btn || steps.length === 0) return;
+  let idx = 0;
+  btn.addEventListener('click', ()=>{
+    if (idx < steps.length){
+      steps[idx].classList.add('show');
+      idx++;
+      counter.textContent = idx + " / " + steps.length;
+      if (MathJax.typesetPromise) MathJax.typesetPromise();
+      if (idx === steps.length){
+        btn.disabled = true;
+        btn.textContent = "All steps revealed ✓";
+      }
+    }
+  });
+});
+
+/* ============================================================
+   INIT
+   ============================================================ */
+window.addEventListener('load', ()=>{
+  drawA();
+  drawB();
+  if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise();
+});
+sldA.addEventListener('input', drawA);
+sldB.addEventListener('input', drawB);
+chkQ3.addEventListener('change', drawB);
+</script>
+</body>
+</html>

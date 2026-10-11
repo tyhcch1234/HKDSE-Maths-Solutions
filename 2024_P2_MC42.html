@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HKDSE Math 2024 Paper 2 Q42 — Permutations with Restrictions</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- MathJax for LaTeX rendering -->
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+  <style>
+    /* Custom smooth animation for accordion */
+    .step-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.45s ease-out, opacity 0.35s ease-in;
+      opacity: 0;
+    }
+    .step-content.open {
+      max-height: 1200px; /* large enough to fit content */
+      opacity: 1;
+    }
+    /* Visual queue animation */
+    .queue-slot {
+      transition: all 0.3s ease;
+    }
+    .gap-highlight {
+      background-color: #fef3c7; /* amber-100 */
+      border-color: #f59e0b;     /* amber-500 */
+    }
+    /* Make arrows interactive */
+    .arrow-btn {
+      cursor: pointer;
+      transition: transform 0.15s, background-color 0.2s;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .arrow-btn:active {
+      transform: scale(0.92);
+    }
+    .arrow-btn.active {
+      background-color: #3b82f6;
+      color: white;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.3);
+    }
+    /* Table style for choices */
+    .choice-card {
+      transition: background-color 0.2s, border-color 0.2s;
+    }
+    .choice-card:hover {
+      background-color: #f8fafc;
+    }
+    .choice-card.correct {
+      background-color: #dcfce7;
+      border-color: #22c55e;
+    }
+    .choice-card.wrong {
+      background-color: #fee2e2;
+      border-color: #ef4444;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col items-center py-6 px-4">
+
+  <!-- ===== HEADER ===== -->
+  <header class="w-full max-w-4xl mb-6">
+    <div class="flex flex-wrap items-center gap-3">
+      <span class="bg-blue-600 text-white text-sm font-bold px-4 py-1.5 rounded-full shadow-sm">HKDSE Math 2024 Paper 2</span>
+      <span class="bg-amber-100 text-amber-800 text-sm font-semibold px-4 py-1.5 rounded-full border border-amber-200">Q42</span>
+    </div>
+    <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-3 tracking-tight">Permutations with Restrictions</h1>
+    <p class="text-slate-600 mt-1 text-sm sm:text-base">Topic 14 — Probability &amp; Counting</p>
+  </header>
+
+  <!-- ===== QUESTION CARD ===== -->
+  <section class="w-full max-w-4xl bg-white rounded-2xl shadow-md border border-slate-200 p-5 sm:p-7 mb-6">
+    <div class="flex items-start gap-3">
+      <span class="text-2xl mt-0.5" aria-hidden="true">📋</span>
+      <div>
+        <h2 class="text-lg font-semibold text-slate-800 mb-2">Question</h2>
+        <p class="text-base sm:text-lg leading-relaxed text-slate-700">
+          A queue is formed by <strong>2 managers</strong> and <strong>7 officers</strong>. If no managers are next to each other, how many different queues can be formed?
+        </p>
+      </div>
+    </div>
+
+    <!-- Concept tags -->
+    <div class="flex flex-wrap gap-2 mt-5">
+      <span class="bg-sky-100 text-sky-700 text-xs font-medium px-3 py-1 rounded-full">Permutations</span>
+      <span class="bg-emerald-100 text-emerald-700 text-xs font-medium px-3 py-1 rounded-full">Counting</span>
+      <span class="bg-violet-100 text-violet-700 text-xs font-medium px-3 py-1 rounded-full">Gap Method</span>
+      <span class="bg-rose-100 text-rose-700 text-xs font-medium px-3 py-1 rounded-full">Restrictions</span>
+    </div>
+  </section>
+
+  <!-- ===== INTERACTIVE VISUAL DEMO ===== -->
+  <section class="w-full max-w-4xl bg-white rounded-2xl shadow-md border border-slate-200 p-5 sm:p-7 mb-6">
+    <h2 class="text-lg font-semibold text-slate-800 flex items-center gap-2 mb-2">
+      <span class="text-xl" aria-hidden="true">🎯</span> Interactive Demo — The Gap Method
+    </h2>
+    <p class="text-sm text-slate-600 mb-4">
+      First arrange the 7 officers (O). This creates <strong>8 gaps</strong> (drawn as arrows ↓). Choose <strong>2 gaps</strong> to place the managers (M). Click on the arrows to toggle selection.
+    </p>
+
+    <!-- Queue visualisation area -->
+    <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 mb-4 overflow-x-auto">
+      <div class="flex items-center justify-center gap-1 min-w-[600px] py-3">
+        <!-- We build this via JS for clarity -->
+        <div id="gap-demo" class="flex items-center gap-1"></div>
+      </div>
+    </div>
+
+    <!-- Legend / status -->
+    <div class="flex flex-wrap items-center justify-between gap-3 mt-2">
+      <div class="flex items-center gap-4 text-sm">
+        <span class="flex items-center gap-1.5"><span class="inline-block w-6 h-6 rounded-full bg-amber-400 text-white text-xs font-bold flex items-center justify-center">O</span> Officer</span>
+        <span class="flex items-center gap-1.5"><span class="inline-block w-6 h-6 rounded-full bg-blue-500 text-white text-xs font-bold flex items-center justify-center">M</span> Manager</span>
+        <span class="flex items-center gap-1.5"><span class="inline-block w-6 h-6 rounded-full bg-white border-2 border-dashed border-slate-400 text-xs font-bold flex items-center justify-center text-slate-500">?</span> Gap</span>
+      </div>
+      <div id="selection-status" class="text-sm font-medium text-slate-700 bg-slate-100 px-3 py-1.5 rounded-full">
+        Selected: <span id="sel-count" class="font-bold text-blue-600">0</span> / 2 gaps
+      </div>
+    </div>
+
+    <!-- Reset button -->
+    <div class="mt-4 flex justify-end">
+      <button id="reset-demo" class="text-sm bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium px-4 py-2 rounded-lg transition-colors">
+        ↺ Reset Demo
+      </button>
+    </div>
+  </section>
+
+  <!-- ===== STEP-BY-STEP SOLUTION ===== -->
+  <section class="w-full max-w-4xl mb-6">
+    <h2 class="text-lg font-semibold text-slate-800 flex items-center gap-2 mb-3">
+      <span class="text-xl" aria-hidden="true">🧩</span> Step-by-Step Guided Solution
+    </h2>
+    <p class="text-sm text-slate-600 mb-4">Click each step to reveal the reasoning. Try to think ahead before opening!</p>
+
+    <div class="space-y-4">
+
+      <!-- STEP 1 -->
+      <div class="step-card bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <button class="step-header w-full flex items-center justify-between px-5 py-4 text-left hover:bg-slate-50 transition-colors" data-target="step1">
+          <span class="flex items-center gap-3">
+            <span class="bg-blue-100 text-blue-700 text-sm font-bold w-8 h-8 rounded-full flex items-center justify-center">1</span>
+            <span class="font-semibold text-slate-800">Arrange the 7 officers first</span>
+          </span>
+          <svg class="step-arrow w-5 h-5 text-slate-400 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div id="step1" class="step-content px-5 pb-5">
+          <div class="border-t border-slate-100 pt-4">
+            <p class="text-slate-700 mb-3">The 7 officers can be arranged in a queue in:</p>
+            <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center text-lg">
+              \[ {}_7P_7 = 7! = 5040 \text{ ways} \]
+            </div>
+            <div class="mt-4 flex items-start gap-2 text-sm text-slate-600 bg-slate-50 rounded-lg p-3 border border-slate-200">
+              <span class="text-amber-500 text-lg leading-none">💡</span>
+              <span><strong>Hint:</strong> Since all 7 officers are distinct, we arrange all of them: \(7!\).</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="step-card bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <button class="step-header w-full flex items-center justify-between px-5 py-4 text-left hover:bg-slate-50 transition-colors" data-target="step2">
+          <span class="flex items-center gap-3">
+            <span class="bg-blue-100 text-blue-700 text-sm font-bold w-8 h-8 rounded-full flex items-center justify-center">2</span>
+            <span class="font-semibold text-slate-800">Identify the available gaps</span>
+          </span>
+          <svg class="step-arrow w-5 h-5 text-slate-400 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div id="step2" class="step-content px-5 pb-5">
+          <div class="border-t border-slate-100 pt-4">
+            <p class="text-slate-700 mb-3">When the 7 officers stand in a row, they create <strong>gaps</strong> around and between them:</p>
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 flex justify-center overflow-x-auto">
+              <div class="flex items-center gap-0.5 text-lg">
+                <span class="text-blue-500 font-bold">↓</span>
+                <span class="w-9 h-9 rounded-full bg-amber-400 text-white text-sm font-bold flex items-center justify-center">O</span>
+                <span class="text-blue-500 font-bold">↓</span>
+                <span class="w-9 h-9 rounded-full bg-amber-400 text-white text-sm font-bold flex items-center justify-center">O</span>
+                <span class="text-blue-500 font-bold">↓</span>
+                <span class="w-9 h-9 rounded-full bg-amber-400 text-white text-sm font-bold flex items-center justify-center">O</span>
+                <span class="text-blue-500 font-bold">↓</span>
+                <span class="w-9 h-9 rounded-full bg-amber-400 text-white text-sm font-bold flex items-center justify-center">O</span>
+                <span class="text-blue-500 font-bold">↓</span>
+                <span class="w-9 h-9 rounded-full bg-amber-400 text-white text-sm font-bold flex items-center justify-center">O</span>
+                <span class="text-blue-500 font-bold">↓</span>
+                <span class="w-9 h-9 rounded-full bg-amber-400 text-white text-sm font-bold flex items-center justify-center">O</span>
+                <span class="text-blue-500 font-bold">↓</span>
+                <span class="w-9 h-9 rounded-full bg-amber-400 text-white text-sm font-bold flex items-center justify-center">O</span>
+                <span class="text-blue-500 font-bold">↓</span>
+              </div>
+            </div>
+            <p class="text-slate-700 mt-3">Number of gaps = \( 7 + 1 = 8 \).</p>
+            <div class="mt-4 flex items-start gap-2 text-sm text-slate-600 bg-slate-50 rounded-lg p-3 border border-slate-200">
+              <span class="text-amber-500 text-lg leading-none">💡</span>
+              <span><strong>Hint:</strong> With \(n\) people in a row, there are \(n+1\) gaps (including the ends).</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="step-card bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <button class="step-header w-full flex items-center justify-between px-5 py-4 text-left hover:bg-slate-50 transition-colors" data-target="step3">
+          <span class="flex items-center gap-3">
+            <span class="bg-blue-100 text-blue-700 text-sm font-bold w-8 h-8 rounded-full flex items-center justify-center">3</span>
+            <span class="font-semibold text-slate-800">Place the 2 managers into the gaps</span>
+          </span>
+          <svg class="step-arrow w-5 h-5 text-slate-400 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div id="step3" class="step-content px-5 pb-5">
+          <div class="border-t border-slate-100 pt-4">
+            <p class="text-slate-700 mb-3">We must choose <strong>2 different gaps</strong> from the 8 available gaps, and then arrange the 2 distinct managers in those gaps.</p>
+            <p class="text-slate-700 mb-3 font-medium">Number of ways:</p>
+            <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center text-lg">
+              \[ {}_8P_2 = 8 \times 7 = 56 \]
+            </div>
+            <p class="text-slate-600 text-sm mt-3">Each manager is distinct, so order matters — we use permutations \({}_8P_2\), not combinations.</p>
+            <div class="mt-4 flex items-start gap-2 text-sm text-slate-600 bg-slate-50 rounded-lg p-3 border border-slate-200">
+              <span class="text-amber-500 text-lg leading-none">💡</span>
+              <span><strong>Hint:</strong> Choosing 2 gaps from 8 and arranging 2 managers: \({}_8P_2 = \frac{8!}{(8-2)!} = 8 \times 7\).</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="step-card bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <button class="step-header w-full flex items-center justify-between px-5 py-4 text-left hover:bg-slate-50 transition-colors" data-target="step4">
+          <span class="flex items-center gap-3">
+            <span class="bg-blue-100 text-blue-700 text-sm font-bold w-8 h-8 rounded-full flex items-center justify-center">4</span>
+            <span class="font-semibold text-slate-800">Apply the multiplication principle</span>
+          </span>
+          <svg class="step-arrow w-5 h-5 text-slate-400 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div id="step4" class="step-content px-5 pb-5">
+          <div class="border-t border-slate-100 pt-4">
+            <p class="text-slate-700 mb-3">The total number of different queues is the product of the two stages:</p>
+            <div class="bg-blue-50 border border-blue-200 rounded-xl p-5 text-center">
+              <div class="text-xl">
+                \[ \text{Total} = {}_8P_2 \times 7! \]
+              </div>
+            </div>
+            <div class="mt-4 flex items-start gap-2 text-sm text-slate-600 bg-slate-50 rounded-lg p-3 border border-slate-200">
+              <span class="text-amber-500 text-lg leading-none">💡</span>
+              <span><strong>Hint:</strong> Multiplication principle — if one task can be done in \(m\) ways and another in \(n\) ways, together they can be done in \(m \times n\) ways.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 5 -->
+      <div class="step-card bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <button class="step-header w-full flex items-center justify-between px-5 py-4 text-left hover:bg-slate-50 transition-colors" data-target="step5">
+          <span class="flex items-center gap-3">
+            <span class="bg-blue-100 text-blue-700 text-sm font-bold w-8 h-8 rounded-full flex items-center justify-center">5</span>
+            <span class="font-semibold text-slate-800">Calculate the final answer</span>
+          </span>
+          <svg class="step-arrow w-5 h-5 text-slate-400 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div id="step5" class="step-content px-5 pb-5">
+          <div class="border-t border-slate-100 pt-4">
+            <div class="bg-emerald-50 border border-emerald-300 rounded-xl p-6 text-center">
+              <p class="text-sm font-medium text-emerald-700 mb-2">Compute:</p>
+              <div class="text-2xl">
+                \[ {}_8P_2 \times 7! = 56 \times 5040 = 282\,240 \]
+              </div>
+            </div>
+            <p class="text-slate-700 mt-4 font-medium">Therefore, the answer is <strong>C. 282 240</strong>.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ===== ANSWER CHOICES ===== -->
+  <section class="w-full max-w-4xl bg-white rounded-2xl shadow-md border border-slate-200 p-5 sm:p-7 mb-6">
+    <h2 class="text-lg font-semibold text-slate-800 flex items-center gap-2 mb-4">
+      <span class="text-xl" aria-hidden="true">✅</span> Check Your Understanding
+    </h2>
+    <p class="text-sm text-slate-600 mb-4">Click on an option to see if it's correct.</p>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="choices-container">
+      <!-- Choices generated by JS -->
+    </div>
+    <div id="choice-feedback" class="mt-4 text-sm font-medium hidden"></div>
+  </section>
+
+  <!-- ===== FORMULA SUMMARY ===== -->
+  <section class="w-full max-w-4xl bg-gradient-to-br from-slate-800 to-slate-700 rounded-2xl shadow-lg p-5 sm:p-7 mb-10 text-white">
+    <h2 class="text-lg font-semibold flex items-center gap-2 mb-4">
+      <span class="text-xl" aria-hidden="true">📝</span> Key Formulas to Remember
+    </h2>
+    <div class="grid sm:grid-cols-2 gap-4 text-sm">
+      <div class="bg-white/10 backdrop-blur rounded-xl p-4 border border-white/10">
+        <p class="font-semibold text-amber-300 mb-1">Permutations</p>
+        <div class="text-lg">\[ {}_nP_r = \frac{n!}{(n-r)!} \]</div>
+        <p class="text-slate-300 mt-1 text-xs">Arranging \(r\) items out of \(n\) distinct items (order matters).</p>
+      </div>
+      <div class="bg-white/10 backdrop-blur rounded-xl p-4 border border-white/10">
+        <p class="font-semibold text-amber-300 mb-1">Gap Method</p>
+        <div class="text-lg">\[ \text{For } n \text{ in a row} \Rightarrow n+1 \text{ gaps} \]</div>
+        <p class="text-slate-300 mt-1 text-xs">Useful when no two specified items can be adjacent.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="w-full max-w-4xl text-center text-xs text-slate-400 pb-6">
+    <p>HKDSE Math 2024 Paper 2 Q42 — Interactive Solution · Created for study purposes</p>
+  </footer>
+
+  <!-- ===== JAVASCRIPT ===== -->
+  <script>
+    (function() {
+      // ---------- ACCORDION ----------
+      const stepHeaders = document.querySelectorAll('.step-header');
+      stepHeaders.forEach(btn => {
+        btn.addEventListener('click', function() {
+          const targetId = this.dataset.target;
+          const content = document.getElementById(targetId);
+          const arrow = this.querySelector('.step-arrow');
+          const isOpen = content.classList.contains('open');
+
+          // Close all other steps (optional)
+          // Uncomment the following block if you want only one open at a time:
+          /*
+          document.querySelectorAll('.step-content').forEach(el => {
+            if (el.id !== targetId) {
+              el.classList.remove('open');
+              const otherBtn = document.querySelector(`.step-header[data-target="${el.id}"]`);
+              if (otherBtn) otherBtn.querySelector('.step-arrow').style.transform = 'rotate(0deg)';
+            }
+          });
+          */
+
+          if (isOpen) {
+            content.classList.remove('open');
+            arrow.style.transform = 'rotate(0deg)';
+          } else {
+            content.classList.add('open');
+            arrow.style.transform = 'rotate(180deg)';
+          }
+          // Re-render MathJax inside the newly opened content
+          if (!isOpen && window.MathJax && MathJax.typesetPromise) {
+            MathJax.typesetPromise([content]);
+          }
+        });
+      });
+
+      // Open first step by default
+      const firstContent = document.getElementById('step1');
+      if (firstContent) {
+        firstContent.classList.add('open');
+        const firstArrow = document.querySelector('.step-header[data-target="step1"] .step-arrow');
+        if (firstArrow) firstArrow.style.transform = 'rotate(180deg)';
+      }
+
+      // ---------- INTERACTIVE GAP DEMO ----------
+      const demoContainer = document.getElementById('gap-demo');
+      const selCountEl = document.getElementById('sel-count');
+      const selectionStatus = document.getElementById('selection-status');
+      const resetBtn = document.getElementById('reset-demo');
+
+      // State: array of gap indices (0..7) that are selected
+      let selectedGaps = new Set();
+
+      function renderDemo() {
+        let html = '';
+        for (let g = 0; g <= 7; g++) {
+          // Gap arrow before each officer (and after last)
+          const isSelected = selectedGaps.has(g);
+          const arrowClass = isSelected ? 'arrow-btn active' : 'arrow-btn';
+          html += `<div class="${arrowClass} flex flex-col items-center justify-center w-8 h-14 rounded-lg border-2 border-dashed border-slate-300 bg-white text-blue-500 font-bold text-xl" data-gap="${g}" role="button" tabindex="0" aria-label="Gap ${g+1}">↓</div>`;
+          // Officer (except after the last gap)
+          if (g < 7) {
+            html += `<div class="w-9 h-9 rounded-full bg-amber-400 text-white text-sm font-bold flex items-center justify-center shadow-sm">O</div>`;
+          }
+        }
+        demoContainer.innerHTML = html;
+
+        // Attach click listeners
+        demoContainer.querySelectorAll('.arrow-btn').forEach(btn => {
+          btn.addEventListener('click', function() {
+            const gapIdx = parseInt(this.dataset.gap, 10);
+            toggleGap(gapIdx);
+          });
+          // Keyboard accessibility
+          btn.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              const gapIdx = parseInt(this.dataset.gap, 10);
+              toggleGap(gapIdx);
+            }
+          });
+        });
+
+        updateStatus();
+      }
+
+      function toggleGap(idx) {
+        if (selectedGaps.has(idx)) {
+          selectedGaps.delete(idx);
+        } else {
+          if (selectedGaps.size < 2) {
+            selectedGaps.add(idx);
+          } else {
+            // Replace: remove oldest, add new (or just do nothing — let's replace the first)
+            // Simpler: just do nothing and flash feedback
+            // Better UX: show a quick message
+            selectionStatus.classList.add('bg-red-100', 'text-red-700');
+            setTimeout(() => {
+              selectionStatus.classList.remove('bg-red-100', 'text-red-700');
+            }, 400);
+            return;
+          }
+        }
+        renderDemo();
+      }
+
+      function updateStatus() {
+        const count = selectedGaps.size;
+        selCountEl.textContent = count;
+        if (count === 2) {
+          selectionStatus.classList.add('bg-emerald-100', 'text-emerald-700');
+          selectionStatus.classList.remove('bg-slate-100', 'text-slate-700');
+        } else {
+          selectionStatus.classList.remove('bg-emerald-100', 'text-emerald-700');
+          selectionStatus.classList.add('bg-slate-100', 'text-slate-700');
+        }
+      }
+
+      resetBtn.addEventListener('click', function() {
+        selectedGaps.clear();
+        renderDemo();
+      });
+
+      // Initial render
+      renderDemo();
+
+      // ---------- ANSWER CHOICES ----------
+      const choices = [
+        { label: 'A', value: '80640', text: '80 640' },
+        { label: 'B', value: '141120', text: '141 120' },
+        { label: 'C', value: '282240', text: '282 240' },
+        { label: 'D', value: '362880', text: '362 880' }
+      ];
+      const correctValue = '282240';
+
+      const container = document.getElementById('choices-container');
+      const feedback = document.getElementById('choice-feedback');
+
+      choices.forEach(ch => {
+        const btn = document.createElement('button');
+        btn.className = 'choice-card w-full text-left px-4 py-3 rounded-xl border-2 border-slate-200 bg-white font-medium text-slate-700 flex items-center gap-3';
+        btn.innerHTML = `
+          <span class="bg-slate-200 text-slate-700 text-sm font-bold w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0">${ch.label}</span>
+          <span>${ch.text}</span>
+        `;
+        btn.addEventListener('click', function() {
+          // Reset all
+          container.querySelectorAll('button').forEach(b => {
+            b.classList.remove('correct', 'wrong');
+            b.disabled = false;
+          });
+          if (ch.value === correctValue) {
+            this.classList.add('correct');
+            feedback.textContent = '🎉 Correct! Well done. The answer is C. 282 240.';
+            feedback.className = 'mt-4 text-sm font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg p-3';
+          } else {
+            this.classList.add('wrong');
+            // Also highlight the correct one
+            container.querySelectorAll('button').forEach(b => {
+              if (b.querySelector('span:last-child').textContent.trim() === '282 240') {
+                b.classList.add('correct');
+              }
+            });
+            feedback.textContent = '❌ Not quite. Remember to use the gap method: arrange officers first, then place managers in gaps.';
+            feedback.className = 'mt-4 text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-lg p-3';
+          }
+          feedback.classList.remove('hidden');
+        });
+        container.appendChild(btn);
+      });
+
+      // ---------- RENDER MATHJAX AFTER DOM LOAD ----------
+      // Initial typeset for all static content
+      if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise().catch(err => console.warn('MathJax error:', err));
+      }
+
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HKDSE Math 2024 Paper 2 Q1 – Polynomials</title>
+
+<!-- MathJax for LaTeX rendering -->
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+  :root {
+    --bg: #f6f8fc;
+    --card: #ffffff;
+    --ink: #1e293b;
+    --muted: #64748b;
+    --brand: #2563eb;
+    --brand-soft: #dbeafe;
+    --accent: #16a34a;
+    --accent-soft: #dcfce7;
+    --warn: #d97706;
+    --warn-soft: #fef3c7;
+    --border: #e2e8f0;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
+  }
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 999px;
+  }
+  .tag-blue { background: var(--brand-soft); color: var(--brand); }
+  .tag-green { background: var(--accent-soft); color: var(--accent); }
+  .tag-amber { background: var(--warn-soft); color: var(--warn); }
+
+  /* Step cards */
+  .step-head {
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s ease;
+  }
+  .step-head:hover { background: #f8fafc; }
+  .step-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.45s ease, opacity 0.35s ease, padding 0.3s ease;
+    opacity: 0;
+  }
+  .step.open .step-body {
+    max-height: 900px;
+    opacity: 1;
+  }
+  .chev {
+    transition: transform 0.3s ease;
+  }
+  .step.open .chev { transform: rotate(180deg); }
+
+  .hint-box {
+    background: var(--warn-soft);
+    border-left: 4px solid var(--warn);
+    border-radius: 10px;
+    font-size: 0.9rem;
+    color: #78350f;
+  }
+  .num-badge {
+    width: 34px; height: 34px;
+    flex: 0 0 34px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.9rem;
+    background: var(--brand);
+    color: #fff;
+  }
+  .step.solved .num-badge { background: var(--accent); }
+
+  /* Interactive slider */
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--brand) 0%, var(--brand) 50%, #e2e8f0 50%, #e2e8f0 100%);
+    outline: none;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--brand);
+    border: 3px solid #fff;
+    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.4);
+    cursor: pointer;
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--brand);
+    border: 3px solid #fff;
+    cursor: pointer;
+  }
+
+  .bar {
+    transition: height 0.25s ease;
+    border-radius: 6px 6px 0 0;
+  }
+  .pulse { animation: pulse 1.8s infinite; }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.55; }
+  }
+  .fade-in { animation: fadeIn 0.5s ease; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .option-btn {
+    border: 2px solid var(--border);
+    transition: all 0.18s ease;
+  }
+  .option-btn:hover { border-color: var(--brand); background: #f0f6ff; }
+  .option-btn.correct { border-color: var(--accent); background: var(--accent-soft); }
+  .option-btn.wrong { border-color: #ef4444; background: #fee2e2; }
+
+  /* responsive tweaks */
+  @media (max-width: 640px) {
+    .formula-panel { font-size: 0.85rem; }
+    .num-badge { width: 28px; height: 28px; flex: 0 0 28px; font-size: 0.8rem; }
+  }
+</style>
+</head>
+<body class="min-h-screen">
+
+  <!-- ===== HEADER ===== -->
+  <header class="w-full bg-white border-b border-slate-200 sticky top-0 z-20 backdrop-blur">
+    <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <div class="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold">DSE</div>
+        <div>
+          <p class="text-[0.7rem] uppercase tracking-wider text-slate-400 font-semibold leading-none">Math · Paper 2</p>
+          <p class="text-sm font-bold text-slate-700 leading-tight">2024 Q1</p>
+        </div>
+      </div>
+      <span class="tag tag-blue text-[0.7rem]">Topic 4 · Polynomials</span>
+    </div>
+  </header>
+
+  <main class="max-w-4xl mx-auto px-4 py-6 md:py-10 space-y-6">
+
+    <!-- ===== QUESTION OVERVIEW ===== -->
+    <section class="card p-5 md:p-7 fade-in">
+      <div class="flex flex-wrap items-center gap-2 mb-4">
+        <span class="tag tag-blue">🔑 Difference of Two Squares</span>
+        <span class="tag tag-green">🧮 Factorisation</span>
+        <span class="tag tag-amber">⚡ Identity: \(a^2-b^2\)</span>
+      </div>
+
+      <h1 class="text-xl md:text-2xl font-bold text-slate-800 mb-1">
+        HKDSE Math 2024 Paper 2 · Question 1
+      </h1>
+      <p class="text-slate-500 text-sm mb-5">Multiple Choice · Polynomials</p>
+
+      <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 md:p-6">
+        <p class="text-base md:text-lg text-slate-800 mb-5">
+          \[
+            (x+3y)^2-(x-3y)^2 = ?
+          \]
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="options">
+          <button class="option-btn text-left rounded-xl px-4 py-3 font-medium text-slate-700" data-opt="A">
+            <span class="font-bold text-slate-400 mr-2">A.</span> \(2x^2\)
+          </button>
+          <button class="option-btn text-left rounded-xl px-4 py-3 font-medium text-slate-700" data-opt="B">
+            <span class="font-bold text-slate-400 mr-2">B.</span> \(6xy\)
+          </button>
+          <button class="option-btn text-left rounded-xl px-4 py-3 font-medium text-slate-700" data-opt="C">
+            <span class="font-bold text-slate-400 mr-2">C.</span> \(12xy\)
+          </button>
+          <button class="option-btn text-left rounded-xl px-4 py-3 font-medium text-slate-700" data-opt="D">
+            <span class="font-bold text-slate-400 mr-2">D.</span> \(2x^2+18y^2\)
+          </button>
+        </div>
+        <p id="feedback" class="mt-4 text-sm font-semibold hidden"></p>
+      </div>
+    </section>
+
+    <!-- ===== HINT ===== -->
+    <section class="card p-5 md:p-6">
+      <p class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-2">💡 Key Hint — Formula first, numbers later</p>
+      <div class="hint-box p-4">
+        <p class="font-bold mb-1">Difference of Two Squares Identity</p>
+        <p class="mb-2">\[ a^2-b^2 = (a+b)(a-b) \]</p>
+        <p class="text-xs leading-relaxed">
+          Here \(a = x+3y\) and \(b = x-3y\). Note the middle term \(xy\) appears when adding/subtracting these two branches.
+        </p>
+      </div>
+    </section>
+
+    <!-- ===== STEP BY STEP ===== -->
+    <section class="space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg md:text-xl font-bold text-slate-800">Step-by-Step Solution</h2>
+        <button id="toggleAll" class="text-sm font-semibold text-blue-600 hover:text-blue-800">Expand all</button>
+      </div>
+
+      <!-- Step 1 -->
+      <article class="step card overflow-hidden" data-step="1">
+        <div class="step-head px-4 md:px-5 py-4 flex items-center gap-3">
+          <span class="num-badge">1</span>
+          <div class="flex-1">
+            <p class="font-semibold text-slate-800">Recognise the pattern</p>
+            <p class="text-xs text-slate-400">It is of the form \(a^2-b^2\)</p>
+          </div>
+          <svg class="chev w-5 h-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </div>
+        <div class="step-body px-4 md:px-5 pb-5">
+          <div class="bg-slate-50 rounded-xl p-4 text-slate-700">
+            \[
+              \underbrace{(x+3y)^2}_{a^2} - \underbrace{(x-3y)^2}_{b^2}
+            \]
+            <p class="text-sm mt-3">So \(a = x+3y\) and \(b = x-3y\).</p>
+          </div>
+        </div>
+      </article>
+
+      <!-- Step 2 -->
+      <article class="step card overflow-hidden" data-step="2">
+        <div class="step-head px-4 md:px-5 py-4 flex items-center gap-3">
+          <span class="num-badge">2</span>
+          <div class="flex-1">
+            <p class="font-semibold text-slate-800">Apply the identity</p>
+            <p class="text-xs text-slate-400">\(a^2-b^2=(a+b)(a-b)\)</p>
+          </div>
+          <svg class="chev w-5 h-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </div>
+        <div class="step-body px-4 md:px-5 pb-5">
+          <div class="bg-slate-50 rounded-xl p-4 text-slate-700">
+            \[
+              = \big[(x+3y)+(x-3y)\big]\big[(x+3y)-(x-3y)\big]
+            \]
+          </div>
+        </div>
+      </article>
+
+      <!-- Step 3 -->
+      <article class="step card overflow-hidden" data-step="3">
+        <div class="step-head px-4 md:px-5 py-4 flex items-center gap-3">
+          <span class="num-badge">3</span>
+          <div class="flex-1">
+            <p class="font-semibold text-slate-800">Simplify each bracket</p>
+            <p class="text-xs text-slate-400">Notice that the \(\pm 3y\) terms cancel out</p>
+          </div>
+          <svg class="chev w-5 h-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </div>
+        <div class="step-body px-4 md:px-5 pb-5">
+          <div class="bg-slate-50 rounded-xl p-4 text-slate-700">
+            \[
+              = (2x)(6y)
+            \]
+            <p class="text-sm mt-3 text-slate-500">The \(y\)-terms vanish when added/subtracted — only \(2x\) and \(6y\) remain.</p>
+          </div>
+        </div>
+      </article>
+
+      <!-- Step 4 -->
+      <article class="step card overflow-hidden" data-step="4">
+        <div class="step-head px-4 md:px-5 py-4 flex items-center gap-3">
+          <span class="num-badge">4</span>
+          <div class="flex-1">
+            <p class="font-semibold text-slate-800">Final result</p>
+            <p class="text-xs text-slate-400">Multiply the two remaining terms</p>
+          </div>
+          <svg class="chev w-5 h-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </div>
+        <div class="step-body px-4 md:px-5 pb-5">
+          <div class="bg-green-50 border border-green-200 rounded-xl p-4 text-green-900 font-semibold">
+            \[
+              = 12xy \quad \Rightarrow \quad \boxed{\text{C}}
+            \]
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- ===== INTERACTIVE VISUAL ===== -->
+    <section class="card p-5 md:p-7">
+      <h2 class="text-lg md:text-xl font-bold text-slate-800 mb-1">🔬 Interactive Visualisation</h2>
+      <p class="text-sm text-slate-500 mb-5">
+        Move the slider to change \(x\). The bars show \(a^2=(x+3y)^2\) and \(b^2=(x-3y)^2\), and the difference \(a^2-b^2\) is always \(12xy\) (with \(y\) fixed at 1).
+      </p>
+
+      <div class="flex items-center gap-4 mb-5">
+        <span class="text-sm font-bold text-slate-600 w-10 text-center">x =</span>
+        <input id="xSlider" type="range" min="1" max="10" value="4" step="1" />
+        <span id="xVal" class="text-lg font-bold text-blue-600 w-10 text-center">4</span>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end" style="height: 240px;" id="chart">
+        <div class="flex flex-col items-center justify-end h-full">
+          <p id="a2Val" class="text-xs font-bold text-blue-600 mb-1">49</p>
+          <div id="barA" class="bar w-full bg-blue-500" style="height: 60%;"></div>
+          <p class="text-xs text-slate-500 mt-2 text-center">\(a^2=(x+3y)^2\)</p>
+        </div>
+        <div class="flex flex-col items-center justify-end h-full">
+          <p id="b2Val" class="text-xs font-bold text-rose-500 mb-1">1</p>
+          <div id="barB" class="bar w-full bg-rose-400" style="height: 2%;"></div>
+          <p class="text-xs text-slate-500 mt-2 text-center">\(b^2=(x-3y)^2\)</p>
+        </div>
+        <div class="flex flex-col items-center justify-end h-full">
+          <p id="diffVal" class="text-xs font-bold text-emerald-600 mb-1">48</p>
+          <div id="barD" class="bar w-full bg-emerald-500" style="height: 60%;"></div>
+          <p class="text-xs text-slate-500 mt-2 text-center">Difference \(=12xy\)</p>
+        </div>
+      </div>
+
+      <div class="mt-5 bg-slate-50 rounded-xl p-4 text-center text-slate-700">
+        \[
+          a^2-b^2 = \big(\,\text{<span id="spanA">49</span>}\,\big) - \big(\,\text{<span id="spanB">1</span>}\,\big) = \text{<span id="spanD" class="text-emerald-600 font-bold">48</span>}
+        \]
+      </div>
+    </section>
+
+    <!-- ===== COMMON MISTAKES ===== -->
+    <section class="card p-5 md:p-6">
+      <h2 class="text-lg font-bold text-slate-800 mb-3">⚠️ Watch out for these mistakes</h2>
+      <ul class="space-y-3 text-sm text-slate-600">
+        <li class="flex gap-3"><span class="text-rose-500 font-bold">✗</span>
+          Expanding directly as \((x+3y)^2-(x-3y)^2 = x^2+6xy+9y^2 - x^2+6xy-9y^2\). This gives \(12xy\), but many students forget the sign and write \(6xy\) or \(18y^2\).</li>
+        <li class="flex gap-3"><span class="text-rose-500 font-bold">✗</span>
+          Choosing A (\(2x^2\)): this ignores the cross terms and assumes squaring just doubles the square.</li>
+        <li class="flex gap-3"><span class="text-rose-500 font-bold">✗</span>
+          Choosing B (\(6xy\)): only counting one cross term instead of both.</li>
+        <li class="flex gap-3"><span class="text-rose-500 font-bold">✗</span>
+          Choosing D (\(2x^2+18y^2\)): this is the answer to \((x+3y)^2+(x-3y)^2\), not the difference.</li>
+      </ul>
+    </section>
+
+    <!-- ===== QUICK CHECK ===== -->
+    <section class="card p-5 md:p-6 bg-gradient-to-br from-blue-50 to-white">
+      <h2 class="text-lg font-bold text-slate-800 mb-2">🎯 Quick Check</h2>
+      <p class="text-sm text-slate-600 mb-4">Try a related one: what is \((x+5y)^2-(x-5y)^2\)?</p>
+      <div class="flex flex-wrap gap-2" id="quickCheck">
+        <button class="option-btn rounded-xl px-4 py-2 font-semibold text-slate-700" data-q="1">\(10xy\)</button>
+        <button class="option-btn rounded-xl px-4 py-2 font-semibold text-slate-700" data-q="2">\(20xy\)</button>
+        <button class="option-btn rounded-xl px-4 py-2 font-semibold text-slate-700" data-q="3">\(2x^2\)</button>
+        <button class="option-btn rounded-xl px-4 py-2 font-semibold text-slate-700" data-q="4">\(50y^2\)</button>
+      </div>
+      <p id="quickFeedback" class="mt-3 text-sm font-semibold hidden"></p>
+    </section>
+
+  </main>
+
+  <footer class="max-w-4xl mx-auto px-4 pb-10 text-center text-xs text-slate-400">
+    HKDSE Math 2024 Paper 2 · Q1 · Interactive Solution · Topic 4 Polynomials
+  </footer>
+
+<script>
+  /* ---------- Step accordion ---------- */
+  document.querySelectorAll('.step').forEach(step => {
+    const head = step.querySelector('.step-head');
+    head.addEventListener('click', () => {
+      step.classList.toggle('open');
+    });
+  });
+
+  // preopen step 1
+  document.querySelector('.step[data-step="1"]').classList.add('open');
+
+  /* ---------- Toggle all ---------- */
+  const toggleAllBtn = document.getElementById('toggleAll');
+  let allOpen = false;
+  toggleAllBtn.addEventListener('click', () => {
+    allOpen = !allOpen;
+    document.querySelectorAll('.step').forEach(s => {
+      s.classList.toggle('open', allOpen);
+    });
+    toggleAllBtn.textContent = allOpen ? 'Collapse all' : 'Expand all';
+  });
+
+  /* ---------- MCQ answer check ---------- */
+  const feedback = document.getElementById('feedback');
+  document.querySelectorAll('#options .option-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      // reset
+      document.querySelectorAll('#options .option-btn').forEach(b => {
+        b.classList.remove('correct', 'wrong');
+      });
+      const choice = btn.dataset.opt;
+      if (choice === 'C') {
+        btn.classList.add('correct');
+        feedback.textContent = '✅ Correct! Using \(a^2-b^2=(a+b)(a-b)\), the result is \(12xy\).';
+        feedback.className = 'mt-4 text-sm font-semibold text-green-600';
+      } else {
+        btn.classList.add('wrong');
+        feedback.textContent = '❌ Not quite. Try using the difference-of-squares identity \(a^2-b^2=(a+b)(a-b)\).';
+        feedback.className = 'mt-4 text-sm font-semibold text-rose-600';
+      }
+      feedback.classList.remove('hidden');
+      if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise([feedback]);
+      }
+    });
+  });
+
+  /* ---------- Interactive slider visualisation ---------- */
+  const slider = document.getElementById('xSlider');
+  const xValEl = document.getElementById('xVal');
+  const barA = document.getElementById('barA');
+  const barB = document.getElementById('barB');
+  const barD = document.getElementById('barD');
+  const a2ValEl = document.getElementById('a2Val');
+  const b2ValEl = document.getElementById('b2Val');
+  const diffValEl = document.getElementById('diffVal');
+  const spanA = document.getElementById('spanA');
+  const spanB = document.getElementById('spanB');
+  const spanD = document.getElementById('spanD');
+
+  const y = 1; // fixed y value
+
+  function updateViz() {
+    const x = parseFloat(slider.value);
+    xValEl.textContent = x;
+
+    const a = x + 3 * y;
+    const b = x - 3 * y;
+    const a2 = a * a;
+    const b2 = b * b;
+    const diff = a2 - b2;
+
+    const maxVal = Math.max(a2, b2, diff, 1);
+
+    // bar heights as percentages
+    barA.style.height = (a2 / maxVal * 100) + '%';
+    barB.style.height = Math.max((b2 / maxVal * 100), 1) + '%';
+    barD.style.height = (diff / maxVal * 100) + '%';
+
+    a2ValEl.textContent = a2;
+    b2ValEl.textContent = b2;
+    diffValEl.textContent = diff;
+
+    spanA.textContent = a2;
+    spanB.textContent = b2;
+    spanD.textContent = diff;
+
+    // mini pulse on diff bar
+    barD.classList.remove('pulse');
+    void barD.offsetWidth;
+    barD.classList.add('pulse');
+  }
+
+  slider.addEventListener('input', updateViz);
+  updateViz();
+
+  /* ---------- Quick check ---------- */
+  const quickFeedback = document.getElementById('quickFeedback');
+  document.querySelectorAll('#quickCheck .option-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#quickCheck .option-btn').forEach(b => {
+        b.classList.remove('correct', 'wrong');
+      });
+      const q = btn.dataset.q;
+      if (q === '2') {
+        btn.classList.add('correct');
+        quickFeedback.textContent = '✅ Correct! \((x+5y)^2-(x-5y)^2 = (2x)(10y) = 20xy\).';
+        quickFeedback.className = 'mt-3 text-sm font-semibold text-green-600';
+      } else {
+        btn.classList.add('wrong');
+        quickFeedback.textContent = '❌ Try again. Apply \(a^2-b^2=(a+b)(a-b)\) with \(a=x+5y,\;b=x-5y\).';
+        quickFeedback.className = 'mt-3 text-sm font-semibold text-rose-600';
+      }
+      quickFeedback.classList.remove('hidden');
+      if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise([quickFeedback]);
+      }
+    });
+  });
+</script>
+</body>
+</html>

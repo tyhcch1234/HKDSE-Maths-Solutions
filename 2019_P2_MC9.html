@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>HKDSE Math 2019 Paper 2 Q9 · Polynomials</title>
+  <!-- MathJax -->
+  <script>
+    MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+  <!-- Tailwind via CDN (lightweight) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- custom styles -->
+  <style>
+    body {
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      background: #f8fafc;
+    }
+    .card-shadow {
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04), 0 1px 4px rgba(0, 0, 0, 0.02);
+    }
+    .step-card {
+      transition: all 0.2s ease;
+      border-left: 4px solid #e2e8f0;
+    }
+    .step-card.active {
+      border-left-color: #3b82f6;
+      background: #f0f7ff;
+    }
+    .step-card.completed {
+      border-left-color: #22c55e;
+      background: #f0fdf4;
+    }
+    .step-card.locked {
+      opacity: 0.6;
+    }
+    .badge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.2rem 0.8rem;
+      border-radius: 9999px;
+    }
+    .slider {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 5px;
+      background: #e2e8f0;
+      outline: none;
+    }
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #3b82f6;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4);
+      transition: transform 0.1s;
+    }
+    .slider::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+    .slider::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #3b82f6;
+      cursor: pointer;
+      border: none;
+    }
+    .mono {
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+    }
+    /* Smooth accordion */
+    .accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease-out, padding 0.2s ease;
+    }
+    .accordion-content.open {
+      max-height: 800px;
+      transition: max-height 0.5s ease-in;
+    }
+    /* canvas container */
+    .canvas-container {
+      position: relative;
+      width: 100%;
+      background: #ffffff;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      touch-action: none;
+    }
+    .option-btn {
+      transition: all 0.15s ease;
+    }
+    .option-btn.selected {
+      background: #3b82f6 !important;
+      color: white !important;
+      border-color: #3b82f6 !important;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+    .option-btn.correct {
+      background: #22c55e !important;
+      color: white !important;
+      border-color: #22c55e !important;
+    }
+    .option-btn.wrong {
+      background: #ef4444 !important;
+      color: white !important;
+      border-color: #ef4444 !important;
+    }
+  </style>
+</head>
+<body class="min-h-screen antialiased text-slate-800 px-3 py-5 md:px-6 md:py-8">
+
+  <!-- Main container -->
+  <main class="max-w-3xl mx-auto">
+
+    <!-- Question display card -->
+    <div class="bg-white rounded-2xl card-shadow p-5 md:p-7 mb-5">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+        <h1 class="text-lg md:text-xl font-bold text-slate-900 tracking-tight">
+          <span class="text-blue-600">HKDSE Math 2019 Paper 2</span> · Q9
+        </h1>
+        <span class="badge bg-blue-100 text-blue-700">Polynomials</span>
+      </div>
+
+      <!-- Concept tags -->
+      <div class="flex flex-wrap gap-2 mb-4">
+        <span class="badge bg-indigo-50 text-indigo-700 border border-indigo-200">Remainder Theorem</span>
+        <span class="badge bg-emerald-50 text-emerald-700 border border-emerald-200">Factor Theorem</span>
+        <span class="badge bg-amber-50 text-amber-700 border border-amber-200">Algebra</span>
+      </div>
+
+      <!-- Question text -->
+      <div class="text-base md:text-lg leading-relaxed text-slate-700 mb-4">
+        <p class="mb-2">
+          Let \(k\) be a constant such that
+          \[
+            2x^4 + kx^3 - 4x - 16
+          \]
+          is divisible by \(2x + k\). Find \(k\).
+        </p>
+      </div>
+
+      <!-- Answer choices -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 mb-2" id="optionsContainer">
+        <button data-opt="A" class="option-btn bg-white border-2 border-slate-200 rounded-xl py-2.5 px-3 text-base font-semibold text-slate-700 hover:border-blue-300 active:scale-[0.97]">
+          A. \(-2\)
+        </button>
+        <button data-opt="B" class="option-btn bg-white border-2 border-slate-200 rounded-xl py-2.5 px-3 text-base font-semibold text-slate-700 hover:border-blue-300 active:scale-[0.97]">
+          B. \(2\)
+        </button>
+        <button data-opt="C" class="option-btn bg-white border-2 border-slate-200 rounded-xl py-2.5 px-3 text-base font-semibold text-slate-700 hover:border-blue-300 active:scale-[0.97]">
+          C. \(4\)
+        </button>
+        <button data-opt="D" class="option-btn bg-white border-2 border-slate-200 rounded-xl py-2.5 px-3 text-base font-semibold text-slate-700 hover:border-blue-300 active:scale-[0.97]">
+          D. \(8\)
+        </button>
+      </div>
+      <p id="feedbackMsg" class="text-sm font-medium min-h-[1.5rem] text-slate-500 mt-1"></p>
+    </div>
+
+    <!-- Step-by-step solution -->
+    <div class="bg-white rounded-2xl card-shadow p-5 md:p-7 mb-5">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg md:text-xl font-semibold text-slate-800 flex items-center gap-2">
+          <span class="text-2xl">🧩</span> Step-by-Step Solution
+        </h2>
+        <button id="resetStepsBtn" class="text-sm text-blue-600 hover:text-blue-800 font-medium underline underline-offset-2">
+          Reset
+        </button>
+      </div>
+
+      <!-- Steps container -->
+      <div id="stepsContainer" class="space-y-3">
+
+        <!-- Step 1 -->
+        <div class="step-card bg-white border border-slate-200 rounded-xl p-4 cursor-pointer" data-step="1">
+          <div class="flex items-start justify-between gap-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400 mt-0.5">Step 1</span>
+            <span class="step-status text-slate-300 text-lg">○</span>
+          </div>
+          <h3 class="font-semibold text-slate-800 mt-1 mb-2">Understand the Given Condition</h3>
+          <div class="accordion-content text-slate-600 text-sm leading-relaxed">
+            <p>The polynomial \(P(x) = 2x^4 + kx^3 - 4x - 16\) is <strong>divisible</strong> by \(2x + k\).</p>
+            <p class="mt-2">By the <strong>Factor Theorem</strong>, if \(P(x)\) is divisible by a linear factor \((ax + b)\), then \(P\left(-\frac{b}{a}\right) = 0\).</p>
+            <div class="mt-3 bg-blue-50 border border-blue-100 rounded-lg p-3 text-blue-800 text-sm">
+              <strong>💡 Hint:</strong> Divisible means the remainder is \(0\). Don't just plug in \(0!\) Find the root of the divisor first.
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="step-card bg-white border border-slate-200 rounded-xl p-4 cursor-pointer locked" data-step="2">
+          <div class="flex items-start justify-between gap-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400 mt-0.5">Step 2</span>
+            <span class="step-status text-slate-300 text-lg">○</span>
+          </div>
+          <h3 class="font-semibold text-slate-800 mt-1 mb-2">Find the Root of the Divisor</h3>
+          <div class="accordion-content text-slate-600 text-sm leading-relaxed">
+            <p>The divisor is \(2x + k\). Set it to zero to find the root:</p>
+            <p class="mt-2 mono text-base bg-slate-50 p-2 rounded-md text-center">\[
+              2x + k = 0 \quad\Rightarrow\quad x = -\frac{k}{2}
+            \]</p>
+            <p class="mt-2">So we substitute \(x = -\frac{k}{2}\) into \(P(x)\) and set the result to \(0\).</p>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="step-card bg-white border border-slate-200 rounded-xl p-4 cursor-pointer locked" data-step="3">
+          <div class="flex items-start justify-between gap-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400 mt-0.5">Step 3</span>
+            <span class="step-status text-slate-300 text-lg">○</span>
+          </div>
+          <h3 class="font-semibold text-slate-800 mt-1 mb-2">Substitute & Simplify</h3>
+          <div class="accordion-content text-slate-600 text-sm leading-relaxed">
+            <p>Set \(P\left(-\frac{k}{2}\right) = 0\):</p>
+            <p class="mt-2 mono bg-slate-50 p-2 rounded-md text-center text-base">\[
+              2\left(-\frac{k}{2}\right)^4 + k\left(-\frac{k}{2}\right)^3 - 4\left(-\frac{k}{2}\right) - 16 = 0
+            \]</p>
+            <p class="mt-3">Simplify term by term:</p>
+            <ul class="list-disc list-inside mt-2 space-y-1 text-slate-700">
+              <li>\(2 \cdot \frac{k^4}{16} = \frac{k^4}{8}\)</li>
+              <li>\(k \cdot \left(-\frac{k^3}{8}\right) = -\frac{k^4}{8}\)</li>
+              <li>\(-4 \cdot \left(-\frac{k}{2}\right) = +2k\)</li>
+              <li>\(-16\) stays</li>
+            </ul>
+            <p class="mt-3 text-slate-800 font-medium">Result:</p>
+            <p class="mono bg-blue-50 p-2 rounded-md text-center text-base text-blue-800">\[
+              \frac{k^4}{8} - \frac{k^4}{8} + 2k - 16 = 0
+            \]</p>
+            <div class="mt-2 text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-lg p-2 text-sm">
+              ✨ The \(k^4\) terms cancel out! This is a key observation.
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="step-card bg-white border border-slate-200 rounded-xl p-4 cursor-pointer locked" data-step="4">
+          <div class="flex items-start justify-between gap-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400 mt-0.5">Step 4</span>
+            <span class="step-status text-slate-300 text-lg">○</span>
+          </div>
+          <h3 class="font-semibold text-slate-800 mt-1 mb-2">Solve for \(k\)</h3>
+          <div class="accordion-content text-slate-600 text-sm leading-relaxed">
+            <p>Since the \(k^4\) terms cancel, we are left with a linear equation:</p>
+            <p class="mt-2 mono bg-slate-50 p-2 rounded-md text-center text-base">\[
+              2k - 16 = 0
+            \]</p>
+            <p class="mt-2 mono text-center text-base">\[
+              2k = 16 \quad\Rightarrow\quad k = 8
+            \]</p>
+            <p class="mt-3 text-slate-800 font-medium">Answer: <span class="text-indigo-600">\(k = 8\)</span> → Option D</p>
+          </div>
+        </div>
+
+        <!-- Step 5 (Verification) -->
+        <div class="step-card bg-white border border-slate-200 rounded-xl p-4 cursor-pointer locked" data-step="5">
+          <div class="flex items-start justify-between gap-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400 mt-0.5">Step 5</span>
+            <span class="step-status text-slate-300 text-lg">○</span>
+          </div>
+          <h3 class="font-semibold text-slate-800 mt-1 mb-2">Let's Verify!</h3>
+          <div class="accordion-content text-slate-600 text-sm leading-relaxed">
+            <p>Substitute \(k = 8\) into \(P(x)\):</p>
+            <p class="mt-1 mono text-base">\[ P(x) = 2x^4 + 8x^3 - 4x - 16 \]</p>
+            <p class="mt-2">Divisor: \(2x + 8 = 0 \Rightarrow x = -4\).</p>
+            <p class="mt-2">Check \(P(-4)\):</p>
+            <p class="mono bg-slate-50 p-2 rounded-md text-sm">\[
+              2(-4)^4 + 8(-4)^3 - 4(-4) - 16 = 512 - 512 + 16 - 16 = 0 \checkmark
+            \]</p>
+            <p class="mt-2 text-green-700 font-medium">✓ Remainder is zero. \(k = 8\) is correct!</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Navigation buttons -->
+      <div class="flex items-center justify-between mt-5 gap-3">
+        <button id="prevStepBtn" class="px-4 py-2.5 rounded-xl border-2 border-slate-200 text-slate-600 font-medium text-sm hover:border-blue-300 active:scale-[0.97] transition disabled:opacity-40 disabled:pointer-events-none" disabled>
+          ← Previous
+        </button>
+        <span id="stepIndicator" class="text-sm text-slate-400 font-medium">0 / 5</span>
+        <button id="nextStepBtn" class="px-5 py-2.5 rounded-xl bg-blue-600 text-white font-semibold text-sm shadow-md shadow-blue-200 hover:bg-blue-700 active:scale-[0.97] transition disabled:opacity-40 disabled:pointer-events-none">
+          Next Step →
+        </button>
+      </div>
+    </div>
+
+    <!-- Interactive visualisation: slider to explore k -->
+    <div class="bg-white rounded-2xl card-shadow p-5 md:p-7 mb-5">
+      <h2 class="text-lg md:text-xl font-semibold text-slate-800 flex items-center gap-2 mb-2">
+        <span class="text-2xl">📊</span> Interactive: Remainder vs \(k\)
+      </h2>
+      <p class="text-sm text-slate-500 mb-4">
+        Drag the slider to change \(k\) and see the remainder when \(2x^4 + kx^3 - 4x - 16\) is divided by \(2x + k\).
+        The correct \(k\) makes the remainder <strong>zero</strong>.
+      </p>
+
+      <!-- Slider control -->
+      <div class="mb-4">
+        <div class="flex items-center justify-between text-sm mb-1">
+          <label for="kSlider" class="font-medium text-slate-600">\(k =\) <span id="kValue" class="text-blue-600 font-bold text-base">0</span></label>
+          <span class="text-xs text-slate-400">Range: \(-10\) to \(10\)</span>
+        </div>
+        <input type="range" id="kSlider" min="-10" max="10" step="0.1" value="0" class="slider w-full">
+      </div>
+
+      <!-- Canvas graph -->
+      <div class="canvas-container p-2 bg-slate-50">
+        <canvas id="graphCanvas" width="600" height="280"></canvas>
+      </div>
+
+      <!-- Remainder display -->
+      <div class="mt-3 flex items-center justify-between bg-slate-50 rounded-xl p-3">
+        <span class="text-sm font-medium text-slate-600">Remainder when divided by \(2x + k\):</span>
+        <span id="remainderDisplay" class="mono text-base font-bold text-slate-800">0.00</span>
+      </div>
+      <div class="mt-2 min-h-[1.8rem] text-sm" id="visualFeedback"></div>
+    </div>
+
+    <!-- Quick summary / formula reference -->
+    <div class="bg-white rounded-2xl card-shadow p-5 md:p-7 mb-8">
+      <h2 class="text-lg font-semibold text-slate-800 flex items-center gap-2 mb-3">
+        <span class="text-2xl">📝</span> Key Takeaway
+      </h2>
+      <div class="grid gap-3 sm:grid-cols-2">
+        <div class="bg-blue-50 rounded-xl p-4 border border-blue-100">
+          <p class="text-xs font-bold uppercase tracking-wider text-blue-500 mb-1">Factor Theorem</p>
+          <p class="text-sm text-slate-700">If \(P(x)\) is divisible by \((ax + b)\), then \(P\left(-\frac{b}{a}\right) = 0\).</p>
+        </div>
+        <div class="bg-emerald-50 rounded-xl p-4 border border-emerald-100">
+          <p class="text-xs font-bold uppercase tracking-wider text-emerald-600 mb-1">Remainder Theorem</p>
+          <p class="text-sm text-slate-700">The remainder when \(P(x)\) is divided by \((ax + b)\) is \(P\left(-\frac{b}{a}\right)\).</p>
+        </div>
+      </div>
+      <p class="text-sm text-slate-500 mt-4 italic">
+        For this particular polynomial, the \(k^4\) terms cancel, leaving a simple linear equation. 
+        Always simplify carefully before solving!
+      </p>
+    </div>
+
+  </main>
+
+  <!-- JavaScript -->
+  <script>
+    (function() {
+      // ---------- STEPPER LOGIC ----------
+      const steps = document.querySelectorAll('.step-card');
+      const prevBtn = document.getElementById('prevStepBtn');
+      const nextBtn = document.getElementById('nextStepBtn');
+      const stepIndicator = document.getElementById('stepIndicator');
+      const resetBtn = document.getElementById('resetStepsBtn');
+      let currentStep = 0; // index of step currently expanded (-1 means none)
+
+      const totalSteps = steps.length;
+
+      function updateStepperUI() {
+        // enable/disable buttons
+        prevBtn.disabled = currentStep <= 0;
+        nextBtn.disabled = currentStep >= totalSteps - 1;
+        // indicator
+        stepIndicator.textContent = `${currentStep + 1} / ${totalSteps}`;
+        // update each card status class and accordion open state
+        steps.forEach((card, idx) => {
+          const content = card.querySelector('.accordion-content');
+          const statusEl = card.querySelector('.step-status');
+          if (idx === currentStep) {
+            card.classList.add('active');
+            card.classList.remove('completed', 'locked');
+            content.classList.add('open');
+            statusEl.textContent = '◉';
+            statusEl.classList.add('text-blue-500');
+            statusEl.classList.remove('text-slate-300');
+          } else if (idx < currentStep) {
+            card.classList.add('completed');
+            card.classList.remove('active', 'locked');
+            content.classList.remove('open');
+            content.style.maxHeight = null; // reset inline style
+            statusEl.textContent = '✓';
+            statusEl.classList.add('text-green-500');
+            statusEl.classList.remove('text-blue-500', 'text-slate-300');
+          } else {
+            card.classList.add('locked');
+            card.classList.remove('active', 'completed');
+            content.classList.remove('open');
+            statusEl.textContent = '○';
+            statusEl.classList.add('text-slate-300');
+            statusEl.classList.remove('text-blue-500', 'text-green-500');
+          }
+        });
+        // ensure open content have correct max-height
+        steps.forEach((card, idx) => {
+          const content = card.querySelector('.accordion-content');
+          if (idx === currentStep) {
+            content.classList.add('open');
+            // trigger reflow for max-height
+            content.style.maxHeight = content.scrollHeight + 'px';
+            // after transition, set to none for dynamic content? simpler: just set maxHeight large
+            setTimeout(() => {
+              if (idx === currentStep) content.style.maxHeight = content.scrollHeight + 'px';
+            }, 50);
+          } else if (idx < currentStep) {
+            content.classList.remove('open');
+            content.style.maxHeight = '0';
+          } else {
+            content.classList.remove('open');
+            content.style.maxHeight = '0';
+          }
+        });
+        // Also update any accordion open class to sync
+      }
+
+      // Initialize
+      function initStepper() {
+        // Set all accordion content closed
+        steps.forEach(card => {
+          const content = card.querySelector('.accordion-content');
+          content.style.maxHeight = '0';
+          content.classList.remove('open');
+          card.classList.add('locked');
+        });
+        currentStep = 0;
+        updateStepperUI();
+      }
+
+      // Event: click on step card locks to that step
+      steps.forEach((card, idx) => {
+        card.addEventListener('click', () => {
+          // Only allow clicking if it's not locked (or we can allow unlocking? For guided flow, let's allow click only on unlocked/completed, but we'll just set currentStep)
+          // For simplicity, allow jumping to any step <= currentStep + 1? Actually to guide, let's allow only up to next step.
+          // We'll allow jumping to any step that is not locked? But locked steps are future steps.
+          // Let's allow click only if idx <= currentStep (review previous or current) OR if idx === currentStep+1 (advance) -- but simpler: allow any click to set currentStep, but we handle lock classes.
+          if (idx <= currentStep + 1) {
+            currentStep = idx;
+            updateStepperUI();
+          }
+        });
+      });
+
+      nextBtn.addEventListener('click', () => {
+        if (currentStep < totalSteps - 1) {
+          currentStep++;
+          updateStepperUI();
+        }
+      });
+
+      prevBtn.addEventListener('click', () => {
+        if (currentStep > 0) {
+          currentStep--;
+          updateStepperUI();
+        }
+      });
+
+      resetBtn.addEventListener('click', () => {
+        currentStep = 0;
+        // Reset all accordion styles
+        steps.forEach((card, idx) => {
+          const content = card.querySelector('.accordion-content');
+          content.classList.remove('open');
+          content.style.maxHeight = '0';
+        });
+        updateStepperUI();
+      });
+
+      // Handle content height changes if resizing
+      window.addEventListener('resize', () => {
+        if (currentStep >= 0 && currentStep < totalSteps) {
+          const content = steps[currentStep].querySelector('.accordion-content');
+          if (content.classList.contains('open')) {
+            content.style.maxHeight = content.scrollHeight + 'px';
+          }
+        }
+      });
+
+      // ---------- OPTION SELECTION (MC) ----------
+      const options = document.querySelectorAll('.option-btn');
+      const feedback = document.getElementById('feedbackMsg');
+      const correctAnswer = 'D';
+
+      options.forEach(btn => {
+        btn.addEventListener('click', () => {
+          // clear previous
+          options.forEach(b => {
+            b.classList.remove('selected', 'correct', 'wrong');
+          });
+          const chosen = btn.getAttribute('data-opt');
+          if (chosen === correctAnswer) {
+            btn.classList.add('correct');
+            feedback.textContent = '✅ Correct! k = 8. Well done!';
+            feedback.className = 'text-sm font-medium min-h-[1.5rem] text-green-600 mt-1';
+          } else {
+            btn.classList.add('wrong');
+            feedback.textContent = '❌ Not quite. Try again or follow the steps below.';
+            feedback.className = 'text-sm font-medium min-h-[1.5rem] text-red-500 mt-1';
+          }
+        });
+      });
+
+      // ---------- INTERACTIVE CANVAS / SLIDER ----------
+      const canvas = document.getElementById('graphCanvas');
+      const ctx = canvas.getContext('2d');
+      const kSlider = document.getElementById('kSlider');
+      const kValueSpan = document.getElementById('kValue');
+      const remainderDisplay = document.getElementById('remainderDisplay');
+      const visualFeedback = document.getElementById('visualFeedback');
+
+      function resizeCanvas() {
+        const container = canvas.parentElement;
+        const w = container.clientWidth - 16; // padding
+        const h = Math.max(180, Math.min(280, w * 0.45));
+        canvas.width = w * 2; // for retina
+        canvas.height = h * 2;
+        canvas.style.width = w + 'px';
+        canvas.style.height = h + 'px';
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.scale(2, 2);
+        drawGraph(parseFloat(kSlider.value));
+      }
+
+      function remainderFor(k) {
+        // P(x) = 2x^4 + kx^3 - 4x - 16
+        // divisor 2x + k = 0 => x = -k/2
+        const x = -k / 2;
+        const val = 2 * Math.pow(x, 4) + k * Math.pow(x, 3) - 4 * x - 16;
+        return val;
+      }
+
+      function drawGraph(k) {
+        const w = canvas.width / 2;
+        const h = canvas.height / 2;
+        ctx.clearRect(0, 0, w, h);
+
+        // Background
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, w, h);
+
+        // Padding
+        const pad = { top: 24, right: 20, bottom: 30, left: 40 };
+        const graphW = w - pad.left - pad.right;
+        const graphH = h - pad.top - pad.bottom;
+
+        // Ranges for k: -10 to 10, remainder expected range ~ [-1000, 1000]? Let's compute for k range -10 to 10
+        // Actually remainder R(k) = 2*(-k/2)^4 + k*(-k/2)^3 -4*(-k/2) -16 = 2k^4/16 - k*k^3/8 +2k -16 = k^4/8 - k^4/8 +2k -16 = 2k -16
+        // Nice! Remainder depends linearly on k: R(k) = 2k - 16
+        // That's much simpler! So let's visualise R(k) = 2k - 16.
+        // But the slider is k, and we plot remainder as function of k. We can show a straight line.
+        // Let's show points for k from -10 to 10, and a dot for current k.
+
+        const kMin = -10, kMax = 10;
+        // Compute R(k) for endpoints
+        const rMin = 2 * kMin - 16; // -36
+        const rMax = 2 * kMax - 16; // 4
+        // Add some padding
+        const yMin = Math.min(rMin, rMax) - 5;
+        const yMax = Math.max(rMin, rMax) + 5;
+
+        // Map data to canvas coords
+        const mapX = (kk) => pad.left + ((kk - kMin) / (kMax - kMin)) * graphW;
+        const mapY = (rr) => pad.top + graphH - ((rr - yMin) / (yMax - yMin)) * graphH;
+
+        // Draw axes
+        ctx.strokeStyle = '#cbd5e1';
+        ctx.lineWidth = 1;
+        // x-axis (k=0)
+        const x0 = mapX(0);
+        const y0 = mapY(0); // remainder=0
+        ctx.beginPath();
+        ctx.moveTo(pad.left, y0);
+        ctx.lineTo(pad.left + graphW, y0);
+        ctx.strokeStyle = '#94a3b8';
+        ctx.stroke();
+
+        // y-axis (k=0 line)
+        ctx.beginPath();
+        ctx.moveTo(x0, pad.top);
+        ctx.lineTo(x0, pad.top + graphH);
+        ctx.strokeStyle = '#94a3b8';
+        ctx.stroke();
+
+        // Draw line R(k) = 2k - 16
+        ctx.beginPath();
+        ctx.moveTo(mapX(kMin), mapY(2 * kMin - 16));
+        ctx.lineTo(mapX(kMax), mapY(2 * kMax - 16));
+        ctx.strokeStyle = '#3b82f6';
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+
+        // Draw grid lines for k values -10,-5,0,5,10
+        ctx.fillStyle = '#64748b';
+        ctx.font = '10px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        for (let kk = kMin; kk <= kMax; kk += 5) {
+          const x = mapX(kk);
+          ctx.beginPath();
+          ctx.moveTo(x, pad.top + graphH);
+          ctx.lineTo(x, pad.top + graphH + 4);
+          ctx.strokeStyle = '#94a3b8';
+          ctx.stroke();
+          ctx.fillText(kk, x, pad.top + graphH + 16);
+        }
+
+        // y labels
+        ctx.textAlign = 'right';
+        const yTicks = [ -30, -20, -10, 0, 10 ];
+        for (let rr of yTicks) {
+          const y = mapY(rr);
+          if (y > pad.top && y < pad.top + graphH) {
+            ctx.beginPath();
+            ctx.moveTo(pad.left - 4, y);
+            ctx.lineTo(pad.left, y);
+            ctx.strokeStyle = '#94a3b8';
+            ctx.stroke();
+            ctx.fillText(rr, pad.left - 8, y + 3);
+          }
+        }
+
+        // Axis labels
+        ctx.fillStyle = '#475569';
+        ctx.font = '11px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('k', pad.left + graphW / 2, pad.top + graphH + 28);
+        ctx.save();
+        ctx.translate(12, pad.top + graphH / 2);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillText('Remainder', 0, 0);
+        ctx.restore();
+
+        // Current point
+        const currK = k;
+        const currR = 2 * currK - 16;
+        const px = mapX(currK);
+        const py = mapY(currR);
+        // Highlight if remainder ~ 0
+        if (Math.abs(currR) < 0.01) {
+          ctx.beginPath();
+          ctx.arc(px, py, 7, 0, 2 * Math.PI);
+          ctx.fillStyle = '#22c55e';
+          ctx.shadowColor = '#22c55e';
+          ctx.shadowBlur = 12;
+          ctx.fill();
+          ctx.shadowBlur = 0;
+          ctx.strokeStyle = '#15803d';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+        } else {
+          ctx.beginPath();
+          ctx.arc(px, py, 5, 0, 2 * Math.PI);
+          ctx.fillStyle = '#ef4444';
+          ctx.shadowColor = '#ef4444';
+          ctx.shadowBlur = 8;
+          ctx.fill();
+          ctx.shadowBlur = 0;
+          ctx.strokeStyle = '#b91c1c';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+        }
+
+        // Update display
+        kValueSpan.textContent = currK.toFixed(1);
+        const rem = remainderFor(currK);
+        remainderDisplay.textContent = rem.toFixed(2);
+        if (Math.abs(rem) < 0.01) {
+          visualFeedback.innerHTML = '🎉 Perfect! Remainder is zero. \(k = 8\) is the solution.';
+          visualFeedback.className = 'text-sm text-green-600 font-medium min-h-[1.8rem]';
+        } else {
+          visualFeedback.innerHTML = `Remainder = \(2k - 16 = ${(2 * currK - 16).toFixed(2)}\). Adjust \(k\) to make it zero.`;
+          visualFeedback.className = 'text-sm text-slate-500 min-h-[1.8rem]';
+        }
+      }
+
+      kSlider.addEventListener('input', (e) => {
+        const k = parseFloat(e.target.value);
+        drawGraph(k);
+      });
+
+      // initial draw
+      window.addEventListener('load', () => {
+        resizeCanvas();
+        initStepper();
+        // set initial slider to 0, draw
+        kSlider.value = 0;
+        drawGraph(0);
+      });
+
+      window.addEventListener('resize', () => {
+        resizeCanvas();
+      });
+
+      // Trigger load if already loaded
+      if (document.readyState === 'complete') {
+        resizeCanvas();
+        initStepper();
+        drawGraph(parseFloat(kSlider.value));
+      } else {
+        window.addEventListener('load', () => {
+          resizeCanvas();
+          initStepper();
+          drawGraph(parseFloat(kSlider.value));
+        });
+      }
+
+      // re-render MathJax after any dynamic content change (e.g., visualFeedback)
+      // No dynamic latex, but we use MathJax in feedback? We'll just keep plain text.
+    })();
+  </script>
+
+  <!-- Font Awesome omitted, not needed -->
+</body>
+</html>

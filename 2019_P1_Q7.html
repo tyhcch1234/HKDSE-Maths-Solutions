@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HKDSE Math 2019 Paper 1 Q7 – Ratio Problem</title>
+  <!-- Tailwind CSS (CDN) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- MathJax for LaTeX rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+  <style>
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+    .step-card {
+      transition: all 0.3s ease;
+    }
+    .step-card.hidden-step {
+      display: none;
+    }
+    .hint-badge {
+      background: linear-gradient(135deg, #fef9c3 0%, #fde68a 100%);
+      border-left: 4px solid #f59e0b;
+    }
+    /* Custom slider styling */
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 8px;
+      border-radius: 4px;
+      background: #e2e8f0;
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #3b82f6;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(59,130,246,0.4);
+      transition: transform 0.1s;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #3b82f6;
+      cursor: pointer;
+      border: none;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen">
+
+  <!-- Header / Question Overview -->
+  <header class="max-w-3xl mx-auto px-4 pt-6 pb-2">
+    <div class="bg-white rounded-2xl shadow-md p-5 sm:p-6 border border-slate-100">
+      <div class="flex flex-wrap items-center gap-2 mb-2">
+        <span class="text-sm font-semibold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">HKDSE Math 2019 Paper 1 Q7</span>
+        <span class="text-sm font-semibold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full">6. Equations</span>
+        <span class="text-sm font-semibold text-violet-600 bg-violet-50 px-3 py-1 rounded-full">[4 marks]</span>
+      </div>
+
+      <h1 class="text-xl sm:text-2xl font-bold text-slate-800 mb-3">Ratio Problem</h1>
+
+      <div class="text-slate-700 leading-relaxed text-base sm:text-lg">
+        <p>
+          In a playground, the ratio of the number of adults to the number of children is \(13 : 6\).
+          If \(9\) adults and \(24\) children enter the playground, then the ratio of the number of adults
+          to the number of children becomes \(8 : 7\). Find the <strong>original number of adults</strong> in the playground.
+        </p>
+      </div>
+
+      <div class="mt-4 flex flex-wrap gap-2">
+        <span class="text-xs font-medium bg-slate-100 text-slate-600 px-3 py-1 rounded-full">Ratio</span>
+        <span class="text-xs font-medium bg-slate-100 text-slate-600 px-3 py-1 rounded-full">Linear Equation</span>
+        <span class="text-xs font-medium bg-slate-100 text-slate-600 px-3 py-1 rounded-full">Cross-multiplication</span>
+        <span class="text-xs font-medium bg-slate-100 text-slate-600 px-3 py-1 rounded-full">Unknown Constant \(k\)</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Visual Ratio Explorer -->
+  <section class="max-w-3xl mx-auto px-4 mt-6">
+    <div class="bg-white rounded-2xl shadow-md p-5 sm:p-6 border border-slate-100">
+      <h2 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2">
+        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+        </svg>
+        Explore the Ratio
+      </h2>
+      <p class="text-sm text-slate-500 mb-4">
+        Drag the slider to change the value of \(k\). Observe how the original ratio \(13k : 6k\) changes
+        when 9 adults and 24 children arrive.
+      </p>
+
+      <!-- Slider -->
+      <div class="flex items-center gap-4 mb-4">
+        <span class="text-sm font-semibold text-slate-600 min-w-[40px]">\(k =\)</span>
+        <input type="range" id="kSlider" min="1" max="10" step="1" value="1" class="flex-1">
+        <span id="kValue" class="text-lg font-bold text-blue-600 min-w-[40px] text-right">1</span>
+      </div>
+
+      <!-- Visual Bars -->
+      <div class="space-y-4">
+        <div>
+          <div class="flex justify-between text-sm font-medium text-slate-600 mb-1">
+            <span>Adults</span>
+            <span id="adultCount">13</span>
+          </div>
+          <div class="w-full bg-slate-100 rounded-full h-6 overflow-hidden">
+            <div id="adultBar" class="bg-gradient-to-r from-blue-400 to-blue-600 h-full rounded-full transition-all duration-300" style="width: 13%;"></div>
+          </div>
+        </div>
+        <div>
+          <div class="flex justify-between text-sm font-medium text-slate-600 mb-1">
+            <span>Children</span>
+            <span id="childCount">6</span>
+          </div>
+          <div class="w-full bg-slate-100 rounded-full h-6 overflow-hidden">
+            <div id="childBar" class="bg-gradient-to-r from-amber-400 to-amber-600 h-full rounded-full transition-all duration-300" style="width: 6%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- After entry summary -->
+      <div id="afterEntry" class="mt-4 p-3 bg-slate-50 rounded-xl border border-slate-200 text-sm text-slate-600">
+        <p>
+          After entry: <strong>Adults = <span id="adultAfter">22</span></strong>,
+          <strong>Children = <span id="childAfter">30</span></strong>.
+          Ratio check: \( \frac{22}{30} = \frac{11}{15} \)
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Step-by-step solution -->
+  <main class="max-w-3xl mx-auto px-4 py-6">
+    <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+      <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+      Step-by-Step Solution
+    </h2>
+
+    <!-- Step 1 -->
+    <div class="step-card bg-white rounded-2xl shadow-sm border border-slate-100 p-5 mb-4" data-step="1">
+      <div class="flex items-start gap-3">
+        <div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center text-sm">1</div>
+        <div class="flex-1">
+          <h3 class="font-semibold text-slate-800">Let the original numbers be \(13k\) and \(6k\)</h3>
+          <div class="mt-2 text-slate-600 space-y-2">
+            <p>
+              Since the ratio of adults to children is \(13 : 6\), we can represent the original
+              number of adults as \(13k\) and the original number of children as \(6k\),
+              where \(k\) is a positive constant.
+            </p>
+            <div class="hint-badge p-3 rounded-lg text-sm text-amber-800">
+              <strong>💡 Hint:</strong> Using \(13k\) and \(6k\) automatically preserves the
+              ratio \(13 : 6\) for any positive value of \(k\).
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step-card bg-white rounded-2xl shadow-sm border border-slate-100 p-5 mb-4 hidden-step" data-step="2">
+      <div class="flex items-start gap-3">
+        <div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center text-sm">2</div>
+        <div class="flex-1">
+          <h3 class="font-semibold text-slate-800">Set up the equation after new people enter</h3>
+          <div class="mt-2 text-slate-600 space-y-2">
+            <p>
+              After \(9\) adults and \(24\) children enter:
+            </p>
+            <ul class="list-disc list-inside ml-2 space-y-1">
+              <li>New adults: \(13k + 9\)</li>
+              <li>New children: \(6k + 24\)</li>
+            </ul>
+            <p>
+              The new ratio is \(8 : 7\), so we can write:
+            </p>
+            <div class="bg-slate-50 rounded-lg p-3 text-center text-lg font-medium text-slate-800 border border-slate-200">
+              \[ \frac{13k + 9}{6k + 24} = \frac{8}{7} \]
+            </div>
+            <div class="hint-badge p-3 rounded-lg text-sm text-amber-800">
+              <strong>💡 Hint:</strong> A ratio \(a : b\) can be written as the fraction \(\frac{a}{b}\).
+              Here, the "new adults" is the numerator, and "new children" is the denominator.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="step-card bg-white rounded-2xl shadow-sm border border-slate-100 p-5 mb-4 hidden-step" data-step="3">
+      <div class="flex items-start gap-3">
+        <div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center text-sm">3</div>
+        <div class="flex-1">
+          <h3 class="font-semibold text-slate-800">Solve the equation by cross-multiplication</h3>
+          <div class="mt-2 text-slate-600 space-y-3">
+            <p>
+              Cross-multiplying:
+            </p>
+            <div class="bg-slate-50 rounded-lg p-4 space-y-3 text-slate-700 border border-slate-200">
+              <p>\(7(13k + 9) = 8(6k + 24)\)</p>
+              <p>\(91k + 63 = 48k + 192\)</p>
+              <p>\(91k - 48k = 192 - 63\)</p>
+              <p>\(43k = 129\)</p>
+            </div>
+            <div class="hint-badge p-3 rounded-lg text-sm text-amber-800">
+              <strong>💡 Hint (Cross-multiplication):</strong> If \(\frac{a}{b} = \frac{c}{d}\), then \(ad = bc\).
+              Multiply the numerator of the left side by the denominator of the right side, and vice versa.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="step-card bg-white rounded-2xl shadow-sm border border-slate-100 p-5 mb-4 hidden-step" data-step="4">
+      <div class="flex items-start gap-3">
+        <div class="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 font-bold flex items-center justify-center text-sm">4</div>
+        <div class="flex-1">
+          <h3 class="font-semibold text-slate-800">Find \(k\) and the original number of adults</h3>
+          <div class="mt-2 text-slate-600 space-y-3">
+            <p>
+              From \(43k = 129\):
+            </p>
+            <div class="bg-slate-50 rounded-lg p-4 text-center space-y-3 border border-slate-200">
+              <p>\[ k = \frac{129}{43} = 3 \]</p>
+            </div>
+            <p>
+              The original number of adults is \(13k\):
+            </p>
+            <div class="bg-emerald-50 rounded-lg p-4 text-center border border-emerald-200">
+              <p class="text-lg font-semibold text-emerald-800">\[ 13 \times 3 = 39 \]</p>
+              <p class="text-sm text-emerald-600 mt-1">∴ The original number of adults is <strong>39</strong>.</p>
+            </div>
+            <div class="hint-badge p-3 rounded-lg text-sm text-amber-800">
+              <strong>💡 Hint:</strong> Remember the question asks for the number of adults,
+              which is \(13k\), not \(k\) itself.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="flex justify-between items-center mt-6">
+      <button id="prevBtn" class="px-5 py-2.5 rounded-xl bg-slate-200 text-slate-600 font-medium hover:bg-slate-300 transition disabled:opacity-40 disabled:cursor-not-allowed" disabled>
+        ← Previous
+      </button>
+      <span id="stepIndicator" class="text-sm font-medium text-slate-500">Step 1 of 4</span>
+      <button id="nextBtn" class="px-5 py-2.5 rounded-xl bg-blue-600 text-white font-medium hover:bg-blue-700 transition shadow-md shadow-blue-200">
+        Next →
+      </button>
+    </div>
+  </main>
+
+  <!-- Answer Summary -->
+  <section class="max-w-3xl mx-auto px-4 pb-8">
+    <div class="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl border border-emerald-200 p-5 text-center">
+      <p class="text-sm font-semibold text-emerald-600 uppercase tracking-wide">Final Answer</p>
+      <p class="text-2xl font-bold text-emerald-800 mt-1">The original number of adults is 39</p>
+    </div>
+  </section>
+
+  <script>
+    // ---- Step navigation logic ----
+    const steps = document.querySelectorAll('.step-card');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const stepIndicator = document.getElementById('stepIndicator');
+    let currentStep = 0; // 0-indexed
+
+    function updateSteps() {
+      steps.forEach((step, index) => {
+        if (index <= currentStep) {
+          step.classList.remove('hidden-step');
+        } else {
+          step.classList.add('hidden-step');
+        }
+      });
+
+      stepIndicator.textContent = `Step ${currentStep + 1} of ${steps.length}`;
+      prevBtn.disabled = currentStep === 0;
+      nextBtn.disabled = currentStep === steps.length - 1;
+      nextBtn.textContent = currentStep === steps.length - 1 ? 'Done' : 'Next →';
+    }
+
+    nextBtn.addEventListener('click', () => {
+      if (currentStep < steps.length - 1) {
+        currentStep++;
+        updateSteps();
+        steps[currentStep].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    });
+
+    prevBtn.addEventListener('click', () => {
+      if (currentStep > 0) {
+        currentStep--;
+        updateSteps();
+        steps[currentStep].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    });
+
+    // ---- Interactive slider logic ----
+    const kSlider = document.getElementById('kSlider');
+    const kValue = document.getElementById('kValue');
+    const adultCount = document.getElementById('adultCount');
+    const childCount = document.getElementById('childCount');
+    const adultBar = document.getElementById('adultBar');
+    const childBar = document.getElementById('childBar');
+    const adultAfter = document.getElementById('adultAfter');
+    const childAfter = document.getElementById('childAfter');
+
+    function updateVisuals() {
+      const k = parseInt(kSlider.value);
+      kValue.textContent = k;
+
+      const adults = 13 * k;
+      const children = 6 * k;
+
+      adultCount.textContent = adults;
+      childCount.textContent = children;
+
+      // Bar widths: scale so max value (13*10 = 130) is 100% for adults
+      const maxAdults = 130;
+      const maxChildren = 60; // 6*10
+      adultBar.style.width = `${(adults / maxAdults) * 100}%`;
+      childBar.style.width = `${(children / maxChildren) * 100}%`;
+
+      // After entry
+      const newAdults = adults + 9;
+      const newChildren = children + 24;
+      adultAfter.textContent = newAdults;
+      childAfter.textContent = newChildren;
+    }
+
+    kSlider.addEventListener('input', updateVisuals);
+    updateVisuals(); // initial call
+
+    // ---- Initialize MathJax typesetting ----
+    window.addEventListener('load', () => {
+      if (window.MathJax) {
+        MathJax.typesetPromise();
+      }
+    });
+
+    // Re-typeset after step changes (in case of dynamic content)
+    function typeset() {
+      if (window.MathJax) {
+        MathJax.typesetPromise();
+      }
+    }
+    // Call typeset after each step reveal to ensure formulas render
+    const originalUpdateSteps = updateSteps;
+    updateSteps = function() {
+      originalUpdateSteps();
+      typeset();
+    };
+    // Reassign event listeners to use the new wrapper
+    nextBtn.removeEventListener('click', nextBtn._listener);
+    prevBtn.removeEventListener('click', prevBtn._listener);
+
+    nextBtn.addEventListener('click', () => {
+      if (currentStep < steps.length - 1) {
+        currentStep++;
+        updateSteps();
+        steps[currentStep].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    });
+
+    prevBtn.addEventListener('click', () => {
+      if (currentStep > 0) {
+        currentStep--;
+        updateSteps();
+        steps[currentStep].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    });
+
+    // Initial setup
+    updateSteps();
+    typeset();
+  </script>
+</body>
+</html>

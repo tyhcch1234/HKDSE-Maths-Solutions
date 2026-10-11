@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2013 Paper 2 Q16 · Semicircle Shaded Region</title>
+<script>
+  MathJax = { tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[', '\\]']] } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<style>
+  :root{
+    --blue:#2563eb; --blue-dark:#1d4ed8; --amber:#f59e0b; --amber-bg:#fef3c7;
+    --emerald:#059669; --emerald-bg:#ecfdf5; --ink:#0f172a; --muted:#475569;
+    --card:#ffffff; --line:#e2e8f0; --bg:#f1f5f9;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg); color:var(--ink); line-height:1.6;
+  }
+  .wrap{max-width:960px;margin:0 auto;padding:0 16px 64px}
+  /* HERO */
+  header.hero{
+    background:linear-gradient(135deg,#1e3a8a 0%,#2563eb 45%,#0ea5e9 100%);
+    color:#fff;padding:40px 24px 48px;position:relative;overflow:hidden;
+  }
+  header.hero::after{
+    content:"";position:absolute;right:-90px;top:-90px;width:280px;height:280px;
+    border-radius:50%;background:rgba(255,255,255,.08);
+  }
+  header.hero::before{
+    content:"";position:absolute;right:60px;bottom:-120px;width:220px;height:220px;
+    border-radius:50%;background:rgba(255,255,255,.06);
+  }
+  .hero-inner{max-width:960px;margin:0 auto;position:relative;z-index:2}
+  .eyebrow{font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;opacity:.85;margin:0 0 6px}
+  .hero h1{margin:0;font-size:clamp(1.5rem,4.5vw,2.3rem);font-weight:700;letter-spacing:.01em}
+  .hero .topic{margin:8px 0 16px;font-size:1.02rem;opacity:.95}
+  .pills{display:flex;flex-wrap:wrap;gap:8px}
+  .pill{
+    background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);
+    padding:5px 13px;border-radius:999px;font-size:.78rem;font-weight:600;backdrop-filter:blur(3px);
+  }
+  /* CARDS */
+  .card{
+    background:var(--card);border-radius:16px;padding:22px 22px 20px;margin:22px 0;
+    box-shadow:0 4px 18px rgba(15,23,42,.07);border:1px solid var(--line);
+  }
+  .card h2{margin:0 0 4px;font-size:1.18rem;color:var(--blue-dark);display:flex;align-items:center;gap:10px}
+  .card h2 .num{
+    background:linear-gradient(135deg,var(--blue),#0ea5e9);color:#fff;width:30px;height:30px;
+    border-radius:9px;display:inline-flex;align-items:center;justify-content:center;font-size:.92rem;flex:none;
+  }
+  .marks-badge{
+    display:inline-block;background:var(--amber-bg);color:#92400e;border:1px solid #fcd34d;
+    border-radius:8px;font-size:.74rem;font-weight:700;padding:2px 9px;margin-left:auto;white-space:nowrap;
+  }
+  .qtext{background:#f8fafc;border-left:4px solid var(--blue);border-radius:0 10px 10px 0;padding:14px 16px;margin:14px 0 4px;font-size:1rem}
+  .opt-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:14px}
+  .opt{
+    background:#f8fafc;border:1.5px solid var(--line);border-radius:10px;padding:9px 14px;
+    font-weight:600;color:var(--muted);font-size:.96rem
+  }
+  .opt.correct{background:var(--emerald-bg);border-color:#6ee7b7;color:#065f46}
+  .opt.correct::after{content:" ✓";font-weight:800;color:var(--emerald)}
+  /* CANVAS */
+  .canvas-box{background:#fbfdff;border:1px solid var(--line);border-radius:13px;padding:12px;margin:16px 0}
+  canvas{width:100%;height:auto;display:block;border-radius:9px;touch-action:none;cursor:crosshair}
+  .controls{display:flex;flex-wrap:wrap;gap:16px;align-items:center;margin-top:12px;font-size:.88rem}
+  .ctrl{display:flex;align-items:center;gap:8px;background:#f1f5f9;border-radius:10px;padding:7px 12px}
+  .ctrl label{font-weight:600;color:var(--muted)}
+  input[type=range]{accent-color:var(--blue);width:150px}
+  input[type=checkbox]{accent-color:var(--emerald);width:16px;height:16px}
+  .readout{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+  .ro{
+    background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:7px 12px;
+    font-size:.85rem;color:#1e40af;font-weight:600
+  }
+  .ro b{color:#0f172a;font-weight:800}
+  .ro.green{background:var(--emerald-bg);border-color:#a7f3d0;color:#065f46}
+  .ro.green b{color:#064e3b}
+  /* STEPS */
+  .step{display:none}
+  .step.show{display:block;animation:fade .35s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .step-inner{padding:14px 16px;border-left:3px solid var(--blue);background:#f8fafc;border-radius:0 10px 10px 0;margin:12px 0 0}
+  .step-head{display:flex;align-items:center;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+  .badge-step{
+    background:linear-gradient(135deg,var(--blue),#0ea5e9);color:#fff;font-weight:700;
+    font-size:.78rem;padding:4px 11px;border-radius:999px;letter-spacing:.02em
+  }
+  .badge-marks{
+    background:#fef3c7;color:#92400e;border:1px solid #fcd34d;font-weight:700;
+    font-size:.74rem;padding:3px 10px;border-radius:999px
+  }
+  .hintbox{
+    background:var(--amber-bg);border:1px solid #fcd34d;border-radius:10px;
+    padding:10px 14px;margin-top:12px;font-size:.9rem;color:#78350f
+  }
+  .hintbox b{color:#92400e}
+  .answerbox{
+    background:var(--emerald-bg);border:1px solid #6ee7b7;border-radius:10px;
+    padding:11px 15px;margin-top:12px;font-size:.95rem;color:#065f46;font-weight:600
+  }
+  .answerbox b{color:#064e3b}
+  /* BUTTONS */
+  .btn-row{display:flex;align-items:center;gap:14px;margin-top:18px;flex-wrap:wrap}
+  button.next{
+    background:linear-gradient(135deg,var(--blue),#0ea5e9);color:#fff;border:none;
+    padding:11px 22px;border-radius:11px;font-weight:700;font-size:.94rem;cursor:pointer;
+    box-shadow:0 4px 12px rgba(37,99,235,.3);transition:transform .15s,box-shadow .15s
+  }
+  button.next:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 7px 18px rgba(37,99,235,.38)}
+  button.next:disabled{background:#cbd5e1;color:#64748b;box-shadow:none;cursor:default}
+  .counter{font-size:.86rem;color:var(--muted);font-weight:600}
+  /* SUMMARY */
+  .summary{
+    background:linear-gradient(135deg,#0f172a,#1e293b);color:#e2e8f0;border-radius:16px;
+    padding:26px 24px;margin:26px 0;box-shadow:0 8px 26px rgba(15,23,42,.28)
+  }
+  .summary h2{color:#7dd3fc;margin:0 0 14px;font-size:1.15rem}
+  .summary ul{margin:0;padding-left:4px;list-style:none}
+  .summary li{padding:9px 0 9px 30px;position:relative;border-bottom:1px solid rgba(148,163,184,.18);font-size:.97rem}
+  .summary li:last-child{border-bottom:none}
+  .summary li::before{
+    content:"";position:absolute;left:6px;top:17px;width:8px;height:8px;border-radius:50%;
+    background:#38bdf8;box-shadow:0 0 0 3px rgba(56,189,248,.18)
+  }
+  .summary b{color:#fbbf24}
+  footer{text-align:center;color:var(--muted);font-size:.82rem;padding:28px 16px 8px}
+  .tagline{color:#64748b;font-size:.86rem;margin-top:2px}
+  @media(max-width:560px){
+    .card{padding:17px 15px}
+    input[type=range]{width:110px}
+    .ctrl{padding:6px 9px}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <p class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</p>
+    <h1>2013 Paper 2 · Question 16</h1>
+    <p class="topic">Mensuration — Area of a shaded region inside a semicircle</p>
+    <div class="pills">
+      <span class="pill">Semicircle</span>
+      <span class="pill">Sector Area</span>
+      <span class="pill">Triangle Area</span>
+      <span class="pill">Perpendicular bisector</span>
+      <span class="pill">Trigonometry</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- QUESTION -->
+  <section class="card">
+    <h2><span class="num">Q</span> Question <span class="marks-badge">Multiple Choice</span></h2>
+    <div class="qtext">
+      <p style="margin-top:0"><b>[2013MC#16]</b></p>
+      <p>In the figure, the diameter of the semicircle \(ABC\) is \(3\text{ cm}\).</p>
+      <p>If \(AC = 2\text{ cm}\), find the area of the shaded region correct to the nearest \(0.01\text{ cm}^2\).</p>
+      <div class="opt-grid">
+        <div class="opt">A. \(0.23\text{ cm}^2\)</div>
+        <div class="opt correct">B. \(0.52\text{ cm}^2\)</div>
+        <div class="opt">C. \(0.64\text{ cm}^2\)</div>
+        <div class="opt">D. \(1.07\text{ cm}^2\)</div>
+      </div>
+    </div>
+    <p class="tagline">The shaded region is the part of the semicircle cut off by the chord \(AC\) — i.e. a circular <em>segment</em> on chord \(AC\).</p>
+  </section>
+
+  <!-- PART (a) -->
+  <section class="card" id="partA">
+    <h2><span class="num">a</span> Part (a) — Set up: find the radius, the apothem and the central angle</h2>
+
+    <div class="canvas-box">
+      <canvas id="cv1" width="760" height="440"></canvas>
+      <div class="controls">
+        <div class="ctrl">
+          <label for="slC">Chord \(AC\) length</label>
+          <input type="range" id="slC" min="0.4" max="3" step="0.05" value="2">
+          <span id="lbC" style="font-weight:700;color:#1d4ed8">2.00 cm</span>
+        </div>
+        <div class="ctrl">
+          <label><input type="checkbox" id="ckOM" checked> Show \(OM\perp AC\)</label>
+        </div>
+        <div class="ctrl">
+          <label><input type="checkbox" id="ckAng" checked> Show angle labels</label>
+        </div>
+      </div>
+      <div class="readout">
+        <div class="ro">Radius \(OA = OB = OC\) = <b id="rR">1.50</b> cm</div>
+        <div class="ro">Apothem \(OM=\sqrt{OA^2-AM^2}\) = <b id="rOM">0.559</b> cm</div>
+        <div class="ro">\(\sin\angle AOM = \dfrac{AM}{OA}\) = <b id="rSin">0.667</b></div>
+        <div class="ro green">\(\angle AOC = 2\angle AOM\) = <b id="rAng">83.6°</b></div>
+      </div>
+    </div>
+    <p class="tagline">Drag the slider to change the chord \(AC\) — watch how the apothem \(OM\) and the central angle \(\angle AOC\) respond. The actual question uses \(AC = 2\) cm.</p>
+
+    <button class="next" data-target="partA">Next step →</button>
+    <span class="counter" data-counter="partA">0 / 4</span>
+
+    <div class="step" data-group="partA">
+      <div class="step-inner">
+        <div class="step-head"><span class="badge-step">Step 1</span><span class="badge-marks">1M</span></div>
+        <p>Let \(O\) be the centre of the semicircle. Since \(ABC\) is a semicircle with diameter \(3\text{ cm}\), the radius is</p>
+        \[ OA = OB = OC = \frac{3}{2}\text{ cm} = 1.5\text{ cm}. \]
+        <div class="hintbox"><b>Hint:</b> In any semicircle, the radius is half the diameter. Every point on the arc is exactly one radius from the centre \(O\).</div>
+      </div>
+    </div>
+
+    <div class="step" data-group="partA">
+      <div class="step-inner">
+        <div class="step-head"><span class="badge-step">Step 2</span><span class="badge-marks">1M</span></div>
+        <p>Let \(M\) be the mid-point of the chord \(AC\). Since \(OA=OC\) (radii of the same circle), \(\triangle AOC\) is isosceles, so the median from \(O\) is also the altitude and the angle bisector:</p>
+        \[ OM \perp AC \quad\text{and}\quad OM \text{ bisects } \angle AOC. \]
+        \[ AM = MC = \frac{AC}{2} = \frac{2}{2} = 1\text{ cm}. \]
+        <div class="hintbox"><b>Hint:</b> "Prop. of isos. \(\triangle\)": in an isosceles triangle, the median to the base is also perpendicular to the base and bisects the vertex angle.</div>
+      </div>
+    </div>
+
+    <div class="step" data-group="partA">
+      <div class="step-inner">
+        <div class="step-head"><span class="badge-step">Step 3</span><span class="badge-marks">1M</span></div>
+        <p>Apply Pythagoras in right-angled \(\triangle AOM\):</p>
+        \[ OM = \sqrt{OA^2 - AM^2} = \sqrt{\left(\frac{3}{2}\right)^2 - 1^2} = \sqrt{\frac{9}{4}-1} = \sqrt{\frac{5}{4}} = \frac{\sqrt{5}}{2}\text{ cm}. \]
+        <div class="hintbox"><b>Hint:</b> \(OM\) is the <em>apothem</em> — the perpendicular distance from the centre to the chord. Note \(\sqrt{5}/2 \approx 1.118\) cm \(< 1.5\) cm, which is geometrically consistent.</div>
+      </div>
+    </div>
+
+    <div class="step" data-group="partA">
+      <div class="step-inner">
+        <div class="step-head"><span class="badge-step">Step 4</span><span class="badge-marks">1A</span></div>
+        <p>In \(\triangle AOM\),</p>
+        \[ \sin\angle AOM = \frac{MA}{OA} = \frac{1}{3/2} = \frac{2}{3}. \]
+        <p>Since \(OM\) bisects \(\angle AOC\),</p>
+        \[ \angle AOC = 2\sin^{-1}\frac{2}{3} = 2 \times 41.81\ldots° = 83.62\ldots°. \]
+        <div class="answerbox">Answers so far: \(OA=\tfrac{3}{2}\) cm, \(\;OM=\dfrac{\sqrt5}{2}\) cm, \(\;\angle AOC = 2\sin^{-1}\dfrac{2}{3} \approx 83.62°\).</div>
+        <div class="hintbox"><b>Hint:</b> Angle \(AOC\) corresponds to the minor arc \(AC\) — the sector \(OAC\) bounded by this angle is the sector whose area we shall use at the end.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PART (b) -->
+  <section class="card" id="partB">
+    <h2><span class="num">b</span> Part (b) — Compute the area of the shaded segment</h2>
+
+    <div class="canvas-box">
+      <canvas id="cv2" width="760" height="440"></canvas>
+      <div class="controls">
+        <div class="ctrl">
+          <label for="slC2">Chord \(AC\) length</label>
+          <input type="range" id="slC2" min="0.4" max="3" step="0.05" value="2">
+          <span id="lbC2" style="font-weight:700;color:#1d4ed8">2.00 cm</span>
+        </div>
+        <div class="ctrl">
+          <label><input type="checkbox" id="ckSeg" checked> Shaded segment</label>
+        </div>
+        <div class="ctrl">
+          <label><input type="checkbox" id="ckSector" checked> Sector \(OAC\)</label>
+        </div>
+        <div class="ctrl">
+          <label><input type="checkbox" id="ckTri" checked> Triangle \(\triangle AOC\)</label>
+        </div>
+      </div>
+      <div class="readout">
+        <div class="ro">Sector area \(=\pi r^2\cdot\dfrac{\theta}{360°}\) = <b id="rSec">1.642</b> cm²</div>
+        <div class="ro">Triangle area \(=\tfrac12\cdot AC\cdot OM\) = <b id="rTri">1.118</b> cm²</div>
+        <div class="ro green">Segment = Sector − Triangle = <b id="rSeg">0.524</b> cm²</div>
+      </div>
+    </div>
+    <p class="tagline">Shaded region = <b>sector \(OAC\)</b> (curved side) minus <b>isosceles triangle \(AOC\)</b> (straight chord side). Toggle the checkboxes to see the two building blocks.</p>
+
+    <button class="next" data-target="partB">Next step →</button>
+    <span class="counter" data-counter="partB">0 / 4</span>
+
+    <div class="step" data-group="partB">
+      <div class="step-inner">
+        <div class="step-head"><span class="badge-step">Step 1</span><span class="badge-marks">1M</span></div>
+        <p>Realise that the shaded region is a <em>circular segment</em> on chord \(AC\):</p>
+        \[ \text{Shaded area} = \text{Sector } OAC - \triangle AOC. \]
+        <div class="hintbox"><b>Hint:</b> A "segment" is the region between a chord and the arc it subtends. Always attack it as <em>sector − triangle</em>.</div>
+      </div>
+    </div>
+
+    <div class="step" data-group="partB">
+      <div class="step-inner">
+        <div class="step-head"><span class="badge-step">Step 2</span><span class="badge-marks">1M</span></div>
+        <p><b>Sector \(OAC\):</b> the sector radius is \(OA = \tfrac{3}{2}\) cm and the central angle is \(\angle AOC = 2\sin^{-1}\tfrac{2}{3}\).</p>
+        \[ A_{\text{sector}} = \pi \cdot OA^2 \times \frac{\angle AOC}{360°} = \pi\left(\frac{3}{2}\right)^2 \times \frac{2\sin^{-1}\frac{2}{3}}{360°} \]
+        \[ = \pi\cdot\frac{9}{4}\times \frac{83.62\ldots°}{360°} \approx 1.642\ \text{cm}^2. \]
+        <div class="hintbox"><b>Hint:</b> Make sure your calculator is in <b>degree mode</b> for the fraction \(\frac{\theta}{360°}\), but \(\sin^{-1}\frac{2}{3}\) returns an angle you convert to degrees before dividing.</div>
+      </div>
+    </div>
+
+    <div class="step" data-group="partB">
+      <div class="step-inner">
+        <div class="step-head"><span class="badge-step">Step 3</span><span class="badge-marks">1M</span></div>
+        <p><b>Triangle \(AOC\):</b> base \(AC = 2\) cm, height \(OM = \tfrac{\sqrt5}{2}\) cm.</p>
+        \[ A_{\triangle AOC} = \frac{1}{2}\cdot AC \cdot OM = \frac{1}{2}(2)\left(\frac{\sqrt5}{2}\right) = \frac{\sqrt5}{2} \approx 1.118\ \text{cm}^2. \]
+        <div class="hintbox"><b>Hint:</b> Using \(\frac12 \cdot AC \cdot OM\) is efficient because \(OM\perp AC\) is exactly the height to base \(AC\).</div>
+      </div>
+    </div>
+
+    <div class="step" data-group="partB">
+      <div class="step-inner">
+        <div class="step-head"><span class="badge-step">Step 4</span><span class="badge-marks">1A</span></div>
+        <p>Subtract the triangle from the sector:</p>
+        \[ \text{Shaded} = 1.64189\ldots - 1.11803\ldots = 0.52385\ldots \approx 0.52\ \text{cm}^2 \]
+        <div class="answerbox">The area of the shaded region is <b>\(0.52\text{ cm}^2\)</b> (correct to the nearest \(0.01\text{ cm}^2\)).</div>
+        <div class="hintbox"><b>Hint:</b> \(0.5238\ldots\) rounds to \(0.52\) because the third decimal digit is a \(3\). The correct option is <b>B</b>. Note how the distractors trap you: \(0.23\) (using \(2\times 1.5\times 0.559\) etc.), \(0.64\) (half the triangle), \(1.07\) (segment area \(\approx\) sector alone).</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SUMMARY -->
+  <section class="summary">
+    <h2>Summary — Answers at a glance</h2>
+    <ul>
+      <li>Semicircle radius: \(OA=OB=OC=\dfrac{3}{2}=1.5\text{ cm}\)</li>
+      <li>Apothem: \(OM = \dfrac{\sqrt5}{2} \approx 1.118\text{ cm}\)</li>
+      <li>Central angle: \(\angle AOC = 2\sin^{-1}\dfrac{2}{3} \approx 83.62°\)</li>
+      <li>Sector \(OAC\): \(A = \pi\left(\dfrac{3}{2}\right)^2\cdot\dfrac{\angle AOC}{360°} \approx 1.642\text{ cm}^2\)</li>
+      <li>Triangle \(AOC\): \(A = \dfrac12\cdot AC\cdot OM = \dfrac{\sqrt5}{2} \approx 1.118\text{ cm}^2\)</li>
+      <li><b>Shaded segment \(= 1.64189\ldots - 1.11803\ldots \approx 0.52\text{ cm}^2\)</b></li>
+      <li>Choice: <b>B</b> &nbsp;<span style="opacity:.8">(0.52 cm²)</span></li>
+    </ul>
+  </section>
+
+  <footer>
+    HKDSE Mathematics (Compulsory Part) · Paper 2 interactive solution · Q16 (2013)<br>
+    Built with HTML5 Canvas &amp; MathJax
+  </footer>
+</div>
+
+<script>
+/* ============================================================
+   Shared helpers
+   ============================================================ */
+const DPR = window.devicePixelRatio || 1;
+function setupCanvas(cv, w, h){
+  cv.width  = w * DPR;
+  cv.height = h * DPR;
+  cv.style.width  = w + 'px';
+  cv.style.height = h + 'px';
+  const ctx = cv.getContext('2d');
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  return ctx;
+}
+function toDeg(r){ return r*180/Math.PI; }
+
+/* ============================================================
+   PART (a) canvas — geometry explorer
+   ============================================================ */
+(function(){
+  const cv = document.getElementById('cv1');
+  const W = 760, H = 440;
+  const ctx = setupCanvas(cv, W, H);
+
+  const slC   = document.getElementById('slC');
+  const lbC   = document.getElementById('lbC');
+  const ckOM  = document.getElementById('ckOM');
+  const ckAng = document.getElementById('ckAng');
+
+  const rR  = document.getElementById('rR');
+  const rOM = document.getElementById('rOM');
+  const rSin= document.getElementById('rSin');
+  const rAng= document.getElementById('rAng');
+
+  // world model: circle radius R = 1.5 cm ; screen centre
+  const R = 1.5;
+  const cx = 300, cy = 330;     // screen position of O (in the 760x440 box)
+  const S  = 150;               // pixels per cm
+
+  function draw(){
+    const AC = parseFloat(slC.value);          // chord length in cm
+    lbC.textContent = AC.toFixed(2) + ' cm';
+
+    // chord half length
+    const half = Math.min(AC/2, R*0.999);
+    const angH = Math.asin(half / R);          // half of central angle
+    const theta = 2*angH;                      // central angle (rad)
+    const OM = Math.sqrt(R*R - half*half);
+
+    // Screen coordinates
+    const A = { x: cx - S*half, y: cy };                 // A at y = 0
+    const Cs = { x: cx - S*half, y: cy - S*(2*OM) };     // C above A (chord is vertical!)
+    // Actually easier: fix chord vertical at x = cx - S*half, from A=(that, cy) up to C
+    // C should lie on circle: horizontal distance from O is 'half', vertical is OM.
+    const Cp = { x: cx - S*half, y: cy - S*OM };
+
+    // arc points A -> C
+    const aA = Math.atan2(A.y - cy, A.x - cx);  // angle of A from O (screen coords)
+    const aC = Math.atan2(Cp.y - cy, Cp.x - cx);
+    // we want the arc going from A counter-clockwise (screen) to C
+    let a0 = aA, a1 = aC;
+    // ensure a1 > a0 in screen angle (which increases clockwise? no—in canvas, +y down so atan2 increases clockwise)
+    // we simply take going from a0 decreasing (counter-clockwise in screen = clockwise visually) to a1
+    // safest: draw the arc from aC to aA with anticlockwise=true (visually top arc)
+    // We'll use: ctx.arc(cx, cy, R*S, aC, aA, true)  -- anticlockwise=true draws the upper arc.
+ 
+    // ---------- background ----------
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle = '#fbfdff';
+    ctx.fillRect(0,0,W,H);
+
+    // grid
+    ctx.strokeStyle = '#e6edf5'; ctx.lineWidth = 1;
+    for(let x=0; x<=W; x+=25){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+    for(let y=0; y<=H; y+=25){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+
+    // axes
+    ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(20, cy); ctx.lineTo(W-20, cy); ctx.stroke();       // x-axis
+    ctx.beginPath(); ctx.moveTo(cx, 30); ctx.lineTo(cx, H-20); ctx.stroke();       // y-axis (through O)
+
+    // ---------- semicircle (top half from A to B) ----------
+    ctx.beginPath();
+    ctx.arc(cx, cy, R*S, Math.PI, 0, false);   // upper semicircle from (cx - RS, cy) to (cx + RS, cy)
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(59,130,246,0.07)';
+    ctx.fill();
+    ctx.strokeStyle = '#2563eb'; ctx.lineWidth = 2.5; ctx.stroke();
+
+    // shaded segment (region bounded by chord AC and arc AC)
+    ctx.beginPath();
+    ctx.moveTo(A.x, A.y);
+    // arc from C to A going anticlockwise on screen = visually upper arc
+    ctx.arc(cx, cy, R*S, aC, aA, true);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(251,191,36,0.55)';
+    ctx.fill();
+    ctx.strokeStyle = '#b45309'; ctx.lineWidth = 1.5; ctx.stroke();
+
+    // diameter AB
+    ctx.beginPath();
+    ctx.moveTo(cx - R*S, cy); ctx.lineTo(cx + R*S, cy);
+    ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 2; ctx.stroke();
+
+    // chord AC
+    ctx.beginPath();
+    ctx.moveTo(A.x, A.y); ctx.lineTo(Cp.x, Cp.y);
+    ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 2.5; ctx.stroke();
+
+    // radii OA, OC
+    ctx.setLineDash([6,4]);
+    ctx.strokeStyle = '#7c3aed'; ctx.lineWidth = 1.8;
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(A.x, A.y); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(Cp.x, Cp.y); ctx.stroke();
+
+    // apothem OM
+    const M = { x: A.x, y: (A.y + Cp.y)/2 };  // midpoint of A & C
+    if(ckOM.checked){
+      ctx.strokeStyle = '#059669'; ctx.lineWidth = 2.2;
+      ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(M.x, M.y); ctx.stroke();
+      // right angle mark
+      const r = 10;
+      ctx.beginPath();
+      ctx.moveTo(M.x + r, M.y);
+      ctx.lineTo(M.x + r, M.y - r);
+      ctx.lineTo(M.x, M.y - r);
+      ctx.strokeStyle = '#059669'; ctx.lineWidth = 1.6; ctx.stroke();
+    }
+    ctx.setLineDash([]);
+
+    // ---------- points ----------
+    function dot(x, y, col, label, dx, dy, off){
+      ctx.beginPath(); ctx.arc(x,y,5.5,0,Math.PI*2);
+      ctx.fillStyle="#fff"; ctx.fill();
+      ctx.lineWidth=2.6; ctx.strokeStyle=col; ctx.stroke();
+      if(label){
+        ctx.fillStyle=col; ctx.font='bold 15px Segoe UI, Arial';
+        ctx.textAlign = 'center'; ctx.textBaseline='middle';
+        ctx.fillText(label, x+(dx||0), y+(dy||0));
+      }
+    }
+    dot(A.x, A.y, '#0f172a', 'A', -20, 0);
+    dot(cx + R*S, cy, '#0f172a', 'B', 16, 0);
+    dot(Cp.x, Cp.y, '#dc2626', 'C', -14, -18);
+    dot(cx, cy, '#0f172a', 'O', 0, 22);
+    if(ckOM.checked){ dot(M.x, M.y, '#059669', 'M', 22, -6); }
+
+    // ---------- labels ----------
+    ctx.font = '13px Segoe UI, Arial';
+    ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+
+    // AC = 2 cm label
+    ctx.fillStyle='#dc2626';
+    ctx.save();
+    ctx.translate(A.x - 16, (A.y + Cp.y)/2);
+    ctx.rotate(-Math.PI/2);
+    ctx.textAlign='center';
+    ctx.font='bold 13px Segoe UI, Arial';
+    ctx.fillText('AC = '+AC.toFixed(2)+' cm', 0, 0);
+    ctx.restore();
+
+    // OM
+    if(ckOM.checked){
+      ctx.fillStyle='#059669';
+      ctx.font='bold 13px Segoe UI, Arial';
+      ctx.textAlign='center';
+      ctx.fillText('OM = '+OM.toFixed(3)+' cm', (cx+M.x)/2, (cy+M.y)/2 - 10);
+    }
+
+    // B label
+    ctx.fillStyle='#0f172a';
+    ctx.font='bold 14px Segoe UI, Arial';
+    ctx.textAlign='center';
+    ctx.fillText('diameter AB = 3 cm  (R = 1.5 cm)', cx, 55);
+
+    // Angle labels
+    if(ckAng.checked){
+      const halfDeg = toDeg(angH);
+      ctx.fillStyle='#7c3aed';
+      ctx.font='bold 13px Segoe UI, Arial';
+      ctx.textAlign='left';
+      // angle AOM
+      ctx.fillText('\u2220AOM = '+halfDeg.toFixed(2)+'\u00b0', cx + 12, cy - 30);
+      ctx.fillText('\u2220MOC = '+halfDeg.toFixed(2)+'\u00b0', cx + 12, cy - 50);
+      ctx.fillStyle='#b45309';
+      ctx.font='bold 13px Segoe UI, Arial';
+      ctx.fillText('\u2220AOC = '+(2*halfDeg).toFixed(2)+'\u00b0', cx + 12, cy - 75);
+    }
+
+    // readouts
+    rR.textContent  = R.toFixed(2);
+    rOM.textContent = OM.toFixed(3);
+    rSin.textContent= (OM>1e-6? (half/R).toFixed(3) : '—');
+    rAng.textContent= (2*toDeg(angH)).toFixed(2)+'\u00b0';
+  }
+
+  [slC, ckOM, ckAng].forEach(el=>el.addEventListener('input', draw));
+  draw();
+})();
+
+/* ============================================================
+   PART (b) canvas — sector vs triangle decomposition
+   ============================================================ */
+(function(){
+  const cv = document.getElementById('cv2');
+  const W = 760, H = 440;
+  const ctx = setupCanvas(cv, W, H);
+
+  const slC2    = document.getElementById('slC2');
+  const lbC2    = document.getElementById('lbC2');
+  const ckSeg   = document.getElementById('ckSeg');
+  const ckSec   = document.getElementById('ckSector');
+  const ckTri   = document.getElementById('ckTri');
+
+  const rSec = document.getElementById('rSec');
+  const rTri = document.getElementById('rTri');
+  const rSeg = document.getElementById('rSeg');
+
+  const R = 1.5;
+  const cx = 300, cy = 330;
+  const S  = 150;
+
+  function draw(){
+    const AC = parseFloat(slC2.value);
+    lbC2.textContent = AC.toFixed(2) + ' cm';
+
+    const half = Math.min(AC/2, R*0.999);
+    const angH = Math.asin(half/R);
+    const theta = 2*angH;
+    const OM = Math.sqrt(R*R - half*half);
+
+    const A  = { x: cx - S*half, y: cy };
+    const Cp = { x: cx - S*half, y: cy - S*OM };
+    const M  = { x: A.x, y: (A.y+Cp.y)/2 };
+    const aA = Math.atan2(A.y - cy, A.x - cx);
+    const aC = Math.atan2(Cp.y - cy, Cp.x - cx);
+
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle = '#fbfdff'; ctx.fillRect(0,0,W,H);
+
+    // grid
+    ctx.strokeStyle = '#e6edf5'; ctx.lineWidth = 1;
+    for(let x=0;x<=W;x+=25){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+    for(let y=0;y<=H;y+=25){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+    ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(20,cy); ctx.lineTo(W-20,cy); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx,30); ctx.lineTo(cx,H-20); ctx.stroke();
+
+    // semicircle outline
+    ctx.beginPath();
+    ctx.arc(cx, cy, R*S, Math.PI, 0, false);
+    ctx.closePath();
+    ctx.strokeStyle='#94a3b8'; ctx.lineWidth=1.8; ctx.stroke();
+
+    // sector OAC
+    if(ckSec.checked){
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(A.x, A.y);
+      ctx.arc(cx, cy, R*S, aA, aC, true);
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(59,130,246,0.28)';
+      ctx.fill();
+      ctx.strokeStyle = '#2563eb'; ctx.lineWidth = 2; ctx.stroke();
+    }
+
+    // triangle AOC
+    if(ckTri.checked){
+      ctx.beginPath();
+      ctx.moveTo(A.x, A.y);
+      ctx.lineTo(cx, cy);
+      ctx.lineTo(Cp.x, Cp.y);
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(139,92,246,0.35)';
+      ctx.fill();
+      ctx.strokeStyle = '#7c3aed'; ctx.lineWidth = 2; ctx.stroke();
+    }
+
+    // shaded segment
+    if(ckSeg.checked){
+      ctx.beginPath();
+      ctx.moveTo(A.x, A.y);
+      ctx.arc(cx, cy, R*S, aA, aC, true);
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(251,191,36,0.75)';
+      ctx.fill();
+      ctx.strokeStyle = '#b45309'; ctx.lineWidth = 2.2; ctx.stroke();
+    }
+
+    // chord & diameter
+    ctx.beginPath(); ctx.moveTo(cx-R*S, cy); ctx.lineTo(cx+R*S, cy);
+    ctx.strokeStyle='#0f172a'; ctx.lineWidth=2; ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.lineTo(Cp.x,Cp.y);
+    ctx.strokeStyle='#b45309'; ctx.lineWidth=2.2; ctx.stroke();
+
+    // apothem OM
+    ctx.setLineDash([6,4]);
+    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(M.x,M.y);
+    ctx.strokeStyle='#059669'; ctx.lineWidth=2; ctx.stroke();
+    ctx.setLineDash([]);
+    // right angle
+    const r=10;
+    ctx.beginPath();
+    ctx.moveTo(M.x+r, M.y); ctx.lineTo(M.x+r, M.y-r); ctx.lineTo(M.x, M.y-r);
+    ctx.strokeStyle='#059669'; ctx.lineWidth=1.6; ctx.stroke();
+
+    // points
+    function dot(x,y,col,label,dx,dy){
+      ctx.beginPath(); ctx.arc(x,y,5.5,0,Math.PI*2);
+      ctx.fillStyle='#fff'; ctx.fill();
+      ctx.lineWidth=2.6; ctx.strokeStyle=col; ctx.stroke();
+      if(label){
+        ctx.fillStyle=col; ctx.font='bold 15px Segoe UI, Arial';
+        ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText(label, x+(dx||0), y+(dy||0));
+      }
+    }
+    dot(A.x,A.y,'#0f172a','A',-20,0);
+    dot(cx+R*S,cy,'#0f172a','B',16,0);
+    dot(Cp.x,Cp.y,'#b45309','C',-14,-18);
+    dot(cx,cy,'#0f172a','O',0,22);
+    dot(M.x,M.y,'#059669','M',22,-6);
+
+    // angle AOC indicator
+    ctx.beginPath();
+    ctx.arc(cx, cy, 42, aA, aC, true);
+    ctx.strokeStyle='#2563eb'; ctx.lineWidth=2; ctx.stroke();
+    ctx.fillStyle='#1d4ed8'; ctx.font='bold 13px Segoe UI, Arial';
+    ctx.textAlign='left';
+    ctx.fillText('\u2220AOC = '+(2*toDeg(angH)).toFixed(2)+'\u00b0', cx+48, cy-18);
+
+    // Title
+    ctx.fillStyle='#0f172a'; ctx.font='bold 14px Segoe UI, Arial';
+    ctx.textAlign='center';
+    ctx.fillText('Segment (amber) = Sector (blue) \u2212 Triangle (purple)', cx, 52);
+
+    // readouts
+    const sectorA  = Math.PI*R*R*(theta/(2*Math.PI));  // = 0.5*R^2*theta
+    const triA     = 0.5 * AC * OM;
+    const segA     = sectorA - triA;
+
+    rSec.textContent = sectorA.toFixed(3);
+    rTri.textContent = triA.toFixed(3);
+    rSeg.textContent = segA.toFixed(3);
+  }
+
+  [slC2, ckSeg, ckSec, ckTri].forEach(el=>el.addEventListener('input', draw));
+  draw();
+})();
+
+/* ============================================================
+   Step-by-step reveal
+   ============================================================ */
+document.querySelectorAll('button.next').forEach(btn=>{
+  const groupName = btn.dataset.target;
+  const steps = document.querySelectorAll(`.step[data-group="${groupName}"]`);
+  const counter = document.querySelector(`.counter[data-counter="${groupName}"]`);
+  let idx = 0;
+  function refresh(){
+    counter.textContent = idx + ' / ' + steps.length;
+    if(idx >= steps.length){
+      btn.disabled = true;
+      btn.textContent = 'All steps revealed ✓';
+    } else {
+      btn.disabled = false;
+      btn.textContent = 'Next step →';
+    }
+  }
+  btn.addEventListener('click', ()=>{
+    if(idx < steps.length){
+      steps[idx].classList.add('show');
+      idx++;
+      refresh();
+      if(window.MathJax && MathJax.typesetPromise){
+        MathJax.typesetPromise([steps[idx-1]]);
+      }
+      // small scroll so the new step is visible
+      if(idx === 1){
+        steps[0].scrollIntoView({behavior:'smooth', block:'nearest'});
+      }
+    }
+  });
+  refresh();
+});
+</script>
+</body>
+</html>

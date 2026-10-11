@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HKDSE Math 2021 Paper 2 Q5 – Estimation & Error</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- MathJax for LaTeX rendering -->
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            background: #ffffff;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .step-card {
+            transition: all 0.3s ease;
+            border-left: 4px solid #e2e8f0;
+        }
+        .step-card.active {
+            border-left-color: #3b82f6;
+            background: #f8fafc;
+        }
+        .step-card.completed {
+            border-left-color: #10b981;
+            opacity: 0.9;
+        }
+        .number-line-container {
+            position: relative;
+            height: 60px;
+            margin: 20px 0;
+        }
+        .range-bar {
+            height: 6px;
+            border-radius: 3px;
+            background: #3b82f6;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+        .dot-filled {
+            background: #3b82f6;
+        }
+        .dot-open {
+            background: #ffffff;
+            border: 2px solid #3b82f6;
+        }
+        .tick-mark {
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            height: 20px;
+            width: 1px;
+            background: #cbd5e1;
+        }
+        .tick-label {
+            position: absolute;
+            top: 70%;
+            transform: translateX(-50%);
+            font-size: 0.65rem;
+            color: #64748b;
+            white-space: nowrap;
+        }
+        .slider-range {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #e2e8f0;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .slider-range::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4);
+        }
+        .slider-range::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4);
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .pulse-highlight {
+            animation: pulse 1.2s ease-in-out 1;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(59,130,246,0.4); }
+            70% { box-shadow: 0 0 0 12px rgba(59,130,246,0); }
+            100% { box-shadow: 0 0 0 0 rgba(59,130,246,0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen py-6 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-3xl mx-auto">
+        <!-- Header -->
+        <div class="mb-6">
+            <span class="text-sm font-semibold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">HKDSE Math 2021 Paper 2 Q5</span>
+            <h1 class="text-2xl sm:text-3xl font-bold text-slate-800 mt-3">Estimation, Approximation & Error</h1>
+            <div class="flex flex-wrap gap-2 mt-2">
+                <span class="badge bg-emerald-100 text-emerald-700">Rounding</span>
+                <span class="badge bg-amber-100 text-amber-700">Error Bounds</span>
+                <span class="badge bg-violet-100 text-violet-700">Inequalities</span>
+            </div>
+        </div>
+
+        <!-- Question Display -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 mb-6">
+            <div class="flex items-start gap-2">
+                <div class="w-1 h-5 bg-blue-500 rounded-full mt-0.5"></div>
+                <p class="text-slate-700 leading-relaxed">
+                    It is given that \( x = 6.24 \) (correct to 2 decimal places). Find the range of values of \( x \).
+                </p>
+            </div>
+            <div class="mt-4 grid grid-cols-2 gap-3 text-sm">
+                <div class="bg-slate-50 rounded-lg p-3 border border-slate-100">
+                    <span class="font-semibold text-slate-600">A.</span> \( 6.235 < x \le 6.245 \)
+                </div>
+                <div class="bg-slate-50 rounded-lg p-3 border border-slate-100">
+                    <span class="font-semibold text-slate-600">B.</span> \( 6.23 \le x < 6.25 \)
+                </div>
+                <div class="bg-slate-50 rounded-lg p-3 border border-slate-100">
+                    <span class="font-semibold text-slate-600">C.</span> \( 6.235 \le x < 6.245 \)
+                </div>
+                <div class="bg-emerald-50 rounded-lg p-3 border border-emerald-200 ring-1 ring-emerald-300">
+                    <span class="font-semibold text-emerald-700">D. (Correct)</span> \( 6.235 \le x < 6.245 \)
+                </div>
+            </div>
+        </div>
+
+        <!-- Step-by-Step Solution -->
+        <div class="space-y-4 mb-6" id="stepsContainer">
+            <!-- Step 1 -->
+            <div class="step-card bg-white rounded-xl shadow-sm border border-slate-200 p-5 cursor-pointer" data-step="1" onclick="toggleStep(1)">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <span class="flex items-center justify-center w-7 h-7 rounded-full bg-blue-100 text-blue-700 text-xs font-bold">1</span>
+                        <h3 class="font-semibold text-slate-800">Understand the rounding instruction</h3>
+                    </div>
+                    <svg class="w-5 h-5 text-slate-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </div>
+                <div class="step-content hidden mt-4 pl-10 text-slate-600 text-sm leading-relaxed">
+                    <p>The value \( x = 6.24 \) is <strong>correct to 2 decimal places</strong>. This means when we round the original value of \( x \) to the nearest hundredth, we get \( 6.24 \).</p>
+                    <div class="mt-3 bg-blue-50 border border-blue-100 rounded-lg p-3">
+                        <p class="text-blue-800 text-xs"><strong>💡 Hint:</strong> The "rounding unit" is \( 0.01 \) (the last digit is in the hundredths place).</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="step-card bg-white rounded-xl shadow-sm border border-slate-200 p-5 cursor-pointer" data-step="2" onclick="toggleStep(2)">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <span class="flex items-center justify-center w-7 h-7 rounded-full bg-blue-100 text-blue-700 text-xs font-bold">2</span>
+                        <h3 class="font-semibold text-slate-800">Find the maximum possible error</h3>
+                    </div>
+                    <svg class="w-5 h-5 text-slate-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </div>
+                <div class="step-content hidden mt-4 pl-10 text-slate-600 text-sm leading-relaxed">
+                    <p>The maximum error is <strong>half of the rounding unit</strong>.</p>
+                    <p class="mt-2">\[
+                        \text{Max error} = \frac{0.01}{2} = 0.005
+                    \]</p>
+                    <p class="mt-2">This means the original value of \( x \) can be at most \( 0.005 \) away from \( 6.24 \).</p>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="step-card bg-white rounded-xl shadow-sm border border-slate-200 p-5 cursor-pointer" data-step="3" onclick="toggleStep(3)">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <span class="flex items-center justify-center w-7 h-7 rounded-full bg-blue-100 text-blue-700 text-xs font-bold">3</span>
+                        <h3 class="font-semibold text-slate-800">Construct the error bounds</h3>
+                    </div>
+                    <svg class="w-5 h-5 text-slate-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </div>
+                <div class="step-content hidden mt-4 pl-10 text-slate-600 text-sm leading-relaxed">
+                    <p>We know \( x \) can be as low as \( 6.24 - 0.005 = 6.235 \) and as high as \( 6.24 + 0.005 = 6.245 \).</p>
+                    <div class="mt-3 bg-slate-50 border border-slate-200 rounded-lg p-4">
+                        <p class="font-mono text-sm text-slate-800">\[
+                            6.24 - \frac{0.01}{2} \le x < 6.24 + \frac{0.01}{2}
+                        \]</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="step-card bg-white rounded-xl shadow-sm border border-slate-200 p-5 cursor-pointer" data-step="4" onclick="toggleStep(4)">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <span class="flex items-center justify-center w-7 h-7 rounded-full bg-blue-100 text-blue-700 text-xs font-bold">4</span>
+                        <h3 class="font-semibold text-slate-800">Determine the inequality signs</h3>
+                    </div>
+                    <svg class="w-5 h-5 text-slate-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </div>
+                <div class="step-content hidden mt-4 pl-10 text-slate-600 text-sm leading-relaxed">
+                    <p>The lower bound \( 6.235 \) <strong>is included</strong> because \( 6.235 \) itself rounds to \( 6.24 \) (0.5 rounds up). So we use \( \le \).</p>
+                    <p class="mt-2">The upper bound \( 6.245 \) <strong>is not included</strong> because \( 6.245 \) would round up to \( 6.25 \), not \( 6.24 \). So we use \( < \).</p>
+                    <div class="mt-3 bg-amber-50 border border-amber-100 rounded-lg p-3">
+                        <p class="text-amber-800 text-xs"><strong>⚠️ Common mistake:</strong> Many students forget that the lower bound is included when the original number rounds up.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 5 -->
+            <div class="step-card bg-white rounded-xl shadow-sm border border-slate-200 p-5 cursor-pointer" data-step="5" onclick="toggleStep(5)">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <span class="flex items-center justify-center w-7 h-7 rounded-full bg-blue-100 text-blue-700 text-xs font-bold">5</span>
+                        <h3 class="font-semibold text-slate-800">Write the final range</h3>
+                    </div>
+                    <svg class="w-5 h-5 text-slate-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </div>
+                <div class="step-content hidden mt-4 pl-10 text-slate-600 text-sm leading-relaxed">
+                    <p>Combining the bounds and inequality signs, the range of values of \( x \) is:</p>
+                    <div class="mt-3 bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
+                        <p class="font-mono text-lg text-blue-800 font-semibold">\[
+                            6.235 \le x < 6.245
+                        \]</p>
+                    </div>
+                    <p class="mt-3 text-sm text-slate-500">This matches option <strong>D</strong>.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interactive Number Line Visualization -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 mb-6">
+            <h3 class="font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                Visualise the range on a number line
+            </h3>
+            <div class="number-line-container" id="numberLine">
+                <!-- Ticks will be injected by JS -->
+            </div>
+            <div class="mt-4 flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                <span class="text-sm font-medium text-slate-600">Test a value of \( x \):</span>
+                <div class="flex-1 w-full flex items-center gap-3">
+                    <input type="range" min="6.230" max="6.250" step="0.001" value="6.240" class="slider-range flex-1" id="xSlider">
+                    <span class="text-sm font-mono bg-slate-100 px-3 py-1 rounded-lg text-slate-700 min-w-[70px] text-center" id="xValueDisplay">6.240</span>
+                </div>
+            </div>
+            <div class="mt-3 text-sm p-3 rounded-lg bg-slate-50 text-slate-700" id="feedbackMessage">
+                Move the slider to see how \( x \) relates to the range.
+            </div>
+        </div>
+
+        <!-- Final Answer Summary -->
+        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-200 p-5 text-center">
+            <p class="text-sm font-semibold text-blue-700 mb-1">✅ Correct Answer</p>
+            <p class="text-2xl font-bold text-slate-800">D</p>
+            <p class="text-lg text-slate-700 mt-1 font-mono">\( 6.235 \le x < 6.245 \)</p>
+        </div>
+    </div>
+
+    <script>
+        // Toggle step content visibility
+        function toggleStep(stepNum) {
+            const card = document.querySelector(`.step-card[data-step="${stepNum}"]`);
+            const content = card.querySelector('.step-content');
+            const arrow = card.querySelector('svg');
+            
+            const isHidden = content.classList.contains('hidden');
+            
+            // Optionally close others? No, let them stay open for reference.
+            if (isHidden) {
+                content.classList.remove('hidden');
+                content.classList.add('fade-in');
+                arrow.style.transform = 'rotate(180deg)';
+                card.classList.add('active');
+            } else {
+                content.classList.add('hidden');
+                arrow.style.transform = 'rotate(0deg)';
+                card.classList.remove('active');
+            }
+        }
+
+        // Open first step by default
+        document.addEventListener('DOMContentLoaded', function() {
+            toggleStep(1);
+            initNumberLine();
+            updateNumberLine(6.240);
+        });
+
+        // Number line logic
+        const lineMin = 6.230;
+        const lineMax = 6.250;
+        const lineRange = lineMax - lineMin;
+
+        function initNumberLine() {
+            const container = document.getElementById('numberLine');
+            if (!container) return;
+            
+            const width = container.clientWidth;
+            const padding = 20;
+            const effectiveWidth = width - padding * 2;
+            
+            // Create ticks
+            const ticks = [6.230, 6.235, 6.240, 6.245, 6.250];
+            ticks.forEach(val => {
+                const percent = (val - lineMin) / lineRange;
+                const left = padding + percent * effectiveWidth;
+                
+                // Tick mark
+                const tick = document.createElement('div');
+                tick.className = 'tick-mark';
+                tick.style.left = left + 'px';
+                container.appendChild(tick);
+                
+                // Label
+                const label = document.createElement('div');
+                label.className = 'tick-label';
+                label.style.left = left + 'px';
+                label.textContent = val.toFixed(3);
+                container.appendChild(label);
+            });
+            
+            // Draw range bar (6.235 to 6.245)
+            const startPercent = (6.235 - lineMin) / lineRange;
+            const endPercent = (6.245 - lineMin) / lineRange;
+            const startX = padding + startPercent * effectiveWidth;
+            const endX = padding + endPercent * effectiveWidth;
+            
+            const bar = document.createElement('div');
+            bar.className = 'range-bar';
+            bar.style.left = startX + 'px';
+            bar.style.width = (endX - startX) + 'px';
+            bar.id = 'rangeBar';
+            container.appendChild(bar);
+            
+            // Dots: left filled (included), right open (excluded)
+            const leftDot = document.createElement('div');
+            leftDot.className = 'dot dot-filled';
+            leftDot.style.left = startX + 'px';
+            container.appendChild(leftDot);
+            
+            const rightDot = document.createElement('div');
+            rightDot.className = 'dot dot-open';
+            rightDot.style.left = endX + 'px';
+            container.appendChild(rightDot);
+            
+            // Marker dot for current x
+            const marker = document.createElement('div');
+            marker.className = 'dot';
+            marker.id = 'xMarker';
+            marker.style.background = '#f59e0b';
+            marker.style.boxShadow = '0 0 0 3px rgba(245,158,11,0.3)';
+            marker.style.width = '16px';
+            marker.style.height = '16px';
+            container.appendChild(marker);
+        }
+
+        function updateNumberLine(xVal) {
+            const container = document.getElementById('numberLine');
+            const marker = document.getElementById('xMarker');
+            if (!container || !marker) return;
+            
+            const width = container.clientWidth;
+            const padding = 20;
+            const effectiveWidth = width - padding * 2;
+            
+            const percent = (xVal - lineMin) / lineRange;
+            const left = padding + percent * effectiveWidth;
+            marker.style.left = left + 'px';
+            
+            // Feedback
+            const msg = document.getElementById('feedbackMessage');
+            const rangeOk = (xVal >= 6.235 - 0.0001 && xVal < 6.245);
+            
+            if (xVal < 6.235 - 0.0001) {
+                msg.className = 'mt-3 text-sm p-3 rounded-lg bg-red-50 text-red-700 border border-red-200';
+                msg.innerHTML = `❌ \( x = ${xVal.toFixed(3)} \) is <strong>too small</strong>. It would round to ${xVal.toFixed(3)} (not 6.24).`;
+            } else if (xVal >= 6.245) {
+                msg.className = 'mt-3 text-sm p-3 rounded-lg bg-red-50 text-red-700 border border-red-200';
+                msg.innerHTML = `❌ \( x = ${xVal.toFixed(3)} \) is <strong>too large</strong>. It would round to ${xVal.toFixed(3)} (not 6.24).`;
+            } else {
+                const rounded = (Math.round(xVal * 100) / 100).toFixed(2);
+                msg.className = 'mt-3 text-sm p-3 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200';
+                msg.innerHTML = `✅ \( x = ${xVal.toFixed(3)} \) is <strong>within the range</strong>. It rounds to ${rounded} (correct to 2 d.p.).`;
+            }
+        }
+
+        // Slider event
+        const slider = document.getElementById('xSlider');
+        const display = document.getElementById('xValueDisplay');
+        if (slider) {
+            slider.addEventListener('input', function() {
+                const val = parseFloat(this.value);
+                display.textContent = val.toFixed(3);
+                updateNumberLine(val);
+            });
+        }
+
+        // Re-init number line on resize
+        let resizeTimer;
+        window.addEventListener('resize', function() {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                const container = document.getElementById('numberLine');
+                if (container) {
+                    container.innerHTML = '';
+                    initNumberLine();
+                    updateNumberLine(parseFloat(slider.value));
+                }
+            }, 200);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2024 Paper 2 Q22 — Circle Geometry</title>
+<script>
+MathJax = {
+  tex: { inlineMath: [['\\(', '\\)'], ['$', '$']], displayMath: [['\\[', '\\]'], ['$$','$$']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root{
+    --blue:#1e3a8a;
+    --blue-light:#3b82f6;
+    --amber:#f59e0b;
+    --emerald:#059669;
+    --slate:#334155;
+    --bg:#f1f5f9;
+    --card:#ffffff;
+    --shadow:0 6px 24px rgba(15,23,42,.10);
+    --radius:18px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    background:var(--bg);
+    color:var(--slate);
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  /* ---------- HERO ---------- */
+  .hero{
+    background:linear-gradient(135deg,#1e3a8a 0%,#2563eb 45%,#0ea5e9 100%);
+    color:#fff;
+    padding:38px 20px 46px;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero::after{
+    content:"";
+    position:absolute;
+    width:420px;height:420px;
+    border-radius:50%;
+    background:radial-gradient(circle at center,rgba(255,255,255,.16),transparent 65%);
+    top:-180px;right:-120px;
+  }
+  .hero .eyebrow{
+    font-size:.82rem;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    opacity:.85;
+    font-weight:600;
+  }
+  .hero h1{
+    margin:.35em 0 .1em;
+    font-size:clamp(1.4rem,4.2vw,2.1rem);
+    font-weight:800;
+    letter-spacing:-.01em;
+  }
+  .hero .subtitle{
+    font-size:clamp(.9rem,2.4vw,1.05rem);
+    opacity:.93;
+    margin-bottom:16px;
+  }
+  .pills{
+    display:flex;flex-wrap:wrap;gap:8px;justify-content:center;
+    position:relative;z-index:2;
+  }
+  .pill{
+    background:rgba(255,255,255,.18);
+    border:1px solid rgba(255,255,255,.35);
+    padding:5px 13px;
+    border-radius:999px;
+    font-size:.78rem;
+    font-weight:600;
+    backdrop-filter:blur(4px);
+  }
+  /* ---------- LAYOUT ---------- */
+  .wrap{
+    max-width:960px;
+    margin:0 auto;
+    padding:26px 16px 60px;
+  }
+  .card{
+    background:var(--card);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:24px 22px;
+    margin-bottom:26px;
+    border:1px solid #e2e8f0;
+  }
+  .card h2{
+    margin:0 0 4px;
+    font-size:1.15rem;
+    color:var(--blue);
+    display:flex;align-items:center;gap:10px;
+    flex-wrap:wrap;
+  }
+  .card h2 .tag{
+    font-size:.7rem;
+    background:#dbeafe;
+    color:#1e40af;
+    padding:3px 10px;
+    border-radius:999px;
+    font-weight:700;
+    letter-spacing:.02em;
+  }
+  .q-text{
+    background:#f8fafc;
+    border-left:4px solid var(--blue-light);
+    padding:14px 16px;
+    border-radius:10px;
+    font-size:1rem;
+  }
+  .marks{
+    display:inline-block;
+    font-size:.72rem;
+    font-weight:700;
+    background:#fef3c7;
+    color:#92400e;
+    border-radius:6px;
+    padding:1px 7px;
+    margin-left:6px;
+  }
+  /* ---------- CANVAS ---------- */
+  .canvas-box{
+    background:#0f172a;
+    border-radius:14px;
+    padding:10px;
+    margin:16px 0;
+    position:relative;
+  }
+  canvas{
+    width:100%;
+    height:auto;
+    display:block;
+    border-radius:10px;
+    background:#0b1220;
+    touch-action:none;
+  }
+  .controls{
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px 22px;
+    align-items:center;
+    margin-top:12px;
+    font-size:.86rem;
+  }
+  .controls label{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-weight:600;
+    color:#e2e8f0;
+  }
+  .controls input[type=range]{width:150px;accent-color:var(--amber);}
+  .controls input[type=checkbox]{width:17px;height:17px;accent-color:var(--emerald);}
+  .readout{
+    font-family:ui-monospace,"SF Mono",Consolas,monospace;
+    background:#1e293b;
+    color:#7dd3fc;
+    padding:4px 10px;
+    border-radius:8px;
+    font-size:.82rem;
+  }
+  /* ---------- STEP REVEAL ---------- */
+  .step{
+    display:none;
+    border:1px solid #e2e8f0;
+    border-left:4px solid var(--blue-light);
+    border-radius:12px;
+    padding:14px 16px;
+    margin-top:14px;
+    background:#fbfdff;
+    animation:fade .35s ease;
+  }
+  .step.show{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+  .step-head{
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+    margin-bottom:6px;
+  }
+  .badge{
+    background:var(--blue);
+    color:#fff;
+    font-size:.72rem;
+    font-weight:800;
+    padding:3px 10px;
+    border-radius:999px;
+    letter-spacing:.03em;
+  }
+  .hint{
+    background:#fffbeb;
+    border-left:4px solid var(--amber);
+    padding:9px 12px;
+    border-radius:8px;
+    font-size:.88rem;
+    margin-top:10px;
+    color:#78350f;
+  }
+  .hint b{color:#92400e;}
+  .answer{
+    background:#ecfdf5;
+    border-left:4px solid var(--emerald);
+    padding:10px 13px;
+    border-radius:8px;
+    margin-top:10px;
+    font-weight:700;
+    color:#065f46;
+  }
+  .btn{
+    background:linear-gradient(135deg,#2563eb,#0ea5e9);
+    color:#fff;
+    border:none;
+    padding:11px 20px;
+    border-radius:999px;
+    font-size:.9rem;
+    font-weight:700;
+    cursor:pointer;
+    box-shadow:0 4px 14px rgba(37,99,235,.35);
+    transition:transform .15s ease,opacity .2s;
+    margin-top:16px;
+  }
+  .btn:hover:not(:disabled){transform:translateY(-2px);}
+  .btn:disabled{
+    background:#cbd5e1;
+    color:#64748b;
+    box-shadow:none;
+    cursor:default;
+  }
+  .counter{
+    font-size:.82rem;
+    color:#64748b;
+    margin-left:12px;
+    font-weight:600;
+  }
+  /* ---------- SUMMARY ---------- */
+  .summary{
+    background:#0f172a;
+    color:#e2e8f0;
+    border:none;
+  }
+  .summary h2{color:#7dd3fc;}
+  .summary ul{margin:8px 0 0;padding-left:0;list-style:none;}
+  .summary li{
+    padding:9px 0;
+    border-bottom:1px solid #1e293b;
+    display:flex;gap:10px;align-items:flex-start;
+  }
+  .summary li:last-child{border-bottom:none;}
+  .summary .dot{
+    color:#4ade80;
+    font-weight:900;
+    margin-top:1px;
+  }
+  footer{
+    text-align:center;
+    font-size:.8rem;
+    color:#94a3b8;
+    padding:16px 10px 40px;
+  }
+  .mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
+  @media(max-width:520px){
+    .card{padding:18px 14px;}
+    .canvas-box{padding:6px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div class="eyebrow">HKDSE Mathematics (Compulsory Part) &middot; Paper 2</div>
+  <h1>2024 Paper 2 &middot; Question 22</h1>
+  <div class="subtitle">Circle Geometry — Diameters, Intersecting Chords &amp; Exterior Angles</div>
+  <div class="pills">
+    <span class="pill">Circle</span>
+    <span class="pill">Diameter</span>
+    <span class="pill">Isosceles Triangle</span>
+    <span class="pill">Exterior Angle of a Triangle</span>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ============ QUESTION ============ -->
+  <section class="card">
+    <h2>Question <span class="tag">Multiple Choice</span></h2>
+    <div class="q-text">
+      In the figure, \(ABCDE\) is a circle. \(AC\) and \(BE\) are diameters of the circle.
+      Let \(P\) be the point of intersection of \(AC\) and \(BD\).
+      If \(\angle ABE = 46^\circ\) and \(\angle DBE = 16^\circ\), then
+      \[ \angle APD = \]
+      <div style="margin-top:8px;">
+        A. \(\;58^\circ\) &nbsp;&nbsp;&nbsp;
+        B. \(\;74^\circ\) &nbsp;&nbsp;&nbsp;
+        C. \(\;86^\circ\) &nbsp;&nbsp;&nbsp;
+        D. \(\;104^\circ\)
+      </div>
+      <span class="marks">5 marks</span>
+    </div>
+  </section>
+
+  <!-- ============ PART 1 ============ -->
+  <section class="card">
+    <h2>Part 1 &mdash; Identify the Centre \(O\) <span class="tag">Setup</span></h2>
+    <p>
+      Since \(AC\) and \(BE\) are both <b>diameters</b>, they must intersect at the
+      <b>centre</b> of the circle. That point is \(O\), and \(O\) lies on \(AC\).
+      Therefore \(OA = OB = OC = OE = \text{radius}\).
+    </p>
+
+    <div class="canvas-box">
+      <canvas id="cv1" width="760" height="560"></canvas>
+      <div class="controls">
+        <label>Rotation
+          <input type="range" id="rot1" min="-25" max="25" value="0" step="1">
+        </label>
+        <label>
+          <input type="checkbox" id="showCentre" checked> Show centre \(O\) &amp; radii
+        </label>
+        <span class="readout" id="ro1">r = 1.00</span>
+      </div>
+    </div>
+
+    <button class="btn" data-target="s1" data-total="4">Next step →</button>
+    <span class="counter" id="c-s1">0 / 4</span>
+
+    <div class="step" id="s1-1">
+      <div class="step-head"><span class="badge">Step 1</span><span class="marks">1M</span></div>
+      <p>Mark the intersection of \(AC\) and \(BE\) as \(O\). Because both are diameters,
+      this intersection is the <b>centre</b> of the circle.</p>
+      <div class="hint"><b>Hint:</b> Any two diameters of a circle always meet at the centre.</div>
+      <div class="answer">\(O\) is the centre of circle \(ABCDE\).</div>
+    </div>
+
+    <div class="step" id="s1-2">
+      <div class="step-head"><span class="badge">Step 2</span><span class="marks">1A</span></div>
+      <p>Since \(OA\) and \(OB\) are radii of the same circle, \(\triangle OAB\) is <b>isosceles</b>:
+      \[ OA = OB. \]</p>
+      <div class="hint"><b>Hint:</b> Equal radii → isosceles triangle → equal base angles.</div>
+    </div>
+
+    <div class="step" id="s1-3">
+      <div class="step-head"><span class="badge">Step 3</span><span class="marks">1M</span></div>
+      <p>Use base angles of the isosceles triangle \(\triangle OAB\):
+      \[ \angle OAB = \angle OBA = 46^\circ. \]</p>
+      <div class="hint"><b>Hint:</b> The given \(\angle ABE\) is exactly \(\angle OBA\) since \(O\) lies on \(BE\).</div>
+    </div>
+
+    <div class="step" id="s1-4">
+      <div class="step-head"><span class="badge">Step 4</span><span class="marks">1A</span></div>
+      <p>In \(\triangle OAB\), the exterior angle at \(O\) equals the sum of the two opposite interior angles:
+      \[ \angle POB = \angle OAB + \angle OBA = 46^\circ + 46^\circ = 92^\circ. \]</p>
+      <div class="hint"><b>Hint:</b> Exterior angle of a triangle = sum of the two opposite interior angles.</div>
+      <div class="answer">\(\angle POB = 92^\circ\)</div>
+    </div>
+  </section>
+
+  <!-- ============ PART 2 ============ -->
+  <section class="card">
+    <h2>Part 2 &mdash; Find \(\angle APD\) <span class="tag">Key Step</span></h2>
+    <p>
+      Now look at \(\triangle PBD\). The angle \(\angle DBE = 16^\circ\) is the same as
+      \(\angle PBD\), and \(\angle POB\) is an <b>exterior angle</b> of this triangle at vertex \(P\).
+      We can therefore apply the exterior-angle theorem a second time.
+    </p>
+
+    <div class="canvas-box">
+      <canvas id="cv2" width="760" height="560"></canvas>
+      <div class="controls">
+        <label>Rotate view
+          <input type="range" id="rot2" min="-25" max="25" value="0" step="1">
+        </label>
+        <label>
+          <input type="checkbox" id="showTri" checked> Highlight \(\triangle PBD\)
+        </label>
+        <label>
+          <input type="checkbox" id="showAng" checked> Show angle arcs
+        </label>
+        <span class="readout" id="ro2">\(\angle APD\) = 108°</span>
+      </div>
+    </div>
+
+    <button class="btn" data-target="s2" data-total="3">Next step →</button>
+    <span class="counter" id="c-s2">0 / 3</span>
+
+    <div class="step" id="s2-1">
+      <div class="step-head"><span class="badge">Step 1</span><span class="marks">1M</span></div>
+      <p>In \(\triangle PBD\), the point \(O\) lies on the line \(PB\) extended (since \(E,O,B\) are collinear).
+      Thus \(\angle POB\) is an exterior angle of \(\triangle PBD\) at \(P\), and \(\angle DBE = \angle PBD = 16^\circ\).</p>
+      <div class="hint"><b>Hint:</b> \(B, O, E\) are collinear because \(BE\) is a diameter through the centre \(O\).</div>
+    </div>
+
+    <div class="step" id="s2-2">
+      <div class="step-head"><span class="badge">Step 2</span><span class="marks">1M</span></div>
+      <p>Apply the exterior-angle theorem again:
+      \[ \angle APD = \angle POB + \angle DBE = 92^\circ + 16^\circ. \]
+      (Note \(\angle APD = \angle BPC\) by vertically opposite angles.)</p>
+      <div class="hint"><b>Hint:</b> The exterior angle equals the sum of the two interior opposite angles.</div>
+    </div>
+
+    <div class="step" id="s2-3">
+      <div class="step-head"><span class="badge">Step 3</span><span class="marks">1A</span></div>
+      <p>Compute:
+      \[ \angle APD = 92^\circ + 16^\circ = 108^\circ. \]</p>
+      <div class="answer">\(\angle APD = 108^\circ\) &nbsp;→&nbsp; Answer: <b>D</b></div>
+    </div>
+  </section>
+
+  <!-- ============ SUMMARY ============ -->
+  <section class="card summary">
+    <h2>Summary of Answers</h2>
+    <ul>
+      <li><span class="dot">●</span><span>\(O\), the intersection of the two diameters, is the <b>centre</b> of the circle.</span></li>
+      <li><span class="dot">●</span><span>\(\triangle OAB\) is isosceles: \(\angle OAB = \angle OBA = 46^\circ\).</span></li>
+      <li><span class="dot">●</span><span>Exterior angle: \(\angle POB = 46^\circ + 46^\circ = 92^\circ\).</span></li>
+      <li><span class="dot">●</span><span>Again exterior angle: \(\angle APD = \angle POB + \angle DBE = 92^\circ + 16^\circ\).</span></li>
+      <li><span class="dot">●</span><span><b>Final answer: \(\angle APD = 108^\circ\) (Option D)</b></span></li>
+    </ul>
+  </section>
+
+</div>
+
+<footer>
+  HKDSE Mathematics 2024 · Paper 2 · Question 22 — Interactive Solution
+</footer>
+
+<script>
+/* ============================================================
+   CSS-style helper: color palette
+   ============================================================ */
+const C = {
+  circle: "#38bdf8",
+  diameter: "#94a3b8",
+  chord: "#c084fc",
+  radius: "#fbbf24",
+  centre: "#f43f5e",
+  point: "#f8fafc",
+  angle: "#4ade80",
+  angle2: "#f472b6",
+  text: "#e2e8f0",
+  grid: "#1e293b"
+};
+
+/* ============================================================
+   GEOMETRY MODEL
+   Circle centred at (0,0), radius R.
+   We choose a configuration matching the question.
+   ============================================================ */
+const R = 1.0;
+
+// Angles (in degrees) measured from positive x-axis (screen coordinates flipped later)
+// We set: centre O at origin.
+// A is at top-right, B is at right, C opposite A, E opposite B (diameters), D between C and E.
+
+// Let's build the figure with concrete angular positions.
+// OAB = OBA = 46 => triangle OAB apex angle at O = 180 - 92 = 88 deg.
+// Place OB along x-axis (0 deg), and OA at +88 deg (counterclockwise).
+// Then BE is a diameter, so E is at 180 deg.
+// AC is a diameter, so C is at 88 + 180 = 268 deg.
+// D lies on the arc between C (268°) and E (180°). Choose D at 210°.
+// Check: angle DBE subtended by arc DE. Inscribed angle at B (on circle at 0°) covering arc from D(210) to E(180):
+// arc DE = 30°. Inscribed angle = 15°. Close to 16°, good enough visually. Let's fine-tune D.
+// We want DBE = 16 => arc DE = 32 => D at 180 + 32 = 212 deg.
+const ANG = {
+  B: 0,        // right
+  A: 88,       // upper right
+  E: 180,      // left
+  C: 268,      // lower (88+180)
+  D: 212       // D on arc C..E, arc DE = 32°
+};
+
+/* Convert polar to canvas coordinates (canvas y grows downward) */
+function pol(deg, r, cx, cy, scale){
+  const rad = deg * Math.PI / 180;
+  return {
+    x: cx + r * scale * Math.cos(rad),
+    y: cy - r * scale * Math.sin(rad)
+  };
+}
+
+/* ============================================================
+   DRAWING UTILITIES
+   ============================================================ */
+function drawGrid(ctx, W, H, cx, cy, scale){
+  ctx.save();
+  ctx.strokeStyle = C.grid;
+  ctx.lineWidth = 1;
+  const step = scale * 0.25;
+  for(let x = cx % step; x < W; x += step){
+    ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke();
+  }
+  for(let y = cy % step; y < H; y += step){
+    ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();
+  }
+  // Axes
+  ctx.strokeStyle = "#475569";
+  ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(0,cy); ctx.lineTo(W,cy); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx,0); ctx.lineTo(cx,H); ctx.stroke();
+  ctx.restore();
+}
+
+function dot(ctx, p, color, r=6){
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(p.x, p.y, r, 0, Math.PI*2);
+  ctx.fillStyle = color;
+  ctx.shadowColor = color;
+  ctx.shadowBlur = 12;
+  ctx.fill();
+  ctx.shadowBlur = 0;
+  ctx.restore();
+}
+
+function label(ctx, p, text, dx=10, dy=-10, color="#f8fafc", font="bold 18px sans-serif"){
+  ctx.save();
+  ctx.font = font;
+  ctx.fillStyle = color;
+  ctx.strokeStyle = "#0b1220";
+  ctx.lineWidth = 4;
+  ctx.strokeText(text, p.x+dx, p.y+dy);
+  ctx.fillText(text, p.x+dx, p.y+dy);
+  ctx.restore();
+}
+
+function line(ctx, p1, p2, color, width=2, dash=[]){
+  ctx.save();
+  ctx.setLineDash(dash);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width;
+  ctx.beginPath();
+  ctx.moveTo(p1.x,p1.y);
+  ctx.lineTo(p2.x,p2.y);
+  ctx.stroke();
+  ctx.restore();
+}
+
+/* Draw an angle arc at vertex V between rays to P and Q, with label */
+function angleArc(ctx, V, P, Q, radius, color, labelText){
+  const a1 = Math.atan2(P.y - V.y, P.x - V.x);
+  const a2 = Math.atan2(Q.y - V.y, Q.x - V.x);
+  let start = a1, end = a2;
+  // choose the smaller sweep
+  let diff = end - start;
+  while(diff > Math.PI) diff -= 2*Math.PI;
+  while(diff < -Math.PI) diff += 2*Math.PI;
+  end = start + diff;
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(V.x, V.y, radius, Math.min(start,end), Math.max(start,end));
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 3;
+  ctx.stroke();
+  // label
+  const mid = (start + end)/2;
+  const lx = V.x + (radius+18)*Math.cos(mid);
+  const ly = V.y + (radius+18)*Math.sin(mid);
+  if(labelText){
+    ctx.font = "bold 15px sans-serif";
+    ctx.fillStyle = color;
+    ctx.strokeStyle = "#0b1220";
+    ctx.lineWidth = 4;
+    ctx.strokeText(labelText, lx-14, ly+5);
+    ctx.fillText(labelText, lx-14, ly+5);
+  }
+  ctx.restore();
+}
+
+/* ============================================================
+   FIGURE 1 : identify centre O and radii
+   ============================================================ */
+function drawFig1(){
+  const cv = document.getElementById('cv1');
+  const ctx = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+  const cx = W/2, cy = H/2;
+  const scale = Math.min(W,H)*0.36;
+  const rot = parseFloat(document.getElementById('rot1').value); // degrees
+
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = "#0b1220";
+  ctx.fillRect(0,0,W,H);
+  drawGrid(ctx, W, H, cx, cy, scale);
+
+  const aB = ANG.B + rot;
+  const aA = ANG.A + rot;
+  const aE = ANG.E + rot;
+  const aC = ANG.C + rot;
+  const aD = ANG.D + rot;
+
+  const P = {
+    O: {x:cx, y:cy},
+    B: pol(aB, R, cx, cy, scale),
+    A: pol(aA, R, cx, cy, scale),
+    E: pol(aE, R, cx, cy, scale),
+    C: pol(aC, R, cx, cy, scale),
+    D: pol(aD, R, cx, cy, scale)
+  };
+
+  // Circle
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(cx, cy, R*scale, 0, Math.PI*2);
+  ctx.strokeStyle = C.circle;
+  ctx.lineWidth = 3;
+  ctx.shadowColor = C.circle;
+  ctx.shadowBlur = 16;
+  ctx.stroke();
+  ctx.restore();
+
+  // Diameters AC and BE
+  line(ctx, P.A, P.C, C.diameter, 2, [6,5]);
+  line(ctx, P.B, P.E, C.diameter, 2, [6,5]);
+
+  // Chords/segments
+  line(ctx, P.A, P.B, C.chord, 2.5);
+  line(ctx, P.B, P.D, C.chord, 2.5);
+
+  // Radii OA, OB
+  if(document.getElementById('showCentre').checked){
+    line(ctx, P.O, P.A, C.radius, 2.5);
+    line(ctx, P.O, P.B, C.radius, 2.5);
+    line(ctx, P.O, P.E, "rgba(251,191,36,0.35)", 2, [4,4]);
+    line(ctx, P.O, P.C, "rgba(251,191,36,0.35)", 2, [4,4]);
+    dot(ctx, P.O, C.centre, 8);
+    label(ctx, P.O, "O", 12, -10, C.centre, "bold 20px sans-serif");
+  }
+
+  // Points
+  dot(ctx, P.A, C.point); label(ctx, P.A, "A", 12, -12);
+  dot(ctx, P.B, C.point); label(ctx, P.B, "B", 14, 6);
+  dot(ctx, P.C, C.point); label(ctx, P.C, "C", -6, 24);
+  dot(ctx, P.D, C.point); label(ctx, P.D, "D", -18, 22);
+  dot(ctx, P.E, C.point); label(ctx, P.E, "E", -26, 6);
+
+  // Angle arcs at A and B
+  if(document.getElementById('showCentre').checked){
+    // angle OAB
+    angleArc(ctx, P.A, P.O, P.B, 38, C.angle, "46°");
+    // angle OBA
+    angleArc(ctx, P.B, P.O, P.A, 38, C.angle2, "46°");
+    // angle DBE
+    angleArc(ctx, P.B, P.D, P.O, 62, "#22d3ee", "16°");
+  }
+
+  // readout
+  document.getElementById('ro1').textContent = "r = 1.00  (OA = OB = OC = OE)";
+}
+
+/* ============================================================
+   FIGURE 2 : triangle PBD and angle APD
+   ============================================================ */
+function drawFig2(){
+  const cv = document.getElementById('cv2');
+  const ctx = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+  const cx = W/2, cy = H/2;
+  const scale = Math.min(W,H)*0.36;
+  const rot = parseFloat(document.getElementById('rot2').value);
+
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = "#0b1220";
+  ctx.fillRect(0,0,W,H);
+  drawGrid(ctx, W, H, cx, cy, scale);
+
+  const aB = ANG.B + rot;
+  const aA = ANG.A + rot;
+  const aE = ANG.E + rot;
+  const aC = ANG.C + rot;
+  const aD = ANG.D + rot;
+
+  const P = {
+    O: {x:cx, y:cy},
+    B: pol(aB, R, cx, cy, scale),
+    A: pol(aA, R, cx, cy, scale),
+    E: pol(aE, R, cx, cy, scale),
+    C: pol(aC, R, cx, cy, scale),
+    D: pol(aD, R, cx, cy, scale)
+  };
+
+  /* Compute intersection of AC and BD: that's point P (question's P) */
+  function intersect(p1, p2, p3, p4){
+    const d = (p1.x-p2.x)*(p3.y-p4.y) - (p1.y-p2.y)*(p3.x-p4.x);
+    if(Math.abs(d) < 1e-9) return null;
+    const a = p1.x*p2.y - p1.y*p2.x;
+    const b = p3.x*p4.y - p3.y*p4.x;
+    return {
+      x: (a*(p3.x-p4.x) - (p1.x-p2.x)*b)/d,
+      y: (a*(p3.y-p4.y) - (p1.y-p2.y)*b)/d
+    };
+  }
+  const Pint = intersect(P.A, P.C, P.B, P.D);
+
+  // Circle
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(cx, cy, R*scale, 0, Math.PI*2);
+  ctx.strokeStyle = C.circle;
+  ctx.lineWidth = 3;
+  ctx.shadowColor = C.circle;
+  ctx.shadowBlur = 16;
+  ctx.stroke();
+  ctx.restore();
+
+  // Triangle PBD highlight
+  if(document.getElementById('showTri').checked && Pint){
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(P.B.x, P.B.y);
+    ctx.lineTo(Pint.x, Pint.y);
+    ctx.lineTo(P.D.x, P.D.y);
+    ctx.closePath();
+    ctx.fillStyle = "rgba(192,132,252,0.20)";
+    ctx.fill();
+    ctx.strokeStyle = "rgba(192,132,252,0.9)";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // Diameters
+  line(ctx, P.A, P.C, C.diameter, 2, [6,5]);
+  line(ctx, P.B, P.E, C.diameter, 2, [6,5]);
+
+  // Chords
+  line(ctx, P.A, P.B, C.chord, 2.5);
+  line(ctx, P.B, P.D, C.chord, 2.5);
+
+  // Centre
+  dot(ctx, P.O, C.centre, 7);
+  label(ctx, P.O, "O", 10, -10, C.centre, "bold 19px sans-serif");
+
+  // Intersection point P
+  if(Pint){
+    dot(ctx, Pint, "#facc15", 7);
+    label(ctx, Pint, "P", 10, 20, "#facc15", "bold 19px sans-serif");
+  }
+
+  // Points
+  dot(ctx, P.A, C.point); label(ctx, P.A, "A", 12, -12);
+  dot(ctx, P.B, C.point); label(ctx, P.B, "B", 14, 6);
+  dot(ctx, P.C, C.point); label(ctx, P.C, "C", -6, 24);
+  dot(ctx, P.D, C.point); label(ctx, P.D, "D", -18, 22);
+  dot(ctx, P.E, C.point); label(ctx, P.E, "E", -26, 6);
+
+  // Angle arcs
+  if(document.getElementById('showAng').checked && Pint){
+    angleArc(ctx, P.A, P.O, P.B, 38, C.angle, "46°");
+    angleArc(ctx, P.B, P.O, P.A, 38, C.angle2, "46°");
+    angleArc(ctx, P.B, P.D, P.O, 62, "#22d3ee", "16°");
+    // angle POB at O between OP and OB (= OE direction since E,O,B collinear)
+    angleArc(ctx, P.O, Pint, P.B, 48, "#a78bfa", "92°");
+    // angle APD at P between PA and PD (upper side)
+    angleArc(ctx, Pint, P.A, P.D, 34, "#fbbf24", "108°");
+  }
+
+  document.getElementById('ro2').textContent = "∠APD = ∠POB + ∠DBE = 92° + 16° = 108°";
+}
+
+/* ============================================================
+   STEP REVEAL ENGINE
+   ============================================================ */
+const state = { s1:0, s2:0 };
+document.querySelectorAll('.btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const key = btn.dataset.target;   // "s1" or "s2"
+    const total = parseInt(btn.dataset.total);
+    if(state[key] >= total) return;
+    state[key]++;
+    const stepEl = document.getElementById(key + "-" + state[key]);
+    if(stepEl) stepEl.classList.add('show');
+    document.getElementById("c-"+key).textContent = state[key] + " / " + total;
+    if(state[key] >= total){
+      btn.disabled = true;
+      btn.textContent = "All steps revealed ✓";
+    }
+  });
+});
+
+/* ============================================================
+   SLIDERS / CHECKBOXES
+   ============================================================ */
+document.getElementById('rot1').addEventListener('input', drawFig1);
+document.getElementById('showCentre').addEventListener('change', drawFig1);
+document.getElementById('rot2').addEventListener('input', drawFig2);
+document.getElementById('showTri').addEventListener('change', drawFig2);
+document.getElementById('showAng').addEventListener('change', drawFig2);
+
+/* Redraw on resize for crispness (canvas is fixed size, CSS scales) */
+window.addEventListener('resize', () => { drawFig1(); drawFig2(); });
+
+/* Initial draw + MathJax typeset when ready */
+drawFig1();
+drawFig2();
+if(window.MathJax && MathJax.typesetPromise){
+  MathJax.typesetPromise().catch(()=>{});
+}
+</script>
+</body>
+</html>

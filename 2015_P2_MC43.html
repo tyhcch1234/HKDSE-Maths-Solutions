@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HKDSE 2015 Paper 2 Q43 – Probability</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- MathJax for LaTeX rendering -->
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            background: #f8fafc;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+        .card {
+            transition: all 0.2s ease;
+        }
+        .card:hover {
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        }
+        .step-hidden {
+            display: none;
+        }
+        .badge {
+            @apply inline-block px-3 py-1 text-xs font-semibold rounded-full mr-2 mb-2;
+        }
+        .btn-primary {
+            @apply bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 px-6 rounded-xl transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed;
+        }
+        .btn-secondary {
+            @apply bg-white border border-indigo-200 text-indigo-700 hover:bg-indigo-50 font-semibold py-2.5 px-6 rounded-xl transition-colors duration-200;
+        }
+        .queue-chip {
+            @apply w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center font-bold text-white text-sm md:text-base shadow-md transition-all duration-300;
+        }
+        .boy-chip { @apply bg-blue-500; }
+        .girl-chip { @apply bg-pink-500; }
+        .slider-thumb {
+            @apply appearance-none h-2 w-full rounded-full bg-indigo-200 outline-none;
+        }
+        .slider-thumb::-webkit-slider-thumb {
+            @apply appearance-none w-5 h-5 rounded-full bg-indigo-600 cursor-pointer shadow;
+        }
+    </style>
+</head>
+<body class="min-h-screen py-6 px-4 md:px-8">
+    <div class="max-w-3xl mx-auto">
+
+        <!-- Header -->
+        <div class="text-center mb-6">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800">HKDSE Math 2015 Paper 2 <span class="text-indigo-600">Q43</span></h1>
+            <p class="text-gray-500 text-sm mt-1">Topic 14 · Probability (Arrangements)</p>
+        </div>
+
+        <!-- Question Card -->
+        <div class="card bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+            <div class="flex flex-wrap gap-2 mb-3">
+                <span class="badge bg-indigo-100 text-indigo-700">Permutations</span>
+                <span class="badge bg-amber-100 text-amber-700">Complementary Counting</span>
+                <span class="badge bg-emerald-100 text-emerald-700">Factorials</span>
+            </div>
+            <p class="text-gray-800 text-base md:text-lg leading-relaxed">
+                A queue is formed by <strong>6 boys</strong> and <strong>2 girls</strong>. If <strong>no girls are next to each other</strong>, how many different queues can be formed?
+            </p>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
+                <div class="bg-gray-50 rounded-xl p-3 text-center border border-gray-100">
+                    <span class="text-xs text-gray-500 block">A</span>
+                    <span class="font-semibold text-gray-700">1 440</span>
+                </div>
+                <div class="bg-gray-50 rounded-xl p-3 text-center border border-gray-100">
+                    <span class="text-xs text-gray-500 block">B</span>
+                    <span class="font-semibold text-gray-700">10 080</span>
+                </div>
+                <div class="bg-indigo-50 rounded-xl p-3 text-center border border-indigo-200 ring-2 ring-indigo-300">
+                    <span class="text-xs text-indigo-500 block font-semibold">C ✓</span>
+                    <span class="font-semibold text-indigo-700">30 240</span>
+                </div>
+                <div class="bg-gray-50 rounded-xl p-3 text-center border border-gray-100">
+                    <span class="text-xs text-gray-500 block">D</span>
+                    <span class="font-semibold text-gray-700">35 280</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interactive Visualisation: Queue Simulator -->
+        <div class="card bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+            <h2 class="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                <span class="text-xl">🎯</span> Queue Simulator
+            </h2>
+            <p class="text-sm text-gray-500 mb-3">Drag the slider to see a random queue. The helper counts how many queues have the girls <em>together</em>.</p>
+            
+            <div class="mb-4">
+                <label for="randomSlider" class="block text-sm font-medium text-gray-600 mb-1">
+                    Random queue number: <span id="queueNumberDisplay" class="font-bold text-indigo-600">0</span>
+                </label>
+                <input type="range" id="randomSlider" min="0" max="40319" value="0" class="slider-thumb w-full">
+            </div>
+
+            <!-- Queue visualisation -->
+            <div id="queueContainer" class="flex flex-wrap justify-center gap-1.5 md:gap-2 mb-4 min-h-[3rem]"></div>
+
+            <!-- Status message -->
+            <div id="statusMessage" class="text-center text-sm font-medium py-2 rounded-lg"></div>
+
+            <!-- Stats -->
+            <div class="mt-4 grid grid-cols-2 gap-3 text-center text-sm">
+                <div class="bg-gray-50 rounded-xl p-3">
+                    <div class="text-gray-500">Total queues (8!)</div>
+                    <div class="font-bold text-gray-800 text-lg">40 320</div>
+                </div>
+                <div class="bg-rose-50 rounded-xl p-3">
+                    <div class="text-gray-500">Girls together (2 · 7!)</div>
+                    <div class="font-bold text-rose-700 text-lg">10 080</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step-by-step solution -->
+        <div class="card bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <span class="text-xl">🧩</span> Guided Solution
+            </h2>
+
+            <!-- Step 1 -->
+            <div id="step1" class="mb-4 border-l-4 border-indigo-300 pl-4">
+                <div class="flex items-start gap-3">
+                    <span class="bg-indigo-100 text-indigo-700 text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shrink-0 mt-0.5">1</span>
+                    <div>
+                        <p class="font-medium text-gray-800">Understand the total without restriction</p>
+                        <p class="text-sm text-gray-600 mt-1">If we ignore the "no girls next to each other" rule, we just arrange 8 distinct people in a row.</p>
+                        <div class="mt-2 bg-gray-50 rounded-lg p-3 text-sm">
+                            <span class="text-gray-500">Total arrangements</span> = \(8! = 40\,320\)
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div id="step2" class="mb-4 border-l-4 border-indigo-300 pl-4 step-hidden">
+                <div class="flex items-start gap-3">
+                    <span class="bg-indigo-100 text-indigo-700 text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shrink-0 mt-0.5">2</span>
+                    <div>
+                        <p class="font-medium text-gray-800">Use complementary counting</p>
+                        <p class="text-sm text-gray-600 mt-1">It's easier to count the <em>opposite</em> case: queues where the girls <strong>are</strong> next to each other.</p>
+                        <div class="mt-2 bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-800">
+                            <strong>💡 Hint:</strong> Desired = Total − (girls together)
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div id="step3" class="mb-4 border-l-4 border-indigo-300 pl-4 step-hidden">
+                <div class="flex items-start gap-3">
+                    <span class="bg-indigo-100 text-indigo-700 text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shrink-0 mt-0.5">3</span>
+                    <div>
+                        <p class="font-medium text-gray-800">Count queues where the two girls are together</p>
+                        <p class="text-sm text-gray-600 mt-1">Treat the 2 girls as a single "block". Then we arrange this block together with the 6 boys.</p>
+                        <ul class="list-disc list-inside text-sm text-gray-600 mt-2 space-y-1">
+                            <li>Number of objects to arrange: \(6 + 1 = 7\)</li>
+                            <li>Arrange 7 objects: \(7!\)</li>
+                            <li>The two girls inside the block can swap: \(2!\)</li>
+                        </ul>
+                        <div class="mt-2 bg-gray-50 rounded-lg p-3 text-sm">
+                            <span class="text-gray-500">Girls together</span> = \(2! \times 7! = 2 \times 5\,040 = 10\,080\)
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div id="step4" class="mb-4 border-l-4 border-indigo-300 pl-4 step-hidden">
+                <div class="flex items-start gap-3">
+                    <span class="bg-indigo-100 text-indigo-700 text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shrink-0 mt-0.5">4</span>
+                    <div>
+                        <p class="font-medium text-gray-800">Compute the answer</p>
+                        <div class="mt-2 bg-indigo-50 border border-indigo-200 rounded-lg p-4 text-center">
+                            <p class="text-gray-600 text-sm mb-1">Required number of queues</p>
+                            <p class="text-lg md:text-xl font-bold text-indigo-800">\(8! - 2! \cdot 7! = 40\,320 - 10\,080 = 30\,240\)</p>
+                            <p class="text-emerald-600 font-semibold mt-2 text-sm">Answer: C · 30 240</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="flex flex-wrap gap-3 mt-6">
+                <button id="nextBtn" class="btn-primary">Next Step ▸</button>
+                <button id="resetBtn" class="btn-secondary">Reset</button>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <p class="text-center text-xs text-gray-400 mt-8 pb-4">HKDSE Mathematics · Probability · Interactive Solution</p>
+    </div>
+
+    <script>
+        // ---------- Step-by-step reveal ----------
+        const steps = [1, 2, 3, 4];
+        let currentStep = 1;
+        const nextBtn = document.getElementById('nextBtn');
+        const resetBtn = document.getElementById('resetBtn');
+
+        function showStep(n) {
+            for (let i = 1; i <= 4; i++) {
+                const el = document.getElementById('step' + i);
+                if (i <= n) {
+                    el.classList.remove('step-hidden');
+                } else {
+                    el.classList.add('step-hidden');
+                }
+            }
+            if (n >= 4) {
+                nextBtn.disabled = true;
+                nextBtn.textContent = 'All Steps Shown ✓';
+            } else {
+                nextBtn.disabled = false;
+                nextBtn.textContent = 'Next Step ▸';
+            }
+        }
+
+        nextBtn.addEventListener('click', () => {
+            if (currentStep < 4) {
+                currentStep++;
+                showStep(currentStep);
+            }
+        });
+
+        resetBtn.addEventListener('click', () => {
+            currentStep = 1;
+            showStep(currentStep);
+            nextBtn.disabled = false;
+            nextBtn.textContent = 'Next Step ▸';
+        });
+
+        // ---------- Queue Simulator ----------
+        const slider = document.getElementById('randomSlider');
+        const queueContainer = document.getElementById('queueContainer');
+        const statusMessage = document.getElementById('statusMessage');
+        const queueNumberDisplay = document.getElementById('queueNumberDisplay');
+
+        // Represent queue as array of 'B' (boy) and 'G' (girl)
+        // We'll generate a specific queue based on slider index.
+        // To make it deterministic and cover all 8! = 40320 permutations,
+        // we'll map index to a lexicographic permutation of 6 B's and 2 G's.
+        // However, there are duplicate B's, so we simply generate one representative.
+
+        // Generate all distinct arrangements of 6 B and 2 G (total 28)
+        // For visualisation, we just need a mapping from 0..40319 to one of these arrangements.
+        // But to make it feel like "random", we can generate a pseudo-random queue from index.
+
+        function indexToQueue(index) {
+            // Simple hash to distribute: use index to pick a random-ish arrangement
+            // We'll just generate an arrangement based on index using a seeded approach.
+            // For educational purposes, we'll create a deterministic "random" queue.
+            
+            // We want positions of the 2 G's among 8 slots.
+            // There are C(8,2)=28 possible positions, but with boys identical.
+            // For visual variety, we'll map the slider value to one of 28 position pairs,
+            // then shuffle the boys' order (but boys are identical so it doesn't matter visually).
+            
+            // To simulate "all 8! queues", we'll use a simple linear congruential generator
+            // seeded by the slider index, then map to a permutation with distinct persons.
+            // Actually, for visual clarity, we just need a queue of B's and G's that looks plausible.
+            
+            // Let's create a deterministic pseudo-random arrangement:
+            let seed = index + 1;
+            function nextRandom() {
+                seed = (seed * 9301 + 49297) % 233280;
+                return seed / 233280;
+            }
+            
+            // Start with all boys
+            let arr = ['B','B','B','B','B','B','G','G'];
+            // Fisher-Yates shuffle
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(nextRandom() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function isGirlsTogether(queue) {
+            const girlIndices = [];
+            queue.forEach((el, idx) => { if (el === 'G') girlIndices.push(idx); });
+            if (girlIndices.length < 2) return false;
+            return Math.abs(girlIndices[0] - girlIndices[1]) === 1;
+        }
+
+        function renderQueue(queue) {
+            queueContainer.innerHTML = '';
+            queue.forEach((person, i) => {
+                const chip = document.createElement('div');
+                chip.className = `queue-chip ${person === 'B' ? 'boy-chip' : 'girl-chip'}`;
+                chip.textContent = person === 'B' ? '👦' : '👧';
+                chip.style.animation = 'fadeIn 0.3s ease forwards';
+                chip.style.opacity = '0';
+                chip.style.animationDelay = (i * 0.03) + 's';
+                queueContainer.appendChild(chip);
+            });
+        }
+
+        function updateSimulator() {
+            const val = parseInt(slider.value);
+            queueNumberDisplay.textContent = val;
+            const queue = indexToQueue(val);
+            renderQueue(queue);
+
+            const together = isGirlsTogether(queue);
+            if (together) {
+                statusMessage.className = 'text-center text-sm font-medium py-2 rounded-lg bg-rose-100 text-rose-700';
+                statusMessage.innerHTML = '❌ Girls are <strong>next to each other</strong> — this queue is NOT counted.';
+            } else {
+                statusMessage.className = 'text-center text-sm font-medium py-2 rounded-lg bg-emerald-100 text-emerald-700';
+                statusMessage.innerHTML = '✅ Girls are <strong>separated</strong> — this queue IS counted.';
+            }
+        }
+
+        slider.addEventListener('input', updateSimulator);
+
+        // Initial render
+        updateSimulator();
+
+        // Add CSS animation keyframes
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(8px) scale(0.9); }
+                to { opacity: 1; transform: translateY(0) scale(1); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Show step 1 initially
+        showStep(1);
+    </script>
+</body>
+</html>

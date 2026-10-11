@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE Math 2023 Paper 2 Q14 — Recurrence Relation Solution</title>
+<script>
+  MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+  :root{
+    --bg:#f4f7fb;
+    --card:#ffffff;
+    --ink:#12263a;
+    --muted:#5b7189;
+    --accent:#2563eb;
+    --accent-soft:#e8f0fe;
+    --good:#16a34a;
+    --good-soft:#e7f8ef;
+    --warn:#d97706;
+    --warn-soft:#fef3e2;
+    --line:#dfe7f1;
+    --shadow:0 10px 30px rgba(23,52,84,.09);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Segoe UI",Roboto,"Helvetica Neue",system-ui,-apple-system,"Noto Sans",sans-serif;
+    line-height:1.65;
+    padding:18px 14px 60px;
+  }
+  .wrap{max-width:920px;margin:0 auto;}
+  header.top{
+    background:linear-gradient(135deg,#1e3a8a 0%,#2563eb 60%,#3b82f6 100%);
+    color:#fff;border-radius:20px;padding:22px 24px;box-shadow:var(--shadow);
+  }
+  header.top .qnum{
+    font-size:.82rem;letter-spacing:.14em;text-transform:uppercase;
+    opacity:.85;font-weight:600;
+  }
+  header.top h1{margin:.15em 0 .35em;font-size:1.35rem;line-height:1.35;}
+  .tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+  .tag{
+    background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);
+    padding:3px 11px;border-radius:999px;font-size:.76rem;font-weight:600;
+  }
+  .card{
+    background:var(--card);border-radius:18px;padding:20px 22px;
+    box-shadow:var(--shadow);margin-top:18px;
+  }
+  .card h2{
+    font-size:1.02rem;margin:0 0 12px;color:var(--accent);
+    display:flex;align-items:center;gap:8px;
+  }
+  .card h2 .dot{
+    width:9px;height:9px;border-radius:50%;background:var(--accent);flex:none;
+  }
+  .question-text{font-size:1.02rem;}
+  .question-text .q-line{margin:.5em 0;}
+  .options{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+    gap:10px;margin-top:16px;
+  }
+  .opt{
+    border:1.5px solid var(--line);border-radius:12px;padding:10px 14px;
+    font-size:.98rem;background:#fbfdff;
+  }
+  .opt b{color:var(--accent);}
+  .note{
+    background:var(--accent-soft);border-left:4px solid var(--accent);
+    border-radius:0 12px 12px 0;padding:12px 14px;font-size:.9rem;color:#1b3b6f;
+    margin-top:14px;
+  }
+
+  /* sequence strip */
+  .seqwrap{overflow-x:auto;padding-bottom:6px;}
+  .seq{display:flex;gap:8px;min-width:max-content;padding-top:4px;}
+  .term{
+    width:66px;flex:none;text-align:center;border-radius:12px;padding:8px 4px;
+    border:1.5px solid var(--line);background:#fbfdff;transition:all .28s ease;
+  }
+  .term .idx{font-size:.7rem;color:var(--muted);font-weight:700;letter-spacing:.05em;}
+  .term .val{font-size:1.05rem;font-weight:700;margin-top:2px;}
+  .term.known{background:var(--accent-soft);border-color:#bcd4fb;}
+  .term.unknown .val{color:#b8c6d8;}
+  .term.filled{background:var(--good-soft);border-color:#9fe0bb;}
+  .term.filled .val{color:#0f7a3d;}
+  .term.target{border-color:#f0b429;background:var(--warn-soft);}
+  .term.active{
+    transform:translateY(-4px) scale(1.05);
+    box-shadow:0 8px 18px rgba(37,99,235,.25);
+    border-color:var(--accent);
+  }
+
+  /* steps */
+  .steps{margin-top:16px;}
+  .step{
+    border:1.5px solid var(--line);border-radius:14px;margin-bottom:10px;
+    overflow:hidden;background:#fbfdff;
+  }
+  .step-head{
+    display:flex;align-items:center;gap:10px;padding:12px 14px;
+    cursor:pointer;user-select:none;font-weight:600;font-size:.95rem;
+    background:#f7faff;
+  }
+  .step-head:hover{background:#eef5ff;}
+  .badge{
+    flex:none;width:26px;height:26px;border-radius:50%;background:var(--accent);
+    color:#fff;display:flex;align-items:center;justify-content:center;
+    font-size:.78rem;font-weight:700;
+  }
+  .chev{margin-left:auto;color:var(--muted);transition:transform .25s;font-size:.8rem;}
+  .step.open .chev{transform:rotate(90deg);}
+  .step-body{
+    max-height:0;overflow:hidden;transition:max-height .35s ease;
+    padding:0 16px;font-size:.94rem;
+  }
+  .step.open .step-body{max-height:600px;padding:12px 16px 16px;}
+  .hint{
+    margin-top:10px;background:var(--warn-soft);border-radius:10px;
+    padding:10px 12px;font-size:.87rem;color:#6b3f06;border-left:3px solid var(--warn);
+  }
+  .hint b{color:#8a4b02;}
+
+  .btnrow{display:flex;flex-wrap:wrap;gap:10px;margin-top:4px;}
+  button.btn{
+    border:none;border-radius:11px;padding:11px 18px;font-size:.9rem;font-weight:700;
+    cursor:pointer;transition:.2s;font-family:inherit;
+  }
+  .btn-primary{background:var(--accent);color:#fff;}
+  .btn-primary:hover{background:#1d4ed8;}
+  .btn-ghost{background:#eef3fb;color:#20395c;}
+  .btn-ghost:hover{background:#dfe9f8;}
+  button.btn:disabled{opacity:.45;cursor:not-allowed;}
+
+  /* interactive calc */
+  .calc-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  .calc-row label{font-weight:700;font-size:.92rem;}
+  input[type=range]{flex:1;min-width:160px;accent-color:var(--accent);height:26px;}
+  .pill{
+    background:var(--accent-soft);border-radius:10px;padding:6px 14px;
+    font-weight:700;color:#1b3b6f;font-family:ui-monospace,Consolas,monospace;
+    font-size:.95rem;
+  }
+  .formula-box{
+    text-align:center;background:#f7faff;border:1px dashed #c7d8f2;
+    border-radius:12px;padding:12px;margin:12px 0;overflow-x:auto;
+  }
+  .answer-box{
+    text-align:center;background:var(--good-soft);border:2px solid #9fe0bb;
+    border-radius:14px;padding:16px;margin-top:8px;
+  }
+  .answer-box .big{font-size:1.5rem;font-weight:800;color:#0f7a3d;}
+  footer{text-align:center;color:var(--muted);font-size:.8rem;margin-top:26px;}
+  @media(max-width:520px){
+    body{padding:12px 10px 50px;}
+    header.top{padding:18px 16px;}
+    header.top h1{font-size:1.12rem;}
+    .card{padding:16px 15px;border-radius:15px;}
+    .term{width:58px;}
+    .btnrow .btn{flex:1 1 auto;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="qnum">HKDSE Math 2023 Paper 2 Q14</div>
+    <h1>Recurrence Relation: Finding a Term without Listing Every Term</h1>
+    <div class="tags">
+      <span class="tag">Formulas &amp; Sequences</span>
+      <span class="tag">Recurrence Relation</span>
+      <span class="tag">Substitution</span>
+      <span class="tag">MC Answer</span>
+    </div>
+  </header>
+
+  <!-- QUESTION -->
+  <section class="card">
+    <h2><span class="dot"></span>Question</h2>
+    <div class="question-text">
+      <p class="q-line">Let \(a_n\) be the \(n\)th term of a sequence. It is given that</p>
+      <div class="formula-box">
+        \[ a_6 = 23,\qquad a_8 = 60,\qquad a_{n+2}=a_n+a_{n+1}\ \text{ for any positive integer } n. \]
+      </div>
+      <p class="q-line">Find \(a_3\).</p>
+    </div>
+    <div class="options">
+      <div class="opt"><b>A.</b> 4</div>
+      <div class="opt"><b>B.</b> 5</div>
+      <div class="opt"><b>C.</b> 9</div>
+      <div class="opt"><b>D.</b> 14</div>
+    </div>
+    <div class="note">
+      <strong>Key idea:</strong> The relation \(a_{n+2}=a_n+a_{n+1}\) can be rearranged. Instead of
+      moving forwards (which needs a starting point), we move <strong>backwards</strong> from the two
+      known terms \(a_6\) and \(a_8\) to reach \(a_3\).
+    </div>
+  </section>
+
+  <!-- VISUAL SEQUENCE TRACKER -->
+  <section class="card">
+    <h2><span class="dot"></span>Sequence Tracker</h2>
+    <div class="seqwrap">
+      <div class="seq" id="seq"></div>
+    </div>
+    <p style="font-size:.86rem;color:var(--muted);margin:12px 0 0;">
+      Blue = given. Green = found by working backwards. Gold = the answer we need.
+    </p>
+  </section>
+
+  <!-- INTERACTIVE DEMO -->
+  <section class="card">
+    <h2><span class="dot"></span>See the Relation at Work</h2>
+    <p style="font-size:.92rem;margin-top:0;">
+      Rearranging the given relation gives the <strong>backwards formula</strong>:
+    </p>
+    <div class="formula-box">
+      \[ a_{n+2}=a_n+a_{n+1}\ \Longrightarrow\ a_n=a_{n+2}-a_{n+1} \]
+    </div>
+    <p style="font-size:.92rem;">
+      So the term <em>two places before</em> equals the difference of the next two terms.
+      Drag the slider to pick a starting index \(n\) and watch the substitution happen:
+    </p>
+    <div class="calc-row">
+      <label for="nSlide">n =</label>
+      <span class="pill" id="nVal">6</span>
+      <input type="range" id="nSlide" min="3" max="6" step="1" value="6">
+    </div>
+    <div class="formula-box" id="calcOut" style="min-height:56px;"></div>
+    <p style="font-size:.86rem;color:var(--muted);margin:0;">
+      Note: \(a_7\) is not given — it is the bridge value we must find first.
+    </p>
+  </section>
+
+  <!-- STEP BY STEP -->
+  <section class="card">
+    <h2><span class="dot"></span>Step-by-Step Guided Solution</h2>
+    <p style="font-size:.9rem;color:var(--muted);margin-top:0;">
+      Tap a step to open it. Try to predict each number before you look!
+    </p>
+    <div class="steps" id="steps">
+
+      <div class="step" data-term="7">
+        <div class="step-head"><span class="badge">1</span>Rearranging the Relation<span class="chev">▶</span></div>
+        <div class="step-body">
+          <p>We are given the relation for any positive integer \(n\):</p>
+          <div class="formula-box">\[ a_{n+2}=a_n+a_{n+1} \]</div>
+          <p>To go <strong>backwards</strong> (from bigger indices to smaller ones), make \(a_n\) the subject:</p>
+          <div class="formula-box">\[ a_n=a_{n+2}-a_{n+1} \]</div>
+          <div class="hint">
+            <b>Hint:</b> This is the same relation, just rearranged. It lets us find an earlier term
+            using two later terms — perfect, because \(a_6\) and \(a_8\) are given.
+          </div>
+        </div>
+      </div>
+
+      <div class="step" data-term="7">
+        <div class="step-head"><span class="badge">2</span>Find the Missing Bridge Value \(a_7\)<span class="chev">▶</span></div>
+        <div class="step-body">
+          <p>We know \(a_6=23\) and \(a_8=60\), but we do not know \(a_7\). Put \(n=6\) into the relation:</p>
+          <div class="formula-box">\[ a_{6+2}=a_6+a_{6+1}\ \Rightarrow\ a_8=a_6+a_7 \]</div>
+          <p>Substitute the known values:</p>
+          <div class="formula-box">\[ 60=23+a_7\ \Rightarrow\ a_7=60-23=37 \]</div>
+          <div class="hint">
+            <b>Hint:</b> The value \(37\) is not in the answer options — it is an intermediate step
+            that unlocks the rest of the working.
+          </div>
+        </div>
+      </div>
+
+      <div class="step" data-term="5">
+        <div class="step-head"><span class="badge">3</span>Step Back to \(a_5\)<span class="chev">▶</span></div>
+        <div class="step-body">
+          <p>Now use the backwards formula with \(n=5\):</p>
+          <div class="formula-box">\[ a_5=a_{7}-a_{6} \]</div>
+          <div class="formula-box">\[ a_5=37-23=14 \]</div>
+          <div class="hint">
+            <b>Hint:</b> Check: does \(a_5+a_6=a_7\)? Yes — \(14+23=37\). \(\checkmark\)
+          </div>
+        </div>
+      </div>
+
+      <div class="step" data-term="4">
+        <div class="step-head"><span class="badge">4</span>Step Back to \(a_4\)<span class="chev">▶</span></div>
+        <div class="step-body">
+          <p>Use the backwards formula with \(n=4\):</p>
+          <div class="formula-box">\[ a_4=a_{6}-a_{5} \]</div>
+          <div class="formula-box">\[ a_4=23-14=9 \]</div>
+          <div class="hint">
+            <b>Hint:</b> Notice the pattern — each new term is the difference of the two terms on its right.
+          </div>
+        </div>
+      </div>
+
+      <div class="step" data-term="3">
+        <div class="step-head"><span class="badge">5</span>Reach the Target \(a_3\)<span class="chev">▶</span></div>
+        <div class="step-body">
+          <p>Use the backwards formula with \(n=3\):</p>
+          <div class="formula-box">\[ a_3=a_{5}-a_{4} \]</div>
+          <div class="formula-box">\[ a_3=14-9=5 \]</div>
+          <div class="hint">
+            <b>Hint:</b> Check: \(a_3+a_4=5+9=14=a_5\). \(\checkmark\)
+          </div>
+        </div>
+      </div>
+
+      <div class="step" data-term="3">
+        <div class="step-head"><span class="badge">6</span>Conclusion &amp; Answer Choice<span class="chev">▶</span></div>
+        <div class="step-body">
+          <p>We have found \(a_3=5\). The sequence so far is:</p>
+          <div class="formula-box">\[ a_3=5,\ a_4=9,\ a_5=14,\ a_6=23,\ a_7=37,\ a_8=60 \]</div>
+          <p>Indeed, working forwards: \(5+9=14\), \(9+14=23\), \(14+23=37\), \(23+37=60\). All consistent.</p>
+          <div class="answer-box">
+            <div style="font-size:.82rem;letter-spacing:.12em;text-transform:uppercase;color:#0f7a3d;font-weight:700;">Correct Option</div>
+            <div class="big">B. 5</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="btnrow" style="margin-top:14px;">
+      <button class="btn btn-primary" id="nextBtn">Show Next Step</button>
+      <button class="btn btn-ghost" id="allBtn">Show All Steps</button>
+      <button class="btn btn-ghost" id="resetBtn">Reset</button>
+    </div>
+  </section>
+
+  <footer>HKDSE Mathematics — Paper 2 · Sequences and Recurrence Relations · Interactive Solution</footer>
+</div>
+
+<script>
+/* ---------- sequence tracker ---------- */
+const seqEl = document.getElementById('seq');
+const TERMS = [3,4,5,6,7,8];
+const state = { known: {6:23, 8:60}, filled: {} };
+
+function renderSeq(activeN){
+  seqEl.innerHTML = '';
+  TERMS.forEach(function(n){
+    const div = document.createElement('div');
+    div.className = 'term';
+    let val = '?';
+    if (state.known[n] !== undefined){
+      div.classList.add('known');
+      val = state.known[n];
+    } else if (state.filled[n] !== undefined){
+      div.classList.add('filled');
+      val = state.filled[n];
+    } else {
+      div.classList.add('unknown');
+    }
+    if (n === 3) div.classList.add('target');
+    if (n === activeN) div.classList.add('active');
+    div.innerHTML = '<div class="idx">a' + n + '</div><div class="val">' + val + '</div>';
+    seqEl.appendChild(div);
+  });
+}
+renderSeq(null);
+
+/* ---------- interactive backwards calculator ---------- */
+const nSlide = document.getElementById('nSlide');
+const nVal   = document.getElementById('nVal');
+const calcOut= document.getElementById('calcOut');
+
+function getVal(k){
+  if (state.known[k] !== undefined) return state.known[k];
+  if (state.filled[k] !== undefined) return state.filled[k];
+  return null;
+}
+
+function renderCalc(){
+  const n = parseInt(nSlide.value,10);
+  nVal.textContent = n;
+  const aNext1 = getVal(n+1), aNext2 = getVal(n+2);
+  let html = '<div style="font-size:.9rem;color:#5b7189;margin-bottom:6px;">' +
+             'Using \\( a_n = a_{n+2} - a_{n+1} \\) with \\( n = ' + n + ' \\)</div>';
+  html += '\\[ a_{' + n + '}=a_{' + (n+2) + '}-a_{' + (n+1) + '} \\]';
+  const v1 = (aNext2===null?'?':aNext2), v2 = (aNext1===null?'?':aNext1);
+  html += '<div style="font-size:.9rem;color:#5b7189;margin-top:6px;">' +
+          '\\[ a_{' + n + '}=(' + v1 + ')-(' + v2 + ') \\]</div>';
+  const result = (aNext2!==null && aNext1!==null) ? (aNext2 - aNext1) : null;
+  if (result !== null) html += '\\[ a_{' + n + '}=' + result + ' \\]';
+  calcOut.innerHTML = html;
+  if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([calcOut]);
+}
+nSlide.addEventListener('input', renderCalc);
+renderCalc();
+
+/* ---------- accordion steps ---------- */
+const steps = Array.prototype.slice.call(document.querySelectorAll('.step'));
+let openCount = 0;
+
+function openStep(i){
+  const s = steps[i];
+  if (!s || s.classList.contains('open')) return;
+  s.classList.add('open');
+  const t = s.getAttribute('data-term');
+  if (t){
+    const n = parseInt(t,10);
+    if (state.filled[n] === undefined && state.known[n] === undefined){
+      // compute backwards value to show
+      const values = {7:37, 5:14, 4:9, 3:5};
+      state.filled[n] = values[n];
+    }
+    renderSeq(n);
+    renderCalc();
+  }
+  steps[i].scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+document.getElementById('nextBtn').addEventListener('click', function(){
+  if (openCount < steps.length) openStep(openCount++);
+  if (openCount >= steps.length) this.disabled = true;
+});
+document.getElementById('allBtn').addEventListener('click', function(){
+  steps.forEach(function(s,i){ openStep(i); });
+  openCount = steps.length;
+  document.getElementById('nextBtn').disabled = true;
+});
+document.getElementById('resetBtn').addEventListener('click', function(){
+  steps.forEach(function(s){ s.classList.remove('open'); });
+  openCount = 0;
+  state.filled = {};
+  document.getElementById('nextBtn').disabled = false;
+  renderSeq(null);
+  nSlide.value = 6;
+  renderCalc();
+});
+steps.forEach(function(s,i){
+  s.querySelector('.step-head').addEventListener('click', function(){
+    if (s.classList.contains('open')){
+      s.classList.remove('open');
+      if (openCount > i) openCount = i;
+    } else {
+      openStep(i);
+      if (openCount <= i) openCount = i + 1;
+    }
+  });
+});
+
+/* first step open by default */
+openStep(0);
+openCount = 1;
+
+/* re-render math on load */
+window.addEventListener('load', function(){
+  if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2013 Paper 2 Q40 — Regular Tetrahedron</title>
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[', '\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<style>
+  :root{
+    --blue:#1d4ed8; --blue-dark:#1e3a8a; --amber:#f59e0b; --amber-soft:#fef3c7;
+    --emerald:#059669; --emerald-soft:#d1fae5; --slate:#0f172a; --ink:#1e293b;
+    --muted:#64748b; --bg:#f1f5f9; --card:#ffffff; --line:#e2e8f0;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  /* ---------- HERO ---------- */
+  header.hero{
+    background:linear-gradient(135deg,#1e3a8a 0%,#1d4ed8 45%,#0891b2 100%);
+    color:#fff; padding:38px 20px 46px; position:relative; overflow:hidden;
+  }
+  header.hero::after{
+    content:""; position:absolute; inset:auto -60px -120px auto; width:340px; height:340px;
+    background:radial-gradient(circle at center, rgba(245,158,11,.35), transparent 70%);
+    border-radius:50%;
+  }
+  .hero-inner{max-width:960px; margin:0 auto; position:relative; z-index:2;}
+  .eyebrow{
+    text-transform:uppercase; letter-spacing:.18em; font-size:.72rem; font-weight:700;
+    color:#bfdbfe; margin:0 0 6px;
+  }
+  .hero h1{margin:0; font-size:clamp(1.4rem,4vw,2.1rem); font-weight:800; letter-spacing:-.01em;}
+  .hero .qno{
+    display:inline-block; margin:10px 0 4px; font-size:1.5rem; font-weight:800;
+    background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.3);
+    padding:6px 16px; border-radius:999px;
+  }
+  .hero .sub{margin:6px 0 0; color:#dbeafe; font-size:.98rem;}
+  .pills{margin:16px 0 0; display:flex; flex-wrap:wrap; gap:8px;}
+  .pill{
+    background:rgba(255,255,255,.95); color:var(--blue-dark); font-weight:700;
+    font-size:.74rem; padding:5px 12px; border-radius:999px; letter-spacing:.02em;
+  }
+  .pill.amber{background:#fde68a; color:#7c2d12;}
+  .pill.green{background:#a7f3d0; color:#065f46;}
+  /* ---------- LAYOUT ---------- */
+  main{max-width:960px; margin:-26px auto 0; padding:0 16px 60px;}
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:18px;
+    box-shadow:0 8px 26px rgba(15,23,42,.07); padding:22px 22px 20px; margin-bottom:24px;
+  }
+  .card h2{
+    margin:0 0 4px; font-size:1.12rem; font-weight:800; color:var(--blue-dark);
+    display:flex; align-items:center; gap:10px;
+  }
+  .card h2 .badge-num{
+    background:var(--blue); color:#fff; font-size:.78rem; width:26px; height:26px;
+    display:inline-flex; align-items:center; justify-content:center; border-radius:8px; flex:0 0 auto;
+  }
+  .card .lead{color:var(--muted); font-size:.9rem; margin:0 0 14px;}
+  .qtext{font-size:1rem;}
+  .qtext ol{padding-left:20px;}
+  .qtext li{margin:6px 0;}
+  .markstag{
+    display:inline-block; background:var(--amber-soft); color:#92400e; font-weight:700;
+    font-size:.72rem; padding:2px 9px; border-radius:999px; margin-left:6px; vertical-align:middle;
+  }
+  /* ---------- CANVAS ---------- */
+  .canvas-wrap{
+    background:linear-gradient(180deg,#fbfdff,#f1f6fc); border:1px solid #dbeafe;
+    border-radius:14px; padding:10px; margin:10px 0 14px;
+  }
+  canvas{display:block; width:100%; height:auto; border-radius:10px; background:#fff;}
+  .readouts{display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;}
+  .readout{
+    background:#fff; border:1px solid #cbd5e1; border-radius:10px; padding:6px 11px;
+    font-size:.8rem; font-weight:600; color:#334155;
+  }
+  .readout b{color:var(--blue-dark);}
+  .controls{
+    display:flex; flex-wrap:wrap; gap:16px; align-items:center; margin-top:12px;
+    background:#f8fafc; border:1px dashed #cbd5e1; border-radius:12px; padding:10px 14px;
+  }
+  .ctl{display:flex; align-items:center; gap:9px; font-size:.85rem; font-weight:600; color:#334155;}
+  input[type=range]{width:150px; accent-color:var(--blue);}
+  input[type=checkbox]{width:17px; height:17px; accent-color:var(--emerald);}
+  .ctlval{
+    background:var(--blue); color:#fff; font-size:.78rem; font-weight:700;
+    padding:2px 8px; border-radius:6px; min-width:52px; text-align:center;
+  }
+  /* ---------- STEPS ---------- */
+  .step{
+    display:none; border-left:4px solid var(--blue); background:#f8fbff;
+    border-radius:0 12px 12px 0; padding:12px 14px; margin:12px 0;
+    animation:fade .35s ease;
+  }
+  .step.show{display:block;}
+  @keyframes fade{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
+  .step-head{display:flex; align-items:center; gap:9px; margin-bottom:6px; flex-wrap:wrap;}
+  .step-head .num{
+    width:24px; height:24px; border-radius:50%; background:var(--blue); color:#fff;
+    font-size:.76rem; font-weight:800; display:inline-flex; align-items:center;
+    justify-content:center; flex:0 0 auto;
+  }
+  .step-head .ttl{font-weight:700; color:var(--blue-dark); font-size:.95rem;}
+  .mk{background:#ede9fe; color:#5b21b6; font-size:.7rem; font-weight:800; padding:2px 8px; border-radius:999px;}
+  .mk.acc{background:#fef3c7; color:#92400e;}
+  .hint{
+    background:var(--amber-soft); border-left:4px solid var(--amber); border-radius:8px;
+    padding:8px 12px; margin:9px 0; font-size:.86rem; color:#78350f;
+  }
+  .hint b{color:#92400e;}
+  .ans{
+    background:var(--emerald-soft); border-left:4px solid var(--emerald); border-radius:8px;
+    padding:9px 12px; margin:9px 0 2px; font-size:.9rem; color:#064e3b; font-weight:600;
+  }
+  .btn-row{display:flex; align-items:center; gap:12px; margin-top:14px; flex-wrap:wrap;}
+  button.next{
+    background:linear-gradient(135deg,var(--blue),#0e7490); color:#fff; border:none;
+    padding:9px 20px; border-radius:999px; font-size:.88rem; font-weight:700; cursor:pointer;
+    box-shadow:0 5px 14px rgba(29,78,216,.3); transition:transform .12s, box-shadow .12s;
+  }
+  button.next:hover:not(:disabled){transform:translateY(-2px); box-shadow:0 9px 20px rgba(29,78,216,.36);}
+  button.next:disabled{
+    background:#cbd5e1; color:#64748b; box-shadow:none; cursor:default;
+  }
+  .counter{font-size:.82rem; font-weight:700; color:var(--muted);}
+  /* ---------- SUMMARY ---------- */
+  .summary{
+    background:linear-gradient(135deg,#0f172a,#1e293b); color:#e2e8f0; border:none;
+  }
+  .summary h2{color:#fbbf24;}
+  .summary h2 .badge-num{background:#fbbf24; color:#0f172a;}
+  .summary ul{margin:8px 0 0; padding-left:20px;}
+  .summary li{margin:7px 0; font-size:.95rem;}
+  .summary .hl{color:#fbbf24; font-weight:800; font-size:1.05rem;}
+  footer{
+    text-align:center; color:var(--muted); font-size:.8rem; padding:0 16px 40px;
+  }
+  .note{
+    background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; padding:10px 14px;
+    font-size:.86rem; color:#1e40af; margin-top:12px;
+  }
+  @media (max-width:560px){
+    .card{padding:17px 14px;}
+    main{padding:0 10px 50px;}
+    input[type=range]{width:110px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <p class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2 · Multiple Choice</p>
+    <div class="qno">2013 Paper 2 · Question 40</div>
+    <h1>Regular Tetrahedron — Height &amp; Volume</h1>
+    <p class="sub">Trigonometry in 3-D solids · 13. Trigonometry</p>
+    <div class="pills">
+      <span class="pill">Regular Tetrahedron</span>
+      <span class="pill amber">3-D Trigonometry</span>
+      <span class="pill amber">Cosine Formula</span>
+      <span class="pill green">Volume of Pyramid</span>
+      <span class="pill">Equilateral Faces</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ================= QUESTION CARD ================= -->
+  <section class="card">
+    <h2><span class="badge-num">Q</span>Question</h2>
+    <p class="lead">Read the question carefully, then explore each part below.</p>
+    <div class="qtext">
+      <p><b>[2013 MC #40]</b></p>
+      <p>If the height of a regular tetrahedron is \(2\text{ cm}\), then the volume of the tetrahedron is</p>
+      <ol type="A">
+        <li>\(2\text{ cm}^3\)</li>
+        <li>\(\sqrt{3}\text{ cm}^3\)</li>
+        <li>\(\sqrt{6}\text{ cm}^3\)</li>
+        <li>\(3\sqrt{3}\text{ cm}^3\)</li>
+      </ol>
+      <p class="markstag">Multiple choice · 1 answer</p>
+    </div>
+    <div class="note">
+      <b>Note:</b> In a <i>regular</i> tetrahedron, all four faces are congruent equilateral triangles and the foot of
+      perpendicular from a vertex is the centroid of the opposite face.
+    </div>
+  </section>
+
+  <!-- ================= PART (a) ================= -->
+  <section class="card">
+    <h2><span class="badge-num">a</span>Part (a) — Relate the side \(l\) to the height</h2>
+    <p class="lead">Find the median \(AM\) of the equilateral face \(ABC\), then relate \(l\) to the height \(h\).</p>
+
+    <div class="canvas-wrap">
+      <canvas id="cvA" width="800" height="470"></canvas>
+      <div class="readouts">
+        <span class="readout">Side \(l\) = <b id="ro-l">—</b></span>
+        <span class="readout">Face median \(AM\) = <b id="ro-am">—</b></span>
+        <span class="readout">Height \(h\) = <b id="ro-h">—</b></span>
+        <span class="readout">\(\cos\angle AMD\) = <b id="ro-cos">—</b></span>
+      </div>
+      <div class="controls">
+        <label class="ctl">Height \(h\): <input type="range" id="sldH" min="1" max="4" step="0.1" value="2"><span class="ctlval" id="valH">2.0</span> cm</label>
+        <label class="ctl"><input type="checkbox" id="chkPlane" checked> Show base plane \(BCD\)</label>
+        <label class="ctl"><input type="checkbox" id="chkAH" checked> Show height \(AH\)</label>
+        <label class="ctl"><input type="checkbox" id="chkMD" checked> Show median \(DM\)</label>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><span class="num">1</span><span class="ttl">Let \(l\) be the side length</span><span class="mk">1M</span></div>
+      <p>Since the tetrahedron is regular, every face is an equilateral triangle of side \(l\). Let \(M\) be the mid-point of \(BC\). Then \(AM\) is a median of \(\triangle ABC\), so it is also an altitude:</p>
+      \[ AM = AB\sin\angle ABC = l\sin 60^\circ = \frac{\sqrt{3}}{2}l \]
+      <div class="hint"><b>Hint:</b> In an equilateral triangle of side \(l\), the median/altitude always equals \(\dfrac{\sqrt{3}}{2}l\).</div>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><span class="num">2</span><span class="ttl">Work in the plane \(\triangle ADM\)</span><span class="mk">1M</span></div>
+      <p>\(DM\) is likewise a median of the equilateral face \(BCD\) (since \(M\) is the mid-point of \(BC\)), so</p>
+      \[ DM = \frac{\sqrt{3}}{2}l \]
+      <p>Let \(H\) be the foot of the perpendicular from \(A\) to the plane \(BCD\). Because the tetrahedron is regular, \(H\) is the centroid of \(\triangle BCD\), and \(H\) lies on the median \(DM\). Also \(AH \perp\) plane \(BCD\), so \(AH \perp DM\).</p>
+      \[ AH = h = 2\text{ cm} \]
+      <div class="hint"><b>Hint:</b> Only the triangle \(ADM\) matters — the whole 3-D problem reduces to a plane triangle once we drop the height.</div>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><span class="num">3</span><span class="ttl">Use the cosine formula in \(\triangle ADM\)</span><span class="mk">1M</span></div>
+      <p>The three sides of \(\triangle ADM\) are \(AD = l\), \(AM = DM = \dfrac{\sqrt{3}}{2}l\). The angle \(\angle AMD\) is the one between a face-median and the base median:</p>
+      \[ \cos\angle AMD = \frac{AM^2 + DM^2 - AD^2}{2\cdot AM\cdot DM} = \frac{\left(\frac{\sqrt{3}}{2}l\right)^2 + \left(\frac{\sqrt{3}}{2}l\right)^2 - l^2}{2\cdot\frac{\sqrt{3}}{2}l\cdot\frac{\sqrt{3}}{2}l} = \frac{1}{3} \]
+      <div class="hint"><b>Hint:</b> Notice \(AD\) is the side opposite \(\angle AMD\). The numbers \(\frac{3}{4}l^2 + \frac{3}{4}l^2 - l^2 = \frac{1}{2}l^2\) give \(\cos\angle AMD = \frac{1}{3}\).</div>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><span class="num">4</span><span class="ttl">Get \(l\) in terms of \(h\)</span><span class="mk">1M</span><span class="mk acc">1A</span></div>
+      <p>From \(\cos\angle AMD = \frac{1}{3}\) in \(\triangle ADM\) (right-angled at \(H\) after dropping the height):</p>
+      \[ \sin\angle AMD = \sqrt{1-\cos^2\angle AMD} = \sqrt{1-\left(\tfrac{1}{3}\right)^2} = \frac{2\sqrt{2}}{3} \]
+      \[ AH = AM\sin\angle AMD = \frac{\sqrt{3}}{2}l \cdot \frac{2\sqrt{2}}{3} = \frac{\sqrt{6}}{3}l \]
+      Setting \(AH=2\):
+      \[ \frac{\sqrt{6}}{3}l = 2 \;\Longrightarrow\; l = \frac{6}{\sqrt{6}} = \sqrt{6}\text{ cm} \]
+      <div class="ans"><b>Answer (a):</b> \(l = \sqrt{6}\text{ cm}\)</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="next" data-target="a">Next step →</button>
+      <span class="counter" data-counter="a">0 / 4</span>
+    </div>
+  </section>
+
+  <!-- ================= PART (b) ================= -->
+  <section class="card">
+    <h2><span class="badge-num">b</span>Part (b) — Base area and Volume</h2>
+    <p class="lead">Compute the area of the equilateral base \(BCD\), then apply the pyramid volume formula.</p>
+
+    <div class="canvas-wrap">
+      <canvas id="cvB" width="800" height="440"></canvas>
+      <div class="readouts">
+        <span class="readout">\(l\) = <b id="ro-l2">√6 ≈ 2.449</b> cm</span>
+        <span class="readout">Base area \(= \frac{\sqrt{3}}{4}l^2\) = <b id="ro-base">—</b></span>
+        <span class="readout">Height \(h\) = <b id="ro-h2">2.00</b> cm</span>
+        <span class="readout">Volume \(= \frac{1}{3}\cdot\text{base}\cdot h\) = <b id="ro-vol">—</b></span>
+      </div>
+      <div class="controls">
+        <label class="ctl"><input type="checkbox" id="chkPyr" checked> Show pyramid outline</label>
+        <label class="ctl"><input type="checkbox" id="chkNet"> Show flattened net of the base</label>
+        <label class="ctl">Height \(h\): <input type="range" id="sldH2" min="1" max="4" step="0.1" value="2"><span class="ctlval" id="valH2">2.0</span> cm</label>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><span class="num">1</span><span class="ttl">Area of an equilateral triangle</span><span class="mk">1M</span></div>
+      <p>The base \(BCD\) is equilateral with side \(l=\sqrt{6}\). Using \(\text{Area}=\frac{1}{2}bc\sin A\) (or the standard formula):</p>
+      \[ \text{Area of } \triangle BCD = \frac{1}{2}\cdot BC\cdot DM = \frac{1}{2}\cdot\sqrt{6}\cdot\frac{\sqrt{3}}{2}\cdot\sqrt{6} = \frac{3\sqrt{3}}{2}\text{ cm}^2 \]
+      <div class="hint"><b>Hint:</b> Equivalently, area \(=\dfrac{\sqrt{3}}{4}l^2 = \dfrac{\sqrt{3}}{4}\times 6 = \dfrac{3\sqrt{3}}{2}\text{ cm}^2\).</div>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><span class="num">2</span><span class="ttl">Volume of the tetrahedron</span><span class="mk">1M</span><span class="mk acc">1A</span></div>
+      <p>A tetrahedron is a pyramid; volume \(=\frac{1}{3}\times(\text{base area})\times(\text{height})\).</p>
+      \[ V = \frac{1}{3}\times \frac{3\sqrt{3}}{2}\times 2 = \sqrt{3}\text{ cm}^3 \]
+      <div class="ans"><b>Answer (b):</b> \(V = \sqrt{3}\text{ cm}^3\) → the correct option is <b>B</b>.</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="next" data-target="b">Next step →</button>
+      <span class="counter" data-counter="b">0 / 2</span>
+    </div>
+
+    <div class="note">
+      <b>Alternative:</b> You can also use Heron's formula on \(\triangle BCD\) (all sides \(\sqrt{6}\)) to get the same base area \(\frac{3\sqrt{3}}{2}\).
+    </div>
+  </section>
+
+  <!-- ================= SUMMARY ================= -->
+  <section class="card summary">
+    <h2><span class="badge-num">✓</span>Summary of Answers</h2>
+    <ul>
+      <li>Side length of the tetrahedron: <span class="hl">\(l = \sqrt{6}\text{ cm}\)</span></li>
+      <li>Face median used: \(AM = DM = \frac{\sqrt{3}}{2}l\)</li>
+      <li>Key angle: \(\cos\angle AMD = \frac{1}{3}\), so \(\sin\angle AMD = \frac{2\sqrt{2}}{3}\)</li>
+      <li>Height relation: \(h = AH = \frac{\sqrt{6}}{3}l\)</li>
+      <li>Base area: \(\frac{3\sqrt{3}}{2}\text{ cm}^2\)</li>
+      <li>Volume: <span class="hl">\(V = \frac{1}{3}\times\frac{3\sqrt{3}}{2}\times 2 = \sqrt{3}\text{ cm}^3\)</span></li>
+      <li>Correct option: <span class="hl">B</span></li>
+    </ul>
+  </section>
+
+</main>
+
+<footer>
+  HKDSE Mathematics (Compulsory Part) · 2013 Paper 2 Question 40 · Interactive Solution
+</footer>
+
+<script>
+/* =====================================================================
+   Utility: rounded rect, colour palette
+   ===================================================================== */
+const C = {
+  blue:'#1d4ed8', blueDark:'#1e3a8a', cyan:'#0891b2',
+  amber:'#f59e0b', amberSoft:'#fef3c7',
+  emerald:'#059669', emeraldSoft:'#d1fae5',
+  red:'#dc2626', violet:'#7c3aed', slate:'#334155',
+  grey:'#94a3b8', light:'#cbd5e1', grid:'#eef2f7', plane:'#dbeafe'
+};
+
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+
+/* Rescale a canvas for crisp rendering on HiDPI screens */
+function setupHiDPI(canvas){
+  const dpr = window.devicePixelRatio || 1;
+  const cssW = canvas.clientWidth || canvas.width;
+  const cssH = (canvas.height / canvas.width) * cssW;
+  canvas.style.height = cssH + 'px';
+  canvas.width  = cssW * dpr;
+  canvas.height = cssH * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  return {ctx, W: cssW, H: cssH};
+}
+
+/* =====================================================================
+   PART (a) CANVAS  —  3-D view of the tetrahedron + the key triangle ADM
+   ===================================================================== */
+function drawA(){
+  const cv = document.getElementById('cvA');
+  const {ctx, W, H} = setupHiDPI(cv);
+  ctx.clearRect(0,0,W,H);
+
+  const h = parseFloat(document.getElementById('sldH').value);   // height in cm
+  const l = Math.sqrt(6)/3 * h * 1; // from h = sqrt6/3 * l  => l = 3h/sqrt6
+  const showPlane = document.getElementById('chkPlane').checked;
+  const showAH    = document.getElementById('chkAH').checked;
+  const showMD    = document.getElementById('chkMD').checked;
+
+  /* ---------- left panel: 3-D tetrahedron ---------- */
+  const cx = W*0.30, cy = H*0.55, S = Math.min(W,H)*0.30;
+
+  // 3-D coordinates of a regular tetrahedron (unit-ish), then scale
+  const baseR = l/Math.sqrt(3);            // circumradius of base triangle
+  const k = S / 2.5;                        // pixels per cm-ish
+  // base triangle B, C, D laid flat on the "ground", A above centroid
+  const ang = [-90, 30, 150].map(d=>d*Math.PI/180);
+  const B = {x: cx + k*baseR*Math.cos(ang[0])*1.0, y: cy + k*0.45*baseR*Math.sin(ang[0])*1.0};
+  const Cc= {x: cx + k*baseR*Math.cos(ang[1])*1.0, y: cy + k*0.45*baseR*Math.sin(ang[1])*1.0};
+  const D = {x: cx + k*baseR*Math.cos(ang[2])*1.0, y: cy + k*0.45*baseR*Math.sin(ang[2])*1.0};
+  const Hh= {x: cx, y: cy};
+  const A = {x: cx, y: cy - k*h*0.62};
+  const M = {x:(B.x+Cc.x)/2, y:(B.y+Cc.y)/2};
+
+  // ground plane grid
+  if(showPlane){
+    ctx.save();
+    ctx.fillStyle = C.plane; ctx.globalAlpha=.45;
+    ctx.beginPath();
+    ctx.moveTo(B.x,B.y); ctx.lineTo(Cc.x,Cc.y); ctx.lineTo(D.x,D.y); ctx.closePath();
+    ctx.fill();
+    ctx.globalAlpha=1;
+    ctx.strokeStyle='#93c5fd'; ctx.lineWidth=1.5;
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // hidden edges (BC through M region) drawn dashed after filling faces
+  const faces = [[A,B,Cc],[A,Cc,D],[A,D,B]];
+  faces.forEach(f=>{
+    ctx.beginPath();
+    ctx.moveTo(f[0].x,f[0].y); ctx.lineTo(f[1].x,f[1].y); ctx.lineTo(f[2].x,f[2].y); ctx.closePath();
+    ctx.fillStyle='rgba(219,234,254,.65)';
+    ctx.fill();
+    ctx.strokeStyle=C.blue; ctx.lineWidth=1.6; ctx.stroke();
+  });
+  // base face
+  ctx.beginPath();
+  ctx.moveTo(B.x,B.y); ctx.lineTo(Cc.x,Cc.y); ctx.lineTo(D.x,D.y); ctx.closePath();
+  ctx.fillStyle='rgba(191,219,254,.6)'; ctx.fill();
+  ctx.strokeStyle=C.blue; ctx.lineWidth=1.6; ctx.stroke();
+
+  // dashed hidden edge BC
+  ctx.save();
+  ctx.setLineDash([6,6]);
+  ctx.strokeStyle=C.blue; ctx.lineWidth=1.6;
+  ctx.beginPath(); ctx.moveTo(B.x,B.y); ctx.lineTo(Cc.x,Cc.y); ctx.stroke();
+  ctx.restore();
+
+  // height AH
+  if(showAH){
+    ctx.save();
+    ctx.setLineDash([5,5]);
+    ctx.strokeStyle=C.red; ctx.lineWidth=2.2;
+    ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.lineTo(Hh.x,Hh.y); ctx.stroke();
+    ctx.restore();
+    // right angle marker at H
+    ctx.strokeStyle=C.red; ctx.lineWidth=1.6;
+    ctx.strokeRect(Hh.x+2, Hh.y-12, 10, 10);
+  }
+
+  // median DM
+  if(showMD){
+    ctx.save();
+    ctx.setLineDash([4,4]);
+    ctx.strokeStyle=C.emerald; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(D.x,D.y); ctx.lineTo(M.x,M.y); ctx.stroke();
+    ctx.restore();
+  }
+
+  // median AM
+  ctx.save();
+  ctx.setLineDash([4,4]);
+  ctx.strokeStyle=C.violet; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.lineTo(M.x,M.y); ctx.stroke();
+  ctx.restore();
+
+  // points + labels
+  const pts = [
+    {p:A, t:'A', c:C.red, dx:0, dy:-14},
+    {p:B, t:'B', c:C.blue, dx:-16, dy:8},
+    {p:Cc,t:'C', c:C.blue, dx:10, dy:14},
+    {p:D, t:'D', c:C.blue, dx:16, dy:6},
+    {p:Hh,t:'H', c:C.red, dx:10, dy:16},
+    {p:M, t:'M', c:C.emerald, dx:-16, dy:16}
+  ];
+  pts.forEach(o=>{
+    ctx.beginPath();
+    ctx.arc(o.p.x,o.p.y,4.6,0,2*Math.PI);
+    ctx.fillStyle=o.c; ctx.fill();
+    ctx.strokeStyle='#fff'; ctx.lineWidth=1.4; ctx.stroke();
+    ctx.fillStyle='#0f172a'; ctx.font='bold 14px Segoe UI';
+    ctx.fillText(o.t, o.p.x+o.dx, o.p.y+o.dy);
+  });
+
+  // height label
+  ctx.fillStyle=C.red; ctx.font='bold 13px Segoe UI';
+  ctx.fillText('h = ' + h.toFixed(2) + ' cm', A.x+12, (A.y+Hh.y)/2);
+
+  // title for the 3-D panel
+  ctx.fillStyle=C.blueDark; ctx.font='bold 15px Segoe UI';
+  ctx.fillText('3-D view: regular tetrahedron ABCD', 14, 24);
+  ctx.fillStyle=C.slate; ctx.font='13px Segoe UI';
+  ctx.fillText('side l = ' + l.toFixed(3) + ' cm', 14, 44);
+
+  /* ---------- right panel: plane triangle ADM ---------- */
+  const ox = W*0.62, oy = H*0.72, sc = Math.min(W,H)*0.55 / (l*1.15);
+
+  // triangle ADM: A at top, D at left-bottom, M at right-bottom
+  // We fix the geometry: AM = DM = sqrt3/2 * l, AD = l, angle AMD = arccos(1/3)
+  const am = Math.sqrt(3)/2*l;
+  const angAMD = Math.acos(1/3);
+  const px = (x,y)=> ({x: ox + (x-0.45*l)*sc, y: oy - (y)*sc});
+
+  // Place M at origin, D along direction making angle angAMD with M->A
+  const Ma = {x: am*Math.cos(Math.PI - angAMD/2)*0, y:0};
+  // Simpler: M at (0,0), D at (-am*cos(?,)... ) — build with law of cosines directly:
+  // Let M=(0,0). Let A be at distance am from M. Angle AMD = angAMD.
+  // Put A at angle a1 and D at angle a2 so that |A-D| = l.
+  const a1 = Math.PI*0.5 + angAMD*0.15;   // A roughly up
+  const a2 = a1 - angAMD;                  // D rotated
+  const Mpt = {x:0,y:0};
+  const Apt = {x: am*Math.cos(a1), y: am*Math.sin(a1)};
+  const Dpt = {x: am*Math.cos(a2), y: am*Math.sin(a2)};
+
+  const P = v => ({x: ox + v.x*sc, y: oy - v.y*sc});
+  const PM = P(Mpt), PA = P(Apt), PD = P(Dpt);
+
+  // fill triangle
+  ctx.beginPath();
+  ctx.moveTo(PM.x,PM.y); ctx.lineTo(PA.x,PA.y); ctx.lineTo(PD.x,PD.y); ctx.closePath();
+  ctx.fillStyle='rgba(209,250,229,.55)'; ctx.fill();
+  ctx.strokeStyle=C.emerald; ctx.lineWidth=2; ctx.stroke();
+
+  // right angle at H (foot of perpendicular from A to DM)
+  // H is the projection of A onto line DM
+  const vx = PD.x-PM.x, vy = PD.y-PM.y;
+  const wx = PA.x-PM.x, wy = PA.y-PM.y;
+  const t = (wx*vx+wy*vy)/(vx*vx+vy*vy);
+  const HP = {x: PM.x + t*vx, y: PM.y + t*vy};
+  ctx.save();
+  ctx.setLineDash([5,5]);
+  ctx.strokeStyle=C.red; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(PA.x,PA.y); ctx.lineTo(HP.x,HP.y); ctx.stroke();
+  ctx.restore();
+  // right-angle square at H
+  const u = {x:(PM.x-HP.x)/Math.hypot(PM.x-HP.x,PM.y-HP.y), y:(PM.y-HP.y)/Math.hypot(PM.x-HP.x,PM.y-HP.y)};
+  const q = {x:(PA.x-HP.x)/Math.hypot(PA.x-HP.x,PA.y-HP.y), y:(PA.y-HP.y)/Math.hypot(PA.x-HP.x,PA.y-HP.y)};
+  const sq = 11;
+  ctx.beginPath();
+  ctx.moveTo(HP.x+u.x*sq, HP.y+u.y*sq);
+  ctx.lineTo(HP.x+(u.x+q.x)*sq, HP.y+(u.y+q.y)*sq);
+  ctx.lineTo(HP.x+q.x*sq, HP.y+q.y*sq);
+  ctx.strokeStyle=C.red; ctx.lineWidth=1.4; ctx.stroke();
+
+  // angle arc at M
+  const r0 = 26;
+  const startAng = Math.atan2(PD.y-PM.y, PD.x-PM.x);
+  const endAng   = Math.atan2(PA.y-PM.y, PA.x-PM.x);
+  ctx.beginPath();
+  ctx.arc(PM.x, PM.y, r0, endAng, startAng, true);
+  ctx.strokeStyle=C.amber; ctx.lineWidth=2.2; ctx.stroke();
+  ctx.fillStyle=C.amber; ctx.font='bold 13px Segoe UI';
+  ctx.fillText('∠AMD', PM.x - 30, PM.y - 16);
+
+  // points + labels
+  const tri = [
+    {p:PA,t:'A',c:C.red,dx:-6,dy:-14},
+    {p:PD,t:'D',c:C.emerald,dx:-20,dy:10},
+    {p:PM,t:'M',c:C.emerald,dx:12,dy:14},
+    {p:HP,t:'H',c:C.red,dx:8,dy:16}
+  ];
+  tri.forEach(o=>{
+    ctx.beginPath(); ctx.arc(o.p.x,o.p.y,4.6,0,2*Math.PI);
+    ctx.fillStyle=o.c; ctx.fill();
+    ctx.strokeStyle='#fff'; ctx.lineWidth=1.4; ctx.stroke();
+    ctx.fillStyle='#0f172a'; ctx.font='bold 14px Segoe UI';
+    ctx.fillText(o.t, o.p.x+o.dx, o.p.y+o.dy);
+  });
+
+  // side labels
+  ctx.fillStyle=C.violet; ctx.font='bold 12.5px Segoe UI';
+  ctx.fillText('AD = l', (PA.x+PD.x)/2 - 34, (PA.y+PD.y)/2 - 4);
+  ctx.fillStyle=C.emerald;
+  ctx.fillText('AM = DM = (√3/2)l', (PA.x+PM.x)/2 + 6, (PA.y+PM.y)/2 + 4);
+  ctx.fillStyle=C.red;
+  ctx.fillText('h', (PA.x+HP.x)/2 + 8, (PA.y+HP.y)/2);
+
+  ctx.fillStyle=C.blueDark; ctx.font='bold 15px Segoe UI';
+  ctx.fillText('Key plane triangle △ADM', W*0.55, 24);
+  ctx.fillStyle=C.slate; ctx.font='13px Segoe UI';
+  ctx.fillText('cos∠AMD = 1/3  →  sin∠AMD = 2√2/3', W*0.55, 44);
+
+  /* ---------- readouts ---------- */
+  document.getElementById('ro-l').textContent  = l.toFixed(3) + ' cm';
+  document.getElementById('ro-am').textContent = (Math.sqrt(3)/2*l).toFixed(3) + ' cm';
+  document.getElementById('ro-h').textContent  = h.toFixed(2) + ' cm';
+  document.getElementById('ro-cos').textContent= (1/3).toFixed(4);
+}
+
+/* =====================================================================
+   PART (b) CANVAS  —  base triangle area & volume
+   ===================================================================== */
+function drawB(){
+  const cv = document.getElementById('cvB');
+  const {ctx, W, H} = setupHiDPI(cv);
+  ctx.clearRect(0,0,W,H);
+
+  const h = parseFloat(document.getElementById('sldH2').value);
+  const l = Math.sqrt(6)/3 * h;
+  const showPyr = document.getElementById('chkPyr').checked;
+  const showNet = document.getElementById('chkNet').checked;
+
+  /* ---------- left: base triangle BCD with median ---------- */
+  const cx = W*0.28, cy = H*0.60, R = Math.min(W,H)*0.32;
+  const ang = [-90, 30, 150].map(d=>d*Math.PI/180);
+  const B = {x: cx + R*Math.cos(ang[0]), y: cy + R*0.55*Math.sin(ang[0])};
+  const Cc= {x: cx + R*Math.cos(ang[1]), y: cy + R*0.55*Math.sin(ang[1])};
+  const D = {x: cx + R*Math.cos(ang[2]), y: cy + R*0.55*Math.sin(ang[2])};
+  const M = {x:(B.x+Cc.x)/2, y:(B.y+Cc.y)/2};
+
+  // base fill
+  ctx.beginPath();
+  ctx.moveTo(B.x,B.y); ctx.lineTo(Cc.x,Cc.y); ctx.lineTo(D.x,D.y); ctx.closePath();
+  ctx.fillStyle='rgba(191,219,254,.6)'; ctx.fill();
+  ctx.strokeStyle=C.blue; ctx.lineWidth=2.2; ctx.stroke();
+
+  // median DM
+  ctx.save();
+  ctx.setLineDash([5,5]);
+  ctx.strokeStyle=C.emerald; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(D.x,D.y); ctx.lineTo(M.x,M.y); ctx.stroke();
+  ctx.restore();
+
+  // right-angle marker at M
+  ctx.strokeStyle=C.emerald; ctx.lineWidth=1.5;
+  ctx.strokeRect(M.x-2, M.y-11, 10, 10);
+
+  // labels
+  [{p:B,t:'B',dx:-16,dy:8},{p:Cc,t:'C',dx:10,dy:14},{p:D,t:'D',dx:14,dy:4},{p:M,t:'M',dx:-6,dy:-8}]
+  .forEach(o=>{
+    ctx.beginPath(); ctx.arc(o.p.x,o.p.y,4.6,0,2*Math.PI);
+    ctx.fillStyle=C.blue; ctx.fill();
+    ctx.strokeStyle='#fff'; ctx.lineWidth=1.4; ctx.stroke();
+    ctx.fillStyle='#0f172a'; ctx.font='bold 14px Segoe UI';
+    ctx.fillText(o.t, o.p.x+o.dx, o.p.y+o.dy);
+  });
+
+  // side labels
+  ctx.fillStyle=C.blueDark; ctx.font='bold 13px Segoe UI';
+  ctx.fillText('l = √6 cm', (B.x+Cc.x)/2 - 26, (B.y+Cc.y)/2 + 20);
+  ctx.fillText('DM = (√3/2)l', (D.x+M.x)/2 - 10, (D.y+M.y)/2 - 6);
+
+  ctx.fillStyle=C.blueDark; ctx.font='bold 15px Segoe UI';
+  ctx.fillText('Base △BCD (equilateral)', W*0.06, 24);
+  ctx.fillStyle=C.slate; ctx.font='13px Segoe UI';
+  const baseArea = Math.sqrt(3)/4 * l * l;
+  ctx.fillText('Area = (√3/4)l² = ' + baseArea.toFixed(3) + ' cm²', W*0.06, 44);
+
+  /* ---------- right: volume bar / pyramid ---------- */
+  if(showPyr){
+    const px = W*0.68, py = H*0.68, S = Math.min(W,H)*0.30;
+    // simple pyramid sketch
+    const bR = l/Math.sqrt(3);
+    const kk = S/2.2;
+    const bAng = [-90, 30, 150].map(d=>d*Math.PI/180);
+    const pB = {x: px + kk*bR*Math.cos(bAng[0])*0.8, y: py + kk*0.42*bR*Math.sin(bAng[0])};
+    const pC = {x: px + kk*bR*Math.cos(bAng[1])*0.8, y: py + kk*0.42*bR*Math.sin(bAng[1])};
+    const pD = {x: px + kk*bR*Math.cos(bAng[2])*0.8, y: py + kk*0.42*bR*Math.sin(bAng[2])};
+    const pA = {x: px, y: py - kk*h*0.75};
+    const pH = {x: px, y: py};
+
+    // faces
+    [[pA,pB,pC],[pA,pC,pD],[pA,pD,pB]].forEach(f=>{
+      ctx.beginPath();
+      ctx.moveTo(f[0].x,f[0].y); ctx.lineTo(f[1].x,f[1].y); ctx.lineTo(f[2].x,f[2].y); ctx.closePath();
+      ctx.fillStyle='rgba(253,230,138,.5)'; ctx.fill();
+      ctx.strokeStyle=C.amber; ctx.lineWidth=1.5; ctx.stroke();
+    });
+    // base
+    ctx.beginPath();
+    ctx.moveTo(pB.x,pB.y); ctx.lineTo(pC.x,pC.y); ctx.lineTo(pD.x,pD.y); ctx.closePath();
+    ctx.fillStyle='rgba(191,219,254,.6)'; ctx.fill();
+    ctx.strokeStyle=C.blue; ctx.lineWidth=1.8; ctx.stroke();
+
+    // height
+    ctx.save();
+    ctx.setLineDash([5,5]);
+    ctx.strokeStyle=C.red; ctx.lineWidth=2; ctx.beginPath();
+    ctx.moveTo(pA.x,pA.y); ctx.lineTo(pH.x,pH.y); ctx.stroke();
+    ctx.restore();
+
+    ctx.fillStyle=C.red; ctx.font='bold 13px Segoe UI';
+    ctx.fillText('h = ' + h.toFixed(2), pA.x+10, (pA.y+pH.y)/2);
+
+    ctx.fillStyle=C.blueDark; ctx.font='bold 15px Segoe UI';
+    ctx.fillText('Tetrahedron = pyramid', W*0.56, 24);
+    ctx.fillStyle=C.slate; ctx.font='13px Segoe UI';
+    ctx.fillText('V = ⅓ · base area · h', W*0.56, 44);
+  }
+
+  /* ---------- net toggle ---------- */
+  if(showNet){
+    // small net at bottom-right
+    const nx = W*0.56, ny = H*0.86, nr = 26;
+    ctx.strokeStyle=C.violet; ctx.lineWidth=1.6;
+    ctx.beginPath();
+    ctx.moveTo(nx, ny-nr); ctx.lineTo(nx-nr*0.9, ny+nr*0.6); ctx.lineTo(nx+nr*0.9, ny+nr*0.6); ctx.closePath();
+    ctx.stroke();
+    ctx.fillStyle=C.violet; ctx.font='bold 11px Segoe UI';
+    ctx.fillText('net of base', nx-32, ny+nr+14);
+  }
+
+  /* ---------- readouts & volume ---------- */
+  const vol = (1/3)*baseArea*h;
+  document.getElementById('ro-l2').textContent  = l.toFixed(3) + ' cm';
+  document.getElementById('ro-base').textContent= baseArea.toFixed(3) + ' cm²';
+  document.getElementById('ro-h2').textContent  = h.toFixed(2) + ' cm';
+  document.getElementById('ro-vol').textContent = vol.toFixed(3) + ' cm³';
+}
+
+/* =====================================================================
+   Step-by-step reveal
+   ===================================================================== */
+function initSteps(target){
+  const card = document.querySelector(`[data-target="${target}"]`).closest('.card');
+  const steps = card.querySelectorAll('.step');
+  const btn = card.querySelector('.next');
+  const counter = card.querySelector('.counter');
+  let shown = 0;
+  const total = steps.length;
+  counter.textContent = `0 / ${total}`;
+  btn.addEventListener('click', ()=>{
+    if(shown >= total) return;
+    steps[shown].classList.add('show');
+    shown++;
+    counter.textContent = `${shown} / ${total}`;
+    if(shown === total){
+      btn.disabled = true;
+      btn.textContent = 'All steps revealed ✓';
+    }
+  });
+}
+initSteps('a');
+initSteps('b');
+
+/* =====================================================================
+   Wire up sliders / checkboxes
+   ===================================================================== */
+function bind(){
+  const sldH = document.getElementById('sldH');
+  const valH = document.getElementById('valH');
+  const chkPlane = document.getElementById('chkPlane');
+  const chkAH = document.getElementById('chkAH');
+  const chkMD = document.getElementById('chkMD');
+
+  const sldH2 = document.getElementById('sldH2');
+  const valH2 = document.getElementById('valH2');
+  const chkPyr = document.getElementById('chkPyr');
+  const chkNet = document.getElementById('chkNet');
+
+  function sync(){
+    valH.textContent = parseFloat(sldH.value).toFixed(1);
+    valH2.textContent = parseFloat(sldH2.value).toFixed(1);
+    drawA(); drawB();
+  }
+  sldH.addEventListener('input', sync);
+  sldH2.addEventListener('input', sync);
+  chkPlane.addEventListener('change', drawA);
+  chkAH.addEventListener('change', drawA);
+  chkMD.addEventListener('change', drawA);
+  chkPyr.addEventListener('change', drawB);
+  chkNet.addEventListener('change', drawB);
+  window.addEventListener('resize', ()=>{ drawA(); drawB(); });
+  sync();
+}
+bind();
+</script>
+</body>
+</html>

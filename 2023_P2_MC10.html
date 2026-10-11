@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HKDSE 2023 Paper 2 Q10 — Graph of y = 5 + (x − 3)²</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[','\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  :root{
+    --blue:#1d4ed8; --blue-l:#3b82f6; --blue-d:#1e3a8a;
+    --amber:#f59e0b; --amber-l:#fde68a;
+    --emerald:#059669; --emerald-l:#d1fae5;
+    --rose:#e11d48;
+    --ink:#0f172a; --muted:#475569;
+    --card:#ffffff; --bg:#f1f5f9; --line:#e2e8f0;
+    --shadow:0 10px 30px rgba(15,23,42,.08);
+    --radius:18px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.6;
+  }
+  .wrap{max-width:980px; margin:0 auto; padding:0 16px 56px;}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    background:linear-gradient(125deg,#1e3a8a 0%,#2563eb 45%,#0ea5e9 100%);
+    color:#fff; padding:38px 16px 46px; position:relative; overflow:hidden;
+  }
+  .hero::after{
+    content:""; position:absolute; right:-80px; top:-80px; width:340px; height:340px;
+    background:radial-gradient(circle,rgba(255,255,255,.22),transparent 65%);
+    border-radius:50%;
+  }
+  .hero-inner{max-width:980px;margin:0 auto; position:relative; z-index:2;}
+  .eyebrow{font-size:.78rem; letter-spacing:.16em; text-transform:uppercase; opacity:.9; font-weight:700;}
+  .qnum{font-size:clamp(1.5rem,4.4vw,2.3rem); font-weight:800; margin:6px 0 4px; letter-spacing:.5px;}
+  .qsub{font-size:clamp(.95rem,2.6vw,1.1rem); opacity:.95; font-weight:500; max-width:700px;}
+  .pills{margin-top:16px; display:flex; flex-wrap:wrap; gap:8px;}
+  .pill{
+    background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.38);
+    padding:5px 13px; border-radius:999px; font-size:.78rem; font-weight:700;
+    backdrop-filter:blur(4px);
+  }
+
+  /* ---------- CARDS ---------- */
+  .card{
+    background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow);
+    padding:24px 22px; margin-top:26px; border:1px solid var(--line);
+  }
+  .card h2{
+    margin:0 0 4px; font-size:1.22rem; color:var(--blue-d);
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  }
+  .card h2 .tag{
+    font-size:.72rem; background:var(--blue-l); color:#fff; padding:3px 10px;
+    border-radius:999px; font-weight:700; letter-spacing:.04em;
+  }
+  .card p.lead{margin:6px 0 14px; color:var(--muted);}
+  .marks-badge{
+    background:var(--amber-l); color:#92400e; font-weight:800; font-size:.72rem;
+    padding:3px 9px; border-radius:8px; border:1px solid #fcd34d;
+  }
+
+  /* ---------- QUESTION ---------- */
+  .qbox{
+    background:linear-gradient(180deg,#f8fafc,#eef4ff);
+    border-left:6px solid var(--blue); border-radius:14px; padding:18px 18px 10px;
+  }
+  .opt{
+    display:flex; gap:10px; align-items:flex-start; padding:9px 12px; margin:6px 0;
+    background:#fff; border:1px solid var(--line); border-radius:12px;
+  }
+  .opt .ltr{
+    flex:0 0 26px; height:26px; border-radius:50%; background:var(--blue-d); color:#fff;
+    font-weight:800; font-size:.8rem; display:flex; align-items:center; justify-content:center;
+    margin-top:2px;
+  }
+  .opt.correct{border-color:var(--emerald); background:var(--emerald-l);}
+  .opt.correct .ltr{background:var(--emerald);}
+
+  /* ---------- CANVAS ---------- */
+  .canvas-wrap{
+    background:#fbfdff; border:1px solid var(--line); border-radius:14px;
+    padding:12px; margin:14px 0;
+  }
+  canvas{width:100%; display:block; border-radius:10px; touch-action:none;}
+  .controls{
+    margin-top:12px; display:flex; flex-wrap:wrap; gap:16px; align-items:center;
+  }
+  .ctrl{
+    display:flex; align-items:center; gap:10px; font-size:.86rem; font-weight:600; color:var(--muted);
+  }
+  input[type=range]{
+    width:170px; accent-color:var(--blue); cursor:pointer;
+  }
+  .ctrl input[type=checkbox]{width:17px; height:17px; accent-color:var(--amber); cursor:pointer;}
+  .readout{
+    display:flex; flex-wrap:wrap; gap:10px; margin-top:12px;
+  }
+  .ro{
+    background:#eff6ff; border:1px solid #bfdbfe; color:#1e3a8a;
+    border-radius:10px; padding:6px 12px; font-size:.83rem; font-weight:700;
+    font-variant-numeric:tabular-nums;
+  }
+  .ro.amber{background:#fffbeb; border-color:#fcd34d; color:#92400e;}
+  .ro.green{background:var(--emerald-l); border-color:#6ee7b7; color:#065f46;}
+
+  /* ---------- STEPS ---------- */
+  .step{
+    display:none; border-left:4px solid var(--blue-l); background:#f8fbff;
+    padding:13px 15px; border-radius:0 12px 12px 0; margin:12px 0;
+    animation:fade .35s ease;
+  }
+  .step.show{display:block;}
+  @keyframes fade{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;}}
+  .step-head{display:flex; align-items:center; gap:10px; margin-bottom:6px; flex-wrap:wrap;}
+  .badge{
+    width:26px; height:26px; border-radius:50%; background:var(--blue);
+    color:#fff; font-size:.78rem; font-weight:800; display:flex; align-items:center; justify-content:center;
+  }
+  .step-title{font-weight:800; color:var(--blue-d); font-size:.95rem;}
+  .hint{
+    background:#fffbeb; border:1px solid #fde68a; border-left:4px solid var(--amber);
+    border-radius:0 10px 10px 0; padding:9px 13px; font-size:.86rem; margin:9px 0; color:#78350f;
+  }
+  .hint b{color:#b45309;}
+  .answerbox{
+    background:var(--emerald-l); border:1px solid #6ee7b7; border-left:4px solid var(--emerald);
+    border-radius:0 10px 10px 0; padding:10px 13px; font-weight:700; color:#065f46; margin:9px 0 2px;
+  }
+  .btnrow{display:flex; align-items:center; gap:14px; margin-top:16px; flex-wrap:wrap;}
+  button.next{
+    background:linear-gradient(135deg,var(--blue),var(--blue-d)); color:#fff;
+    border:none; border-radius:12px; padding:11px 22px; font-size:.93rem; font-weight:800;
+    cursor:pointer; box-shadow:0 6px 16px rgba(29,78,216,.28); transition:transform .15s, box-shadow .15s;
+  }
+  button.next:hover:not(:disabled){transform:translateY(-2px); box-shadow:0 10px 22px rgba(29,78,216,.36);}
+  button.next:disabled{background:#94a3b8; box-shadow:none; cursor:not-allowed;}
+  .counter{font-size:.83rem; font-weight:800; color:var(--muted); font-variant-numeric:tabular-nums;}
+
+  /* ---------- SUMMARY ---------- */
+  .summary{
+    background:linear-gradient(135deg,#0f172a,#1e293b); color:#e2e8f0;
+    border-radius:var(--radius); padding:26px 24px; margin-top:28px;
+    box-shadow:0 14px 34px rgba(15,23,42,.32);
+  }
+  .summary h2{color:#fff; margin:0 0 14px; font-size:1.24rem; display:flex; gap:10px; align-items:center;}
+  .summary ul{margin:0; padding-left:4px; list-style:none;}
+  .summary li{
+    padding:9px 0 9px 30px; position:relative; border-bottom:1px dashed rgba(255,255,255,.14);
+    font-size:.95rem;
+  }
+  .summary li:last-child{border-bottom:none;}
+  .summary li::before{
+    content:"✓"; position:absolute; left:0; top:9px; width:20px; height:20px;
+    background:var(--emerald); color:#fff; border-radius:50%; font-size:.72rem;
+    display:flex; align-items:center; justify-content:center; font-weight:800;
+  }
+  .summary .hi{color:#fde68a; font-weight:800;}
+  .summary .verdict{
+    margin-top:16px; background:rgba(5,150,105,.18); border:1px solid #059669;
+    border-radius:12px; padding:12px 14px; color:#a7f3d0; font-weight:700; font-size:.92rem;
+  }
+
+  footer{
+    text-align:center; color:#94a3b8; font-size:.8rem; padding:26px 16px 8px;
+  }
+  @media (max-width:560px){
+    .card{padding:18px 15px;}
+    input[type=range]{width:120px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= HERO ================= -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</div>
+    <div class="qnum">2023 Paper 2 · Question 10</div>
+    <div class="qsub">Quadratic graph in vertex (completing-the-square) form — intercepts, direction and points on the curve</div>
+    <div class="pills">
+      <span class="pill">Quadratic Function</span>
+      <span class="pill">Vertex Form</span>
+      <span class="pill">x-intercept</span>
+      <span class="pill">y-intercept</span>
+      <span class="pill">Graph Reading</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ================= QUESTION ================= -->
+  <section class="card">
+    <h2>Question <span class="tag">Multiple Choice</span> <span class="marks-badge">4 marks</span></h2>
+    <div class="qbox">
+      <p style="margin-top:0">Which of the following statements about the graph of
+        \[ y = 5 + (x-3)^2 \]
+        is true?</p>
+      <div class="opt"><span class="ltr">A</span><span>The graph opens downwards.</span></div>
+      <div class="opt"><span class="ltr">B</span><span>The \(x\)-intercept of the graph is \(3\).</span></div>
+      <div class="opt"><span class="ltr">C</span><span>The \(y\)-intercept of the graph is \(5\).</span></div>
+      <div class="opt correct"><span class="ltr">D</span><span>The graph passes through the point \((3,\,5)\).</span></div>
+    </div>
+    <p class="lead" style="margin-bottom:0">
+      Key idea: read the graph's features (direction, intercepts, a named point) straight from its
+      <b>vertex form</b> \(y = (x-h)^2 + k\), without any long computation.
+    </p>
+  </section>
+
+  <!-- ================= PART A : DIRECTION ================= -->
+  <section class="card" id="cardA">
+    <h2>Part (a) &nbsp;Does the graph open up or down? <span class="marks-badge">1A</span></h2>
+    <p class="lead">Look at the coefficient of \(x^2\). Drag the slider to change the vertex \(k\) and watch how the curve always opens upward.</p>
+
+    <div class="canvas-wrap">
+      <canvas id="cvA" height="360"></canvas>
+      <div class="controls">
+        <label class="ctrl">Vertex \(k\): <input type="range" id="slK" min="-6" max="8" step="1" value="5"><span id="lblK" style="min-width:34px">5</span></label>
+        <label class="ctrl"><input type="checkbox" id="ckOpen" checked> show "opens upward" arrow</label>
+      </div>
+      <div class="readout">
+        <span class="ro">\(y = 5 + (x-3)^2\)</span>
+        <span class="ro amber">Coefficient of \(x^2\) = \(+1\)</span>
+        <span class="ro green" id="roA">Opens upward ↑</span>
+      </div>
+    </div>
+
+    <div class="btnrow">
+      <button class="next" data-target="A">Next step →</button>
+      <span class="counter" id="cntA">0 / 2</span>
+    </div>
+
+    <div class="step" data-part="A">
+      <div class="step-head"><span class="badge">1</span><span class="step-title">Expand to see the coefficient of \(x^2\)</span><span class="marks-badge">1M</span></div>
+      \[ y = 5 + (x-3)^2 = 5 + x^2 - 6x + 9 = x^2 - 6x + 14 \]
+      The coefficient of \(x^2\) is \(+1 > 0\).
+      <div class="hint"><b>Hint:</b> In \(y=(x-h)^2+k\) the coefficient of \(x^2\) is the same \(+1\); a positive coefficient always gives a “smile” (opens upward).</div>
+    </div>
+
+    <div class="step" data-part="A">
+      <div class="step-head"><span class="badge">2</span><span class="step-title">Conclusion for option A</span><span class="marks-badge">1A</span></div>
+      Since \(1>0\), the parabola opens <b>upward</b>, not downward.
+      <div class="answerbox">∴ Option A is <b>false</b>.</div>
+    </div>
+  </section>
+
+  <!-- ================= PART B : INTERCEPTS ================= -->
+  <section class="card" id="cardB">
+    <h2>Part (b) &nbsp;Find the \(x\)- and \(y\)-intercepts <span class="marks-badge">1M 1A</span></h2>
+    <p class="lead">Move the horizontal line to test where the curve meets the axes. Notice the curve never reaches \(y=0\).</p>
+
+    <div class="canvas-wrap">
+      <canvas id="cvB" height="380"></canvas>
+      <div class="controls">
+        <label class="ctrl">Vertex \(k\): <input type="range" id="slK2" min="-2" max="8" step="1" value="5"><span id="lblK2" style="min-width:34px">5</span></label>
+        <label class="ctrl"><input type="checkbox" id="ckX" checked> show \(x\)-axis interception attempt</label>
+        <label class="ctrl"><input type="checkbox" id="ckY" checked> show \(y\)-intercept (0, 14)</label>
+      </div>
+      <div class="readout">
+        <span class="ro" id="roX">x-intercept: none (curve above \(y=0\))</span>
+        <span class="ro green">y-intercept: \((0,\;14)\)</span>
+      </div>
+    </div>
+
+    <div class="btnrow">
+      <button class="next" data-target="B">Next step →</button>
+      <span class="counter" id="cntB">0 / 3</span>
+    </div>
+
+    <div class="step" data-part="B">
+      <div class="step-head"><span class="badge">1</span><span class="step-title">\(y\)-intercept: put \(x=0\)</span><span class="marks-badge">1M</span></div>
+      \[ y = 5 + (0-3)^2 = 5 + 9 = 14 \]
+      So the \(y\)-intercept is \(\mathbf{(0,\,14)}\).
+      <div class="hint"><b>Hint:</b> The \(y\)-intercept is found at \(x=0\), <b>never</b> by reading the constant \(5\) in \(5+(x-3)^2\).</div>
+      <div class="answerbox">\(y\)-intercept \(= (0,\,14)\), so option C \((0,5)\) is <b>false</b>.</div>
+    </div>
+
+    <div class="step" data-part="B">
+      <div class="step-head"><span class="badge">2</span><span class="step-title">\(x\)-intercept: put \(y=0\)</span><span class="marks-badge">1M</span></div>
+      \[ 0 = 5 + (x-3)^2 \quad\Longrightarrow\quad (x-3)^2 = -5 \]
+      A square can never be negative, so there is <b>no real solution</b>.
+      <div class="hint"><b>Hint:</b> The vertex has \(y\)-value \(5>0\) and the graph opens upward, so the whole curve stays above the \(x\)-axis — it never crosses it.</div>
+    </div>
+
+    <div class="step" data-part="B">
+      <div class="step-head"><span class="badge">3</span><span class="step-title">Conclusion for options B and C</span><span class="marks-badge">1A</span></div>
+      There is no \(x\)-intercept, so “the \(x\)-intercept is \(3\)” is wrong; and the \(y\)-intercept is \(14\), not \(5\).
+      <div class="answerbox">∴ Options B and C are <b>false</b>.</div>
+    </div>
+  </section>
+
+  <!-- ================= PART C : POINT ON GRAPH ================= -->
+  <section class="card" id="cardC">
+    <h2>Part (c) &nbsp;Check the point \((3,\,5)\) <span class="marks-badge">1A</span></h2>
+    <p class="lead">Slide the test point along the curve and watch the coordinates — the lowest point of the curve is exactly \((3,\,5)\).</p>
+
+    <div class="canvas-wrap">
+      <canvas id="cvC" height="380"></canvas>
+      <div class="controls">
+        <label class="ctrl">Move point \(x\): <input type="range" id="slPt" min="-1.5" max="7.5" step="0.1" value="3"><span id="lblPt" style="min-width:52px">3.0</span></label>
+        <label class="ctrl"><input type="checkbox" id="ckVtx" checked> mark vertex \((3,5)\)</label>
+      </div>
+      <div class="readout">
+        <span class="ro" id="roPt">Point on curve: \((3.0,\;5.0)\)</span>
+        <span class="ro green" id="roVtx">Vertex = minimum = \((3,\,5)\)</span>
+      </div>
+    </div>
+
+    <div class="btnrow">
+      <button class="next" data-target="C">Next step →</button>
+      <span class="counter" id="cntC">0 / 2</span>
+    </div>
+
+    <div class="step" data-part="C">
+      <div class="step-head"><span class="badge">1</span><span class="step-title">Substitute \(x=3\) into the equation</span><span class="marks-badge">1M</span></div>
+      \[ y = 5 + (3-3)^2 = 5 + 0 = 5 \]
+      So the point \((3,\,5)\) lies on the graph — it is precisely the <b>vertex</b> (the minimum point).
+      <div class="hint"><b>Hint:</b> In the form \(y = k + (x-h)^2\), the vertex is \((h,\,k)\). Comparing: \(h=3\), \(k=5\) — the point \((3,5)\) is read off directly.</div>
+      <div class="answerbox">∴ Option D is <b>true</b>.</div>
+    </div>
+
+    <div class="step" data-part="C">
+      <div class="step-head"><span class="badge">2</span><span class="step-title">Eliminate every other option</span><span class="marks-badge">1A</span></div>
+      A: opens upward ✗ &nbsp;·&nbsp; B: no \(x\)-intercept ✗ &nbsp;·&nbsp; C: \(y\)-intercept is \((0,14)\neq(0,5)\) ✗
+      <div class="answerbox">Answer: <b>D</b> — the graph passes through \((3,\,5)\).</div>
+    </div>
+  </section>
+
+  <!-- ================= SUMMARY ================= -->
+  <section class="summary">
+    <h2>📘 Summary — answers at a glance</h2>
+    <ul>
+      <li>Rewrite: \(y = x^{2}-6x+14\), so the coefficient of \(x^{2}\) is <span class="hi">\(+1>0\)</span> ⇒ the graph <b>opens upward</b>.</li>
+      <li>\(y\)-intercept (\(x=0\)): \(y = 5+(0-3)^2 = \mathbf{(0,\,14)}\) — <b>not</b> \(5\).</li>
+      <li>\(x\)-intercept (\(y=0\)): \((x-3)^2 = -5\) has <b>no real root</b> ⇒ no \(x\)-intercept.</li>
+      <li>Vertex form \(y = 5+(x-3)^2\) ⇒ vertex \(= \mathbf{(3,\,5)}\), the minimum point ⇒ the graph passes through \((3,5)\).</li>
+    </ul>
+    <div class="verdict">✅ Correct option: <b>D</b> — “The graph passes through the point \((3,\,5)\).”</div>
+  </section>
+
+  <footer>
+    HKDSE Mathematics (Compulsory Part) · Paper 2 2023 Q10 · Interactive solution
+    <br>Quadratic graphs · vertex form · intercepts
+  </footer>
+</div>
+
+<script>
+/* =========================================================
+   Shared helpers for all canvases
+   ========================================================= */
+function setup(canvas, opts){
+  const dpr = window.devicePixelRatio || 1;
+  const cssW = canvas.clientWidth || 600;
+  const cssH = opts.h || 360;
+  canvas.width  = Math.round(cssW * dpr);
+  canvas.height = Math.round(cssH * dpr);
+  canvas.style.height = cssH + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  return {ctx, W: cssW, H: cssH};
+}
+
+/* world <-> screen */
+function makeMap(W,H, xmin,xmax,ymin,ymax, pad){
+  pad = pad || 34;
+  const sx = (W - 2*pad) / (xmax - xmin);
+  const sy = (H - 2*pad) / (ymax - ymin);
+  const s  = Math.min(sx, sy);
+  const ox = pad + ( (W-2*pad) - (xmax-xmin)*s )/2;
+  const oy = pad + ( (H-2*pad) - (ymax-ymin)*s )/2;
+  return {
+    X: x => ox + (x - xmin)*s,
+    Y: y => oy + (ymax - y)*s,
+    s: s, xmin, xmax, ymin, ymax,
+    invX: px => xmin + (px-ox)/s,
+    invY: py => ymax - (py-oy)/s
+  };
+}
+
+function drawGrid(ctx, m, W, H){
+  ctx.save();
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0,0,W,H);
+
+  // light grid
+  ctx.strokeStyle = "#e8eef7";
+  ctx.lineWidth = 1;
+  for(let x = Math.ceil(m.xmin); x <= m.xmax; x++){
+    ctx.beginPath(); ctx.moveTo(m.X(x), m.Y(m.ymin)); ctx.lineTo(m.X(x), m.Y(m.ymax)); ctx.stroke();
+  }
+  for(let y = Math.ceil(m.ymin); y <= m.ymax; y++){
+    ctx.beginPath(); ctx.moveTo(m.X(m.xmin), m.Y(y)); ctx.lineTo(m.X(m.xmax), m.Y(y)); ctx.stroke();
+  }
+
+  // axes
+  ctx.strokeStyle = "#334155"; ctx.lineWidth = 2;
+  const y0 = Math.max(m.ymin, Math.min(m.ymax, 0));
+  const x0 = Math.max(m.xmin, Math.min(m.xmax, 0));
+  ctx.beginPath(); ctx.moveTo(m.X(m.xmin), m.Y(y0)); ctx.lineTo(m.X(m.xmax), m.Y(y0)); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(m.X(x0), m.Y(m.ymin)); ctx.lineTo(m.X(x0), m.Y(m.ymax)); ctx.stroke();
+
+  // ticks + numbers on x-axis
+  ctx.fillStyle = "#64748b";
+  ctx.font = "600 11px Segoe UI, sans-serif";
+  ctx.textAlign = "center"; ctx.textBaseline = "top";
+  for(let x = Math.ceil(m.xmin); x <= m.xmax; x++){
+    if(x===0) continue;
+    ctx.beginPath();
+    ctx.moveTo(m.X(x), m.Y(y0)-4); ctx.lineTo(m.X(x), m.Y(y0)+4);
+    ctx.strokeStyle="#94a3b8"; ctx.lineWidth=1; ctx.stroke();
+    ctx.fillText(x, m.X(x), m.Y(y0)+7);
+  }
+  ctx.textAlign = "right"; ctx.textBaseline = "middle";
+  for(let y = Math.ceil(m.ymin); y <= m.ymax; y++){
+    if(y===0) continue;
+    ctx.beginPath();
+    ctx.moveTo(m.X(x0)-4, m.Y(y)); ctx.lineTo(m.X(x0)+4, m.Y(y));
+    ctx.strokeStyle="#94a3b8"; ctx.lineWidth=1; ctx.stroke();
+    ctx.fillText(y, m.X(x0)-7, m.Y(y));
+  }
+  // origin
+  ctx.textAlign="right"; ctx.textBaseline="top";
+  ctx.fillStyle="#475569"; ctx.fillText("O", m.X(x0)-5, m.Y(y0)+4);
+  // axis labels
+  ctx.font = "italic 700 13px Segoe UI, sans-serif";
+  ctx.fillStyle="#334155";
+  ctx.textAlign="right"; ctx.textBaseline="middle";
+  ctx.fillText("x", m.X(m.xmax)-2, m.Y(y0)-12);
+  ctx.textAlign="center"; ctx.textBaseline="top";
+  ctx.fillText("y", m.X(x0)+14, m.Y(m.ymax)+2);
+  ctx.restore();
+}
+
+function plotParabola(ctx, m, h, k, color, lw){
+  ctx.save();
+  ctx.strokeStyle = color; ctx.lineWidth = lw || 3; ctx.lineJoin="round";
+  ctx.beginPath();
+  const steps = 400;
+  let started = false;
+  for(let i=0;i<=steps;i++){
+    const x = m.xmin + (m.xmax-m.xmin)*i/steps;
+    const y = k + (x-h)*(x-h);
+    const px = m.X(x), py = m.Y(y);
+    if(!started){ ctx.moveTo(px,py); started=true; } else { ctx.lineTo(px,py); }
+  }
+  ctx.stroke();
+  ctx.restore();
+}
+
+function dot(ctx, m, x, y, color, r, label, labelDx, labelDy){
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(m.X(x), m.Y(y), r||5.5, 0, Math.PI*2);
+  ctx.fillStyle = color; ctx.fill();
+  ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 2; ctx.stroke();
+  if(label){
+    ctx.font = "800 12px Segoe UI, sans-serif";
+    ctx.fillStyle = color;
+    ctx.textAlign="left"; ctx.textBaseline="bottom";
+    ctx.fillText(label, m.X(x)+(labelDx||8), m.Y(y)+(labelDy||-8));
+  }
+  ctx.restore();
+}
+
+/* =========================================================
+   CANVAS A — direction
+   ========================================================= */
+const cvA = document.getElementById('cvA');
+let A = null;
+function drawA(){
+  const k = +document.getElementById('slK').value;
+  document.getElementById('lblK').textContent = k;
+  const d = setup(cvA, {h:360});
+  const m = makeMap(d.W, d.H, -3, 9, -4, 16);
+  drawGrid(d.ctx, m, d.W, d.H);
+  plotParabola(d.ctx, m, 3, k, "#2563eb", 3.4);
+
+  // vertex
+  dot(d.ctx, m, 3, k, "#e11d48", 6, "vertex ("+3+", "+k+")", 9, -6);
+
+  // upward arrow near vertex
+  if(document.getElementById('ckOpen').checked){
+    const vx = m.X(3), vy = m.Y(k);
+    d.ctx.save();
+    d.ctx.strokeStyle = "#059669"; d.ctx.fillStyle="#059669"; d.ctx.lineWidth=2.5;
+    d.ctx.beginPath();
+    d.ctx.moveTo(vx-70, vy+42);
+    d.ctx.quadraticCurveTo(vx-96, vy+4, vx-62, vy-34);
+    d.ctx.stroke();
+    // arrow head
+    d.ctx.beginPath();
+    d.ctx.moveTo(vx-62, vy-34);
+    d.ctx.lineTo(vx-72, vy-24);
+    d.ctx.lineTo(vx-52, vy-26);
+    d.ctx.closePath(); d.ctx.fill();
+
+    d.ctx.beginPath();
+    d.ctx.moveTo(vx+70, vy+42);
+    d.ctx.quadraticCurveTo(vx+96, vy+4, vx+62, vy-34);
+    d.ctx.stroke();
+    d.ctx.beginPath();
+    d.ctx.moveTo(vx+62, vy-34);
+    d.ctx.lineTo(vx+72, vy-24);
+    d.ctx.lineTo(vx+52, vy-26);
+    d.ctx.closePath(); d.ctx.fill();
+
+    d.ctx.font = "800 12px Segoe UI, sans-serif";
+    d.ctx.fillStyle = "#059669";
+    d.ctx.textAlign="center"; d.ctx.textBaseline="top";
+    d.ctx.fillText("arms point UP (a = +1 > 0)", vx, vy+56);
+    d.ctx.restore();
+  }
+
+  document.getElementById('roA').textContent = "Opens upward ↑";
+}
+cvA.addEventListener('mousemove', e => {
+  // readout of (x,y)
+});
+document.getElementById('slK').addEventListener('input', drawA);
+document.getElementById('ckOpen').addEventListener('change', drawA);
+
+/* =========================================================
+   CANVAS B — intercepts
+   ========================================================= */
+const cvB = document.getElementById('cvB');
+function drawB(){
+  const k = +document.getElementById('slK2').value;
+  document.getElementById('lblK2').textContent = k;
+  const d = setup(cvB, {h:380});
+  const m = makeMap(d.W, d.H, -3, 9, -4, 16);
+  drawGrid(d.ctx, m, d.W, d.H);
+
+  // x-axis highlight line (y = 0) if checkbox
+  if(document.getElementById('ckX').checked){
+    d.ctx.save();
+    d.ctx.strokeStyle = "#f59e0b"; d.ctx.lineWidth = 3;
+    d.ctx.setLineDash([8,6]);
+    d.ctx.beginPath();
+    d.ctx.moveTo(m.X(m.xmin), m.Y(0));
+    d.ctx.lineTo(m.X(m.xmax), m.Y(0));
+    d.ctx.stroke();
+    d.ctx.restore();
+  }
+
+  plotParabola(d.ctx, m, 3, k, "#2563eb", 3.4);
+
+  // vertex
+  dot(d.ctx, m, 3, k, "#e11d48", 6, "("+3+", "+k+")", 9, -6);
+
+  // y-intercept marker at x = 0
+  const yInt = k + 9;
+  if(document.getElementById('ckY').checked){
+    dot(d.ctx, m, 0, yInt, "#059669", 6, "(0, "+(k+9)+")", -12, -8);
+    d.ctx.save();
+    d.ctx.strokeStyle="#059669"; d.ctx.lineWidth=1.6; d.ctx.setLineDash([5,4]);
+    d.ctx.beginPath(); d.ctx.moveTo(m.X(0), m.Y(yInt)); d.ctx.lineTo(m.X(0), m.Y(0)); d.ctx.stroke();
+    d.ctx.restore();
+  }
+
+  // x-intercept attempt: solve (x-3)^2 = -k
+  const disc = -k;
+  const roX = document.getElementById('roX');
+  if(disc < 0){
+    roX.textContent = "x-intercept: NONE  ((x−3)² = " + disc + " < 0)";
+  } else {
+    const r1 = 3 - Math.sqrt(disc), r2 = 3 + Math.sqrt(disc);
+    roX.textContent = "x-intercepts: x = " + r1.toFixed(2) + " , " + r2.toFixed(2);
+    dot(d.ctx, m, r1, 0, "#f59e0b", 6, "x = "+r1.toFixed(2), -10, 18);
+    dot(d.ctx, m, r2, 0, "#f59e0b", 6, "x = "+r2.toFixed(2), -10, 18);
+  }
+}
+document.getElementById('slK2').addEventListener('input', drawB);
+document.getElementById('ckX').addEventListener('change', drawB);
+document.getElementById('ckY').addEventListener('change', drawB);
+
+/* =========================================================
+   CANVAS C — point (3,5) / slider along curve
+   ========================================================= */
+const cvC = document.getElementById('cvC');
+function drawC(){
+  const xp = +document.getElementById('slPt').value;
+  document.getElementById('lblPt').textContent = xp.toFixed(1);
+  const d = setup(cvC, {h:380});
+  const m = makeMap(d.W, d.H, -2, 8, -3, 16);
+  drawGrid(d.ctx, m, d.W, d.H);
+  plotParabola(d.ctx, m, 3, 5, "#2563eb", 3.4);
+
+  const yp = 5 + (xp-3)*(xp-3);
+
+  // dashed guides from point to axes
+  d.ctx.save();
+  d.ctx.strokeStyle = "#94a3b8"; d.ctx.lineWidth = 1.4; d.ctx.setLineDash([5,4]);
+  d.ctx.beginPath(); d.ctx.moveTo(m.X(xp), m.Y(yp)); d.ctx.lineTo(m.X(xp), m.Y(0)); d.ctx.stroke();
+  d.ctx.beginPath(); d.ctx.moveTo(m.X(xp), m.Y(yp)); d.ctx.lineTo(m.X(0), m.Y(yp)); d.ctx.stroke();
+  d.ctx.restore();
+
+  // moving point
+  dot(d.ctx, m, xp, yp, "#7c3aed", 7, "("+xp.toFixed(1)+", "+yp.toFixed(1)+")", 10, -10);
+
+  // vertex marker
+  if(document.getElementById('ckVtx').checked){
+    dot(d.ctx, m, 3, 5, "#059669", 7, "vertex (3, 5)", 10, -10);
+    d.ctx.save();
+    d.ctx.strokeStyle = "#059669"; d.ctx.lineWidth = 1.6; d.ctx.setLineDash([4,4]);
+    d.ctx.beginPath(); d.ctx.arc(m.X(3), m.Y(5), 16, 0, Math.PI*2); d.ctx.stroke();
+    d.ctx.restore();
+  }
+
+  document.getElementById('roPt').textContent = "Point on curve: ("+xp.toFixed(1)+", "+yp.toFixed(1)+")";
+  document.getElementById('roVtx').textContent = "Vertex = minimum = (3, 5)";
+}
+document.getElementById('slPt').addEventListener('input', drawC);
+document.getElementById('ckVtx').addEventListener('change', drawC);
+
+/* =========================================================
+   STEP REVEAL LOGIC
+   ========================================================= */
+document.querySelectorAll('.next').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const part = btn.dataset.target;
+    const steps = Array.from(document.querySelectorAll('.step[data-part="'+part+'"]'));
+    const hidden = steps.filter(s=>!s.classList.contains('show'));
+    if(hidden.length === 0) return;
+    hidden[0].classList.add('show');
+    const shown = steps.filter(s=>s.classList.contains('show')).length;
+    const counter = document.getElementById('cnt'+part);
+    counter.textContent = shown + " / " + steps.length;
+    if(shown === steps.length){
+      btn.disabled = true;
+      btn.textContent = "All steps revealed ✓";
+    }
+  });
+});
+
+/* =========================================================
+   INIT + RESIZE
+   ========================================================= */
+function initAll(){
+  drawA(); drawB(); drawC();
+}
+let rt = null;
+window.addEventListener('resize', ()=>{
+  clearTimeout(rt);
+  rt = setTimeout(initAll, 140);
+});
+window.addEventListener('load', ()=>{
+  if(window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise();
+  initAll();
+});
+initAll();
+</script>
+</body>
+</html>

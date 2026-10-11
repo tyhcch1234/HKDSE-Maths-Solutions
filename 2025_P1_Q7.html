@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HKDSE 2025 Paper 1 Q7 · Percentage Interactive</title>
+    <!-- MathJax for LaTeX rendering -->
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+    <!-- Tailwind-like utility classes via CDN (simple custom CSS actually, but I'll use a clean style) -->
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #f8fafc;
+            color: #0f172a;
+            line-height: 1.5;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .page-container {
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        /* header / question badge */
+        .badge {
+            display: inline-block;
+            background: #1e293b;
+            color: #f1f5f9;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 0.3rem 0.9rem;
+            border-radius: 9999px;
+            letter-spacing: 0.3px;
+            margin-bottom: 1rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 1.25rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e9eef3;
+            margin-bottom: 1.5rem;
+            transition: box-shadow 0.2s;
+        }
+
+        .card:hover {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: #1e293b;
+        }
+
+        .tag-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .tag {
+            background: #eef2ff;
+            color: #1e40af;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            border: 1px solid #c7d2fe;
+            letter-spacing: 0.2px;
+        }
+
+        .highlight-box {
+            background: #f1f5f9;
+            border-left: 4px solid #3b82f6;
+            padding: 1rem 1.25rem;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            margin: 1rem 0;
+        }
+
+        .step-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 1rem;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+
+        .step-card.active {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.25rem;
+            background: #f8fafc;
+            cursor: pointer;
+            user-select: none;
+            font-weight: 600;
+            color: #0f172a;
+            gap: 0.75rem;
+            transition: background 0.2s;
+        }
+
+        .step-header:hover {
+            background: #f1f5f9;
+        }
+
+        .step-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2rem;
+            height: 2rem;
+            background: #3b82f6;
+            color: white;
+            border-radius: 9999px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .step-title {
+            flex: 1;
+        }
+
+        .step-arrow {
+            font-size: 1.2rem;
+            color: #64748b;
+            transition: transform 0.25s;
+        }
+
+        .step-card.open .step-arrow {
+            transform: rotate(90deg);
+        }
+
+        .step-body {
+            padding: 0 1.25rem 1.25rem 1.25rem;
+            background: white;
+            display: none;
+            font-size: 1rem;
+        }
+
+        .step-card.open .step-body {
+            display: block;
+        }
+
+        .hint {
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+            color: #78350f;
+            margin: 0.75rem 0;
+        }
+
+        .hint strong {
+            color: #b45309;
+        }
+
+        .math-block {
+            background: #f1f5f9;
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            margin: 0.75rem 0;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .answer-highlight {
+            background: #dcfce7;
+            color: #166534;
+            padding: 0.4rem 0.8rem;
+            border-radius: 0.5rem;
+            font-weight: 700;
+            display: inline-block;
+            margin-top: 0.5rem;
+        }
+
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.5rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            box-shadow: 0 4px 8px rgba(59, 130, 246, 0.25);
+        }
+
+        button:hover {
+            background: #2563eb;
+        }
+
+        button:active {
+            transform: scale(0.96);
+        }
+
+        button.secondary {
+            background: #e2e8f0;
+            color: #1e293b;
+            box-shadow: none;
+            border: 1px solid #cbd5e1;
+        }
+
+        button.secondary:hover {
+            background: #cbd5e1;
+        }
+
+        .button-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 1.25rem;
+            align-items: center;
+        }
+
+        .slider-container {
+            background: #f8fafc;
+            border-radius: 1rem;
+            padding: 1.25rem;
+            margin: 1rem 0;
+            border: 1px solid #e2e8f0;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            max-width: 500px;
+            height: auto;
+            background: white;
+            border-radius: 0.75rem;
+            border: 1px solid #e2e8f0;
+            margin: 0 auto;
+        }
+
+        .flex-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stat-box {
+            background: #ffffff;
+            border-radius: 0.75rem;
+            padding: 0.75rem 1.25rem;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+            min-width: 130px;
+            text-align: center;
+        }
+
+        .stat-box .label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .stat-box .value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .stat-box .value.green {
+            color: #16a34a;
+        }
+
+        .stat-box .value.red {
+            color: #dc2626;
+        }
+
+        .stat-box .value.blue {
+            color: #2563eb;
+        }
+
+        /* mobile adjustments */
+        @media (max-width: 600px) {
+            .card {
+                padding: 1rem;
+            }
+
+            .step-header {
+                padding: 0.75rem 1rem;
+            }
+
+            .step-number {
+                width: 1.6rem;
+                height: 1.6rem;
+                font-size: 0.8rem;
+            }
+
+            .flex-row {
+                gap: 0.75rem;
+            }
+
+            .stat-box {
+                padding: 0.5rem 0.75rem;
+                min-width: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <!-- Question Header -->
+        <div class="badge">HKDSE Math 2025 Paper 1 Q7</div>
+
+        <!-- Question Card -->
+        <div class="card">
+            <h2 style="font-size: 1.3rem; margin-bottom: 0.75rem;">📌 Question</h2>
+            <div class="question-text">
+                The selling price of a souvenir is $378. The souvenir is sold at a discount of 60% on its marked price. The marked price of the souvenir is 75% above its cost.
+            </div>
+            <div style="margin-top: 0.5rem; font-weight: 500;">
+                (a) Find the marked price of the souvenir.<br>
+                (b) Find the cost of the souvenir.<br>
+                (c) Determine whether there is a gain or a loss after selling the souvenir. Explain your answer.
+            </div>
+            <div style="margin-top: 0.5rem; font-size: 0.9rem; color: #475569;">(5 marks)</div>
+            <div class="tag-container">
+                <span class="tag">Percentages</span>
+                <span class="tag">Discount</span>
+                <span class="tag">Marked Price</span>
+                <span class="tag">Cost & Profit/Loss</span>
+                <span class="tag">Percentage Change</span>
+            </div>
+        </div>
+
+        <!-- Interactive Visualisation (Price Bar + Slider) -->
+        <div class="card">
+            <h2 style="font-size: 1.2rem; margin-bottom: 0.75rem;">📊 Visualise the Relationship</h2>
+            <p style="font-size: 0.95rem; color: #334155; margin-bottom: 0.5rem;">
+                Drag the slider to see how the <strong>marked price</strong> changes if the <strong>cost</strong> varies (keeping the same percentage relationships).
+            </p>
+            <div class="slider-container">
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    <div>
+                        <label for="costSlider" style="font-weight: 600; font-size: 0.9rem;">Adjust Cost ($):</label>
+                        <input type="range" id="costSlider" min="100" max="1000" value="540" step="10" style="width: 100%; margin-top: 0.3rem;">
+                    </div>
+                    <div class="flex-row">
+                        <div class="stat-box">
+                            <div class="label">Cost</div>
+                            <div class="value blue" id="costDisplay">$540</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="label">Marked Price</div>
+                            <div class="value" id="markedDisplay">$945</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="label">Selling Price</div>
+                            <div class="value green" id="sellingDisplay">$378</div>
+                        </div>
+                    </div>
+                    <div style="text-align: center;">
+                        <canvas id="priceCanvas" width="600" height="140" style="width: 100%; max-width: 500px; height: auto;"></canvas>
+                    </div>
+                    <div style="font-size: 0.8rem; color: #475569; text-align: center;">
+                        <span style="display: inline-block; width: 12px; height: 12px; background: #3b82f6; border-radius: 3px; margin-right: 4px;"></span> Cost 
+                        <span style="display: inline-block; width: 12px; height: 12px; background: #f59e0b; border-radius: 3px; margin-left: 12px; margin-right: 4px;"></span> Marked Price 
+                        <span style="display: inline-block; width: 12px; height: 12px; background: #10b981; border-radius: 3px; margin-left: 12px; margin-right: 4px;"></span> Selling Price
+                    </div>
+                    <div style="font-size: 0.85rem; color: #64748b; text-align: center; margin-top: 0.2rem;">
+                        (Fixed relationships: Selling Price = 40% of Marked Price; Marked Price = 175% of Cost)
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step by step solution -->
+        <div class="card">
+            <h2 style="font-size: 1.3rem; margin-bottom: 1rem;">🧩 Step-by-Step Solution</h2>
+            <p style="color: #475569; font-size: 0.9rem; margin-bottom: 1rem;">Click each step to reveal the explanation. Use hints if you get stuck.</p>
+
+            <!-- Step 1 -->
+            <div class="step-card open" id="step1">
+                <div class="step-header" onclick="toggleStep('step1')">
+                    <span class="step-number">1</span>
+                    <span class="step-title">Understand the discount on marked price</span>
+                    <span class="step-arrow">▶</span>
+                </div>
+                <div class="step-body">
+                    <p>The selling price is <strong>$378</strong>. This price is after a <strong>60% discount</strong> on the marked price.</p>
+                    <p>That means the selling price is <strong>40%</strong> of the marked price (since 100% − 60% = 40%).</p>
+                    <div class="hint">
+                        <strong>💡 Hint:</strong> Discount percentage is always applied to the marked price. So: 
+                        <br>\(\text{Selling Price} = \text{Marked Price} \times (1 - \text{discount}\%)\)
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="step-card" id="step2">
+                <div class="step-header" onclick="toggleStep('step2')">
+                    <span class="step-number">2</span>
+                    <span class="step-title">Find the marked price (Part a)</span>
+                    <span class="step-arrow">▶</span>
+                </div>
+                <div class="step-body">
+                    <p>Let \(M\) be the marked price. We have:</p>
+                    <div class="math-block">
+                        \(378 = M \times 40\%\)
+                    </div>
+                    <p>Solve for \(M\):</p>
+                    <div class="math-block">
+                        \(M = \dfrac{378}{40\%} = \dfrac{378}{0.4} = \dfrac{378 \times 10}{4} = 945\)
+                    </div>
+                    <div class="answer-highlight">✅ Marked price = $945</div>
+                    <div class="hint" style="margin-top: 0.75rem;">
+                        <strong>📘 Note:</strong> 40% is the same as \(\frac{2}{5}\). So \(378 \div \frac{2}{5} = 378 \times \frac{5}{2} = 945\).
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="step-card" id="step3">
+                <div class="step-header" onclick="toggleStep('step3')">
+                    <span class="step-number">3</span>
+                    <span class="step-title">Relate marked price to cost</span>
+                    <span class="step-arrow">▶</span>
+                </div>
+                <div class="step-body">
+                    <p>The marked price is <strong>75% above the cost</strong>. So:</p>
+                    <div class="math-block">
+                        \(\text{Marked Price} = \text{Cost} \times (1 + 75\%) = \text{Cost} \times 1.75\)
+                    </div>
+                    <p>Equivalently, the marked price is 175% of the cost.</p>
+                    <div class="hint">
+                        <strong>💡 Hint:</strong> "75% above cost" means if cost = 100, marked price = 175. So marked price = \(1.75 \times\) cost.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="step-card" id="step4">
+                <div class="step-header" onclick="toggleStep('step4')">
+                    <span class="step-number">4</span>
+                    <span class="step-title">Find the cost (Part b)</span>
+                    <span class="step-arrow">▶</span>
+                </div>
+                <div class="step-body">
+                    <p>We know marked price = $945, and marked price = \(1.75 \times\) cost.</p>
+                    <div class="math-block">
+                        \(945 = \text{Cost} \times 1.75\)
+                    </div>
+                    <p>So,</p>
+                    <div class="math-block">
+                        \(\text{Cost} = \dfrac{945}{1.75} = \dfrac{945}{\frac{7}{4}} = \dfrac{945 \times 4}{7} = 135 \times 4 = 540\)
+                    </div>
+                    <div class="answer-highlight">✅ Cost = $540</div>
+                    <div class="hint" style="margin-top: 0.5rem;">
+                        <strong>📘 Shortcut:</strong> \(1.75 = \frac{7}{4}\), so dividing by 1.75 is the same as multiplying by \(\frac{4}{7}\).
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 5 -->
+            <div class="step-card" id="step5">
+                <div class="step-header" onclick="toggleStep('step5')">
+                    <span class="step-number">5</span>
+                    <span class="step-title">Determine gain or loss (Part c)</span>
+                    <span class="step-arrow">▶</span>
+                </div>
+                <div class="step-body">
+                    <p>Compare the selling price and the cost:</p>
+                    <ul style="margin: 0.5rem 0 1rem 1.5rem;">
+                        <li>Selling price = <strong>$378</strong></li>
+                        <li>Cost = <strong>$540</strong></li>
+                    </ul>
+                    <p>Since \(540 > 378\), the cost is greater than the selling price. Therefore, the shop sells at a loss.</p>
+                    <div class="answer-highlight" style="background: #fee2e2; color: #991b1b;">
+                        📉 There is a loss after selling the souvenir.
+                    </div>
+                    <div class="hint" style="margin-top: 0.75rem;">
+                        <strong>💡 Explanation:</strong> Loss occurs when Selling Price &lt; Cost. Here $378 &lt; $540, so it is a loss.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary / Answer reveal -->
+            <div class="button-row" style="justify-content: space-between; margin-top: 1.5rem;">
+                <button class="secondary" onclick="resetAll()">🔄 Reset Steps</button>
+                <button onclick="openAll()">📖 Show All Steps</button>
+            </div>
+        </div>
+
+        <!-- Extra tip / examiner's note -->
+        <div class="card" style="background: #f0f9ff; border-color: #bae6fd;">
+            <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
+                <span style="font-size: 1.5rem;">📝</span>
+                <div>
+                    <h3 style="font-size: 1rem; font-weight: 700; color: #0369a1; margin-bottom: 0.25rem;">Examiner's tip</h3>
+                    <p style="font-size: 0.9rem; color: #0c4a6e;">Always identify the base (100%) for each percentage. Here, discount is on marked price, and "75% above cost" means cost is the base. Be careful not to confuse marked price with cost.</p>
+                    <p style="font-size: 0.9rem; color: #0c4a6e; margin-top: 0.5rem;">Marks: (a) 1M 1A, (b) 1M 1A, (c) 1A.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle step open/close
+        function toggleStep(stepId) {
+            const card = document.getElementById(stepId);
+            if (!card) return;
+            card.classList.toggle('open');
+        }
+
+        // Open all steps
+        function openAll() {
+            document.querySelectorAll('.step-card').forEach(card => {
+                card.classList.add('open');
+            });
+        }
+
+        // Reset steps (close all except first? or close all)
+        function resetAll() {
+            document.querySelectorAll('.step-card').forEach(card => {
+                card.classList.remove('open');
+            });
+            // Open first step for guidance
+            const first = document.getElementById('step1');
+            if (first) first.classList.add('open');
+        }
+
+        // ---------- Interactive Slider & Canvas ----------
+        const costSlider = document.getElementById('costSlider');
+        const costDisplay = document.getElementById('costDisplay');
+        const markedDisplay = document.getElementById('markedDisplay');
+        const sellingDisplay = document.getElementById('sellingDisplay');
+        const canvas = document.getElementById('priceCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Relationship: Marked = Cost * 1.75, Selling = Marked * 0.4
+        function updateFromCost(cost) {
+            const marked = cost * 1.75;
+            const selling = marked * 0.4;
+
+            costDisplay.textContent = '$' + cost.toFixed(0);
+            markedDisplay.textContent = '$' + marked.toFixed(0);
+            sellingDisplay.textContent = '$' + selling.toFixed(0);
+
+            // change selling color based on gain/loss
+            if (selling < cost) {
+                sellingDisplay.className = 'value red';
+            } else {
+                sellingDisplay.className = 'value green';
+            }
+
+            drawCanvas(cost, marked, selling);
+        }
+
+        function drawCanvas(cost, marked, selling) {
+            const w = canvas.width;
+            const h = canvas.height;
+            ctx.clearRect(0, 0, w, h);
+
+            // max value for scaling (max of cost, marked, selling) with some padding
+            const maxVal = Math.max(marked, cost, selling, 100) * 1.1;
+
+            const barWidth = 100;
+            const gap = 35;
+            const startX = (w - (barWidth * 3 + gap * 2)) / 2;
+            const baseY = h - 30; // bottom line
+
+            function drawBar(x, value, color, label) {
+                const barHeight = (value / maxVal) * (h - 50); // max height h-50
+                const y = baseY - barHeight;
+
+                // bar
+                ctx.fillStyle = color;
+                ctx.shadowColor = 'rgba(0,0,0,0.08)';
+                ctx.shadowBlur = 6;
+                ctx.shadowOffsetY = 2;
+                ctx.beginPath();
+                ctx.roundRect(x, y, barWidth, barHeight, 6);
+                ctx.fill();
+                ctx.shadowColor = 'transparent'; // reset
+
+                // value label above bar
+                ctx.fillStyle = '#1e293b';
+                ctx.font = 'bold 13px Inter, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('$' + value.toFixed(0), x + barWidth/2, y - 8);
+
+                // label below bar
+                ctx.fillStyle = '#475569';
+                ctx.font = '12px Inter, sans-serif';
+                ctx.fillText(label, x + barWidth/2, baseY + 20);
+            }
+
+            // Draw bars
+            drawBar(startX, cost, '#3b82f6', 'Cost');
+            drawBar(startX + barWidth + gap, marked, '#f59e0b', 'Marked');
+            drawBar(startX + 2*(barWidth + gap), selling, '#10b981', 'Selling');
+
+            // baseline
+            ctx.beginPath();
+            ctx.strokeStyle = '#cbd5e1';
+            ctx.lineWidth = 1.5;
+            ctx.moveTo(20, baseY);
+            ctx.lineTo(w - 20, baseY);
+            ctx.stroke();
+        }
+
+        // Helper for roundRect
+        CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+            if (w < 2 * r) r = w / 2;
+            if (h < 2 * r) r = h / 2;
+            this.moveTo(x + r, y);
+            this.lineTo(x + w - r, y);
+            this.quadraticCurveTo(x + w, y, x + w, y + r);
+            this.lineTo(x + w, y + h - r);
+            this.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+            this.lineTo(x + r, y + h);
+            this.quadraticCurveTo(x, y + h, x, y + h - r);
+            this.lineTo(x, y + r);
+            this.quadraticCurveTo(x, y, x + r, y);
+            return this;
+        };
+
+        // Slider event
+        costSlider.addEventListener('input', function(e) {
+            const cost = parseFloat(e.target.value);
+            updateFromCost(cost);
+        });
+
+        // Initial draw (cost = 540)
+        window.addEventListener('load', function() {
+            // Set slider to 540 initially
+            costSlider.value = 540;
+            updateFromCost(540);
+            // Open first step by default (already open, but ensure)
+            document.getElementById('step1').classList.add('open');
+        });
+
+        // Also handle window resize for canvas? Not necessary, but could.
+        // For now fine.
+    </script>
+</body>
+</html>

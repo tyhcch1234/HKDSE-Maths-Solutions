@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <title>HKDSE Math 2020 P1 Q3 · Rounding</title>
+
+  <!-- MathJax CDN for LaTeX rendering -->
+  <script>
+    MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    /* ---------- Global Reset & Variables ---------- */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f7f9fc;
+      --card: #ffffff;
+      --primary: #2563eb;
+      --primary-light: #dbeafe;
+      --primary-dark: #1e40af;
+      --accent: #f59e0b;
+      --accent-light: #fef3c7;
+      --correct: #16a34a;
+      --correct-light: #dcfce7;
+      --text: #1e293b;
+      --text-light: #64748b;
+      --border: #e2e8f0;
+      --radius: 16px;
+      --shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 8px 28px rgba(0, 0, 0, 0.10);
+      --transition: 0.3s ease;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+      padding: 0 0 60px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 18px;
+    }
+
+    /* ---------- Header ---------- */
+    .header {
+      background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 55%, #3b82f6 100%);
+      color: #fff;
+      padding: 30px 18px 26px;
+      border-bottom-left-radius: 28px;
+      border-bottom-right-radius: 28px;
+      box-shadow: var(--shadow-lg);
+      margin-bottom: 24px;
+    }
+
+    .header-inner {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .header .q-number {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(4px);
+      padding: 4px 14px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      margin-bottom: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+
+    .header h1 {
+      font-size: clamp(1.35rem, 4.5vw, 1.9rem);
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 6px;
+    }
+
+    .header .subtitle {
+      font-size: clamp(0.86rem, 2.8vw, 1rem);
+      opacity: 0.88;
+      font-weight: 400;
+    }
+
+    /* ---------- Concept Tags ---------- */
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .tag {
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 5px 14px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+
+    /* ---------- Cards ---------- */
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 22px 20px;
+      margin-bottom: 20px;
+      border: 1px solid var(--border);
+      transition: box-shadow var(--transition);
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow-lg);
+    }
+
+    .card-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      margin-bottom: 14px;
+    }
+
+    .card-title .icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 9px;
+      background: var(--primary-light);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+      flex-shrink: 0;
+      font-weight: 700;
+    }
+
+    /* ---------- Question box ---------- */
+    .question-box {
+      background: #f1f5f9;
+      border-left: 5px solid var(--primary);
+      border-radius: 10px;
+      padding: 16px 18px;
+      margin-bottom: 4px;
+      font-size: 1rem;
+    }
+
+    .question-box p { margin-bottom: 10px; }
+    .question-box p:last-child { margin-bottom: 0; }
+
+    .question-box .lbl {
+      font-weight: 700;
+      color: var(--primary-dark);
+      margin-right: 4px;
+    }
+
+    .number-given {
+      font-family: 'Courier New', monospace;
+      font-size: 1.12em;
+      font-weight: 700;
+      color: var(--primary-dark);
+      background: #e0e7ff;
+      padding: 1px 7px;
+      border-radius: 6px;
+    }
+
+    /* ---------- Step Cards (Accordion) ---------- */
+    .step-card {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      margin-bottom: 14px;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+      transition: box-shadow var(--transition), border-color var(--transition);
+    }
+
+    .step-card.open {
+      border-color: #bfdbfe;
+      box-shadow: 0 4px 18px rgba(37, 99, 235, 0.10);
+    }
+
+    .step-card .step-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 15px 16px;
+      cursor: pointer;
+      user-select: none;
+      background: #fff;
+      transition: background var(--transition);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .step-card .step-header:hover {
+      background: #f8fafc;
+    }
+
+    .step-card.open .step-header {
+      background: #f0f7ff;
+    }
+
+    .step-badge {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.88rem;
+      flex-shrink: 0;
+      transition: background var(--transition), color var(--transition);
+    }
+
+    .step-card.open .step-badge {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .step-title-text {
+      flex: 1;
+      font-weight: 600;
+      font-size: 0.98rem;
+      color: var(--text);
+    }
+
+    .step-card.open .step-title-text {
+      color: var(--primary-dark);
+    }
+
+    .chevron {
+      font-size: 0.75rem;
+      color: var(--text-light);
+      transition: transform var(--transition);
+      flex-shrink: 0;
+    }
+
+    .step-card.open .chevron {
+      transform: rotate(180deg);
+      color: var(--primary);
+    }
+
+    .step-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease, padding 0.3s ease;
+      padding: 0 18px;
+    }
+
+    .step-card.open .step-body {
+      max-height: 1200px;
+      padding: 0 18px 18px;
+    }
+
+    .step-body p {
+      font-size: 0.95rem;
+      margin-bottom: 10px;
+      color: #334155;
+    }
+
+    .step-body p:last-child { margin-bottom: 0; }
+
+    /* ---------- Hint Box ---------- */
+    .hint-box {
+      background: var(--accent-light);
+      border-left: 4px solid var(--accent);
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-top: 12px;
+      font-size: 0.88rem;
+      color: #78350f;
+    }
+
+    .hint-box .hint-label {
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin-bottom: 4px;
+      color: #92400e;
+    }
+
+    /* ---------- Formula Display ---------- */
+    .formula-display {
+      background: #f8fafc;
+      border: 1px dashed #cbd5e1;
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin: 10px 0;
+      text-align: center;
+      font-size: 1.05rem;
+      overflow-x: auto;
+    }
+
+    /* ---------- Answer Highlight ---------- */
+    .answer-highlight {
+      display: inline-block;
+      background: var(--correct-light);
+      color: #166534;
+      font-weight: 700;
+      padding: 3px 12px;
+      border-radius: 8px;
+      font-size: 1.08rem;
+      border: 1px solid #86efac;
+      margin-top: 6px;
+    }
+
+    /* ---------- Visual Number Line ---------- */
+    .viz-container {
+      background: #f8fafc;
+      border-radius: 14px;
+      padding: 18px 16px;
+      border: 1px solid var(--border);
+    }
+
+    .viz-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+      justify-content: center;
+    }
+
+    .viz-btn {
+      background: #fff;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 9px 16px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--text);
+      transition: all var(--transition);
+      font-family: inherit;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .viz-btn:hover {
+      border-color: #93c5fd;
+      background: #f0f7ff;
+    }
+
+    .viz-btn.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+      box-shadow: 0 3px 10px rgba(37, 99, 235, 0.3);
+    }
+
+    .number-line-wrapper {
+      position: relative;
+      padding: 30px 10px 10px;
+      overflow-x: auto;
+    }
+
+    .number-line {
+      position: relative;
+      height: 68px;
+      min-width: 500px;
+    }
+
+    .line-bar {
+      position: absolute;
+      top: 32px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: #94a3b8;
+      border-radius: 2px;
+    }
+
+    .tick {
+      position: absolute;
+      top: 24px;
+      width: 2px;
+      height: 18px;
+      background: #64748b;
+      transform: translateX(-50%);
+    }
+
+    .tick-label {
+      position: absolute;
+      top: 46px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-light);
+      transform: translateX(-50%);
+      white-space: nowrap;
+    }
+
+    .marker {
+      position: absolute;
+      top: 4px;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 3;
+    }
+
+    .marker-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: 3px solid #fff;
+      box-shadow: 0 2px 8px rgba(245, 158, 11, 0.5);
+    }
+
+    .marker-arrow {
+      width: 0;
+      height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 8px solid var(--accent);
+      margin-top: -1px;
+    }
+
+    .marker-value {
+      position: absolute;
+      top: -22px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #92400e;
+      background: #fef3c7;
+      padding: 1px 8px;
+      border-radius: 6px;
+      white-space: nowrap;
+      border: 1px solid #fcd34d;
+    }
+
+    .round-target {
+      position: absolute;
+      top: 20px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--correct);
+      border: 2px solid #fff;
+      box-shadow: 0 0 0 2px var(--correct);
+      transform: translateX(-50%);
+      z-index: 4;
+      transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s;
+    }
+
+    .round-target .target-label {
+      position: absolute;
+      top: -24px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #166534;
+      background: var(--correct-light);
+      padding: 1px 7px;
+      border-radius: 5px;
+      white-space: nowrap;
+      border: 1px solid #86efac;
+    }
+
+    .viz-caption {
+      text-align: center;
+      font-size: 0.86rem;
+      color: var(--text-light);
+      margin-top: 12px;
+      min-height: 1.4em;
+      transition: color var(--transition);
+    }
+
+    .viz-caption strong {
+      color: var(--primary-dark);
+    }
+
+    /* ---------- Final Summary Table ---------- */
+    .summary-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin-top: 8px;
+      font-size: 0.9rem;
+    }
+
+    .summary-table th {
+      background: #f1f5f9;
+      color: var(--primary-dark);
+      font-weight: 700;
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .summary-table td {
+      padding: 11px 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    .summary-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .summary-table .part-label {
+      font-weight: 700;
+      color: var(--primary-dark);
+      white-space: nowrap;
+    }
+
+    .summary-table .ans {
+      font-weight: 700;
+      color: #166534;
+      font-family: 'Courier New', monospace;
+      font-size: 1.05em;
+    }
+
+    /* ---------- Buttons ---------- */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 24px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition);
+      font-family: inherit;
+      -webkit-tap-highlight-color: transparent;
+      box-shadow: 0 3px 10px rgba(37, 99, 235, 0.25);
+    }
+
+    .btn:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 5px 16px rgba(37, 99, 235, 0.35);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 6px;
+    }
+
+    /* ---------- Footer ---------- */
+    .footer {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-light);
+      margin-top: 30px;
+      padding: 0 18px;
+    }
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 600px) {
+      .card { padding: 18px 15px; }
+      .step-header { padding: 13px 12px; gap: 10px; }
+      .step-body { padding: 0 14px; }
+      .step-card.open .step-body { padding: 0 14px 16px; }
+      .step-badge { width: 28px; height: 28px; font-size: 0.8rem; }
+      .step-title-text { font-size: 0.9rem; }
+      .viz-btn { padding: 10px 13px; font-size: 0.82rem; }
+      .summary-table th, .summary-table td { padding: 8px 8px; font-size: 0.82rem; }
+      .header { padding: 24px 16px 22px; border-bottom-left-radius: 22px; border-bottom-right-radius: 22px; }
+    }
+
+    @media (max-width: 400px) {
+      .viz-controls { gap: 6px; }
+      .viz-btn { padding: 8px 10px; font-size: 0.78rem; }
+    }
+
+    /* ---------- Animation ---------- */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card {
+      animation: fadeInUp 0.5s ease both;
+    }
+
+    .card:nth-child(2) { animation-delay: 0.06s; }
+    .card:nth-child(3) { animation-delay: 0.12s; }
+    .card:nth-child(4) { animation-delay: 0.18s; }
+    .card:nth-child(5) { animation-delay: 0.24s; }
+  </style>
+</head>
+<body>
+
+  <!-- ============ HEADER ============ -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="q-number">HKDSE Math 2020 · Paper 1 · Q3</div>
+      <h1>Estimation, Approximation &amp; Error</h1>
+      <p class="subtitle">Rounding to the nearest hundred, decimal places &amp; significant figures</p>
+      <div class="tags">
+        <span class="tag">Rounding</span>
+        <span class="tag">Decimal Places</span>
+        <span class="tag">Significant Figures</span>
+        <span class="tag">Approximation</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- ============ QUESTION ============ -->
+    <section class="card">
+      <div class="card-title">
+        <div class="icon">📋</div>
+        Question
+      </div>
+      <div class="question-box">
+        <p>Given the number <span class="number-given">534.7698</span>:</p>
+        <p><span class="lbl">(a)</span> Round <strong>up</strong> 534.7698 to the nearest hundred.</p>
+        <p><span class="lbl">(b)</span> Round <strong>down</strong> 534.7698 to 2 decimal places.</p>
+        <p><span class="lbl">(c)</span> Round <strong>off</strong> 534.7698 to 2 significant figures.</p>
+        <p style="margin-top:10px; color:#64748b; font-size:0.88rem;">[3 marks]</p>
+      </div>
+    </section>
+
+    <!-- ============ VISUAL NUMBER LINE ============ -->
+    <section class="card">
+      <div class="card-title">
+        <div class="icon">📊</div>
+        Interactive Number Line
+      </div>
+      <div class="viz-container">
+        <div class="viz-controls">
+          <button class="viz-btn active" data-part="a" id="btnA">(a) Nearest 100</button>
+          <button class="viz-btn" data-part="b" id="btnB">(b) 2 Decimal Places</button>
+          <button class="viz-btn" data-part="c" id="btnC">(c) 2 Sig. Figures</button>
+        </div>
+
+        <div class="number-line-wrapper">
+          <div class="number-line" id="numberLine">
+            <div class="line-bar"></div>
+            <!-- Ticks and labels injected by JS -->
+            <!-- Marker -->
+            <div class="marker" id="marker" style="left: 50%;">
+              <div class="marker-value" id="markerValue">534.7698</div>
+              <div class="marker-dot"></div>
+              <div class="marker-arrow"></div>
+            </div>
+            <!-- Rounding target -->
+            <div class="round-target" id="roundTarget" style="left: 50%; opacity: 0;">
+              <div class="target-label" id="targetLabel"></div>
+            </div>
+          </div>
+        </div>
+
+        <p class="viz-caption" id="vizCaption">
+          The original number is <strong>534.7698</strong>. Select a part above to see the rounding visually.
+        </p>
+      </div>
+    </section>
+
+    <!-- ============ STEP-BY-STEP SOLUTION ============ -->
+    <section class="card">
+      <div class="card-title">
+        <div class="icon">🧭</div>
+        Step-by-Step Guided Solution
+      </div>
+
+      <!-- ---- Part (a) ---- -->
+      <div class="step-card open" id="stepA1">
+        <div class="step-header" onclick="toggleStep('stepA1')">
+          <div class="step-badge">a</div>
+          <div class="step-title-text">Part (a) — Round <em>up</em> to the nearest hundred</div>
+          <div class="chevron">▼</div>
+        </div>
+        <div class="step-body">
+          <p>“Nearest hundred” means we look for the multiples of 100 closest to 534.7698.</p>
+          <p>The two neighbouring hundreds are:</p>
+          <div class="formula-display">
+            \[\underline{500} \quad \longleftarrow \quad 534.7698 \quad \longrightarrow \quad \underline{600}\]
+          </div>
+          <p>The number 534.7698 lies between 500 and 600. Its position is closer to 500, but the question asks us to <strong>round up</strong>.</p>
+          <p><strong>Round up</strong> means we always choose the <em>larger</em> hundred — i.e. 600.</p>
+          <div class="hint-box">
+            <div class="hint-label">💡 Hint</div>
+            “Round up” is a <em>directed rounding</em> — it ignores whether the number is closer to the lower or upper value. It always moves to the <strong>next higher</strong> place value.
+          </div>
+          <p style="margin-top:12px;">Answer: <span class="answer-highlight">600</span></p>
+        </div>
+      </div>
+
+      <!-- ---- Part (b) ---- -->
+      <div class="step-card" id="stepB1">
+        <div class="step-header" onclick="toggleStep('stepB1')">
+          <div class="step-badge">b</div>
+          <div class="step-title-text">Part (b) — Round <em>down</em> to 2 decimal places</div>
+          <div class="chevron">▼</div>
+        </div>
+        <div class="step-body">
+          <p>“2 decimal places” means we keep <strong>exactly two digits</strong> after the decimal point.</p>
+          <div class="formula-display">
+            \[534.7\underline{6}\,98\]
+          </div>
+          <p>Look at the digit in the <strong>third decimal place</strong>, which is <strong>9</strong>. Normally, 9 ≥ 5 would cause rounding up. However, the question asks us to <strong>round down</strong>.</p>
+          <p><strong>Round down</strong> (truncation) means we simply <em>drop</em> all digits after the second decimal place, regardless of the next digit.</p>
+          <div class="hint-box">
+            <div class="hint-label">💡 Hint</div>
+            For “round down”, the digit after the target place never changes the kept digits — it is discarded without adjustment.
+          </div>
+          <p style="margin-top:12px;">Answer: <span class="answer-highlight">534.76</span></p>
+        </div>
+      </div>
+
+      <!-- ---- Part (c) ---- -->
+      <div class="step-card" id="stepC1">
+        <div class="step-header" onclick="toggleStep('stepC1')">
+          <div class="step-badge">c</div>
+          <div class="step-title-text">Part (c) — Round <em>off</em> to 2 significant figures</div>
+          <div class="chevron">▼</div>
+        </div>
+        <div class="step-body">
+          <p>Significant figures start from the first non-zero digit.</p>
+          <p>The first two significant figures of 534.7698 are <strong>5</strong> and <strong>3</strong>:</p>
+          <div class="formula-display">
+            \[\underline{5}\;\underline{3}\;4.7698\]
+          </div>
+          <p>Now look at the <strong>third significant figure</strong> (the digit 4). Since <strong>4 &lt; 5</strong>, we round <strong>down</strong> — the second significant figure stays the same.</p>
+          <p>Replace all digits after the second significant figure with zeros to preserve the place value:</p>
+          <div class="formula-display">
+            \[53\underline{0}\]
+          </div>
+          <div class="hint-box">
+            <div class="hint-label">💡 Hint</div>
+            “Round off” is the standard rounding rule: if the next digit is 5 or more, round up; otherwise round down. Here the next digit is 4, so we keep 3 and fill with 0.
+          </div>
+          <p style="margin-top:12px;">Answer: <span class="answer-highlight">530</span></p>
+        </div>
+      </div>
+
+      <!-- ---- Quick Summary ---- -->
+      <div style="margin-top:18px;">
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th>Part</th>
+              <th>Instruction</th>
+              <th>Answer</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="part-label">(a)</td>
+              <td>Round up to nearest hundred</td>
+              <td class="ans">600</td>
+            </tr>
+            <tr>
+              <td class="part-label">(b)</td>
+              <td>Round down to 2 decimal places</td>
+              <td class="ans">534.76</td>
+            </tr>
+            <tr>
+              <td class="part-label">(c)</td>
+              <td>Round off to 2 significant figures</td>
+              <td class="ans">530</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============ TAKEAWAY ============ -->
+    <section class="card">
+      <div class="card-title">
+        <div class="icon">🎯</div>
+        Key Takeaway
+      </div>
+      <p style="font-size:0.95rem; color:#334155;">
+        In HKDSE, you must carefully distinguish between the three instructions:
+      </p>
+      <div style="display:flex; flex-direction:column; gap:10px; margin-top:12px;">
+        <div style="background:#f0f7ff; border-radius:10px; padding:12px 15px; border-left:4px solid var(--primary);">
+          <strong style="color:var(--primary-dark);">Round up</strong> — always move to the next higher value at the given place.
+        </div>
+        <div style="background:#fef3c7; border-radius:10px; padding:12px 15px; border-left:4px solid var(--accent);">
+          <strong style="color:#92400e;">Round down</strong> — simply truncate (cut off) at the given place, ignoring the following digit.
+        </div>
+        <div style="background:#dcfce7; border-radius:10px; padding:12px 15px; border-left:4px solid var(--correct);">
+          <strong style="color:#166534;">Round off</strong> — standard rounding: look at the next digit; if it is 5 or more, round up; otherwise round down.
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="footer">
+    <p>HKDSE Mathematics 2020 Paper 1 Q3 — Interactive Solution</p>
+    <p style="margin-top:4px; opacity:0.7;">Built for HKDSE candidates · Rounding &amp; Approximation</p>
+  </footer>
+
+  <!-- ============ JAVASCRIPT ============ -->
+  <script>
+    // ---------- Accordion Toggle ----------
+    function toggleStep(id) {
+      const card = document.getElementById(id);
+      card.classList.toggle('open');
+    }
+
+    // ---------- Number Line Visualisation ----------
+    (function () {
+      const numberLine = document.getElementById('numberLine');
+      const marker = document.getElementById('marker');
+      const markerValue = document.getElementById('markerValue');
+      const roundTarget = document.getElementById('roundTarget');
+      const targetLabel = document.getElementById('targetLabel');
+      const vizCaption = document.getElementById('vizCaption');
+      const btnA = document.getElementById('btnA');
+      const btnB = document.getElementById('btnB');
+      const btnC = document.getElementById('btnC');
+
+      const buttons = [btnA, btnB, btnC];
+
+      // State
+      let activePart = 'a';
+
+      // ------- Helper: clear ticks -------
+      function clearTicks() {
+        numberLine.querySelectorAll('.tick, .tick-label').forEach(el => el.remove());
+      }
+
+      // ------- Helper: add tick -------
+      function addTick(positionPercent, label) {
+        const tick = document.createElement('div');
+        tick.className = 'tick';
+        tick.style.left = positionPercent + '%';
+        numberLine.appendChild(tick);
+
+        const lbl = document.createElement('div');
+        lbl.className = 'tick-label';
+        lbl.style.left = positionPercent + '%';
+        lbl.textContent = label;
+        numberLine.appendChild(lbl);
+      }
+
+      // ------- Helper: set marker position -------
+      function setMarker(positionPercent, valueText) {
+        marker.style.left = positionPercent + '%';
+        markerValue.textContent = valueText;
+      }
+
+      // ------- Helper: set round target -------
+      function setTarget(positionPercent, label) {
+        if (positionPercent === null) {
+          roundTarget.style.opacity = '0';
+          return;
+        }
+        roundTarget.style.opacity = '1';
+        roundTarget.style.left = positionPercent + '%';
+        targetLabel.textContent = label;
+      }
+
+      // ------- Helper: deactivate all buttons -------
+      function deactivateAll() {
+        buttons.forEach(b => b.classList.remove('active'));
+      }
+
+      // ------- Part A: nearest hundred -------
+      function showPartA() {
+        deactivateAll();
+        btnA.classList.add('active');
+        clearTicks();
+
+        // Ticks at 0%, 100% for 500 and 600
+        addTick(0, '500');
+        addTick(100, '600');
+
+        // Marker position: 534.7698 maps to (534.7698 - 500)/(600-500) = 34.7698/100 = 34.77%
+        const posA = ((534.7698 - 500) / (600 - 500)) * 100; // 34.7698%
+        setMarker(posA, '534.7698');
+
+        // Round up target at 600 (100%)
+        setTarget(100, 'Round up → 600');
+
+        vizCaption.innerHTML = 'The number <strong>534.7698</strong> is closer to 500, but <strong>round up</strong> always moves to the next higher hundred → <strong>600</strong>.';
+      }
+
+      // ------- Part B: 2 decimal places -------
+      function showPartB() {
+        deactivateAll();
+        btnB.classList.add('active');
+        clearTicks();
+
+        // Range for 2 d.p.: 534.70 to 534.80
+        addTick(0, '534.70');
+        addTick(50, '534.75');
+        addTick(100, '534.80');
+
+        // Marker position: 534.7698 maps to (534.7698 - 534.70)/(0.10) = 0.0698/0.10 = 69.8%
+        const posB = ((534.7698 - 534.70) / 0.10) * 100; // 69.8%
+        setMarker(posB, '534.7698');
+
+        // Round down target at 534.76 (60% since (534.76-534.70)/0.10 = 60%)
+        setTarget(60, 'Round down → 534.76');
+
+        vizCaption.innerHTML = '<strong>Round down</strong> to 2 d.p. truncates at the second decimal place: 534.76 (the digit 9 in the third place is simply discarded).';
+      }
+
+      // ------- Part C: 2 significant figures -------
+      function showPartC() {
+        deactivateAll();
+        btnC.classList.add('active');
+        clearTicks();
+
+        // Range: 520 to 540 (multiples of 10 around 534.7698 for 2 s.f.)
+        addTick(0, '520');
+        addTick(50, '530');
+        addTick(100, '540');
+
+        // Marker position: (534.7698 - 520)/20 = 14.7698/20 = 73.849%
+        const posC = ((534.7698 - 520) / 20) * 100;
+        setMarker(posC, '534.7698');
+
+        // Round off target at 530 (50%)
+        setTarget(50, 'Round off → 530');
+
+        vizCaption.innerHTML = 'For <strong>2 significant figures</strong>, look at the third s.f. (4). Since 4 &lt; 5, round down → <strong>530</strong>.';
+      }
+
+      // ------- Event Listeners -------
+      btnA.addEventListener('click', showPartA);
+      btnB.addEventListener('click', showPartB);
+      btnC.addEventListener('click', showPartC);
+
+      // Initialise with Part A
+      showPartA();
+
+      // re-render on resize (MathJax friendly + responsive)
+      window.addEventListener('resize', () => {
+        if (activePart === 'a') showPartA();
+        else if (activePart === 'b') showPartB();
+        else showPartC();
+      });
+    })();
+  </script>
+
+  <!-- Re-render MathJax after dynamic content -->
+  <script>
+    // Ensure MathJax re-typesets any dynamically expanded content
+    (function () {
+      const observer = new MutationObserver((mutations) => {
+        let needsTypeset = false;
+        mutations.forEach((m) => {
+          if (m.type === 'attributes' && m.attributeName === 'class') {
+            needsTypeset = true;
+          }
+        });
+        if (needsTypeset && window.MathJax && MathJax.typesetPromise) {
+          MathJax.typesetPromise().catch(() => {});
+        }
+      });
+
+      document.querySelectorAll('.step-card').forEach((card) => {
+        observer.observe(card, { attributes: true, attributeFilter: ['class'] });
+      });
+    })();
+  </script>
+
+</body>
+</html>

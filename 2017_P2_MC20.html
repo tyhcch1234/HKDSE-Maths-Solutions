@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2017 Paper 2 Q20 — Parallelogram Angle Chasing</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[', '\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<style>
+  :root{
+    --blue:#1e3a8a;
+    --blue-l:#3b82f6;
+    --amber:#f59e0b;
+    --amber-l:#fef3c7;
+    --emerald:#059669;
+    --emerald-l:#d1fae5;
+    --ink:#0f172a;
+    --muted:#64748b;
+    --card:#ffffff;
+    --bg:#eef2f7;
+    --line:#e2e8f0;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.6;
+  }
+  /* ---------- HERO ---------- */
+  .hero{
+    background:linear-gradient(135deg,#1e3a8a 0%,#2563eb 55%,#0ea5e9 100%);
+    color:#fff;
+    padding:38px 22px 46px;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero::after{
+    content:"";
+    position:absolute;inset:0;
+    background:radial-gradient(circle at 85% 15%, rgba(255,255,255,.18), transparent 45%),
+               radial-gradient(circle at 10% 90%, rgba(245,158,11,.25), transparent 40%);
+    pointer-events:none;
+  }
+  .hero-inner{max-width:960px;margin:0 auto;position:relative;z-index:2;}
+  .eyebrow{
+    font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;
+    opacity:.85;font-weight:600;margin-bottom:8px;
+  }
+  .hero h1{margin:0 0 6px;font-size:1.9rem;line-height:1.2;letter-spacing:-.01em;}
+  .hero h1 span{color:#fcd34d;}
+  .hero .sub{opacity:.92;font-size:1.02rem;max-width:640px;}
+  .pills{margin-top:18px;display:flex;flex-wrap:wrap;gap:8px;}
+  .pill{
+    background:rgba(255,255,255,.16);
+    border:1px solid rgba(255,255,255,.35);
+    padding:5px 13px;border-radius:999px;font-size:.78rem;font-weight:600;
+    backdrop-filter:blur(4px);
+  }
+  /* ---------- LAYOUT ---------- */
+  main{max-width:960px;margin:-28px auto 0;padding:0 18px 60px;position:relative;z-index:5;}
+  .card{
+    background:var(--card);
+    border-radius:16px;
+    box-shadow:0 4px 20px rgba(15,23,42,.08),0 1px 3px rgba(15,23,42,.06);
+    padding:24px 24px 26px;
+    margin-bottom:22px;
+    border:1px solid var(--line);
+  }
+  .card h2{
+    margin:0 0 4px;font-size:1.2rem;color:var(--blue);
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  }
+  .card h2 .num{
+    background:var(--blue);color:#fff;font-size:.78rem;font-weight:700;
+    border-radius:8px;padding:3px 10px;letter-spacing:.04em;
+  }
+  .card h2 .mk{
+    background:var(--amber-l);color:#92400e;font-size:.75rem;font-weight:700;
+    border-radius:999px;padding:3px 11px;border:1px solid #fcd34d;
+  }
+  .qtext{font-size:1.02rem;}
+  .qtext p{margin:10px 0;}
+  hr.sep{border:none;border-top:1px dashed var(--line);margin:18px 0;}
+  .hint{
+    background:var(--amber-l);
+    border-left:4px solid var(--amber);
+    border-radius:8px;
+    padding:10px 14px;
+    font-size:.92rem;
+    color:#7c2d12;
+    margin:12px 0 0;
+  }
+  .hint b{color:#92400e;}
+  .ans{
+    background:var(--emerald-l);
+    border-left:4px solid var(--emerald);
+    border-radius:8px;
+    padding:10px 14px;
+    font-size:.95rem;
+    color:#064e3b;
+    margin-top:12px;
+    font-weight:600;
+  }
+  .ans b{color:#065f46;}
+  /* ---------- STEPS ---------- */
+  .step{
+    display:none;
+    border-left:3px solid var(--blue-l);
+    background:#f8fafc;
+    border-radius:0 10px 10px 0;
+    padding:14px 16px 14px 18px;
+    margin-top:14px;
+    position:relative;
+    animation:fade .35s ease;
+  }
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+  .step.show{display:block;}
+  .step-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px;}
+  .badge{
+    background:var(--blue);color:#fff;border-radius:50%;
+    width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;
+    font-size:.78rem;font-weight:700;flex:0 0 auto;
+  }
+  .step-title{font-weight:700;color:var(--blue);font-size:.95rem;}
+  .mks{
+    background:#dbeafe;color:#1e40af;border-radius:999px;
+    font-size:.7rem;font-weight:700;padding:2px 9px;border:1px solid #bfdbfe;
+  }
+  .ctrl{display:flex;align-items:center;gap:14px;margin-top:18px;flex-wrap:wrap;}
+  button.next{
+    background:linear-gradient(135deg,var(--blue),var(--blue-l));
+    color:#fff;border:none;border-radius:999px;
+    padding:10px 22px;font-size:.9rem;font-weight:700;cursor:pointer;
+    box-shadow:0 4px 12px rgba(37,99,235,.35);
+    transition:transform .15s, box-shadow .15s, opacity .2s;
+  }
+  button.next:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 7px 18px rgba(37,99,235,.42);}
+  button.next:disabled{
+    background:#cbd5e1;color:#64748b;box-shadow:none;cursor:not-allowed;
+  }
+  .counter{font-size:.82rem;color:var(--muted);font-weight:600;}
+  /* ---------- CANVAS ---------- */
+  .canvas-wrap{
+    background:#f8fafc;
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:12px;
+    margin:14px 0 4px;
+  }
+  canvas{width:100%;height:auto;display:block;border-radius:8px;background:#fff;}
+  .sliders{
+    display:flex;flex-wrap:wrap;gap:16px 26px;margin-top:12px;align-items:center;
+  }
+  .slider-item{display:flex;align-items:center;gap:10px;font-size:.83rem;color:#334155;font-weight:600;}
+  input[type=range]{width:150px;accent-color:var(--blue-l);}
+  .chk{display:flex;align-items:center;gap:7px;font-size:.83rem;color:#334155;font-weight:600;cursor:pointer;}
+  input[type=checkbox]{accent-color:var(--emerald);width:16px;height:16px;cursor:pointer;}
+  .readout{
+    margin-top:10px;font-size:.83rem;color:#334155;
+    background:#eff6ff;border:1px dashed #bfdbfe;border-radius:8px;padding:8px 12px;
+    display:flex;flex-wrap:wrap;gap:16px;
+  }
+  .readout span b{color:var(--blue);}
+  /* ---------- SUMMARY ---------- */
+  .summary{
+    background:linear-gradient(135deg,#0f172a,#1e293b);
+    color:#e2e8f0;border-radius:16px;padding:24px;
+    box-shadow:0 8px 26px rgba(15,23,42,.35);
+  }
+  .summary h2{color:#fcd34d;margin:0 0 14px;font-size:1.15rem;}
+  .summary ul{margin:0;padding-left:20px;}
+  .summary li{margin:9px 0;font-size:.97rem;}
+  .summary .final{
+    margin-top:16px;background:rgba(16,185,129,.15);
+    border:1px solid rgba(16,185,129,.5);border-radius:10px;
+    padding:12px 16px;font-weight:700;color:#6ee7b7;font-size:1.05rem;
+  }
+  footer{
+    text-align:center;color:var(--muted);font-size:.8rem;
+    padding:0 18px 40px;max-width:960px;margin:0 auto;
+  }
+  @media (max-width:600px){
+    .hero h1{font-size:1.4rem;}
+    .card{padding:18px 16px 20px;}
+    main{padding:0 12px 50px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= HERO ================= -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</div>
+    <h1>2017 Paper 2 · <span>Question 20</span></h1>
+    <div class="sub">Geometry — Parallelogram, mid-point &amp; equal angles: which statements must be true?</div>
+    <div class="pills">
+      <span class="pill">Parallelogram</span>
+      <span class="pill">Angle Chasing</span>
+      <span class="pill">Mid-point</span>
+      <span class="pill">Congruent Triangles</span>
+      <span class="pill">Multiple Choice</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ================= QUESTION ================= -->
+  <section class="card">
+    <h2><span class="num">QUESTION</span> The problem statement</h2>
+    <div class="qtext">
+      <p>\(ABCD\) is a parallelogram. Let \(E\) be the mid-point of \(AD\).</p>
+      <p>If \(\angle ABE = \angle CBD = \angle DBE\), which of the following are true?</p>
+      <p>
+        I. \(AB = BD\)<br>
+        II. \(\angle ABC = 135^\circ\)<br>
+        III. \(\triangle ABE \cong \triangle DBE\)
+      </p>
+      <p>
+        A. I and II only &nbsp;&nbsp; B. I and III only &nbsp;&nbsp;
+        C. II and III only &nbsp;&nbsp; D. I, II and III
+      </p>
+    </div>
+    <div class="hint">
+      <b>Strategy:</b> Let the equal angle be \(\theta\). Use the fact that \(AD \parallel BC\) and that \(E\) is the mid-point to build a chain of angle equalities, then test each statement.
+    </div>
+  </section>
+
+  <!-- ================= PART (a) ================= -->
+  <section class="card">
+    <h2><span class="num">PART (a)</span> Set up the angles <span class="mk">1A</span></h2>
+    <p>Let \(\angle ABE = \angle CBD = \angle DBE = \theta\). Chase angles through the parallelogram.</p>
+
+    <div class="canvas-wrap">
+      <canvas id="cv1" width="720" height="420"></canvas>
+      <div class="sliders">
+        <div class="slider-item">
+          <label for="th1">\(\theta\)</label>
+          <input id="th1" type="range" min="10" max="60" value="30" step="1">
+          <span id="th1v" style="color:#1e3a8a;min-width:42px;">30°</span>
+        </div>
+        <label class="chk"><input id="chkDiag1" type="checkbox" checked> show diagonals &amp; angle marks</label>
+      </div>
+      <div class="readout">
+        <span>\(\angle ABE=\angle CBD=\angle DBE=\) <b id="roTh">30°</b></span>
+        <span>\(\angle BED=\) <b id="roBed">—</b></span>
+        <span>\(\angle ABD=\) <b id="roAbd">—</b></span>
+        <span>\(\angle ABC=\) <b id="roAbc">—</b></span>
+      </div>
+    </div>
+
+    <div class="step" id="a1">
+      <div class="step-head">
+        <span class="badge">1</span>
+        <span class="step-title">Use \(AD \parallel BC\) (parallel sides of a parallelogram)</span>
+        <span class="mks">1M</span>
+      </div>
+      <p>Since \(AD \parallel BC\) and \(DB\) is a transversal,
+      \[
+        \angle ADB = \angle DBC = \angle DBE + \angle EBC.
+      \]
+      Also \(AB \parallel DC\), so \(\angle ABD = \angle BDC\).</p>
+      <div class="hint"><b>Hint:</b> The key is that the two equal angles \(\angle CBD\) and \(\angle DBE\) together form \(\angle CBE\), which equals \(\angle ADB\).</div>
+      <div class="ans">\(\angle ADB = \angle CBD + \angle DBE\), so \(\angle ADB = 2\theta\) if \(\angle EBC=\theta\) … let's be careful: \(\angle DBC = \theta+\theta=2\theta\) only if \(\angle EBC=\theta\).</div>
+    </div>
+
+    <div class="step" id="a2">
+      <div class="step-head">
+        <span class="badge">2</span>
+        <span class="step-title">Refine using \(E\) on \(AD\) and \(\angle ABE=\theta\)</span>
+        <span class="mks">1M</span>
+      </div>
+      <p>In \(\triangle ABE\), \(E\) lies on \(AD\), so
+        \[
+          \angle BAE = \angle BAD \quad (\text{same angle}).
+        \]
+      </p>
+      <p>In \(\triangle DBE\), \(E\) lies on \(AD\), so \(\angle BDE = \angle BDA = \angle ADB\).</p>
+      <p>And \(\angle DBE = \theta\).</p>
+      <div class="hint"><b>Hint:</b> Write down all three angles in \(\triangle ABE\): \(\angle ABE=\theta\), \(\angle BAE\), \(\angle AEB\).</div>
+      <div class="ans">Angles of \(\triangle ABE\): \(\theta,\ \angle BAD,\ \angle AEB\).</div>
+    </div>
+
+    <div class="step" id="a3">
+      <div class="step-head">
+        <span class="badge">3</span>
+        <span class="step-title">Deduce \(\angle AEB = 90^\circ\)</span>
+        <span class="mks">1A</span>
+      </div>
+      <p>Since \(E\) is the mid-point of \(AD\) and \(\angle ABE=\angle DBE\), \(BE\) is the median from \(B\) to \(AD\). Also \(\angle ABE=\angle DBE\), so \(BE\) bisects \(\angle ABD\).</p>
+      <p>A median that is also an angle bisector in triangle \(ABD\) means \(\triangle ABD\) is isosceles with \(AB=BD\), and \(BE \perp AD\).</p>
+      <p>Hence \(\angle AEB = 90^\circ\).</p>
+      <div class="hint"><b>Hint:</b> Recognise the "median = angle bisector" condition — it forces an isosceles triangle.</div>
+      <div class="ans">\(\angle AEB = 90^\circ\), and \(AB=BD\).</div>
+    </div>
+    <div class="ctrl">
+      <button class="next" data-target="a">Next step →</button>
+      <span class="counter" id="ca">0 / 3</span>
+    </div>
+  </section>
+
+  <!-- ================= PART (b) ================= -->
+  <section class="card">
+    <h2><span class="num">PART (b)</span> Evaluate statement I: \(AB=BD\) <span class="mk">1A</span></h2>
+    <p>From part (a), \(BE\) is both the median and the angle bisector from \(B\) in \(\triangle ABD\).</p>
+
+    <div class="canvas-wrap">
+      <canvas id="cv2" width="720" height="420"></canvas>
+      <div class="sliders">
+        <div class="slider-item">
+          <label for="th2">\(\theta\)</label>
+          <input id="th2" type="range" min="10" max="60" value="35" step="1">
+          <span id="th2v" style="color:#1e3a8a;min-width:42px;">35°</span>
+        </div>
+        <label class="chk"><input id="chkSym" type="checkbox" checked> show symmetry of \(\triangle ABD\)</label>
+      </div>
+      <div class="readout">
+        <span>\(AB=\) <b id="roab">—</b></span>
+        <span>\(BD=\) <b id="robd">—</b></span>
+        <span>\(\angle ABE=\) <b id="roa2">—</b></span>
+        <span>\(\angle DBE=\) <b id="rod2">—</b></span>
+      </div>
+    </div>
+
+    <div class="step" id="b1">
+      <div class="step-head">
+        <span class="badge">1</span>
+        <span class="step-title">Consider \(\triangle ABD\)</span>
+        <span class="mks">1M</span>
+      </div>
+      <p>In \(\triangle ABD\), \(E\) is the mid-point of \(AD\), so \(BE\) is a median.</p>
+      <p>Given \(\angle ABE = \angle DBE = \theta\), \(BE\) bisects \(\angle ABD\).</p>
+      <div class="hint"><b>Hint:</b> A median that is also an angle bisector occurs only in an isosceles triangle (from the base).</div>
+      <div class="ans">\(BE\) is median + angle bisector \(\angle ABD\).</div>
+    </div>
+
+    <div class="step" id="b2">
+      <div class="step-head">
+        <span class="badge">2</span>
+        <span class="step-title">Conclude \(AB = BD\)</span>
+        <span class="mks">1A</span>
+      </div>
+      <p>By the isosceles triangle property, \(\triangle ABD\) is isosceles with \(AB=BD\).</p>
+      <div class="hint"><b>Hint:</b> The two equal angles at \(B\) plus equal median lengths force the sides opposite those angles to be equal.</div>
+      <div class="ans"><b>Statement I is TRUE.</b> \(AB = BD\).</div>
+    </div>
+    <div class="ctrl">
+      <button class="next" data-target="b">Next step →</button>
+      <span class="counter" id="cb">0 / 2</span>
+    </div>
+  </section>
+
+  <!-- ================= PART (c) ================= -->
+  <section class="card">
+    <h2><span class="num">PART (c)</span> Evaluate statement II: \(\angle ABC = 135^\circ\) <span class="mk">1A</span></h2>
+    <p>Use the angle sum and the equal angles to find \(\angle ABC\).</p>
+
+    <div class="canvas-wrap">
+      <canvas id="cv3" width="720" height="420"></canvas>
+      <div class="sliders">
+        <div class="slider-item">
+          <label for="th3">\(\theta\)</label>
+          <input id="th3" type="range" min="10" max="55" value="30" step="1">
+          <span id="th3v" style="color:#1e3a8a;min-width:42px;">30°</span>
+        </div>
+        <label class="chk"><input id="chkAng" type="checkbox" checked> show angle marks</label>
+      </div>
+      <div class="readout">
+        <span>\(\angle ABD=\) <b id="roAb" style="color:#1e3a8a;">—</b></span>
+        <span>\(\angle CBD=\) <b id="roCb" style="color:#1e3a8a;">—</b></span>
+        <span>\(\angle ABC=\) <b id="roAbc3">—</b></span>
+      </div>
+    </div>
+
+    <div class="step" id="c1">
+      <div class="step-head">
+        <span class="badge">1</span>
+        <span class="step-title">Express \(\angle ABD\) in terms of \(\theta\)</span>
+        <span class="mks">1M</span>
+      </div>
+      <p>\(\angle ABE = \angle DBE = \theta\), so \(\angle ABD = 2\theta\).</p>
+      <p>From part (b), \(\triangle ABD\) is isosceles with \(AB=BD\), so \(\angle BAD = \angle BDA\).</p>
+      <p>Angle sum: \(\angle BAD + \angle BDA + 2\theta = 180^\circ\)
+        \[
+          2\angle BAD = 180^\circ - 2\theta \quad\Rightarrow\quad \angle BAD = 90^\circ - \theta.
+        \]
+      </p>
+      <div class="hint"><b>Hint:</b> In an isosceles triangle, the base angles are equal. The apex is \(2\theta\).</div>
+      <div class="ans">\(\angle BAD = 90^\circ - \theta\).</div>
+    </div>
+
+    <div class="step" id="c2">
+      <div class="step-head">
+        <span class="badge">2</span>
+        <span class="step-title">Find \(\angle ABC\)</span>
+        <span class="mks">1M</span>
+      </div>
+      <p>\(\angle ABC = \angle ABD + \angle DBC = 2\theta + \angle DBC\).</p>
+      <p>Since \(AD \parallel BC\) and \(AB\) is a transversal:
+        \[
+          \angle DAB + \angle ABC = 180^\circ
+        \]
+        \[
+          90^\circ - \theta + \angle ABC = 180^\circ
+        \]
+        \[
+          \angle ABC = 90^\circ + \theta.
+        \]
+      </p>
+      <div class="hint"><b>Hint:</b> Co-interior angles between parallel lines sum to \(180^\circ\).</div>
+      <div class="ans">\(\angle ABC = 90^\circ + \theta\).</div>
+    </div>
+
+    <div class="step" id="c3">
+      <div class="step-head">
+        <span class="badge">3</span>
+        <span class="step-title">Determine \(\theta\) and check \(135^\circ\)</span>
+        <span class="mks">1A</span>
+      </div>
+      <p>Also \(\angle CBD = \theta\) and \(\angle DBA = 2\theta\); since \(B,D,C\) arrangement in the parallelogram gives \(\angle CBA = \angle ABD + \angle DBC = 2\theta + \theta = 3\theta\)? Careful — that double counts.</p>
+      <p>Correct approach: At \(B\), the rays \(BA\), \(BE\), \(BD\), \(BC\) appear in that order. We have \(\angle ABE=\theta\), \(\angle EBD=\theta\), \(\angle DBC=\theta\). Hence
+        \[
+          \angle ABC = \theta + \theta + \theta = 3\theta.
+        \]
+      </p>
+      <p>But from part (c)(2), \(\angle ABC = 90^\circ + \theta\). Therefore
+        \[
+          3\theta = 90^\circ + \theta \;\Rightarrow\; 2\theta = 90^\circ \;\Rightarrow\; \theta = 45^\circ.
+        \]
+        \[
+          \angle ABC = 3 \times 45^\circ = 135^\circ.
+        \]
+      </p>
+      <div class="hint"><b>Hint:</b> At vertex \(B\) the three equal angles \(\theta\) tile \(\angle ABC\) exactly once each.</div>
+      <div class="ans"><b>Statement II is TRUE.</b> \(\angle ABC = 135^\circ\).</div>
+    </div>
+    <div class="ctrl">
+      <button class="next" data-target="c">Next step →</button>
+      <span class="counter" id="cc">0 / 3</span>
+    </div>
+  </section>
+
+  <!-- ================= PART (d) ================= -->
+  <section class="card">
+    <h2><span class="num">PART (d)</span> Evaluate statement III: \(\triangle ABE \cong \triangle DBE\) <span class="mk">1A</span></h2>
+    <p>Check whether the two triangles are congruent.</p>
+
+    <div class="canvas-wrap">
+      <canvas id="cv4" width="720" height="420"></canvas>
+      <div class="sliders">
+        <div class="slider-item">
+          <label for="th4">\(\theta\)</label>
+          <input id="th4" type="range" min="10" max="60" value="30" step="1">
+          <span id="th4v" style="color:#1e3a8a;min-width:42px;">30°</span>
+        </div>
+        <label class="chk"><input id="chkTri" type="checkbox" checked> highlight \(\triangle ABE\) &amp; \(\triangle DBE\)</label>
+      </div>
+      <div class="readout">
+        <span>\(\angle AEB=\) <b id="roAeb" style="color:#1e3a8a;">—</b></span>
+        <span>\(\angle DEB=\) <b id="roDeb" style="color:#1e3a8a;">—</b></span>
+        <span>\(AB=\) <b id="roab4">—</b></span>
+        <span>\(DB=\) <b id="rodb4">—</b></span>
+        <span>\(AE=\) <b id="roae4">—</b></span>
+        <span>\(DE=\) <b id="rode4">—</b></span>
+      </div>
+    </div>
+
+    <div class="step" id="d1">
+      <div class="step-head">
+        <span class="badge">1</span>
+        <span class="step-title">List the equal elements</span>
+        <span class="mks">1M</span>
+      </div>
+      <p>From the given: \(\angle ABE = \angle DBE = \theta\).</p>
+      <p>From part (a): \(\angle AEB = \angle DEB = 90^\circ\).</p>
+      <p>And \(BE\) is common.</p>
+      <div class="hint"><b>Hint:</b> Two equal angles and the included side in common — check the order carefully.</div>
+      <div class="ans">\(\angle ABE=\angle DBE\), \(\angle AEB=\angle DEB=90^\circ\), \(BE\) common.</div>
+    </div>
+
+    <div class="step" id="d2">
+      <div class="step-head">
+        <span class="badge">2</span>
+        <span class="step-title">Apply the AAS (or ASA) congruence test</span>
+        <span class="mks">1A</span>
+      </div>
+      <p>In \(\triangle ABE\) and \(\triangle DBE\):</p>
+      <ul>
+        <li>\(\angle ABE = \angle DBE\) (given)</li>
+        <li>\(\angle AEB = \angle DEB = 90^\circ\) (from part a)</li>
+        <li>\(BE = BE\) (common side)</li>
+      </ul>
+      <p>By AAS, \(\triangle ABE \cong \triangle DBE\).</p>
+      <div class="hint"><b>Hint:</b> Since two angles and the non-included side match, AAS applies.</div>
+      <div class="ans"><b>Statement III is TRUE.</b> \(\triangle ABE \cong \triangle DBE\).</div>
+    </div>
+    <div class="ctrl">
+      <button class="next" data-target="d">Next step →</button>
+      <span class="counter" id="cd">0 / 2</span>
+    </div>
+  </section>
+
+  <!-- ================= SUMMARY ================= -->
+  <section class="summary">
+    <h2>Summary of Results</h2>
+    <ul>
+      <li><b>Part (a):</b> \(\angle ABE = \angle CBD = \angle DBE = \theta\), \(\angle AEB = 90^\circ\), \(\angle ABD = 2\theta\).</li>
+      <li><b>Statement I:</b> \(AB = BD\) — <b style="color:#6ee7b7;">TRUE</b> (isosceles \(\triangle ABD\)).</li>
+      <li><b>Statement II:</b> \(\angle ABC = 135^\circ\) — <b style="color:#6ee7b7;">TRUE</b> (with \(\theta = 45^\circ\)).</li>
+      <li><b>Statement III:</b> \(\triangle ABE \cong \triangle DBE\) — <b style="color:#6ee7b7;">TRUE</b> (AAS).</li>
+    </ul>
+    <div class="final">
+      Answer: D — I, II and III are all true.
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  HKDSE Mathematics (Compulsory Part) · Paper 2 · 2017 Q20 · Interactive Solution<br>
+  Move the sliders and toggle the checkboxes to explore the geometry.
+</footer>
+
+<script>
+/* =====================================================
+   STEP-BY-STEP REVEAL
+   ===================================================== */
+document.querySelectorAll('.ctrl').forEach(ctrl => {
+  const target = ctrl.querySelector('.next').dataset.target;
+  const steps = document.querySelectorAll('.step[id^="' + target + '"]');
+  const counter = ctrl.querySelector('.counter');
+  const btn = ctrl.querySelector('.next');
+  let idx = 0;
+
+  function update() {
+    counter.textContent = idx + ' / ' + steps.length;
+    if (idx >= steps.length) {
+      btn.disabled = true;
+      btn.textContent = 'All steps revealed ✓';
+    }
+  }
+
+  btn.addEventListener('click', () => {
+    if (idx < steps.length) {
+      steps[idx].classList.add('show');
+      idx++;
+      update();
+    }
+  });
+  update();
+});
+
+/* =====================================================
+   GEOMETRY HELPERS
+   ===================================================== */
+/**
+ * Build a parallelogram ABCD from:
+ *  - theta: half-angle at B for the diagonal structure
+ *  - a scaling for the canvas
+ * Actually we parametrise the figure from the derived constraints:
+ *  In the correct configuration, AB = BD, triangle ABD is isosceles.
+ *  Let A = (0,0). Let D = (2s, 0) so that the mid point E = (s, 0).
+ *  Since BE is perpendicular to AD, B = (s, h).
+ *  AB = BD requires:  sqrt(s^2 + h^2) = sqrt(s^2 + h^2) ... automatic.
+ *  The angle condition: angle ABE = angle DBE = theta, tan(theta) = s/h.
+ *  So h = s / tan(theta).
+ *  C is the 4th vertex: C = B + D - A = (s + 2s, h) = (3s, h).
+ */
+function buildFigure(theta) {
+  const s = 1; // half of AD
+  const t = theta * Math.PI / 180;
+  const h = s / Math.tan(t);   // height of B above AD
+  const A = { x: 0, y: 0 };
+  const D = { x: 2 * s, y: 0 };
+  const E = { x: s, y: 0 };
+  const B = { x: s, y: h };
+  const C = { x: 3 * s, y: h };
+  return { A, B, C, D, E, s, h, t };
+}
+
+/** Fit a set of points into a canvas with padding, returning a point mapper. */
+function fitToCanvas(pts, W, H, pad) {
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  pts.forEach(p => {
+    if (p.x < minX) minX = p.x;
+    if (p.x > maxX) maxX = p.x;
+    if (p.y < minY) minY = p.y;
+    if (p.y > maxY) maxY = p.y;
+  });
+  const w = maxX - minX || 1;
+  const h = maxY - minY || 1;
+  const scale = Math.min((W - 2 * pad) / w, (H - 2 * pad) / h);
+  const ox = (W - scale * w) / 2 - minX * scale;
+  const oy = H - ((H - scale * h) / 2) + minY * scale; // flip y
+  return {
+    scale,
+    map: p => ({ x: p.x * scale + ox, y: -p.y * scale + oy })
+  };
+}
+
+/** Draw an angle arc at vertex V between rays to P and to Q. */
+function drawAngleArc(ctx, V, P, Q, radius, color, label, labelOff) {
+  const a1 = Math.atan2(P.y - V.y, P.x - V.x);
+  const a2 = Math.atan2(Q.y - V.y, Q.x - V.x);
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.8;
+  let start = a1, end = a2;
+  // choose shorter sweep
+  let diff = end - start;
+  while (diff > Math.PI) diff -= 2 * Math.PI;
+  while (diff < -Math.PI) diff += 2 * Math.PI;
+  ctx.beginPath();
+  ctx.arc(V.x, V.y, radius, start, start + diff, diff < 0);
+  ctx.stroke();
+  if (label) {
+    const mid = start + diff / 2;
+    let lx = V.x + Math.cos(mid) * (radius + 14);
+    let ly = V.y + Math.sin(mid) * (radius + 14);
+    if (labelOff) { lx += labelOff.x; ly += labelOff.y; }
+    ctx.fillStyle = color;
+    ctx.font = 'bold 13px Segoe UI, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(label, lx, ly);
+  }
+  ctx.restore();
+}
+
+function drawGrid(ctx, W, H, step) {
+  ctx.save();
+  ctx.strokeStyle = '#eef2f7';
+  ctx.lineWidth = 1;
+  for (let x = 0; x < W; x += step) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+  }
+  for (let y = 0; y < H; y += step) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function labelPoint(ctx, pt, text, color, dx, dy) {
+  ctx.save();
+  ctx.fillStyle = color;
+  ctx.font = 'bold 15px Segoe UI, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.beginPath();
+  ctx.arc(pt.x, pt.y, 4, 0, 2 * Math.PI);
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.fillStyle = color;
+  ctx.fillText(text, pt.x + (dx || 0), pt.y + (dy || 0));
+  ctx.restore();
+}
+
+/** Draw the base parallelogram. */
+function drawParallelogram(ctx, M, col) {
+  const order = ['A', 'B', 'C', 'D'];
+  ctx.save();
+  ctx.strokeStyle = col;
+  ctx.lineWidth = 2.4;
+  ctx.beginPath();
+  order.forEach((k, i) => {
+    const p = M(k);
+    if (i === 0) ctx.moveTo(p.x, p.y);
+    else ctx.lineTo(p.x, p.y);
+  });
+  ctx.closePath();
+  ctx.stroke();
+  ctx.restore();
+}
+
+/* =====================================================
+   CANVAS 1 — general picture with angle chase
+   ===================================================== */
+(function () {
+  const cv = document.getElementById('cv1');
+  const ctx = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+  const sl = document.getElementById('th1');
+  const slv = document.getElementById('th1v');
+  const chk = document.getElementById('chkDiag1');
+
+  const roTh = document.getElementById('roTh');
+  const roBed = document.getElementById('roBed');
+  const roAbd = document.getElementById('roAbd');
+  const roAbc = document.getElementById('roAbc');
+
+  function draw() {
+    const theta = parseFloat(sl.value);
+    slv.textContent = theta + '°';
+    ctx.clearRect(0, 0, W, H);
+    drawGrid(ctx, W, H, 30);
+
+    const fig = buildFigure(theta);
+    const pts = [fig.A, fig.B, fig.C, fig.D];
+    const fit = fitToCanvas(pts, W, H, 70);
+    const M = k => fit.map(fig[k]);
+
+    // parallelogram
+    drawParallelogram(ctx, M, '#1e3a8a');
+
+    // segment BE
+    const A = M('A'), B = M('B'), C = M('C'), D = M('D'), E = M('E');
+    ctx.save();
+    ctx.strokeStyle = '#dc2626';
+    ctx.lineWidth = 2.2;
+    ctx.setLineDash([7, 5]);
+    ctx.beginPath(); ctx.moveTo(B.x, B.y); ctx.lineTo(E.x, E.y); ctx.stroke();
+    ctx.restore();
+
+    // diagonals
+    if (chk.checked) {
+      ctx.save();
+      ctx.strokeStyle = '#a78bfa';
+      ctx.lineWidth = 1.6;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath(); ctx.moveTo(A.x, A.y); ctx.lineTo(C.x, C.y); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(B.x, B.y); ctx.lineTo(D.x, D.y); ctx.stroke();
+      ctx.restore();
+    }
+
+    // right angle mark at E
+    ctx.save();
+    ctx.strokeStyle = '#059669';
+    ctx.lineWidth = 1.8;
+    const size = 14;
+    const dx = (B.x - E.x) / Math.hypot(B.x - E.x, B.y - E.y) * size;
+    const dy = (B.y - E.y) / Math.hypot(B.x - E.x, B.y - E.y) * size;
+    const sx = (A.x - E.x) / Math.hypot(A.x - E.x, A.y - E.y) * size;
+    ctx.beginPath();
+    ctx.moveTo(E.x + dx, E.y + dy);
+    ctx.lineTo(E.x + dx + sx, E.y + dy);
+    ctx.lineTo(E.x + sx, E.y);
+    ctx.stroke();
+    ctx.restore();
+
+    // angle arcs at B
+    drawAngleArc(ctx, B, A, E, 34, '#dc2626', 'θ');
+    drawAngleArc(ctx, B, E, D, 46, '#ea580c', 'θ');
+    drawAngleArc(ctx, B, D, C, 34, '#7c3aed', 'θ');
+
+    // points
+    labelPoint(ctx, A, 'A', '#1e3a8a', -16, 14);
+    labelPoint(ctx, B, 'B', '#1e3a8a', 0, -18);
+    labelPoint(ctx, C, 'C', '#1e3a8a', 16, -6);
+    labelPoint(ctx, D, 'D', '#1e3a8a', 18, 14);
+    labelPoint(ctx, E, 'E', '#dc2626', -6, 18);
+
+    // readouts
+    roTh.textContent = theta + '°';
+    roBed.textContent = '90°';
+    roAbd.textContent = (2 * theta) + '°';
+    roAbc.textContent = (90 + theta) + '°';
+  }
+  sl.addEventListener('input', draw);
+  chk.addEventListener('change', draw);
+  draw();
+})();
+
+/* =====================================================
+   CANVAS 2 — symmetry / AB = BD
+   ===================================================== */
+(function () {
+  const cv = document.getElementById('cv2');
+  const ctx = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+  const sl = document.getElementById('th2');
+  const slv = document.getElementById('th2v');
+  const chk = document.getElementById('chkSym');
+
+  const roab = document.getElementById('roab');
+  const robd = document.getElementById('robd');
+  const roa2 = document.getElementById('roa2');
+  const rod2 = document.getElementById('rod2');
+
+  function draw() {
+    const theta = parseFloat(sl.value);
+    slv.textContent = theta + '°';
+    ctx.clearRect(0, 0, W, H);
+    drawGrid(ctx, W, H, 30);
+
+    const fig = buildFigure(theta);
+    const pts = [fig.A, fig.B, fig.C, fig.D];
+    const fit = fitToCanvas(pts, W, H, 70);
+    const M = k => fit.map(fig[k]);
+    const A = M('A'), B = M('B'), D = M('D'), E = M('E');
+
+    // full parallelogram faded
+    drawParallelogram(ctx, M, '#cbd5e1');
+
+    // triangle ABD highlighted
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(A.x, A.y); ctx.lineTo(B.x, B.y); ctx.lineTo(D.x, D.y);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(59,130,246,0.13)';
+    ctx.fill();
+    ctx.strokeStyle = '#2563eb';
+    ctx.lineWidth = 2.6;
+    ctx.stroke();
+    ctx.restore();
+
+    // symmetry axis BE
+    if (chk.checked) {
+      ctx.save();
+      ctx.strokeStyle = '#dc2626';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([7, 5]);
+      ctx.beginPath(); ctx.moveTo(B.x, B.y); ctx.lineTo(E.x, E.y); ctx.stroke();
+      ctx.restore();
+      ctx.save();
+      ctx.fillStyle = '#dc2626';
+      ctx.font = 'bold 12px Segoe UI, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText('axis of symmetry (median & angle bisector)', E.x + 8, E.y - 10);
+      ctx.restore();
+    }
+
+    // equal side ticks AB and BD
+    ctx.save();
+    ctx.strokeStyle = '#059669';
+    ctx.lineWidth = 2.4;
+
+    function tick(P, Q, n) {
+      const mx = (P.x + Q.x) / 2, my = (P.y + Q.y) / 2;
+      const dx = Q.x - P.x, dy = Q.y - P.y;
+      const L = Math.hypot(dx, dy);
+      const nx = -dy / L, ny = dx / L;
+      for (let i = 0; i < n; i++) {
+        const off = (i - (n - 1) / 2) * 7;
+        ctx.beginPath();
+        ctx.moveTo(mx + dx / L * off - nx * 8, my + dy / L * off - ny * 8);
+        ctx.lineTo(mx + dx / L * off + nx * 8, my + dy / L * off + ny * 8);
+        ctx.stroke();
+      }
+    }
+    tick(A, B, 1);
+    tick(B, D, 1);
+    ctx.restore();
+
+    // angle arcs at B
+    drawAngleArc(ctx, B, A, E, 34, '#dc2626', 'θ');
+    drawAngleArc(ctx, B, E, D, 46, '#ea580c', 'θ');
+
+    labelPoint(ctx, A, 'A', '#1e3a8a', -16, 14);
+    labelPoint(ctx, B, 'B', '#1e3a8a', 0, -18);
+    labelPoint(ctx, D, 'D', '#1e3a8a', 18, 14);
+    labelPoint(ctx, E, 'E', '#dc2626', -6, 18);
+
+    // numeric readouts
+    const AB = Math.hypot(fig.A.x - fig.B.x, fig.A.y - fig.B.y) / fig.s;
+    const BD = Math.hypot(fig.B.x - fig.D.x, fig.B.y - fig.D.y) / fig.s;
+    roab.textContent = AB.toFixed(3) + ' (units of AE)';
+    robd.textContent = BD.toFixed(3) + ' (units of AE)';
+    roa2.textContent = theta + '°';
+    rod2.textContent = theta + '°';
+  }
+  sl.addEventListener('input', draw);
+  chk.addEventListener('change', draw);
+  draw();
+})();
+
+/* =====================================================
+   CANVAS 3 — angle ABC
+   ===================================================== */
+(function () {
+  const cv = document.getElementById('cv3');
+  const ctx = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+  const sl = document.getElementById('th3');
+  const slv = document.getElementById('th3v');
+  const chk = document.getElementById('chkAng');
+
+  const roAb = document.getElementById('roAb');
+  const roCb = document.getElementById('roCb');
+  const roAbc3 = document.getElementById('roAbc3');
+
+  function draw() {
+    const theta = parseFloat(sl.value);
+    slv.textContent = theta + '°';
+    ctx.clearRect(0, 0, W, H);
+    drawGrid(ctx, W, H, 30);
+
+    const fig = buildFigure(theta);
+    const pts = [fig.A, fig.B, fig.C, fig.D];
+    const fit = fitToCanvas(pts, W, H, 70);
+    const M = k => fit.map(fig[k]);
+    const A = M('A'), B = M('B'), C = M('C'), D = M('D'), E = M('E');
+
+    drawParallelogram(ctx, M, '#1e3a8a');
+
+    ctx.save();
+    ctx.strokeStyle = '#dc2626';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([7, 5]);
+    ctx.beginPath(); ctx.moveTo(B.x, B.y); ctx.lineTo(E.x, E.y); ctx.stroke();
+    ctx.restore();
+
+    if (chk.checked) {
+      drawAngleArc(ctx, B, A, E, 32, '#dc2626', 'θ');
+      drawAngleArc(ctx, B, E, D, 44, '#ea580c', 'θ');
+      drawAngleArc(ctx, B, D, C, 32, '#7c3aed', 'θ');
+      // total arc
+      drawAngleArc(ctx, B, A, C, 70, '#1e3a8a', '3θ', { x: 0, y: 0 });
+    }
+
+    labelPoint(ctx, A, 'A', '#1e3a8a', -16, 14);
+    labelPoint(ctx, B, 'B', '#1e3a8a', 0, -18);
+    labelPoint(ctx, C, 'C', '#1e3a8a', 18, -6);
+    labelPoint(ctx, D, 'D', '#1e3a8a', 18, 14);
+    labelPoint(ctx, E, 'E', '#dc2626', -6, 18);
+
+    roAb.textContent = (2 * theta) + '°';
+    roCb.textContent = theta + '°';
+    roAbc3.textContent = (3 * theta) + '°';
+  }
+  sl.addEventListener('input', draw);
+  chk.addEventListener('change', draw);
+  draw();
+})();
+
+/* =====================================================
+   CANVAS 4 — triangle congruence
+   ===================================================== */
+(function () {
+  const cv = document.getElementById('cv4');
+  const ctx = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+  const sl = document.getElementById('th4');
+  const slv = document.getElementById('th4v');
+  const chk = document.getElementById('chkTri');
+
+  const roAeb = document.getElementById('roAeb');
+  const roDeb = document.getElementById('roDeb');
+  const roab4 = document.getElementById('roab4');
+  const rodb4 = document.getElementById('rodb4');
+  const roae4 = document.getElementById('roae4');
+  const rode4 = document.getElementById('rode4');
+
+  function draw() {
+    const theta = parseFloat(sl.value);
+    slv.textContent = theta + '°';
+    ctx.clearRect(0, 0, W, H);
+    drawGrid(ctx, W, H, 30);
+
+    const fig = buildFigure(theta);
+    const pts = [fig.A, fig.B, fig.C, fig.D];
+    const fit = fitToCanvas(pts, W, H, 70);
+    const M = k => fit.map(fig[k]);
+    const A = M('A'), B = M('B'), C = M('C'), D = M('D'), E = M('E');
+
+    // parallelogram faded
+    drawParallelogram(ctx, M, '#cbd5e1');
+
+    if (chk.checked) {
+      // triangle ABE
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(A.x, A.y); ctx.lineTo(B.x, B.y); ctx.lineTo(E.x, E.y);
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(59,130,246,0.18)';
+      ctx.fill();
+      ctx.strokeStyle = '#2563eb';
+      ctx.lineWidth = 2.4;
+      ctx.stroke();
+      ctx.restore();
+
+      // triangle DBE
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(D.x, D.y); ctx.lineTo(B.x, B.y); ctx.lineTo(E.x, E.y);
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(245,158,11,0.20)';
+      ctx.fill();
+      ctx.strokeStyle = '#d97706';
+      ctx.lineWidth = 2.4;
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // common side BE strongly
+    ctx.save();
+    ctx.strokeStyle = '#dc2626';
+    ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(B.x, B.y); ctx.lineTo(E.x, E.y); ctx.stroke();
+    ctx.restore();
+
+    // right angle marks
+    ctx.save();
+    ctx.strokeStyle = '#059669';
+    ctx.lineWidth = 1.8;
+    const size = 12;
+    const dxE = (B.x - E.x) / Math.hypot(B.x - E.x, B.y - E.y) * size;
+    const dyE = (B.y - E.y) / Math.hypot(B.x - E.x, B.y - E.y) * size;
+    // at E toward A
+    let sxA = (A.x - E.x) / Math.hypot(A.x - E.x, A.y - E.y) * size;
+    ctx.beginPath();
+    ctx.moveTo(E.x + dxE, E.y + dyE);
+    ctx.lineTo(E.x + dxE + sxA, E.y + dyE);
+    ctx.lineTo(E.x + sxA, E.y);
+    ctx.stroke();
+    // at E toward D
+    let sxD = (D.x - E.x) / Math.hypot(D.x - E.x, D.y - E.y) * size;
+    ctx.beginPath();
+    ctx.moveTo(E.x + dxE, E.y + dyE);
+    ctx.lineTo(E.x + dxE + sxD, E.y + dyE);
+    ctx.lineTo(E.x + sxD, E.y);
+    ctx.stroke();
+    ctx.restore();
+
+    // angle arcs at B
+    drawAngleArc(ctx, B, A, E, 34, '#2563eb', 'θ');
+    drawAngleArc(ctx, B, E, D, 46, '#d97706', 'θ');
+
+    labelPoint(ctx, A, 'A', '#1e3a8a', -16, 14);
+    labelPoint(ctx, B, 'B', '#1e3a8a', 0, -18);
+    labelPoint(ctx, C, 'C', '#1e3a8a', 18, -6);
+    labelPoint(ctx, D, 'D', '#1e3a8a', 18, 14);
+    labelPoint(ctx, E, 'E', '#dc2626', -6, 18);
+
+    // readouts — use AE = s as unit
+    const u = fig.s;
+    const AB = Math.hypot(fig.A.x - fig.B.x, fig.A.y - fig.B.y) / u;
+    const DB = Math.hypot(fig.D.x - fig.B.x, fig.D.y - fig.B.y) / u;
+    const AE = Math.hypot(fig.A.x - fig.E.x, fig.A.y - fig.E.y) / u;
+    const DE = Math.hypot(fig.D.x - fig.E.x, fig.D.y - fig.E.y) / u;
+
+    roAeb.textContent = '90°';
+    roDeb.textContent = '90°';
+    roab4.textContent = AB.toFixed(3);
+    rodb4.textContent = DB.toFixed(3);
+    roae4.textContent = AE.toFixed(3);
+    rode4.textContent = DE.toFixed(3);
+  }
+  sl.addEventListener('input', draw);
+  chk.addEventListener('change', draw);
+  draw();
+})();
+</script>
+</body>
+</html>

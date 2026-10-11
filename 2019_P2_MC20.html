@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2019 Paper 2 Q20 — Rhombus &amp; Isosceles Triangle</title>
+<script>
+  MathJax = { tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[','\\]']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+<style>
+  :root{
+    --blue:#1e40af; --blue-l:#3b82f6; --amber:#f59e0b; --amber-l:#fef3c7;
+    --emer:#059669; --emer-l:#d1fae5; --ink:#0f172a; --muted:#475569;
+    --bg:#f1f5f9; --card:#ffffff; --line:#e2e8f0; --dark:#0f172a;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  /* ---------- Hero ---------- */
+  .hero{
+    background:linear-gradient(135deg,#1e3a8a 0%,#2563eb 45%,#0ea5e9 100%);
+    color:#fff; padding:38px 20px 46px; position:relative; overflow:hidden;
+  }
+  .hero::after{
+    content:""; position:absolute; right:-70px; top:-70px; width:280px; height:280px;
+    border-radius:50%; background:rgba(255,255,255,.08);
+  }
+  .hero::before{
+    content:""; position:absolute; left:-40px; bottom:-90px; width:220px; height:220px;
+    border-radius:50%; background:rgba(255,255,255,.06);
+  }
+  .hero-inner{max-width:960px; margin:0 auto; position:relative; z-index:2;}
+  .eyebrow{
+    font-size:.78rem; letter-spacing:.18em; text-transform:uppercase;
+    font-weight:700; color:#bfdbfe; margin-bottom:10px;
+  }
+  .hero h1{margin:0 0 6px; font-size:clamp(1.5rem,4vw,2.15rem); letter-spacing:-.5px;}
+  .hero .sub{margin:0; color:#dbeafe; font-size:1rem;}
+  .pills{margin-top:18px; display:flex; flex-wrap:wrap; gap:8px;}
+  .pill{
+    background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.32);
+    padding:5px 13px; border-radius:999px; font-size:.78rem; font-weight:600; backdrop-filter:blur(4px);
+  }
+  /* ---------- Layout ---------- */
+  main{max-width:960px; margin:-26px auto 0; padding:0 16px 60px; position:relative; z-index:3;}
+  .card{
+    background:var(--card); border-radius:18px; padding:22px 22px 24px;
+    box-shadow:0 4px 6px -1px rgba(15,23,42,.07), 0 10px 28px -8px rgba(15,23,42,.10);
+    margin-bottom:22px; border:1px solid var(--line);
+  }
+  .card h2{
+    margin:0 0 4px; font-size:1.18rem; display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  }
+  .card h2 .tag{
+    font-size:.7rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase;
+    background:var(--blue-l); color:#fff; padding:3px 10px; border-radius:999px;
+  }
+  .card .lead{margin:2px 0 16px; color:var(--muted); font-size:.92rem;}
+  .markline{
+    display:flex; gap:8px; flex-wrap:wrap; margin-bottom:6px; font-size:.8rem;
+  }
+  .mtag{background:#e0e7ff; color:#3730a3; font-weight:700; padding:2px 9px; border-radius:6px;}
+  /* ---------- Question ---------- */
+  .qbox{background:#f8fafc; border-left:4px solid var(--blue-l); border-radius:10px; padding:14px 16px;}
+  .qbox p{margin:.35rem 0;}
+  .choices{padding-left:1.1rem; margin:.5rem 0 .2rem;}
+  .choices li{margin:.15rem 0;}
+  /* ---------- Canvas ---------- */
+  .canvas-wrap{
+    background:#fbfdff; border:1px solid var(--line); border-radius:14px; padding:12px;
+    margin-bottom:16px;
+  }
+  canvas{width:100%; height:auto; display:block; border-radius:10px; background:#fff; touch-action:none;}
+  .controls{
+    display:flex; flex-wrap:wrap; gap:14px; align-items:center; margin-top:12px;
+    padding-top:12px; border-top:1px dashed var(--line); font-size:.86rem;
+  }
+  .ctrl{display:flex; align-items:center; gap:8px; flex:1 1 240px; min-width:210px;}
+  .ctrl label{font-weight:600; color:var(--muted); white-space:nowrap;}
+  input[type=range]{flex:1; accent-color:var(--blue-l); cursor:pointer;}
+  .readout{
+    background:#eff6ff; border:1px solid #bfdbfe; color:#1e40af; border-radius:8px;
+    padding:6px 10px; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.82rem;
+    display:flex; gap:14px; flex-wrap:wrap;
+  }
+  .readout b{color:#1d4ed8;}
+  .chk{display:flex; align-items:center; gap:6px; font-weight:600; color:var(--muted); cursor:pointer;}
+  .chk input{width:16px; height:16px; accent-color:var(--emer); cursor:pointer;}
+  /* ---------- Steps ---------- */
+  .steps{margin-top:6px;}
+  .step{
+    display:none; background:#f8fafc; border:1px solid var(--line); border-left:4px solid var(--amber);
+    border-radius:12px; padding:14px 16px; margin-bottom:12px;
+  }
+  .step.show{display:block; animation:fade .35s ease;}
+  @keyframes fade{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;}}
+  .step-head{display:flex; align-items:center; gap:10px; margin-bottom:8px; flex-wrap:wrap;}
+  .badge{
+    background:var(--blue); color:#fff; font-weight:800; font-size:.74rem;
+    width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    flex:0 0 auto;
+  }
+  .mk{font-size:.7rem; font-weight:800; padding:2px 8px; border-radius:6px; letter-spacing:.04em;}
+  .mk.m{background:#fde68a; color:#92400e;}
+  .mk.a{background:#bbf7d0; color:#065f46;}
+  .mk.g{background:#e2e8f0; color:#334155;}
+  .hint{
+    background:var(--amber-l); border-left:3px solid var(--amber); border-radius:8px;
+    padding:9px 12px; margin:10px 0 0; font-size:.88rem; color:#78350f;
+  }
+  .hint b{color:#92400e;}
+  .ans{
+    background:var(--emer-l); border-left:3px solid var(--emer); border-radius:8px;
+    padding:9px 12px; margin:10px 0 0; font-size:.92rem; color:#065f46; font-weight:600;
+  }
+  .btns{display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-top:14px;}
+  button{
+    font-family:inherit; font-size:.9rem; font-weight:700; cursor:pointer;
+    background:linear-gradient(135deg,#2563eb,#1e40af); color:#fff; border:none;
+    padding:11px 20px; border-radius:10px; box-shadow:0 3px 10px rgba(37,99,235,.28);
+    transition:.18s;
+  }
+  button:hover:not(:disabled){transform:translateY(-1px); box-shadow:0 6px 16px rgba(37,99,235,.35);}
+  button:disabled{opacity:.55; cursor:default; box-shadow:none;}
+  .counter{font-size:.84rem; font-weight:700; color:var(--muted); font-variant-numeric:tabular-nums;}
+  /* ---------- Summary ---------- */
+  .summary{
+    background:linear-gradient(140deg,#0f172a,#1e293b); color:#e2e8f0; border:none;
+  }
+  .summary h2{color:#fff;}
+  .summary ul{margin:10px 0 0; padding-left:20px;}
+  .summary li{margin:.5rem 0; color:#cbd5e1;}
+  .summary li b{color:#fff;}
+  .keystat{
+    display:inline-block; background:#1d4ed8; color:#fff; font-weight:800;
+    padding:4px 12px; border-radius:8px; margin-left:6px;
+  }
+  footer{
+    text-align:center; color:#94a3b8; font-size:.8rem; padding:8px 16px 40px;
+  }
+  .legend{display:flex; gap:14px; flex-wrap:wrap; font-size:.78rem; color:var(--muted); margin-top:10px;}
+  .legend span{display:flex; align-items:center; gap:6px;}
+  .swatch{width:14px; height:4px; border-radius:2px; display:inline-block;}
+  @media(max-width:520px){
+    .card{padding:18px 15px 20px;}
+    .hero{padding:28px 16px 40px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= HERO ================= -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</div>
+    <h1>2019 Paper 2 · Question 20</h1>
+    <p class="sub">Rhombus properties &amp; isosceles triangle angle chasing</p>
+    <div class="pills">
+      <span class="pill">Rhombus</span>
+      <span class="pill">Isosceles Triangle</span>
+      <span class="pill">Angle Sum of Δ</span>
+      <span class="pill">Exterior Angle</span>
+      <span class="pill">Angle Bisector</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- ================= QUESTION ================= -->
+<section class="card">
+  <h2><span class="tag">Question</span> Multiple Choice</h2>
+  <p class="lead">Read the figure carefully, then trace the angles step by step.</p>
+  <div class="markline"><span class="mtag">2 marks</span><span class="mtag">MCQ</span></div>
+  <div class="qbox">
+    <p>In the figure, \(ABCD\) is a rhombus. \(ABE\) and \(BCF\) are straight lines such that \(BE = EF\). If \(\angle BEF = 56^\circ\), then \(\angle BDC =\)</p>
+    <ol class="choices" type="A">
+      <li>\(56^\circ\)</li>
+      <li>\(62^\circ\)</li>
+      <li>\(59^\circ\)</li>
+      <li>\(48^\circ\)</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ================= PART A ================= -->
+<section class="card">
+  <h2><span class="tag">Part (a)</span> The isosceles triangle \(BEF\)</h2>
+  <p class="lead">\(BE = EF\) means \(\triangle BEF\) is isosceles with apex \(E\). Drag the slider to change \(\angle BEF\) and watch the base angles adapt.</p>
+
+  <div class="canvas-wrap">
+    <canvas id="cv1" width="900" height="470"></canvas>
+    <div class="controls">
+      <div class="ctrl">
+        <label for="s1">∠BEF</label>
+        <input type="range" id="s1" min="20" max="140" value="56" step="1">
+        <span id="s1v" style="font-weight:700;color:#1e40af;width:48px;">56°</span>
+      </div>
+      <div class="ctrl" style="flex:0 0 auto;">
+        <span class="chk"><input type="checkbox" id="c1a" checked><label for="c1a" style="cursor:pointer;">Show rhombus</label></span>
+      </div>
+    </div>
+    <div class="readout">
+      <span>∠BEF = <b id="r1a">56°</b></span>
+      <span>∠EBF = <b id="r1b">62°</b></span>
+      <span>∠EFB = <b id="r1c">62°</b></span>
+      <span>sum = <b id="r1d">180°</b></span>
+    </div>
+    <div class="legend">
+      <span><i class="swatch" style="background:#2563eb;"></i>isosceles sides BE = EF</span>
+      <span><i class="swatch" style="background:#f59e0b;"></i>base angles (equal)</span>
+      <span><i class="swatch" style="background:#94a3b8;"></i>rhombus \(ABCD\)</span>
+    </div>
+  </div>
+
+  <div class="steps" id="steps-a">
+    <div class="step">
+      <div class="step-head"><span class="badge">1</span><span class="mk m">1M</span></div>
+      <p>In \(\triangle BEF\), \(BE = EF\) is given, so it is an <b>isosceles triangle</b> with apex \(E\). Therefore the base angles are equal:</p>
+      \[ \angle EBF = \angle EFB \qquad \text{(base } \angle\text{s, isos. } \triangle) \]
+      <div class="hint"><b>Hint:</b> The two equal sides \(BE\) and \(EF\) meet at \(E\), so \(E\) is the apex and \(BF\) is the base — the equal angles sit at \(B\) and \(F\).</div>
+    </div>
+    <div class="step">
+      <div class="step-head"><span class="badge">2</span><span class="mk m">1M</span></div>
+      <p>Angle sum of a triangle:</p>
+      \[ \angle EBF + \angle EFB = 180^\circ - \angle BEF = 180^\circ - 56^\circ = 124^\circ \]
+      <div class="hint"><b>Hint:</b> The three angles of any triangle add to \(180^\circ\), so the two base angles share the remainder \(180^\circ - 56^\circ\).</div>
+    </div>
+    <div class="step">
+      <div class="step-head"><span class="badge">3</span><span class="mk a">1A</span></div>
+      <p>Since the two base angles are equal, each one is half of \(124^\circ\):</p>
+      \[ \angle EBF = \angle EFB = 124^\circ \div 2 = 62^\circ \]
+      <div class="ans">Answer: \(\angle EBF = \angle EFB = 62^\circ\)</div>
+    </div>
+  </div>
+  <div class="btns">
+    <button id="btn-a">Next step →</button>
+    <span class="counter" id="cnt-a">0 / 3</span>
+  </div>
+</section>
+
+<!-- ================= PART B ================= -->
+<section class="card">
+  <h2><span class="tag">Part (b)</span> The exterior angle at \(B\)</h2>
+  <p class="lead">\(A\), \(B\), \(E\) are collinear, so \(\angle ABF\) is an <b>exterior angle</b> of \(\triangle BEF\) at vertex \(B\).</p>
+
+  <div class="canvas-wrap">
+    <canvas id="cv2" width="900" height="470"></canvas>
+    <div class="controls">
+      <div class="ctrl">
+        <label for="s2">∠BEF</label>
+        <input type="range" id="s2" min="20" max="140" value="56" step="1">
+        <span id="s2v" style="font-weight:700;color:#1e40af;width:48px;">56°</span>
+      </div>
+      <div class="ctrl" style="flex:0 0 auto;">
+        <span class="chk"><input type="checkbox" id="c2a" checked><label for="c2a" style="cursor:pointer;">Highlight exterior ∠ABF</label></span>
+      </div>
+    </div>
+    <div class="readout">
+      <span>∠EBF = <b id="r2a">62°</b></span>
+      <span>∠BEF = <b id="r2b">56°</b></span>
+      <span>∠ABF = 62° + 56° = <b id="r2c">118°</b></span>
+    </div>
+    <div class="legend">
+      <span><i class="swatch" style="background:#ef4444;"></i>exterior angle at B</span>
+      <span><i class="swatch" style="background:#f59e0b;"></i>base angle ∠EBF</span>
+      <span><i class="swatch" style="background:#10b981;"></i>apex angle ∠BEF</span>
+    </div>
+  </div>
+
+  <div class="steps" id="steps-b">
+    <div class="step">
+      <div class="step-head"><span class="badge">1</span><span class="mk m">1M</span></div>
+      <p>Because \(A\), \(B\), \(E\) lie on the straight line \(ABE\), the side \(EB\) is produced to \(A\). Hence \(\angle ABF\) is an exterior angle of \(\triangle BEF\) at \(B\):</p>
+      \[ \angle ABF = \angle EFB + \angle BEF \qquad (\text{ext. } \angle \text{ of } \triangle) \]
+      <div class="hint"><b>Hint:</b> An exterior angle of a triangle equals the sum of the two <i>interior opposite</i> angles — here \(\angle EFB\) and \(\angle BEF\), not the adjacent \(\angle EBF\).</div>
+    </div>
+    <div class="step">
+      <div class="step-head"><span class="badge">2</span><span class="mk a">1A</span></div>
+      <p>Substitute the values found in part (a):</p>
+      \[ \angle ABF = 62^\circ + 56^\circ = 118^\circ \]
+      <div class="ans">Answer: \(\angle ABF = 118^\circ\)</div>
+    </div>
+  </div>
+  <div class="btns">
+    <button id="btn-b">Next step →</button>
+    <span class="counter" id="cnt-b">0 / 2</span>
+  </div>
+</section>
+
+<!-- ================= PART C ================= -->
+<section class="card">
+  <h2><span class="tag">Part (c)</span> Use the rhombus to split the angle</h2>
+  <p class="lead">In a rhombus the diagonal \(BD\) bisects \(\angle ABC\), so \(\angle BDC=\angle ABC \div 2\).</p>
+
+  <div class="canvas-wrap">
+    <canvas id="cv3" width="900" height="470"></canvas>
+    <div class="controls">
+      <div class="ctrl">
+        <label for="s3">∠BEF</label>
+        <input type="range" id="s3" min="20" max="140" value="56" step="1">
+        <span id="s3v" style="font-weight:700;color:#1e40af;width:48px;">56°</span>
+      </div>
+      <div class="ctrl" style="flex:0 0 auto;">
+        <span class="chk"><input type="checkbox" id="c3a" checked><label for="c3a" style="cursor:pointer;">Show diagonal BD</label></span>
+      </div>
+      <div class="ctrl" style="flex:0 0 auto;">
+        <span class="chk"><input type="checkbox" id="c3b" checked><label for="c3b" style="cursor:pointer;">Shade ∠BDC</label></span>
+      </div>
+    </div>
+    <div class="readout">
+      <span>∠ABC = ∠ABF = <b id="r3a">118°</b></span>
+      <span>∠BDC = ∠ABC ÷ 2 = <b id="r3b">59°</b></span>
+      <span>check: ∠BCD = <b id="r3c">62°</b></span>
+    </div>
+    <div class="legend">
+      <span><i class="swatch" style="background:#8b5cf6;"></i>diagonal BD (angle bisector)</span>
+      <span><i class="swatch" style="background:#059669;"></i>shaded ∠BDC</span>
+      <span><i class="swatch" style="background:#94a3b8;"></i>rhombus \(ABCD\)</span>
+    </div>
+  </div>
+
+  <div class="steps" id="steps-c">
+    <div class="step">
+      <div class="step-head"><span class="badge">1</span><span class="mk m">1M</span></div>
+      <p>Since \(ABE\) is a straight line, the angle \(\angle ABC\) of the rhombus (at \(B\)) is the same as \(\angle ABF\):</p>
+      \[ \angle ABC = \angle ABF = 118^\circ \]
+      <div class="hint"><b>Hint:</b> \(BC\) lies on the straight line \(BCF\), and \(BA\) lies along \(BE\). So the interior angle at \(B\) of the rhombus equals the exterior angle of \(\triangle BEF\).</div>
+    </div>
+    <div class="step">
+      <div class="step-head"><span class="badge">2</span><span class="mk m">1M</span></div>
+      <p>Property of a rhombus: the diagonal \(BD\) <b>bisects</b> the angle at \(B\), i.e. \(\angle ABD = \angle DBC\). Hence</p>
+      \[ \angle BDC = \angle ABC \div 2 \]
+      <div class="hint"><b>Hint:</b> In a rhombus, all sides are equal, so \(\triangle ABD\) and \(\triangle CBD\) are isosceles. This forces the diagonal from \(B\) to bisect the angle at \(B\).</div>
+    </div>
+    <div class="step">
+      <div class="step-head"><span class="badge">3</span><span class="mk a">1A</span></div>
+      <p>Substitute \(\angle ABC = 118^\circ\):</p>
+      \[ \angle BDC = 118^\circ \div 2 = 59^\circ \]
+      <div class="ans">Answer: \(\angle BDC = 59^\circ\) — the correct choice is <b>C</b>.</div>
+    </div>
+  </div>
+  <div class="btns">
+    <button id="btn-c">Next step →</button>
+    <span class="counter" id="cnt-c">0 / 3</span>
+  </div>
+</section>
+
+<!-- ================= SUMMARY ================= -->
+<section class="card summary">
+  <h2>📌 Summary at a glance</h2>
+  <ul>
+    <li><b>Part (a):</b> \(\triangle BEF\) is isosceles (\(BE=EF\)) \(\Rightarrow \angle EBF = \angle EFB = \dfrac{180^\circ - 56^\circ}{2} = 62^\circ\)</li>
+    <li><b>Part (b):</b> Exterior angle of \(\triangle BEF\): \(\angle ABF = 62^\circ + 56^\circ = 118^\circ\)</li>
+    <li><b>Part (c):</b> Rhombus diagonal bisects the angle: \(\angle BDC = \angle ABC \div 2 = 118^\circ \div 2 = 59^\circ\)</li>
+    <li><b>Correct option:</b> C <span class="keystat">59°</span></li>
+  </ul>
+</section>
+
+</main>
+
+<footer>HKDSE Mathematics · Interactive solution · 2019 Paper 2 Q20</footer>
+
+<script>
+/* =========================================================
+   Shared geometry helpers
+   ========================================================= */
+const D2R = Math.PI/180;
+
+function arrowlessLine(ctx,x1,y1,x2,y2,color,w,dash){
+  ctx.save();
+  ctx.strokeStyle=color; ctx.lineWidth=w||2;
+  if(dash) ctx.setLineDash(dash);
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  ctx.restore();
+}
+
+function label(ctx,text,x,y,color,size,weight,align){
+  ctx.save();
+  ctx.fillStyle=color||'#0f172a';
+  ctx.font=(weight||'700')+' '+(size||14)+'px -apple-system,Segoe UI,Roboto,sans-serif';
+  ctx.textAlign=align||'center'; ctx.textBaseline='middle';
+  ctx.fillText(text,x,y);
+  ctx.restore();
+}
+
+function dot(ctx,x,y,color,r){
+  ctx.save();
+  ctx.fillStyle=color||'#1e40af';
+  ctx.beginPath(); ctx.arc(x,y,r||4.5,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle='#fff'; ctx.lineWidth=1.6; ctx.stroke();
+  ctx.restore();
+}
+
+/* draw an angle arc at vertex V between rays to P and Q */
+function angleArc(ctx,V,P,Q,radius,color,fill,labelTxt){
+  const a1=Math.atan2(P.y-V.y,P.x-V.x);
+  const a2=Math.atan2(Q.y-V.y,Q.x-V.x);
+  let diff=a2-a1;
+  while(diff<=-Math.PI) diff+=2*Math.PI;
+  while(diff>Math.PI)  diff-=2*Math.PI;
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(V.x,V.y);
+  ctx.arc(V.x,V.y,radius,a1,a1+diff,diff<0);
+  ctx.closePath();
+  if(fill){ ctx.fillStyle=fill; ctx.fill(); }
+  if(color){ ctx.strokeStyle=color; ctx.lineWidth=2; ctx.stroke(); }
+  ctx.restore();
+  if(labelTxt){
+    const mid=a1+diff/2;
+    const lx=V.x+Math.cos(mid)*(radius+20);
+    const ly=V.y+Math.sin(mid)*(radius+20);
+    label(ctx,labelTxt,lx,ly,color||'#0f172a',13,'800');
+  }
+}
+
+/* =========================================================
+   Global figure generator
+   Given apex angle t (deg) at E, build a consistent figure.
+   Base line is horizontal through B and E.
+   ========================================================= */
+function buildFigure(tDeg){
+  const t = tDeg*D2R;
+  const base = 420;               // BE length in px
+
+  // E on the right, B on the left
+  const E = {x: 610, y: 340};
+  const B = {x: E.x - base, y: E.y};
+
+  // triangle BEF isosceles: BE = EF, base angles at B and F are equal
+  const baseAng = (180 - tDeg)/2;      // degrees at B and F
+  const bR = baseAng*D2R;
+
+  // From B, ray BF makes angle bR above the +x direction (toward E side), 
+  // actually BF goes up-right: direction angle = -baseAng measured from BE (pointing +x)
+  const dirBF = -bR;                    // above horizontal
+  const F = { x: B.x + base*Math.cos(bR), y: B.y - base*Math.sin(bR) };
+
+  // ---- rhombus ABCD ----
+  // A lies on the line ABE (to the left of B) — used as drawing anchor
+  const A = { x: B.x - 250, y: B.y };
+  // One interior angle of rhombus at B equals angle ABF.
+  // angle ABF = angle between BA (pointing left, 180°) and BF.
+  // BA direction is exactly 180°. BF direction = -baseAng (i.e. 360-baseAng deg).
+  // interior angle at B (the one inside the rhombus, above line) :
+  const abc = 180 - baseAng;            // = 118 when baseAng = 62
+  // D and C: rhombus sides AD = DC = CB = AB = 250
+  const side = 250;
+  // Angle that BC makes with the positive x-axis: baseAng (rising) → BC direction = 180-baseAng?? 
+  // Let's place C along BF direction from B at distance "side":
+  const dirBC = dirBF;                  // BC lies along BF
+  const C = { x: B.x + side*Math.cos(dirBC), y: B.y + side*Math.sin(dirBC) };
+  // D is A + (C - B)
+  const D = { x: A.x + (C.x - B.x), y: A.y + (C.y - B.y) };
+
+  return {E,B,F,A,C,D,side,baseAng,tDeg};
+}
+
+/* =========================================================
+   CANVAS 1  —  isosceles triangle BEF
+   ========================================================= */
+(function(){
+  const cv=document.getElementById('cv1');
+  if(!cv) return;
+  const ctx=cv.getContext('2d');
+  const s1=document.getElementById('s1'), s1v=document.getElementById('s1v');
+  const c1a=document.getElementById('c1a');
+
+  function draw(){
+    const val=+s1.value;
+    s1v.textContent=val+'°';
+    const g=buildFigure(val);
+    const {E,B,F,A,C,D}=g;
+
+    ctx.clearRect(0,0,cv.width,cv.height);
+    // soft grid
+    ctx.save();
+    ctx.strokeStyle='#eef4fb'; ctx.lineWidth=1;
+    for(let x=0;x<cv.width;x+=30){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,cv.height);ctx.stroke();}
+    for(let y=0;y<cv.height;y+=30){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(cv.width,y);ctx.stroke();}
+    ctx.restore();
+
+    // rhombus (ghost)
+    if(c1a.checked){
+      ctx.save();
+      ctx.strokeStyle='#cbd5e1'; ctx.lineWidth=1.6; ctx.setLineDash([6,5]);
+      ctx.beginPath();
+      ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,B.y); ctx.lineTo(C.x,C.y); ctx.lineTo(D.x,D.y); ctx.closePath();
+      ctx.stroke();
+      ctx.restore();
+      label(ctx,'A',A.x-6,A.y+20,'#94a3b8',14);
+      label(ctx,'D',D.x-14,D.y-4,'#94a3b8',14);
+      label(ctx,'C',C.x+14,C.y-6,'#94a3b8',14);
+    }
+
+    // isosceles sides BE (blue) and EF (blue)
+    arrowlessLine(ctx,B.x,B.y,E.x,E.y,'#2563eb',4);
+    arrowlessLine(ctx,E.x,E.y,F.x,F.y,'#2563eb',4);
+    // base BF
+    arrowlessLine(ctx,B.x,B.y,F.x,F.y,'#0f172a',2.4);
+
+    // equal side tick marks
+    (function(){
+      function tick(x1,y1,x2,y2){
+        const mx=(x1+x2)/2,my=(y1+y2)/2;
+        const dx=x2-x1,dy=y2-y1,L=Math.hypot(dx,dy);
+        const nx=-dy/L*9, ny=dx/L*9;
+        ctx.save();ctx.strokeStyle='#2563eb';ctx.lineWidth=3;
+        ctx.beginPath();ctx.moveTo(mx-nx,my-ny);ctx.lineTo(mx+nx,my+ny);ctx.stroke();ctx.restore();
+      }
+      tick(B.x,B.y,E.x,E.y);
+      tick(E.x,E.y,F.x,F.y);
+    })();
+
+    // angle arcs
+    angleArc(ctx,E,B,F,52,'#10b981','rgba(16,185,129,.18)', val+'°');
+    angleArc(ctx,B,F,E,50,'#f59e0b','rgba(245,158,11,.20)', Math.round((180-val)/2)+'°');
+    angleArc(ctx,F,E,B,50,'#f59e0b','rgba(245,158,11,.20)', Math.round((180-val)/2)+'°');
+
+    // points + labels
+    dot(ctx,B.x,B.y,'#1e40af'); dot(ctx,E.x,E.y,'#1e40af'); dot(ctx,F.x,F.y,'#1e40af');
+    label(ctx,'B',B.x-16,B.y+18,'#0f172a',16,'800');
+    label(ctx,'E',E.x+18,E.y+18,'#0f172a',16,'800');
+    label(ctx,'F',F.x+6,F.y-18,'#0f172a',16,'800');
+
+    // straight line tag
+    label(ctx,'ABE is a straight line',B.x-40,B.y+54,'#94a3b8',12,'700');
+
+    // readouts
+    const base=Math.round((180-val)/2);
+    document.getElementById('r1a').textContent=val+'°';
+    document.getElementById('r1b').textContent=base+'°';
+    document.getElementById('r1c').textContent=base+'°';
+    document.getElementById('r1d').textContent=(val+base+base)+'°';
+  }
+  s1.addEventListener('input',draw);
+  c1a.addEventListener('change',draw);
+  draw();
+})();
+
+/* =========================================================
+   CANVAS 2 — exterior angle at B
+   ========================================================= */
+(function(){
+  const cv=document.getElementById('cv2');
+  if(!cv) return;
+  const ctx=cv.getContext('2d');
+  const s2=document.getElementById('s2'), s2v=document.getElementById('s2v');
+  const c2a=document.getElementById('c2a');
+
+  function draw(){
+    const val=+s2.value;
+    s2v.textContent=val+'°';
+    const g=buildFigure(val);
+    const {E,B,F,A,C,D}=g;
+    const base=Math.round((180-val)/2);
+
+    ctx.clearRect(0,0,cv.width,cv.height);
+    ctx.save();
+    ctx.strokeStyle='#eef4fb'; ctx.lineWidth=1;
+    for(let x=0;x<cv.width;x+=30){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,cv.height);ctx.stroke();}
+    for(let y=0;y<cv.height;y+=30){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(cv.width,y);ctx.stroke();}
+    ctx.restore();
+
+    // faint rhombus
+    ctx.save();
+    ctx.strokeStyle='#e2e8f0'; ctx.lineWidth=1.6; ctx.setLineDash([5,5]);
+    ctx.beginPath();
+    ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,B.y); ctx.lineTo(C.x,C.y); ctx.lineTo(D.x,D.y); ctx.closePath();
+    ctx.stroke(); ctx.restore();
+
+    // line ABE extended (straight line)
+    arrowlessLine(ctx,A.x,A.y,E.x+60,E.y,'#94a3b8',2,[8,6]);
+
+    // triangle sides
+    arrowlessLine(ctx,B.x,B.y,E.x,E.y,'#2563eb',4);
+    arrowlessLine(ctx,E.x,E.y,F.x,F.y,'#2563eb',4);
+    arrowlessLine(ctx,B.x,B.y,F.x,F.y,'#0f172a',2.4);
+
+    // interior angles
+    angleArc(ctx,E,B,F,46,'#10b981','rgba(16,185,129,.16)', val+'°');
+    angleArc(ctx,B,F,E,46,'#f59e0b','rgba(245,158,11,.20)', base+'°');
+
+    // exterior angle ABF (between BA pointing left and BF)
+    if(c2a.checked){
+      angleArc(ctx,B,A,F,74,'#ef4444','rgba(239,68,68,.16)', (val+base)+'°');
+    }
+
+    dot(ctx,B.x,B.y,'#1e40af'); dot(ctx,E.x,E.y,'#1e40af'); dot(ctx,F.x,F.y,'#1e40af');
+    dot(ctx,A.x,A.y,'#94a3b8');
+    label(ctx,'B',B.x-16,B.y+20,'#0f172a',16,'800');
+    label(ctx,'E',E.x+18,E.y+20,'#0f172a',16,'800');
+    label(ctx,'F',F.x+4,F.y-18,'#0f172a',16,'800');
+    label(ctx,'A',A.x-16,A.y+18,'#94a3b8',14,'700');
+
+    document.getElementById('r2a').textContent=base+'°';
+    document.getElementById('r2b').textContent=val+'°';
+    document.getElementById('r2c').textContent=(base+val)+'°';
+  }
+  s2.addEventListener('input',draw);
+  c2a.addEventListener('change',draw);
+  draw();
+})();
+
+/* =========================================================
+   CANVAS 3 — rhombus with diagonal BD
+   ========================================================= */
+(function(){
+  const cv=document.getElementById('cv3');
+  if(!cv) return;
+  const ctx=cv.getContext('2d');
+  const s3=document.getElementById('s3'), s3v=document.getElementById('s3v');
+  const c3a=document.getElementById('c3a'), c3b=document.getElementById('c3b');
+
+  function draw(){
+    const val=+s3.value;
+    s3v.textContent=val+'°';
+    const g=buildFigure(val);
+    const {E,B,F,A,C,D}=g;
+    const base=Math.round((180-val)/2);
+    const abc = val + base;           // = 118 when val=56
+    const bdc = abc/2;
+
+    ctx.clearRect(0,0,cv.width,cv.height);
+    ctx.save();
+    ctx.strokeStyle='#eef4fb'; ctx.lineWidth=1;
+    for(let x=0;x<cv.width;x+=30){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,cv.height);ctx.stroke();}
+    for(let y=0;y<cv.height;y+=30){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(cv.width,y);ctx.stroke();}
+    ctx.restore();
+
+    // filled rhombus
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,B.y); ctx.lineTo(C.x,C.y); ctx.lineTo(D.x,D.y); ctx.closePath();
+    ctx.fillStyle='rgba(148,163,184,.12)'; ctx.fill();
+    ctx.strokeStyle='#64748b'; ctx.lineWidth=2.2; ctx.stroke();
+    ctx.restore();
+
+    // line ABE (thin, dashed, so visually B-E is "inside" the extension)
+    arrowlessLine(ctx,A.x,A.y,E.x+50,E.y,'#cbd5e1',1.6,[7,6]);
+
+    // diagonal BD
+    if(c3a.checked){
+      arrowlessLine(ctx,B.x,B.y,D.x,D.y,'#8b5cf6',2.8,[10,6]);
+    }
+
+    // shaded angle BDC  (at D between DB and DC)
+    if(c3b.checked){
+      angleArc(ctx,D,B,C,54,'#059669','rgba(5,150,105,.22)', bdc+'°');
+    }
+    // interior angle at B of rhombus (between BA and BC)
+    angleArc(ctx,B,A,C,64,'#ef4444','rgba(239,68,68,.12)', abc+'°');
+
+    // points
+    dot(ctx,A.x,A.y,'#334155'); dot(ctx,B.x,B.y,'#1e40af');
+    dot(ctx,C.x,C.y,'#334155'); dot(ctx,D.x,D.y,'#334155');
+    dot(ctx,E.x,E.y,'#94a3b8'); dot(ctx,F.x,F.y,'#94a3b8');
+
+    label(ctx,'A',A.x-16,A.y+18,'#334155',16,'800');
+    label(ctx,'B',B.x-18,B.y+22,'#1e40af',16,'800');
+    label(ctx,'C',C.x+16,C.y-8,'#334155',16,'800');
+    label(ctx,'D',D.x-16,D.y-6,'#334155',16,'800');
+    label(ctx,'E',E.x+16,E.y+20,'#94a3b8',14,'700');
+    label(ctx,'F',F.x+2,F.y-18,'#94a3b8',14,'700');
+
+    document.getElementById('r3a').textContent=abc+'°';
+    document.getElementById('r3b').textContent=bdc+'°';
+    document.getElementById('r3c').textContent=base+'°';
+  }
+  s3.addEventListener('input',draw);
+  c3a.addEventListener('change',draw);
+  c3b.addEventListener('change',draw);
+  draw();
+})();
+
+/* =========================================================
+   Step-by-step reveal
+   ========================================================= */
+function setupSteps(stepsId, btnId, cntId){
+  const steps=[...document.querySelectorAll('#'+stepsId+' .step')];
+  const btn=document.getElementById(btnId);
+  const cnt=document.getElementById(cntId);
+  let shown=0;
+  function update(){
+    steps.forEach((s,i)=>s.classList.toggle('show', i<shown));
+    cnt.textContent=shown+' / '+steps.length;
+    if(shown>=steps.length){
+      btn.disabled=true;
+      btn.textContent='All steps revealed ✓';
+    }else{
+      btn.disabled=false;
+      btn.textContent='Next step →';
+    }
+  }
+  btn.addEventListener('click',()=>{ if(shown<steps.length){shown++; update();} });
+  update();
+}
+setupSteps('steps-a','btn-a','cnt-a');
+setupSteps('steps-b','btn-b','cnt-b');
+setupSteps('steps-c','btn-c','cnt-c');
+
+/* redraw canvases on resize to keep crisp (optional scaling) */
+window.addEventListener('resize',()=>{
+  // canvases use fixed internal resolution scaled by CSS width; nothing needed
+});
+</script>
+</body>
+</html>

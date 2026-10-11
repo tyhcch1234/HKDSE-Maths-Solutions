@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2021 Paper 2 Q21 · Regular Octagon</title>
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[', '\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  :root{
+    --blue:#1d4ed8; --blue-l:#3b82f6; --amber:#f59e0b; --amber-l:#fef3c7;
+    --emerald:#059669; --emerald-l:#d1fae5; --ink:#0f172a; --slate:#475569;
+    --bg:#f1f5f9; --card:#ffffff; --line:#e2e8f0;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
+    background:var(--bg); color:var(--ink); line-height:1.6;
+  }
+  /* ---------- HERO ---------- */
+  .hero{
+    background:linear-gradient(135deg,#1e3a8a 0%,#1d4ed8 45%,#3b82f6 100%);
+    color:#fff; padding:38px 22px 34px; position:relative; overflow:hidden;
+  }
+  .hero::after{
+    content:""; position:absolute; right:-80px; top:-80px; width:280px; height:280px;
+    border-radius:50%; background:rgba(255,255,255,.08);
+  }
+  .hero-inner{max-width:960px; margin:0 auto; position:relative; z-index:2;}
+  .eyebrow{font-size:.8rem; letter-spacing:.16em; text-transform:uppercase; opacity:.85; font-weight:600;}
+  .qnum{font-size:2rem; font-weight:800; margin:6px 0 4px; letter-spacing:-.01em;}
+  .subtitle{font-size:1rem; opacity:.92; margin-bottom:16px;}
+  .pills{display:flex; flex-wrap:wrap; gap:8px;}
+  .pill{
+    background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35);
+    padding:5px 13px; border-radius:999px; font-size:.78rem; font-weight:600; backdrop-filter:blur(4px);
+  }
+  /* ---------- LAYOUT ---------- */
+  .wrap{max-width:960px; margin:0 auto; padding:26px 16px 60px;}
+  .card{
+    background:var(--card); border-radius:18px; padding:22px 22px 26px;
+    box-shadow:0 4px 18px rgba(15,23,42,.07); margin-bottom:24px; border:1px solid var(--line);
+  }
+  .card h2{font-size:1.18rem; margin:0 0 12px; color:var(--blue); display:flex; align-items:center; gap:10px;}
+  .card h2 .dot{width:11px; height:11px; border-radius:50%; background:var(--amber); flex:none; box-shadow:0 0 0 4px var(--amber-l);}
+  .card h3{font-size:1rem; color:var(--slate); margin:18px 0 8px; letter-spacing:.01em;}
+  .qbox{background:#f8fafc; border-left:5px solid var(--blue); border-radius:10px; padding:14px 16px; font-size:.98rem;}
+  .qbox ol{margin:8px 0 0; padding-left:22px;}
+  .qbox li{margin-bottom:7px;}
+  .marks{font-weight:700; color:var(--blue); white-space:nowrap;}
+  /* ---------- STEPS ---------- */
+  .step{
+    display:none; border:1px solid var(--line); border-left:5px solid var(--blue-l);
+    border-radius:12px; padding:14px 16px; margin-top:14px; background:#fbfdff;
+    animation:fade .35s ease;
+  }
+  .step.show{display:block;}
+  @keyframes fade{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;}}
+  .step-head{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:8px;}
+  .badge-num{
+    background:var(--blue); color:#fff; width:26px; height:26px; border-radius:50%;
+    display:grid; place-items:center; font-size:.82rem; font-weight:700; flex:none;
+  }
+  .step-title{font-weight:700; font-size:.95rem; color:var(--ink);}
+  .badge-mark{
+    font-size:.72rem; font-weight:800; letter-spacing:.05em; padding:3px 9px; border-radius:999px;
+    background:var(--amber-l); color:#92400e; border:1px solid #fcd34d; margin-left:auto;
+  }
+  .hint{
+    background:var(--amber-l); border:1px solid #fcd34d; border-left:4px solid var(--amber);
+    border-radius:9px; padding:9px 13px; font-size:.88rem; margin:12px 0 6px; color:#78350f;
+  }
+  .hint b{color:#92400e;}
+  .ans{
+    background:var(--emerald-l); border:1px solid #6ee7b7; border-left:4px solid var(--emerald);
+    border-radius:9px; padding:10px 14px; font-size:.95rem; margin-top:12px; color:#064e3b;
+  }
+  .ans b{color:#047857;}
+  .work{font-size:.97rem; margin:6px 0;}
+  /* ---------- CONTROLS ---------- */
+  .btn{
+    background:linear-gradient(135deg,var(--blue) 0%,var(--blue-l) 100%); color:#fff; border:none;
+    padding:10px 20px; border-radius:999px; font-size:.9rem; font-weight:700; cursor:pointer;
+    box-shadow:0 3px 10px rgba(29,78,216,.28); transition:.18s; margin-top:16px;
+  }
+  .btn:hover:not(:disabled){transform:translateY(-1px); box-shadow:0 6px 16px rgba(29,78,216,.35);}
+  .btn:disabled{background:#cbd5e1; box-shadow:none; cursor:not-allowed; color:#64748b;}
+  .counter{font-size:.82rem; color:var(--slate); font-weight:600; margin-left:12px;}
+  .btnrow{display:flex; align-items:center; flex-wrap:wrap;}
+  /* ---------- CANVAS PANEL ---------- */
+  .canvas-panel{
+    background:#f8fafc; border:1px solid var(--line); border-radius:14px; padding:12px;
+    margin:10px 0 6px;
+  }
+  canvas{width:100%; height:auto; display:block; border-radius:10px; background:#ffffff; touch-action:none;}
+  .ctrls{display:flex; flex-wrap:wrap; gap:14px; align-items:center; margin-top:12px; font-size:.84rem; color:var(--slate);}
+  .ctrl-item{display:flex; align-items:center; gap:8px; background:#fff; border:1px solid var(--line); padding:6px 12px; border-radius:999px;}
+  .ctrl-item label{font-weight:600; cursor:pointer; user-select:none;}
+  input[type=range]{width:130px; accent-color:var(--blue);}
+  input[type=checkbox]{width:16px; height:16px; accent-color:var(--emerald); cursor:pointer;}
+  .readout{
+    display:flex; flex-wrap:wrap; gap:10px; margin-top:12px; font-size:.83rem;
+  }
+  .ro{background:#eef2ff; border:1px solid #c7d2fe; border-radius:9px; padding:6px 11px; color:#3730a3; font-weight:600;}
+  .ro em{font-style:normal; color:#1e3a8a; font-weight:800;}
+  /* ---------- SUMMARY ---------- */
+  .summary{background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%); color:#e2e8f0; border:none;}
+  .summary h2{color:#fbbf24;}
+  .summary ul{margin:10px 0 0; padding-left:20px;}
+  .summary li{margin-bottom:9px; font-size:.95rem;}
+  .summary .hl{color:#6ee7b7; font-weight:700;}
+  /* ---------- FOOTER ---------- */
+  footer{text-align:center; color:#94a3b8; font-size:.82rem; padding:10px 16px 34px;}
+  .verdict{
+    display:inline-block; margin-top:10px; background:var(--emerald-l); color:#065f46;
+    border:1px solid #6ee7b7; border-radius:12px; padding:10px 18px; font-weight:800; font-size:1rem;
+  }
+  @media(max-width:520px){
+    .qnum{font-size:1.5rem;} .hero{padding:26px 16px 24px;}
+    .card{padding:18px 15px 20px;} .ctrls{gap:8px;}
+    input[type=range]{width:96px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= HERO ================= -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</div>
+    <div class="qnum">2021 Paper 2 · Question 21</div>
+    <div class="subtitle">Geometry of a Regular 8-sided Polygon — Equal Arcs, Equal Chords &amp; Angles at the Circumference</div>
+    <div class="pills">
+      <span class="pill">Regular Polygon</span>
+      <span class="pill">Circumcircle</span>
+      <span class="pill">Equal Chords / Equal Arcs</span>
+      <span class="pill">Angles at Circumference</span>
+      <span class="pill">Parallel Lines</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ================= QUESTION ================= -->
+  <section class="card">
+    <h2><span class="dot"></span>Question</h2>
+    <div class="qbox">
+      \(ABCDEFGH\) is a regular 8-sided polygon (octagon). Which of the following are true?
+      <ol type="I">
+        <li>\(AG \parallel BF\)</li>
+        <li>\(BD = EG\)</li>
+        <li>\(\angle CAG = 2\,\angle BDH\)</li>
+      </ol>
+      <div style="margin-top:10px;">
+        <b>A.</b> I and II only &nbsp;&nbsp; <b>B.</b> I and III only &nbsp;&nbsp;
+        <b>C.</b> II and III only &nbsp;&nbsp; <b>D.</b> I, II and III
+      </div>
+      <div style="margin-top:8px;" class="marks">(Answer: D) — 1 mark</div>
+    </div>
+    <p style="font-size:.9rem;color:var(--slate);margin-top:12px;">
+      Move the <b>sliders</b> and <b>toggles</b> in the diagrams below to explore why each statement holds.
+      The regular octagon has 8 equal sides, 8 equal arcs on its circumcircle, and each arc subtends
+      \(\dfrac{360^\circ}{8}=45^\circ\) at the centre.
+    </p>
+  </section>
+
+  <!-- ================= PART I ================= -->
+  <section class="card">
+    <h2><span class="dot"></span>Statement I — Is \(AG \parallel BF\)?</h2>
+
+    <div class="canvas-panel">
+      <canvas id="cv1" width="900" height="560"></canvas>
+      <div class="ctrls">
+        <div class="ctrl-item">
+          <label for="s1">Rotate octagon</label>
+          <input type="range" id="s1" min="0" max="45" step="1" value="0">
+        </div>
+        <div class="ctrl-item">
+          <input type="checkbox" id="c1arcs" checked>
+          <label for="c1arcs">Show equal arcs <span style="color:#be185d">\(\widehat{FG},\widehat{AB}\)</span></label>
+        </div>
+        <div class="ctrl-item">
+          <input type="checkbox" id="c1ang" checked>
+          <label for="c1ang">Show \(\angle FAG,\angle AFB\)</label>
+        </div>
+        <div class="ctrl-item">
+          <input type="checkbox" id="c1par" checked>
+          <label for="c1par">Emphasise \(AG\parallel BF\)</label>
+        </div>
+      </div>
+      <div class="readout">
+        <div class="ro">arc \(\widehat{FG}\) = <em id="r1a">45°</em></div>
+        <div class="ro">arc \(\widehat{AB}\) = <em id="r1b">45°</em></div>
+        <div class="ro">\(\angle FAG\) = <em id="r1c">22.5°</em></div>
+        <div class="ro">\(\angle AFB\) = <em id="r1d">22.5°</em></div>
+        <div class="ro">\(\angle FAG-\angle AFB\) = <em id="r1e">0°</em> ⇒ parallel ✓</div>
+      </div>
+    </div>
+
+    <div class="step" id="s1-1">
+      <div class="step-head">
+        <span class="badge-num">1</span>
+        <span class="step-title">All vertices lie on one circle</span>
+      </div>
+      <div class="work">Since \(ABCDEFGH\) is a <b>regular</b> polygon, there is a circle passing through all its vertices (the circumcircle). The whole circumference is split into 8 equal arcs:</div>
+      \[ \widehat{AB}=\widehat{BC}=\widehat{CD}=\widehat{DE}=\widehat{EF}=\widehat{FG}=\widehat{GH}=\widehat{HA}=\frac{360^\circ}{8}=45^\circ \]
+      <div class="hint"><b>Hint:</b> "Regular" means equal sides <i>and</i> equal interior angles \(\Rightarrow\) the 8 arcs on the circumcircle are equal. Every fact below comes from this.</div>
+    </div>
+
+    <div class="step" id="s1-2">
+      <div class="step-head">
+        <span class="badge-num">2</span>
+        <span class="step-title">Equal arcs \(\Rightarrow\) equal angles at the circumference</span>
+      </div>
+      <div class="work">
+        Equal chords cut off equal arcs: \(\widehat{FG}=\widehat{AB}=45^\circ\).<br>
+        Angles subtended by equal arcs at the circumference are equal:
+      </div>
+      \[ \angle FAG = \angle AFB = \tfrac{1}{2}\times 45^\circ = 22.5^\circ \]
+      <div class="hint"><b>Hint (arc prop. to \(\angle\)s at circumference):</b> an angle at the circumference equals half the arc it stands on. Both angles stand on a \(45^\circ\) arc.</div>
+    </div>
+
+    <div class="step" id="s1-3">
+      <div class="step-head">
+        <span class="badge-num">3</span>
+        <span class="step-title">Alternate angles equal \(\Rightarrow\) parallel</span>
+        <span class="badge-mark">1A</span>
+      </div>
+      <div class="work">
+        \( \angle FAG \) and \( \angle AFB \) are alternate angles formed by the transversal \(AF\) cutting lines \(AG\) and \(BF\).
+        Since they are equal, the lines are parallel.
+      </div>
+      \[ \boxed{AG \parallel BF} \quad\Rightarrow\quad \text{Statement I is TRUE} \]
+      <div class="ans"><b>Answer:</b> I is true.</div>
+    </div>
+
+    <div class="btnrow">
+      <button class="btn" id="b1" onclick="nextStep('p1')">Next step →</button>
+      <span class="counter" id="p1-count">0 / 3</span>
+    </div>
+  </section>
+
+  <!-- ================= PART II ================= -->
+  <section class="card">
+    <h2><span class="dot"></span>Statement II — Is \(BD = EG\)?</h2>
+
+    <div class="canvas-panel">
+      <canvas id="cv2" width="900" height="560"></canvas>
+      <div class="ctrls">
+        <div class="ctrl-item">
+          <input type="checkbox" id="c2arc" checked>
+          <label for="c2arc">Highlight arcs <span style="color:#0891b2">\(\widehat{BCD}\)</span> &amp; <span style="color:#db2777">\(\widehat{EFG}\)</span></label>
+        </div>
+        <div class="ctrl-item">
+          <input type="checkbox" id="c2chord" checked>
+          <label for="c2chord">Show chords \(BD\), \(EG\)</label>
+        </div>
+      </div>
+      <div class="readout">
+        <div class="ro">arc \(\widehat{BCD}\) = <em id="r2a">135°</em></div>
+        <div class="ro">arc \(\widehat{EFG}\) = <em id="r2b">135°</em></div>
+        <div class="ro">\(BD\) = <em id="r2c">0.000</em></div>
+        <div class="ro">\(EG\) = <em id="r2d">0.000</em></div>
+        <div class="ro">\(BD-EG\) = <em id="r2e">0.000</em> ⇒ equal ✓</div>
+      </div>
+    </div>
+
+    <div class="step" id="s2-1">
+      <div class="step-head">
+        <span class="badge-num">1</span>
+        <span class="step-title">Every side cuts off an equal arc</span>
+      </div>
+      <div class="work">From the regular octagon (see Statement I):</div>
+      \[ \widehat{BC}=\widehat{CD}=\widehat{EF}=\widehat{FG}=45^\circ \]
+      <div class="hint"><b>Hint:</b> each side of a regular octagon subtends \(45^\circ\) at the centre — this is the "equal chords, equal arcs" fact.</div>
+    </div>
+
+    <div class="step" id="s2-2">
+      <div class="step-head">
+        <span class="badge-num">2</span>
+        <span class="step-title">Add the arcs to compare</span>
+      </div>
+      <div class="work">
+        \[ \widehat{BCD}=\widehat{BC}+\widehat{CD}=45^\circ+45^\circ=90^\circ \]
+        But wait — we must compare the arcs standing on the two chords:
+        \[ \widehat{BCD}=\widehat{BC}+\widehat{CD}=90^\circ,\qquad \widehat{EFG}=\widehat{EF}+\widehat{FG}=90^\circ \]
+        \[ \therefore \widehat{BCD}=\widehat{EFG} \]
+      </div>
+      <div class="hint"><b>Hint:</b> chord \(BD\) is subtended by the arc from \(B\) to \(D\) <i>through</i> \(C\); chord \(EG\) by the arc from \(E\) to \(G\) <i>through</i> \(F\). Both arcs consist of exactly 2 sides of the octagon.</div>
+    </div>
+
+    <div class="step" id="s2-3">
+      <div class="step-head">
+        <span class="badge-num">3</span>
+        <span class="step-title">Equal arcs \(\Rightarrow\) equal chords</span>
+        <span class="badge-mark">1A</span>
+      </div>
+      <div class="work">Equal arcs in the same circle are subtended by equal chords:</div>
+      \[ \widehat{BCD}=\widehat{EFG} \;\Rightarrow\; \boxed{BD=EG} \quad\Rightarrow\quad \text{Statement II is TRUE} \]
+      <div class="ans"><b>Answer:</b> II is true.</div>
+    </div>
+
+    <div class="btnrow">
+      <button class="btn" id="b2" onclick="nextStep('p2')">Next step →</button>
+      <span class="counter" id="p2-count">0 / 3</span>
+    </div>
+  </section>
+
+  <!-- ================= PART III ================= -->
+  <section class="card">
+    <h2><span class="dot"></span>Statement III — Is \(\angle CAG = 2\,\angle BDH\)?</h2>
+
+    <div class="canvas-panel">
+      <canvas id="cv3" width="900" height="560"></canvas>
+      <div class="ctrls">
+        <div class="ctrl-item">
+          <input type="checkbox" id="c3arc1" checked>
+          <label for="c3arc1">Highlight <span style="color:#db2777">\(\widehat{CDEFG}\)</span></label>
+        </div>
+        <div class="ctrl-item">
+          <input type="checkbox" id="c3arc2" checked>
+          <label for="c3arc2">Highlight <span style="color:#0369a1">\(\widehat{BAH}\)</span></label>
+        </div>
+        <div class="ctrl-item">
+          <input type="checkbox" id="c3ang" checked>
+          <label for="c3ang">Draw \(\angle CAG\) &amp; \(\angle BDH\)</label>
+        </div>
+      </div>
+      <div class="readout">
+        <div class="ro">arc \(\widehat{CDEFG}\) = <em id="r3a">225°</em></div>
+        <div class="ro">arc \(\widehat{BAH}\) = <em id="r3b">112.5°</em></div>
+        <div class="ro">\(\angle CAG\) = <em id="r3c">112.5°</em></div>
+        <div class="ro">\(\angle BDH\) = <em id="r3d">56.25°</em></div>
+        <div class="ro">ratio = <em id="r3e">2.00</em></div>
+      </div>
+    </div>
+
+    <div class="step" id="s3-1">
+      <div class="step-head">
+        <span class="badge-num">1</span>
+        <span class="step-title">Count the arcs on each side</span>
+      </div>
+      <div class="work">
+        The arc standing on chord/angle \(CAG\) runs from \(C\) to \(G\) <i>through</i> \(D,E,F\):
+        \[ \widehat{CDEFG}=\widehat{CD}+\widehat{DE}+\widehat{EF}+\widehat{FG}=4\times 45^\circ = 180^\circ \]
+        The arc standing on \(\angle BDH\) runs from \(B\) to \(H\) <i>through</i> \(C,D,E,F,G\):
+        \[ \widehat{BAH}=\widehat{AB}+\widehat{GH}=2\times45^\circ=90^\circ \]
+      </div>
+      <div class="hint"><b>Hint:</b> "arc prop. to \(\angle\)s at circumference" — an angle at the circumference equals half the arc standing on it. (Careful: the arc must be the one <i>not</i> containing the vertex.)</div>
+    </div>
+
+    <div class="step" id="s3-2">
+      <div class="step-head">
+        <span class="badge-num">2</span>
+        <span class="step-title">Apply the arc–angle relation</span>
+      </div>
+      <div class="work">
+        \[ \angle CAG = \tfrac12 \times \widehat{CDEFG} = \tfrac12 \times 180^\circ = 90^\circ \]
+        \[ \angle BDH = \tfrac12 \times \widehat{BAH} = \tfrac12 \times 90^\circ = 45^\circ \]
+      </div>
+      <div class="hint"><b>Hint:</b> check numerically in the diagram — the pink angle is twice the blue angle in every configuration.</div>
+    </div>
+
+    <div class="step" id="s3-3">
+      <div class="step-head">
+        <span class="badge-num">3</span>
+        <span class="step-title">Compare</span>
+        <span class="badge-mark">1A</span>
+      </div>
+      <div class="work">
+        \[ \frac{\angle CAG}{\angle BDH}=\frac{90^\circ}{45^\circ}=2 \;\Rightarrow\; \angle CAG = 2\,\angle BDH \]
+      </div>
+      \[ \boxed{\angle CAG = 2\,\angle BDH} \quad\Rightarrow\quad \text{Statement III is TRUE} \]
+      <div class="ans"><b>Answer:</b> III is true.</div>
+    </div>
+
+    <div class="btnrow">
+      <button class="btn" id="b3" onclick="nextStep('p3')">Next step →</button>
+      <span class="counter" id="p3-count">0 / 3</span>
+    </div>
+  </section>
+
+  <!-- ================= SUMMARY ================= -->
+  <section class="card summary">
+    <h2><span class="dot" style="box-shadow:0 0 0 4px rgba(251,191,36,.25)"></span>Summary of Answers</h2>
+    <ul>
+      <li><span class="hl">I.</span> \(AG \parallel BF\) — <b>TRUE</b> (equal arcs \(\widehat{FG}=\widehat{AB}\) give equal alternate angles \(\angle FAG=\angle AFB=22.5^\circ\)).</li>
+      <li><span class="hl">II.</span> \(BD = EG\) — <b>TRUE</b> (equal arcs \(\widehat{BCD}=\widehat{EFG}=90^\circ\) subtend equal chords).</li>
+      <li><span class="hl">III.</span> \(\angle CAG = 2\,\angle BDH\) — <b>TRUE</b> (\(\angle CAG=90^\circ\) stands on the semicircular arc; \(\angle BDH=45^\circ\)).</li>
+      <li>Therefore the correct choice is <span class="hl">D. I, II and III</span>.</li>
+    </ul>
+    <div class="verdict">Answer: D</div>
+  </section>
+
+  <footer>
+    HKDSE Mathematics (Compulsory Part) · 2021 Paper 2 Question 21 — Interactive Solution<br>
+    Built with HTML5 Canvas + MathJax
+  </footer>
+</div>
+
+<script>
+/* ============================================================
+   SHARED GEOMETRY HELPERS
+   ============================================================ */
+// Angle (in degrees from +x axis) for each vertex so that the polygon
+// looks like the textbook figure: A bottom-left, going anti-clockwise B,C,D,...H.
+// We place H at bottom-right and A at bottom-left with a slight tilt.
+const BASE_ANGLES = [247.5, 292.5, 337.5, 22.5, 67.5, 112.5, 157.5, 202.5]; // A,B,C,D,E,F,G,H
+
+function octPoints(cx, cy, R, rotDeg){
+  const rot = rotDeg * Math.PI/180;
+  const pts = {};
+  const names = ['A','B','C','D','E','F','G','H'];
+  names.forEach((n,i)=>{
+    // canvas y grows downward → use -sin to get mathematical CCW
+    const a = (BASE_ANGLES[i]*Math.PI/180) + rot;
+    pts[n] = { x: cx + R*Math.cos(a), y: cy - R*Math.sin(a) };
+  });
+  return pts;
+}
+
+function drawPolygon(ctx, P, names, fill, stroke, lw){
+  ctx.beginPath();
+  names.forEach((n,i)=>{ const p=P[n]; i? ctx.lineTo(p.x,p.y) : ctx.moveTo(p.x,p.y); });
+  ctx.closePath();
+  if(fill) { ctx.fillStyle=fill; ctx.fill(); }
+  if(stroke){ ctx.strokeStyle=stroke; ctx.lineWidth=lw||2; ctx.stroke(); }
+}
+
+function drawCircumcircle(ctx, cx, cy, R){
+  ctx.beginPath();
+  ctx.arc(cx,cy,R,0,Math.PI*2);
+  ctx.strokeStyle='#cbd5e1'; ctx.lineWidth=1.6; ctx.setLineDash([6,6]); ctx.stroke();
+  ctx.setLineDash([]);
+}
+
+function drawVertex(ctx, p, name, color, labelOff){
+  ctx.beginPath();
+  ctx.arc(p.x,p.y,5.5,0,Math.PI*2);
+  ctx.fillStyle=color||'#1d4ed8'; ctx.fill();
+  ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
+  const off = labelOff || {x:0,y:0};
+  ctx.font='bold 16px Segoe UI, sans-serif';
+  ctx.fillStyle='#0f172a';
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(name, p.x+off.x, p.y+off.y);
+}
+
+function drawLine(ctx, p, q, color, lw, dash){
+  ctx.beginPath();
+  ctx.moveTo(p.x,p.y); ctx.lineTo(q.x,q.y);
+  ctx.strokeStyle=color; ctx.lineWidth=lw||2.5;
+  if(dash) ctx.setLineDash(dash);
+  ctx.stroke(); ctx.setLineDash([]);
+}
+
+// highlight an arc (list of consecutive vertex names on the circumcircle)
+function drawArcHighlight(ctx, cx,cy,R, names, P, color, lw, alpha){
+  ctx.save();
+  ctx.beginPath();
+  // approximate arc through the actual vertex points using arcs between them
+  ctx.strokeStyle = color;
+  ctx.lineWidth = lw || 9;
+  ctx.globalAlpha = alpha==null?0.55:alpha;
+  ctx.lineCap='round';
+  ctx.beginPath();
+  ctx.moveTo(P[names[0]].x, P[names[0]].y);
+  for(let i=1;i<names.length;i++){
+    ctx.lineTo(P[names[i]].x, P[names[i]].y);
+  }
+  ctx.stroke();
+  ctx.restore();
+}
+
+// draw an angle mark at vertex V between directions to P and Q
+function drawAngle(ctx, V, P, Q, radius, color, label){
+  const a1 = Math.atan2(P.y-V.y, P.x-V.x);
+  const a2 = Math.atan2(Q.y-V.y, Q.x-V.x);
+  ctx.beginPath();
+  ctx.arc(V.x, V.y, radius, a1, a2, true);
+  ctx.strokeStyle=color; ctx.lineWidth=3; ctx.stroke();
+  // small filled wedge
+  ctx.beginPath();
+  ctx.moveTo(V.x,V.y);
+  ctx.arc(V.x,V.y,radius,a1,a2,true);
+  ctx.closePath();
+  ctx.fillStyle=color; ctx.globalAlpha=0.13; ctx.fill(); ctx.globalAlpha=1;
+  if(label){
+    let mid = (a1+a2)/2;
+    // pick the "outer" midpoint (shorter arc)
+    if(Math.abs(a1-a2)>Math.PI){ mid += Math.PI; }
+    ctx.font='bold 15px Segoe UI, sans-serif';
+    ctx.fillStyle=color; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(label, V.x+(radius+20)*Math.cos(mid), V.y+(radius+20)*Math.sin(mid));
+  }
+}
+
+// grid + axes background
+function drawGrid(ctx, w, h, cx, cy, spacing, R){
+  ctx.save();
+  ctx.strokeStyle='#eef2f7'; ctx.lineWidth=1;
+  for(let x=cx%spacing; x<w; x+=spacing){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke(); }
+  for(let y=cy%spacing; y<h; y+=spacing){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
+  ctx.restore();
+  // faint concentric circles as radius scale
+  ctx.save();
+  ctx.strokeStyle='#f1f5f9'; ctx.lineWidth=1;
+  for(let k=1;k<=3;k++){
+    ctx.beginPath(); ctx.arc(cx,cy,R*k/3,0,Math.PI*2); ctx.stroke();
+  }
+  ctx.restore();
+}
+
+const CO = {
+  blue:'#1d4ed8', blueL:'#3b82f6', pink:'#db2777', cyan:'#0891b2',
+  amber:'#f59e0b', emerald:'#059669', slate:'#475569', ink:'#0f172a',
+  red:'#dc2626', violet:'#7c3aed', sky:'#0369a1'
+};
+
+/* ============================================================
+   CANVAS 1 : Statement I  (AG // BF)
+   ============================================================ */
+const cv1 = document.getElementById('cv1');
+const ctx1 = cv1.getContext('2d');
+function draw1(){
+  const W=cv1.width, H=cv1.height;
+  ctx1.clearRect(0,0,W,H);
+  ctx1.fillStyle='#ffffff'; ctx1.fillRect(0,0,W,H);
+
+  const cx=W/2, cy=H/2, R=205;
+  drawGrid(ctx1,W,H,cx,cy,45,R);
+  drawCircumcircle(ctx1,cx,cy,R);
+
+  const rot = +document.getElementById('s1').value;
+  const P = octPoints(cx,cy,R,rot);
+  const namesAll = ['A','B','C','D','E','F','G','H'];
+
+  // highlighted arcs AB and FG
+  if(document.getElementById('c1arcs').checked){
+    drawArcHighlight(ctx1,cx,cy,R,['A','B'],P,CO.pink,10,0.5);
+    drawArcHighlight(ctx1,cx,cy,R,['F','G'],P,CO.pink,10,0.5);
+  }
+
+  // polygon
+  drawPolygon(ctx1,P,namesAll,'rgba(59,130,246,.06)','#94a3b8',2);
+
+  // chords AG, BF
+  const parallel = document.getElementById('c1par').checked;
+  drawLine(ctx1,P.A,P.G, parallel?CO.red:CO.slate, parallel?4:3);
+  drawLine(ctx1,P.B,P.F, parallel?CO.emerald:CO.slate, parallel?4:3);
+
+  // transversal AF
+  drawLine(ctx1,P.A,P.F,'#cbd5e1',2,[5,5]);
+
+  // angle marks
+  if(document.getElementById('c1ang').checked){
+    drawAngle(ctx1,P.A,P.F,P.G,44,CO.pink,'22.5°');
+    drawAngle(ctx1,P.F,P.A,P.B,44,CO.cyan,'22.5°');
+  }
+
+  // vertices
+  namesAll.forEach((n,i)=>{
+    const dir={x:(P[n].x-cx)/R*22, y:(P[n].y-cy)/R*22};
+    drawVertex(ctx1,P[n],n, namesAll.includes(n)?CO.blue:CO.ink, dir);
+  });
+
+  // legend / title
+  ctx1.font='bold 17px Segoe UI, sans-serif'; ctx1.fillStyle=CO.ink;
+  ctx1.textAlign='left'; ctx1.textBaseline='top';
+  ctx1.fillText('Regular octagon ABCDEFGH with circumcircle', 18, 16);
+  ctx1.font='14px Segoe UI, sans-serif'; ctx1.fillStyle=CO.slate;
+  ctx1.fillText('Red: AG   •   Green: BF   •   Pink/cyan: equal angles on equal arcs', 18, 40);
+
+  if(parallel){
+    ctx1.font='bold 16px Segoe UI, sans-serif'; ctx1.fillStyle=CO.red;
+    ctx1.fillText('AG ∥ BF ✓', 18, H-34);
+  }
+
+  // readouts (rotation does not change them for a regular octagon)
+  document.getElementById('r1a').textContent='45°';
+  document.getElementById('r1b').textContent='45°';
+  document.getElementById('r1c').textContent='22.5°';
+  document.getElementById('r1d').textContent='22.5°';
+  document.getElementById('r1e').textContent='0°';
+}
+document.getElementById('s1').addEventListener('input',draw1);
+['c1arcs','c1ang','c1par'].forEach(id=>document.getElementById(id).addEventListener('change',draw1));
+
+/* ============================================================
+   CANVAS 2 : Statement II (BD = EG)
+   ============================================================ */
+const cv2 = document.getElementById('cv2');
+const ctx2 = cv2.getContext('2d');
+function draw2(){
+  const W=cv2.width, H=cv2.height;
+  ctx2.clearRect(0,0,W,H);
+  ctx2.fillStyle='#ffffff'; ctx2.fillRect(0,0,W,H);
+
+  const cx=W/2, cy=H/2, R=205;
+  drawGrid(ctx2,W,H,cx,cy,45,R);
+  drawCircumcircle(ctx2,cx,cy,R);
+
+  const P = octPoints(cx,cy,R,0);
+  const namesAll = ['A','B','C','D','E','F','G','H'];
+
+  // highlighted arcs BCD and EFG
+  if(document.getElementById('c2arc').checked){
+    drawArcHighlight(ctx2,cx,cy,R,['B','C','D'],P,CO.cyan,10,0.5);
+    drawArcHighlight(ctx2,cx,cy,R,['E','F','G'],P,CO.pink,10,0.5);
+  }
+
+  drawPolygon(ctx2,P,namesAll,'rgba(59,130,246,.06)','#94a3b8',2);
+
+  // chords BD and EG
+  if(document.getElementById('c2chord').checked){
+    drawLine(ctx2,P.B,P.D,CO.cyan,4);
+    drawLine(ctx2,P.E,P.G,CO.pink,4);
+    // centre radial lines to show equal arcs
+    drawLine(ctx2,{x:cx,y:cy},P.B,'#e2e8f0',1.5,[4,4]);
+    drawLine(ctx2,{x:cx,y:cy},P.D,'#e2e8f0',1.5,[4,4]);
+    drawLine(ctx2,{x:cx,y:cy},P.E,'#e2e8f0',1.5,[4,4]);
+    drawLine(ctx2,{x:cx,y:cy},P.G,'#e2e8f0',1.5,[4,4]);
+  }
+
+  namesAll.forEach(n=>{
+    const dir={x:(P[n].x-cx)/R*22, y:(P[n].y-cy)/R*22};
+    drawVertex(ctx2,P[n],n,CO.blue,dir);
+  });
+
+  ctx2.font='bold 17px Segoe UI, sans-serif'; ctx2.fillStyle=CO.ink;
+  ctx2.textAlign='left'; ctx2.textBaseline='top';
+  ctx2.fillText('Equal arcs ⟶ equal chords', 18, 16);
+  ctx2.font='14px Segoe UI, sans-serif'; ctx2.fillStyle=CO.slate;
+  ctx2.fillText('Cyan arc BCD = 90°  •  Pink arc EFG = 90°', 18, 40);
+
+  // numeric chord lengths (in "units" where R = 1)
+  const R1 = 1;
+  const ang = (a,b)=> Math.abs(a-b)*Math.PI/180;
+  // central angles B->D (two steps) and E->G (two steps)
+  const c = 2*R1*Math.sin((2*45*Math.PI/180)/2); // 2*45 = 90°
+  document.getElementById('r2a').textContent='90°';
+  document.getElementById('r2b').textContent='90°';
+  document.getElementById('r2c').textContent = c.toFixed(3);
+  document.getElementById('r2d').textContent = c.toFixed(3);
+  document.getElementById('r2e').textContent = '0.000';
+
+  // chord labels
+  ctx2.font='bold 15px Segoe UI, sans-serif'; ctx2.fillStyle=CO.cyan;
+  ctx2.fillText('BD', (P.B.x+P.D.x)/2+14, (P.B.y+P.D.y)/2-6);
+  ctx2.fillStyle=CO.pink;
+  ctx2.fillText('EG', (P.E.x+P.G.x)/2-34, (P.E.y+P.G.y)/2+4);
+  ctx2.textAlign='left'; ctx2.textBaseline='top';
+}
+['c2arc','c2chord'].forEach(id=>document.getElementById(id).addEventListener('change',draw2));
+
+/* ============================================================
+   CANVAS 3 : Statement III (∠CAG = 2∠BDH)
+   ============================================================ */
+const cv3 = document.getElementById('cv3');
+const ctx3 = cv3.getContext('2d');
+function draw3(){
+  const W=cv3.width, H=cv3.height;
+  ctx3.clearRect(0,0,W,H);
+  ctx3.fillStyle='#ffffff'; ctx3.fillRect(0,0,W,H);
+
+  const cx=W/2, cy=H/2, R=205;
+  drawGrid(ctx3,W,H,cx,cy,45,R);
+  drawCircumcircle(ctx3,cx,cy,R);
+
+  const P = octPoints(cx,cy,R,0);
+  const namesAll=['A','B','C','D','E','F','G','H'];
+
+  if(document.getElementById('c3arc1').checked){
+    drawArcHighlight(ctx3,cx,cy,R,['C','D','E','F','G'],P,CO.pink,11,0.5);
+  }
+  if(document.getElementById('c3arc2').checked){
+    drawArcHighlight(ctx3,cx,cy,R,['B','A','H'],P,CO.sky,11,0.5);
+  }
+
+  drawPolygon(ctx3,P,namesAll,'rgba(59,130,246,.06)','#94a3b8',2);
+
+  if(document.getElementById('c3ang').checked){
+    // angle CAG at A
+    drawLine(ctx3,P.A,P.C,CO.pink,3.2);
+    drawLine(ctx3,P.A,P.G,CO.pink,3.2);
+    drawAngle(ctx3,P.A,P.C,P.G,60,CO.pink,'∠CAG = 90°');
+    // angle BDH at D
+    drawLine(ctx3,P.D,P.B,CO.sky,3.2);
+    drawLine(ctx3,P.D,P.H,CO.sky,3.2);
+    drawAngle(ctx3,P.D,P.B,P.H,52,CO.sky,'∠BDH = 45°');
+  }
+
+  namesAll.forEach(n=>{
+    const dir={x:(P[n].x-cx)/R*22, y:(P[n].y-cy)/R*22};
+    drawVertex(ctx3,P[n],n,CO.blue,dir);
+  });
+
+  ctx3.font='bold 17px Segoe UI, sans-serif'; ctx3.fillStyle=CO.ink;
+  ctx3.textAlign='left'; ctx3.textBaseline='top';
+  ctx3.fillText('Angle at circumference = ½ × arc standing on it', 18, 16);
+  ctx3.font='14px Segoe UI, sans-serif'; ctx3.fillStyle=CO.slate;
+  ctx3.fillText('Pink arc CDEFG = 180°  •  Blue arc BAH = 90°', 18, 40);
+
+  ctx3.textAlign='left'; ctx3.textBaseline='top';
+  ctx3.font='bold 15px Segoe UI, sans-serif'; ctx3.fillStyle=CO.pink;
+  ctx3.fillText('arc CDEFG (4 sides) = 180°', 18, H-56);
+  ctx3.fillStyle=CO.sky;
+  ctx3.fillText('arc BAH (2 sides) = 90°', 18, H-34);
+
+  document.getElementById('r3a').textContent='180°';
+  document.getElementById('r3b').textContent='90°';
+  document.getElementById('r3c').textContent='90°';
+  document.getElementById('r3d').textContent='45°';
+  document.getElementById('r3e').textContent='2.00';
+}
+['c3arc1','c3arc2','c3ang'].forEach(id=>document.getElementById(id).addEventListener('change',draw3));
+
+/* ============================================================
+   STEP-BY-STEP REVEAL
+   ============================================================ */
+const stepState = {
+  p1: { ids:['s1-1','s1-2','s1-3'], btn:'b1', counter:'p1-count', idx:0 },
+  p2: { ids:['s2-1','s2-2','s2-3'], btn:'b2', counter:'p2-count', idx:0 },
+  p3: { ids:['s3-1','s3-2','s3-3'], btn:'b3', counter:'p3-count', idx:0 }
+};
+function nextStep(key){
+  const st = stepState[key];
+  if(st.idx < st.ids.length){
+    document.getElementById(st.ids[st.idx]).classList.add('show');
+    st.idx++;
+  }
+  document.getElementById(st.counter).textContent = st.idx + ' / ' + st.ids.length;
+  if(st.idx === st.ids.length){
+    const b = document.getElementById(st.btn);
+    b.disabled = true;
+    b.textContent = 'All steps revealed ✓';
+  }
+  if(window.MathJax && MathJax.typesetPromise){
+    MathJax.typesetPromise();
+  }
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+function initAll(){
+  draw1(); draw2(); draw3();
+}
+window.addEventListener('load', ()=>{
+  initAll();
+  if(window.MathJax && MathJax.typesetPromise){ MathJax.typesetPromise(); }
+});
+window.addEventListener('resize', ()=>{});
+</script>
+</body>
+</html>

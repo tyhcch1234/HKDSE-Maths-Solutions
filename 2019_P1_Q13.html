@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2019 Paper 1 Q13 — Circle Geometry</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root{
+    --blue:#2563eb; --blue-d:#1e40af; --amber:#f59e0b; --amber-l:#fef3c7;
+    --emerald:#059669; --emerald-l:#d1fae5; --slate:#334155; --slate-l:#64748b;
+    --paper:#f8fafc; --line:#e2e8f0;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
+    background:var(--paper); color:var(--slate); line-height:1.6;
+  }
+  .wrap{max-width:960px; margin:0 auto; padding:0 16px 60px;}
+
+  /* ---------- Hero ---------- */
+  .hero{
+    background:linear-gradient(135deg,#1e3a8a 0%,#2563eb 45%,#0ea5e9 100%);
+    color:#fff; padding:38px 16px 46px; position:relative; overflow:hidden;
+  }
+  .hero::after{
+    content:""; position:absolute; right:-70px; top:-70px; width:260px; height:260px;
+    border-radius:50%; background:rgba(255,255,255,.08);
+  }
+  .hero::before{
+    content:""; position:absolute; left:-50px; bottom:-90px; width:200px; height:200px;
+    border-radius:50%; background:rgba(255,255,255,.06);
+  }
+  .hero-inner{max-width:960px; margin:0 auto; position:relative; z-index:2;}
+  .eyebrow{font-size:.8rem; letter-spacing:.14em; text-transform:uppercase; opacity:.85; font-weight:600;}
+  .hero h1{margin:.25em 0 .1em; font-size:1.9rem; font-weight:700;}
+  .hero .sub{font-size:1.02rem; opacity:.92;}
+  .pills{margin-top:16px; display:flex; flex-wrap:wrap; gap:8px;}
+  .pill{
+    background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35);
+    padding:5px 13px; border-radius:999px; font-size:.78rem; font-weight:600;
+    backdrop-filter:blur(4px);
+  }
+
+  /* ---------- Cards ---------- */
+  .card{
+    background:#fff; border-radius:18px; padding:24px; margin-top:26px;
+    box-shadow:0 4px 18px rgba(15,23,42,.07), 0 1px 3px rgba(15,23,42,.05);
+    border:1px solid var(--line);
+  }
+  .card h2{
+    margin:0 0 4px; font-size:1.22rem; color:var(--blue-d);
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  }
+  .card h2 .tag{
+    font-size:.72rem; background:var(--blue); color:#fff; padding:3px 10px;
+    border-radius:999px; font-weight:700; letter-spacing:.03em;
+  }
+  .card h2 .mk{
+    font-size:.72rem; background:var(--amber); color:#3a2a00; padding:3px 10px;
+    border-radius:999px; font-weight:700;
+  }
+  .qtext{font-size:1.03rem;}
+
+  /* ---------- Canvas ---------- */
+  .canvas-box{
+    margin:16px 0; background:#fbfdff; border:1px solid var(--line);
+    border-radius:14px; padding:12px;
+  }
+  canvas{width:100%; height:auto; display:block; border-radius:10px;}
+  .controls{
+    display:flex; flex-wrap:wrap; gap:14px 26px; align-items:center;
+    margin-top:12px; padding-top:12px; border-top:1px dashed var(--line);
+  }
+  .ctl{display:flex; align-items:center; gap:9px; font-size:.86rem; font-weight:600; color:var(--slate);}
+  input[type=range]{width:130px; accent-color:var(--blue);}
+  input[type=checkbox]{width:17px; height:17px; accent-color:var(--emerald);}
+  .readout{
+    font-family:'Consolas','SF Mono',monospace; font-size:.86rem; font-weight:600;
+    background:#eff6ff; color:var(--blue-d); padding:4px 10px; border-radius:8px;
+  }
+  .readout.gr{background:var(--emerald-l); color:#065f46;}
+
+  /* ---------- Steps ---------- */
+  .step{
+    display:none; border-left:4px solid var(--blue); background:#f8fafc;
+    border-radius:0 12px 12px 0; padding:14px 18px; margin:14px 0;
+    animation:fade .35s ease;
+  }
+  .step.on{display:block;}
+  @keyframes fade{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
+  .step-head{display:flex; align-items:center; gap:10px; margin-bottom:8px; flex-wrap:wrap;}
+  .badge{
+    background:var(--blue); color:#fff; font-size:.72rem; font-weight:700;
+    padding:3px 10px; border-radius:999px;
+  }
+  .mkb{
+    background:var(--amber-l); color:#92400e; border:1px solid #fcd34d;
+    font-size:.72rem; font-weight:700; padding:2px 9px; border-radius:999px;
+  }
+  .hint{
+    background:var(--amber-l); border-left:4px solid var(--amber);
+    padding:9px 13px; border-radius:0 8px 8px 0; margin:10px 0; font-size:.9rem;
+  }
+  .hint::before{content:"Hint  "; font-weight:700; color:#92400e;}
+  .ansbox{
+    background:var(--emerald-l); border-left:4px solid var(--emerald);
+    padding:9px 13px; border-radius:0 8px 8px 0; margin:10px 0; font-weight:600;
+    color:#065f46;
+  }
+  .btnrow{display:flex; align-items:center; gap:14px; margin-top:16px; flex-wrap:wrap;}
+  button{
+    background:var(--blue); color:#fff; border:none; padding:10px 20px;
+    border-radius:10px; font-size:.93rem; font-weight:700; cursor:pointer;
+    transition:.2s; box-shadow:0 2px 8px rgba(37,99,235,.28);
+  }
+  button:hover:not(:disabled){background:var(--blue-d); transform:translateY(-1px);}
+  button:disabled{background:#cbd5e1; cursor:not-allowed; box-shadow:none; color:#64748b;}
+  .counter{font-size:.85rem; font-weight:700; color:var(--slate-l);}
+
+  /* ---------- Summary ---------- */
+  .summary{
+    background:linear-gradient(140deg,#0f172a,#1e293b); color:#e2e8f0;
+    border-radius:18px; padding:26px; margin-top:26px;
+    box-shadow:0 8px 26px rgba(15,23,42,.25);
+  }
+  .summary h2{color:#7dd3fc; margin:0 0 12px; font-size:1.2rem;}
+  .summary ul{margin:0; padding-left:6px; list-style:none;}
+  .summary li{padding:9px 0; border-bottom:1px solid rgba(255,255,255,.1); display:flex; gap:12px;}
+  .summary li:last-child{border-bottom:none;}
+  .summary .k{color:#fbbf24; font-weight:700; min-width:120px;}
+  .summary .v{font-family:'Consolas',monospace;}
+
+  footer{text-align:center; color:var(--slate-l); font-size:.82rem; padding:30px 16px 10px;}
+  @media(max-width:560px){
+    .hero h1{font-size:1.45rem;}
+    .card{padding:18px;}
+    input[type=range]{width:100px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 1</div>
+    <h1>2019 Paper 1 · Question 13</h1>
+    <div class="sub">Circle Geometry — Angles in a Circle, Cyclic Quadrilateral &amp; Sector Perimeter</div>
+    <div class="pills">
+      <span class="pill">Angles in a Circle</span>
+      <span class="pill">Cyclic Quadrilateral</span>
+      <span class="pill">Angle in Semicircle</span>
+      <span class="pill">Sector Perimeter</span>
+      <span class="pill">Estimation</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ============ QUESTION ============ -->
+  <section class="card">
+    <h2>Question <span class="tag">8 marks</span></h2>
+    <div class="qtext">
+      <p>In Figure 1, \(O\) is the centre of circle \(ABCDE\). \(AC\) is a diameter of the circle. \(BD\) and \(OC\) intersect at the point \(F\). It is given that \(\angle AED = 115^\circ\) and \(OB = 18\text{ cm}\).</p>
+      <p><b>(a)</b> Find \(\angle CBF\). <span class="mk">3 marks</span></p>
+      <p><b>(b)</b> Suppose that \(BC \parallel OD\) and \(OB = 18\text{ cm}\). Is the perimeter of the sector \(OBC\) less than \(60\text{ cm}\)? Explain your answer. <span class="mk">5 marks</span></p>
+    </div>
+  </section>
+
+  <!-- ============ PART (a) ============ -->
+  <section class="card">
+    <h2>Part (a) — Finding \(\angle CBF\) <span class="tag">3 marks</span></h2>
+
+    <div class="canvas-box">
+      <canvas id="cv1" width="720" height="560"></canvas>
+      <div class="controls">
+        <div class="ctl"><label for="sldA">\(\angle AED\)</label>
+          <input type="range" id="sldA" min="100" max="160" step="1" value="115">
+          <span class="readout" id="roA">115°</span>
+        </div>
+        <div class="ctl"><label><input type="checkbox" id="ck1a" checked> Show \(\angle ABC\)</label></div>
+        <div class="ctl"><label><input type="checkbox" id="ck1b" checked> Show \(\angle CBF\)</label></div>
+        <div class="ctl"><label><input type="checkbox" id="ck1c"> Highlight cyclic quad \(ABDE\)</label></div>
+      </div>
+      <p style="font-size:.82rem;color:#64748b;margin:10px 0 0;">
+        Slide to change \(\angle AED\) and watch \(\angle CBF = 90^\circ - (180^\circ - \angle AED)\) update live.
+      </p>
+    </div>
+
+    <div class="step" data-step="1">
+      <div class="step-head"><span class="badge">Step 1</span><span class="mkb">1M</span></div>
+      <p>\(ABDE\) is a cyclic quadrilateral (all four vertices lie on the circle). Opposite angles of a cyclic quadrilateral are supplementary:</p>
+      \[ \angle ABF + \angle AED = 180^\circ \]
+      \[ \angle ABF + 115^\circ = 180^\circ \]
+      <div class="hint">Use the <b>opposite angles of a cyclic quadrilateral</b> property. Note \(\angle ABF = \angle ABD\).</div>
+      <div class="ansbox">\(\angle ABF = 65^\circ\)</div>
+    </div>
+
+    <div class="step" data-step="2">
+      <div class="step-head"><span class="badge">Step 2</span><span class="mkb">1M</span></div>
+      <p>Since \(AC\) is a <b>diameter</b>, the angle in a semicircle is a right angle:</p>
+      \[ \angle ABC = 90^\circ \]
+      <div class="hint">Angle in semicircle: an angle subtended by a diameter at the circumference is \(90^\circ\).</div>
+      <div class="ansbox">\(\angle ABC = 90^\circ\)</div>
+    </div>
+
+    <div class="step" data-step="3">
+      <div class="step-head"><span class="badge">Step 3</span><span class="mkb">1A</span></div>
+      <p>Since \(F\) lies on \(BD\), the ray \(BF\) is along \(BD\), and \(B, F, D\) are collinear. Also \(BF\) lies inside \(\angle ABC\):</p>
+      \[ \angle CBF + \angle ABF = \angle ABC = 90^\circ \]
+      \[ \angle CBF + 65^\circ = 90^\circ \]
+      <div class="hint">Split \(\angle ABC\) into two parts: \(\angle ABF\) (found in Step 1) and \(\angle CBF\).</div>
+      <div class="ansbox">\(\angle CBF = 25^\circ\)</div>
+    </div>
+
+    <div class="btnrow">
+      <button id="btn1">Next step →</button>
+      <span class="counter" id="cnt1">0 / 3</span>
+    </div>
+  </section>
+
+  <!-- ============ PART (b) ============ -->
+  <section class="card">
+    <h2>Part (b) — Sector \(OBC\) Perimeter vs \(60\text{ cm}\) <span class="tag">5 marks</span></h2>
+
+    <div class="canvas-box">
+      <canvas id="cv2" width="720" height="580"></canvas>
+      <div class="controls">
+        <div class="ctl"><label for="sldR">Radius \(OB\)</label>
+          <input type="range" id="sldR" min="12" max="26" step="1" value="18">
+          <span class="readout" id="roR">18 cm</span>
+        </div>
+        <div class="ctl"><label><input type="checkbox" id="ck2a" checked> Sector \(OBC\) (shaded)</label></div>
+        <div class="ctl"><label><input type="checkbox" id="ck2b" checked> Show angles</label></div>
+        <div class="ctl"><label><input type="checkbox" id="ck2c"> Show \(BC \parallel OD\)</label></div>
+      </div>
+      <div class="controls" style="border-top:none;padding-top:0;margin-top:8px;">
+        <span class="readout" id="roTheta">∠BOC = 80°</span>
+        <span class="readout gr" id="roPer">Perimeter ≈ 61.13 cm</span>
+        <span class="readout" id="roCmp">61.13 &gt; 60 ✓ not less</span>
+      </div>
+    </div>
+
+    <div class="step" data-step="1">
+      <div class="step-head"><span class="badge">Step 1</span><span class="mkb">1M</span></div>
+      <p>Because \(BC \parallel OD\), alternate angles give:</p>
+      \[ \angle ODF = \angle CBF = 25^\circ \]
+      <div class="hint">\(OD \parallel BC\) with transversal \(BD\) — alternate angles \(\angle ODF\) and \(\angle CBF\) are equal.</div>
+      <div class="ansbox">\(\angle ODF = 25^\circ\)</div>
+    </div>
+
+    <div class="step" data-step="2">
+      <div class="step-head"><span class="badge">Step 2</span><span class="mkb">1M</span></div>
+      <p>\(OB = OD\) (radii of the same circle), so \(\triangle OBD\) is isosceles and the base angles are equal:</p>
+      \[ \angle OBF = \angle ODF = 25^\circ \]
+      <div class="hint">Two radii form an isosceles triangle: base angles at \(B\) and \(D\) are equal.</div>
+      <div class="ansbox">\(\angle OBF = 25^\circ\)</div>
+    </div>
+
+    <div class="step" data-step="3">
+      <div class="step-head"><span class="badge">Step 3</span><span class="mkb">1M</span></div>
+      <p>\(\angle DOF\) is the central angle subtending the same arc as the inscribed angle \(\angle DCB\). By the angle-at-centre theorem:</p>
+      \[ \angle DOF = 2\angle DCB = 2\angle CBF = 2(25^\circ) = 50^\circ \]
+      <div class="hint">Angle at centre = twice angle at circumference (same arc \(DB\)).</div>
+      <div class="ansbox">\(\angle DOF = 50^\circ\)</div>
+    </div>
+
+    <div class="step" data-step="4">
+      <div class="step-head"><span class="badge">Step 4</span><span class="mkb">1M &amp; 1A</span></div>
+      <p>In \(\triangle ODF\), the angles on the straight line \(BD\) at \(F\) sum to \(180^\circ\). Alternatively use the angles of \(\triangle ODF\):</p>
+      \[ \angle BOC = 180^\circ - \angle DOF - \angle OBF - \angle ODF \]
+      \[ = 180^\circ - 50^\circ - 25^\circ - 25^\circ = 80^\circ \]
+      <p>Perimeter of sector \(OBC\) with \(r = 18\):</p>
+      \[ \frac{80}{360}\left(2\pi(18)\right) + 2(18) = 8\pi + 36 \]
+      <div class="hint">Sector perimeter = arc length + 2 radii. Then compare with 60 using \(\pi > 3\).</div>
+      <div class="ansbox">\(\angle BOC = 80^\circ\), Perimeter \(= 8\pi + 36\)</div>
+    </div>
+
+    <div class="step" data-step="5">
+      <div class="step-head"><span class="badge">Step 5</span><span class="mkb">1A</span></div>
+      <p>Since \(\pi > 3\):</p>
+      \[ 8\pi + 36 > 8(3) + 36 = 60 \]
+      \[ \therefore \text{perimeter} > 60\text{ cm} \]
+      <div class="hint">Use the simple bound \(\pi > 3\) to give a rigorous comparison without a calculator.</div>
+      <div class="ansbox">No — the perimeter is <b>not less than</b> \(60\text{ cm}\) (it exceeds \(60\text{ cm}\)).</div>
+    </div>
+
+    <div class="btnrow">
+      <button id="btn2">Next step →</button>
+      <span class="counter" id="cnt2">0 / 5</span>
+    </div>
+  </section>
+
+  <!-- ============ SUMMARY ============ -->
+  <section class="summary">
+    <h2>Summary of Answers</h2>
+    <ul>
+      <li><span class="k">Part (a)</span><span class="v">\(\angle CBF = 25^\circ\)</span></li>
+      <li><span class="k">Part (b) key angles</span><span class="v">\(\angle ODF = \angle OBF = 25^\circ,\ \angle DOF = 50^\circ,\ \angle BOC = 80^\circ\)</span></li>
+      <li><span class="k">Sector perimeter</span><span class="v">\(8\pi + 36 \approx 61.13\text{ cm}\)</span></li>
+      <li><span class="k">Conclusion</span><span class="v">Since \(8\pi + 36 > 8(3)+36 = 60\), the perimeter is <b>not</b> less than \(60\text{ cm}\).</span></li>
+    </ul>
+  </section>
+
+  <footer>
+    HKDSE Mathematics (Compulsory Part) · 2019 Paper 1 Question 13 · Interactive Solution
+  </footer>
+</div>
+
+<script>
+/* =========================================================
+   SHARED MATH HELPERS
+   ========================================================= */
+function P(cx, cy, r, deg){            // point on circle, angle in degrees
+  const a = deg * Math.PI / 180;
+  return { x: cx + r * Math.cos(a), y: cy - r * Math.sin(a) };
+}
+function line(ctx, a, b, color, w, dash){
+  ctx.save();
+  ctx.setLineDash(dash || []);
+  ctx.strokeStyle = color; ctx.lineWidth = w || 1.5;
+  ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+  ctx.restore();
+}
+function dot(ctx, p, color, label, dx, dy, lcolor){
+  ctx.fillStyle = color;
+  ctx.beginPath(); ctx.arc(p.x, p.y, 4.5, 0, Math.PI * 2); ctx.fill();
+  if(label){
+    ctx.fillStyle = lcolor || '#0f172a';
+    ctx.font = 'bold 15px Segoe UI, sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(label, p.x + (dx || 0), p.y + (dy || 0));
+  }
+}
+function arcMarker(ctx, O, A, B, radius, color, label){
+  const a1 = Math.atan2(-(A.y - O.y), A.x - O.x);
+  const a2 = Math.atan2(-(B.y - O.y), B.x - O.x);
+  ctx.save();
+  ctx.strokeStyle = color; ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(O.x, O.y, radius, -a1, -a2, true);   // y-flip handling
+  ctx.stroke();
+  if(label){
+    const mid = (a1 + a2) / 2;
+    const px = O.x + (radius + 16) * Math.cos(mid);
+    const py = O.y - (radius + 16) * Math.sin(mid);
+    ctx.fillStyle = color; ctx.font = 'bold 12px Segoe UI, sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(label, px, py);
+  }
+  ctx.restore();
+}
+/* draw the smaller arc between two angles (degrees) */
+function arcPath(ctx, O, r, d1, d2, color, w){
+  ctx.save();
+  ctx.strokeStyle = color; ctx.lineWidth = w || 2;
+  ctx.beginPath();
+  ctx.arc(O.x, O.y, r, -d1 * Math.PI / 180, -d2 * Math.PI / 180, true);
+  ctx.stroke();
+  ctx.restore();
+}
+
+/* =========================================================
+   CANVAS 1 — PART (a)
+   ========================================================= */
+const cv1 = document.getElementById('cv1');
+const c1  = cv1.getContext('2d');
+
+function drawPartA(){
+  const W = cv1.width, H = cv1.height;
+  c1.clearRect(0, 0, W, H);
+
+  const O = { x: W / 2, y: H / 2 + 10 };
+  const R = 205;
+
+  const angAED = +document.getElementById('sldA').value;
+  document.getElementById('roA').textContent = angAED + '°';
+
+  /* angles (standard, anti-clockwise, degrees) */
+  const cDeg = 180;                      // C on left
+  const aDeg = 0;                        // A on right
+  const bDeg = -65;                      // B lower (below AC)
+  const dDeg = 118;                      // D upper-left
+  const eDeg = 52;                       // E upper-right
+
+  const A = P(O.x, O.y, R, aDeg);
+  const B = P(O.x, O.y, R, bDeg);
+  const C = P(O.x, O.y, R, cDeg);
+  const D = P(O.x, O.y, R, dDeg);
+  const E = P(O.x, O.y, R, eDeg);
+
+  /* intersection of BD with AC (the diameter) = F */
+  function inter(p1, p2, p3, p4){
+    const d1x = p2.x - p1.x, d1y = p2.y - p1.y;
+    const d2x = p4.x - p3.x, d2y = p4.y - p3.y;
+    const den = d1x * d2y - d1y * d2x;
+    if(Math.abs(den) < 1e-9) return null;
+    const t = ((p3.x - p1.x) * d2y - (p3.y - p1.y) * d2x) / den;
+    return { x: p1.x + t * d1x, y: p1.y + t * d1y };
+  }
+  const F = inter(B, D, C, A);
+
+  /* ---- grid ---- */
+  c1.save();
+  c1.strokeStyle = '#eef2f7'; c1.lineWidth = 1;
+  for(let x = 0; x < W; x += 20){ c1.beginPath(); c1.moveTo(x,0); c1.lineTo(x,H); c1.stroke(); }
+  for(let y = 0; y < H; y += 20){ c1.beginPath(); c1.moveTo(0,y); c1.lineTo(W,y); c1.stroke(); }
+  c1.restore();
+
+  /* ---- circle ---- */
+  c1.save();
+  c1.strokeStyle = '#1e40af'; c1.lineWidth = 2.6;
+  c1.beginPath(); c1.arc(O.x, O.y, R, 0, Math.PI * 2); c1.stroke();
+  c1.restore();
+
+  /* ---- cyclic quad ABDE highlight ---- */
+  if(document.getElementById('ck1c').checked){
+    c1.save();
+    c1.fillStyle = 'rgba(245,158,11,.14)';
+    c1.beginPath();
+    c1.moveTo(A.x, A.y); c1.lineTo(B.x, B.y); c1.lineTo(D.x, D.y); c1.lineTo(E.x, E.y);
+    c1.closePath(); c1.fill();
+    c1.strokeStyle = '#f59e0b'; c1.lineWidth = 2; c1.stroke();
+    c1.restore();
+  }
+
+  /* ---- diameter AC ---- */
+  line(c1, C, A, '#334155', 2.2);
+
+  /* ---- chords ---- */
+  line(c1, B, D, '#0891b2', 2);           // BD
+  line(c1, B, C, '#7c3aed', 2.2);         // BC
+  line(c1, A, E, '#94a3b8', 1.6);         // AE
+  line(c1, D, E, '#94a3b8', 1.6);         // DE
+  line(c1, O, D, '#059669', 2);           // OD
+  line(c1, O, B, '#059669', 2);           // OB
+
+  /* ---- angle ABC (right angle marker) ---- */
+  if(document.getElementById('ck1a').checked){
+    arcMarker(c1, B, A, C, 44, '#2563eb', '90°');
+  }
+
+  /* ---- angle ABF ---- */
+  arcMarker(c1, B, A, D, 66, '#d97706', (180 - angAED) + '°');
+
+  /* ---- angle CBF (target) ---- */
+  if(document.getElementById('ck1b').checked){
+    arcMarker(c1, B, C, D, 88, '#dc2626', (angAED - 90) + '°');
+  }
+
+  /* ---- angle AED ---- */
+  arcMarker(c1, E, A, D, 40, '#be185d', angAED + '°');
+
+  /* ---- points ---- */
+  dot(c1, O, '#1e293b', 'O', 0, 20, '#1e293b');
+  dot(c1, A, '#1e293b', 'A', 16, -8);
+  dot(c1, B, '#1e293b', 'B', 6, 22);
+  dot(c1, C, '#1e293b', 'C', -16, -8);
+  dot(c1, D, '#1e293b', 'D', -14, -12);
+  dot(c1, E, '#1e293b', 'E', 16, -12);
+  if(F) dot(c1, F, '#dc2626', 'F', -4, 20, '#dc2626');
+
+  /* ---- caption ---- */
+  c1.fillStyle = '#475569'; c1.font = 'bold 13px Segoe UI, sans-serif';
+  c1.textAlign = 'left'; c1.textBaseline = 'top';
+  c1.fillText('Figure 1 — Circle ABCDE with diameter AC', 14, 12);
+  c1.fillStyle = '#dc2626';
+  c1.fillText('∠CBF = 90° − (180° − ∠AED) = ' + (angAED - 90) + '°', 14, 32);
+}
+
+['sldA','ck1a','ck1b','ck1c'].forEach(id =>
+  document.getElementById(id).addEventListener('input', drawPartA));
+drawPartA();
+
+/* =========================================================
+   CANVAS 2 — PART (b)
+   ========================================================= */
+const cv2 = document.getElementById('cv2');
+const c2  = cv2.getContext('2d');
+
+function drawPartB(){
+  const W = cv2.width, H = cv2.height;
+  c2.clearRect(0, 0, W, H);
+
+  const Rval = +document.getElementById('sldR').value;
+  document.getElementById('roR').textContent = Rval + ' cm';
+
+  const O = { x: W / 2 - 40, y: H / 2 + 30 };
+  const R = 200;                                  // drawing radius
+
+  /* Geometry: angleBOC = 80°, O at centre.
+     Put C at 180°, B at 180+80 = 260° (i.e. -100°). */
+  const cDeg = 180, bDeg = 260, dDeg = 115, aDeg = 0;
+  const C = P(O.x, O.y, R, cDeg);
+  const B = P(O.x, O.y, R, bDeg);
+  const A = P(O.x, O.y, R, aDeg);
+  const D = P(O.x, O.y, R, dDeg);
+
+  /* F = intersection of BD and OC (the horizontal diameter through C,O,A) */
+  function inter(p1,p2,p3,p4){
+    const d1x=p2.x-p1.x,d1y=p2.y-p1.y,d2x=p4.x-p3.x,d2y=p4.y-p3.y;
+    const den=d1x*d2y-d1y*d2x; if(Math.abs(den)<1e-9) return null;
+    const t=((p3.x-p1.x)*d2y-(p3.y-p1.y)*d2x)/den;
+    return {x:p1.x+t*d1x, y:p1.y+t*d1y};
+  }
+  const F = inter(B, D, O, C);
+
+  /* ---- grid ---- */
+  c2.save();
+  c2.strokeStyle = '#eef2f7'; c2.lineWidth = 1;
+  for(let x=0;x<W;x+=20){c2.beginPath();c2.moveTo(x,0);c2.lineTo(x,H);c2.stroke();}
+  for(let y=0;y<H;y+=20){c2.beginPath();c2.moveTo(0,y);c2.lineTo(W,y);c2.stroke();}
+  c2.restore();
+
+  /* ---- circle ---- */
+  c2.save();
+  c2.strokeStyle = '#1e40af'; c2.lineWidth = 2.6;
+  c2.beginPath(); c2.arc(O.x, O.y, R, 0, Math.PI*2); c2.stroke();
+  c2.restore();
+
+  /* ---- sector OBC fill ---- */
+  if(document.getElementById('ck2a').checked){
+    c2.save();
+    c2.fillStyle = 'rgba(14,165,233,.18)';
+    c2.beginPath();
+    c2.moveTo(O.x, O.y);
+    c2.arc(O.x, O.y, R, -cDeg*Math.PI/180, -bDeg*Math.PI/180, true);
+    c2.closePath(); c2.fill();
+    c2.restore();
+  }
+
+  /* ---- diameter AC ---- */
+  line(c2, C, A, '#334155', 2.2);
+  /* ---- BD ---- */
+  line(c2, B, D, '#0891b2', 2);
+  /* ---- BC chord ---- */
+  line(c2, B, C, '#7c3aed', 2.6);
+  /* ---- radii OB, OC, OD ---- */
+  line(c2, O, B, '#059669', 2.2);
+  line(c2, O, C, '#059669', 2.2);
+  line(c2, O, D, '#059669', 2.2);
+  /* ---- DE, AE for completeness ---- */
+  line(c2, D, {x:P(O.x,O.y,R,52).x, y:P(O.x,O.y,R,52).y}, '#cbd5e1', 1.4);
+
+  /* ---- parallel marks ---- */
+  if(document.getElementById('ck2c').checked){
+    c2.save();
+    c2.strokeStyle='#ea580c'; c2.lineWidth=3;
+    /* double arrow marks on BC and OD */
+    const mx1=(B.x+C.x)/2, my1=(B.y+C.y)/2;
+    const mx2=(O.x+D.x)/2, my2=(O.y+D.y)/2;
+    c2.beginPath(); c2.moveTo(mx1-7,my1-5); c2.lineTo(mx1,my1); c2.lineTo(mx1-7,my1+5); c2.stroke();
+    c2.beginPath(); c2.moveTo(mx2-7,my2-5); c2.lineTo(mx2,my2); c2.lineTo(mx2-7,my2+5); c2.stroke();
+    c2.restore();
+  }
+
+  /* ---- angle markers ---- */
+  if(document.getElementById('ck2b').checked){
+    arcMarker(c2, O, C, B, 40, '#dc2626', '80°');        // ∠BOC
+    arcMarker(c2, O, D, B, 62, '#9333ea', '50°');        // ∠DOB (central)
+    arcMarker(c2, D, O, B, 40, '#059669', '25°');        // ∠ODB
+    arcMarker(c2, B, C, D, 40, '#0891b2', '25°');        // ∠CBF
+    /* ∠ODF */
+    if(F) arcMarker(c2, D, O, F, 58, '#f59e0b', '25°');
+  }
+
+  /* ---- points ---- */
+  dot(c2, O, '#1e293b', 'O', -4, 20, '#1e293b');
+  dot(c2, A, '#1e293b', 'A', 16, -8);
+  dot(c2, B, '#1e293b', 'B', 8, 22);
+  dot(c2, C, '#1e293b', 'C', -16, -8);
+  dot(c2, D, '#1e293b', 'D', -16, -12);
+  if(F) dot(c2, F, '#dc2626', 'F', -4, 20, '#dc2626');
+
+  /* ---- numeric readouts ---- */
+  const theta = 80, r = Rval;
+  const arcLen = theta/360 * 2 * Math.PI * r;
+  const per = arcLen + 2*r;
+  document.getElementById('roTheta').textContent = '∠BOC = 80°';
+  document.getElementById('roPer').textContent = 'Perimeter = ' + per.toFixed(2) + ' cm';
+  const less = per < 60;
+  document.getElementById('roCmp').textContent = per.toFixed(2) + (less ? ' < ' : ' > ') + '60 → ' + (less ? 'less than 60 ✓' : 'NOT less than 60');
+  document.getElementById('roCmp').style.background = less ? '#fee2e2' : '#d1fae5';
+  document.getElementById('roCmp').style.color = less ? '#991b1b' : '#065f46';
+
+  /* ---- caption ---- */
+  c2.fillStyle = '#475569'; c2.font = 'bold 13px Segoe UI, sans-serif';
+  c2.textAlign = 'left'; c2.textBaseline = 'top';
+  c2.fillText('Sector OBC — BC ∥ OD, OB = ' + r + ' cm', 14, 12);
+  c2.fillStyle = '#059669';
+  c2.fillText('Perimeter = 8π + 36 ≈ ' + (8*Math.PI+36).toFixed(2) + ' cm', 14, 32);
+  c2.fillStyle = '#dc2626';
+  c2.fillText('8π + 36 > 8(3) + 36 = 60', 14, 52);
+}
+
+['sldR','ck2a','ck2b','ck2c'].forEach(id =>
+  document.getElementById(id).addEventListener('input', drawPartB));
+drawPartB();
+
+/* =========================================================
+   STEP-BY-STEP REVEAL
+   ========================================================= */
+function setupReveal(btnId, cntId, cardSel){
+  const btn = document.getElementById(btnId);
+  const cnt = document.getElementById(cntId);
+  const steps = Array.from(document.querySelectorAll(cardSel + ' .step'));
+  const total = steps.length;
+  let cur = 0;
+  cnt.textContent = '0 / ' + total;
+
+  btn.addEventListener('click', () => {
+    if(cur < total){
+      steps[cur].classList.add('on');
+      cur++;
+      cnt.textContent = cur + ' / ' + total;
+      steps[cur-1].scrollIntoView({behavior:'smooth', block:'nearest'});
+      if(cur === total){
+        btn.disabled = true;
+        btn.textContent = 'All steps revealed ✓';
+      }
+    }
+  });
+}
+/* assign unique selectors by wrapping: use data attributes */
+document.querySelectorAll('section.card').forEach((card, i) => {
+  const btn = card.querySelector('button[id^="btn"]');
+  if(!btn) return;
+  const cnt = card.querySelector('span[id^="cnt"]');
+  const steps = Array.from(card.querySelectorAll('.step'));
+  let cur = 0;
+  cnt.textContent = '0 / ' + steps.length;
+  btn.addEventListener('click', () => {
+    if(cur < steps.length){
+      steps[cur].classList.add('on');
+      cur++;
+      cnt.textContent = cur + ' / ' + steps.length;
+      if(cur === steps.length){
+        btn.disabled = true;
+        btn.textContent = 'All steps revealed ✓';
+      }
+    }
+  });
+});
+
+/* redraw canvases on resize (keeps them crisp) */
+window.addEventListener('resize', () => { drawPartA(); drawPartB(); });
+</script>
+</body>
+</html>

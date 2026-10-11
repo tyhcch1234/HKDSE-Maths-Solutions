@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2013 Paper 1 Q15 — Box-and-Whisker Diagram &amp; Standard Scores</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root{
+    --blue:#2563eb;
+    --blue-dark:#1e3a8a;
+    --amber:#f59e0b;
+    --amber-bg:#fffbeb;
+    --emerald:#059669;
+    --emerald-bg:#ecfdf5;
+    --slate:#0f172a;
+    --slate-soft:#1e293b;
+    --grey:#64748b;
+    --line:#e2e8f0;
+    --card-shadow:0 10px 30px rgba(15,23,42,.08);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    background:#f1f5f9;
+    color:var(--slate);
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  /* ---------- HERO ---------- */
+  .hero{
+    background:linear-gradient(135deg,#1e3a8a 0%,#2563eb 45%,#0ea5e9 100%);
+    color:#fff;
+    padding:48px 22px 56px;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero::after{
+    content:"";
+    position:absolute;
+    width:420px;height:420px;
+    right:-140px;top:-180px;
+    background:radial-gradient(circle,rgba(255,255,255,.22),transparent 70%);
+    border-radius:50%;
+  }
+  .hero::before{
+    content:"";
+    position:absolute;
+    width:260px;height:260px;
+    left:-100px;bottom:-140px;
+    background:radial-gradient(circle,rgba(245,158,11,.35),transparent 70%);
+    border-radius:50%;
+  }
+  .hero-inner{max-width:1000px;margin:0 auto;position:relative;z-index:2;}
+  .eyebrow{
+    text-transform:uppercase;
+    letter-spacing:.16em;
+    font-size:.74rem;
+    font-weight:700;
+    opacity:.85;
+    margin:0 0 10px;
+  }
+  .hero h1{
+    font-size:clamp(1.5rem,4vw,2.3rem);
+    margin:0 0 6px;
+    font-weight:800;
+    letter-spacing:-.01em;
+  }
+  .hero h2{
+    font-size:clamp(1rem,2.4vw,1.25rem);
+    margin:0 0 18px;
+    font-weight:500;
+    opacity:.92;
+  }
+  .pills{display:flex;flex-wrap:wrap;gap:9px;}
+  .pill{
+    background:rgba(255,255,255,.16);
+    border:1px solid rgba(255,255,255,.32);
+    padding:6px 14px;
+    border-radius:999px;
+    font-size:.79rem;
+    font-weight:600;
+    backdrop-filter:blur(4px);
+  }
+  /* ---------- LAYOUT ---------- */
+  main{max-width:1000px;margin:-30px auto 0;padding:0 18px 60px;position:relative;z-index:3;}
+  .card{
+    background:#fff;
+    border-radius:18px;
+    padding:26px 24px;
+    margin-bottom:26px;
+    box-shadow:var(--card-shadow);
+    border:1px solid rgba(226,232,240,.9);
+  }
+  .card h3{
+    margin:0 0 4px;
+    font-size:1.22rem;
+    color:var(--blue-dark);
+    font-weight:800;
+    letter-spacing:-.01em;
+  }
+  .card .sub{color:var(--grey);font-size:.86rem;margin:0 0 16px;}
+  .marks{
+    display:inline-block;
+    background:var(--amber);
+    color:#3b2600;
+    font-weight:800;
+    font-size:.72rem;
+    padding:3px 10px;
+    border-radius:999px;
+    letter-spacing:.03em;
+    vertical-align:middle;
+    margin-left:6px;
+    white-space:nowrap;
+  }
+  .qtext{font-size:1.02rem;}
+  .qtext .stem{
+    background:#f8fafc;
+    border-left:5px solid var(--blue);
+    padding:14px 16px;
+    border-radius:0 12px 12px 0;
+    margin-bottom:18px;
+  }
+  .subpart{margin:14px 0 0;padding-left:2px;}
+  /* ---------- CANVAS ---------- */
+  .canvas-wrap{
+    background:#fbfdff;
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:12px;
+    margin:16px 0 8px;
+  }
+  canvas{width:100%;height:auto;display:block;border-radius:10px;background:#fff;}
+  .controls{
+    display:flex;flex-wrap:wrap;gap:18px;
+    align-items:center;margin-top:12px;
+    font-size:.86rem;color:var(--slate-soft);
+  }
+  .ctrl{display:flex;align-items:center;gap:8px;}
+  .ctrl label{font-weight:600;}
+  input[type=range]{
+    width:150px;accent-color:var(--blue);
+  }
+  .ctrl input[type=checkbox]{
+    width:17px;height:17px;accent-color:var(--emerald);
+  }
+  .val{
+    font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
+    background:#eff6ff;color:var(--blue-dark);
+    padding:2px 8px;border-radius:7px;font-weight:700;font-size:.82rem;
+    min-width:52px;text-align:center;
+  }
+  .readouts{
+    display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;
+  }
+  .ro{
+    flex:1 1 150px;
+    background:#f8fafc;
+    border:1px solid var(--line);
+    border-radius:11px;
+    padding:9px 12px;
+  }
+  .ro .k{font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:var(--grey);font-weight:700;}
+  .ro .v{font-size:1.02rem;font-weight:800;color:var(--blue-dark);font-family:ui-monospace,Consolas,monospace;}
+  .ro.good .v{color:var(--emerald);}
+  /* ---------- STEPS ---------- */
+  .step{
+    display:none;
+    border:1px solid var(--line);
+    border-radius:13px;
+    padding:16px 17px;
+    margin-top:14px;
+    background:#fdfefe;
+    animation:fade .35s ease;
+  }
+  .step.show{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+  .step-head{
+    display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;
+  }
+  .badge{
+    background:var(--blue);
+    color:#fff;
+    font-size:.72rem;
+    font-weight:800;
+    padding:4px 10px;
+    border-radius:8px;
+    letter-spacing:.03em;
+    white-space:nowrap;
+  }
+  .badge.mark{background:var(--amber);color:#3b2600;}
+  .hint{
+    background:var(--amber-bg);
+    border-left:4px solid var(--amber);
+    padding:10px 13px;
+    border-radius:0 10px 10px 0;
+    margin:12px 0;
+    font-size:.9rem;
+    color:#4a3208;
+  }
+  .hint b{color:#92400e;}
+  .answer{
+    background:var(--emerald-bg);
+    border-left:4px solid var(--emerald);
+    padding:10px 13px;
+    border-radius:0 10px 10px 0;
+    margin:12px 0 2px;
+    font-size:.95rem;
+    color:#064e3b;
+  }
+  .answer b{color:#065f46;}
+  .btn-row{display:flex;align-items:center;gap:14px;margin-top:16px;flex-wrap:wrap;}
+  button.next{
+    background:linear-gradient(135deg,#2563eb,#1d4ed8);
+    color:#fff;
+    border:none;
+    padding:11px 22px;
+    border-radius:11px;
+    font-size:.92rem;
+    font-weight:700;
+    cursor:pointer;
+    box-shadow:0 6px 16px rgba(37,99,235,.32);
+    transition:transform .15s,box-shadow .15s,opacity .2s;
+  }
+  button.next:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 10px 22px rgba(37,99,235,.4);}
+  button.next:disabled{
+    background:#cbd5e1;color:#475569;cursor:default;box-shadow:none;
+  }
+  .counter{font-size:.84rem;color:var(--grey);font-weight:700;font-family:ui-monospace,Consolas,monospace;}
+  /* ---------- SUMMARY ---------- */
+  .summary{
+    background:linear-gradient(140deg,#0f172a,#1e293b);
+    color:#e2e8f0;
+    border-radius:18px;
+    padding:28px 26px;
+    box-shadow:0 16px 40px rgba(15,23,42,.35);
+  }
+  .summary h3{color:#fff;margin:0 0 16px;font-size:1.22rem;font-weight:800;}
+  .summary ul{margin:0;padding-left:22px;}
+  .summary li{margin-bottom:11px;font-size:.97rem;}
+  .summary li::marker{color:var(--amber);}
+  .summary .hl{color:#fbbf24;font-weight:800;}
+  footer{
+    text-align:center;color:var(--grey);font-size:.82rem;
+    padding:0 18px 44px;
+  }
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  @media(max-width:700px){
+    .grid2{grid-template-columns:1fr;}
+    .hero{padding:36px 18px 48px;}
+    .card{padding:20px 16px;}
+    input[type=range]{width:120px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= HERO ================= -->
+<header class="hero">
+  <div class="hero-inner">
+    <p class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 1</p>
+    <h1>2013 Paper 1 · Question 15</h1>
+    <h2>Box-and-Whisker Diagram, Mean &amp; Standard Score</h2>
+    <div class="pills">
+      <span class="pill">Statistics</span>
+      <span class="pill">Box-and-Whisker Diagram</span>
+      <span class="pill">Median &amp; Mean</span>
+      <span class="pill">Standard Score \( z=\dfrac{x-\mu}{\sigma} \)</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- ================= QUESTION CARD ================= -->
+<section class="card">
+  <h3>Question 15 <span class="marks">Total 4 marks</span></h3>
+  <p class="sub">Full question text</p>
+
+  <div class="qtext">
+    <div class="stem">
+      The box-and-whisker diagram below shows the distribution of the scores (in marks) of the students of a class in a test. Susan gets the highest score while Tom gets \(65\) marks in the test. The standard scores of Susan and Tom in the test are \(3\) and \(0.5\) respectively.
+    </div>
+
+    <div class="canvas-wrap">
+      <canvas id="qCanvas" width="900" height="300" aria-label="Box-and-whisker diagram of scores"></canvas>
+    </div>
+
+    <p class="subpart"><b>(a)</b> Find the mean of the distribution. <span class="marks">2 marks</span></p>
+    <p class="subpart"><b>(b)</b> Susan claims that the standard scores of at least half of the students in the test are negative. Do you agree? Explain your answer. <span class="marks">2 marks</span></p>
+  </div>
+</section>
+
+<!-- ================= PART (a) ================= -->
+<section class="card">
+  <h3>Part (a) — Finding the Mean <span class="marks">2 marks</span></h3>
+  <p class="sub">Convert the two given standard scores into two equations in \(\mu\) and \(\sigma\).</p>
+
+  <div class="canvas-wrap">
+    <canvas id="canvasA" width="900" height="330" aria-label="Interactive number line for standard scores"></canvas>
+    <div class="controls">
+      <div class="ctrl">
+        <label for="muSlider">\(\mu\) =</label>
+        <input type="range" id="muSlider" min="40" max="80" step="1" value="55">
+        <span class="val" id="muVal">55</span>
+      </div>
+      <div class="ctrl">
+        <label for="sigmaSlider">\(\sigma\) =</label>
+        <input type="range" id="sigmaSlider" min="4" max="20" step="0.5" value="12">
+        <span class="val" id="sigmaVal">12</span>
+      </div>
+      <div class="ctrl">
+        <input type="checkbox" id="showScores" checked>
+        <label for="showScores">Show z-scores</label>
+      </div>
+    </div>
+    <div class="readouts">
+      <div class="ro"><div class="k">Susan \(x=90\)</div><div class="v" id="roSusan">—</div></div>
+      <div class="ro"><div class="k">Tom \(x=65\)</div><div class="v" id="roTom">—</div></div>
+      <div class="ro good"><div class="k">Target</div><div class="v">3 and 0.5</div></div>
+    </div>
+  </div>
+
+  <div id="stepsA">
+    <div class="step">
+      <div class="step-head"><span class="badge">Step 1</span><span class="badge mark">1M</span></div>
+      <p>Let \(\mu\) marks and \(\sigma\) marks be the mean and the standard deviation of the distribution respectively. The standard score of a score \(x\) is</p>
+      \[ z=\frac{x-\mu}{\sigma}. \]
+      <div class="hint"><b>Hint:</b> Susan has the <b>highest</b> score. From the box-and-whisker diagram the right whisker ends at \(90\), so Susan's score is \(90\).</div>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><span class="badge">Step 2</span><span class="badge mark">1M</span></div>
+      <p>Form one equation for each student:</p>
+      \[ \text{Susan: } \frac{90-\mu}{\sigma}=3 \quad\Longrightarrow\quad 90-\mu=3\sigma \]
+      \[ \text{Tom: } \frac{65-\mu}{\sigma}=0.5 \quad\Longrightarrow\quad 65-\mu=0.5\sigma \]
+      <div class="hint"><b>Hint:</b> Subtract the two equations to eliminate \(\mu\).</div>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><span class="badge">Step 3</span><span class="badge mark">1A</span></div>
+      <p>Subtracting:</p>
+      \[ (90-\mu)-(65-\mu)=3\sigma-0.5\sigma \]
+      \[ 25=2.5\sigma \quad\Longrightarrow\quad \sigma=10. \]
+      <p>Substituting \(\sigma=10\) back into \(90-\mu=3\sigma\):</p>
+      \[ 90-\mu=30 \quad\Longrightarrow\quad \mu=60. \]
+      <div class="answer"><b>Answer (a):</b> The mean of the distribution is \(\boxed{60}\) marks (and \(\sigma=10\)).</div>
+      <div class="hint"><b>Hint:</b> Use the sliders above and set \(\mu=60,\ \sigma=10\) — the two readouts should turn to exactly \(3\) and \(0.5\).</div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="next" data-target="stepsA">Next step →</button>
+    <span class="counter">0 / 3</span>
+  </div>
+</section>
+
+<!-- ================= PART (b) ================= -->
+<section class="card">
+  <h3>Part (b) — Are the Standard Scores of Half the Students Negative? <span class="marks">2 marks</span></h3>
+  <p class="sub">Compare the median with the mean.</p>
+
+  <div class="canvas-wrap">
+    <canvas id="canvasB" width="900" height="400" aria-label="Box plot compared with the mean line"></canvas>
+    <div class="controls">
+      <div class="ctrl">
+        <input type="checkbox" id="showMeanLine" checked>
+        <label for="showMeanLine">Show mean line \(\mu=60\)</label>
+      </div>
+      <div class="ctrl">
+        <input type="checkbox" id="showMedianLine" checked>
+        <label for="showMedianLine">Show median line \(=55\)</label>
+      </div>
+      <div class="ctrl">
+        <input type="checkbox" id="showNegative">
+        <label for="showNegative">Highlight negative z-scores</label>
+      </div>
+      <div class="ctrl">
+        <label for="meanSlider">\(\mu\) =</label>
+        <input type="range" id="meanSlider" min="45" max="80" step="1" value="60">
+        <span class="val" id="meanVal">60</span>
+      </div>
+    </div>
+    <div class="readouts">
+      <div class="ro"><div class="k">Median</div><div class="v">55</div></div>
+      <div class="ro"><div class="k">Mean \(\mu\)</div><div class="v" id="roMean">60</div></div>
+      <div class="ro good"><div class="k">At least half with \(z<0\)?</div><div class="v" id="roVerdict">…</div></div>
+    </div>
+  </div>
+
+  <div id="stepsB">
+    <div class="step">
+      <div class="step-head"><span class="badge">Step 1</span><span class="badge mark">1M</span></div>
+      <p>A standard score is negative exactly when the raw score is <b>less than the mean</b>:</p>
+      \[ z=\frac{x-\mu}{\sigma}<0 \iff x<\mu . \]
+      <div class="hint"><b>Hint:</b> \(\sigma>0\) always, so the sign of \(z\) is decided by \(x-\mu\) alone.</div>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><span class="badge">Step 2</span><span class="badge mark">1M</span></div>
+      <p>Read the box-and-whisker diagram: the median (line inside the box) is \(55\), while from part (a) the mean is \(\mu=60\). Hence</p>
+      \[ \text{median }55 < \text{mean }60. \]
+      <div class="hint"><b>Hint:</b> By definition of the median, at least half of the students score \(\le 55\) (i.e. at most the median).</div>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><span class="badge">Step 3</span><span class="badge mark">1A</span></div>
+      <p>At least half of the students have scores \(\le 55 < 60=\mu\). For all these students, \(x<\mu\), so their standard scores are negative.</p>
+      <div class="answer"><b>Answer (b):</b> Yes, we agree. Since the median \(55\) is less than the mean \(60\), at least half of the students score below the mean, so the standard scores of at least half of the students are negative.</div>
+      <div class="hint"><b>Hint:</b> Tick "Highlight negative z-scores" above: everything to the left of the mean line lies at or below the median region, so it is negative.</div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="next" data-target="stepsB">Next step →</button>
+    <span class="counter">0 / 3</span>
+  </div>
+</section>
+
+<!-- ================= SUMMARY ================= -->
+<section class="summary">
+  <h3>Summary of Answers</h3>
+  <ul>
+    <li><span class="hl">(a)</span> Let \(\mu\) be the mean and \(\sigma\) the standard deviation. From Susan (\(x=90,\ z=3\)) and Tom (\(x=65,\ z=0.5\)):
+      \[ 90-\mu=3\sigma,\qquad 65-\mu=0.5\sigma \;\Longrightarrow\; \sigma=10,\ \mu=60. \]
+      The mean of the distribution is <span class="hl">\(60\) marks</span>.
+    </li>
+    <li><span class="hl">(b)</span> From the box-and-whisker diagram, the median is \(55\), which is less than the mean \(60\).
+      A standard score is negative \(\iff\) the score is below the mean. Since at least half of the students have scores \(\le 55 < 60\), <span class="hl">at least half of the standard scores are negative</span>.
+      So <span class="hl">we agree</span> with Susan's claim.
+    </li>
+    <li><span class="hl">Key idea:</span> \( z=\dfrac{x-\mu}{\sigma} \), and \(z<0 \iff x<\mu\).</li>
+  </ul>
+</section>
+
+</main>
+
+<footer>
+  HKDSE Mathematics (Compulsory Part) · Paper 1 · 2013 Question 15 — Interactive Solution
+</footer>
+
+<script>
+/* ============================================================
+   Utility
+   ============================================================ */
+function setupHiDPI(canvas){
+  const ratio = window.devicePixelRatio || 1;
+  const w = canvas.width, h = canvas.height;
+  canvas.style.width = w + 'px';
+  canvas.style.height = h + 'px';
+  canvas.width = w * ratio;
+  canvas.height = h * ratio;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(ratio, ratio);
+  return ctx;
+}
+/* keep logical size for drawing */
+function initCanvas(id){
+  const c = document.getElementById(id);
+  const W = c.width, H = c.height;
+  const ratio = window.devicePixelRatio || 1;
+  c.width = W * ratio;
+  c.height = H * ratio;
+  c.style.width = '100%';
+  c.style.height = 'auto';
+  const ctx = c.getContext('2d');
+  ctx.scale(ratio, ratio);
+  return {ctx, W, H};
+}
+
+/* ============================================================
+   1. Question diagram — the original box-and-whisker plot
+   ============================================================ */
+(function(){
+  const c = document.getElementById('qCanvas');
+  const W = 900, H = 300;
+  const ratio = window.devicePixelRatio || 1;
+  c.width = W*ratio; c.height = H*ratio;
+  c.style.width='100%'; c.style.height='auto';
+  const ctx = c.getContext('2d');
+  ctx.scale(ratio, ratio);
+
+  const x0 = 80, x1 = 780;          // axis range in px  -> scores 20..100
+  const minS = 20, maxS = 100;
+  const yAxis = 220, boxTop = 130, boxH = 46;
+
+  const px = s => x0 + (s - minS)/(maxS-minS)*(x1-x0);
+
+  // background
+  ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,W,H);
+
+  // vertical dotted grid every 10 marks
+  ctx.strokeStyle='#cbd5e1'; ctx.lineWidth=1;
+  ctx.setLineDash([3,4]);
+  for(let s=minS;s<=maxS;s+=10){
+    ctx.beginPath();
+    ctx.moveTo(px(s),60);
+    ctx.lineTo(px(s),yAxis+8);
+    ctx.stroke();
+  }
+  ctx.setLineDash([]);
+
+  // outliers
+  ctx.fillStyle = '#0f172a';
+  [[30,26],[36,20],[42,17]].forEach(([s,y])=>{
+    ctx.beginPath(); ctx.arc(px(s), y, 3.2, 0, Math.PI*2); ctx.fill();
+  });
+
+  // whiskers
+  ctx.strokeStyle='#0f172a'; ctx.lineWidth=2.4;
+  ctx.beginPath(); ctx.moveTo(px(45), yAxis); ctx.lineTo(px(45), boxTop-14); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(px(45), boxTop-14); ctx.lineTo(px(52), boxTop-14); ctx.stroke();
+
+  ctx.beginPath(); ctx.moveTo(px(70), yAxis); ctx.lineTo(px(70), boxTop-14); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(px(70), boxTop-14); ctx.lineTo(px(90), boxTop-14); ctx.stroke();
+
+  // box
+  ctx.fillStyle='rgba(37,99,235,0.12)';
+  ctx.fillRect(px(52), boxTop, px(70)-px(52), boxH);
+  ctx.strokeStyle='#1e3a8a'; ctx.lineWidth=2.4;
+  ctx.strokeRect(px(52), boxTop, px(70)-px(52), boxH);
+
+  // median
+  ctx.strokeStyle='#f59e0b'; ctx.lineWidth=3.4;
+  ctx.beginPath(); ctx.moveTo(px(55), boxTop); ctx.lineTo(px(55), boxTop+boxH); ctx.stroke();
+
+  // axis
+  ctx.strokeStyle='#0f172a'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(x0-40, yAxis); ctx.lineTo(x1+30, yAxis); ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(x1+30, yAxis); ctx.lineTo(x1+20, yAxis-5); ctx.lineTo(x1+20, yAxis+5); ctx.closePath();
+  ctx.fillStyle='#0f172a'; ctx.fill();
+
+  // axis labels
+  ctx.fillStyle='#334155'; ctx.font='600 13px ui-monospace,Consolas,monospace';
+  ctx.textAlign='center';
+  for(let s=minS;s<=maxS;s+=10){
+    ctx.fillText(s, px(s), yAxis+26);
+  }
+  ctx.fillStyle='#0f172a'; ctx.font='700 14px "Segoe UI",Arial';
+  ctx.textAlign='left';
+  ctx.fillText('Score (marks)', x1+8, yAxis-12);
+  ctx.textAlign='right';
+  ctx.fillText('marks', x0-46, yAxis-10);
+
+  // key annotations
+  ctx.textAlign='center'; ctx.font='700 12.5px "Segoe UI",Arial';
+  ctx.fillStyle='#b45309';
+  ctx.fillText('median 55', px(55), boxTop-14);
+  ctx.fillStyle='#1d4ed8';
+  ctx.fillText('Q1 = 52', px(52), yAxis+46);
+  ctx.fillText('Q3 = 70', px(70), yAxis+46);
+  ctx.fillStyle='#0f766e';
+  ctx.fillText('highest 90', px(90), boxTop-24);
+  ctx.fillText('lowest 45', px(45), boxTop-24);
+})();
+
+/* ============================================================
+   2. Part (a) canvas — interactive standard-score number line
+   ============================================================ */
+(function(){
+  const c = document.getElementById('canvasA');
+  const W = 900, H = 330;
+  const ratio = window.devicePixelRatio || 1;
+  c.width = W*ratio; c.height = H*ratio;
+  c.style.width='100%'; c.style.height='auto';
+  const ctx = c.getContext('2d');
+  ctx.scale(ratio, ratio);
+
+  const muS = document.getElementById('muSlider');
+  const sigS = document.getElementById('sigmaSlider');
+  const muV  = document.getElementById('muVal');
+  const sigV = document.getElementById('sigmaVal');
+  const showScores = document.getElementById('showScores');
+  const roSusan = document.getElementById('roSusan');
+  const roTom   = document.getElementById('roTom');
+
+  const L = 90, R = 850, axisY = 230;
+  const minS = 0, maxS = 100;
+  const X = s => L + (s-minS)/(maxS-minS)*(R-L);
+
+  function draw(){
+    const mu = parseFloat(muS.value);
+    const sg = parseFloat(sigS.value);
+    muV.textContent = mu;
+    sigV.textContent = sg;
+
+    const zS = (90-mu)/sg;
+    const zT = (65-mu)/sg;
+    roSusan.textContent = zS.toFixed(2);
+    roTom.textContent   = zT.toFixed(2);
+    roSusan.style.color = Math.abs(zS-3)<0.05 ? '#059669' : '#1e3a8a';
+    roTom.style.color   = Math.abs(zT-0.5)<0.05 ? '#059669' : '#1e3a8a';
+
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,W,H);
+
+    // grid lines every 5
+    ctx.strokeStyle='#eef2f7'; ctx.lineWidth=1;
+    for(let s=minS;s<=maxS;s+=5){
+      ctx.beginPath(); ctx.moveTo(X(s),70); ctx.lineTo(X(s),axisY); ctx.stroke();
+    }
+
+    // normal-like curve density (illustrative)
+    ctx.beginPath();
+    for(let s=minS;s<=maxS;s+=0.5){
+      const y = axisY - 110*Math.exp(-Math.pow((s-mu)/sg,2)/2);
+      if(s===minS) ctx.moveTo(X(s),y); else ctx.lineTo(X(s),y);
+    }
+    ctx.strokeStyle='#bfdbfe'; ctx.lineWidth=2.5; ctx.stroke();
+
+    // shade x < mu (negative z)
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(X(minS), axisY);
+    for(let s=minS;s<=mu;s+=0.5){
+      const y = axisY - 110*Math.exp(-Math.pow((s-mu)/sg,2)/2);
+      ctx.lineTo(X(s), y);
+    }
+    ctx.lineTo(X(mu), axisY);
+    ctx.closePath();
+    ctx.fillStyle='rgba(245,158,11,0.20)';
+    ctx.fill();
+    ctx.restore();
+
+    // axis
+    ctx.strokeStyle='#0f172a'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(L-30,axisY); ctx.lineTo(R+20,axisY); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(R+20,axisY); ctx.lineTo(R+10,axisY-5); ctx.lineTo(R+10,axisY+5);
+    ctx.closePath(); ctx.fillStyle='#0f172a'; ctx.fill();
+
+    // ticks
+    ctx.fillStyle='#475569'; ctx.font='600 12px ui-monospace,Consolas,monospace';
+    ctx.textAlign='center';
+    for(let s=minS;s<=maxS;s+=10){
+      ctx.beginPath(); ctx.moveTo(X(s),axisY); ctx.lineTo(X(s),axisY+6); ctx.strokeStyle='#0f172a'; ctx.stroke();
+      ctx.fillText(s, X(s), axisY+22);
+    }
+    ctx.fillStyle='#0f172a'; ctx.font='700 13px "Segoe UI",Arial';
+    ctx.textAlign='left'; ctx.fillText('Score', R+22, axisY+4);
+    ctx.textAlign='right'; ctx.fillText('marks', L-36, axisY-10);
+
+    // mean line
+    ctx.strokeStyle='#2563eb'; ctx.lineWidth=2.4; ctx.setLineDash([7,5]);
+    ctx.beginPath(); ctx.moveTo(X(mu),60); ctx.lineTo(X(mu),axisY); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='#1d4ed8'; ctx.font='700 13px "Segoe UI",Arial';
+    ctx.textAlign='center';
+    ctx.fillText('μ = '+mu, X(mu), 52);
+
+    // one sigma markers
+    ctx.strokeStyle='#93c5fd'; ctx.lineWidth=1.6; ctx.setLineDash([4,4]);
+    [mu-sg, mu+sg].forEach(v=>{
+      if(v>=minS && v<=maxS){
+        ctx.beginPath(); ctx.moveTo(X(v),150); ctx.lineTo(X(v),axisY); ctx.stroke();
+      }
+    });
+    ctx.setLineDash([]);
+
+    // markers for Susan and Tom
+    function marker(score, z, color, label, yOff){
+      const x = X(score);
+      ctx.beginPath(); ctx.arc(x, axisY, 6.5, 0, Math.PI*2);
+      ctx.fillStyle = color; ctx.fill();
+      ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
+      ctx.font='700 13px "Segoe UI",Arial';
+      ctx.fillStyle = color;
+      ctx.textAlign='center';
+      ctx.fillText(label, x, axisY-14+yOff);
+      if(showScores.checked){
+        ctx.font='700 12px ui-monospace,Consolas,monospace';
+        ctx.fillStyle='#334155';
+        ctx.fillText('x='+score+', z='+z.toFixed(2), x, axisY-32+yOff);
+      }
+    }
+    marker(90, zS, '#dc2626', 'Susan', 0);
+    marker(65, zT, '#059669', 'Tom', 0);
+
+    // legend for shaded area
+    ctx.fillStyle='rgba(245,158,11,0.22)';
+    ctx.fillRect(L, 88, 20, 14);
+    ctx.strokeStyle='#d97706'; ctx.lineWidth=1.4; ctx.strokeRect(L,88,20,14);
+    ctx.fillStyle='#78350f'; ctx.font='600 12.5px "Segoe UI",Arial';
+    ctx.textAlign='left';
+    ctx.fillText('shaded region: x < μ  ⟹  negative standard score', L+28, 100);
+  }
+
+  ['input','change'].forEach(ev=>{
+    muS.addEventListener(ev, draw);
+    sigS.addEventListener(ev, draw);
+    showScores.addEventListener(ev, draw);
+  });
+  draw();
+})();
+
+/* ============================================================
+   3. Part (b) canvas — box plot + mean line + negative-z shading
+   ============================================================ */
+(function(){
+  const c = document.getElementById('canvasB');
+  const W = 900, H = 400;
+  const ratio = window.devicePixelRatio || 1;
+  c.width = W*ratio; c.height = H*ratio;
+  c.style.width='100%'; c.style.height='auto';
+  const ctx = c.getContext('2d');
+  ctx.scale(ratio, ratio);
+
+  const meanSlider = document.getElementById('meanSlider');
+  const meanVal = document.getElementById('meanVal');
+  const roMean = document.getElementById('roMean');
+  const showMeanLine = document.getElementById('showMeanLine');
+  const showMedianLine = document.getElementById('showMedianLine');
+  const showNegative = document.getElementById('showNegative');
+  const roVerdict = document.getElementById('roVerdict');
+
+  const L=100, R=840, base=280;
+  const minS=20, maxS=100;
+  const X = s => L + (s-minS)/(maxS-minS)*(R-L);
+  const boxTop=170, boxH=52;
+
+  function draw(){
+    const mu = parseFloat(meanSlider.value);
+    meanVal.textContent = mu;
+    roMean.textContent = mu;
+
+    // verdict
+    if(showNegative.checked){
+      if(mu > 55){
+        roVerdict.textContent = 'YES';
+        roVerdict.style.color = '#059669';
+      } else if(mu === 55){
+        roVerdict.textContent = 'Halves';
+        roVerdict.style.color = '#b45309';
+      } else {
+        roVerdict.textContent = 'NO';
+        roVerdict.style.color = '#dc2626';
+      }
+    } else {
+      roVerdict.textContent = 'tick it';
+      roVerdict.style.color = '#64748b';
+    }
+
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,W,H);
+
+    // grid
+    ctx.strokeStyle='#eef2f7'; ctx.lineWidth=1;
+    for(let s=minS;s<=maxS;s+=10){
+      ctx.beginPath(); ctx.moveTo(X(s),90); ctx.lineTo(X(s),base); ctx.stroke();
+    }
+
+    // highlight region x < mu (negative z)
+    if(showNegative.checked){
+      ctx.fillStyle = mu>55 ? 'rgba(5,150,105,0.13)' : 'rgba(220,38,38,0.10)';
+      ctx.fillRect(X(minS), 90, X(mu)-X(minS), base-90);
+    }
+
+    // whiskers
+    ctx.strokeStyle='#0f172a'; ctx.lineWidth=2.4;
+    ctx.beginPath(); ctx.moveTo(X(45), base); ctx.lineTo(X(45), boxTop-18); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(X(45), boxTop-18); ctx.lineTo(X(52), boxTop-18); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(X(70), base); ctx.lineTo(X(70), boxTop-18); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(X(70), boxTop-18); ctx.lineTo(X(90), boxTop-18); ctx.stroke();
+
+    // outliers
+    ctx.fillStyle='#0f172a';
+    [[30,44],[36,38],[42,35]].forEach(([s,y])=>{
+      ctx.beginPath(); ctx.arc(X(s), y, 3.2, 0, Math.PI*2); ctx.fill();
+    });
+
+    // box
+    ctx.fillStyle='rgba(37,99,235,0.12)';
+    ctx.fillRect(X(52), boxTop, X(70)-X(52), boxH);
+    ctx.strokeStyle='#1e3a8a'; ctx.lineWidth=2.4;
+    ctx.strokeRect(X(52), boxTop, X(70)-X(52), boxH);
+
+    // median line
+    if(showMedianLine.checked){
+      ctx.strokeStyle='#f59e0b'; ctx.lineWidth=3.6;
+      ctx.beginPath(); ctx.moveTo(X(55), boxTop-8); ctx.lineTo(X(55), boxTop+boxH+8); ctx.stroke();
+      ctx.fillStyle='#b45309'; ctx.font='700 13px "Segoe UI",Arial';
+      ctx.textAlign='center';
+      ctx.fillText('median = 55', X(55), boxTop-26);
+    }
+
+    // mean line
+    if(showMeanLine.checked){
+      ctx.strokeStyle='#2563eb'; ctx.lineWidth=2.6; ctx.setLineDash([8,6]);
+      ctx.beginPath(); ctx.moveTo(X(mu), 80); ctx.lineTo(X(mu), base+14); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle='#1d4ed8'; ctx.font='700 13px "Segoe UI",Arial';
+      ctx.textAlign='center';
+      ctx.fillText('mean μ = '+mu, X(mu), 72);
+    }
+
+    // axis
+    ctx.strokeStyle='#0f172a'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(L-40, base); ctx.lineTo(R+30, base); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(R+30, base); ctx.lineTo(R+20, base-5); ctx.lineTo(R+20, base+5);
+    ctx.closePath(); ctx.fillStyle='#0f172a'; ctx.fill();
+
+    ctx.fillStyle='#475569'; ctx.font='600 12px ui-monospace,Consolas,monospace';
+    ctx.textAlign='center';
+    for(let s=minS;s<=maxS;s+=10){
+      ctx.beginPath(); ctx.moveTo(X(s),base); ctx.lineTo(X(s),base+6); ctx.strokeStyle='#0f172a'; ctx.stroke();
+      ctx.fillText(s, X(s), base+24);
+    }
+    ctx.fillStyle='#0f172a'; ctx.font='700 13px "Segoe UI",Arial';
+    ctx.textAlign='left'; ctx.fillText('Score (marks)', R+20, base-12);
+
+    // Note
+    ctx.textAlign='left';
+    ctx.font='600 12.5px "Segoe UI",Arial';
+    if(showNegative.checked){
+      ctx.fillStyle = mu>55 ? '#065f46' : '#991b1b';
+      ctx.fillText('shaded = scores below the mean ⟹ negative standard scores', L-30, 110);
+    } else {
+      ctx.fillStyle='#64748b';
+      ctx.fillText('Tip: tick "Highlight negative z-scores" to shade x < μ', L-30, 110);
+    }
+  }
+
+  ['input','change'].forEach(ev=>{
+    meanSlider.addEventListener(ev, draw);
+    showMeanLine.addEventListener(ev, draw);
+    showMedianLine.addEventListener(ev, draw);
+    showNegative.addEventListener(ev, draw);
+  });
+  draw();
+})();
+
+/* ============================================================
+   4. Step-by-step reveal
+   ============================================================ */
+document.querySelectorAll('.btn-row').forEach(row=>{
+  const btn = row.querySelector('button.next');
+  const counter = row.querySelector('.counter');
+  const container = document.getElementById(btn.dataset.target);
+  const steps = container.querySelectorAll('.step');
+  let idx = 0;
+
+  function update(){
+    counter.textContent = idx + ' / ' + steps.length;
+    if(idx >= steps.length){
+      btn.disabled = true;
+      btn.textContent = 'All steps revealed ✓';
+    } else {
+      btn.disabled = false;
+      btn.textContent = 'Next step →';
+    }
+  }
+
+  btn.addEventListener('click', ()=>{
+    if(idx < steps.length){
+      steps[idx].classList.add('show');
+      idx++;
+      update();
+      if(window.MathJax && MathJax.typesetPromise){
+        MathJax.typesetPromise([steps[idx-1]]).catch(()=>{});
+      }
+      steps[idx-1].scrollIntoView({behavior:'smooth', block:'nearest'});
+    }
+  });
+
+  update();
+});
+</script>
+</body>
+</html>

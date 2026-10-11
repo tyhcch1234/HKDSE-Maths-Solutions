@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HKDSE Math 2025 Paper 2 Q36 — Linear Programming</title>
+
+<!-- MathJax -->
+<script>
+  MathJax = {
+    tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+
+<style>
+  :root{
+    --bg:#f4f7fb;
+    --card:#ffffff;
+    --ink:#17233b;
+    --muted:#5b6b88;
+    --brand:#2563eb;
+    --brand-soft:#e3edff;
+    --accent:#0ea47a;
+    --accent-soft:#e2f7f0;
+    --warn:#b45309;
+    --warn-soft:#fdf3e3;
+    --line:#dbe4f0;
+    --radius:18px;
+    --shadow:0 10px 26px rgba(23,35,59,.08);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:radial-gradient(1200px 600px at 10% -10%, #e8f0ff 0%, var(--bg) 55%) no-repeat, var(--bg);
+    color:var(--ink);
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+    line-height:1.6;
+    -webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:1060px;margin:0 auto;padding:20px 16px 60px;}
+
+  /* ---------- header ---------- */
+  header.hero{
+    background:linear-gradient(135deg,#1d4ed8 0%, #2563eb 45%, #38bdf8 100%);
+    color:#fff;border-radius:var(--radius);
+    padding:22px 22px 24px;box-shadow:var(--shadow);
+    position:relative;overflow:hidden;
+  }
+  header.hero::after{
+    content:"";position:absolute;right:-60px;top:-60px;width:220px;height:220px;
+    background:rgba(255,255,255,.14);border-radius:50%;
+  }
+  .paper-tag{
+    display:inline-block;background:rgba(255,255,255,.2);
+    border:1px solid rgba(255,255,255,.45);
+    padding:4px 12px;border-radius:999px;font-size:.78rem;font-weight:700;letter-spacing:.06em;
+  }
+  header.hero h1{margin:10px 0 4px;font-size:clamp(1.25rem,3.4vw,1.7rem);line-height:1.35;}
+  header.hero p.q-sub{margin:0;opacity:.92;font-size:.92rem;}
+
+  /* ---------- generic card ---------- */
+  .card{
+    background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:18px 18px 20px;margin-top:18px;border:1px solid #eef2f9;
+  }
+  .card h2{
+    margin:0 0 10px;font-size:1.06rem;letter-spacing:.01em;
+    display:flex;align-items:center;gap:8px;
+  }
+  .card h2 .dot{width:10px;height:10px;border-radius:50%;background:var(--brand);flex:none;}
+  .muted{color:var(--muted);}
+  .small{font-size:.86rem;}
+
+  /* ---------- tags ---------- */
+  .tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+  .tag{
+    background:var(--brand-soft);color:#1e40af;font-size:.8rem;font-weight:700;
+    padding:5px 11px;border-radius:999px;border:1px solid #cfe0ff;
+  }
+  .tag.green{background:var(--accent-soft);color:#047857;border-color:#bfeee0;}
+  .tag.amber{background:var(--warn-soft);color:var(--warn);border-color:#f3ddba;}
+
+  /* ---------- inequality list ---------- */
+  .sys{
+    display:flex;align-items:stretch;gap:10px;margin:12px 0 4px;
+    background:#f8fbff;border:1px dashed #c9dbff;border-radius:14px;padding:12px 14px;
+  }
+  .sys .brace{font-size:3rem;line-height:1;color:#93b4f5;font-weight:300;}
+  .sys ul{list-style:none;margin:0;padding:0;display:grid;gap:6px;}
+  .sys li{font-size:1rem;}
+
+  /* ---------- two-column layout ---------- */
+  .grid2{display:grid;grid-template-columns:1fr;gap:18px;}
+  @media(min-width:880px){ .grid2{grid-template-columns:1.05fr .95fr;} }
+
+  /* ---------- canvas ---------- */
+  .canvas-wrap{
+    background:#fbfdff;border:1px solid var(--line);border-radius:14px;
+    padding:6px;position:relative;
+  }
+  canvas{width:100%;height:auto;display:block;border-radius:10px;touch-action:none;cursor:grab;}
+  canvas:active{cursor:grabbing;}
+
+  .readout{
+    display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:12px;
+  }
+  @media(min-width:520px){ .readout{grid-template-columns:repeat(3,1fr);} }
+  .stat{
+    background:#f8fbff;border:1px solid var(--line);border-radius:12px;
+    padding:9px 10px;text-align:center;
+  }
+  .stat .k{font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:700;}
+  .stat .v{font-size:1.12rem;font-weight:800;margin-top:2px;}
+  .stat.hi{background:var(--accent-soft);border-color:#a9e6d5;}
+  .stat.hi .v{color:#047857;}
+
+  .btnrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+  button{
+    font:inherit;font-weight:700;font-size:.88rem;
+    border-radius:11px;border:1px solid #cfe0ff;background:#fff;color:#1e40af;
+    padding:10px 14px;cursor:pointer;transition:.16s;
+    min-height:44px;
+  }
+  button:hover{background:var(--brand-soft);}
+  button.primary{background:var(--brand);border-color:var(--brand);color:#fff;}
+  button.primary:hover{background:#1d4ed8;}
+  button.ghost{background:#fff;color:var(--muted);border-color:var(--line);}
+  button.ghost:hover{background:#f1f5fd;color:var(--ink);}
+  button:disabled{opacity:.45;cursor:not-allowed;}
+
+  /* ---------- steps ---------- */
+  .step{
+    border:1px solid var(--line);border-radius:14px;background:#fff;
+    margin-top:12px;overflow:hidden;transition:.2s;
+  }
+  .step.open{border-color:#bcd3ff;box-shadow:0 6px 18px rgba(37,99,235,.09);}
+  .step-head{
+    display:flex;align-items:center;gap:11px;
+    padding:13px 14px;cursor:pointer;user-select:none;background:#fdfefe;
+  }
+  .step-head:hover{background:#f7faff;}
+  .step-num{
+    flex:none;width:30px;height:30px;border-radius:50%;
+    background:var(--brand-soft);color:#1e40af;font-weight:800;font-size:.9rem;
+    display:flex;align-items:center;justify-content:center;border:1px solid #cfe0ff;
+  }
+  .step.open .step-num{background:var(--brand);color:#fff;border-color:var(--brand);}
+  .step-title{font-weight:700;font-size:.96rem;flex:1;}
+  .chev{flex:none;color:var(--muted);transition:transform .22s;font-size:.9rem;}
+  .step.open .chev{transform:rotate(180deg);}
+  .step-body{
+    max-height:0;overflow:hidden;transition:max-height .3s ease;
+    padding:0 14px;border-top:1px solid transparent;
+  }
+  .step.open .step-body{border-top-color:#eef2f9;}
+  .step-inner{padding:12px 0 16px;}
+  .step-inner p{margin:.45em 0;}
+  .step-inner ul{margin:.4em 0 .4em 1.1em;padding:0;}
+  .step-inner li{margin:.25em 0;}
+
+  .hint{
+    margin-top:10px;background:var(--warn-soft);border-left:4px solid #f0b34e;
+    border-radius:10px;padding:10px 12px;font-size:.88rem;color:#7c4a06;
+  }
+  .hint b{color:var(--warn);}
+  .keybox{
+    margin-top:10px;background:#f2f7ff;border-left:4px solid var(--brand);
+    border-radius:10px;padding:10px 12px;font-size:.9rem;
+  }
+
+  table.calc{
+    width:100%;border-collapse:collapse;margin-top:10px;font-size:.9rem;
+  }
+  table.calc th, table.calc td{
+    border:1px solid var(--line);padding:8px 9px;text-align:center;
+  }
+  table.calc th{background:#f4f8ff;font-size:.8rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);}
+  table.calc td.win{background:var(--accent-soft);color:#047857;font-weight:800;}
+
+  /* ---------- MCQ options ---------- */
+  .options{display:grid;gap:10px;margin-top:12px;}
+  @media(min-width:560px){ .options{grid-template-columns:1fr 1fr;} }
+  .opt{
+    display:flex;align-items:center;gap:12px;border:1.5px solid var(--line);
+    background:#fff;border-radius:13px;padding:12px 14px;cursor:pointer;transition:.16s;
+    font-size:1rem;font-weight:600;
+  }
+  .opt:hover{border-color:#bcd3ff;background:#f8fbff;}
+  .opt .badge{
+    flex:none;width:30px;height:30px;border-radius:50%;background:#eef4ff;color:#1e40af;
+    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.9rem;
+  }
+  .opt.correct{border-color:#16a34a;background:#effaf3;}
+  .opt.correct .badge{background:#16a34a;color:#fff;}
+  .opt.wrong{border-color:#e05252;background:#fef2f2;}
+  .opt.wrong .badge{background:#e05252;color:#fff;}
+  .opt .mark{margin-left:auto;font-weight:800;font-size:.85rem;}
+  .fb{margin-top:12px;font-size:.93rem;font-weight:700;display:none;}
+  .fb.show{display:block;}
+
+  footer.note{
+    text-align:center;color:var(--muted);font-size:.8rem;margin-top:26px;
+  }
+
+  /* MathJax sizing tweak */
+  mjx-container{font-size:1.02em !important;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ============ HEADER ============ -->
+  <header class="hero">
+    <span class="paper-tag">HKDSE MATH 2025 · PAPER 2</span>
+    <h1>Question 36 — Linear Programming: Greatest Value in a Region</h1>
+    <p class="q-sub">Find the greatest value of \(8x-6y+11\) for a point \((x,y)\) lying in region \(D\).</p>
+    <div class="tags">
+      <span class="tag">Inequalities</span>
+      <span class="tag">Linear Programming</span>
+      <span class="tag">Feasible Region</span>
+      <span class="tag green">Vertices of a Polygon</span>
+      <span class="tag amber">Objective Function</span>
+    </div>
+  </header>
+
+  <!-- ============ QUESTION ============ -->
+  <section class="card">
+    <h2><span class="dot"></span>Question</h2>
+    <p style="margin-top:0">
+      Consider the following system of inequalities and let \(D\) be the region which represents the solution of the system.
+      If \((x,y)\) is a point lying in \(D\), then the greatest value of \(8x-6y+11\) is
+    </p>
+    <div class="sys">
+      <div class="brace">{</div>
+      <ul>
+        <li>\(x \le 11\)</li>
+        <li>\(4x+5y-19 \ge 0\)</li>
+        <li>\(7x-6y+11 \le 0\)</li>
+      </ul>
+    </div>
+    <p class="muted small" style="margin-top:10px">
+      The boundary lines of \(D\) are \(x=11\), \(4x+5y-19=0\) and \(7x-6y+11=0\), with the three vertices
+      \((11,\tfrac{44}{3})\), \((1,3)\) and \((11,-5)\).
+    </p>
+  </section>
+
+  <!-- ============ INTERACTIVE GRAPH + SOLUTION ============ -->
+  <div class="grid2">
+
+    <!-- ---- GRAPH ---- -->
+    <section class="card" style="margin-top:0">
+      <h2><span class="dot"></span>Interactive Region \(D\)</h2>
+      <p class="small muted" style="margin:0 0 10px">
+        Drag the point \(P(x,y)\) inside the shaded region and watch how \(8x-6y+11\) changes.
+      </p>
+
+      <div class="canvas-wrap">
+        <canvas id="cv" width="620" height="620" aria-label="Graph of region D with draggable point P"></canvas>
+      </div>
+
+      <div class="readout">
+        <div class="stat"><div class="k">Point P</div><div class="v" id="sPt">(11, 14.67)</div></div>
+        <div class="stat"><div class="k">8x − 6y + 11</div><div class="v" id="sVal">11</div></div>
+        <div class="stat hi"><div class="k">Max so far</div><div class="v" id="sMax">11</div></div>
+      </div>
+
+      <div class="btnrow">
+        <button class="primary" id="btnV1">Go to (11, 44/3)</button>
+        <button id="btnV2">Go to (1, 3)</button>
+        <button id="btnV3">Go to (11, −5)</button>
+        <button class="ghost" id="btnReset">Reset max</button>
+      </div>
+      <p class="small muted" style="margin:10px 0 0">
+        Tip: the maximum of a linear function over a polygon is always attained at a vertex — but check
+        <em>which</em> vertices are actual corners of \(D\).
+      </p>
+    </section>
+
+    <!-- ---- STEP BY STEP ---- -->
+    <section class="card" style="margin-top:0">
+      <h2><span class="dot"></span>Step-by-Step Guided Solution</h2>
+
+      <div class="btnrow" style="margin-top:2px">
+        <button class="primary" id="btnNext">Next Step ▸</button>
+        <button class="ghost" id="btnAll">Show All</button>
+        <button class="ghost" id="btnCloseAll">Collapse All</button>
+      </div>
+
+      <!-- STEP 1 -->
+      <div class="step" data-step>
+        <div class="step-head">
+          <div class="step-num">1</div>
+          <div class="step-title">Read the information given by the figure</div>
+          <div class="chev">▾</div>
+        </div>
+        <div class="step-body"><div class="step-inner">
+          <p>The figure shows three boundary lines and the region \(D\) is already shaded/labelled:</p>
+          <ul>
+            <li>\(x=11\) — a vertical line,</li>
+            <li>\(4x+5y-19=0\) — a line rising from left to right,</li>
+            <li>\(7x-6y+11=0\) — a line falling from left to right.</li>
+          </ul>
+          <p>The three labelled intersection points are</p>
+          <p>\[(11,\tfrac{44}{3}),\quad (1,3),\quad (11,-5).\]</p>
+          <div class="hint">
+            <b>Hint — how intersections are found:</b> solve two boundary equations simultaneously.
+            For example, put \(x=11\) into \(4x+5y-19=0\):
+            \(4(11)+5y-19=0 \Rightarrow 5y=-25 \Rightarrow y=-5\), giving \((11,-5)\).
+          </div>
+        </div></div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="step" data-step>
+        <div class="step-head">
+          <div class="step-num">2</div>
+          <div class="step-title">Identify the true vertices of region \(D\)</div>
+          <div class="chev">▾</div>
+        </div>
+        <div class="step-body"><div class="step-inner">
+          <p>Only <b>two</b> of the three labelled intersection points are actually corners of \(D\):</p>
+          <ul>
+            <li>\((11,\tfrac{44}{3})\) — corner where \(x=11\) meets \(7x-6y+11=0\), ✔ in \(D\)</li>
+            <li>\((1,3)\) — corner where the two slanted lines meet, ✔ in \(D\)</li>
+            <li>\((11,-5)\) — intersection of \(x=11\) and \(4x+5y-19=0\), ✘ <em>not</em> in \(D\)</li>
+          </ul>
+          <p>Why is \((11,-5)\) excluded? Check it in the other inequality
+            \(7x-6y+11\le 0\):</p>
+          <p>\[7(11)-6(-5)+11 = 77+30+11 = 118 \not\le 0.\]</p>
+          <p>So \((11,-5)\) lies on the wrong side of \(7x-6y+11=0\) and is not a vertex of \(D\).</p>
+          <div class="keybox">
+            <b>Key idea:</b> a point is a vertex of \(D\) only if it satisfies <em>all</em> the inequalities of the system.
+          </div>
+        </div></div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="step" data-step>
+        <div class="step-head">
+          <div class="step-num">3</div>
+          <div class="step-title">Define the objective function</div>
+          <div class="chev">▾</div>
+        </div>
+        <div class="step-body"><div class="step-inner">
+          <p>We want to maximise the linear expression in \(x\) and \(y\). Write it as a function:</p>
+          <p>\[P(x,y)=8x-6y+11.\]</p>
+          <div class="hint">
+            <b>Hint — why vertices?</b> A linear function on a convex polygon takes its maximum and
+            minimum <b>at a vertex</b>. So we only need to test the vertices of \(D\).
+          </div>
+          <p class="small muted">(Equivalently, \(8x-6y+11=k\) are parallel lines; we slide the line outwards
+            as far as possible while it still touches \(D\).)</p>
+        </div></div>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="step" data-step>
+        <div class="step-head">
+          <div class="step-num">4</div>
+          <div class="step-title">Substitute each vertex of \(D\)</div>
+          <div class="chev">▾</div>
+        </div>
+        <div class="step-body"><div class="step-inner">
+          <p>At \((11,\tfrac{44}{3})\):</p>
+          <p>\[P = 8(11)-6\!\left(\tfrac{44}{3}\right)+11
+                 = 88-6(14.\overline{6})+11
+                 = 88-88+11 = 11.\]</p>
+          <p>At \((1,3)\):</p>
+          <p>\[P = 8(1)-6(3)+11 = 8-18+11 = 1.\]</p>
+          <table class="calc">
+            <thead>
+              <tr><th>Vertex of \(D\)</th><th>\(8x-6y+11\)</th><th>In \(D\)?</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>\((11,\tfrac{44}{3})\)</td><td class="win">11</td><td>Yes ✔</td></tr>
+              <tr><td>\((1,3)\)</td><td>1</td><td>Yes ✔</td></tr>
+              <tr><td>\((11,-5)\)</td><td>129</td><td>No ✘</td></tr>
+            </tbody>
+          </table>
+          <div class="hint">
+            <b>Beware of the trap option D (129):</b> it comes from substituting \((11,-5)\), a point which is
+            <em>not</em> inside region \(D\). Always verify the vertex is in the feasible region first.
+          </div>
+        </div></div>
+      </div>
+
+      <!-- STEP 5 -->
+      <div class="step" data-step>
+        <div class="step-head">
+          <div class="step-num">5</div>
+          <div class="step-title">Conclude the greatest value</div>
+          <div class="chev">▾</div>
+        </div>
+        <div class="step-body"><div class="step-inner">
+          <p>Comparing the values at the vertices of \(D\): \(11 > 1\).</p>
+          <p>\[\therefore \text{the greatest value of } 8x-6y+11 \text{ in } D \text{ is } 11.\]</p>
+          <div class="keybox">
+            <b>Answer: B. 11</b>
+          </div>
+          <p class="small muted">Region \(D\) is unbounded in one direction, but the objective function still
+            attains its maximum at the vertex \((11,\tfrac{44}{3})\) — the draggable graph above confirms this.</p>
+        </div></div>
+      </div>
+
+    </section>
+  </div>
+
+  <!-- ============ MCQ CHECK ============ -->
+  <section class="card">
+    <h2><span class="dot"></span>Choose the Answer</h2>
+    <p class="small muted" style="margin:0">Click an option to check your reasoning.</p>
+    <div class="options" id="opts">
+      <div class="opt" data-a="A"><span class="badge">A</span><span>\(-11\)</span><span class="mark"></span></div>
+      <div class="opt" data-a="B"><span class="badge">B</span><span>\(11\)</span><span class="mark"></span></div>
+      <div class="opt" data-a="C"><span class="badge">C</span><span>\(15\)</span><span class="mark"></span></div>
+      <div class="opt" data-a="D"><span class="badge">D</span><span>\(129\)</span><span class="mark"></span></div>
+    </div>
+    <div class="fb" id="fb"></div>
+  </section>
+
+  <footer class="note">
+    HKDSE Mathematics 2025 · Paper 2 · Question 36 — Interactive solution for learning purposes.
+  </footer>
+</div>
+
+<script>
+/* ============================================================
+   Geometry / region setup
+   Region D is defined by:
+     x <= 11
+     4x + 5y - 19 >= 0     ->  y >= (19 - 4x)/5
+     7x - 6y + 11 <= 0     ->  y >= (7x + 11)/6
+   So y >= max( (19-4x)/5 , (7x+11)/6 ), with x <= 11.
+   The two slanted lines meet at x = 1 (y = 3).
+   Vertices of D: (1,3) and (11, 44/3).
+   ============================================================ */
+
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+
+// world -> screen mapping
+const W = cv.width, H = cv.height;
+const SCALE = 34;                 // pixels per unit
+const X0 = 190;                   // screen x of world x = 0
+const Y0 = 320;                   // screen y of world y = 0
+
+function sx(x){ return X0 + x * SCALE; }
+function sy(y){ return Y0 - y * SCALE; }
+
+// region boundaries
+const R = {
+  xMax: 11,
+  lineA: x => (19 - 4*x)/5,       // 4x + 5y - 19 = 0  -> y = ...
+  lineB: x => (7*x + 11)/6,       // 7x - 6y + 11 = 0  -> y = ...
+  yTop: 20,
+  yBot: -6
+};
+
+function lowerBound(x){ return Math.max(R.lineA(x), R.lineB(x)); }
+function inD(x, y){
+  if (x > 11 + 1e-9) return false;
+  if (4*x + 5*y - 19 < -1e-9) return false;
+  if (7*x - 6*y + 11 >  1e-9) return false;
+  return true;
+}
+function P(x, y){ return 8*x - 6*y + 11; }
+
+// draggable point
+let pt = { x: 11, y: 44/3 };
+let maxSeen = P(pt.x, pt.y);
+
+/* ---------- drawing ---------- */
+function drawGrid(){
+  ctx.clearRect(0,0,W,H);
+  // background
+  ctx.fillStyle = '#fbfdff';
+  ctx.fillRect(0,0,W,H);
+
+  // grid lines
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = '#e7eefb';
+  for(let x = -4; x <= 15; x++){
+    ctx.beginPath(); ctx.moveTo(sx(x), sy(R.yBot)); ctx.lineTo(sx(x), sy(R.yTop)); ctx.stroke();
+  }
+  for(let y = -6; y <= 20; y++){
+    ctx.beginPath(); ctx.moveTo(sx(-4), sy(y)); ctx.lineTo(sx(15), sy(y)); ctx.stroke();
+  }
+}
+
+function drawAxes(){
+  ctx.strokeStyle = '#94a3b8';
+  ctx.lineWidth = 2;
+  // x-axis
+  ctx.beginPath(); ctx.moveTo(sx(-4), sy(0)); ctx.lineTo(sx(15), sy(0)); ctx.stroke();
+  // y-axis
+  ctx.beginPath(); ctx.moveTo(sx(0), sy(-6)); ctx.lineTo(sx(0), sy(20)); ctx.stroke();
+  // arrows
+  ctx.fillStyle = '#94a3b8';
+  ctx.beginPath(); ctx.moveTo(sx(15), sy(0)); ctx.lineTo(sx(14.55), sy(0.28)); ctx.lineTo(sx(14.55), sy(-0.28)); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(sx(0), sy(20)); ctx.lineTo(sx(0.30), sy(19.5)); ctx.lineTo(sx(-0.30), sy(19.5)); ctx.fill();
+
+  ctx.fillStyle = '#64748b';
+  ctx.font = 'bold 17px Segoe UI, sans-serif';
+  ctx.fillText('x', sx(14.7), sy(-0.7));
+  ctx.fillText('y', sx(0.45), sy(19.3));
+  ctx.font = '15px Segoe UI, sans-serif';
+  ctx.fillText('O', sx(-0.75), sy(-0.65));
+}
+
+function drawRegion(){
+  // Build polygon: go along lower envelope from x=1 to x=11, then back along x=11
+  ctx.beginPath();
+  ctx.moveTo(sx(1), sy(lowerBound(1)));
+  const N = 180;
+  for(let i=0;i<=N;i++){
+    const x = 1 + (11-1)*i/N;
+    ctx.lineTo(sx(x), sy(lowerBound(x)));
+  }
+  // close by going up along x = 11
+  ctx.lineTo(sx(11), sy(R.yTop));
+  ctx.lineTo(sx(1), sy(R.yTop));
+  ctx.closePath();
+
+  const g = ctx.createLinearGradient(sx(1), sy(20), sx(11), sy(-5));
+  g.addColorStop(0,'rgba(37,99,235,.22)');
+  g.addColorStop(1,'rgba(14,164,122,.20)');
+  ctx.fillStyle = g;
+  ctx.fill();
+
+  ctx.strokeStyle = 'rgba(37,99,235,.55)';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([7,5]);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // label D
+  ctx.fillStyle = '#1e40af';
+  ctx.font = 'italic bold 26px Georgia, serif';
+  ctx.fillText('D', sx(6.4), sy(11.5));
+}
+
+function drawLines(){
+  ctx.lineWidth = 2.6;
+  ctx.strokeStyle = '#0f172a';
+
+  // x = 11  (vertical)
+  ctx.beginPath(); ctx.moveTo(sx(11), sy(-6)); ctx.lineTo(sx(11), sy(20)); ctx.stroke();
+
+  // 4x + 5y - 19 = 0
+  ctx.beginPath(); ctx.moveTo(sx(-2.5), sy(R.lineA(-2.5))); ctx.lineTo(sx(12), sy(R.lineA(12))); ctx.stroke();
+
+  // 7x - 6y + 11 = 0
+  ctx.beginPath(); ctx.moveTo(sx(-2.5), sy(R.lineB(-2.5))); ctx.lineTo(sx(12), sy(R.lineB(12))); ctx.stroke();
+
+  // line labels
+  ctx.font = 'bold 15px Segoe UI, sans-serif';
+  ctx.fillStyle = '#0f172a';
+  ctx.fillText('x = 11', sx(11.25), sy(19.2));
+  ctx.fillText('4x + 5y − 19 = 0', sx(-3.6), sy(R.lineA(-2.5)-0.9));
+  ctx.fillText('7x − 6y + 11 = 0', sx(6.3), sy(R.lineB(11.5)+0.3));
+}
+
+function labelPoint(x, y, text, color, dx=10, dy=-10, align='left'){
+  ctx.fillStyle = color;
+  ctx.beginPath(); ctx.arc(sx(x), sy(y), 6, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+
+  ctx.font = 'bold 15px Segoe UI, sans-serif';
+  ctx.fillStyle = color;
+  ctx.textAlign = align;
+  ctx.fillText(text, sx(x)+dx, sy(y)+dy);
+  ctx.textAlign = 'left';
+}
+
+function drawVertices(){
+  labelPoint(11, 44/3, '(11, 44/3)', '#047857', -118, -14);
+  labelPoint(1, 3, '(1, 3)', '#047857', 12, 20);
+  labelPoint(11, -5, '(11, −5)  ✘ not in D', '#b91c1c', 14, 22);
+}
+
+function drawP(){
+  const {x,y} = pt;
+  // level line through P: 8x - 6y + 11 = k  =>  y = (8x + 11 - k)/6
+  const k = P(x,y);
+  ctx.save();
+  ctx.setLineDash([6,6]);
+  ctx.strokeStyle = 'rgba(234,88,12,.75)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  const xa = -4, xb = 14;
+  ctx.moveTo(sx(xa), sy((8*xa + 11 - k)/6));
+  ctx.lineTo(sx(xb), sy((8*xb + 11 - k)/6));
+  ctx.stroke();
+  ctx.restore();
+
+  // the point
+  ctx.beginPath();
+  ctx.arc(sx(x), sy(y), 10, 0, Math.PI*2);
+  ctx.fillStyle = '#ea580c';
+  ctx.fill();
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 3; ctx.stroke();
+
+  ctx.font = 'bold 16px Segoe UI, sans-serif';
+  ctx.fillStyle = '#c2410c';
+  ctx.fillText('P', sx(x)+14, sy(y)-10);
+
+  // value bubble
+  const label = '8x − 6y + 11 = ' + (Math.round(k*100)/100);
+  ctx.font = 'bold 14px Segoe UI, sans-serif';
+  const tw = ctx.measureText(label).width;
+  let bx = sx(x)+18, by = sy(y)+10;
+  if (bx + tw + 16 > W) bx = W - tw - 22;
+  if (by + 26 > H) by = H - 34;
+  ctx.fillStyle = 'rgba(255,247,237,.96)';
+  ctx.strokeStyle = '#fdba74';
+  ctx.lineWidth = 1.5;
+  roundRect(bx, by, tw+16, 26, 8);
+  ctx.fill(); ctx.stroke();
+  ctx.fillStyle = '#9a3412';
+  ctx.fillText(label, bx+8, by+18);
+}
+
+function roundRect(x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+
+function render(){
+  drawGrid();
+  drawLines();
+  drawRegion();
+  drawAxes();
+  drawVertices();
+  drawP();
+  updateStats();
+}
+
+/* ---------- stats ---------- */
+function updateStats(){
+  const k = P(pt.x, pt.y);
+  document.getElementById('sPt').textContent  = '(' + (Math.round(pt.x*100)/100) + ', ' + (Math.round(pt.y*100)/100) + ')';
+  document.getElementById('sVal').textContent = (Math.round(k*100)/100);
+  if (k > maxSeen + 1e-9){ maxSeen = k; }
+  document.getElementById('sMax').textContent = (Math.round(maxSeen*100)/100);
+}
+
+/* ---------- interaction ---------- */
+let dragging = false;
+
+function toWorld(clientX, clientY){
+  const r = cv.getBoundingClientRect();
+  const px = (clientX - r.left) * (cv.width  / r.width);
+  const py = (clientY - r.top ) * (cv.height / r.height);
+  return { x: (px - X0)/SCALE, y: (Y0 - py)/SCALE };
+}
+
+function clampToD(x, y){
+  // clamp x, then push y up to the lower envelope (so point stays in D)
+  let cx = Math.min(11, Math.max(1, x));
+  let lb = lowerBound(cx);
+  let cy = Math.max(y, lb);
+  // also cap y for a nice visual range
+  cy = Math.min(cy, 20);
+  return { x: cx, y: cy };
+}
+
+function setPoint(x, y){ pt = clampToD(x, y); render(); }
+
+cv.addEventListener('pointerdown', e => {
+  dragging = true;
+  cv.setPointerCapture(e.pointerId);
+  const w = toWorld(e.clientX, e.clientY);
+  setPoint(w.x, w.y);
+});
+cv.addEventListener('pointermove', e => {
+  if (!dragging) return;
+  const w = toWorld(e.clientX, e.clientY);
+  setPoint(w.x, w.y);
+});
+cv.addEventListener('pointerup',   () => dragging = false);
+cv.addEventListener('pointercancel', () => dragging = false);
+
+/* ---------- buttons ---------- */
+document.getElementById('btnV1').onclick = () => setPoint(11, 44/3);
+document.getElementById('btnV2').onclick = () => setPoint(1, 3);
+document.getElementById('btnV3').onclick = () => { // (11,-5) is NOT in D; show nearest valid point
+  setPoint(11, -5);   // clamped to D
+};
+document.getElementById('btnReset').onclick = () => {
+  maxSeen = P(pt.x, pt.y);
+  updateStats();
+};
+
+/* ---------- steps / accordion ---------- */
+const steps = Array.from(document.querySelectorAll('.step'));
+steps.forEach((s, i) => {
+  const head = s.querySelector('.step-head');
+  head.addEventListener('click', () => toggleStep(s, !s.classList.contains('open')));
+});
+
+function toggleStep(s, open){
+  const body = s.querySelector('.step-body');
+  if (open){
+    s.classList.add('open');
+    body.style.maxHeight = (body.scrollHeight + 60) + 'px';
+  } else {
+    s.classList.remove('open');
+    body.style.maxHeight = '0px';
+  }
+  if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise();
+}
+
+document.getElementById('btnAll').onclick = () => {
+  steps.forEach(s => toggleStep(s, true));
+};
+document.getElementById('btnCloseAll').onclick = () => {
+  steps.forEach(s => toggleStep(s, false));
+};
+document.getElementById('btnNext').onclick = () => {
+  const idx = steps.findIndex(s => !s.classList.contains('open'));
+  if (idx === -1){
+    steps.forEach(s => toggleStep(s, false));
+    setTimeout(() => { toggleStep(steps[0], true);
+      steps[0].scrollIntoView({behavior:'smooth', block:'center'}); }, 200);
+    return;
+  }
+  toggleStep(steps[idx], true);
+  steps[idx].scrollIntoView({behavior:'smooth', block:'center'});
+};
+
+// open first step by default
+toggleStep(steps[0], true);
+
+/* ---------- MCQ ---------- */
+const opts = document.querySelectorAll('.opt');
+const fb = document.getElementById('fb');
+opts.forEach(o => {
+  o.addEventListener('click', () => {
+    const ans = o.dataset.a;
+    opts.forEach(x => {
+      x.classList.remove('correct','wrong');
+      x.querySelector('.mark').textContent = '';
+    });
+    if (ans === 'B'){
+      o.classList.add('correct');
+      o.querySelector('.mark').textContent = '✔ Correct';
+      fb.textContent = 'Correct! The greatest value is 11, attained at the vertex (11, 44/3) of region D.';
+      fb.style.color = '#047857';
+    } else {
+      o.classList.add('wrong');
+      o.querySelector('.mark').textContent = '✘';
+      if (ans === 'D'){
+        fb.textContent = '129 is the value at (11, −5), but that point is NOT in region D — always confirm the vertex lies in the feasible region.';
+      } else if (ans === 'A'){
+        fb.textContent = 'A negative value would need a different region; D lies where both slanted lines give large y, so the expression is positive there.';
+      } else {
+        fb.textContent = '15 is not the value at any vertex of D. Test the vertices (11, 44/3) and (1, 3).';
+      }
+      fb.style.color = '#b91c1c';
+    }
+    fb.classList.add('show');
+  });
+});
+
+/* ---------- init ---------- */
+window.addEventListener('resize', () => {
+  // keep step bodies sized correctly
+  steps.forEach(s => {
+    if (s.classList.contains('open')){
+      const b = s.querySelector('.step-body');
+      b.style.maxHeight = (b.scrollHeight + 60) + 'px';
+    }
+  });
+});
+
+render();
+</script>
+</body>
+</html>

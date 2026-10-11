@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2023 Paper 2 Q29 — Box-and-Whisker Diagram</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  :root{
+    --blue:#2563eb; --blue-d:#1e40af; --amber:#f59e0b; --amber-l:#fef3c7;
+    --emerald:#059669; --emerald-l:#d1fae5; --slate:#0f172a; --slate-2:#1e293b;
+    --ink:#0f172a; --muted:#64748b; --line:#e2e8f0; --bg:#f1f5f9;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    background:var(--bg); color:var(--ink); line-height:1.6;
+  }
+  /* ---------- Hero ---------- */
+  .hero{
+    background:linear-gradient(135deg,#1e3a8a 0%,#2563eb 55%,#0ea5e9 100%);
+    color:#fff; padding:38px 22px 30px; text-align:center;
+    border-radius:0 0 26px 26px; box-shadow:0 8px 26px rgba(37,99,235,.28);
+  }
+  .hero .eyebrow{font-size:.78rem; letter-spacing:.18em; text-transform:uppercase; opacity:.85; font-weight:600;}
+  .hero h1{margin:.35em 0 .1em; font-size:clamp(1.5rem,4.5vw,2.3rem); font-weight:800; letter-spacing:-.02em;}
+  .hero .subtitle{font-size:clamp(.95rem,2.6vw,1.1rem); opacity:.95; margin-bottom:14px;}
+  .pills{display:flex; flex-wrap:wrap; gap:8px; justify-content:center;}
+  .pill{
+    background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.38);
+    padding:4px 13px; border-radius:999px; font-size:.78rem; font-weight:600; backdrop-filter:blur(3px);
+  }
+  /* ---------- Layout ---------- */
+  .wrap{max-width:920px; margin:0 auto; padding:22px 16px 60px;}
+  .card{
+    background:#fff; border-radius:18px; padding:22px 22px 20px; margin-bottom:22px;
+    box-shadow:0 3px 14px rgba(15,23,42,.07); border:1px solid var(--line);
+  }
+  .card h2{
+    margin:0 0 4px; font-size:1.16rem; font-weight:800; color:var(--blue-d);
+    display:flex; align-items:center; gap:9px; flex-wrap:wrap;
+  }
+  .chip{
+    font-size:.68rem; font-weight:800; letter-spacing:.05em; text-transform:uppercase;
+    background:var(--amber-l); color:#92400e; padding:3px 10px; border-radius:999px;
+  }
+  .card p{margin:.55em 0;}
+  .qtext{font-size:1.02rem;}
+  .opts{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:9px; margin-top:12px;}
+  .opt{
+    background:#f8fafc; border:1px solid var(--line); border-radius:11px;
+    padding:9px 14px; font-weight:600; font-size:.95rem;
+  }
+  /* ---------- Canvas ---------- */
+  .canvas-box{
+    position:relative; background:linear-gradient(180deg,#fbfdff,#f4f8ff);
+    border:1px solid #dbeafe; border-radius:14px; padding:10px; margin-top:14px;
+  }
+  canvas{display:block; width:100%; height:auto; border-radius:9px; touch-action:manipulation;}
+  .readout{
+    display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;
+  }
+  .ro{
+    background:#fff; border:1px solid var(--line); border-radius:9px; padding:5px 11px;
+    font-size:.82rem; font-weight:600; box-shadow:0 1px 3px rgba(0,0,0,.04);
+  }
+  .ro b{font-weight:800;}
+  /* ---------- Controls ---------- */
+  .controls{display:flex; flex-wrap:wrap; gap:14px; align-items:center; margin-top:14px;}
+  .ctrl{
+    display:flex; align-items:center; gap:9px; background:#f8fafc; border:1px solid var(--line);
+    border-radius:11px; padding:8px 13px; font-size:.84rem; font-weight:600; color:var(--slate-2);
+  }
+  input[type=range]{-webkit-appearance:none; appearance:none; width:150px; height:5px; border-radius:5px; background:#cbd5e1; outline:none;}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:17px; height:17px; border-radius:50%; background:var(--blue); cursor:pointer; box-shadow:0 0 0 3px rgba(37,99,235,.2);}
+  input[type=range]::-moz-range-thumb{width:17px; height:17px; border:none; border-radius:50%; background:var(--blue); cursor:pointer;}
+  input[type=checkbox]{width:17px; height:17px; accent-color:var(--emerald); cursor:pointer;}
+  /* ---------- Steps ---------- */
+  .step{
+    display:none; border-left:4px solid var(--blue); background:#f8fafc;
+    border-radius:0 12px 12px 0; padding:14px 16px; margin-top:14px; animation:fade .35s ease;
+  }
+  .step.show{display:block;}
+  @keyframes fade{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+  .step-head{display:flex; align-items:center; gap:10px; margin-bottom:7px; flex-wrap:wrap;}
+  .badge-n{
+    background:var(--blue); color:#fff; font-weight:800; font-size:.76rem;
+    width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .badge-m{
+    background:var(--amber); color:#3b2600; font-weight:800; font-size:.7rem;
+    padding:2px 9px; border-radius:999px; letter-spacing:.03em;
+  }
+  .hint{
+    background:var(--amber-l); border-left:4px solid var(--amber); border-radius:0 9px 9px 0;
+    padding:9px 13px; margin-top:10px; font-size:.88rem;
+  }
+  .hint b{color:#92400e;}
+  .ans{
+    background:var(--emerald-l); border-left:4px solid var(--emerald); border-radius:0 9px 9px 0;
+    padding:9px 13px; margin-top:10px; font-size:.92rem; font-weight:600;
+  }
+  .ans b{color:#065f46;}
+  .btn{
+    margin-top:16px; background:var(--blue); color:#fff; border:none; border-radius:11px;
+    padding:11px 22px; font-size:.92rem; font-weight:700; cursor:pointer;
+    box-shadow:0 3px 10px rgba(37,99,235,.3); transition:transform .12s, background .2s;
+  }
+  .btn:hover:not(:disabled){background:var(--blue-d); transform:translateY(-1px);}
+  .btn:disabled{background:#94a3b8; cursor:not-allowed; box-shadow:none;}
+  .counter{font-size:.82rem; color:var(--muted); font-weight:700; margin-left:12px;}
+  /* ---------- Summary ---------- */
+  .summary{background:linear-gradient(135deg,#0f172a,#1e293b); color:#e2e8f0; border:none;}
+  .summary h2{color:#7dd3fc;}
+  .summary ul{margin:10px 0 0; padding-left:20px;}
+  .summary li{margin:.45em 0; font-size:.98rem;}
+  .summary .final{color:#6ee7b7; font-weight:800;}
+  footer{
+    text-align:center; color:var(--muted); font-size:.8rem; padding:10px 16px 34px;
+  }
+  @media(max-width:560px){
+    .card{padding:17px 15px;}
+    .wrap{padding:16px 10px 50px;}
+    input[type=range]{width:110px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div class="eyebrow">HKDSE Mathematics (Compulsory Part) &middot; Paper 2</div>
+  <h1>2023 Paper 2 &middot; Question 29</h1>
+  <div class="subtitle">Statistics &mdash; Reading a Box-and-Whisker Diagram</div>
+  <div class="pills">
+    <span class="pill">Box-and-Whisker Diagram</span>
+    <span class="pill">Quartiles</span>
+    <span class="pill">Five-Number Summary</span>
+    <span class="pill">Multiple Choice</span>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ============ QUESTION ============ -->
+  <section class="card">
+    <h2>Question <span class="chip">4 options &middot; 1 mark</span></h2>
+    <p class="qtext">
+      The box-and-whisker diagram below shows the distribution of the numbers of training hours of
+      some engineers in a year. Find the upper quartile of the distribution.
+    </p>
+    <div class="opts">
+      <div class="opt">A. \(20\)</div>
+      <div class="opt">B. \(40\)</div>
+      <div class="opt">C. \(60\)</div>
+      <div class="opt">D. \(70\)</div>
+    </div>
+  </section>
+
+  <!-- ============ PART (a) : READ THE DIAGRAM ============ -->
+  <section class="card">
+    <h2>Part (a) &mdash; Meet the Box-and-Whisker Diagram</h2>
+    <p>
+      A box-and-whisker diagram packs the <b>five-number summary</b> of a data set onto a single
+      number line. Move the slider to highlight each of the five landmarks in the diagram below.
+    </p>
+
+    <div class="canvas-box">
+      <canvas id="cvA" width="880" height="230"></canvas>
+      <div class="readout">
+        <div class="ro">Highlighted: <b id="roA-label">Minimum</b></div>
+        <div class="ro">Value: <b id="roA-val">10</b></div>
+        <div class="ro">Position: <b id="roA-pos">Left whisker end</b></div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <label class="ctrl">
+        Landmark
+        <input type="range" id="slA" min="0" max="4" step="1" value="0">
+      </label>
+      <label class="ctrl">
+        <input type="checkbox" id="ckA" checked> Show scale guides
+      </label>
+    </div>
+
+    <button class="btn" data-target="stepsA">Next step &rarr;</button>
+    <span class="counter" id="cntA">0 / 3</span>
+
+    <div class="step" data-group="stepsA">
+      <div class="step-head"><span class="badge-n">1</span><span class="badge-m">1M</span></div>
+      <p>Read the <b>five-number summary</b> off the diagram:</p>
+      \[
+        \text{min}=10,\quad Q_1=20,\quad \text{median}=40,\quad Q_3=60,\quad \text{max}=80
+      \]
+      <div class="hint"><b>Hint:</b> The two <i>whisker ends</i> give the minimum and maximum; the two <i>box ends</i> give the quartiles \(Q_1\) and \(Q_3\); the <i>vertical line inside the box</i> gives the median.</div>
+    </div>
+
+    <div class="step" data-group="stepsA">
+      <div class="step-head"><span class="badge-n">2</span><span class="badge-m">1M</span></div>
+      <p>The <b>upper quartile</b> \(Q_3\) is the right-hand edge of the box (the side closer to the maximum). From the diagram its position falls on \(60\).</p>
+      <div class="hint"><b>Hint:</b> The upper quartile separates the top \(25\%\) of the data, so it is always at the <b>upper (right) end of the box</b> — not at the whisker tip.</div>
+    </div>
+
+    <div class="step" data-group="stepsA">
+      <div class="step-head"><span class="badge-n">3</span><span class="badge-m">1A</span></div>
+      <p>Hence the upper quartile is \(60\). Comparing with the options:</p>
+      <div class="ans"><b>Answer:</b> \[ Q_3 = 60 \quad\Longrightarrow\quad \boxed{\text{C}} \]</div>
+    </div>
+  </section>
+
+  <!-- ============ PART (b) : INTERACTIVE QUARTILE SPLIT ============ -->
+  <section class="card">
+    <h2>Part (b) &mdash; What "Upper Quartile" Really Means</h2>
+    <p>
+      \(Q_3\) cuts off the <b>top \(25\%\)</b> of the data. Drag the slider to move a split line
+      and watch the percentages below (and above) it change. At \(Q_3 = 60\) the split is exactly \(75\% / 25\%\).
+    </p>
+
+    <div class="canvas-box">
+      <canvas id="cvB" width="880" height="250"></canvas>
+      <div class="readout">
+        <div class="ro">Split value: <b id="roB-val">60</b></div>
+        <div class="ro">Below: <b id="roB-low">75%</b></div>
+        <div class="ro">Above: <b id="roB-high">25%</b></div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <label class="ctrl">
+        Split value
+        <input type="range" id="slB" min="10" max="80" step="1" value="60">
+      </label>
+      <label class="ctrl">
+        <input type="checkbox" id="ckB"> Snap to the true \(Q_3\)
+      </label>
+    </div>
+
+    <button class="btn" data-target="stepsB">Next step &rarr;</button>
+    <span class="counter" id="cntB">0 / 2</span>
+
+    <div class="step" data-group="stepsB">
+      <div class="step-head"><span class="badge-n">1</span><span class="badge-m">1M</span></div>
+      <p>
+        The three quartiles divide the ordered data into four equal parts:
+      </p>
+      \[
+        \underbrace{\;\;25\%\;\;}_{10\to Q_1=20}\;\;
+        \underbrace{\;\;25\%\;\;}_{20\to 40}\;\;
+        \underbrace{\;\;25\%\;\;}_{40\to Q_3=60}\;\;
+        \underbrace{\;\;25\%\;\;}_{60\to 80}
+      \]
+      <div class="hint"><b>Hint:</b> The right-hand edge of the box (\(Q_3\)) is where \(75\%\) of the data lies below it and \(25\%\) lies above it.</div>
+    </div>
+
+    <div class="step" data-group="stepsB">
+      <div class="step-head"><span class="badge-n">2</span><span class="badge-m">1A</span></div>
+      <p>So the value at the right edge of the box is the required upper quartile.</p>
+      <div class="ans"><b>Upper quartile</b> \(= Q_3 = \boxed{60}\) (option <b>C</b>)</div>
+    </div>
+  </section>
+
+  <!-- ============ PART (c) : WHY NOT THE OTHERS ============ -->
+  <section class="card">
+    <h2>Part (c) &mdash; Why the Other Options Are Wrong</h2>
+    <p>
+      Toggle each option to see which feature of the diagram it actually corresponds to. Only the
+      right-hand box edge is the upper quartile.
+    </p>
+
+    <div class="canvas-box">
+      <canvas id="cvC" width="880" height="230"></canvas>
+      <div class="readout">
+        <div class="ro" id="roC">Selected: none</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <label class="ctrl"><input type="checkbox" class="ckC" data-v="20"> A &mdash; \(20\)</label>
+      <label class="ctrl"><input type="checkbox" class="ckC" data-v="40"> B &mdash; \(40\)</label>
+      <label class="ctrl"><input type="checkbox" class="ckC" data-v="60"> C &mdash; \(60\)</label>
+      <label class="ctrl"><input type="checkbox" class="ckC" data-v="70"> D &mdash; \(70\)</label>
+    </div>
+
+    <button class="btn" data-target="stepsC">Next step &rarr;</button>
+    <span class="counter" id="cntC">0 / 3</span>
+
+    <div class="step" data-group="stepsC">
+      <div class="step-head"><span class="badge-n">1</span><span class="badge-m">1M</span></div>
+      <p>
+        \(20\) is the <b>lower quartile</b> \(Q_1\) (left edge of the box) — that separates the bottom
+        \(25\%\), not the top \(25\%\).
+      </p>
+      <div class="hint"><b>Hint:</b> Don't confuse the two ends of the box. Low value \(\to Q_1\), high value \(\to Q_3\).</div>
+    </div>
+
+    <div class="step" data-group="stepsC">
+      <div class="step-head"><span class="badge-n">2</span><span class="badge-m">1M</span></div>
+      <p>
+        \(40\) is the <b>median</b> (the vertical line inside the box) — it splits the data into a lower
+        \(50\%\) and an upper \(50\%\).
+      </p>
+      <p>
+        \(70\) is <b>not a landmark</b> at all: it lies on the right whisker between \(Q_3=60\) and
+        \(\max=80\).
+      </p>
+      <div class="hint"><b>Hint:</b> Only five values are marked: min, \(Q_1\), median, \(Q_3\), max. Any other value read from the axis is just an interior data value.</div>
+    </div>
+
+    <div class="step" data-group="stepsC">
+      <div class="step-head"><span class="badge-n">3</span><span class="badge-m">1A</span></div>
+      <p>Therefore the only correct choice is the right-hand box edge.</p>
+      <div class="ans"><b>Answer:</b> \(\boxed{\text{C}\;\;60}\)</div>
+    </div>
+  </section>
+
+  <!-- ============ SUMMARY ============ -->
+  <section class="card summary">
+    <h2>Summary &mdash; At a Glance</h2>
+    <ul>
+      <li>Read landmarks off the diagram: \(\min=10,\; Q_1=20,\; \text{median}=40,\; Q_3=60,\; \max=80\).</li>
+      <li>The <b>upper quartile</b> is the <b>right-hand edge of the box</b>.</li>
+      <li>It marks the \(75\%\) point, leaving the top \(25\%\) of the data above it.</li>
+      <li>\(20\) is \(Q_1\), \(40\) is the median, \(70\) is just a point on the right whisker.</li>
+      <li class="final">Final answer: C &mdash; \(60\)</li>
+    </ul>
+  </section>
+
+</div>
+
+<footer>HKDSE 2023 Paper 2 Q29 &middot; Interactive solution &middot; Built with HTML5 Canvas &amp; MathJax</footer>
+
+<script>
+/* ============================================================
+   SHARED DATA
+   ============================================================ */
+const DATA = { min: 10, q1: 20, med: 40, q3: 60, max: 80 };
+const XMIN = 0, XMAX = 90;
+
+/* ============================================================
+   STEP-BY-STEP REVEAL ENGINE
+   ============================================================ */
+document.querySelectorAll('.btn[data-target]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const group = btn.dataset.target;
+    const steps = Array.from(document.querySelectorAll(`.step[data-group="${group}"]`));
+    const counter = document.getElementById('cnt' + group.replace('steps', ''));
+    const hidden = steps.find(s => !s.classList.contains('show'));
+    if (hidden) hidden.classList.add('show');
+    const shown = steps.filter(s => s.classList.contains('show')).length;
+    if (counter) counter.textContent = shown + ' / ' + steps.length;
+    if (shown === steps.length) {
+      btn.disabled = true;
+      btn.textContent = 'All steps revealed \u2713';
+    }
+  });
+});
+
+/* ============================================================
+   CANVAS A — LANDMARK HIGHLIGHTER
+   ============================================================ */
+const cvA = document.getElementById('cvA');
+const ctxA = cvA.getContext('2d');
+
+const LANDMARKS = [
+  { key:'min',  val:10, label:'Minimum',  pos:'Left whisker end',    color:'#dc2626' },
+  { key:'q1',   val:20, label:'Lower Quartile Q\u2081', pos:'Left box edge', color:'#7c3aed' },
+  { key:'med',  val:40, label:'Median',   pos:'Vertical line in box', color:'#0891b2' },
+  { key:'q3',   val:60, label:'Upper Quartile Q\u2083', pos:'Right box edge', color:'#059669' },
+  { key:'max',  val:80, label:'Maximum',  pos:'Right whisker end',   color:'#dc2626' }
+];
+
+function xToPx(v, pad, w){
+  return pad + (v - XMIN) / (XMAX - XMIN) * (w - 2*pad);
+}
+
+function drawAxisA(ctx, W, H, showGuides){
+  const pad = 55, axisY = H - 62;
+  const x = v => xToPx(v, pad, W);
+
+  ctx.clearRect(0,0,W,H);
+
+  // grid
+  ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1;
+  for(let g = 0; g <= 90; g += 10){
+    if(!showGuides && g % 20 !== 0) continue;
+    ctx.beginPath(); ctx.moveTo(x(g), 26); ctx.lineTo(x(g), axisY); ctx.stroke();
+  }
+
+  // axis line
+  ctx.strokeStyle = '#334155'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(x(0)-14, axisY); ctx.lineTo(x(90)+18, axisY); ctx.stroke();
+
+  // ticks + labels
+  ctx.fillStyle = '#475569'; ctx.font = '600 12px -apple-system, Segoe UI, sans-serif';
+  ctx.textAlign = 'center';
+  for(let g = 0; g <= 90; g += 10){
+    ctx.beginPath(); ctx.moveTo(x(g), axisY); ctx.lineTo(x(g), axisY + 7); ctx.stroke();
+    if(g % 10 === 0){
+      ctx.fillText(g, x(g), axisY + 23);
+    }
+  }
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#64748b'; ctx.font = 'italic 12px -apple-system, Segoe UI, sans-serif';
+  ctx.fillText('Number of training hours', x(90) + 6, axisY - 6);
+}
+
+function drawBoxA(ctx, W, H, activeIdx){
+  const pad = 55, axisY = H - 62;
+  const x = v => xToPx(v, pad, W);
+  const boxTop = axisY - 46, boxH = 30;
+
+  const {min,q1,med,q3,max} = DATA;
+
+  // whiskers
+  ctx.strokeStyle = '#334155'; ctx.lineWidth = 2.5;
+  ctx.beginPath(); ctx.moveTo(x(min), axisY); ctx.lineTo(x(min), boxTop + boxH/2); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x(max), axisY); ctx.lineTo(x(max), boxTop + boxH/2); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x(min), boxTop + boxH/2); ctx.lineTo(x(q1), boxTop + boxH/2); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x(q3), boxTop + boxH/2); ctx.lineTo(x(max), boxTop + boxH/2); ctx.stroke();
+
+  // box
+  ctx.fillStyle = 'rgba(37,99,235,.10)';
+  ctx.fillRect(x(q1), boxTop, x(q3) - x(q1), boxH);
+  ctx.strokeStyle = '#1e40af'; ctx.lineWidth = 2.5;
+  ctx.strokeRect(x(q1), boxTop, x(q3) - x(q1), boxH);
+
+  // median line
+  ctx.strokeStyle = '#1e40af'; ctx.lineWidth = 2.5;
+  ctx.beginPath(); ctx.moveTo(x(med), boxTop); ctx.lineTo(x(med), boxTop + boxH); ctx.stroke();
+
+  // highlight
+  const lm = LANDMARKS[activeIdx];
+  ctx.save();
+  ctx.strokeStyle = lm.color; ctx.lineWidth = 3.5;
+  ctx.setLineDash([7,5]);
+  ctx.beginPath(); ctx.moveTo(x(lm.val), 22); ctx.lineTo(x(lm.val), axisY); ctx.stroke();
+  ctx.restore();
+
+  ctx.fillStyle = lm.color;
+  ctx.beginPath(); ctx.arc(x(lm.val), boxTop + boxH/2, 6.5, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+
+  // value tag
+  ctx.fillStyle = lm.color;
+  const tagW = 46, tx = Math.min(Math.max(x(lm.val) - tagW/2, 4), W - tagW - 4);
+  ctx.beginPath();
+  ctx.roundRect(tx, 4, tagW, 20, 6);
+  ctx.fill();
+  ctx.fillStyle = '#fff'; ctx.font = '800 12px -apple-system, Segoe UI, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(lm.val, tx + tagW/2, 18);
+
+  // endpoints on axis
+  ctx.fillStyle = '#334155';
+  [min,q1,med,q3,max].forEach(v => {
+    ctx.beginPath(); ctx.arc(x(v), axisY, 3.5, 0, Math.PI*2); ctx.fill();
+  });
+}
+
+function refreshA(){
+  const idx = +document.getElementById('slA').value;
+  const guides = document.getElementById('ckA').checked;
+  const W = cvA.width, H = cvA.height;
+  drawAxisA(ctxA, W, H, guides);
+  drawBoxA(ctxA, W, H, idx);
+
+  const lm = LANDMARKS[idx];
+  document.getElementById('roA-label').textContent = lm.label;
+  document.getElementById('roA-val').textContent = lm.val;
+  document.getElementById('roA-pos').textContent = lm.pos;
+}
+document.getElementById('slA').addEventListener('input', refreshA);
+document.getElementById('ckA').addEventListener('change', refreshA);
+
+/* ============================================================
+   CANVAS B — QUARTILE SPLIT / PERCENTAGE
+   ============================================================ */
+const cvB = document.getElementById('cvB');
+const ctxB = cvB.getContext('2d');
+
+function intervalShare(v){
+  // piecewise-linear cumulative assumption between landmarks
+  const {min,q1,med,q3,max} = DATA;
+  if(v <= min) return 0;
+  if(v >= max) return 100;
+  if(v <= q1) return (v-min)/(q1-min)*25;
+  if(v <= med) return 25 + (v-q1)/(med-q1)*25;
+  if(v <= q3) return 50 + (v-med)/(q3-med)*25;
+  return 75 + (v-q3)/(max-q3)*25;
+}
+
+function drawB(){
+  const W = cvB.width, H = cvB.height;
+  const pad = 55, axisY = H - 70;
+  const x = v => xToPx(v, pad, W);
+  let v = +document.getElementById('slB').value;
+  const snap = document.getElementById('ckB').checked;
+  if(snap) v = DATA.q3;
+
+  ctxB.clearRect(0,0,W,H);
+
+  // grid
+  ctxB.strokeStyle = '#e8eef7'; ctxB.lineWidth = 1;
+  for(let g = 0; g <= 90; g += 10){
+    ctxB.beginPath(); ctxB.moveTo(x(g), 20); ctxB.lineTo(x(g), axisY); ctxB.stroke();
+  }
+
+  const boxTop = axisY - 50, boxH = 34;
+  const {min,q1,med,q3,max} = DATA;
+
+  // box fill
+  ctxB.fillStyle = 'rgba(37,99,235,.10)';
+  ctxB.fillRect(x(q1), boxTop, x(q3)-x(q1), boxH);
+
+  // shaded "below split" region on axis
+  const pct = intervalShare(v);
+  ctxB.save();
+  ctxB.beginPath();
+  ctxB.rect(x(min), axisY + 6, x(v) - x(min), 16);
+  ctxB.fillStyle = 'rgba(5,150,105,.35)';
+  ctxB.fill();
+  ctxB.restore();
+  ctxB.save();
+  ctxB.beginPath();
+  ctxB.rect(x(v), axisY + 6, x(max) - x(v), 16);
+  ctxB.fillStyle = 'rgba(245,158,11,.45)';
+  ctxB.fill();
+  ctxB.restore();
+  ctxB.strokeStyle = '#94a3b8'; ctxB.lineWidth = 1;
+  ctxB.strokeRect(x(min), axisY + 6, x(max) - x(min), 16);
+
+  // whiskers + box
+  ctxB.strokeStyle = '#334155'; ctxB.lineWidth = 2.5;
+  ctxB.beginPath(); ctxB.moveTo(x(min), axisY); ctxB.lineTo(x(min), boxTop + boxH/2); ctxB.stroke();
+  ctxB.beginPath(); ctxB.moveTo(x(max), axisY); ctxB.lineTo(x(max), boxTop + boxH/2); ctxB.stroke();
+  ctxB.beginPath(); ctxB.moveTo(x(min), boxTop + boxH/2); ctxB.lineTo(x(q1), boxTop + boxH/2); ctxB.stroke();
+  ctxB.beginPath(); ctxB.moveTo(x(q3), boxTop + boxH/2); ctxB.lineTo(x(max), boxTop + boxH/2); ctxB.stroke();
+  ctxB.strokeStyle = '#1e40af'; ctxB.lineWidth = 2.5;
+  ctxB.strokeRect(x(q1), boxTop, x(q3)-x(q1), boxH);
+  ctxB.beginPath(); ctxB.moveTo(x(med), boxTop); ctxB.lineTo(x(med), boxTop + boxH); ctxB.stroke();
+
+  // landmark labels
+  ctxB.font = '700 11px -apple-system, Segoe UI, sans-serif';
+  ctxB.textAlign = 'center';
+  ctxB.fillStyle = '#475569';
+  ctxB.fillText('Q\u2081=' + q1, x(q1), boxTop - 8);
+  ctxB.fillText('median=' + med, x(med), boxTop - 24);
+  ctxB.fillText('Q\u2083=' + q3, x(q3), boxTop - 8);
+
+  // moving split line
+  ctxB.save();
+  ctxB.strokeStyle = v === q3 ? '#059669' : '#d97706';
+  ctxB.lineWidth = 3; ctxB.setLineDash([6,4]);
+  ctxB.beginPath(); ctxB.moveTo(x(v), 16); ctxB.lineTo(x(v), axisY + 26); ctxB.stroke();
+  ctxB.restore();
+
+  // axis
+  ctxB.strokeStyle = '#334155'; ctxB.lineWidth = 2;
+  ctxB.beginPath(); ctxB.moveTo(x(0)-14, axisY); ctxB.lineTo(x(90)+18, axisY); ctxB.stroke();
+  ctxB.fillStyle = '#475569'; ctxB.font = '600 12px -apple-system, Segoe UI, sans-serif';
+  for(let g = 0; g <= 90; g += 10){
+    ctxB.beginPath(); ctxB.moveTo(x(g), axisY); ctxB.lineTo(x(g), axisY + 6); ctxB.stroke();
+    ctxB.fillText(g, x(g), axisY + 38);
+  }
+  ctxB.textAlign = 'left';
+  ctxB.fillStyle = '#64748b'; ctxB.font = 'italic 12px -apple-system, Segoe UI, sans-serif';
+  ctxB.fillText('hours', x(90) + 6, axisY - 6);
+
+  // split value tag
+  ctxB.fillStyle = v === q3 ? '#059669' : '#d97706';
+  const tw = 42, tx = Math.min(Math.max(x(v)-tw/2, 3), W-tw-3);
+  ctxB.beginPath(); ctxB.roundRect(tx, 2, tw, 20, 6); ctxB.fill();
+  ctxB.fillStyle = '#fff'; ctxB.font = '800 12px -apple-system, Segoe UI, sans-serif';
+  ctxB.textAlign = 'center';
+  ctxB.fillText(v, tx + tw/2, 16);
+
+  // percentage labels on the axis bar
+  ctxB.font = '800 12px -apple-system, Segoe UI, sans-serif';
+  ctxB.fillStyle = '#065f46';
+  ctxB.fillText(pct.toFixed(0) + '%', (x(min)+x(v))/2, axisY + 19);
+  ctxB.fillStyle = '#92400e';
+  ctxB.fillText((100-pct).toFixed(0) + '%', (x(v)+x(max))/2, axisY + 19);
+
+  document.getElementById('roB-val').textContent = v;
+  document.getElementById('roB-low').textContent = pct.toFixed(0) + '%';
+  document.getElementById('roB-high').textContent = (100-pct).toFixed(0) + '%';
+}
+
+document.getElementById('slB').addEventListener('input', drawB);
+document.getElementById('ckB').addEventListener('change', drawB);
+
+/* ============================================================
+   CANVAS C — OPTION DISCRIMINATOR
+   ============================================================ */
+const cvC = document.getElementById('cvC');
+const ctxC = cvC.getContext('2d');
+
+const OPT_INFO = {
+  20: { text:'\(20\) = lower quartile \(Q_1\) (left box edge)', color:'#7c3aed' },
+  40: { text:'\(40\) = median (line inside the box)', color:'#0891b2' },
+  60: { text:'\(60\) = upper quartile \(Q_3\) \u2713 correct', color:'#059669' },
+  70: { text:'\(70\) = a point on the right whisker, not a landmark', color:'#dc2626' }
+};
+
+function drawC(){
+  const W = cvC.width, H = cvC.height;
+  const pad = 55, axisY = H - 62;
+  const x = v => xToPx(v, pad, W);
+  const {min,q1,med,q3,max} = DATA;
+
+  ctxC.clearRect(0,0,W,H);
+
+  // grid
+  ctxC.strokeStyle = '#e8eef7'; ctxC.lineWidth = 1;
+  for(let g = 0; g <= 90; g += 10){
+    ctxC.beginPath(); ctxC.moveTo(x(g), 24); ctxC.lineTo(x(g), axisY); ctxC.stroke();
+  }
+
+  const boxTop = axisY - 46, boxH = 30;
+
+  // whiskers / box / median
+  ctxC.strokeStyle = '#334155'; ctxC.lineWidth = 2.5;
+  ctxC.beginPath(); ctxC.moveTo(x(min), axisY); ctxC.lineTo(x(min), boxTop + boxH/2); ctxC.stroke();
+  ctxC.beginPath(); ctxC.moveTo(x(max), axisY); ctxC.lineTo(x(max), boxTop + boxH/2); ctxC.stroke();
+  ctxC.beginPath(); ctxC.moveTo(x(min), boxTop + boxH/2); ctxC.lineTo(x(q1), boxTop + boxH/2); ctxC.stroke();
+  ctxC.beginPath(); ctxC.moveTo(x(q3), boxTop + boxH/2); ctxC.lineTo(x(max), boxTop + boxH/2); ctxC.stroke();
+  ctxC.fillStyle = 'rgba(37,99,235,.10)';
+  ctxC.fillRect(x(q1), boxTop, x(q3)-x(q1), boxH);
+  ctxC.strokeStyle = '#1e40af'; ctxC.lineWidth = 2.5;
+  ctxC.strokeRect(x(q1), boxTop, x(q3)-x(q1), boxH);
+  ctxC.beginPath(); ctxC.moveTo(x(med), boxTop); ctxC.lineTo(x(med), boxTop + boxH); ctxC.stroke();
+
+  // axis
+  ctxC.strokeStyle = '#334155'; ctxC.lineWidth = 2;
+  ctxC.beginPath(); ctxC.moveTo(x(0)-14, axisY); ctxC.lineTo(x(90)+18, axisY); ctxC.stroke();
+  ctxC.fillStyle = '#475569'; ctxC.font = '600 12px -apple-system, Segoe UI, sans-serif';
+  ctxC.textAlign = 'center';
+  for(let g = 0; g <= 90; g += 10){
+    ctxC.beginPath(); ctxC.moveTo(x(g), axisY); ctxC.lineTo(x(g), axisY + 7); ctxC.stroke();
+    ctxC.fillText(g, x(g), axisY + 23);
+  }
+  ctxC.textAlign = 'left';
+  ctxC.fillStyle = '#64748b'; ctxC.font = 'italic 12px -apple-system, Segoe UI, sans-serif';
+  ctxC.fillText('Number of training hours', x(90) + 6, axisY - 6);
+
+  // checked options
+  const checked = Array.from(document.querySelectorAll('.ckC'))
+                        .filter(c => c.checked)
+                        .map(c => +c.dataset.v);
+
+  let msgs = [];
+  checked.forEach(v => {
+    const info = OPT_INFO[v];
+    ctxC.save();
+    ctxC.strokeStyle = info.color; ctxC.lineWidth = 3; ctxC.setLineDash([6,4]);
+    ctxC.beginPath(); ctxC.moveTo(x(v), 26); ctxC.lineTo(x(v), axisY); ctxC.stroke();
+    ctxC.restore();
+    ctxC.fillStyle = info.color;
+    ctxC.beginPath(); ctxC.arc(x(v), boxTop + boxH/2, 6, 0, Math.PI*2); ctxC.fill();
+    ctxC.strokeStyle = '#fff'; ctxC.lineWidth = 2; ctxC.stroke();
+
+    const tw = 40, tx = Math.min(Math.max(x(v)-tw/2, 3), W-tw-3);
+    ctxC.beginPath(); ctxC.roundRect(tx, 4, tw, 20, 6); ctxC.fill();
+    ctxC.fillStyle = '#fff'; ctxC.font = '800 12px -apple-system, Segoe UI, sans-serif';
+    ctxC.textAlign = 'center';
+    ctxC.fillText(v, tx + tw/2, 18);
+    msgs.push(info.text);
+  });
+
+  const ro = document.getElementById('roC');
+  if(!msgs.length){
+    ro.textContent = 'Selected: none';
+  } else if(checked.length === 1){
+    const v = checked[0];
+    ctxC.beginPath(); ctxC.roundRect(tx, 4, tw, 20, 6); ctxC.fill();
+    ro.innerHTML = 'Selected: <b>' + v + '</b> &mdash; ' + OPT_INFO[v].text;
+  } else {
+    ro.innerHTML = 'Selected: <b>' + checked.join(', ') + '</b> &mdash; ' + msgs.length + ' options highlighted';
+  }
+}
+document.querySelectorAll('.ckC').forEach(c => c.addEventListener('change', drawC));
+
+/* ============================================================
+   INIT
+   ============================================================ */
+window.addEventListener('load', () => {
+  refreshA();
+  drawB();
+  drawC();
+});
+// also draw immediately in case load already fired
+refreshA(); drawB(); drawC();
+
+/* roundRect polyfill for older browsers */
+if(!CanvasRenderingContext2D.prototype.roundRect){
+  CanvasRenderingContext2D.prototype.roundRect = function(x,y,w,h,r){
+    if(w < 2*r) r = w/2;
+    if(h < 2*r) r = h/2;
+    this.beginPath();
+    this.moveTo(x+r,y);
+    this.arcTo(x+w,y,x+w,y+h,r);
+    this.arcTo(x+w,y+h,x,y+h,r);
+    this.arcTo(x,y+h,x,y,r);
+    this.arcTo(x,y,x+w,y,r);
+    this.closePath();
+    return this;
+  };
+}
+</script>
+</body>
+</html>

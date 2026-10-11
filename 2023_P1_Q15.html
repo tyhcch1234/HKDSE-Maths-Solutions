@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>HKDSE Math 2023 P1 Q15 · Probability</title>
+  <!-- MathJax for LaTeX rendering -->
+  <script>
+    MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+  <!-- Tailwind via CDN for utility classes (light, clean) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Font for modern readability -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
+  <style>
+    /* Custom base and tweaks */
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: #f8fafc;
+      color: #0f172a;
+      -webkit-tap-highlight-color: transparent;
+    }
+    /* Smooth accordion transitions */
+    .step-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease-out, opacity 0.25s ease;
+      opacity: 0;
+    }
+    .step-content.open {
+      max-height: 800px; /* enough for content, responsive */
+      opacity: 1;
+      transition: max-height 0.5s ease-in, opacity 0.3s ease;
+    }
+    /* Ball visual styles */
+    .ball {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease, box-shadow 0.2s;
+      width: 2.2rem;
+      height: 2.2rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      user-select: none;
+    }
+    .ball-red {
+      background: #ef4444;
+      border: 2px solid #b91c1c;
+      color: white;
+    }
+    .ball-black {
+      background: #1e293b;
+      border: 2px solid #0f172a;
+      color: white;
+    }
+    .ball-highlight {
+      transform: scale(1.15);
+      box-shadow: 0 0 0 3px #fbbf24, 0 4px 10px rgba(0,0,0,0.2);
+      z-index: 2;
+    }
+    /* Interactive slider thumb */
+    input[type=range] {
+      -webkit-appearance: none;
+      background: transparent;
+    }
+    input[type=range]::-webkit-slider-runnable-track {
+      height: 8px;
+      border-radius: 8px;
+      background: #e2e8f0;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 22px;
+      width: 22px;
+      border-radius: 50%;
+      background: #2563eb;
+      margin-top: -7px;
+      box-shadow: 0 2px 6px rgba(37,99,235,0.4);
+      cursor: pointer;
+    }
+    input[type=range]::-moz-range-track {
+      height: 8px;
+      border-radius: 8px;
+      background: #e2e8f0;
+    }
+    input[type=range]::-moz-range-thumb {
+      height: 22px;
+      width: 22px;
+      border: none;
+      border-radius: 50%;
+      background: #2563eb;
+      margin-top: -7px;
+      cursor: pointer;
+    }
+    /* Card hover subtle */
+    .step-card {
+      transition: box-shadow 0.2s, border-color 0.2s;
+    }
+    .step-card:hover {
+      box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+      border-color: #94a3b8;
+    }
+    /* Scrollable visual group for mobile */
+    .visual-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
+      justify-content: center;
+    }
+    @media (max-width: 420px) {
+      .ball { width: 1.8rem; height: 1.8rem; font-size: 0.7rem; }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center py-4 px-3 sm:px-6">
+
+  <!-- Main container -->
+  <main class="w-full max-w-3xl bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl border border-slate-200/80 p-5 sm:p-7 md:p-8 space-y-6">
+
+    <!-- QUESTION HEADER -->
+    <header class="border-b border-slate-200 pb-4">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <h1 class="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight">
+          HKDSE Math 2023 Paper 1 <span class="text-blue-600">Q15</span>
+        </h1>
+        <div class="flex gap-2">
+          <span class="px-2.5 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-semibold border border-blue-200">Probability</span>
+          <span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-full text-xs font-semibold border border-emerald-200">Combinations</span>
+        </div>
+      </div>
+      <!-- Question text -->
+      <div class="mt-4 text-slate-700 text-base sm:text-lg leading-relaxed">
+        <p><span class="font-semibold text-slate-800">In a box, there are 5 red balls and 4 black balls.</span> From the box, 2 balls are randomly chosen at the same time.</p>
+        <p class="mt-2"><span class="font-semibold text-blue-700">(a)</span> Find the probability that the 2 balls chosen are red. <span class="text-slate-400 text-sm">[2 marks]</span></p>
+        <p class="mt-2"><span class="font-semibold text-blue-700">(b)</span> In a bag, there are 8 red balls. The 2 balls chosen from the box are put into the bag and then 3 balls are randomly chosen at the same time from the bag. Find the probability that the 3 balls chosen are of the same colour. <span class="text-slate-400 text-sm">[2 marks]</span></p>
+      </div>
+    </header>
+
+    <!-- INTERACTIVE VISUAL: BOX & BALLS -->
+    <section class="bg-slate-50/80 rounded-2xl p-4 sm:p-5 border border-slate-200">
+      <h2 class="text-sm font-semibold text-slate-600 uppercase tracking-wider mb-3 flex items-center gap-2">
+        <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+        Box content (initial)
+      </h2>
+      <div class="visual-grid">
+        <div class="flex flex-wrap gap-1.5 justify-center">
+          <!-- 5 red -->
+          <span class="ball ball-red" aria-label="red ball">R</span>
+          <span class="ball ball-red" aria-label="red ball">R</span>
+          <span class="ball ball-red" aria-label="red ball">R</span>
+          <span class="ball ball-red" aria-label="red ball">R</span>
+          <span class="ball ball-red" aria-label="red ball">R</span>
+          <!-- 4 black -->
+          <span class="ball ball-black" aria-label="black ball">B</span>
+          <span class="ball ball-black" aria-label="black ball">B</span>
+          <span class="ball ball-black" aria-label="black ball">B</span>
+          <span class="ball ball-black" aria-label="black ball">B</span>
+        </div>
+        <p class="text-xs text-slate-500 w-full text-center mt-1">5 red (R), 4 black (B) — total 9 balls</p>
+      </div>
+    </section>
+
+    <!-- STEP BY STEP SOLUTION (ACCORDION) -->
+    <section class="space-y-3">
+      <!-- Step 1 -->
+      <div class="step-card bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <button class="w-full flex items-center justify-between px-5 py-4 text-left font-semibold text-slate-800 hover:bg-slate-50/80 transition-colors" onclick="toggleStep('step1')">
+          <span class="flex items-center gap-3">
+            <span class="flex items-center justify-center w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs font-bold">1</span>
+            <span>Understanding the problem &amp; combinations</span>
+          </span>
+          <svg id="icon-step1" class="w-5 h-5 text-slate-400 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+        </button>
+        <div id="step1" class="step-content border-t border-slate-100 px-5 pb-5 pt-3">
+          <div class="text-sm sm:text-base text-slate-700 space-y-2">
+            <p>We choose <strong>2 balls at the same time</strong> — order does <u>not</u> matter. So we use <strong>combinations</strong>.</p>
+            <div class="bg-amber-50 border-l-4 border-amber-400 p-3 rounded-r-lg mt-2 text-sm">
+              <span class="font-semibold text-amber-800">Hint:</span> \( ^nC_r = \frac{n!}{r!(n-r)!} \) = number of ways to choose \(r\) objects from \(n\) distinct objects.
+            </div>
+            <p>Total number of ways to pick 2 balls from 9: \( ^9C_2 \).</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step-card bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <button class="w-full flex items-center justify-between px-5 py-4 text-left font-semibold text-slate-800 hover:bg-slate-50/80 transition-colors" onclick="toggleStep('step2')">
+          <span class="flex items-center gap-3">
+            <span class="flex items-center justify-center w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs font-bold">2</span>
+            <span>Part (a): both balls are red</span>
+          </span>
+          <svg id="icon-step2" class="w-5 h-5 text-slate-400 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+        </button>
+        <div id="step2" class="step-content border-t border-slate-100 px-5 pb-5 pt-3">
+          <div class="text-sm sm:text-base text-slate-700 space-y-3">
+            <p>Number of ways to choose 2 red from 5 red: \( ^5C_2 \).</p>
+            <div class="bg-amber-50 border-l-4 border-amber-400 p-3 rounded-r-lg text-sm">
+              <span class="font-semibold text-amber-800">Hint:</span> Favourable outcomes ÷ total outcomes.
+            </div>
+            <p>Required probability:</p>
+            <div class="bg-slate-100 p-3 rounded-lg font-mono text-base overflow-x-auto">
+              \[
+              \frac{^5C_2}{^9C_2} = \frac{10}{36} = \frac{5}{18}
+              \]
+            </div>
+            <p class="text-slate-600 text-sm">So \( P(\text{both red}) = \frac{5}{18} \).</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="step-card bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <button class="w-full flex items-center justify-between px-5 py-4 text-left font-semibold text-slate-800 hover:bg-slate-50/80 transition-colors" onclick="toggleStep('step3')">
+          <span class="flex items-center gap-3">
+            <span class="flex items-center justify-center w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs font-bold">3</span>
+            <span>Part (b): Setting up the bag</span>
+          </span>
+          <svg id="icon-step3" class="w-5 h-5 text-slate-400 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+        </button>
+        <div id="step3" class="step-content border-t border-slate-100 px-5 pb-5 pt-3">
+          <div class="text-sm sm:text-base text-slate-700 space-y-3">
+            <p>Initially, the bag has <strong>8 red balls</strong>. The 2 balls from the box are added. We need the total colour composition.</p>
+            <p>Two cases for the 2 transferred balls:</p>
+            <ul class="list-disc pl-5 space-y-1 text-sm">
+              <li><span class="font-medium">Case 1:</span> Both red (probability \( \frac{5}{18} \) from part a). Then bag has \(8+2=10\) red, 0 black → total 10.</li>
+              <li><span class="font-medium">Case 2:</span> 1 red, 1 black. Bag has \(8+1=9\) red, 1 black → total 10.</li>
+              <li><span class="font-medium">Case 3:</span> Both black. Bag has \(8\) red, 2 black → total 10.</li>
+            </ul>
+            <p class="text-slate-600 text-sm mt-1">We need probability that 3 chosen from bag are same colour.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="step-card bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <button class="w-full flex items-center justify-between px-5 py-4 text-left font-semibold text-slate-800 hover:bg-slate-50/80 transition-colors" onclick="toggleStep('step4')">
+          <span class="flex items-center gap-3">
+            <span class="flex items-center justify-center w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs font-bold">4</span>
+            <span>Part (b): Probabilities for each transfer case</span>
+          </span>
+          <svg id="icon-step4" class="w-5 h-5 text-slate-400 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+        </button>
+        <div id="step4" class="step-content border-t border-slate-100 px-5 pb-5 pt-3">
+          <div class="text-sm sm:text-base text-slate-700 space-y-2">
+            <p class="font-medium">P(both transferred are red) = \( \frac{^5C_2}{^9C_2} = \frac{5}{18} \)</p>
+            <p class="font-medium">P(both transferred are black) = \( \frac{^4C_2}{^9C_2} = \frac{6}{36} = \frac{1}{6} \)</p>
+            <p class="font-medium">P(1 red &amp; 1 black) = \( \frac{^5C_1 \cdot ^4C_1}{^9C_2} = \frac{20}{36} = \frac{5}{9} \)</p>
+            <div class="bg-amber-50 border-l-4 border-amber-400 p-3 rounded-r-lg text-sm mt-2">
+              <span class="font-semibold text-amber-800">Hint:</span> These three probabilities sum to 1: \( \frac{5}{18}+\frac{1}{6}+\frac{5}{9} = \frac{5}{18}+\frac{3}{18}+\frac{10}{18}=1 \).
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 5 -->
+      <div class="step-card bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <button class="w-full flex items-center justify-between px-5 py-4 text-left font-semibold text-slate-800 hover:bg-slate-50/80 transition-colors" onclick="toggleStep('step5')">
+          <span class="flex items-center gap-3">
+            <span class="flex items-center justify-center w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs font-bold">5</span>
+            <span>Part (b): Probability of same colour after transfer (total)</span>
+          </span>
+          <svg id="icon-step5" class="w-5 h-5 text-slate-400 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+        </button>
+        <div id="step5" class="step-content border-t border-slate-100 px-5 pb-5 pt-3">
+          <div class="text-sm sm:text-base text-slate-700 space-y-3">
+            <p>Use <strong>Law of Total Probability</strong>. For each transfer case, compute \(P(\text{3 same colour from bag})\).</p>
+            <div class="space-y-2 text-sm">
+              <p><span class="font-medium">Case 1 (both red):</span> Bag: 10 red, 0 black. P(3 same) = P(3 red) = \( \frac{^{10}C_3}{^{10}C_3}=1 \).</p>
+              <p><span class="font-medium">Case 2 (1 red, 1 black):</span> Bag: 9 red, 1 black. P(3 same) = P(3 red) + P(3 black). But only 1 black, so P(3 black)=0. P(3 red) = \( \frac{^9C_3}{^{10}C_3} = \frac{84}{120} = \frac{7}{10} \).</p>
+              <p><span class="font-medium">Case 3 (both black):</span> Bag: 8 red, 2 black. P(3 same) = P(3 red) + P(3 black) = \( \frac{^8C_3}{^{10}C_3} + \frac{^2C_3}{^{10}C_3} \). Note \( ^2C_3 = 0 \). So P = \( \frac{56}{120} = \frac{7}{15} \).</p>
+            </div>
+            <p class="font-medium mt-2">Now combine:</p>
+            <div class="bg-slate-100 p-3 rounded-lg font-mono text-sm sm:text-base overflow-x-auto">
+              \[
+              \begin{aligned}
+              P &= \frac{5}{18} \cdot 1 + \frac{5}{9} \cdot \frac{7}{10} + \frac{1}{6} \cdot \frac{7}{15} \\
+              &= \frac{5}{18} + \frac{35}{90} + \frac{7}{90} \\
+              &= \frac{25}{90} + \frac{35}{90} + \frac{7}{90} = \frac{67}{90}
+              \end{aligned}
+              \]
+            </div>
+            <p class="text-slate-600 text-sm">Therefore the probability is \( \frac{67}{90} \).</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HINT / FORMULA CARD (static summary) -->
+    <section class="bg-gradient-to-br from-blue-50 to-indigo-50/70 rounded-2xl p-4 sm:p-5 border border-blue-100">
+      <h3 class="text-sm font-semibold text-blue-800 uppercase tracking-wider mb-2 flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        Key formulas used
+      </h3>
+      <ul class="text-sm text-slate-700 space-y-1.5 list-disc pl-5">
+        <li>Combination: \( ^nC_r = \frac{n!}{r!(n-r)!} \)</li>
+        <li>Probability = favourable outcomes / total outcomes</li>
+        <li>Law of total probability: \( P(A) = \sum P(A|B_i)P(B_i) \)</li>
+      </ul>
+    </section>
+
+    <!-- FOOTER note -->
+    <footer class="text-center text-xs text-slate-400 pt-2 border-t border-slate-200">
+      HKDSE 2023 Paper 1 Q15 · Interactive solution
+    </footer>
+  </main>
+
+  <script>
+    // Accordion toggle with smooth max-height
+    function toggleStep(id) {
+      const content = document.getElementById(id);
+      const icon = document.getElementById('icon-' + id);
+      if (!content) return;
+      
+      const isOpen = content.classList.contains('open');
+      
+      // Close all other steps (optional accordion style)
+      document.querySelectorAll('.step-content').forEach(el => {
+        if (el.id !== id && el.classList.contains('open')) {
+          el.classList.remove('open');
+          const otherIcon = document.getElementById('icon-' + el.id);
+          if (otherIcon) otherIcon.classList.remove('rotate-180');
+        }
+      });
+
+      if (isOpen) {
+        content.classList.remove('open');
+        if (icon) icon.classList.remove('rotate-180');
+      } else {
+        content.classList.add('open');
+        if (icon) icon.classList.add('rotate-180');
+      }
+    }
+
+    // Open first step by default for better UX
+    window.addEventListener('DOMContentLoaded', () => {
+      const firstStep = document.getElementById('step1');
+      const firstIcon = document.getElementById('icon-step1');
+      if (firstStep && firstIcon) {
+        firstStep.classList.add('open');
+        firstIcon.classList.add('rotate-180');
+      }
+    });
+  </script>
+</body>
+</html>

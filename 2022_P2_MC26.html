@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE Math 2022 Paper 2 Q26 — Locus of P</title>
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[', '\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  :root{
+    --blue:#1d4ed8; --blue-d:#1e3a8a; --amber:#d97706; --amber-l:#fef3c7;
+    --emerald:#059669; --emerald-l:#ecfdf5; --ink:#0f172a; --muted:#64748b;
+    --line:#e2e8f0; --card:#ffffff;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+    background:#f1f5f9; color:var(--ink); line-height:1.6;
+  }
+  .wrap{max-width:960px; margin:0 auto; padding:0 16px 60px;}
+
+  /* HERO */
+  .hero{
+    background:linear-gradient(135deg,#1e3a8a 0%,#1d4ed8 45%,#3b82f6 100%);
+    color:#fff; padding:38px 20px 44px; margin-bottom:-26px;
+    border-radius:0 0 26px 26px;
+    box-shadow:0 10px 30px rgba(29,78,216,.28);
+  }
+  .hero-inner{max-width:960px; margin:0 auto;}
+  .eyebrow{font-size:.74rem; letter-spacing:.16em; text-transform:uppercase; opacity:.85; font-weight:600;}
+  .qnum{font-size:2rem; font-weight:800; margin:8px 0 4px; letter-spacing:-.02em;}
+  .subtitle{font-size:1.02rem; opacity:.92; margin-bottom:16px;}
+  .pills{display:flex; flex-wrap:wrap; gap:8px;}
+  .pill{
+    background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35);
+    padding:5px 13px; border-radius:999px; font-size:.76rem; font-weight:600;
+    backdrop-filter:blur(4px);
+  }
+
+  /* CARDS */
+  .card{
+    background:var(--card); border-radius:18px; padding:24px 22px; margin:22px 0;
+    box-shadow:0 4px 18px rgba(15,23,42,.07); border:1px solid var(--line);
+  }
+  .card h2{
+    font-size:1.22rem; margin:0 0 14px; color:var(--blue-d);
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  }
+  .card h2 .tag{
+    font-size:.68rem; background:var(--amber-l); color:var(--amber);
+    border-radius:8px; padding:3px 9px; font-weight:700; letter-spacing:.04em;
+  }
+  .question-text{font-size:1.02rem;}
+  .opts{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:10px; margin-top:14px;
+  }
+  .opt{
+    border:1.5px solid var(--line); border-radius:12px; padding:9px 13px;
+    font-size:.95rem; background:#f8fafc;
+  }
+  .opt.correct{border-color:var(--emerald); background:var(--emerald-l);}
+  .opt b{color:var(--blue-d);}
+
+  /* CANVAS */
+  .canvas-box{
+    background:#f8fafc; border:1px solid var(--line); border-radius:14px;
+    padding:12px; margin:16px 0; text-align:center;
+  }
+  canvas{width:100%; max-width:560px; height:auto; touch-action:none; border-radius:10px; background:#fff;}
+  .controls{display:flex; flex-wrap:wrap; gap:14px; align-items:center; justify-content:center; margin-top:12px;}
+  .ctrl{display:flex; align-items:center; gap:8px; font-size:.85rem; font-weight:600; color:#334155;}
+  input[type=range]{width:150px; accent-color:var(--blue);}
+  input[type=checkbox]{width:17px; height:17px; accent-color:var(--emerald);}
+  .readout{
+    display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:10px;
+  }
+  .chip{
+    background:#fff; border:1px solid var(--line); border-radius:10px;
+    padding:6px 12px; font-size:.82rem; font-weight:600; color:#334155;
+    font-variant-numeric:tabular-nums;
+  }
+  .chip span{color:var(--blue-d); font-weight:800;}
+
+  /* STEPS */
+  .step{
+    display:none; border-left:4px solid var(--blue); background:#f8fafc;
+    border-radius:0 12px 12px 0; padding:14px 16px; margin:12px 0;
+    animation:fade .35s ease;
+  }
+  .step.show{display:block;}
+  @keyframes fade{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+  .step-head{display:flex; align-items:center; gap:10px; margin-bottom:8px; flex-wrap:wrap;}
+  .badge{
+    width:28px; height:28px; border-radius:50%; background:var(--blue); color:#fff;
+    display:flex; align-items:center; justify-content:center; font-size:.82rem; font-weight:800; flex:0 0 auto;
+  }
+  .marks{
+    background:var(--amber); color:#fff; border-radius:7px; padding:2px 8px;
+    font-size:.72rem; font-weight:800; letter-spacing:.04em;
+  }
+  .step-title{font-weight:700; font-size:.93rem; color:var(--blue-d);}
+  .hint{
+    background:var(--amber-l); border-left:4px solid var(--amber);
+    border-radius:0 10px 10px 0; padding:9px 13px; margin-top:10px; font-size:.9rem;
+  }
+  .hint b{color:var(--amber);}
+  .answer{
+    background:var(--emerald-l); border-left:4px solid var(--emerald);
+    border-radius:0 10px 10px 0; padding:10px 13px; margin-top:10px; font-size:.95rem;
+  }
+  .answer b{color:var(--emerald);}
+
+  /* BUTTONS / COUNTER */
+  .step-bar{display:flex; align-items:center; gap:14px; margin-top:16px; flex-wrap:wrap;}
+  button{
+    background:linear-gradient(135deg,var(--blue),#3b82f6); color:#fff; border:none;
+    border-radius:11px; padding:10px 20px; font-size:.9rem; font-weight:700; cursor:pointer;
+    box-shadow:0 4px 12px rgba(29,78,216,.3); transition:.2s;
+  }
+  button:hover:not(:disabled){transform:translateY(-1px); box-shadow:0 6px 16px rgba(29,78,216,.4);}
+  button:disabled{background:#cbd5e1; box-shadow:none; cursor:not-allowed;}
+  .counter{font-size:.85rem; font-weight:700; color:var(--muted);}
+
+  /* SUMMARY */
+  .summary{
+    background:linear-gradient(135deg,#0f172a,#1e293b); color:#e2e8f0;
+    border-radius:18px; padding:24px 22px; margin:26px 0;
+    box-shadow:0 10px 30px rgba(15,23,42,.35);
+  }
+  .summary h2{color:#fff; margin:0 0 14px; font-size:1.2rem;}
+  .summary ul{margin:0; padding-left:22px;}
+  .summary li{margin:9px 0; font-size:.98rem;}
+  .summary .ok{color:#34d399; font-weight:800;}
+  .summary .hl{color:#fbbf24; font-weight:700;}
+
+  footer{text-align:center; color:var(--muted); font-size:.82rem; padding:26px 0 10px;}
+  .note{font-size:.85rem; color:var(--muted); margin-top:6px;}
+  @media(max-width:560px){
+    .qnum{font-size:1.5rem;}
+    .card{padding:18px 15px;}
+    input[type=range]{width:110px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</div>
+    <div class="qnum">2022 Paper 2 · Question 26</div>
+    <div class="subtitle">Coordinate Geometry — Locus of a Moving Point &amp; the Perpendicular Bisector</div>
+    <div class="pills">
+      <span class="pill">Equation of a Straight Line</span>
+      <span class="pill">Intercepts</span>
+      <span class="pill">Locus</span>
+      <span class="pill">Perpendicular Bisector</span>
+      <span class="pill">Distance Formula</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- QUESTION CARD -->
+  <section class="card">
+    <h2>📝 Question <span class="tag">Multiple Choice</span></h2>
+    <div class="question-text">
+      <p>The straight line \(12x - 5y = 60\) cuts the \(x\)-axis and the \(y\)-axis at the points \(A\) and \(B\) respectively. Let \(P\) be a moving point in the rectangular coordinate plane such that \(AP = BP\). Find the equation of the locus of \(P\).</p>
+      <div class="opts">
+        <div class="opt"><b>A.</b> \(10x + 24y + 119 = 0\)</div>
+        <div class="opt"><b>B.</b> \(15x + 36y + 179 = 0\)</div>
+        <div class="opt"><b>C.</b> \(x^2 + y^2 - 5x + 12y = 0\)</div>
+        <div class="opt"><b>D.</b> \(x^2 + y^2 + 12x - 133 = 0\)</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PART A: INTERCEPTS -->
+  <section class="card" id="partA">
+    <h2>Part (a) — Find the intercepts \(A\) and \(B\) <span class="tag">Warm-up</span></h2>
+    <p>First locate where the line \(12x-5y=60\) meets the two axes. Drag the slider to move a point along the line and watch the intercept labels.</p>
+
+    <div class="canvas-box">
+      <canvas id="cvA" width="560" height="440"></canvas>
+      <div class="controls">
+        <label class="ctrl">Point on line
+          <input type="range" id="sliderA" min="0" max="100" value="35">
+        </label>
+        <label class="ctrl"><input type="checkbox" id="chkLineA" checked> Show line \(12x-5y=60\)</label>
+        <label class="ctrl"><input type="checkbox" id="chkGridA" checked> Show grid</label>
+      </div>
+      <div class="readout">
+        <div class="chip">x-intercept <span>A(5,&nbsp;0)</span></div>
+        <div class="chip">y-intercept <span>B(0,&nbsp;−12)</span></div>
+        <div class="chip">Moving point: <span id="roA">—</span></div>
+      </div>
+    </div>
+
+    <div class="step-bar">
+      <button data-target="stepsA">Next step →</button>
+      <span class="counter" id="cntA">0 / 3</span>
+    </div>
+
+    <div class="steps" id="stepsA">
+      <div class="step">
+        <div class="step-head"><div class="badge">1</div><div class="step-title">x-intercept: put \(y=0\)</div><div class="marks">1M</div></div>
+        <p>\[12x-5(0)=60 \;\Rightarrow\; 12x=60 \;\Rightarrow\; x=5.\]</p>
+        <div class="hint"><b>Hint:</b> The \(x\)-intercept is where the line cuts the \(x\)-axis, so \(y=0\).</div>
+        <div class="answer"><b>Answer:</b> \(A(5,\,0)\)</div>
+      </div>
+      <div class="step">
+        <div class="step-head"><div class="badge">2</div><div class="step-title">y-intercept: put \(x=0\)</div><div class="marks">1M</div></div>
+        <p>\[12(0)-5y=60 \;\Rightarrow\; -5y=60 \;\Rightarrow\; y=-12.\]</p>
+        <div class="hint"><b>Hint:</b> The \(y\)-intercept is where the line cuts the \(y\)-axis, so \(x=0\). Watch the sign!</div>
+        <div class="answer"><b>Answer:</b> \(B(0,\,-12)\)</div>
+      </div>
+      <div class="step">
+        <div class="step-head"><div class="badge">3</div><div class="step-title">Check with the graph</div><div class="marks">1A</div></div>
+        <p>The line passes through \(A(5,0)\) and \(B(0,-12)\). Its slope is \(\dfrac{-12-0}{0-5}=\dfrac{12}{5}\).</p>
+        <div class="hint"><b>Hint:</b> A positive slope rising to the right matches the picture — the line goes up as \(x\) increases.</div>
+        <div class="answer"><b>Answer:</b> \(A(5,0)\), \(B(0,-12)\), slope \(=\dfrac{12}{5}\)</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PART B: LOCUS = PERPENDICULAR BISECTOR -->
+  <section class="card" id="partB">
+    <h2>Part (b) — The locus is the perpendicular bisector of \(AB\) <span class="tag">Key idea</span></h2>
+    <p>Because \(AP=BP\), the moving point \(P\) is <b>equidistant</b> from \(A\) and \(B\). Drag \(P\) (or use the slider) and watch that the two distances always stay equal along the locus.</p>
+
+    <div class="canvas-box">
+      <canvas id="cvB" width="560" height="440"></canvas>
+      <div class="controls">
+        <label class="ctrl">Move \(P\)
+          <input type="range" id="sliderB" min="0" max="100" value="50">
+        </label>
+        <label class="ctrl"><input type="checkbox" id="chkLocusB" checked> Show locus (perp. bisector)</label>
+        <label class="ctrl"><input type="checkbox" id="chkDistB" checked> Show \(AP\), \(BP\)</label>
+        <label class="ctrl"><input type="checkbox" id="chkCircleB"> Show circle \(AP=BP\)</label>
+      </div>
+      <div class="readout">
+        <div class="chip">\(AP =\) <span id="roAP">—</span></div>
+        <div class="chip">\(BP =\) <span id="roBP">—</span></div>
+        <div class="chip">Status: <span id="roEq">—</span></div>
+      </div>
+    </div>
+    <p class="note">Toggle the circle to see that <i>any</i> circle centred at \(P\) through \(A\) also passes through \(B\).</p>
+
+    <div class="step-bar">
+      <button data-target="stepsB">Next step →</button>
+      <span class="counter" id="cntB">0 / 3</span>
+    </div>
+
+    <div class="steps" id="stepsB">
+      <div class="step">
+        <div class="step-head"><div class="badge">1</div><div class="step-title">Interpret the condition \(AP=BP\)</div><div class="marks">1M</div></div>
+        <p>Let \((u,v)\) be the coordinates of \(P\). Then \(AP=BP\) means the point is equidistant from \(A\) and \(B\).</p>
+        <div class="hint"><b>Hint:</b> "Equidistant from two fixed points" always describes the <b>perpendicular bisector</b> of the segment joining them.</div>
+      </div>
+      <div class="step">
+        <div class="step-head"><div class="badge">2</div><div class="step-title">Use the squared distance formula</div><div class="marks">1M</div></div>
+        <p>Squaring avoids square roots: \(AP^2=BP^2\), i.e.
+        \[(u-5)^2+(v-0)^2=(u-0)^2+(v+12)^2.\]</p>
+        <div class="hint"><b>Hint:</b> Since both sides are non-negative, \(AP=BP \iff AP^2=BP^2\). This is valid and cleaner.</div>
+        <div class="answer"><b>Answer:</b> \(AP^2=BP^2\)</div>
+      </div>
+      <div class="step">
+        <div class="step-head"><div class="badge">3</div><div class="step-title">Expand and simplify</div><div class="marks">1A</div></div>
+        <p>
+        \[u^2-10u+25+v^2 \;=\; u^2 + v^2 +24v +144\]
+        \[-10u-24v-119 = 0\]
+        \[10u + 24v + 119 = 0.\]
+        </p>
+        <div class="hint"><b>Hint:</b> All the \(u^2\) and \(v^2\) terms cancel — that is exactly why a <b>straight line</b> (not a circle) appears. Replace \((u,v)\) by \((x,y)\) for the final locus.</div>
+        <div class="answer"><b>Answer:</b> \(10x+24y+119=0\) — so option <b>A</b>.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PART C: PERPENDICULAR BISECTOR METHOD -->
+  <section class="card" id="partC">
+    <h2>Part (c) — Alternative method: perpendicular bisector <span class="tag">Method 2</span></h2>
+    <p>Find the midpoint \(M\) of \(AB\) and the slope of \(AB\), then write the perpendicular bisector. Hook the slider to the slope of \(AB\) and see the bisector swing.</p>
+
+    <div class="canvas-box">
+      <canvas id="cvC" width="560" height="440"></canvas>
+      <div class="controls">
+        <label class="ctrl">Slope of \(AB\)
+          <input type="range" id="sliderC" min="5" max="50" value="24">
+        </label>
+        <label class="ctrl"><input type="checkbox" id="chkBisC" checked> Show perpendicular bisector</label>
+        <label class="ctrl"><input type="checkbox" id="chkMidC" checked> Show midpoint \(M\)</label>
+      </div>
+      <div class="readout">
+        <div class="chip">Slope \(AB =\) <span id="roSlope">12/5</span></div>
+        <div class="chip">Perp. slope \(=\) <span id="roPerp">−5/12</span></div>
+        <div class="chip">Midpoint \(M =\) <span>(2.5, −6)</span></div>
+      </div>
+    </div>
+    <p class="note">The perpendicular bisector always passes through \(M\) and is at right angles to \(AB\).</p>
+
+    <div class="step-bar">
+      <button data-target="stepsC">Next step →</button>
+      <span class="counter" id="cntC">0 / 3</span>
+    </div>
+
+    <div class="steps" id="stepsC">
+      <div class="step">
+        <div class="step-head"><div class="badge">1</div><div class="step-title">Midpoint of \(AB\)</div><div class="marks">1M</div></div>
+        <p>\[M=\left(\frac{5+0}{2},\;\frac{0+(-12)}{2}\right)=\left(\frac{5}{2},\,-6\right)\]</p>
+        <div class="hint"><b>Hint:</b> The perpendicular bisector must pass through the midpoint of the segment.</div>
+        <div class="answer"><b>Answer:</b> \(M\left(\dfrac{5}{2},-6\right)\)</div>
+      </div>
+      <div class="step">
+        <div class="step-head"><div class="badge">2</div><div class="step-title">Slope of \(AB\) and of the bisector</div><div class="marks">1M</div></div>
+        <p>Slope of \(AB=\dfrac{0-(-12)}{5-0}=\dfrac{12}{5}\).</p>
+        <p>Slope of perpendicular bisector \(=-\dfrac{1}{12/5}=-\dfrac{5}{12}\).</p>
+        <div class="hint"><b>Hint:</b> Perpendicular lines have slopes whose product is \(-1\): \(m_1 m_2=-1\).</div>
+        <div class="answer"><b>Answer:</b> Perp. slope \(=-\dfrac{5}{12}\)</div>
+      </div>
+      <div class="step">
+        <div class="step-head"><div class="badge">3</div><div class="step-title">Point–slope form</div><div class="marks">1A</div></div>
+        <p>\[y-(-6)=-\frac{5}{12}\left(x-\frac{5}{2}\right)\]</p>
+        <p>Multiply by 24: \(24y+144=-10x+25\), giving \(10x+24y+119=0\).</p>
+        <div class="hint"><b>Hint:</b> Multiplying through by 24 clears all fractions neatly. The answer matches Method 1 — a strong consistency check.</div>
+        <div class="answer"><b>Answer:</b> \(10x+24y+119=0\), matching option <b>A</b>.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SUMMARY -->
+  <section class="summary">
+    <h2>✅ Summary of Answers</h2>
+    <ul>
+      <li><span class="hl">Intercepts:</span> \(A(5,\,0)\), \(B(0,\,-12)\)</li>
+      <li><span class="hl">Slope of \(AB\):</span> \(\dfrac{12}{5}\); <span class="hl">perpendicular slope:</span> \(-\dfrac{5}{12}\)</li>
+      <li><span class="hl">Midpoint:</span> \(M\left(\dfrac{5}{2},\,-6\right)\)</li>
+      <li><span class="hl">Locus equation:</span> \(10x+24y+119=0\)</li>
+      <li><span class="ok">Correct option: <b>A</b></span></li>
+      <li><b>Key insight:</b> \(AP=BP\) describes the <b>perpendicular bisector</b> of \(AB\) — a straight line, not a circle.</li>
+    </ul>
+  </section>
+
+  <footer>
+    HKDSE Mathematics (Compulsory Part) · Paper 2 · 2022 Q26 — Interactive Solution<br>
+    Coordinate Geometry · Locus of a Moving Point
+  </footer>
+</div>
+
+<script>
+/* ============ shared helpers ============ */
+function setupCanvas(id){
+  const cv = document.getElementById(id);
+  const dpr = window.devicePixelRatio || 1;
+  const W = cv.width, H = cv.height;
+  cv.width = W*dpr; cv.height = H*dpr;
+  cv.style.width = '100%'; cv.style.maxWidth = W+'px'; cv.style.height = 'auto';
+  const ctx = cv.getContext('2d');
+  ctx.scale(dpr,dpr);
+  cv._W = W; cv._H = H;
+  return {cv, ctx, W, H};
+}
+
+// transforms with a per-canvas world window
+function makeView(ctx, W, H, xmin, xmax, ymin, ymax){
+  const sx = W/(xmax-xmin), sy = H/(ymax-ymin);
+  const s = Math.min(sx, sy);
+  const ox = (W - (xmax-xmin)*s)/2;
+  const oy = (H - (ymax-ymin)*s)/2;
+  return {
+    x: u => ox + (u - xmin)*s,
+    y: v => H - oy - (v - ymin)*s,
+    s: s, xmin, xmax, ymin, ymax,
+    set(ctx2){ ctx2.setTransform(1,0,0,1,0,0); }
+  };
+}
+
+function drawGrid(ctx, V, W, H){
+  ctx.save();
+  ctx.strokeStyle = '#eef2f7'; ctx.lineWidth = 1;
+  for(let x = Math.ceil(V.xmin); x <= V.xmax; x++){
+    ctx.beginPath(); ctx.moveTo(V.x(x),0); ctx.lineTo(V.x(x),H); ctx.stroke();
+  }
+  for(let y = Math.ceil(V.ymin); y <= V.ymax; y++){
+    ctx.beginPath(); ctx.moveTo(0,V.y(y)); ctx.lineTo(W,V.y(y)); ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawAxes(ctx, V, W, H){
+  ctx.save();
+  ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1.8;
+  // x-axis
+  const y0 = V.y(0);
+  ctx.beginPath(); ctx.moveTo(0,y0); ctx.lineTo(W,y0); ctx.stroke();
+  // y-axis
+  const x0 = V.x(0);
+  ctx.beginPath(); ctx.moveTo(x0,0); ctx.lineTo(x0,H); ctx.stroke();
+  // arrows
+  ctx.fillStyle = '#94a3b8';
+  ctx.beginPath(); ctx.moveTo(W-2,y0); ctx.lineTo(W-12,y0-5); ctx.lineTo(W-12,y0+5); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(x0,2); ctx.lineTo(x0-5,12); ctx.lineTo(x0+5,12); ctx.fill();
+  // labels
+  ctx.fillStyle = '#64748b'; ctx.font = 'bold 12px system-ui';
+  ctx.fillText('x', W-14, y0-9);
+  ctx.fillText('y', x0+9, 14);
+  ctx.fillText('O', x0-14, y0+14);
+  // tick marks
+  ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 1.4;
+  for(let x = Math.ceil(V.xmin); x <= V.xmax; x++){
+    if(x===0) continue;
+    ctx.beginPath(); ctx.moveTo(V.x(x), y0-3); ctx.lineTo(V.x(x), y0+3); ctx.stroke();
+  }
+  for(let y = Math.ceil(V.ymin); y <= V.ymax; y++){
+    if(y===0) continue;
+    ctx.beginPath(); ctx.moveTo(x0-3, V.y(y)); ctx.lineTo(x0+3, V.y(y)); ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function pt(ctx, V, x, y, color, r=5){
+  ctx.save();
+  ctx.fillStyle = color; ctx.strokeStyle = '#fff'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.arc(V.x(x), V.y(y), r, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+  ctx.restore();
+}
+
+function label(ctx, V, x, y, text, color, dx=8, dy=-8, bold=true){
+  ctx.save();
+  ctx.fillStyle = color;
+  ctx.font = (bold?'bold ':'') + '13px system-ui';
+  ctx.fillText(text, V.x(x)+dx, V.y(y)+dy);
+  ctx.restore();
+}
+
+function drawLineThrough(ctx, V, m, c, color, dash=[]) {
+  // y = m x + c clipped to V
+  const x1 = V.xmin, x2 = V.xmax;
+  const y1 = m*x1 + c, y2 = m*x2 + c;
+  ctx.save();
+  ctx.strokeStyle = color; ctx.lineWidth = 2.2; ctx.setLineDash(dash);
+  ctx.beginPath(); ctx.moveTo(V.x(x1), V.y(y1)); ctx.lineTo(V.x(x2), V.y(y2)); ctx.stroke();
+  ctx.restore();
+}
+
+/* ============ PART A canvas ============ */
+(function(){
+  const {cv, ctx, W, H} = setupCanvas('cvA');
+  const V = makeView(ctx, W, H, -6, 10, -16, 6);
+  const slider = document.getElementById('sliderA');
+  const chkLine = document.getElementById('chkLineA');
+  const chkGrid = document.getElementById('chkGridA');
+  const roA = document.getElementById('roA');
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    if(chkGrid.checked) drawGrid(ctx, V, W, H);
+    drawAxes(ctx, V, W, H);
+
+    if(chkLine.checked){
+      // 12x - 5y = 60  =>  y = (12x-60)/5 = 2.4x - 12
+      drawLineThrough(ctx, V, 12/5, -12, '#1d4ed8');
+    }
+    // intercepts
+    pt(ctx, V, 5, 0, '#dc2626', 6);
+    label(ctx, V, 5, 0, 'A(5, 0)', '#dc2626', 9, -10);
+    pt(ctx, V, 0, -12, '#dc2626', 6);
+    label(ctx, V, 0, -12, 'B(0, −12)', '#dc2626', 9, 20);
+
+    // moving point along the line segment
+    const t = slider.value/100;
+    // parametrise from A to B
+    const x = 5 - 5*t, y = 0 - 12*t;
+    pt(ctx, V, x, y, '#059669', 6);
+    label(ctx, V, x, y, 'P', '#059669', 9, -10);
+    roA.textContent = '(' + x.toFixed(2) + ', ' + y.toFixed(2) + ')';
+
+    // axis labels markers
+    ctx.fillStyle='#64748b'; ctx.font='11px system-ui';
+    ctx.fillText('(5, 0)', V.x(5)-18, V.y(0)+16);
+    ctx.fillText('(0, −12)', V.x(0)-46, V.y(-12)+4);
+  }
+  slider.addEventListener('input', draw);
+  chkLine.addEventListener('change', draw);
+  chkGrid.addEventListener('change', draw);
+  draw();
+})();
+
+/* ============ PART B canvas : AP = BP ============ */
+(function(){
+  const {cv, ctx, W, H} = setupCanvas('cvB');
+  const V = makeView(ctx, W, H, -8, 12, -18, 8);
+  const slider = document.getElementById('sliderB');
+  const chkLocus = document.getElementById('chkLocusB');
+  const chkDist  = document.getElementById('chkDistB');
+  const chkCircle= document.getElementById('chkCircleB');
+  const roAP = document.getElementById('roAP');
+  const roBP = document.getElementById('roBP');
+  const roEq = document.getElementById('roEq');
+
+  const A = [5,0], B = [0,-12];
+  // locus: 10x + 24y + 119 = 0  =>  y = -(10x+119)/24
+  const m = -10/24, c = -119/24;
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    drawGrid(ctx, V, W, H);
+    drawAxes(ctx, V, W, H);
+
+    // original line AB
+    drawLineThrough(ctx, V, 12/5, -12, '#94a3b8', [6,5]);
+
+    // locus
+    if(chkLocus.checked) drawLineThrough(ctx, V, m, c, '#059669');
+
+    // moving P on the locus
+    const t = slider.value/100;
+    const px = -3 + t*12;          // x from -3 to 9
+    const py = m*px + c;
+    const P = [px, py];
+
+    // distances
+    const ap = Math.hypot(P[0]-A[0], P[1]-A[1]);
+    const bp = Math.hypot(P[0]-B[0], P[1]-B[1]);
+
+    if(chkCircle.checked){
+      ctx.save();
+      ctx.strokeStyle = 'rgba(217,119,6,.55)'; ctx.lineWidth = 1.6; ctx.setLineDash([4,4]);
+      const r = ap * V.s;
+      ctx.beginPath();
+      ctx.arc(V.x(P[0]), V.y(P[1]), r, 0, Math.PI*2);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    if(chkDist.checked){
+      ctx.save(); ctx.lineWidth = 2;
+      ctx.strokeStyle = '#2563eb';
+      ctx.beginPath(); ctx.moveTo(V.x(A[0]),V.y(A[1])); ctx.lineTo(V.x(P[0]),V.y(P[1])); ctx.stroke();
+      ctx.strokeStyle = '#d97706';
+      ctx.beginPath(); ctx.moveTo(V.x(B[0]),V.y(B[1])); ctx.lineTo(V.x(P[0]),V.y(P[1])); ctx.stroke();
+      ctx.restore();
+    }
+
+    // right-angle marker at midpoint
+    const M = [(A[0]+B[0])/2, (A[1]+B[1])/2];
+    ctx.save();
+    ctx.strokeStyle = '#7c3aed'; ctx.lineWidth = 1.2; ctx.setLineDash([3,3]);
+    ctx.beginPath();
+    ctx.arc(V.x(M[0]), V.y(M[1]), 6, 0, Math.PI*2);
+    ctx.stroke();
+    ctx.restore();
+
+    // points
+    pt(ctx, V, A[0], A[1], '#dc2626', 6); label(ctx, V, A[0], A[1], 'A(5,0)', '#dc2626', 9, -10);
+    pt(ctx, V, B[0], B[1], '#dc2626', 6); label(ctx, V, B[0], B[1], 'B(0,−12)', '#dc2626', 9, 20);
+    pt(ctx, V, M[0], M[1], '#7c3aed', 5); label(ctx, V, M[0], M[1], 'M(2.5,−6)', '#7c3aed', 6, 18);
+    pt(ctx, V, P[0], P[1], '#059669', 7); label(ctx, V, P[0], P[1], 'P(x,y)', '#059669', 10, -10);
+
+    roAP.textContent = ap.toFixed(3);
+    roBP.textContent = bp.toFixed(3);
+    roEq.textContent = Math.abs(ap-bp) < 1e-9 ? 'AP = BP ✓' : 'AP ≠ BP';
+  }
+  slider.addEventListener('input', draw);
+  [chkLocus, chkDist, chkCircle].forEach(el=>el.addEventListener('change', draw));
+  draw();
+})();
+
+/* ============ PART C canvas : perpendicular bisector ============ */
+(function(){
+  const {cv, ctx, W, H} = setupCanvas('cvC');
+  const V = makeView(ctx, W, H, -8, 12, -18, 8);
+  const slider = document.getElementById('sliderC');
+  const chkBis = document.getElementById('chkBisC');
+  const chkMid = document.getElementById('chkMidC');
+  const roSlope = document.getElementById('roSlope');
+  const roPerp  = document.getElementById('roPerp');
+
+  const A = [5,0], B = [0,-12];
+  const M = [2.5,-6];
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    drawGrid(ctx, V, W, H);
+    drawAxes(ctx, V, W, H);
+
+    // varying slope of AB (demo only)
+    const mAB = slider.value/10;            // 0.5 .. 5
+    const mPerp = -1/mAB;
+
+    // draw a line through A and B fixed (always the same AB)
+    ctx.save();
+    ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 2.4;
+    ctx.beginPath(); ctx.moveTo(V.x(A[0]),V.y(A[1])); ctx.lineTo(V.x(B[0]),V.y(B[1])); ctx.stroke();
+    ctx.restore();
+
+    // perpendicular bisector through M with slope mPerp
+    if(chkBis.checked){
+      const c = M[1] - mPerp*M[0];
+      drawLineThrough(ctx, V, mPerp, c, '#059669');
+    }
+
+    // right-angle marker at M between AB and bisector
+    if(chkMid.checked){
+      pt(ctx, V, M[0], M[1], '#7c3aed', 6);
+      label(ctx, V, M[0], M[1], 'M(2.5,−6)', '#7c3aed', 8, 20);
+
+      // small right angle square
+      const mx = M[0], my = M[1];
+      const d = 0.7;
+      ctx.save();
+      ctx.strokeStyle = '#7c3aed'; ctx.lineWidth = 1.6;
+      // unit vectors
+      const ux = A[0]-B[0], uy = A[1]-B[1];
+      const ul = Math.hypot(ux,uy);
+      const u1 = [ux/ul, uy/ul];
+      const vx = 1, vy = mPerp;
+      const vl = Math.hypot(vx,vy);
+      const u2 = [vx/vl, vy/vl];
+      const p1x = mx + u1[0]*d, p1y = my + u1[1]*d;
+      const p2x = mx + u2[0]*d, p2y = my + u2[1]*d;
+      const p3x = p1x + u2[0]*d, p3y = p1y + u2[1]*d;
+      ctx.beginPath();
+      ctx.moveTo(V.x(p1x),V.y(p1y));
+      ctx.lineTo(V.x(p3x),V.y(p3y));
+      ctx.lineTo(V.x(p2x),V.y(p2y));
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    pt(ctx, V, A[0], A[1], '#dc2626', 6); label(ctx, V, A[0], A[1], 'A(5,0)', '#dc2626', 9, -10);
+    pt(ctx, V, B[0], B[1], '#dc2626', 6); label(ctx, V, B[0], B[1], 'B(0,−12)', '#dc2626', 9, 20);
+
+    roSlope.textContent = mAB.toFixed(2);
+    roPerp.textContent = mPerp.toFixed(2);
+  }
+  slider.addEventListener('input', draw);
+  [chkBis, chkMid].forEach(el=>el.addEventListener('change', draw));
+  draw();
+})();
+
+/* ============ STEP REVEAL ============ */
+document.querySelectorAll('.step-bar button').forEach(btn=>{
+  btn.addEventListener('click', function(){
+    const container = document.getElementById(this.dataset.target);
+    const steps = container.querySelectorAll('.step');
+    const counterId = this.dataset.target.replace('steps','cnt');
+    const counter = document.getElementById(counterId);
+    let shown = container.querySelectorAll('.step.show').length;
+    if(shown < steps.length){
+      steps[shown].classList.add('show');
+      shown++;
+      counter.textContent = shown + ' / ' + steps.length;
+      if(shown === steps.length){
+        this.disabled = true;
+        this.textContent = 'All steps revealed ✓';
+      }
+    }
+  });
+});
+</script>
+</body>
+</html>

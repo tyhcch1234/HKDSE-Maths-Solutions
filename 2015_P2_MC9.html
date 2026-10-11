@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HKDSE Math 2015 Paper 2 Q9 – Percentage Change</title>
+    <!-- KaTeX for rendering formulas -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body, {delimiters: [{left: '\\[', right: '\\]', display: true},{left: '\\(', right: '\\)', display: false}]});"></script>
+    <!-- Tailwind CSS for modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(145deg, #f8faff 0%, #edf2f9 100%);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 20px rgba(0, 20, 50, 0.08);
+            border-radius: 1.5rem;
+            transition: all 0.2s ease;
+        }
+        .card:hover {
+            box-shadow: 0 12px 28px rgba(0, 20, 50, 0.12);
+        }
+        .step-card {
+            background: white;
+            border-radius: 1rem;
+            border-left: 6px solid #3b82f6;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+        }
+        .step-card.completed {
+            border-left-color: #10b981;
+        }
+        .step-badge {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        .slider-label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #334155;
+        }
+        .value-badge {
+            background: #e2e8f0;
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #0f172a;
+            transition: background 0.2s;
+        }
+        .hint-box {
+            background: #fef9e7;
+            border-left: 4px solid #f59e0b;
+            border-radius: 0 0.75rem 0.75rem 0;
+        }
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #d1d9e6;
+            outline: none;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4);
+            transition: transform 0.1s;
+        }
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+        }
+        .option-btn {
+            transition: all 0.1s ease;
+            border: 2px solid #e2e8f0;
+            border-radius: 1rem;
+            padding: 0.75rem 1rem;
+            text-align: left;
+            font-weight: 500;
+            background: white;
+        }
+        .option-btn:hover {
+            border-color: #93c5fd;
+            background: #f0f7ff;
+        }
+        .option-btn.selected-correct {
+            border-color: #10b981;
+            background: #ecfdf5;
+            color: #065f46;
+        }
+        .option-btn.selected-wrong {
+            border-color: #ef4444;
+            background: #fef2f2;
+            color: #991b1b;
+        }
+        .price-bar {
+            height: 2.2rem;
+            border-radius: 0.75rem;
+            background: linear-gradient(90deg, #3b82f6, #60a5fa);
+            transition: width 0.4s ease, background 0.4s;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 0.75rem;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+            min-width: 3rem;
+        }
+        .price-bar.original {
+            background: linear-gradient(90deg, #64748b, #94a3b8);
+        }
+        .price-bar.after-up {
+            background: linear-gradient(90deg, #10b981, #34d399);
+        }
+        .price-bar.after-down {
+            background: linear-gradient(90deg, #ef4444, #f87171);
+        }
+        .highlight-number {
+            background: #fef08a;
+            padding: 0.1rem 0.3rem;
+            border-radius: 0.25rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex justify-center">
+    <div class="max-w-3xl w-full space-y-6">
+
+        <!-- Header: Question Number & Tags -->
+        <div class="flex flex-wrap items-center justify-between gap-3">
+            <h1 class="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight">
+                <span class="text-blue-600">HKDSE Math 2015</span> Paper 2 Q9
+            </h1>
+            <div class="flex flex-wrap gap-2">
+                <span class="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-semibold rounded-full">Percentages</span>
+                <span class="px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-semibold rounded-full">Percentage Change</span>
+                <span class="px-3 py-1 bg-amber-100 text-amber-800 text-xs font-semibold rounded-full">Successive Change</span>
+            </div>
+        </div>
+
+        <!-- Question Overview Card -->
+        <div class="card p-6 md:p-8">
+            <div class="flex items-start gap-3">
+                <div class="bg-blue-50 p-2 rounded-xl">
+                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-slate-700 text-base md:text-lg leading-relaxed">
+                        If the price of a souvenir is <span class="font-semibold text-blue-700">increased by 70%</span> and then 
+                        <span class="font-semibold text-rose-600">decreased by 60%</span>, find the <span class="font-semibold">percentage change</span> in the price of the souvenir.
+                    </p>
+                </div>
+            </div>
+            <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <button class="option-btn" data-option="A" onclick="checkAnswer('A')">A. −58%</button>
+                <button class="option-btn" data-option="B" onclick="checkAnswer('B')">B. −32%</button>
+                <button class="option-btn" data-option="C" onclick="checkAnswer('C')">C. 2%</button>
+                <button class="option-btn" data-option="D" onclick="checkAnswer('D')">D. 10%</button>
+            </div>
+            <div id="answer-feedback" class="mt-4 text-sm font-medium hidden"></div>
+        </div>
+
+        <!-- Interactive Visualisation: Successive Percentage Change -->
+        <div class="card p-6 md:p-8">
+            <h2 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2">
+                <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+                Visualise the price changes
+            </h2>
+            <p class="text-sm text-slate-500 mb-4">Adjust the sliders to see how the final price and percentage change vary.</p>
+
+            <div class="space-y-5">
+                <!-- Slider: Increase % -->
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="slider-label">Increase by</label>
+                        <span class="value-badge" id="increaseVal">70%</span>
+                    </div>
+                    <input type="range" id="increaseSlider" min="0" max="200" value="70" step="5">
+                </div>
+                <!-- Slider: Decrease % -->
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="slider-label">Decrease by</label>
+                        <span class="value-badge" id="decreaseVal">60%</span>
+                    </div>
+                    <input type="range" id="decreaseSlider" min="0" max="100" value="60" step="5">
+                </div>
+
+                <!-- Price Bars -->
+                <div class="pt-2 space-y-3">
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs font-medium text-slate-500 w-20">Original</span>
+                        <div class="flex-1">
+                            <div class="price-bar original" id="barOriginal" style="width: 50%;">$100</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs font-medium text-slate-500 w-20">After ↑</span>
+                        <div class="flex-1">
+                            <div class="price-bar after-up" id="barAfterUp" style="width: 85%;">$170</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs font-medium text-slate-500 w-20">After ↓</span>
+                        <div class="flex-1">
+                            <div class="price-bar after-down" id="barAfterDown" style="width: 34%;">$68</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live calculated percentage change -->
+                <div class="bg-slate-50 rounded-xl p-3 flex justify-between items-center">
+                    <span class="text-sm font-medium text-slate-600">Overall percentage change</span>
+                    <span class="text-xl font-bold" id="liveChange">−32%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step-by-Step Guided Solution -->
+        <div class="card p-6 md:p-8">
+            <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                </svg>
+                Step-by-step solution
+            </h2>
+
+            <!-- Step 1 -->
+            <div class="step-card p-4 md:p-5 mb-3" id="step1">
+                <div class="flex items-start gap-3">
+                    <div class="step-badge bg-blue-100 text-blue-700">1</div>
+                    <div class="flex-1">
+                        <p class="font-semibold text-slate-800">Assign a variable to the original price</p>
+                        <p class="text-slate-600 text-sm mt-1">
+                            Let the original price be \(P\). We will express the final price in terms of \(P\).
+                        </p>
+                        <div class="mt-3">
+                            <button class="text-xs font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1" onclick="toggleHint('hint1')">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                Hint
+                            </button>
+                            <div id="hint1" class="hint-box p-3 mt-2 text-sm text-amber-800 hidden">
+                                <strong>Why assign a variable?</strong> The actual price is not given, so we use a symbol \(P\) to represent it. The percentage change will be independent of \(P\).
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="step-card p-4 md:p-5 mb-3" id="step2">
+                <div class="flex items-start gap-3">
+                    <div class="step-badge bg-blue-100 text-blue-700">2</div>
+                    <div class="flex-1">
+                        <p class="font-semibold text-slate-800">Apply the first increase (70%)</p>
+                        <p class="text-slate-600 text-sm mt-1">
+                            After a 70% increase, the new price is:
+                            \[ P \times (1 + 70\%) = P \times 1.7 \]
+                        </p>
+                        <div class="mt-3">
+                            <button class="text-xs font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1" onclick="toggleHint('hint2')">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                Hint
+                            </button>
+                            <div id="hint2" class="hint-box p-3 mt-2 text-sm text-amber-800 hidden">
+                                <strong>Formula:</strong> New value = Original × (1 + percentage increase). Here, \(70\% = 0.7\), so multiplier is \(1.7\).
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="step-card p-4 md:p-5 mb-3" id="step3">
+                <div class="flex items-start gap-3">
+                    <div class="step-badge bg-blue-100 text-blue-700">3</div>
+                    <div class="flex-1">
+                        <p class="font-semibold text-slate-800">Apply the second change (60% decrease)</p>
+                        <p class="text-slate-600 text-sm mt-1">
+                            Then a 60% decrease acts on the new price:
+                            \[ (P \times 1.7) \times (1 - 60\%) = 1.7P \times 0.4 = 0.68P \]
+                        </p>
+                        <div class="mt-3">
+                            <button class="text-xs font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1" onclick="toggleHint('hint3')">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                Hint
+                            </button>
+                            <div id="hint3" class="hint-box p-3 mt-2 text-sm text-amber-800 hidden">
+                                <strong>Formula:</strong> After a decrease of \(d\%\), multiply by \((1 - d\%)\). Here \(60\% = 0.6\), so multiplier is \(0.4\).
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="step-card p-4 md:p-5 mb-3" id="step4">
+                <div class="flex items-start gap-3">
+                    <div class="step-badge bg-blue-100 text-blue-700">4</div>
+                    <div class="flex-1">
+                        <p class="font-semibold text-slate-800">Compute the overall percentage change</p>
+                        <p class="text-slate-600 text-sm mt-1">
+                            Percentage change \( = \frac{\text{Final} - \text{Original}}{\text{Original}} \times 100\% \)
+                            \[ = \frac{0.68P - P}{P} \times 100\% = \frac{-0.32P}{P} \times 100\% = -32\% \]
+                        </p>
+                        <div class="mt-3">
+                            <button class="text-xs font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1" onclick="toggleHint('hint4')">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                Hint
+                            </button>
+                            <div id="hint4" class="hint-box p-3 mt-2 text-sm text-amber-800 hidden">
+                                <strong>Important:</strong> The percentage change is negative, meaning a net decrease. Do not simply add the percentages: \(70\% - 60\% = 10\%\) is <em>incorrect</em> because the 60% decrease is applied to the already increased price.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Final Answer -->
+            <div class="mt-6 p-4 bg-emerald-50 rounded-2xl border border-emerald-200 flex items-center gap-3">
+                <div class="bg-emerald-200 rounded-full p-1">
+                    <svg class="w-5 h-5 text-emerald-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                </div>
+                <div>
+                    <span class="font-bold text-emerald-800">Answer: B. −32%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center text-xs text-slate-400 py-4">
+            HKDSE 2015 Paper 2 Q9 · Interactive Solution · Percentage Change
+        </div>
+    </div>
+
+    <script>
+        // ---- Mark completed steps when scrolled into view (visual feedback) ----
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('completed');
+                }
+            });
+        }, { threshold: 0.3 });
+        document.querySelectorAll('.step-card').forEach(el => observer.observe(el));
+
+        // ---- Toggle hint visibility ----
+        function toggleHint(id) {
+            const el = document.getElementById(id);
+            if (el) el.classList.toggle('hidden');
+        }
+
+        // ---- Answer checking (MC options) ----
+        let answered = false;
+        function checkAnswer(choice) {
+            if (answered) return;
+            answered = true;
+            const buttons = document.querySelectorAll('.option-btn');
+            const feedback = document.getElementById('answer-feedback');
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                if (btn.dataset.option === 'B') {
+                    btn.classList.add('selected-correct');
+                }
+                if (btn.dataset.option === choice && choice !== 'B') {
+                    btn.classList.add('selected-wrong');
+                }
+            });
+            feedback.classList.remove('hidden');
+            if (choice === 'B') {
+                feedback.innerHTML = '✅ Correct! The overall percentage change is −32%.';
+                feedback.className = 'mt-4 text-sm font-medium text-emerald-700';
+            } else {
+                feedback.innerHTML = '❌ Not quite. The correct answer is B (−32%). Check the step-by-step solution below.';
+                feedback.className = 'mt-4 text-sm font-medium text-rose-600';
+            }
+        }
+
+        // ---- Interactive sliders & live bar updates ----
+        const incSlider = document.getElementById('increaseSlider');
+        const decSlider = document.getElementById('decreaseSlider');
+        const incVal = document.getElementById('increaseVal');
+        const decVal = document.getElementById('decreaseVal');
+        const barOriginal = document.getElementById('barOriginal');
+        const barAfterUp = document.getElementById('barAfterUp');
+        const barAfterDown = document.getElementById('barAfterDown');
+        const liveChange = document.getElementById('liveChange');
+
+        function updateVisuals() {
+            const inc = Number(incSlider.value);
+            const dec = Number(decSlider.value);
+
+            // Update labels
+            incVal.textContent = inc + '%';
+            decVal.textContent = dec + '%';
+
+            // Base price = 100 (for bar width visualisation, max width represents price up to 200% of original)
+            const base = 100;
+            const afterUp = base * (1 + inc / 100);
+            const afterDown = afterUp * (1 - dec / 100);
+
+            // Compute percentage change
+            const pctChange = ((afterDown - base) / base) * 100;
+
+            // --- Bar widths (scale so that the largest bar fits within container) ---
+            // Max possible afterUp = 100 * (1 + 2) = 300 for inc up to 200%
+            // To keep bars visible, we scale widths relative to the maximum of afterUp and afterDown.
+            const maxVal = Math.max(base, afterUp, afterDown, 1); // avoid div by 0
+            const scale = 100 / maxVal; // percentage of container width
+
+            barOriginal.style.width = Math.max(scale * base, 8) + '%';
+            barAfterUp.style.width = Math.max(scale * afterUp, 8) + '%';
+            barAfterDown.style.width = Math.max(scale * afterDown, 8) + '%';
+
+            // Update bar text
+            barOriginal.textContent = '$' + base.toFixed(0);
+            barAfterUp.textContent = '$' + afterUp.toFixed(0);
+            barAfterDown.textContent = '$' + afterDown.toFixed(0);
+
+            // Update live percentage change display with sign
+            const sign = pctChange > 0 ? '+' : '';
+            liveChange.textContent = sign + pctChange.toFixed(0) + '%';
+            // Colour the text based on positive / negative
+            if (pctChange > 0.01) {
+                liveChange.className = 'text-xl font-bold text-emerald-600';
+            } else if (pctChange < -0.01) {
+                liveChange.className = 'text-xl font-bold text-rose-600';
+            } else {
+                liveChange.className = 'text-xl font-bold text-slate-600';
+            }
+        }
+
+        incSlider.addEventListener('input', updateVisuals);
+        decSlider.addEventListener('input', updateVisuals);
+
+        // Initial call
+        updateVisuals();
+    </script>
+</body>
+</html>

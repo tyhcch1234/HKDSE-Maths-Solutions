@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2015 Paper 2 Q16 — Frustum Volume</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[', '\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<style>
+  :root{
+    --blue:#2563eb; --blue-dark:#1e3a8a;
+    --amber:#f59e0b; --amber-bg:#fffbeb;
+    --emerald:#059669; --emerald-bg:#ecfdf5;
+    --slate:#0f172a; --muted:#64748b;
+    --card:#ffffff; --bg:#f1f5f9;
+    --border:#e2e8f0;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--slate);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.6;
+  }
+  .wrap{max-width:960px;margin:0 auto;padding:0 16px 60px;}
+
+  /* Hero */
+  header.hero{
+    background:linear-gradient(135deg,#1e3a8a 0%,#2563eb 45%,#0ea5e9 100%);
+    color:#fff; padding:42px 16px 38px; margin-bottom:26px;
+  }
+  .hero-inner{max-width:960px;margin:0 auto;}
+  .eyebrow{
+    font-size:.78rem; letter-spacing:.14em; text-transform:uppercase;
+    opacity:.85; font-weight:600; margin-bottom:8px;
+  }
+  .hero h1{font-size:clamp(1.5rem,4.5vw,2.15rem);margin:0 0 6px;font-weight:750;letter-spacing:-.01em;}
+  .hero .topic{font-size:1.02rem;opacity:.92;margin:0 0 18px;font-weight:500;}
+  .pills{display:flex;flex-wrap:wrap;gap:9px;}
+  .pill{
+    background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35);
+    padding:5px 13px; border-radius:999px; font-size:.8rem; font-weight:600;
+    backdrop-filter:blur(4px);
+  }
+
+  /* Cards */
+  .card{
+    background:var(--card); border-radius:16px; padding:22px 22px 24px;
+    box-shadow:0 2px 4px rgba(15,23,42,.04), 0 10px 26px -12px rgba(15,23,42,.16);
+    margin-bottom:22px; border:1px solid var(--border);
+  }
+  .card h2{
+    font-size:1.18rem; margin:0 0 14px; font-weight:700; color:var(--blue-dark);
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  }
+  .card h2 .num{
+    background:var(--blue); color:#fff; width:30px; height:30px; border-radius:9px;
+    display:inline-flex; align-items:center; justify-content:center;
+    font-size:.9rem; font-weight:700; flex:none;
+  }
+  .marks-tag{
+    background:#fff7ed; color:#c2410c; border:1px solid #fed7aa;
+    font-size:.72rem; font-weight:700; padding:3px 9px; border-radius:999px;
+    margin-left:auto;
+  }
+  .qtext{font-size:1.02rem;}
+  .choices{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:10px; margin-top:16px;
+  }
+  .choice{
+    border:1px solid var(--border); border-radius:11px; padding:10px 14px;
+    background:#f8fafc; font-weight:600; font-size:.97rem;
+  }
+  .choice.correct{background:var(--emerald-bg); border-color:#a7f3d0; color:#065f46;}
+
+  /* Steps */
+  .step{
+    display:none;
+    border-left:4px solid var(--blue);
+    background:#f8fafc;
+    border-radius:0 12px 12px 0;
+    padding:14px 16px;
+    margin:14px 0;
+    animation:fade .35s ease;
+  }
+  .step.show{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+  .step-head{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;}
+  .badge{
+    background:var(--blue); color:#fff; font-size:.7rem; font-weight:700;
+    padding:3px 9px; border-radius:999px; letter-spacing:.03em;
+  }
+  .mbadge{
+    background:#fef3c7; color:#92400e; border:1px solid #fcd34d;
+    font-size:.7rem; font-weight:700; padding:3px 8px; border-radius:999px;
+  }
+  .hint{
+    background:var(--amber-bg); border-left:4px solid var(--amber);
+    padding:10px 13px; border-radius:0 8px 8px 0; margin-top:10px; font-size:.93rem;
+  }
+  .hint b{color:#b45309;}
+  .answer{
+    background:var(--emerald-bg); border-left:4px solid var(--emerald);
+    padding:10px 13px; border-radius:0 8px 8px 0; margin-top:10px; font-size:.95rem;
+  }
+  .answer b{color:#065f46;}
+
+  .btn-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:8px;}
+  button.next{
+    background:var(--blue); color:#fff; border:none; border-radius:11px;
+    padding:11px 22px; font-size:.95rem; font-weight:650; cursor:pointer;
+    transition:.18s; box-shadow:0 4px 12px -3px rgba(37,99,235,.5);
+  }
+  button.next:hover:not(:disabled){background:#1d4ed8; transform:translateY(-1px);}
+  button.next:disabled{background:#cbd5e1; color:#475569; box-shadow:none; cursor:default;}
+  .counter{font-size:.85rem;color:var(--muted);font-weight:600;}
+
+  /* Canvas */
+  .canvas-box{
+    background:#fbfdff; border:1px solid var(--border); border-radius:13px;
+    padding:12px; margin:6px 0 16px;
+  }
+  canvas{width:100%; height:auto; display:block; border-radius:8px; background:#fff;}
+  .controls{
+    display:flex; flex-wrap:wrap; gap:16px; align-items:center;
+    margin-top:12px; padding-top:12px; border-top:1px dashed var(--border);
+    font-size:.87rem;
+  }
+  .ctl{display:flex;align-items:center;gap:8px;}
+  .ctl label{font-weight:600;color:#334155;}
+  input[type=range]{accent-color:var(--blue); width:130px;}
+  input[type=checkbox]{accent-color:var(--emerald); width:16px;height:16px;}
+  .readout{
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+    background:#0f172a; color:#a7f3d0; padding:6px 11px; border-radius:8px;
+    font-size:.8rem; font-weight:600; display:inline-block;
+  }
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.8rem;font-weight:600;margin-top:4px;}
+  .legend span{display:flex;align-items:center;gap:6px;}
+  .swatch{width:14px;height:4px;border-radius:2px;display:inline-block;}
+
+  /* Summary */
+  .summary{
+    background:linear-gradient(135deg,#0f172a,#1e293b); color:#e2e8f0;
+    border-radius:16px; padding:24px; border:1px solid #334155;
+  }
+  .summary h2{color:#f8fafc;}
+  .summary h2 .num{background:var(--emerald);}
+  .summary ul{margin:6px 0 0;padding-left:20px;}
+  .summary li{margin-bottom:9px;}
+  .summary .hl{color:#6ee7b7;font-weight:700;}
+
+  footer{
+    text-align:center; color:var(--muted); font-size:.83rem;
+    padding:26px 16px 10px;
+  }
+  mjx-container{overflow-x:auto; overflow-y:hidden; max-width:100%;}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</div>
+    <h1>2015 Paper 2 · Question 16</h1>
+    <p class="topic">Mensuration — Volume of a Frustum of a Right Circular Cone</p>
+    <div class="pills">
+      <span class="pill">Similar Solids</span>
+      <span class="pill">Volume of Cone</span>
+      <span class="pill">Frustum</span>
+      <span class="pill">Ratio of Volumes</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- Question card -->
+  <div class="card">
+    <h2><span class="num">Q</span>Question</h2>
+    <div class="qtext">
+      <p>The height and the base radius of a right circular cone are \(12\text{ cm}\) and \(9\text{ cm}\) respectively. The figure shows a frustum which is made by cutting off the upper part of the circular cone. The height of the frustum is \(8\text{ cm}\). Find the volume of the frustum.</p>
+    </div>
+    <div class="choices">
+      <div class="choice">A. \(210\pi\text{ cm}^3\)</div>
+      <div class="choice correct">B. \(312\pi\text{ cm}^3\) ✓</div>
+      <div class="choice">C. \(324\pi\text{ cm}^3\)</div>
+      <div class="choice">D. \(936\pi\text{ cm}^3\)</div>
+    </div>
+  </div>
+
+  <!-- Part (a) -->
+  <div class="card">
+    <h2><span class="num">a</span>Set Up the Geometry<span class="marks-tag">Understanding</span></h2>
+
+    <div class="canvas-box">
+      <canvas id="cv1" width="760" height="470"></canvas>
+      <div class="legend">
+        <span><i class="swatch" style="background:#2563eb"></i>Original cone (h=12, r=9)</span>
+        <span><i class="swatch" style="background:#ef4444"></i>Removed upper cone (h=4, r=3)</span>
+        <span><i class="swatch" style="background:#059669"></i>Frustum (h=8)</span>
+      </div>
+      <div class="controls">
+        <div class="ctl">
+          <label for="cut">Frustum height h:</label>
+          <input type="range" id="cut" min="1" max="11" value="8" step="1">
+          <span id="cutVal" style="font-weight:700;color:#2563eb;">8 cm</span>
+        </div>
+        <div class="ctl">
+          <label><input type="checkbox" id="showFull" checked> Show full cone</label>
+        </div>
+        <div class="ctl">
+          <label><input type="checkbox" id="showUpper" checked> Show upper part</label>
+        </div>
+      </div>
+      <div style="margin-top:10px;">
+        <span class="readout" id="ro1">cone height = 12 cm, base radius = 9 cm</span>
+      </div>
+    </div>
+
+    <div class="step" id="a1">
+      <div class="step-head"><span class="badge">Step 1</span><span class="mbadge">1M</span></div>
+      <p>Whole cone: height \(H = 12\text{ cm}\), base radius \(R = 9\text{ cm}\).</p>
+      <p>The frustum is the whole cone <em>minus</em> the small upper cone. Since the frustum height is \(8\text{ cm}\), the removed cone has height</p>
+      \[h = 12 - 8 = 4\text{ cm}\]
+      <div class="hint"><b>Hint:</b> Always subtract heights from the <em>full</em> cone to find the removed cone's height.</div>
+    </div>
+
+    <div class="step" id="a2">
+      <div class="step-head"><span class="badge">Step 2</span><span class="mbadge">1M</span></div>
+      <p>By similar triangles (or similar solids), the small cone and the large cone have proportional radii:</p>
+      \[\frac{r}{R} = \frac{h}{H}\]
+      \[\frac{r}{9} = \frac{4}{12} = \frac{1}{3}\]
+      <div class="hint"><b>Hint:</b> The two cones share the same apex angle, so every length scales by the ratio \(h : H\).</div>
+      <div class="answer"><b>Radius of the upper cone:</b> \(r = 3\text{ cm}\)</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="next" data-target="partA">Next step →</button>
+      <span class="counter" id="cA">0 / 2</span>
+    </div>
+  </div>
+
+  <!-- Part (b) -->
+  <div class="card">
+    <h2><span class="num">b</span>Compute the Frustum Volume<span class="marks-tag">Solution</span></h2>
+
+    <div class="canvas-box">
+      <canvas id="cv2" width="760" height="430"></canvas>
+      <div class="controls">
+        <div class="ctl">
+          <label for="scaleBar">Scale factor k (upper cone):</label>
+          <input type="range" id="scaleBar" min="0.1" max="1" value="0.333" step="0.01">
+          <span id="sVal" style="font-weight:700;color:#ef4444;">k = 0.333</span>
+        </div>
+        <div class="ctl">
+          <label><input type="checkbox" id="showM"> Show volume formula</label>
+        </div>
+      </div>
+      <div style="margin-top:10px;">
+        <span class="readout" id="ro2">V(frustum) = V(big) − V(small)</span>
+      </div>
+    </div>
+
+    <div class="step" id="b1">
+      <div class="step-head"><span class="badge">Step 1</span><span class="mbadge">1M</span></div>
+      <p>Volume of the whole cone:</p>
+      \[V_{\text{big}} = \frac{1}{3}\pi R^2 H = \frac{1}{3}\pi (9)^2 (12) = 324\pi\text{ cm}^3\]
+      <div class="hint"><b>Hint:</b> Use \(V = \frac{1}{3}\pi r^2 h\) where \(r\) is the base radius and \(h\) the height.</div>
+    </div>
+
+    <div class="step" id="b2">
+      <div class="step-head"><span class="badge">Step 2</span><span class="mbadge">1M</span></div>
+      <p>Volume of the removed upper cone (height \(4\text{ cm}\), radius \(3\text{ cm}\)):</p>
+      \[V_{\text{small}} = \frac{1}{3}\pi (3)^2 (4) = 12\pi\text{ cm}^3\]
+      <div class="hint"><b>Hint:</b> Notice \(V_{\text{small}} = \left(\frac{1}{3}\right)^3 V_{\text{big}} = \frac{1}{27} \cdot 324\pi = 12\pi\). Volume scales as \(k^3\).</div>
+    </div>
+
+    <div class="step" id="b3">
+      <div class="step-head"><span class="badge">Step 3</span><span class="mbadge">1A</span></div>
+      <p>Therefore the frustum volume is:</p>
+      \[V = V_{\text{big}} - V_{\text{small}} = 324\pi - 12\pi = 312\pi\text{ cm}^3\]
+      <div class="hint"><b>Hint:</b> The answer matches option <b>B</b>.</div>
+      <div class="answer"><b>Volume of the frustum</b> \(= 312\pi\text{ cm}^3\) &nbsp;(Option B)</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="next" data-target="partB">Next step →</button>
+      <span class="counter" id="cB">0 / 3</span>
+    </div>
+  </div>
+
+  <!-- Summary -->
+  <div class="card summary">
+    <h2><span class="num">✓</span>Summary of Answers</h2>
+    <ul>
+      <li>Height of the removed upper cone: \(h = 12 - 8 = \mathbf{4\text{ cm}}\)</li>
+      <li>Base radius of the upper cone (similar triangles): \(r = 9 \times \frac{4}{12} = \mathbf{3\text{ cm}}\)</li>
+      <li>Volume of the whole cone: \(\frac{1}{3}\pi(9)^2(12) = \mathbf{324\pi\text{ cm}^3}\)</li>
+      <li>Volume of the upper cone: \(\frac{1}{3}\pi(3)^2(4) = \mathbf{12\pi\text{ cm}^3}\)</li>
+      <li>Volume of the frustum: \(324\pi - 12\pi = \mathbf{312\pi\text{ cm}^3}\)</li>
+      <li>Correct option: <span class="hl">B</span></li>
+    </ul>
+  </div>
+
+</div>
+
+<footer>HKDSE Mathematics (Compulsory Part) · Paper 2 · Interactive Solution</footer>
+
+<script>
+(function(){
+  /* ============ Step reveal ============ */
+  function setupReveal(btnSel, counterSel, group){
+    const btn = document.querySelector(btnSel);
+    const counter = document.querySelector(counterSel);
+    const steps = document.querySelectorAll('[id^="' + group + '"]');
+    const total = steps.length;
+    let idx = 0;
+    counter.textContent = '0 / ' + total;
+
+    btn.addEventListener('click', function(){
+      if(idx >= total) return;
+      steps[idx].classList.add('show');
+      idx++;
+      counter.textContent = idx + ' / ' + total;
+      if(idx === total){
+        btn.disabled = true;
+        btn.textContent = 'All steps revealed ✓';
+      } else {
+        btn.textContent = 'Next step →';
+      }
+    });
+  }
+  setupReveal('[data-target="partA"]', '#cA', 'a');
+  setupReveal('[data-target="partB"]', '#cB', 'b');
+
+  /* ============ Canvas helper ============ */
+  function arrowLine(ctx, x1,y1,x2,y2){
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  }
+
+  /* ============ Diagram 1 : Full cone with cut ============ */
+  const cv1 = document.getElementById('cv1');
+  const ctx1 = cv1.getContext('2d');
+  const cutSlider = document.getElementById('cut');
+  const cutVal = document.getElementById('cutVal');
+  const showFull = document.getElementById('showFull');
+  const showUpper = document.getElementById('showUpper');
+  const ro1 = document.getElementById('ro1');
+
+  const A1 = {ox: 380, oy: 70, scale: 22}; // apex at (380,70), 1cm = 22px
+
+  function drawEllipse(ctx, cx, cy, rx, ry, dashed){
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI*2);
+    if(dashed) ctx.setLineDash([6,5]); else ctx.setLineDash([]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  function drawCone1(){
+    const H = 12, R = 9;
+    const cutH = parseFloat(cutSlider.value); // frustum height
+    const s = A1.scale;
+    const apexX = A1.ox, apexY = A1.oy;
+    const baseY = apexY + H*s;
+    const baseRX = R*s;
+    const baseRY = R*s*0.26;
+
+    // small cone radius via similarity
+    const hSmall = H - cutH;
+    const rSmall = R * hSmall / H;
+
+    ctx1.clearRect(0,0,cv1.width,cv1.height);
+
+    // background axes
+    ctx1.strokeStyle = '#e2e8f0';
+    ctx1.lineWidth = 1;
+    ctx1.setLineDash([3,4]);
+    ctx1.beginPath();
+    ctx1.moveTo(apexX, 40); ctx1.lineTo(apexX, baseY+30);
+    ctx1.stroke();
+    ctx1.setLineDash([]);
+
+    // full cone outline
+    if(showFull.checked){
+      ctx1.strokeStyle = '#93c5fd';
+      ctx1.lineWidth = 3;
+      ctx1.beginPath();
+      ctx1.moveTo(apexX - baseRX, baseY);
+      ctx1.lineTo(apexX, apexY);
+      ctx1.lineTo(apexX + baseRX, baseY);
+      ctx1.stroke();
+      // base ellipse
+      ctx1.strokeStyle = '#2563eb';
+      ctx1.lineWidth = 2.5;
+      drawEllipse(ctx1, apexX, baseY, baseRX, baseRY, false);
+    }
+
+    // removed upper cone
+    const cutY = apexY + (H - cutH)*s;
+    if(showUpper.checked && hSmall > 0.05){
+      ctx1.strokeStyle = '#f87171';
+      ctx1.lineWidth = 3;
+      ctx1.beginPath();
+      ctx1.moveTo(apexX - baseRX*(hSmall/H), cutY);
+      ctx1.lineTo(apexX, apexY);
+      ctx1.lineTo(apexX + baseRX*(hSmall/H), cutY);
+      ctx1.stroke();
+      ctx1.strokeStyle = '#ef4444';
+      ctx1.lineWidth = 2;
+      drawEllipse(ctx1, apexX, cutY, baseRX*(hSmall/H), baseRY*(hSmall/H), true);
+    }
+
+    // frustum region (shade)
+    ctx1.fillStyle = 'rgba(16,185,129,0.10)';
+    ctx1.beginPath();
+    ctx1.moveTo(apexX - baseRX, baseY);
+    ctx1.lineTo(apexX - baseRX*(hSmall/H), cutY);
+    ctx1.lineTo(apexX + baseRX*(hSmall/H), cutY);
+    ctx1.lineTo(apexX + baseRX, baseY);
+    ctx1.closePath();
+    ctx1.fill();
+
+    // frustum sides in green
+    ctx1.strokeStyle = '#059669';
+    ctx1.lineWidth = 3;
+    ctx1.beginPath();
+    ctx1.moveTo(apexX - baseRX, baseY);
+    ctx1.lineTo(apexX - baseRX*(hSmall/H), cutY);
+    ctx1.moveTo(apexX + baseRX, baseY);
+    ctx1.lineTo(apexX + baseRX*(hSmall/H), cutY);
+    ctx1.stroke();
+
+    // top ellipse of frustum
+    ctx1.strokeStyle = '#059669';
+    ctx1.beginPath();
+    ctx1.ellipse(apexX, cutY, baseRX*(hSmall/H), baseRY*(hSmall/H), 0, 0, Math.PI*2);
+    ctx1.stroke();
+
+    // bottom ellipse of frustum
+    ctx1.strokeStyle = '#047857';
+    ctx1.beginPath();
+    ctx1.ellipse(apexX, baseY, baseRX, baseRY, 0, 0, Math.PI*2);
+    ctx1.stroke();
+
+    // dimension line: full height 12
+    ctx1.strokeStyle = '#1e40af';
+    ctx1.lineWidth = 1.5;
+    ctx1.setLineDash([5,4]);
+    arrowLine(ctx1, apexX + baseRX + 34, apexY, apexX + baseRX + 34, baseY);
+    ctx1.setLineDash([]);
+    ctx1.beginPath();
+    ctx1.arc(apexX+baseRX+34, baseY, 3, 0, Math.PI*2); ctx1.fill();
+
+    // dimension line frustum height
+    ctx1.strokeStyle = '#065f46';
+    ctx1.setLineDash([5,4]);
+    arrowLine(ctx1, apexX - baseRX - 34, baseY, apexX - baseRX - 34, cutY);
+    ctx1.setLineDash([]);
+
+    // labels
+    ctx1.fillStyle = '#0f172a';
+    ctx1.font = '600 14px system-ui, sans-serif';
+    ctx1.fillText('apex', apexX + 10, apexY + 4);
+    ctx1.fillText('12 cm', apexX + baseRX + 40, (apexY+baseY)/2);
+    ctx1.fillStyle = '#065f46';
+    ctx1.fillText(cutH.toFixed(0) + ' cm (frustum)', apexX - baseRX - 150, (cutY+baseY)/2);
+    ctx1.fillStyle = '#2563eb';
+    ctx1.fillText('R = 9 cm', apexX + baseRX + 8, baseY + 18);
+    ctx1.fillStyle = '#ef4444';
+    ctx1.fillText('r = ' + rSmall.toFixed(1) + ' cm', apexX + baseRX*(hSmall/H) + 8, cutY + 4);
+
+    ro1.textContent = 'frustum h = ' + cutH + ' cm | upper cone h = ' + hSmall + ' cm, r = ' + rSmall.toFixed(2) + ' cm';
+  }
+
+  cutSlider.addEventListener('input', function(){
+    cutVal.textContent = cutSlider.value + ' cm';
+    drawCone1();
+  });
+  showFull.addEventListener('change', drawCone1);
+  showUpper.addEventListener('change', drawCone1);
+
+  /* ============ Diagram 2 : Volume comparison bars ============ */
+  const cv2 = document.getElementById('cv2');
+  const ctx2 = cv2.getContext('2d');
+  const scaleBar = document.getElementById('scaleBar');
+  const sVal = document.getElementById('sVal');
+  const showM = document.getElementById('showM');
+  const ro2 = document.getElementById('ro2');
+
+  function drawDiag2(){
+    const k = parseFloat(scaleBar.value);
+    ctx2.clearRect(0,0,cv2.width,cv2.height);
+
+    const Vbig = 324*Math.PI;
+    const Vsmall = Vbig * k*k*k;
+    const Vfrust = Vbig - Vsmall;
+
+    const maxV = Vbig;
+    const barMaxH = 250;
+    const baseY = 340;
+    const scaleH = barMaxH / maxV;
+
+    function bar(x, value, color, label, hLabel){
+      const h = value * scaleH;
+      ctx2.fillStyle = color;
+      ctx2.beginPath();
+      ctx2.roundRect(x, baseY - h, 120, h, [10,10,0,0]);
+      ctx2.fill();
+      ctx2.fillStyle = '#0f172a';
+      ctx2.font = '700 13px system-ui, sans-serif';
+      ctx2.textAlign = 'center';
+      ctx2.fillText(label, x+60, baseY + 22);
+      ctx2.fillStyle = color;
+      ctx2.font = '700 14px system-ui, sans-serif';
+      ctx2.fillText(hLabel, x+60, baseY - h - 10);
+      ctx2.textAlign = 'left';
+    }
+
+    // baseline
+    ctx2.strokeStyle = '#cbd5e1'; ctx2.lineWidth = 2;
+    ctx2.beginPath(); ctx2.moveTo(50, baseY); ctx2.lineTo(710, baseY); ctx2.stroke();
+
+    bar(90, Vbig, '#2563eb', 'Whole cone', (324).toFixed(0) + 'π');
+    bar(290, Vsmall, '#ef4444', 'Upper cone', (Math.round(k*k*k*324*100)/100).toFixed(2) + 'π');
+    bar(490, Vfrust, '#059669', 'Frustum', (Math.round(Vfrust/Math.PI)).toFixed(0) + 'π');
+
+    // title
+    ctx2.fillStyle = '#1e293b';
+    ctx2.font = '700 16px system-ui, sans-serif';
+    ctx2.textAlign = 'center';
+    ctx2.fillText('Volume Comparison', 380, 30);
+    ctx2.font = '500 13px system-ui, sans-serif';
+    ctx2.fillStyle = '#64748b';
+    ctx2.fillText('k = ' + k.toFixed(2) + '  →  V(small)/V(big) = k³ = ' + (k*k*k).toFixed(3), 380, 52);
+    ctx2.textAlign = 'left';
+
+    // formula box
+    if(showM.checked){
+      ctx2.fillStyle = 'rgba(255,251,235,0.95)';
+      ctx2.strokeStyle = '#fcd34d';
+      ctx2.lineWidth = 1.5;
+      ctx2.beginPath();
+      ctx2.roundRect(500, 70, 210, 84, 10);
+      ctx2.fill(); ctx2.stroke();
+      ctx2.fillStyle = '#92400e';
+      ctx2.font = '600 13px system-ui, sans-serif';
+      ctx2.fillText('V = ⅓πr²h', 520, 98);
+      ctx2.fillText('V(big) = 324π', 520, 120);
+      ctx2.fillText('V(small) = 12π (k=⅓)', 520, 142);
+    }
+
+    const vf = Math.round(Vfrust/Math.PI);
+    ro2.textContent = 'V(frustum) = ' + (324).toFixed(0) + 'π − ' + (Math.round(k*k*k*324)).toFixed(0) + 'π = ' + vf + 'π cm³';
+    sVal.textContent = 'k = ' + k.toFixed(3);
+  }
+
+  scaleBar.addEventListener('input', drawDiag2);
+  showM.addEventListener('change', drawDiag2);
+
+  // roundRect polyfill for older browsers
+  if(!CanvasRenderingContext2D.prototype.roundRect){
+    CanvasRenderingContext2D.prototype.roundRect = function(x,y,w,h,r){
+      if(typeof r === 'number') r = [r,r,r,r];
+      this.moveTo(x+r[0], y);
+      this.arcTo(x+w, y, x+w, y+h, r[1]);
+      this.arcTo(x+w, y+h, x, y+h, r[2]);
+      this.arcTo(x, y+h, x, y, r[3]);
+      this.arcTo(x, y, x+w, y, r[0]);
+      this.closePath();
+      return this;
+    };
+  }
+
+  drawCone1();
+  drawDiag2();
+
+  // Redraw on resize for crispness
+  window.addEventListener('resize', function(){
+    drawCone1();
+    drawDiag2();
+  });
+})();
+</script>
+</body>
+</html>

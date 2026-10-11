@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2023 Paper 2 Q44 — Statistics</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[', '\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root{
+    --blue:#1d4ed8; --blue-light:#dbeafe; --blue-dark:#1e3a8a;
+    --amber:#f59e0b; --amber-light:#fef3c7;
+    --emerald:#059669; --emerald-light:#d1fae5;
+    --slate:#0f172a; --slate-mid:#334155; --slate-soft:#f1f5f9;
+    --rose:#e11d48;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    background:#f8fafc; color:#0f172a; line-height:1.6;
+  }
+  /* ---------- HERO ---------- */
+  .hero{
+    background:linear-gradient(135deg,#1e3a8a 0%,#1d4ed8 45%,#0ea5e9 100%);
+    color:#fff; padding:44px 22px 52px; position:relative; overflow:hidden;
+    border-radius:0 0 28px 28px; box-shadow:0 12px 30px -12px rgba(30,58,138,.55);
+  }
+  .hero::after{
+    content:""; position:absolute; width:300px; height:300px; border-radius:50%;
+    background:rgba(255,255,255,.08); top:-120px; right:-90px;
+  }
+  .hero-inner{max-width:960px; margin:0 auto; position:relative; z-index:2;}
+  .eyebrow{font-size:.78rem; letter-spacing:.18em; text-transform:uppercase; opacity:.85; font-weight:600;}
+  .hero h1{margin:8px 0 4px; font-size:clamp(1.6rem,4.6vw,2.5rem); font-weight:800; letter-spacing:-.01em;}
+  .hero .sub{font-size:clamp(.95rem,2.4vw,1.1rem); opacity:.95;}
+  .pills{margin-top:18px; display:flex; flex-wrap:wrap; gap:8px;}
+  .pill{
+    background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35);
+    padding:5px 13px; border-radius:999px; font-size:.78rem; font-weight:600; backdrop-filter:blur(4px);
+  }
+  /* ---------- CARDS ---------- */
+  .wrap{max-width:960px; margin:0 auto; padding:26px 18px 60px;}
+  .card{
+    background:#fff; border-radius:20px; padding:24px 22px; margin-bottom:26px;
+    box-shadow:0 4px 18px -6px rgba(15,23,42,.12), 0 1px 3px rgba(15,23,42,.06);
+    border:1px solid #e6eaf0;
+  }
+  .card h2{
+    margin:0 0 14px; font-size:1.2rem; font-weight:800; color:var(--blue-dark);
+    display:flex; align-items:center; gap:10px;
+  }
+  .card h2 .num{
+    background:var(--blue); color:#fff; width:30px; height:30px; border-radius:9px;
+    display:inline-flex; align-items:center; justify-content:center; font-size:.9rem; flex:0 0 auto;
+  }
+  .qtext{font-size:1.02rem;}
+  /* Question table */
+  table.qtab{border-collapse:collapse; margin:14px 0; font-size:.95rem;}
+  table.qtab th, table.qtab td{border:1.6px solid #94a3b8; padding:8px 18px; text-align:center;}
+  table.qtab th{background:var(--slate-soft); font-weight:700;}
+  .opts{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:8px; margin-top:12px;}
+  .opt{background:var(--slate-soft); border-radius:10px; padding:9px 14px; font-weight:600; font-size:.95rem; border:1px solid #e2e8f0;}
+  /* ---------- CANVAS ---------- */
+  .canvas-box{
+    background:linear-gradient(180deg,#fbfdff,#eff6ff); border:1px solid #dbeafe;
+    border-radius:16px; padding:12px; margin:6px 0 16px;
+  }
+  canvas{width:100%; height:auto; display:block; border-radius:10px; background:#fff;}
+  .controls{display:flex; flex-wrap:wrap; gap:18px; align-items:center; margin-top:12px; padding:0 4px;}
+  .ctrl{display:flex; align-items:center; gap:9px; font-size:.86rem; font-weight:600; color:var(--slate-mid);}
+  input[type=range]{width:150px; accent-color:var(--blue); cursor:pointer;}
+  .ctrl label{cursor:pointer; display:flex; align-items:center; gap:6px;}
+  input[type=checkbox]{accent-color:var(--emerald); width:16px; height:16px; cursor:pointer;}
+  .readout{
+    display:flex; flex-wrap:wrap; gap:10px; margin-top:12px;
+  }
+  .ro{
+    background:#fff; border:1px solid #dbeafe; border-radius:10px; padding:7px 12px;
+    font-size:.84rem; font-weight:600; color:var(--slate-mid);
+  }
+  .ro b{color:var(--blue); font-family:ui-monospace,Consolas,monospace;}
+  /* ---------- STEPS ---------- */
+  .step{
+    border-left:4px solid var(--blue); background:var(--slate-soft);
+    border-radius:0 12px 12px 0; padding:14px 16px; margin:14px 0;
+    display:none; animation:slideIn .35s ease;
+  }
+  .step.show{display:block;}
+  @keyframes slideIn{from{opacity:0; transform:translateX(-8px);} to{opacity:1; transform:translateX(0);}}
+  .step-head{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:8px;}
+  .badge{
+    background:var(--blue); color:#fff; font-size:.74rem; font-weight:700;
+    padding:3px 10px; border-radius:999px;
+  }
+  .marks{background:var(--amber); color:#3b2503; font-size:.72rem; font-weight:800; padding:3px 9px; border-radius:999px;}
+  .hint{
+    background:var(--amber-light); border-left:4px solid var(--amber);
+    border-radius:0 10px 10px 0; padding:10px 14px; margin-top:12px; font-size:.9rem;
+  }
+  .hint::before{content:"💡 Hint — "; font-weight:800; color:#92400e;}
+  .answer{
+    background:var(--emerald-light); border-left:4px solid var(--emerald);
+    border-radius:0 10px 10px 0; padding:10px 14px; margin-top:12px; font-size:.94rem;
+  }
+  .answer::before{content:"✓ Answer — "; font-weight:800; color:#065f46;}
+  /* Buttons */
+  .btn-row{display:flex; align-items:center; gap:14px; margin-top:6px; flex-wrap:wrap;}
+  button.next{
+    background:linear-gradient(135deg,var(--blue),#2563eb); color:#fff; border:none;
+    padding:11px 22px; border-radius:12px; font-weight:700; font-size:.9rem; cursor:pointer;
+    box-shadow:0 6px 16px -6px rgba(29,78,216,.7); transition:.2s;
+  }
+  button.next:hover:not(:disabled){transform:translateY(-2px); box-shadow:0 10px 22px -8px rgba(29,78,216,.8);}
+  button.next:disabled{background:#94a3b8; box-shadow:none; cursor:not-allowed;}
+  .counter{font-size:.85rem; font-weight:700; color:var(--slate-mid); background:var(--slate-soft); padding:6px 13px; border-radius:999px;}
+  /* Summary */
+  .summary{background:linear-gradient(135deg,#0f172a,#1e293b); color:#e2e8f0; border:none;}
+  .summary h2{color:#93c5fd;}
+  .summary ul{margin:0; padding-left:20px;}
+  .summary li{margin:9px 0; font-size:.98rem;}
+  .summary b{color:#fbbf24;}
+  /* Footer */
+  footer{text-align:center; padding:26px 16px 40px; color:#64748b; font-size:.82rem;}
+  footer .line{width:60px; height:3px; background:var(--blue); border-radius:2px; margin:0 auto 14px;}
+  @media(max-width:560px){
+    .card{padding:18px 15px; border-radius:16px;}
+    .controls{gap:12px;}
+    input[type=range]{width:120px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</div>
+    <h1>2023 Paper 2 · Question 44</h1>
+    <div class="sub">Statistics — Standard Score (z-score)</div>
+    <div class="pills">
+      <span class="pill">Mean μ</span>
+      <span class="pill">Standard Deviation σ</span>
+      <span class="pill">Standard Score</span>
+      <span class="pill">Simultaneous Equations</span>
+      <span class="pill">Multiple Choice</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ============ QUESTION CARD ============ -->
+  <div class="card">
+    <h2><span class="num">Q</span>Question (2023MC#44)</h2>
+    <div class="qtext">
+      <p>The table below shows the scores (in marks) and the corresponding standard scores of three students in an examination.</p>
+      <table class="qtab">
+        <tr><th>Score (marks)</th><td>46</td><td>\(x\)</td><td>86</td></tr>
+        <tr><th>Standard score</th><td>\(-3\)</td><td>\(1\)</td><td>\(2\)</td></tr>
+      </table>
+      <p><strong>Find \(x\).</strong></p>
+      <div class="opts">
+        <div class="opt">A. 64</div>
+        <div class="opt">B. 66</div>
+        <div class="opt">C. 70</div>
+        <div class="opt">D. 78</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PART 1: FIND μ AND σ ============ -->
+  <div class="card">
+    <h2><span class="num">1</span>Setting up the equations — find μ and σ</h2>
+    <div class="qtext">
+      <p>Let \(\mu\) be the mean and \(\sigma\) be the standard deviation of the scores.
+      The standard score of a score \(s\) is defined as</p>
+      \[ z = \frac{s-\mu}{\sigma}. \]
+      <p>Using the first and third students, we can form two equations.</p>
+    </div>
+
+    <div class="canvas-box">
+      <canvas id="cv1" width="880" height="380"></canvas>
+      <div class="controls">
+        <div class="ctrl">
+          <span>μ =</span>
+          <input type="range" id="muSlider" min="50" max="90" step="1" value="70">
+          <b id="muVal" style="color:#1d4ed8;">70</b>
+        </div>
+        <div class="ctrl">
+          <span>σ =</span>
+          <input type="range" id="sdSlider" min="4" max="20" step="1" value="8">
+          <b id="sdVal" style="color:#e11d48;">8</b>
+        </div>
+        <div class="ctrl">
+          <label><input type="checkbox" id="showIdeal" checked> Show ideal solution (μ=70, σ=8)</label>
+        </div>
+      </div>
+      <div class="readout">
+        <div class="ro">Line (1) for 46: z = (<b id="z1">-3.00</b>)</div>
+        <div class="ro">Line (3) for 86: z = (<b id="z3">2.00</b>)</div>
+        <div class="ro">Ideal z: (46−70)/8 = −3, (86−70)/8 = 2</div>
+      </div>
+    </div>
+
+    <div class="step" id="s1-1">
+      <div class="step-head"><span class="badge">Step 1</span><span class="marks">1M</span></div>
+      <p>Write the standard score formula for the first student (score 46, z-score −3):</p>
+      \[ \frac{46-\mu}{\sigma} = -3 \;\Longrightarrow\; \mu - 3\sigma = 46 \quad \cdots (1) \]
+    </div>
+    <div class="step" id="s1-2">
+      <div class="step-head"><span class="badge">Step 2</span><span class="marks">1M</span></div>
+      <p>Write the standard score formula for the third student (score 86, z-score 2):</p>
+      \[ \frac{86-\mu}{\sigma} = 2 \;\Longrightarrow\; \mu + 2\sigma = 86 \quad \cdots (3) \]
+    </div>
+    <div class="step" id="s1-3">
+      <div class="step-head"><span class="badge">Step 3</span><span class="marks">1A</span></div>
+      <p>Solve (1) and (3) simultaneously. Subtract (1) from (3):</p>
+      \[ 5\sigma = 40 \;\Longrightarrow\; \sigma = 8 \]
+      <p>Substitute back into (1):</p>
+      \[ \mu = 46 + 3(8) = 70 \]
+      <div class="hint">Subtracting the two equations cancels μ, leaving a simple equation in σ. Always solve for σ first.</div>
+      <div class="answer">\(\mu = 70\) and \(\sigma = 8\).</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="next" onclick="reveal('part1')">Next step →</button>
+      <span class="counter" id="cnt-part1">0 / 3</span>
+    </div>
+  </div>
+
+  <!-- ============ PART 2: FIND x ============ -->
+  <div class="card">
+    <h2><span class="num">2</span>Using the second student to find \(x\)</h2>
+    <div class="qtext">
+      <p>Now we know \(\mu = 70\) and \(\sigma = 8\). The second student has score \(x\) and standard score \(1\).</p>
+    </div>
+
+    <div class="canvas-box">
+      <canvas id="cv2" width="880" height="400"></canvas>
+      <div class="controls">
+        <div class="ctrl">
+          <span>x =</span>
+          <input type="range" id="xSlider" min="40" max="100" step="1" value="78">
+          <b id="xVal" style="color:#059669;">78</b>
+        </div>
+        <div class="ctrl">
+          <label><input type="checkbox" id="showDist" checked> Show normal curve (μ=70, σ=8)</label>
+        </div>
+      </div>
+      <div class="readout">
+        <div class="ro">Standard score = (x − μ)/σ = <b id="zOut">(78 − 70)/8 = 1.00</b></div>
+        <div class="ro">Target z-score = <b>1</b></div>
+        <div class="ro" id="matchRo" style="border-color:#059669; color:#059669;">✓ Matched!</div>
+      </div>
+    </div>
+
+    <div class="step" id="s2-1">
+      <div class="step-head"><span class="badge">Step 1</span><span class="marks">1M</span></div>
+      <p>Write the standard score formula for the second student (score \(x\), z-score \(1\)):</p>
+      \[ \frac{x-\mu}{\sigma} = 1 \;\Longrightarrow\; x = \mu + \sigma \quad \cdots (2) \]
+    </div>
+    <div class="step" id="s2-2">
+      <div class="step-head"><span class="badge">Step 2</span><span class="marks">1A</span></div>
+      <p>Substitute \(\mu = 70\) and \(\sigma = 8\) into (2):</p>
+      \[ x = 70 + 8 = 78 \]
+      <div class="hint">A student with z-score \(1\) is exactly one standard deviation above the mean.</div>
+      <div class="answer">\(x = 78\) → option <strong>D</strong>.</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="next" onclick="reveal('part2')">Next step →</button>
+      <span class="counter" id="cnt-part2">0 / 2</span>
+    </div>
+  </div>
+
+  <!-- ============ SUMMARY ============ -->
+  <div class="card summary">
+    <h2><span class="num" style="background:#3b82f6;">✓</span>Summary of Answers</h2>
+    <ul>
+      <li>Mean of the examination scores: \(\mu = \mathbf{70}\)</li>
+      <li>Standard deviation: \(\sigma = \mathbf{8}\)</li>
+      <li>The unknown score: \(x = \mu + \sigma = \mathbf{78}\)</li>
+      <li><b>Correct option: D</b></li>
+    </ul>
+  </div>
+
+</div>
+
+<footer>
+  <div class="line"></div>
+  HKDSE Mathematics (Compulsory Part) · Paper 2 · 2023 Q44 — Interactive Solution<br>
+  Topic 15: Statistics · Standard Score (z-score)
+</footer>
+
+<script>
+/* ================= STEP REVEAL ================= */
+const revealState = {
+  part1: { total: 3, shown: 0 },
+  part2: { total: 2, shown: 0 }
+};
+
+function reveal(part) {
+  const st = revealState[part];
+  if (st.shown >= st.total) return;
+  st.shown++;
+  const el = document.getElementById(part === 'part1'
+    ? 's1-' + st.shown
+    : 's2-' + st.shown);
+  if (el) el.classList.add('show');
+  document.getElementById('cnt-' + part).textContent = st.shown + ' / ' + st.total;
+
+  // find the button for this part
+  const card = document.getElementById('cnt-' + part).closest('.card');
+  const btn = card.querySelector('button.next');
+  if (st.shown >= st.total) {
+    btn.disabled = true;
+    btn.textContent = 'All steps revealed ✓';
+  }
+}
+
+/* ================= CANVAS 1 : number line with μ and σ ================= */
+const cv1 = document.getElementById('cv1');
+const ctx1 = cv1.getContext('2d');
+let MU = 70, SD = 8;
+
+function drawCanvas1() {
+  const W = cv1.width, H = cv1.height;
+  ctx1.clearRect(0, 0, W, H);
+
+  // background
+  ctx1.fillStyle = '#ffffff';
+  ctx1.fillRect(0, 0, W, H);
+
+  // axis range
+  const minS = 30, maxS = 110;
+  const padL = 60, padR = 40;
+  const axisY = H * 0.55;
+  const scaleX = s => padL + (s - minS) / (maxS - minS) * (W - padL - padR);
+
+  // grid lines
+  ctx1.strokeStyle = '#eef2f7';
+  ctx1.lineWidth = 1;
+  for (let s = 30; s <= 110; s += 10) {
+    const x = scaleX(s);
+    ctx1.beginPath();
+    ctx1.moveTo(x, 40);
+    ctx1.lineTo(x, H - 60);
+    ctx1.stroke();
+  }
+
+  // draw the normal curve for current μ, σ
+  ctx1.beginPath();
+  ctx1.strokeStyle = 'rgba(29,78,216,0.25)';
+  ctx1.lineWidth = 2;
+  const amp = (H - 140) * (8 / SD);
+  for (let px = padL; px <= W - padR; px += 2) {
+    const s = minS + (px - padL) / (W - padL - padR) * (maxS - minS);
+    const y = axisY - amp * Math.exp(-0.5 * Math.pow((s - MU) / SD, 2));
+    if (px === padL) ctx1.moveTo(px, y);
+    else ctx1.lineTo(px, y);
+  }
+  ctx1.stroke();
+
+  // ideal curve if checked
+  if (document.getElementById('showIdeal').checked) {
+    ctx1.beginPath();
+    ctx1.strokeStyle = 'rgba(5,150,105,0.6)';
+    ctx1.lineWidth = 2.5;
+    ctx1.setLineDash([6, 5]);
+    const amp2 = (H - 140) * (8 / 8);
+    for (let px = padL; px <= W - padR; px += 2) {
+      const s = minS + (px - padL) / (W - padL - padR) * (maxS - minS);
+      const y = axisY - amp2 * Math.exp(-0.5 * Math.pow((s - 70) / 8, 2));
+      if (px === padL) ctx1.moveTo(px, y);
+      else ctx1.lineTo(px, y);
+    }
+    ctx1.stroke();
+    ctx1.setLineDash([]);
+  }
+
+  // axis line
+  ctx1.beginPath();
+  ctx1.strokeStyle = '#0f172a';
+  ctx1.lineWidth = 2;
+  ctx1.moveTo(padL - 20, axisY);
+  ctx1.lineTo(W - padR + 15, axisY);
+  ctx1.stroke();
+  // arrow
+  ctx1.beginPath();
+  ctx1.moveTo(W - padR + 15, axisY);
+  ctx1.lineTo(W - padR + 5, axisY - 6);
+  ctx1.lineTo(W - padR + 5, axisY + 6);
+  ctx1.closePath();
+  ctx1.fillStyle = '#0f172a';
+  ctx1.fill();
+
+  // ticks & labels
+  ctx1.fillStyle = '#334155';
+  ctx1.font = '600 12px system-ui';
+  ctx1.textAlign = 'center';
+  for (let s = 30; s <= 110; s += 10) {
+    const x = scaleX(s);
+    ctx1.beginPath();
+    ctx1.moveTo(x, axisY - 5);
+    ctx1.lineTo(x, axisY + 5);
+    ctx1.strokeStyle = '#0f172a';
+    ctx1.lineWidth = 1.5;
+    ctx1.stroke();
+    ctx1.fillText(s, x, axisY + 20);
+  }
+
+  // shade the two known students region
+  const x46 = scaleX(46);
+  const x86 = scaleX(86);
+
+  // line at 46
+  ctx1.beginPath();
+  ctx1.strokeStyle = '#e11d48';
+  ctx1.lineWidth = 2.5;
+  ctx1.moveTo(x46, axisY);
+  ctx1.lineTo(x46, axisY - 100);
+  ctx1.stroke();
+  ctx1.fillStyle = '#e11d48';
+  ctx1.beginPath();
+  ctx1.arc(x46, axisY, 5, 0, Math.PI * 2);
+  ctx1.fill();
+  ctx1.font = '700 13px system-ui';
+  ctx1.textAlign = 'center';
+  ctx1.fillText('46', x46, axisY - 108);
+  ctx1.font = '600 11px system-ui';
+  ctx1.fillStyle = '#e11d48';
+  ctx1.fillText('z = −3', x46, axisY - 124);
+
+  // line at 86
+  ctx1.beginPath();
+  ctx1.strokeStyle = '#7c3aed';
+  ctx1.lineWidth = 2.5;
+  ctx1.moveTo(x86, axisY);
+  ctx1.lineTo(x86, axisY - 140);
+  ctx1.stroke();
+  ctx1.fillStyle = '#7c3aed';
+  ctx1.beginPath();
+  ctx1.arc(x86, axisY, 5, 0, Math.PI * 2);
+  ctx1.fill();
+  ctx1.font = '700 13px system-ui';
+  ctx1.textAlign = 'center';
+  ctx1.fillText('86', x86, axisY - 148);
+  ctx1.font = '600 11px system-ui';
+  ctx1.fillStyle = '#7c3aed';
+  ctx1.fillText('z = 2', x86, axisY - 164);
+
+  // mean marker
+  const xMu = scaleX(MU);
+  ctx1.beginPath();
+  ctx1.strokeStyle = '#1d4ed8';
+  ctx1.lineWidth = 2;
+  ctx1.setLineDash([5, 4]);
+  ctx1.moveTo(xMu, axisY);
+  ctx1.lineTo(xMu, axisY - 180);
+  ctx1.stroke();
+  ctx1.setLineDash([]);
+  ctx1.fillStyle = '#1d4ed8';
+  ctx1.beginPath();
+  ctx1.arc(xMu, axisY, 6, 0, Math.PI * 2);
+  ctx1.fill();
+  ctx1.font = '700 13px system-ui';
+  ctx1.textAlign = 'center';
+  ctx1.fillText('μ = ' + MU, xMu, axisY - 188);
+
+  // σ shading
+  const xL = scaleX(MU - SD), xR = scaleX(MU + SD);
+  ctx1.fillStyle = 'rgba(29,78,216,0.08)';
+  ctx1.fillRect(xL, axisY - amp2, xR - xL, 4);
+  ctx1.strokeStyle = '#1d4ed8';
+  ctx1.lineWidth = 1.5;
+  ctx1.beginPath();
+  ctx1.moveTo(xL, axisY - amp2 - 4);
+  ctx1.lineTo(xL, axisY - amp2 + 12);
+  ctx1.moveTo(xR, axisY - amp2 - 4);
+  ctx1.lineTo(xR, axisY - amp2 + 12);
+  ctx1.stroke();
+  ctx1.fillStyle = '#1d4ed8';
+  ctx1.font = '600 11px system-ui';
+  ctx1.fillText('σ = ' + SD, (xL + xR) / 2, axisY - amp2 - 12);
+
+  // Title
+  ctx1.fillStyle = '#0f172a';
+  ctx1.font = '700 14px system-ui';
+  ctx1.textAlign = 'left';
+  ctx1.fillText('Number line of scores with z-score markers', padL, 28);
+}
+
+/* ================= CANVAS 2 : standard normal distribution ================= */
+const cv2 = document.getElementById('cv2');
+const ctx2 = cv2.getContext('2d');
+let XVAL = 78;
+
+function drawCanvas2() {
+  const W = cv2.width, H = cv2.height;
+  ctx2.clearRect(0, 0, W, H);
+  ctx2.fillStyle = '#ffffff';
+  ctx2.fillRect(0, 0, W, H);
+
+  // ---- score axis (bottom) ----
+  const padL = 60, padR = 50;
+  const minS = 30, maxS = 110;
+  const axisY = H - 70;
+  const scaleX = s => padL + (s - minS) / (maxS - minS) * (W - padL - padR);
+
+  // ---- z axis (same mapping, 0 at μ=70) ----
+  const mu = 70, sd = 8;
+  const zFromS = s => (s - mu) / sd;
+
+  // grid
+  ctx2.strokeStyle = '#eef2f7';
+  ctx2.lineWidth = 1;
+  for (let s = 30; s <= 110; s += 10) {
+    const x = scaleX(s);
+    ctx2.beginPath();
+    ctx2.moveTo(x, 40);
+    ctx2.lineTo(x, axisY);
+    ctx2.stroke();
+  }
+
+  // curve (density normalised)
+  const curveTop = 50;
+  const curveBot = axisY - 10;
+  const heightScale = (curveBot - curveTop);
+  const xMu = scaleX(mu);
+
+  ctx2.beginPath();
+  ctx2.strokeStyle = '#1d4ed8';
+  ctx2.lineWidth = 2.5;
+  for (let px = padL; px <= W - padR; px += 2) {
+    const s = minS + (px - padL) / (W - padL - padR) * (maxS - minS);
+    const y = axisY - heightScale * Math.exp(-0.5 * Math.pow((s - mu) / sd, 2));
+    if (px === padL) ctx2.moveTo(px, y);
+    else ctx2.lineTo(px, y);
+  }
+  ctx2.stroke();
+
+  // fill under curve up to current x if showDist
+  if (document.getElementById('showDist').checked) {
+    ctx2.beginPath();
+    ctx2.moveTo(padL, axisY);
+    for (let px = padL; px <= W - padR; px += 2) {
+      const s = minS + (px - padL) / (W - padL - padR) * (maxS - minS);
+      const y = axisY - heightScale * Math.exp(-0.5 * Math.pow((s - mu) / sd, 2));
+      ctx2.lineTo(px, y);
+    }
+    ctx2.lineTo(W - padR, axisY);
+    ctx2.closePath();
+    ctx2.fillStyle = 'rgba(29,78,216,0.07)';
+    ctx2.fill();
+  }
+
+  // axis
+  ctx2.beginPath();
+  ctx2.strokeStyle = '#0f172a';
+  ctx2.lineWidth = 2;
+  ctx2.moveTo(padL - 20, axisY);
+  ctx2.lineTo(W - padR + 15, axisY);
+  ctx2.stroke();
+
+  // ticks
+  ctx2.fillStyle = '#334155';
+  ctx2.font = '600 11px system-ui';
+  ctx2.textAlign = 'center';
+  for (let s = 30; s <= 110; s += 10) {
+    const x = scaleX(s);
+    ctx2.beginPath();
+    ctx2.moveTo(x, axisY - 4);
+    ctx2.lineTo(x, axisY + 4);
+    ctx2.strokeStyle = '#0f172a';
+    ctx2.lineWidth = 1.3;
+    ctx2.stroke();
+    ctx2.fillText(s, x, axisY + 18);
+  }
+
+  // ---- shaded visible area for current x ----
+  const xX = scaleX(XVAL);
+  ctx2.beginPath();
+  ctx2.moveTo(padL, axisY);
+  for (let s = minS; s <= XVAL; s += 0.5) {
+    const px = scaleX(s);
+    const y = axisY - heightScale * Math.exp(-0.5 * Math.pow((s - mu) / sd, 2));
+    ctx2.lineTo(px, y);
+  }
+  ctx2.lineTo(xX, axisY);
+  ctx2.closePath();
+  ctx2.fillStyle = 'rgba(5,150,105,0.22)';
+  ctx2.fill();
+
+  // vertical line at x
+  ctx2.beginPath();
+  ctx2.strokeStyle = '#059669';
+  ctx2.lineWidth = 3;
+  ctx2.setLineDash([6, 5]);
+  ctx2.moveTo(xX, axisY);
+  ctx2.lineTo(xX, axisY - heightScale * Math.exp(-0.5 * Math.pow((XVAL - mu) / sd, 2)) - 10);
+  ctx2.stroke();
+  ctx2.setLineDash([]);
+
+  // point on score axis
+  ctx2.beginPath();
+  ctx2.fillStyle = '#059669';
+  ctx2.arc(xX, axisY, 6, 0, Math.PI * 2);
+  ctx2.fill();
+
+  // labels
+  ctx2.font = '700 14px system-ui';
+  ctx2.fillStyle = '#059669';
+  ctx2.textAlign = 'center';
+  ctx2.fillText('x = ' + XVAL, xX, axisY - 95);
+  ctx2.font = '600 12px system-ui';
+  ctx2.fillText('z = ' + zFromS(XVAL).toFixed(2), xX, axisY - 76);
+
+  // μ marker
+  ctx2.beginPath();
+  ctx2.strokeStyle = '#1d4ed8';
+  ctx2.lineWidth = 2;
+  ctx2.setLineDash([5, 4]);
+  ctx2.moveTo(xMu, axisY);
+  ctx2.lineTo(xMu, 45);
+  ctx2.stroke();
+  ctx2.setLineDash([]);
+  ctx2.fillStyle = '#1d4ed8';
+  ctx2.beginPath();
+  ctx2.arc(xMu, axisY, 5, 0, Math.PI * 2);
+  ctx2.fill();
+  ctx2.font = '700 13px system-ui';
+  ctx2.fillText('μ', xMu, 36);
+  ctx2.font = '600 11px system-ui';
+  ctx2.textAlign = 'left';
+  ctx2.fillText('70', xMu + 8, axisY - 8);
+
+  // σ markers
+  const xL = scaleX(mu - sd), xR = scaleX(mu + sd);
+  ctx2.beginPath();
+  ctx2.strokeStyle = '#e11d48';
+  ctx2.lineWidth = 1.5;
+  ctx2.setLineDash([3, 4]);
+  ctx2.moveTo(xL, axisY);
+  ctx2.lineTo(xL, axisY - heightScale * Math.exp(-0.5 * 1) - 5);
+  ctx2.moveTo(xR, axisY);
+  ctx2.lineTo(xR, axisY - heightScale * Math.exp(-0.5 * 1) - 5);
+  ctx2.stroke();
+  ctx2.setLineDash([]);
+  ctx2.fillStyle = '#e11d48';
+  ctx2.font = '600 11px system-ui';
+  ctx2.textAlign = 'center';
+  ctx2.fillText('μ−σ', xL, axisY + 40);
+  ctx2.fillText('μ+σ', xR, axisY + 40);
+
+  // Title
+  ctx2.fillStyle = '#0f172a';
+  ctx2.font = '700 14px system-ui';
+  ctx2.textAlign = 'left';
+  ctx2.fillText('Normal distribution (μ = 70, σ = 8) — shaded area up to x', padL, 24);
+  ctx2.font = '600 11px system-ui';
+  ctx2.fillStyle = '#64748b';
+  ctx2.fillText('Move the x slider to shift the vertical green line.', padL, 42);
+
+  // colour legend
+  ctx2.fillStyle = 'rgba(5,150,105,0.22)';
+  ctx2.fillRect(W - 190, 28, 16, 12);
+  ctx2.fillStyle = '#334155';
+  ctx2.font = '600 11px system-ui';
+  ctx2.textAlign = 'left';
+  ctx2.fillText('Area = P(S ≤ x)', W - 168, 38);
+}
+
+/* ================= SLIDER BINDINGS ================= */
+const muSlider = document.getElementById('muSlider');
+const sdSlider = document.getElementById('sdSlider');
+const xSlider  = document.getElementById('xSlider');
+const showIdeal = document.getElementById('showIdeal');
+const showDist  = document.getElementById('showDist');
+
+muSlider.addEventListener('input', () => {
+  MU = +muSlider.value;
+  document.getElementById('muVal').textContent = MU;
+  document.getElementById('z1').textContent = ((46 - MU) / SD).toFixed(2);
+  document.getElementById('z3').textContent = ((86 - MU) / SD).toFixed(2);
+  drawCanvas1();
+});
+
+sdSlider.addEventListener('input', () => {
+  SD = +sdSlider.value;
+  document.getElementById('sdVal').textContent = SD;
+  document.getElementById('z1').textContent = ((46 - MU) / SD).toFixed(2);
+  document.getElementById('z3').textContent = ((86 - MU) / SD).toFixed(2);
+  drawCanvas1();
+});
+
+xSlider.addEventListener('input', () => {
+  XVAL = +xSlider.value;
+  document.getElementById('xVal').textContent = XVAL;
+  const z = (XVAL - 70) / 8;
+  document.getElementById('zOut').textContent = '(' + XVAL + ' − 70)/8 = ' + z.toFixed(2);
+  const mr = document.getElementById('matchRo');
+  if (Math.abs(z - 1) < 0.001) {
+    mr.textContent = '✓ Matched! z = 1';
+    mr.style.borderColor = '#059669';
+    mr.style.color = '#059669';
+  } else {
+    mr.textContent = 'Not 1 yet — keep adjusting x.';
+    mr.style.borderColor = '#e11d48';
+    mr.style.color = '#e11d48';
+  }
+  drawCanvas2();
+});
+
+showIdeal.addEventListener('change', drawCanvas1);
+showDist.addEventListener('change', drawCanvas2);
+
+/* ================= INIT ================= */
+drawCanvas1();
+drawCanvas2();
+
+// keep canvas crisp on resize
+window.addEventListener('resize', () => {
+  drawCanvas1();
+  drawCanvas2();
+});
+</script>
+</body>
+</html>

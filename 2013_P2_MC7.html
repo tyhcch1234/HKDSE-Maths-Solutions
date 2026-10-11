@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HKDSE Math 2013 Paper 2 Q7 — Axis of Symmetry</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root{
+    --blue:#1d4ed8; --blue-dark:#1e3a8a; --amber:#f59e0b; --amber-lt:#fef3c7;
+    --emerald:#059669; --emerald-lt:#d1fae5; --ink:#0f172a; --muted:#64748b;
+    --card:#ffffff; --line:#e2e8f0;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    background:#f1f5f9; color:var(--ink); line-height:1.55;
+  }
+  /* ---------- HERO ---------- */
+  .hero{
+    background:linear-gradient(125deg,#0f172a 0%,#1d4ed8 55%,#0ea5e9 100%);
+    color:#fff; padding:38px 20px 34px; position:relative; overflow:hidden;
+  }
+  .hero::after{
+    content:""; position:absolute; right:-70px; top:-70px; width:260px; height:260px;
+    border-radius:50%; background:radial-gradient(circle,rgba(255,255,255,.22),transparent 70%);
+  }
+  .hero-inner{max-width:960px;margin:0 auto;position:relative;z-index:1}
+  .eyebrow{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;opacity:.85;font-weight:600}
+  .hero h1{margin:.35em 0 .1em;font-size:clamp(1.5rem,4vw,2.35rem);font-weight:800;letter-spacing:-.02em}
+  .hero .sub{opacity:.94;font-size:1rem;margin:0 0 16px}
+  .pills{display:flex;flex-wrap:wrap;gap:8px}
+  .pill{
+    background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35);
+    padding:5px 13px; border-radius:999px; font-size:.78rem; font-weight:600; backdrop-filter:blur(4px);
+  }
+  /* ---------- LAYOUT ---------- */
+  main{max-width:960px;margin:-24px auto 0;padding:0 16px 60px}
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:18px;
+    padding:22px 22px 20px; margin-bottom:22px; box-shadow:0 6px 22px rgba(15,23,42,.07);
+  }
+  .card h2{
+    margin:0 0 14px; font-size:1.16rem; font-weight:800; color:var(--blue-dark);
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  }
+  .tagmark{
+    font-size:.7rem;font-weight:800;background:var(--amber-lt);color:#92400e;
+    border:1px solid #fcd34d;border-radius:8px;padding:2px 9px;letter-spacing:.04em;
+  }
+  .qtext{font-size:1.02rem}
+  .mcq{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:14px}
+  .mcq div{
+    border:1px solid var(--line);border-radius:12px;padding:9px 12px;background:#f8fafc;font-weight:600;
+  }
+  /* ---------- STEPS ---------- */
+  .step{
+    border-left:4px solid var(--blue); background:#f8fafc; border-radius:0 12px 12px 0;
+    padding:13px 15px; margin:12px 0; display:none; animation:fade .35s ease;
+  }
+  .step.show{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .step-head{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:6px}
+  .badge{
+    background:var(--blue);color:#fff;font-weight:700;font-size:.75rem;
+    border-radius:8px;padding:2px 9px;
+  }
+  .marks{background:var(--amber);color:#3b2400;font-weight:800;font-size:.72rem;border-radius:8px;padding:2px 8px}
+  .hint{
+    background:var(--amber-lt); border-left:4px solid var(--amber); border-radius:0 10px 10px 0;
+    padding:9px 13px; margin-top:10px; font-size:.92rem;
+  }
+  .hint b{color:#92400e}
+  .answer{
+    background:var(--emerald-lt); border-left:4px solid var(--emerald); border-radius:0 10px 10px 0;
+    padding:9px 13px; margin-top:10px; font-size:.95rem; font-weight:600;
+  }
+  .answer b{color:#065f46}
+  .btnrow{display:flex;align-items:center;gap:14px;margin-top:16px;flex-wrap:wrap}
+  button.next{
+    background:linear-gradient(135deg,#1d4ed8,#0ea5e9); color:#fff; border:none;
+    border-radius:11px; padding:10px 20px; font-size:.92rem; font-weight:700; cursor:pointer;
+    box-shadow:0 4px 14px rgba(29,78,216,.32); transition:.18s;
+  }
+  button.next:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 7px 18px rgba(29,78,216,.4)}
+  button.next:disabled{background:#cbd5e1;color:#64748b;box-shadow:none;cursor:not-allowed}
+  .counter{font-size:.84rem;color:var(--muted);font-weight:700}
+  /* ---------- CANVAS ---------- */
+  .canvas-wrap{
+    background:#fbfdff;border:1px solid var(--line);border-radius:14px;padding:10px;margin:6px 0 14px;
+  }
+  canvas{width:100%;height:auto;display:block;border-radius:10px;touch-action:none}
+  .controls{
+    display:flex;flex-wrap:wrap;gap:16px;align-items:center;margin:10px 4px 2px;font-size:.88rem;
+  }
+  .controls label{display:flex;align-items:center;gap:8px;font-weight:600;color:#334155}
+  input[type=range]{accent-color:var(--blue);width:150px}
+  .readouts{
+    display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;
+  }
+  .ro{
+    background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:7px 12px;
+    font-size:.85rem;font-weight:600;color:#1e3a8a;
+  }
+  .ro.green{background:#ecfdf5;border-color:#a7f3d0;color:#065f46}
+  .ro.amber{background:#fffbeb;border-color:#fde68a;color:#92400e}
+  /* ---------- SUMMARY ---------- */
+  .summary{background:#0f172a;color:#e2e8f0;border:none}
+  .summary h2{color:#fff}
+  .summary ul{margin:6px 0 0 4px;padding-left:20px}
+  .summary li{margin:7px 0;font-size:.98rem}
+  .summary .hl{color:#fcd34d;font-weight:700}
+  footer{text-align:center;color:var(--muted);font-size:.82rem;padding:8px 16px 40px}
+  @media (max-width:560px){
+    .card{padding:17px 14px}
+    input[type=range]{width:110px}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</div>
+    <h1>2013 Paper 2 · Question 7</h1>
+    <p class="sub">Quadratic graphs — finding the axis of symmetry from intercepts</p>
+    <div class="pills">
+      <span class="pill">Quadratic Function</span>
+      <span class="pill">y-intercept</span>
+      <span class="pill">x-intercept</span>
+      <span class="pill">Axis of Symmetry</span>
+      <span class="pill">Multiple Choice</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ============ QUESTION ============ -->
+  <section class="card">
+    <h2>Question <span class="tagmark">MCQ</span></h2>
+    <div class="qtext">
+      <p>The figure shows the graph of
+      \[ y = -2x^{2} + ax + b, \]
+      where \(a\) and \(b\) are constants. The graph cuts the negative \(y\)-axis at \(-10\) and cuts the positive \(x\)-axis at \(1\).</p>
+      <p>The equation of the <b>axis of symmetry</b> of the graph is</p>
+      <div class="mcq">
+        <div>A. \(x = 2\)</div>
+        <div>B. \(x = 3\)</div>
+        <div>C. \(x = 5\)</div>
+        <div>D. \(y = 8\)</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PART (a) ============ -->
+  <section class="card">
+    <h2>Part (a) — Find the constant \(b\) from the \(y\)-intercept <span class="tagmark">1M</span></h2>
+
+    <div class="canvas-wrap">
+      <canvas id="cvA" width="820" height="470"></canvas>
+    </div>
+    <div class="controls">
+      <label>Drag to change \(b\):
+        <input type="range" id="sliderB" min="-16" max="2" step="0.5" value="-10">
+        <span id="bVal" style="color:#1d4ed8;font-weight:800">-10</span>
+      </label>
+      <label><input type="checkbox" id="showYint" checked> Show \(y\)-intercept marker</label>
+    </div>
+    <div class="readouts">
+      <div class="ro amber" id="roA">\(y\)-intercept = \((0,\,-10)\) — the given condition</div>
+    </div>
+
+    <div class="step" data-step="a1">
+      <div class="step-head"><span class="badge">Step 1</span><span class="marks">1M</span></div>
+      <p>Put \(x = 0\) into \(y = -2x^{2} + ax + b\):</p>
+      \[ y = -2(0)^{2} + a(0) + b = b. \]
+      <p>So the \(y\)-intercept of the graph is \((0,\;b)\).</p>
+      <div class="hint"><b>Hint:</b> The constant term \(b\) of a quadratic \(y = cx^{2}+ax+b\) <i>is</i> the \(y\)-intercept value. No calculation is needed beyond reading the graph.</div>
+    </div>
+
+    <div class="step" data-step="a2">
+      <div class="step-head"><span class="badge">Step 2</span><span class="marks">1A</span></div>
+      <p>The figure shows the graph meets the negative \(y\)-axis at \(-10\), so</p>
+      \[ b = -10. \]
+      <div class="answer"><b>Answer (a):</b> \(\;b = -10\)</div>
+      <div class="hint"><b>Hint:</b> Always read intercepts directly from the graph — the \(y\)-intercept is where the curve crosses the vertical axis, i.e. at \(x=0\).</div>
+    </div>
+
+    <div class="btnrow">
+      <button class="next" data-target="a">Next step →</button>
+      <span class="counter" id="cnt-a">0 / 2</span>
+    </div>
+  </section>
+
+  <!-- ============ PART (b) ============ -->
+  <section class="card">
+    <h2>Part (b) — Find the constant \(a\) from the \(x\)-intercept <span class="tagmark">1M</span></h2>
+
+    <div class="canvas-wrap">
+      <canvas id="cvB" width="820" height="470"></canvas>
+    </div>
+    <div class="controls">
+      <label>Drag to change \(a\):
+        <input type="range" id="sliderA" min="0" max="24" step="0.5" value="6">
+        <span id="aVal" style="color:#1d4ed8;font-weight:800">6</span>
+      </label>
+      <label><input type="checkbox" id="showRoot" checked> Show the point \((1,0)\)</label>
+    </div>
+    <div class="readouts">
+      <div class="ro" id="roB1">At \(x=1\): \(\;y = -2 + a - 10 = a - 12\)</div>
+      <div class="ro green" id="roB2">Need \(y=0\) at \(x=1\) \(\Rightarrow a = 12\)</div>
+    </div>
+
+    <div class="step" data-step="b1">
+      <div class="step-head"><span class="badge">Step 1</span><span class="marks">1M</span></div>
+      <p>The figure shows one \(x\)-intercept of the graph is \(1\), i.e. the point \((1,\,0)\) lies on the curve. Substitute \(x=1\), \(y=0\) together with \(b=-10\):</p>
+      \[ 0 = -2(1)^{2} + a(1) - 10 \]
+      \[ 0 = -2 + a - 10. \]
+      <div class="hint"><b>Hint:</b> A point lying on the graph must satisfy the equation of the graph. " \(x\)-intercept is 1 " means \((1,0)\) is on the curve.</div>
+    </div>
+
+    <div class="step" data-step="b2">
+      <div class="step-head"><span class="badge">Step 2</span><span class="marks">1A</span></div>
+      <p>Simplify and solve for \(a\):</p>
+      \[ 0 = a - 12 \quad\Rightarrow\quad a = 12. \]
+      <div class="answer"><b>Answer (b):</b> \(\;a = 12\) &nbsp;so the graph is \(\;y = -2x^{2} + 12x - 10\)</div>
+      <div class="hint"><b>Hint:</b> After both constants are found, always write down the full equation — it makes the next part much easier.</div>
+    </div>
+
+    <div class="btnrow">
+      <button class="next" data-target="b">Next step →</button>
+      <span class="counter" id="cnt-b">0 / 2</span>
+    </div>
+  </section>
+
+  <!-- ============ PART (c) ============ -->
+  <section class="card">
+    <h2>Part (c) — Find the axis of symmetry <span class="tagmark">1A</span></h2>
+
+    <div class="canvas-wrap">
+      <canvas id="cvC" width="820" height="470"></canvas>
+    </div>
+    <div class="controls">
+      <label><input type="checkbox" id="showAxis" checked> Show axis of symmetry</label>
+      <label><input type="checkbox" id="showRoots" checked> Show both \(x\)-intercepts</label>
+      <label><input type="checkbox" id="showMid" checked> Show midpoint of roots</label>
+    </div>
+    <div class="readouts">
+      <div class="ro">Roots: \(x = 1\) and \(x = 5\)</div>
+      <div class="ro green">Axis of symmetry: \(x = \dfrac{1+5}{2} = 3\)</div>
+      <div class="ro amber">Vertex: \((3,\;8)\) — maximum point</div>
+    </div>
+
+    <div class="step" data-step="c1">
+      <div class="step-head"><span class="badge">Step 1</span><span class="marks">1M</span></div>
+      <p>For \(y = -2x^{2} + 12x - 10\), the axis of symmetry of a quadratic \(y = cx^{2} + ax + b\) is</p>
+      \[ x = -\frac{a}{2c} = -\frac{12}{2(-2)}. \]
+      <div class="hint"><b>Hint:</b> This is the standard formula — it also equals the \(x\)-coordinate of the vertex.</div>
+    </div>
+
+    <div class="step" data-step="c2">
+      <div class="step-head"><span class="badge">Step 2</span><span class="marks">1A</span></div>
+      <p>Evaluate:</p>
+      \[ x = -\frac{12}{-4} = 3. \]
+      <p><b>Alternative (midpoint of roots):</b> Solve \(-2x^{2}+12x-10=0\), i.e. \(x^{2}-6x+5=0\), giving \(x = 1\) or \(x = 5\). The axis of symmetry passes through the midpoint of the two \(x\)-intercepts:</p>
+      \[ x = \frac{1 + 5}{2} = 3. \]
+      <div class="answer"><b>Answer (c):</b> \(\;x = 3\) \(\Rightarrow\) <b>Option B</b></div>
+      <div class="hint"><b>Hint:</b> By symmetry the vertex always sits exactly halfway between the two \(x\)-intercepts — a handy shortcut in MC questions.</div>
+    </div>
+
+    <div class="btnrow">
+      <button class="next" data-target="c">Next step →</button>
+      <span class="counter" id="cnt-c">0 / 2</span>
+    </div>
+  </section>
+
+  <!-- ============ SUMMARY ============ -->
+  <section class="card summary">
+    <h2>Summary of Answers</h2>
+    <ul>
+      <li>\(y\)-intercept is \((0,\,-10)\) &nbsp;\(\Rightarrow\)&nbsp; <span class="hl">\(b = -10\)</span></li>
+      <li>\((1,\,0)\) lies on the curve &nbsp;\(\Rightarrow\)&nbsp; <span class="hl">\(a = 12\)</span></li>
+      <li>Full equation: <span class="hl">\(y = -2x^{2} + 12x - 10\)</span></li>
+      <li>Axis of symmetry: \(x = -\dfrac{a}{2c} = -\dfrac{12}{2(-2)} = \) <span class="hl">\(3\)</span></li>
+      <li>Correct option: <span class="hl">B. \(x = 3\)</span></li>
+    </ul>
+  </section>
+
+  <footer>HKDSE Mathematics (Compulsory Part) · 2013 Paper 2 Q7 — interactive solution</footer>
+</main>
+
+<script>
+/* =====================================================
+   STEP-BY-STEP REVEAL
+   ===================================================== */
+document.querySelectorAll('button.next').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    const key = btn.dataset.target;
+    const card = btn.closest('.card');
+    const steps = card.querySelectorAll('.step');
+    let shown = card.querySelectorAll('.step.show').length;
+    if(shown < steps.length){
+      steps[shown].classList.add('show');
+      shown++;
+      const counter = document.getElementById('cnt-'+key);
+      if(counter) counter.textContent = shown + ' / ' + steps.length;
+      if(shown === steps.length){
+        btn.disabled = true;
+        btn.textContent = 'All steps revealed ✓';
+      }
+      if(window.MathJax && MathJax.typesetPromise){ MathJax.typesetPromise(); }
+    }
+  });
+});
+
+/* =====================================================
+   CANVAS HELPERS
+   ===================================================== */
+function makePlot(canvas, opts){
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const xMin = opts.xMin, xMax = opts.xMax, yMin = opts.yMin, yMax = opts.yMax;
+  const padL = 54, padR = 26, padT = 24, padB = 42;
+  const plotW = W - padL - padR, plotH = H - padT - padB;
+
+  function X(x){ return padL + (x - xMin) / (xMax - xMin) * plotW; }
+  function Y(y){ return padT + (yMax - y) / (yMax - yMin) * plotH; }
+
+  function clear(){
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle = '#fbfdff';
+    ctx.fillRect(0,0,W,H);
+  }
+
+  function grid(){
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = '#e6eefb';
+    for(let x = Math.ceil(xMin); x <= xMax; x++){
+      ctx.beginPath(); ctx.moveTo(X(x), padT); ctx.lineTo(X(x), padT+plotH); ctx.stroke();
+    }
+    for(let y = Math.ceil(yMin); y <= yMax; y++){
+      ctx.beginPath(); ctx.moveTo(padL, Y(y)); ctx.lineTo(padL+plotW, Y(y)); ctx.stroke();
+    }
+    /* axes */
+    ctx.strokeStyle = '#334155'; ctx.lineWidth = 1.8;
+    ctx.beginPath(); ctx.moveTo(padL, Y(0)); ctx.lineTo(padL+plotW, Y(0)); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(X(0), padT); ctx.lineTo(X(0), padT+plotH); ctx.stroke();
+    /* arrows */
+    function arrow(x1,y1,x2,y2){
+      const a = Math.atan2(y2-y1, x2-x1);
+      ctx.beginPath(); ctx.moveTo(x2,y2);
+      ctx.lineTo(x2-9*Math.cos(a-0.4), y2-9*Math.sin(a-0.4));
+      ctx.lineTo(x2-9*Math.cos(a+0.4), y2-9*Math.sin(a+0.4));
+      ctx.closePath(); ctx.fillStyle='#334155'; ctx.fill();
+    }
+    arrow(padL, Y(0), padL+plotW, Y(0));
+    arrow(X(0), padT+plotH, X(0), padT);
+    /* labels */
+    ctx.fillStyle = '#334155'; ctx.font = 'italic 16px Georgia';
+    ctx.fillText('x', padL+plotW-6, Y(0)+20);
+    ctx.fillText('y', X(0)-20, padT+12);
+    ctx.fillText('O', X(0)-16, Y(0)+17);
+    /* ticks */
+    ctx.font = '13px Segoe UI';
+    ctx.fillStyle = '#475569';
+    for(let x = Math.ceil(xMin); x <= xMax; x++){
+      if(x === 0) continue;
+      ctx.fillText(x, X(x)-4, Y(0)+16);
+    }
+    for(let y = Math.ceil(yMin); y <= yMax; y++){
+      if(y === 0) continue;
+      ctx.fillText(y, X(0)-26, Y(y)+5);
+    }
+  }
+
+  function curve(f, color, lw){
+    ctx.strokeStyle = color; ctx.lineWidth = lw || 3;
+    ctx.beginPath();
+    let started = false;
+    for(let px = 0; px <= plotW; px++){
+      const x = xMin + px / plotW * (xMax - xMin);
+      const y = f(x);
+      const py = Y(y);
+      if(py < padT - 40 || py > padT + plotH + 40){ started = false; continue; }
+      if(!started){ ctx.moveTo(X(x), py); started = true; }
+      else ctx.lineTo(X(x), py);
+    }
+    ctx.stroke();
+  }
+
+  function dot(x, y, color, label, dx, dy){
+    ctx.beginPath();
+    ctx.arc(X(x), Y(y), 6, 0, Math.PI*2);
+    ctx.fillStyle = color; ctx.fill();
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+    if(label){
+      ctx.fillStyle = color; ctx.font = 'bold 14px Segoe UI';
+      ctx.fillText(label, X(x) + (dx||10), Y(y) + (dy||-10));
+    }
+  }
+
+  function vline(x, color, label, dash){
+    ctx.save();
+    ctx.setLineDash(dash || [7,6]);
+    ctx.strokeStyle = color; ctx.lineWidth = 2.2;
+    ctx.beginPath(); ctx.moveTo(X(x), padT+plotH); ctx.lineTo(X(x), padT); ctx.stroke();
+    ctx.restore();
+    if(label){
+      ctx.fillStyle = color; ctx.font = 'bold 14px Segoe UI';
+      ctx.fillText(label, X(x)+7, padT+16);
+    }
+  }
+
+  function hline(y, color, label){
+    ctx.save();
+    ctx.strokeStyle = color; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(padL, Y(y)); ctx.lineTo(padL+plotW, Y(y)); ctx.stroke();
+    ctx.restore();
+    if(label){
+      ctx.fillStyle = color; ctx.font = 'bold 13px Segoe UI';
+      ctx.fillText(label, padL+8, Y(y)-7);
+    }
+  }
+
+  return {ctx, X, Y, clear, grid, curve, dot, vline, hline, W, H, padL, padR, padT, padB, xMin, xMax, yMin, yMax};
+}
+
+/* =====================================================
+   DIAGRAM A  —  y-intercept  b
+   ===================================================== */
+(function(){
+  const cv = document.getElementById('cvA');
+  const slider = document.getElementById('sliderB');
+  const bVal = document.getElementById('bVal');
+  const showY = document.getElementById('showYint');
+  const ro = document.getElementById('roA');
+
+  function draw(){
+    const b = parseFloat(slider.value);
+    bVal.textContent = b.toFixed(1).replace(/\.0$/,'');
+    const P = makePlot(cv, {xMin:-4, xMax:10, yMin:-16, yMax:14});
+    P.clear(); P.grid();
+
+    const a = 12;          /* fixed after part (b) is known */
+    const f = x => -2*x*x + a*x + b;
+
+    /* the true graph (given) in light blue for reference */
+    if(Math.abs(b + 10) > 0.01){
+      P.ctx.save();
+      P.ctx.setLineDash([6,5]);
+      P.curve(x => -2*x*x + a*x - 10, '#93c5fd', 2);
+      P.ctx.restore();
+    }
+
+    P.curve(f, '#1d4ed8', 3.2);
+
+    if(showY.checked){
+      P.dot(0, b, '#f59e0b', '(0, ' + b.toFixed(1).replace(/\.0$/,'') + ')', -86, 4);
+      P.hline(b, '#f59e0b');
+    }
+
+    /* mark the target intercept */
+    P.dot(0, -10, '#059669', '(0, -10)  given', -118, 22);
+
+    /* title */
+    P.ctx.fillStyle = '#1e3a8a'; P.ctx.font = 'bold 15px Segoe UI';
+    P.ctx.fillText('y = -2x² + ax + b   (y-intercept = b)', 62, 20);
+
+    ro.innerHTML = (Math.abs(b+10) < 0.01)
+      ? '\\(y\\)-intercept = \\((0,\\,-10)\\) — matches the given condition ✔'
+      : 'Current \\(b\\) = ' + b.toFixed(1).replace(/\.0$/,'') + ' — slide to \\(-10\\) to match the graph';
+  }
+  slider.addEventListener('input', draw);
+  showY.addEventListener('change', draw);
+  draw();
+})();
+
+/* =====================================================
+   DIAGRAM B  —  x-intercept  1  determines  a
+   ===================================================== */
+(function(){
+  const cv = document.getElementById('cvB');
+  const slider = document.getElementById('sliderA');
+  const aVal = document.getElementById('aVal');
+  const showR = document.getElementById('showRoot');
+  const ro1 = document.getElementById('roB1');
+  const ro2 = document.getElementById('roB2');
+
+  function draw(){
+    const a = parseFloat(slider.value);
+    aVal.textContent = a.toFixed(1).replace(/\.0$/,'');
+    const P = makePlot(cv, {xMin:-4, xMax:10, yMin:-16, yMax:14});
+    P.clear(); P.grid();
+
+    const f = x => -2*x*x + a*x - 10;
+
+    /* reference: a = 12 */
+    if(Math.abs(a - 12) > 0.01){
+      P.ctx.save();
+      P.ctx.setLineDash([6,5]);
+      P.curve(x => -2*x*x + 12*x - 10, '#93c5fd', 2);
+      P.ctx.restore();
+    }
+
+    P.curve(f, '#1d4ed8', 3.2);
+
+    const yAt1 = -2 + a - 10;
+
+    if(showR.checked){
+      P.vline(1, '#059669', 'x = 1');
+      P.dot(1, 0, '#059669', '(1, 0)', 10, -12);
+    }
+
+    /* current curve point at x = 1 */
+    P.dot(1, yAt1, '#dc2626', '(1, ' + yAt1.toFixed(1).replace(/\.0$/,'') + ')', 12, 20);
+
+    P.ctx.fillStyle = '#1e3a8a'; P.ctx.font = 'bold 15px Segoe UI';
+    P.ctx.fillText('y = -2x² + ax - 10', 62, 20);
+
+    ro1.innerHTML = 'At \\(x=1\\): \\(y = -2 + a - 10 = ' + yAt1.toFixed(1).replace(/\.0$/,'') + '\\)';
+    ro2.innerHTML = (Math.abs(yAt1) < 0.01)
+      ? 'Passes through \\((1,0)\\) ✔  \\(a = 12\\)'
+      : 'Need \\(y=0\\) at \\(x=1\\) \\(\\Rightarrow a = 12\\)';
+  }
+  slider.addEventListener('input', draw);
+  showR.addEventListener('change', draw);
+  draw();
+})();
+
+/* =====================================================
+   DIAGRAM C  —  axis of symmetry
+   ===================================================== */
+(function(){
+  const cv = document.getElementById('cvC');
+  const cbAxis = document.getElementById('showAxis');
+  const cbRoots = document.getElementById('showRoots');
+  const cbMid = document.getElementById('showMid');
+
+  function draw(){
+    const P = makePlot(cv, {xMin:-3, xMax:9, yMin:-14, yMax:12});
+    P.clear(); P.grid();
+
+    const f = x => -2*x*x + 12*x - 10;
+
+    /* axis of symmetry */
+    if(cbAxis.checked){
+      P.vline(3, '#dc2626', 'axis: x = 3');
+    }
+
+    P.curve(f, '#1d4ed8', 3.4);
+
+    /* roots */
+    if(cbRoots.checked){
+      P.dot(1, 0, '#059669', '(1, 0)', 10, -14);
+      P.dot(5, 0, '#059669', '(5, 0)', 10, -14);
+      /* double arrow between roots */
+      P.ctx.strokeStyle = '#059669'; P.ctx.lineWidth = 1.6;
+      P.ctx.beginPath(); P.ctx.moveTo(P.X(1), P.Y(0)-24); P.ctx.lineTo(P.X(5), P.Y(0)-24); P.ctx.stroke();
+      P.ctx.fillStyle = '#059669'; P.ctx.font = 'bold 13px Segoe UI';
+      P.ctx.fillText('4 units', (P.X(1)+P.X(5))/2 - 26, P.Y(0)-30);
+    }
+
+    /* midpoint */
+    if(cbMid.checked){
+      P.dot(3, 0, '#7c3aed', '(3, 0)', 10, -12);
+      P.ctx.save();
+      P.ctx.setLineDash([3,4]);
+      P.ctx.strokeStyle = '#7c3aed'; P.ctx.lineWidth = 1.6;
+      P.ctx.beginPath(); P.ctx.moveTo(P.X(3), P.Y(0)); P.ctx.lineTo(P.X(3), P.Y(8)); P.ctx.stroke();
+      P.ctx.restore();
+    }
+
+    /* vertex */
+    P.dot(3, 8, '#f59e0b', 'vertex (3, 8)', 12, -10);
+
+    P.ctx.fillStyle = '#1e3a8a'; P.ctx.font = 'bold 15px Segoe UI';
+    P.ctx.fillText('y = -2x² + 12x - 10', 62, 20);
+    P.ctx.fillStyle = '#dc2626'; P.ctx.font = 'bold 13px Segoe UI';
+    P.ctx.fillText('x = -a/(2c) = -12/(-4) = 3', 62, 40);
+  }
+  cbAxis.addEventListener('change', draw);
+  cbRoots.addEventListener('change', draw);
+  cbMid.addEventListener('change', draw);
+  draw();
+})();
+</script>
+</body>
+</html>

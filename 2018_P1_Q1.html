@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HKDSE 2018 P1 Q1 · Interactive Solution</title>
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- MathJax for formula rendering -->
+  <script>
+    MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f8fafc;
+      color: #0f172a;
+      line-height: 1.5;
+      padding: 1.5rem 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 880px;
+      width: 100%;
+    }
+
+    /* Header / Question card */
+    .question-card {
+      background: white;
+      border-radius: 1.75rem;
+      box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.08);
+      padding: 1.75rem 1.5rem;
+      margin-bottom: 1.75rem;
+      border: 1px solid #e9eef3;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #d0e2ff;
+      color: #1e4e8b;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      padding: 0.25rem 0.9rem;
+      border-radius: 999px;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: #0b1e33;
+      margin-bottom: 0.5rem;
+    }
+
+    .topic-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin: 0.9rem 0 1.2rem;
+    }
+
+    .tag {
+      background: #eef6ff;
+      color: #1a5a9c;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.25rem 0.8rem;
+      border-radius: 999px;
+      border: 1px solid #cde0f5;
+    }
+
+    .question-text {
+      font-size: 1.1rem;
+      background: #f1f7fe;
+      padding: 1.25rem 1.5rem;
+      border-radius: 1.2rem;
+      border-left: 5px solid #2a6eb0;
+      margin: 1rem 0 0.5rem;
+      font-weight: 500;
+    }
+
+    .question-text .math {
+      background: #ffffffb3;
+      padding: 0.15rem 0.4rem;
+      border-radius: 8px;
+    }
+
+    .marks-badge {
+      background: #eff6ff;
+      color: #1f5b9e;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.2rem 0.8rem;
+      border-radius: 999px;
+      margin-left: 0.5rem;
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    /* Step cards */
+    .steps-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .step-card {
+      background: white;
+      border-radius: 1.5rem;
+      border: 1px solid #e2eaf2;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+      overflow: hidden;
+      transition: all 0.2s ease;
+    }
+
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.2rem 1.5rem;
+      cursor: pointer;
+      user-select: none;
+      background: white;
+    }
+
+    .step-number {
+      width: 2rem;
+      height: 2rem;
+      background: #d4e6ff;
+      color: #1e4e8b;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.95rem;
+      flex-shrink: 0;
+    }
+
+    .step-title {
+      font-weight: 600;
+      font-size: 1rem;
+      flex: 1;
+      color: #1d3b5a;
+    }
+
+    .step-chevron {
+      color: #8aa3bb;
+      font-size: 0.9rem;
+      transition: transform 0.25s;
+    }
+
+    .step-card.open .step-chevron {
+      transform: rotate(180deg);
+    }
+
+    .step-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease-out;
+      padding: 0 1.5rem;
+      background: #fafdff;
+      border-top: 1px solid transparent;
+    }
+
+    .step-card.open .step-content {
+      max-height: 800px;
+      padding: 1.2rem 1.5rem 1.5rem;
+      border-top-color: #e2eaf2;
+    }
+
+    .step-math {
+      font-size: 1.1rem;
+      margin: 0.5rem 0 0.8rem;
+      background: #ffffff;
+      padding: 0.8rem 1.2rem;
+      border-radius: 1rem;
+      border: 1px solid #deeaf6;
+      display: inline-block;
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    .hint-box {
+      background: #fefbe6;
+      border-left: 5px solid #f5b342;
+      padding: 0.9rem 1.2rem;
+      border-radius: 0.9rem;
+      margin: 1rem 0 0.5rem;
+      font-size: 0.9rem;
+      color: #3d3320;
+    }
+
+    .hint-box i {
+      color: #d98f1f;
+      margin-right: 0.4rem;
+    }
+
+    .highlight {
+      background: #e6f0ff;
+      font-weight: 600;
+      padding: 0.1rem 0.3rem;
+      border-radius: 6px;
+    }
+
+    /* Interactive slider card */
+    .interactive-card {
+      background: white;
+      border-radius: 1.75rem;
+      border: 1px solid #e2eaf2;
+      box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.06);
+      padding: 1.6rem 1.6rem 1.8rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .interactive-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+      color: #1b3c5e;
+    }
+
+    .slider-container {
+      margin: 1.2rem 0 0.8rem;
+    }
+
+    .slider-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #2d4b6c;
+      margin-bottom: 0.4rem;
+    }
+
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 8px;
+      background: #dfe9f3;
+      border-radius: 10px;
+      outline: none;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 24px;
+      height: 24px;
+      background: #1e6bc7;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(30, 107, 199, 0.3);
+      border: 2px solid white;
+    }
+
+    .value-display {
+      background: #eef5fd;
+      border-radius: 1rem;
+      padding: 0.8rem 1.2rem;
+      font-family: 'Inter', monospace;
+      font-size: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 1.5rem;
+      margin-top: 1rem;
+      border: 1px solid #d0e2f2;
+    }
+
+    .value-item {
+      display: flex;
+      align-items: baseline;
+      gap: 0.4rem;
+    }
+
+    .value-item .label {
+      font-weight: 600;
+      color: #1e4e7a;
+    }
+
+    .value-item .number {
+      font-weight: 700;
+      color: #0b2d4f;
+    }
+
+    .check-mark {
+      color: #0f8b4c;
+      margin-left: 0.5rem;
+      font-size: 1.1rem;
+    }
+
+    /* Footer / note */
+    .footer-note {
+      text-align: center;
+      font-size: 0.8rem;
+      color: #6b7f92;
+      margin-top: 1.5rem;
+      padding-top: 0.5rem;
+      border-top: 1px solid #dae5ef;
+    }
+
+    /* Responsive */
+    @media (max-width: 500px) {
+      h1 { font-size: 1.3rem; }
+      .question-text { font-size: 1rem; padding: 1rem; }
+      .step-header { padding: 1rem; }
+      .step-content { padding: 0 1rem; }
+      .step-card.open .step-content { padding: 1rem 1rem 1.2rem; }
+      .step-math { font-size: 1rem; padding: 0.6rem 0.8rem; }
+      .value-display { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <!-- Question header -->
+  <div class="question-card">
+    <span class="badge"><i class="fas fa-pencil-alt" style="margin-right: 6px;"></i>HKDSE 2018 · Paper 1 · Q1</span>
+    <h1>Make \(b\) the subject of the formula</h1>
+    <div class="topic-tags">
+      <span class="tag">Formula rearrangement</span>
+      <span class="tag">Algebraic manipulation</span>
+      <span class="tag">Subject of formula</span>
+      <span class="tag">Equation solving</span>
+    </div>
+
+    <div class="question-text">
+      <p style="margin-bottom: 8px;">
+        <i class="fas fa-question-circle" style="color: #2a6eb0; margin-right: 6px;"></i>
+        Make \(b\) the subject of the formula
+      </p>
+      <div style="font-size: 1.3rem; margin: 4px 0 0 0; overflow-x: auto;">
+        \[
+        \frac{a+4}{3} = \frac{b+1}{2} \quad \text{.}
+        \]
+      </div>
+      <span class="marks-badge">[3 marks]</span>
+    </div>
+  </div>
+
+  <!-- Step-by-step guide -->
+  <div class="steps-container" id="stepsContainer">
+    <!-- Step 1 -->
+    <div class="step-card open" data-step="1">
+      <div class="step-header" onclick="toggleStep(this)">
+        <span class="step-number">1</span>
+        <span class="step-title">Clear the fractions by cross‑multiplying</span>
+        <span class="step-chevron"><i class="fas fa-chevron-down"></i></span>
+      </div>
+      <div class="step-content">
+        <p>Multiply both sides by \(3 \times 2 = 6\) to eliminate the denominators.</p>
+        <div class="step-math">
+          \[
+          \frac{a+4}{3} \times 6 = \frac{b+1}{2} \times 6
+          \]
+        </div>
+        <div class="step-math">
+          \[
+          2(a+4) = 3(b+1)
+          \]
+        </div>
+        <div class="hint-box">
+          <i class="fas fa-lightbulb"></i> <strong>Hint:</strong> Cross‑multiplication: multiply the numerator of the left fraction by the denominator of the right, and vice versa. The equation becomes an equality of two products.
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step-card" data-step="2">
+      <div class="step-header" onclick="toggleStep(this)">
+        <span class="step-number">2</span>
+        <span class="step-title">Expand both sides</span>
+        <span class="step-chevron"><i class="fas fa-chevron-down"></i></span>
+      </div>
+      <div class="step-content">
+        <p>Remove the brackets by distributing.</p>
+        <div class="step-math">
+          \[
+          2a + 8 = 3b + 3
+          \]
+        </div>
+        <div class="hint-box">
+          <i class="fas fa-lightbulb"></i> <strong>Hint:</strong> Use the distributive law: \(2(a+4) = 2a + 8\) and \(3(b+1) = 3b + 3\).
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="step-card" data-step="3">
+      <div class="step-header" onclick="toggleStep(this)">
+        <span class="step-number">3</span>
+        <span class="step-title">Collect the \(b\)-terms on one side</span>
+        <span class="step-chevron"><i class="fas fa-chevron-down"></i></span>
+      </div>
+      <div class="step-content">
+        <p>Subtract \(3\) from both sides and then rearrange to isolate terms containing \(b\).</p>
+        <div class="step-math">
+          \[
+          2a + 8 - 3 = 3b
+          \]
+        </div>
+        <div class="step-math">
+          \[
+          2a + 5 = 3b
+          \]
+        </div>
+        <div class="hint-box">
+          <i class="fas fa-lightbulb"></i> <strong>Hint:</strong> We want \(b\) alone. Move all other terms away from \(b\). Here we simply move the constant and \(a\)-term to the left.
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="step-card" data-step="4">
+      <div class="step-header" onclick="toggleStep(this)">
+        <span class="step-number">4</span>
+        <span class="step-title">Divide by the coefficient of \(b\)</span>
+        <span class="step-chevron"><i class="fas fa-chevron-down"></i></span>
+      </div>
+      <div class="step-content">
+        <p>Divide both sides by \(3\) to make \(b\) the subject.</p>
+        <div class="step-math" style="background: #e8f2ff; border-color: #b8d4ff;">
+          \[
+          b = \frac{2a+5}{3}
+          \]
+        </div>
+        <div class="hint-box">
+          <i class="fas fa-check-circle" style="color: #0f8b4c;"></i> <strong>Final answer:</strong> \(b = \dfrac{2a+5}{3}\). This matches the standard answer.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive visual check -->
+  <div class="interactive-card">
+    <div class="interactive-title">
+      <i class="fas fa-sliders-h" style="color: #1e6bc7;"></i> 
+      Interactive check: change \(a\) and see \(b\)
+    </div>
+    <p style="font-size: 0.9rem; color: #3b5c7a; margin-bottom: 1rem;">
+      Drag the slider to choose a value of \(a\). The corresponding \(b\) is calculated using the rearranged formula. 
+      You can verify that the original equation holds.
+    </p>
+
+    <div class="slider-container">
+      <div class="slider-label">
+        <span><i class="fas fa-arrow-left"></i> \(a = \)</span>
+        <span id="aValueDisplay" style="font-weight: 700; color: #1e6bc7; font-size: 1.1rem;">2</span>
+        <span><i class="fas fa-arrow-right"></i></span>
+      </div>
+      <input type="range" id="aSlider" min="-5" max="10" value="2" step="0.5">
+    </div>
+
+    <div class="value-display">
+      <div class="value-item">
+        <span class="label">\(a =\)</span>
+        <span class="number" id="showA">2</span>
+      </div>
+      <div class="value-item">
+        <span class="label">\(b = \dfrac{2a+5}{3} =\)</span>
+        <span class="number" id="showB">3</span>
+      </div>
+      <div class="value-item" style="color: #0f8b4c;">
+        <i class="fas fa-check-circle"></i>
+        <span style="font-weight: 500; font-size: 0.9rem;">Check: LHS = RHS</span>
+      </div>
+    </div>
+    <div style="margin-top: 0.8rem; font-size: 0.85rem; color: #3e5e7e; background: #f3f9ff; padding: 0.6rem 1rem; border-radius: 12px;">
+      <i class="fas fa-calculator"></i> 
+      <span id="checkEquation">When \(a = 2\), LHS \(= \frac{2+4}{3} = 2\) and RHS \(= \frac{3+1}{2} = 2\). ✅</span>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    <i class="fas fa-graduation-cap"></i> HKDSE Mathematics · Step-by-step interactive solution
+  </div>
+</div>
+
+<script>
+  // Toggle step accordion
+  function toggleStep(header) {
+    const card = header.closest('.step-card');
+    card.classList.toggle('open');
+  }
+
+  // Slider & live calculation
+  const slider = document.getElementById('aSlider');
+  const aValueDisplay = document.getElementById('aValueDisplay');
+  const showA = document.getElementById('showA');
+  const showB = document.getElementById('showB');
+  const checkEquation = document.getElementById('checkEquation');
+
+  function updateFromSlider() {
+    const a = parseFloat(slider.value);
+    // b = (2a + 5) / 3
+    const b = (2 * a + 5) / 3;
+
+    // update display with 2 decimal places if needed, but keep clean
+    const aDisplay = (Math.abs(a - Math.round(a)) < 0.01) ? a.toFixed(0) : a.toFixed(1);
+    const bDisplay = (Math.abs(b - Math.round(b)) < 0.01) ? b.toFixed(0) : b.toFixed(2);
+
+    aValueDisplay.textContent = aDisplay;
+    showA.textContent = aDisplay;
+    showB.textContent = bDisplay;
+
+    // also update the check sentence
+    const lhsVal = (a + 4) / 3;
+    const rhsVal = (b + 1) / 2;
+    const lhsRounded = lhsVal.toFixed(2);
+    const rhsRounded = rhsVal.toFixed(2);
+    const isEqual = Math.abs(lhsVal - rhsVal) < 1e-9;
+
+    checkEquation.innerHTML = `When \(a = ${aDisplay}\), LHS \\(= \\frac{${aDisplay}+4}{3} = ${lhsRounded}\\) ` +
+                              `and RHS \\(= \\frac{${bDisplay}+1}{2} = ${rhsRounded}\\). ` +
+                              (isEqual ? '✅' : '⚠️');
+
+    // Re-render MathJax for the updated equation
+    if (window.MathJax && MathJax.typesetPromise) {
+      MathJax.typesetPromise([checkEquation]).catch((err) => console.warn(err));
+    }
+  }
+
+  slider.addEventListener('input', updateFromSlider);
+  // initial update
+  updateFromSlider();
+
+  // Open first step by default (already open in html, but safe)
+  document.addEventListener('DOMContentLoaded', () => {
+    // make sure mathjax processes the whole page
+    if (window.MathJax && MathJax.typesetPromise) {
+      MathJax.typesetPromise().catch((err) => console.warn(err));
+    }
+  });
+</script>
+</body>
+</html>

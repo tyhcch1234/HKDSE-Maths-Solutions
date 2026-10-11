@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE Math 2016 P2 Q16 — Geometry</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[','\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<style>
+  :root{
+    --blue:#1e3a8a;
+    --blue2:#2563eb;
+    --amber:#f59e0b;
+    --amber-bg:#fffbeb;
+    --emerald:#10b981;
+    --emerald-bg:#ecfdf5;
+    --ink:#0f172a;
+    --muted:#64748b;
+    --line:#e2e8f0;
+    --card:#ffffff;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+    color:var(--ink);
+    background:#f1f5f9;
+    line-height:1.55;
+  }
+  /* ---------- HERO ---------- */
+  .hero{
+    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 55%, #38bdf8 100%);
+    color:#fff;
+    padding:38px 20px 34px;
+    box-shadow: 0 10px 30px rgba(15,23,42,.25);
+  }
+  .hero-inner{max-width:980px;margin:0 auto;}
+  .eyebrow{
+    font-size:.8rem;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    opacity:.85;
+    margin-bottom:6px;
+    font-weight:600;
+  }
+  .hero h1{
+    font-size:clamp(1.6rem, 4vw, 2.4rem);
+    margin:4px 0 6px;
+    font-weight:800;
+    letter-spacing:-.5px;
+  }
+  .hero .sub{
+    font-size:clamp(.95rem, 2vw, 1.1rem);
+    opacity:.95;
+    margin-bottom:16px;
+  }
+  .pills{display:flex;flex-wrap:wrap;gap:8px;}
+  .pill{
+    background:rgba(255,255,255,.16);
+    border:1px solid rgba(255,255,255,.35);
+    padding:5px 13px;
+    border-radius:999px;
+    font-size:.78rem;
+    font-weight:600;
+    letter-spacing:.02em;
+    backdrop-filter: blur(4px);
+  }
+  /* ---------- LAYOUT ---------- */
+  .wrap{max-width:980px;margin:0 auto;padding:26px 16px 10px;}
+  .card{
+    background:var(--card);
+    border-radius:18px;
+    padding:22px 22px 20px;
+    margin-bottom:22px;
+    box-shadow:0 4px 18px rgba(15,23,42,.07);
+    border:1px solid var(--line);
+  }
+  .card h2{
+    font-size:1.18rem;
+    margin:0 0 12px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    color:var(--blue);
+  }
+  .card h2 .num{
+    background:var(--blue2);
+    color:#fff;
+    font-size:.8rem;
+    padding:4px 11px;
+    border-radius:999px;
+    font-weight:700;
+    white-space:nowrap;
+  }
+  .qtext{
+    font-size:1.02rem;
+    background:#f8fafc;
+    border-left:4px solid var(--blue2);
+    border-radius:8px;
+    padding:14px 16px;
+    margin:8px 0 4px;
+  }
+  .marks-tag{
+    display:inline-block;
+    background:#e0e7ff;
+    color:#3730a3;
+    font-size:.72rem;
+    font-weight:700;
+    padding:2px 9px;
+    border-radius:999px;
+    margin-left:6px;
+    vertical-align:middle;
+  }
+  .opt-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(180px,1fr));
+    gap:10px;
+    margin-top:14px;
+  }
+  .opt{
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:10px 14px;
+    font-size:.98rem;
+    background:#fbfcfe;
+    transition:.2s;
+  }
+  .opt.correct{
+    border-color:var(--emerald);
+    background:var(--emerald-bg);
+    box-shadow:0 0 0 2px rgba(16,185,129,.18);
+    font-weight:600;
+  }
+  .opt .letter{
+    font-weight:800;
+    color:var(--blue2);
+    margin-right:6px;
+  }
+  /* ---------- CANVAS ---------- */
+  .canvas-box{
+    margin:12px 0 6px;
+    background:#f8fafc;
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:12px;
+  }
+  canvas{
+    width:100%;
+    height:auto;
+    display:block;
+    border-radius:10px;
+    background:#ffffff;
+    cursor:crosshair;
+    touch-action:none;
+  }
+  .controls{
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px 24px;
+    align-items:center;
+    margin-top:10px;
+    font-size:.85rem;
+  }
+  .ctrl{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex:1 1 220px;
+    min-width:200px;
+  }
+  .ctrl label{white-space:nowrap;font-weight:600;color:#334155;font-size:.82rem;}
+  input[type=range]{
+    -webkit-appearance:none;
+    appearance:none;
+    height:6px;
+    border-radius:999px;
+    background:linear-gradient(90deg,#93c5fd,#2563eb);
+    outline:none;
+    flex:1;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width:18px;height:18px;border-radius:50%;
+    background:#fff;
+    border:3px solid var(--blue2);
+    box-shadow:0 1px 4px rgba(0,0,0,.25);
+    cursor:pointer;
+  }
+  input[type=range]::-moz-range-thumb{
+    width:16px;height:16px;border-radius:50%;
+    background:#fff;border:3px solid var(--blue2);
+    box-shadow:0 1px 4px rgba(0,0,0,.25);cursor:pointer;
+  }
+  .readouts{
+    display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;
+  }
+  .ro{
+    background:#eff6ff;
+    border:1px solid #bfdbfe;
+    border-radius:10px;
+    padding:7px 13px;
+    font-size:.82rem;
+    font-weight:600;
+    color:#1e40af;
+    font-variant-numeric: tabular-nums;
+  }
+  .ro.em{background:var(--emerald-bg);border-color:#a7f3d0;color:#047857;}
+  .ro.am{background:var(--amber-bg);border-color:#fde68a;color:#92400e;}
+  /* ---------- STEPS ---------- */
+  .step{
+    display:none;
+    border:1px solid var(--line);
+    border-left:4px solid var(--amber);
+    border-radius:10px;
+    padding:13px 15px 12px;
+    margin:12px 0;
+    background:#fff;
+    animation: fadeUp .35s ease;
+  }
+  .step.show{display:block;}
+  @keyframes fadeUp{
+    from{opacity:0;transform:translateY(8px);}
+    to{opacity:1;transform:translateY(0);}
+  }
+  .step-head{
+    display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;
+  }
+  .badge-num{
+    width:26px;height:26px;border-radius:50%;
+    background:var(--blue2);color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    font-size:.8rem;font-weight:800;flex-shrink:0;
+  }
+  .badge-mk{
+    background:var(--amber);color:#fff;
+    font-size:.7rem;font-weight:800;
+    padding:2px 9px;border-radius:999px;
+  }
+  .working{font-size:.98rem;margin:4px 0 8px;}
+  .hint{
+    background:var(--amber-bg);
+    border-left:3px solid var(--amber);
+    border-radius:7px;
+    padding:8px 12px;
+    font-size:.86rem;
+    color:#78350f;
+    margin:8px 0;
+  }
+  .hint b{color:#b45309;}
+  .answer{
+    background:var(--emerald-bg);
+    border-left:3px solid var(--emerald);
+    border-radius:7px;
+    padding:8px 12px;
+    font-size:.95rem;
+    color:#065f46;
+    font-weight:600;
+    margin-top:9px;
+  }
+  .step-controls{
+    display:flex;align-items:center;gap:14px;margin-top:14px;flex-wrap:wrap;
+  }
+  button.next{
+    background:linear-gradient(135deg,#2563eb,#1d4ed8);
+    color:#fff;
+    border:none;
+    border-radius:10px;
+    padding:9px 20px;
+    font-size:.9rem;
+    font-weight:700;
+    cursor:pointer;
+    box-shadow:0 3px 10px rgba(37,99,235,.35);
+    transition:.2s;
+  }
+  button.next:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 16px rgba(37,99,235,.42);}
+  button.next:disabled{
+    background:#cbd5e1;color:#64748b;cursor:not-allowed;box-shadow:none;
+  }
+  .counter{font-size:.82rem;color:var(--muted);font-weight:700;letter-spacing:.03em;}
+  /* ---------- SUMMARY ---------- */
+  .summary{
+    background:#0f172a;
+    color:#e2e8f0;
+    border:none;
+  }
+  .summary h2{color:#fff;}
+  .summary h2 .num{background:var(--amber);color:#1e293b;}
+  .summary ul{margin:8px 0 0;padding-left:20px;}
+  .summary li{margin:7px 0;font-size:.98rem;}
+  .summary .hl{color:#6ee7b7;font-weight:700;}
+  .summary .am{color:#fcd34d;font-weight:700;}
+  footer{
+    text-align:center;
+    padding:22px 16px 34px;
+    color:var(--muted);
+    font-size:.8rem;
+  }
+  .small{font-size:.82rem;color:var(--muted);}
+  @media(max-width:560px){
+    .card{padding:16px 14px;}
+    .hero{padding:28px 14px 26px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= HERO ================= -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</div>
+    <h1>2016 Paper 2 · Question 16</h1>
+    <div class="sub">Geometry on a straight line — collinear points &amp; segment lengths</div>
+    <div class="pills">
+      <span class="pill">Collinear Points</span>
+      <span class="pill">Segment Addition</span>
+      <span class="pill">Surds</span>
+      <span class="pill">Multiple Choice</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ================= QUESTION ================= -->
+  <section class="card">
+    <h2><span class="num">Question</span> The figure</h2>
+    <div class="qtext">
+      In the figure, \(ABCD\) is a straight line. If
+      \(AB = \sqrt{5}\), \(AD = \sqrt{45}\), \(BD = \sqrt{20}\) and \(CD = \sqrt{5}\),
+      then \(BC =\)
+    </div>
+    <div class="opt-grid">
+      <div class="opt"><span class="letter">A.</span> \(\sqrt{5}\)</div>
+      <div class="opt correct"><span class="letter">B.</span> \(\sqrt{20}\) &nbsp;<span style="color:#047857">✓</span></div>
+      <div class="opt"><span class="letter">C.</span> \(\sqrt{45}\)</div>
+      <div class="opt"><span class="letter">D.</span> \(\sqrt{80}\)</div>
+    </div>
+    <p class="small" style="margin-top:12px;">
+      Drag the sliders in the diagram below to see how the four lengths fit together on the same straight line.
+    </p>
+  </section>
+
+  <!-- ================= PART (a) ================= -->
+  <section class="card">
+    <h2><span class="num">Part (a)</span> Read the picture: which pieces touch which?</h2>
+    <p>
+      Points \(A, B, C, D\) all lie on one straight line. We must decide the correct order of the points.
+      Two given facts fix it:
+    </p>
+    <ul style="margin:6px 0 0 18px;padding:0;">
+      <li>\(BD = \sqrt{20}\) and \(AD = \sqrt{45}\) — so \(D\) is on the far side of \(B\) from \(A\).</li>
+      <li>\(CD = \sqrt{5}\) is small, so \(C\) sits close to \(D\).</li>
+    </ul>
+
+    <div class="canvas-box">
+      <canvas id="cvA" width="920" height="260"></canvas>
+      <div class="controls">
+        <div class="ctrl">
+          <label for="sA">Move point&nbsp;C&nbsp;(×√5)</label>
+          <input type="range" id="sA" min="1" max="8" step="1" value="2">
+        </div>
+      </div>
+      <div class="readouts">
+        <span class="ro">AB = √5 ≈ 2.236</span>
+        <span class="ro am">BD = √20 ≈ 4.472</span>
+        <span class="ro em">AD = √45 ≈ 6.708</span>
+        <span class="ro" id="roA">BC = 2√5 ≈ 4.472</span>
+      </div>
+    </div>
+
+    <!-- steps -->
+    <div class="step" id="a1">
+      <div class="step-head"><span class="badge-num">1</span><span class="badge-mk">1M</span></div>
+      <div class="working">Order the four collinear points using the two distances from \(A\):</div>
+      <div class="hint"><b>Hint:</b> A smaller distance from \(A\) means the point is nearer to \(A\).</div>
+      <div class="working">
+        \[ AD=\sqrt{45}\approx 6.71 > AB=\sqrt{5}\approx 2.24 \]
+        so \(B\) is between \(A\) and \(D\). Also \(BD=\sqrt{20}\) places \(B\) between \(A\) and \(D\).
+      </div>
+      <div class="answer">Order: \(A \;-\; B \;-\; C \;-\; D\)</div>
+    </div>
+
+    <div class="step" id="a2">
+      <div class="step-head"><span class="badge-num">2</span><span class="badge-mk">1A</span></div>
+      <div class="working">Check against the given \(CD = \sqrt{5}\):</div>
+      <div class="working">\[ CD = \sqrt{5} \quad \text{(small)} \;\Rightarrow\; C \text{ is between } B \text{ and } D. \]</div>
+      <div class="hint"><b>Hint:</b> \(BC = BD - CD\), not \(BD + CD\), because \(C\) lies between \(B\) and \(D\).</div>
+      <div class="answer">Confirmed order: \(A,\;B,\;C,\;D\) (with \(C\) between \(B\) and \(D\))</div>
+    </div>
+
+    <div class="step-controls">
+      <button class="next" data-target="a">Next step →</button>
+      <span class="counter" id="cnt-a">0 / 2</span>
+    </div>
+  </section>
+
+  <!-- ================= PART (b) ================= -->
+  <section class="card">
+    <h2><span class="num">Part (b)</span> Compute \(BC\) using the segment relation</h2>
+    <p>Because \(A - B - C - D\) lie in that order, the lengths satisfy:</p>
+    \[ BC = BD - CD \]
+    <p>The slider lets you verify numerically that only one value of \(BC\) makes \(AD = AB + BC + CD\).</p>
+
+    <div class="canvas-box">
+      <canvas id="cvB" width="920" height="300"></canvas>
+      <div class="controls">
+        <div class="ctrl">
+          <label for="sB">Guess \(BC = k\sqrt{5}\)</label>
+          <input type="range" id="sB" min="1" max="6" step="1" value="1">
+        </div>
+        <div class="ctrl">
+          <label><input type="checkbox" id="cbAlign" checked> Snap segment lengths to the line</label>
+        </div>
+      </div>
+      <div class="readouts">
+        <span class="ro">AB = √5 ≈ 2.236</span>
+        <span class="ro am">BD = √20 ≈ 4.472</span>
+        <span class="ro em">AD = √45 ≈ 6.708</span>
+        <span class="ro" id="roB"></span>
+      </div>
+    </div>
+
+    <div class="step" id="b1">
+      <div class="step-head"><span class="badge-num">1</span><span class="badge-mk">1M</span></div>
+      <div class="working">Use the straight-line relation \(BD = BC + CD\), so:</div>
+      \[ BC = BD - CD \]
+      <div class="hint"><b>Hint:</b> All four points are collinear, so lengths add and subtract along the same line.</div>
+    </div>
+
+    <div class="step" id="b2">
+      <div class="step-head"><span class="badge-num">2</span><span class="badge-mk">1A</span></div>
+      <div class="working">Substitute the surds and simplify:</div>
+      \[ BC = \sqrt{20} - \sqrt{5} \]
+      \[ \sqrt{20} = \sqrt{4 \times 5} = 2\sqrt{5} \]
+      \[ BC = 2\sqrt{5} - \sqrt{5} = \sqrt{5} \]
+      <div class="hint"><b>Hint:</b> Simplify \(\sqrt{20}\) to \(2\sqrt{5}\) first — then the subtraction is easy.</div>
+      <div class="answer">\[ BC = \sqrt{5} \]</div>
+    </div>
+
+    <div class="step-controls">
+      <button class="next" data-target="b">Next step →</button>
+      <span class="counter" id="cnt-b">0 / 2</span>
+    </div>
+  </section>
+
+  <!-- ================= PART (c): why not the other options ================= -->
+  <section class="card">
+    <h2><span class="num">Part (c)</span> Check the whole line: why only \(\sqrt{5}\) works</h2>
+    <p>
+      We can also verify by adding up the three small pieces from \(A\) to \(D\):
+      \[ AB + BC + CD = \sqrt{5} + \sqrt{5} + \sqrt{5} = 3\sqrt{5} = \sqrt{45} = AD \;\checkmark \]
+    </p>
+
+    <div class="canvas-box">
+      <canvas id="cvC" width="920" height="320"></canvas>
+      <div class="controls">
+        <div class="ctrl">
+          <label for="sC">Offset \(C\) position (drag effect)</label>
+          <input type="range" id="sC" min="-60" max="60" step="1" value="0">
+        </div>
+        <div class="ctrl">
+          <label><input type="checkbox" id="cbSum" checked> Show sum of pieces</label>
+        </div>
+      </div>
+      <div class="readouts">
+        <span class="ro" id="roC1"></span>
+        <span class="ro em" id="roC2"></span>
+      </div>
+    </div>
+
+    <div class="step" id="c1">
+      <div class="step-head"><span class="badge-num">1</span><span class="badge-mk">1M</span></div>
+      <div class="working">Option A is \(\sqrt{5}\), option B is \(\sqrt{20}\), option C is \(\sqrt{45}\), option D is \(\sqrt{80}=4\sqrt{5}\).</div>
+      <div class="working">We need \(BC\) such that \(AB + BC + CD = AD\), i.e. \(\sqrt{5} + BC + \sqrt{5} = \sqrt{45}\).</div>
+      <div class="hint"><b>Hint:</b> Try each option in the equation — only one makes it true.</div>
+    </div>
+
+    <div class="step" id="c2">
+      <div class="step-head"><span class="badge-num">2</span><span class="badge-mk">1A</span></div>
+      <div class="working">Solve for \(BC\):</div>
+      \[ BC = \sqrt{45} - 2\sqrt{5} = 3\sqrt{5} - 2\sqrt{5} = \sqrt{5} \]
+      <div class="answer">\(\sqrt{5} \approx 2.236 \;\Rightarrow\;\) Option A</div>
+    </div>
+
+    <div class="step-controls">
+      <button class="next" data-target="c">Next step →</button>
+      <span class="counter" id="cnt-c">0 / 2</span>
+    </div>
+  </section>
+
+  <!-- ================= SUMMARY ================= -->
+  <section class="card summary">
+    <h2><span class="num">Summary</span> Answers at a glance</h2>
+    <ul>
+      <li>Order of collinear points: <span class="am">\(A - B - C - D\)</span></li>
+      <li>Piece relation: <span class="am">\(BC = BD - CD\)</span></li>
+      <li>Simplification: \(\sqrt{20} = 2\sqrt{5}\), \(\sqrt{45} = 3\sqrt{5}\)</li>
+      <li>Key numeric check: \(\sqrt{5} + \sqrt{5} + \sqrt{5} = \sqrt{45} = AD\) ✓</li>
+      <li>Answer: <span class="hl">\(\boxed{BC = \sqrt{5}}\) — Option A</span></li>
+    </ul>
+  </section>
+
+</div>
+
+<footer>
+  HKDSE Mathematics (Compulsory Part) · Paper 2 · 2016 Q16 &nbsp;|&nbsp; Interactive solution with canvas diagrams
+</footer>
+
+<script>
+/* ============================================================
+   Shared drawing helpers
+   ============================================================ */
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+function chip(ctx,x,y,text,fill,stroke,txtColor){
+  ctx.font='bold 12px "Segoe UI",Arial,sans-serif';
+  const w=ctx.measureText(text).width+16;
+  ctx.fillStyle=fill; ctx.strokeStyle=stroke; ctx.lineWidth=1.2;
+  roundRect(ctx,x,y,w,22,7); ctx.fill(); ctx.stroke();
+  ctx.fillStyle=txtColor; ctx.textAlign='left'; ctx.textBaseline='middle';
+  ctx.fillText(text,x+8,y+11.5);
+  return w;
+}
+
+/* ============================================================
+   CANVAS A  —  where is each point?
+   Slider changes the number of √5 units for BC (visually).
+   ============================================================ */
+(function(){
+  const cv=document.getElementById('cvA');
+  const ctx=cv.getContext('2d');
+  const sA=document.getElementById('sA');
+  const roA=document.getElementById('roA');
+  const SQ5=Math.sqrt(5);
+
+  function draw(){
+    const W=cv.width,H=cv.height;
+    ctx.clearRect(0,0,W,H);
+
+    // background
+    ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,W,H);
+
+    // axes-ish baseline grid
+    ctx.strokeStyle='#eef2f7'; ctx.lineWidth=1;
+    for(let gx=40;gx<W-20;gx+=40){ctx.beginPath();ctx.moveTo(gx,20);ctx.lineTo(gx,H-20);ctx.stroke();}
+
+    // geometry (scaled)
+    const k=52;                 // pixels per √5 unit
+    const yLine=H*0.62;
+    const xA=70;
+    const ABU=1;                // √5
+    const BDU=2;                // 2√5
+    const BCU=parseInt(sA.value,10);
+    // true fixed lengths for reference, but display chosen BC
+    const xB=xA+ABU*k;
+    const xC=xB+BCU*k;
+    const xD=xB+BDU*k;
+
+    // main line
+    ctx.strokeStyle='#cbd5e1'; ctx.lineWidth=6; ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(xA-30,yLine); ctx.lineTo(xD+50,yLine); ctx.stroke();
+
+    // highlight AB, BC, CD as coloured bars slightly above the line
+    const barY=yLine-26;
+    function bar(x1,x2,color,label){
+      ctx.fillStyle=color;
+      roundRect(ctx,x1,barY,x2-x1,14,6); ctx.fill();
+      ctx.fillStyle='#fff';
+      ctx.font='bold 11px "Segoe UI",Arial,sans-serif';
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText(label,(x1+x2)/2,barY+7);
+    }
+    bar(xA,xB,'#6366f1','√5');
+    bar(xB,xC,'#2563eb', BCU+'√5');
+    bar(xC,xD,'#f59e0b','√5');
+
+    // points
+    const pts=[
+      {x:xA,lbl:'A',c:'#6366f1'},
+      {x:xB,lbl:'B',c:'#2563eb'},
+      {x:xC,lbl:'C',c:'#10b981'},
+      {x:xD,lbl:'D',c:'#f59e0b'}
+    ];
+    pts.forEach(p=>{
+      ctx.beginPath(); ctx.arc(p.x,yLine,8,0,Math.PI*2);
+      ctx.fillStyle=p.c; ctx.fill();
+      ctx.strokeStyle='#fff'; ctx.lineWidth=3; ctx.stroke();
+      ctx.fillStyle='#0f172a';
+      ctx.font='bold 15px "Segoe UI",Arial,sans-serif';
+      ctx.textAlign='center'; ctx.textBaseline='bottom';
+      ctx.fillText(p.lbl,p.x,yLine-14);
+    });
+
+    // distance labels under line
+    ctx.font='13px "Segoe UI",Arial,sans-serif';
+    ctx.fillStyle='#334155'; ctx.textBaseline='top';
+    ctx.fillText('√5 ≈ 2.24',(xA+xB)/2,yLine+14);
+    ctx.fillStyle='#1d4ed8';
+    ctx.fillText(BCU+'√5 ≈ '+(BCU*SQ5).toFixed(2),(xB+xC)/2,yLine+14);
+    ctx.fillStyle='#b45309';
+    ctx.fillText('√5 ≈ 2.24',(xC+xD)/2,yLine+14);
+
+    // brace for AD
+    const braceY=yLine+62;
+    ctx.strokeStyle='#64748b'; ctx.lineWidth=1.6;
+    ctx.beginPath();
+    ctx.moveTo(xA,braceY-8); ctx.lineTo(xA,braceY);
+    ctx.lineTo(xD,braceY); ctx.lineTo(xD,braceY-8);
+    ctx.stroke();
+    ctx.fillStyle='#0f172a'; ctx.font='bold 13px "Segoe UI",Arial,sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='bottom';
+    ctx.fillText('AD = √45 ≈ 6.71',(xA+xD)/2,braceY-2);
+
+    // BD bracket
+    const bdY=yLine+98;
+    ctx.strokeStyle='#f59e0b'; ctx.lineWidth=1.6;
+    ctx.beginPath();
+    ctx.moveTo(xB,bdY-8); ctx.lineTo(xB,bdY);
+    ctx.lineTo(xD,bdY); ctx.lineTo(xD,bdY-8);
+    ctx.stroke();
+    ctx.fillStyle='#b45309'; ctx.font='bold 13px "Segoe UI",Arial,sans-serif';
+    ctx.fillText('BD = √20 ≈ 4.47',(xB+xD)/2,bdY-2);
+
+    // top chips
+    chip(ctx,40,20,'AB = √5','#eef2ff','#c7d2fe','#3730a3');
+    chip(ctx,190,20,'BD = √20 = 2√5','#fffbeb','#fde68a','#92400e');
+    chip(ctx,400,20,'AD = √45 = 3√5','#ecfdf5','#a7f3d0','#047857');
+    chip(ctx,W-190,20,'BC changes with slider','#f1f5f9','#cbd5e1','#475569');
+
+    roA.textContent='BC = '+BCU+'√5 ≈ '+(BCU*SQ5).toFixed(3);
+  }
+  sA.addEventListener('input',draw);
+  draw();
+})();
+
+/* ============================================================
+   CANVAS B  —  guess BC, see if the line closes up
+   ============================================================ */
+(function(){
+  const cv=document.getElementById('cvB');
+  const ctx=cv.getContext('2d');
+  const sB=document.getElementById('sB');
+  const cbAlign=document.getElementById('cbAlign');
+  const roB=document.getElementById('roB');
+  const SQ5=Math.sqrt(5);
+
+  function draw(){
+    const W=cv.width,H=cv.height;
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,H);
+
+    // grid
+    ctx.strokeStyle='#f1f5f9'; ctx.lineWidth=1;
+    for(let x=30;x<W;x+=30){ctx.beginPath();ctx.moveTo(x,10);ctx.lineTo(x,H-10);ctx.stroke();}
+    for(let y=10;y<H;y+=30){ctx.beginPath();ctx.moveTo(10,y);ctx.lineTo(W-10,y);ctx.stroke();}
+
+    const k=50;
+    const yLine=H*0.58;
+    const xA=90;
+    const ABk=1;
+    const BDk=2;
+    const BCk=parseInt(sB.value,10);
+    const CDk=1;
+
+    const xB=xA+ABk*k;
+    const xC=xB+BCk*k;
+    const xDfixed=xB+BDk*k;   // required position of D
+
+    // required D marker (dashed)
+    ctx.setLineDash([6,6]);
+    ctx.strokeStyle='#94a3b8'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(xDfixed,yLine-45); ctx.lineTo(xDfixed,yLine+45); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='#94a3b8'; ctx.font='bold 11px "Segoe UI",Arial,sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='bottom';
+    ctx.fillText('required D position',xDfixed,yLine-52);
+
+    // line
+    ctx.strokeStyle='#e2e8f0'; ctx.lineWidth=6; ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(xA-30,yLine); ctx.lineTo(Math.max(xDfixed,xC+100)+60,yLine); ctx.stroke();
+
+    // segments
+    function seg(x1,x2,color,label,dy){
+      ctx.strokeStyle=color; ctx.lineWidth=8; ctx.lineCap='round';
+      ctx.beginPath(); ctx.moveTo(x1,yLine+dy); ctx.lineTo(x2,yLine+dy); ctx.stroke();
+      ctx.fillStyle=color;
+      ctx.font='bold 12px "Segoe UI",Arial,sans-serif';
+      ctx.textAlign='center'; ctx.textBaseline='bottom';
+      ctx.fillText(label,(x1+x2)/2,yLine+dy-9);
+    }
+    seg(xA,xB,'#6366f1','AB = √5',-26);
+    seg(xB,xC,'#2563eb','BC (guess)',-26);
+    seg(xC,xC+CDk*k,'#f59e0b','CD = √5',-26);
+
+    // points
+    function point(x,lbl,color){
+      ctx.beginPath(); ctx.arc(x,yLine,8,0,Math.PI*2);
+      ctx.fillStyle=color; ctx.fill();
+      ctx.strokeStyle='#fff'; ctx.lineWidth=3; ctx.stroke();
+      ctx.fillStyle='#0f172a';
+      ctx.font='bold 15px "Segoe UI",Arial,sans-serif';
+      ctx.textAlign='center'; ctx.textBaseline='top';
+      ctx.fillText(lbl,x,yLine+13);
+    }
+    point(xA,'A','#6366f1');
+    point(xB,'B','#2563eb');
+    point(xC,'C','#10b981');
+    point(xC+CDk*k,'D','#f59e0b');
+
+    // comparison bar
+    const trueBCk = BDk - CDk;  // = 1
+    const ok = (BCk===trueBCk);
+    const barY=H-52;
+    ctx.fillStyle='#f8fafc'; roundRect(ctx,40,barY,W-80,34,10); ctx.fill();
+    ctx.strokeStyle='#e2e8f0'; ctx.lineWidth=1; ctx.stroke();
+    ctx.fillStyle= ok ? '#047857' : '#b45309';
+    ctx.font='bold 14px "Segoe UI",Arial,sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    const msg = ok
+      ? '✓ BC = 2√5 − √5 = √5  — the chain A→B→C→D closes exactly at D'
+      : '✗ With BC = '+BCk+'√5, the chain does not reach the required D. Try another value.';
+    ctx.fillText(msg,W/2,barY+17);
+
+    roB.textContent='Guess: BC = '+BCk+'√5 ≈ '+(BCk*SQ5).toFixed(3)+
+      (ok?'  ✓ correct':' ✗');
+    roB.className='ro'+(ok?' em':' am');
+  }
+  sB.addEventListener('input',draw);
+  cbAlign.addEventListener('change',draw);
+  draw();
+})();
+
+/* ============================================================
+   CANVAS C  —  sum of pieces vs AD, with movable C
+   ============================================================ */
+(function(){
+  const cv=document.getElementById('cvC');
+  const ctx=cv.getContext('2d');
+  const sC=document.getElementById('sC');
+  const cbSum=document.getElementById('cbSum');
+  const roC1=document.getElementById('roC1');
+  const roC2=document.getElementById('roC2');
+  const SQ5=Math.sqrt(5);
+
+  function draw(){
+    const W=cv.width,H=cv.height;
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,H);
+
+    const k=48;
+    const yLine=H*0.42;
+    const xA=80;
+    const ABk=1, CDk=1, BCk=1;   // correct values
+    const offset=parseInt(sC.value,10); // visual nudge of C
+
+    const xB=xA+ABk*k;
+    const xCtrue=xB+BCk*k;
+    const xC=xCtrue+offset;
+    const xD=xB+(BCk+CDk)*k;     // fixed D at correct place (3√5 from A)
+
+    // fixed reference line
+    ctx.strokeStyle='#e2e8f0'; ctx.lineWidth=6; ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(xA-30,yLine); ctx.lineTo(xD+50,yLine); ctx.stroke();
+
+    // pieces
+    ctx.lineWidth=9;
+    ctx.strokeStyle='#6366f1';
+    ctx.beginPath(); ctx.moveTo(xA,yLine-24); ctx.lineTo(xB,yLine-24); ctx.stroke();
+    ctx.strokeStyle='#2563eb';
+    ctx.beginPath(); ctx.moveTo(xB,yLine-24); ctx.lineTo(xC,yLine-24); ctx.stroke();
+    ctx.strokeStyle='#f59e0b';
+    ctx.beginPath(); ctx.moveTo(xC,yLine-24); ctx.lineTo(xC+CDk*k,yLine-24); ctx.stroke();
+
+    // labels
+    ctx.font='bold 12px "Segoe UI",Arial,sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='bottom';
+    ctx.fillStyle='#6366f1'; ctx.fillText('√5',(xA+xB)/2,yLine-32);
+    ctx.fillStyle='#2563eb'; ctx.fillText('√5',(xB+xC)/2,yLine-32);
+    ctx.fillStyle='#f59e0b'; ctx.fillText('√5',(xC+xC+CDk*k)/2,yLine-32);
+
+    // points
+    function point(x,lbl,color){
+      ctx.beginPath(); ctx.arc(x,yLine,8,0,Math.PI*2);
+      ctx.fillStyle=color; ctx.fill();
+      ctx.strokeStyle='#fff'; ctx.lineWidth=3; ctx.stroke();
+      ctx.fillStyle='#0f172a';
+      ctx.font='bold 15px "Segoe UI",Arial,sans-serif';
+      ctx.textAlign='center'; ctx.textBaseline='top';
+      ctx.fillText(lbl,x,yLine+13);
+    }
+    point(xA,'A','#6366f1');
+    point(xB,'B','#2563eb');
+    point(xC,'C','#10b981');
+    point(xD,'D','#f59e0b');
+
+    // end of sum marker
+    const xEnd=xC+CDk*k;
+    ctx.setLineDash([6,5]);
+    ctx.strokeStyle= xEnd===xD ? '#10b981' : '#ef4444';
+    ctx.lineWidth=2.5;
+    ctx.beginPath(); ctx.moveTo(xEnd,yLine-60); ctx.lineTo(xEnd,yLine+40); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle= xEnd===xD ? '#047857' : '#b91c1c';
+    ctx.font='bold 12px "Segoe UI",Arial,sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='bottom';
+    ctx.fillText( (xEnd===xD?'sum ends at D ✓':'sum ends here'),xEnd,yLine-64);
+
+    // sum bar under
+    if(cbSum.checked){
+      const sumY=yLine+80;
+      ctx.fillStyle='#f8fafc'; roundRect(ctx,40,sumY,W-80,40,10); ctx.fill();
+      ctx.strokeStyle='#e2e8f0'; ctx.lineWidth=1; ctx.stroke();
+
+      const barX=60, barW=W-160;
+      const unit=barW/ (3*SQ5);
+      ctx.fillStyle='#6366f1';
+      roundRect(ctx,barX,sumY+10,SQ5*unit,20,5); ctx.fill();
+      ctx.fillStyle='#2563eb';
+      roundRect(ctx,barX+SQ5*unit,sumY+10,SQ5*unit,20,5); ctx.fill();
+      ctx.fillStyle='#f59e0b';
+      roundRect(ctx,barX+2*SQ5*unit,sumY+10,SQ5*unit,20,5); ctx.fill();
+
+      ctx.fillStyle='#0f172a';
+      ctx.font='bold 13px "Segoe UI",Arial,sans-serif';
+      ctx.textAlign='left'; ctx.textBaseline='middle';
+      ctx.fillText('AB+BC+CD = 3√5 = √45 = AD',barX+3*SQ5*unit+14,sumY+20);
+    }
+
+    // readouts
+    const isAligned = (xEnd===xD);
+    roC1.textContent='BC (displayed) = √5 ≈ 2.236';
+    roC2.textContent= isAligned
+      ? '✓ AB + BC + CD = √45 = AD — consistent'
+      : '✗ C moved away from its correct position';
+    roC2.className='ro '+(isAligned?'em':'am');
+  }
+  sC.addEventListener('input',draw);
+  cbSum.addEventListener('change',draw);
+  draw();
+})();
+
+/* ============================================================
+   Step-by-step reveal
+   ============================================================ */
+document.querySelectorAll('button.next').forEach(btn=>{
+  const target = btn.getAttribute('data-target');
+  const counter = document.getElementById('cnt-'+target);
+  let shown = 0;
+  const steps = Array.from(document.querySelectorAll('.step#'+target+'1, .step#'+target+'2, .step#'+target+'3'));
+  const total = steps.length;
+  counter.textContent = shown + ' / ' + total;
+
+  btn.addEventListener('click', ()=>{
+    if(shown < total){
+      steps[shown].classList.add('show');
+      shown++;
+      counter.textContent = shown + ' / ' + total;
+      if(shown === total){
+        btn.disabled = true;
+        btn.textContent = 'All steps revealed ✓';
+      }
+    }
+  });
+});
+
+/* Re-render MathJax after DOM ready (steps are hidden but harmless) */
+</script>
+</body>
+</html>

@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE Math 2018 P2 Q41 — Angle between a Line and a Plane</title>
+<script>
+  MathJax = {
+    tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  :root{
+    --blue:#2563eb;
+    --blue-d:#1e3a8a;
+    --amber:#f59e0b;
+    --amber-l:#fef3c7;
+    --emerald:#059669;
+    --emerald-l:#d1fae5;
+    --ink:#0f172a;
+    --muted:#64748b;
+    --card:#ffffff;
+    --bg:#eef2f7;
+    --line:#e2e8f0;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  /* ---------- Hero ---------- */
+  .hero{
+    background:linear-gradient(135deg,#1e3a8a 0%,#2563eb 45%,#0ea5e9 100%);
+    color:#fff;
+    padding:44px 22px 38px;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero::after{
+    content:"";
+    position:absolute;inset:0;
+    background:
+      radial-gradient(circle at 88% 12%, rgba(255,255,255,.16) 0, transparent 42%),
+      radial-gradient(circle at 6% 92%, rgba(245,158,11,.28) 0, transparent 46%);
+    pointer-events:none;
+  }
+  .hero-inner{max-width:960px;margin:0 auto;position:relative;z-index:2;}
+  .eyebrow{
+    font-size:.78rem;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    opacity:.85;
+    font-weight:600;
+  }
+  .hero h1{
+    margin:.32em 0 .18em;
+    font-size:clamp(1.5rem,4.4vw,2.3rem);
+    font-weight:800;
+    letter-spacing:-.02em;
+  }
+  .hero .sub{opacity:.92;font-size:1rem;margin:0;}
+  .pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px;}
+  .pill{
+    background:rgba(255,255,255,.18);
+    border:1px solid rgba(255,255,255,.35);
+    padding:5px 13px;
+    border-radius:999px;
+    font-size:.78rem;
+    font-weight:600;
+    backdrop-filter:blur(4px);
+  }
+  /* ---------- Layout ---------- */
+  main{max-width:960px;margin:0 auto;padding:26px 16px 60px;}
+  .card{
+    background:var(--card);
+    border-radius:18px;
+    padding:22px 22px 24px;
+    margin-bottom:24px;
+    box-shadow:0 6px 22px rgba(15,23,42,.07), 0 1px 3px rgba(15,23,42,.05);
+    border:1px solid rgba(226,232,240,.9);
+  }
+  .card h2{
+    margin:0 0 6px;
+    font-size:1.22rem;
+    color:var(--blue-d);
+    display:flex;align-items:center;gap:10px;
+    letter-spacing:-.01em;
+  }
+  .card h2 .num{
+    background:var(--blue);
+    color:#fff;
+    width:30px;height:30px;
+    min-width:30px;
+    border-radius:9px;
+    display:inline-flex;align-items:center;justify-content:center;
+    font-size:.9rem;
+    font-weight:800;
+  }
+  .qtext{
+    background:#f8fafc;
+    border-left:5px solid var(--blue);
+    border-radius:0 12px 12px 0;
+    padding:16px 18px;
+    margin-top:12px;
+  }
+  .qtext p{margin:.35em 0;}
+  .marks{
+    display:inline-block;
+    background:var(--amber-l);
+    color:#92400e;
+    border:1px solid #fcd34d;
+    font-size:.72rem;
+    font-weight:800;
+    padding:2px 8px;
+    border-radius:999px;
+    margin-left:6px;
+    vertical-align:middle;
+  }
+  .opts{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+    gap:10px;
+    margin-top:14px;
+  }
+  .opt{
+    border:2px solid var(--line);
+    border-radius:12px;
+    padding:10px 14px;
+    display:flex;align-items:center;gap:10px;
+    font-weight:600;
+    background:#fcfdff;
+    transition:.25s;
+  }
+  .opt .tag{
+    width:26px;height:26px;min-width:26px;
+    border-radius:50%;
+    background:#eff6ff;color:var(--blue);
+    display:inline-flex;align-items:center;justify-content:center;
+    font-size:.82rem;font-weight:800;
+  }
+  .opt.correct{
+    border-color:var(--emerald);
+    background:var(--emerald-l);
+    box-shadow:0 0 0 4px rgba(5,150,105,.12);
+  }
+  .opt.correct .tag{background:var(--emerald);color:#fff;}
+  /* ---------- Canvas ---------- */
+  .canvas-wrap{
+    background:#fbfdff;
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:12px;
+    margin:14px 0 6px;
+  }
+  canvas{
+    width:100%;
+    height:auto;
+    display:block;
+    border-radius:10px;
+    background:#ffffff;
+    touch-action:none;
+  }
+  .controls{
+    display:flex;flex-wrap:wrap;gap:14px 22px;
+    align-items:center;
+    margin-top:12px;
+    font-size:.86rem;
+    color:var(--muted);
+  }
+  .ctrl{display:flex;align-items:center;gap:9px;font-weight:600;color:#334155;}
+  input[type=range]{
+    -webkit-appearance:none;
+    width:150px;height:6px;
+    border-radius:999px;
+    background:linear-gradient(90deg,var(--blue),#38bdf8);
+    outline:none;
+    cursor:pointer;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width:18px;height:18px;border-radius:50%;
+    background:#fff;border:3px solid var(--blue);
+    box-shadow:0 1px 4px rgba(0,0,0,.25);
+    cursor:pointer;
+  }
+  input[type=range]::-moz-range-thumb{
+    width:16px;height:16px;border-radius:50%;
+    background:#fff;border:3px solid var(--blue);cursor:pointer;
+  }
+  input[type=checkbox]{
+    width:17px;height:17px;accent-color:var(--blue);cursor:pointer;
+  }
+  .readout{
+    display:inline-block;
+    background:#eff6ff;
+    color:#1e40af;
+    border:1px solid #bfdbfe;
+    border-radius:8px;
+    padding:3px 10px;
+    font-size:.82rem;
+    font-weight:700;
+    font-variant-numeric:tabular-nums;
+  }
+  .readout.green{background:var(--emerald-l);color:#065f46;border-color:#6ee7b7;}
+  .readout.amber{background:var(--amber-l);color:#92400e;border-color:#fcd34d;}
+  /* ---------- Steps ---------- */
+  .step{
+    display:none;
+    border:1px solid var(--line);
+    border-left:5px solid var(--blue);
+    border-radius:0 12px 12px 0;
+    padding:14px 16px;
+    margin-top:14px;
+    background:#fbfdff;
+    animation:fade .35s ease;
+  }
+  .step.show{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+  .step-head{
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+    margin-bottom:8px;
+  }
+  .badge-num{
+    background:var(--blue-d);color:#fff;
+    font-size:.74rem;font-weight:800;
+    padding:3px 11px;border-radius:999px;
+    letter-spacing:.03em;
+  }
+  .badge-mark{
+    background:var(--amber);color:#fff;
+    font-size:.72rem;font-weight:800;
+    padding:3px 9px;border-radius:999px;
+  }
+  .hint{
+    background:var(--amber-l);
+    border-left:4px solid var(--amber);
+    border-radius:0 10px 10px 0;
+    padding:9px 13px;
+    margin-top:10px;
+    font-size:.9rem;
+    color:#78350f;
+  }
+  .hint b{color:#92400e;}
+  .answer{
+    background:var(--emerald-l);
+    border-left:4px solid var(--emerald);
+    border-radius:0 10px 10px 0;
+    padding:10px 14px;
+    margin-top:10px;
+    font-size:.94rem;
+    color:#064e3b;
+    font-weight:600;
+  }
+  .answer .lbl{
+    font-size:.72rem;font-weight:800;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--emerald);
+    display:block;
+  }
+  .btnbar{
+    display:flex;align-items:center;gap:14px;margin-top:18px;flex-wrap:wrap;
+  }
+  button.next{
+    background:linear-gradient(135deg,var(--blue),#0ea5e9);
+    color:#fff;border:none;
+    padding:11px 22px;border-radius:11px;
+    font-size:.93rem;font-weight:700;
+    cursor:pointer;
+    box-shadow:0 4px 14px rgba(37,99,235,.32);
+    transition:.22s;
+  }
+  button.next:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 7px 20px rgba(37,99,235,.4);}
+  button.next:disabled{
+    background:#cbd5e1;color:#f1f5f9;
+    box-shadow:none;cursor:not-allowed;transform:none;
+  }
+  .counter{
+    font-size:.84rem;font-weight:700;color:var(--muted);
+    font-variant-numeric:tabular-nums;
+  }
+  /* ---------- Summary ---------- */
+  .summary{
+    background:linear-gradient(150deg,#0f172a,#1e293b);
+    color:#e2e8f0;
+    border-radius:18px;
+    padding:26px 26px 24px;
+    box-shadow:0 10px 30px rgba(15,23,42,.28);
+  }
+  .summary h2{color:#fff;font-size:1.2rem;margin:0 0 14px;}
+  .summary ul{list-style:none;padding:0;margin:0;}
+  .summary li{
+    padding:10px 0 10px 30px;
+    position:relative;
+    border-bottom:1px dashed rgba(148,163,184,.28);
+    font-size:.95rem;
+  }
+  .summary li:last-child{border-bottom:none;}
+  .summary li::before{
+    content:"";
+    position:absolute;left:6px;top:19px;
+    width:9px;height:9px;border-radius:50%;
+    background:var(--amber);
+    box-shadow:0 0 0 4px rgba(245,158,11,.18);
+  }
+  .summary .big{
+    margin-top:18px;
+    background:rgba(5,150,105,.18);
+    border:1px solid rgba(16,185,129,.45);
+    border-radius:12px;
+    padding:14px 18px;
+    text-align:center;
+    font-size:1.05rem;
+  }
+  footer{
+    text-align:center;
+    color:var(--muted);
+    font-size:.82rem;
+    padding:10px 16px 40px;
+  }
+  .note{
+    font-size:.85rem;color:var(--muted);
+    margin-top:8px;
+    font-style:italic;
+  }
+  .two-col{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+  }
+  @media(max-width:700px){
+    .two-col{grid-template-columns:1fr;}
+    .card{padding:18px 15px;}
+    .hero{padding:34px 16px 30px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</div>
+    <h1>2018 Paper 2 · Question 41</h1>
+    <p class="sub">Finding the cosine of the angle between a line and a plane in a rectangular block</p>
+    <div class="pills">
+      <span class="pill">3D Trigonometry</span>
+      <span class="pill">Angle between Line &amp; Plane</span>
+      <span class="pill">Projection</span>
+      <span class="pill">Pythagoras in 3D</span>
+      <span class="pill">Rectangular Block</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ============ QUESTION ============ -->
+  <section class="card">
+    <h2><span class="num">Q</span>Question</h2>
+    <div class="qtext">
+      <p>In the figure, \(ABCDEFGH\) is a rectangular block. Let \(X\) be a point lying on \(DE\) such that
+      \(DX = 9\text{ cm}\) and \(EX = 4\text{ cm}\). Denote the angle between \(BX\) and the plane \(ABGF\) by \(\theta\).
+      Find \(\cos\theta\).</p>
+      <p class="note">Given on the figure: \(AB = 12\text{ cm}\), \(BC = 8\text{ cm}\), \(DE = 13\text{ cm}\) (so \(DX + EX = 13\)).</p>
+    </div>
+    <div class="opts" id="opts">
+      <div class="opt" data-opt="A"><span class="tag">A</span> \(\dfrac{3}{5}\)</div>
+      <div class="opt" data-opt="B"><span class="tag">B</span> \(\dfrac{4}{5}\)</div>
+      <div class="opt" data-opt="C"><span class="tag">C</span> \(\dfrac{8}{17}\)</div>
+      <div class="opt" data-opt="D"><span class="tag">D</span> \(\dfrac{15}{17}\)</div>
+    </div>
+    <div class="note">Tap an option to check it — the correct one is revealed after the last step.</div>
+  </section>
+
+  <!-- ============ PART (a) ============ -->
+  <section class="card">
+    <h2><span class="num">1</span>Part (a) — Locate the foot of perpendicular \(Y\)</h2>
+    <p>To measure the angle between the line \(BX\) and the plane \(ABGF\), the standard method is:</p>
+    <p>\[ \text{angle between } BX \text{ and plane } ABGF \;=\; \angle XBY \]</p>
+    <p>where \(Y\) is the <b>foot of the perpendicular</b> from \(X\) to the plane \(ABGF\).</p>
+
+    <div class="canvas-wrap">
+      <canvas id="cv1" width="860" height="520"></canvas>
+      <div class="controls">
+        <div class="ctrl">
+          <label for="s1">\(DX\) (cm):</label>
+          <input type="range" id="s1" min="0" max="13" step="0.5" value="9">
+          <span class="readout" id="s1out">9.0</span>
+        </div>
+        <div class="ctrl">
+          <label for="c1a"><input type="checkbox" id="c1a" checked> Show plane shade</label>
+        </div>
+        <div class="ctrl">
+          <label for="c1b"><input type="checkbox" id="c1b" checked> Show \(XBY\) triangle</label>
+        </div>
+      </div>
+      <div class="controls">
+        <span class="readout" id="r1a">\(EX\) = 4.0 cm</span>
+        <span class="readout amber" id="r1b">\(XY\) = 12.0 cm</span>
+        <span class="readout amber" id="r1c">\(AY\) = 9.0 cm</span>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-top:6px;font-size:.85rem;color:#475569;">
+      <span><span style="display:inline-block;width:14px;height:4px;background:#2563eb;border-radius:2px;"></span> Block edges</span>
+      <span><span style="display:inline-block;width:14px;height:4px;background:#dc2626;border-radius:2px;"></span> Line \(BX\)</span>
+      <span><span style="display:inline-block;width:14px;height:4px;background:#059669;border-radius:2px;"></span> Projection \(BY\) &amp; perpendicular \(XY\)</span>
+      <span><span style="display:inline-block;width:14px;height:10px;background:rgba(14,165,233,.22);border:1px solid #0ea5e9;border-radius:2px;"></span> Plane \(ABGF\)</span>
+    </div>
+
+    <!-- steps -->
+    <div class="step" data-step>
+      <div class="step-head"><span class="badge-num">Step 1</span><span class="badge-mark">1M</span></div>
+      <p>Since \(ABCDEFGH\) is a rectangular block and \(X\) lies on \(DE\) which is perpendicular to the plane \(ABGF\)
+      (because \(DE \parallel AF\) and \(AF \perp\) plane \(ABGF\))...</p>
+      <p>\[\text{The foot of the perpendicular from } X \text{ to plane } ABGF \text{ is } Y.\]</p>
+      <p>Note that \(ADXY\) is a rectangle, so \(AY = DX\) and \(XY = AD\).</p>
+      <div class="hint"><b>Hint:</b> The "angle between a line and a plane" is <em>always</em> the angle between the line and its projection onto the plane. Dropping a perpendicular gives the projection.</div>
+    </div>
+
+    <div class="step" data-step>
+      <div class="step-head"><span class="badge-num">Step 2</span><span class="badge-mark">1A</span></div>
+      <p>So the required angle is</p>
+      <p>\[\theta = \angle XBY.\]</p>
+      <div class="answer"><span class="lbl">Result</span>
+      \(\theta = \angle XBY\), so \(\cos\theta = \cos\angle XBY = \dfrac{BY}{BX}\).</div>
+      <div class="hint"><b>Hint:</b> In the right-angled triangle \(XBY\), \(\cos\angle XBY = \dfrac{\text{adjacent}}{\text{hypotenuse}} = \dfrac{BY}{BX}\).</div>
+    </div>
+
+    <div class="btnbar">
+      <button class="next" data-next>Next step →</button>
+      <span class="counter">0 / 2</span>
+    </div>
+  </section>
+
+  <!-- ============ PART (b) ============ -->
+  <section class="card">
+    <h2><span class="num">2</span>Part (b) — Compute \(BY\) and \(BX\)</h2>
+    <p>Now we only need the lengths \(BY\) and \(BX\) inside the right triangle \(XBY\).</p>
+
+    <div class="canvas-wrap">
+      <canvas id="cv2" width="860" height="520"></canvas>
+      <div class="controls">
+        <div class="ctrl">
+          <label for="s2">\(DX = AY\) (cm):</label>
+          <input type="range" id="s2" min="0" max="13" step="0.5" value="9">
+          <span class="readout" id="s2out">9.0</span>
+        </div>
+        <div class="ctrl">
+          <label for="c2"><input type="checkbox" id="c2" checked> Show right-angle mark</label>
+        </div>
+      </div>
+      <div class="controls">
+        <span class="readout">\(AB\) = 12 cm</span>
+        <span class="readout green" id="r2a">\(BY\) = \(\sqrt{AB^2+AY^2}\) = 15.00 cm</span>
+      </div>
+      <div class="controls">
+        <span class="readout">\(DX\) = 9 cm</span>
+        <span class="readout">\(EX\) = 4 cm</span>
+        <span class="readout green" id="r2b">\(BX\) = \(\sqrt{BY^2+XY^2}\) = 17.00 cm</span>
+      </div>
+    </div>
+
+    <div class="step" data-step>
+      <div class="step-head"><span class="badge-num">Step 3</span><span class="badge-mark">1M</span></div>
+      <p>Since \(ADXY\) is a rectangle, \(AY = DX = 9\text{ cm}\) and \(XY = AD = BC = 8\text{ cm}\).</p>
+      <p>In the right-angled triangle \(ABY\) (right angle at \(A\)):</p>
+      <p>\[BY = \sqrt{AB^2 + AY^2} = \sqrt{12^2 + 9^2} = \sqrt{225} = 15\text{ cm}.\]</p>
+      <div class="hint"><b>Hint:</b> \(AB \perp AY\) because \(AB \perp\) plane \(ADEF\). The 9–12–15 triangle is a scaled 3–4–5 triangle!</div>
+    </div>
+
+    <div class="step" data-step>
+      <div class="step-head"><span class="badge-num">Step 4</span><span class="badge-mark">1M</span></div>
+      <p>In the right-angled triangle \(BXY\) (right angle at \(Y\)):</p>
+      <p>\[BX = \sqrt{BY^2 + XY^2} = \sqrt{15^2 + 8^2} = \sqrt{225 + 64} = \sqrt{289} = 17\text{ cm}.\]</p>
+      <div class="hint"><b>Hint:</b> \(XY \perp\) plane \(ABGF\), so \(XY \perp BY\). The triple 8–15–17 is another Pythagorean triangle.</div>
+    </div>
+
+    <div class="btnbar">
+      <button class="next" data-next>Next step →</button>
+      <span class="counter">0 / 2</span>
+    </div>
+  </section>
+
+  <!-- ============ PART (c) ============ -->
+  <section class="card">
+    <h2><span class="num">3</span>Part (c) — Evaluate \(\cos\theta\)</h2>
+    <p>Finally combine the two lengths to get the cosine.</p>
+
+    <div class="canvas-wrap">
+      <canvas id="cv3" width="860" height="500"></canvas>
+      <div class="controls">
+        <div class="ctrl">
+          <label for="s3">\(AY = DX\):</label>
+          <input type="range" id="s3" min="0" max="13" step="0.5" value="9">
+          <span class="readout" id="s3out">9.0</span>
+        </div>
+        <div class="ctrl">
+          <label for="c3"><input type="checkbox" id="c3" checked> Show angle \(\theta\) arc</label>
+        </div>
+      </div>
+      <div class="controls">
+        <span class="readout amber" id="r3a">\(\theta\) = 28.07°</span>
+        <span class="readout green" id="r3b">\(\cos\theta\) = 15 / 17 = 0.8824</span>
+      </div>
+    </div>
+
+    <div class="step" data-step>
+      <div class="step-head"><span class="badge-num">Step 5</span><span class="badge-mark">1A</span></div>
+      <p>In right triangle \(XBY\):</p>
+      <p>\[\cos\theta = \cos\angle XBY = \frac{\text{adjacent}}{\text{hypotenuse}} = \frac{BY}{BX} = \frac{15}{17}.\]</p>
+      <div class="answer"><span class="lbl">Answer</span>
+      \[\cos\theta = \frac{15}{17}\]</div>
+      <div class="hint"><b>Hint:</b> Compare with the options. \(\dfrac{15}{17}\) matches option <b>D</b>. (Option C, \(\tfrac{8}{17}\), is the common trap obtained by taking \(\tan\theta = \tfrac{8}{15}\).)</div>
+    </div>
+
+    <div class="btnbar">
+      <button class="next" data-next>Next step →</button>
+      <span class="counter">0 / 1</span>
+    </div>
+  </section>
+
+  <!-- ============ SUMMARY ============ -->
+  <section class="card summary">
+    <h2>Summary of Key Results</h2>
+    <ul>
+      <li>\(Y\) = foot of perpendicular from \(X\) to plane \(ABGF\).</li>
+      <li>The angle between \(BX\) and plane \(ABGF\) is \(\theta = \angle XBY\).</li>
+      <li>\(ADXY\) is a rectangle \(\Rightarrow AY = DX = 9\text{ cm}\), \(XY = AD = 8\text{ cm}\).</li>
+      <li>\(BY = \sqrt{AB^2+AY^2} = \sqrt{12^2+9^2} = 15\text{ cm}\).</li>
+      <li>\(BX = \sqrt{BY^2+XY^2} = \sqrt{15^2+8^2} = 17\text{ cm}\).</li>
+      <li>\(\cos\theta = \dfrac{BY}{BX} = \dfrac{15}{17}\).</li>
+    </ul>
+    <div class="big">
+      \[\boxed{\cos\theta = \frac{15}{17}}\]
+      <div style="font-size:.85rem;opacity:.85;margin-top:6px;">Correct option: D</div>
+    </div>
+  </section>
+
+  <footer>
+    HKDSE Mathematics (Compulsory Part) · Paper 2 · 2018 Question 41 · Interactive Solution
+  </footer>
+
+</main>
+
+<!-- ==================== JAVASCRIPT ==================== -->
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- Answer checker ---------- */
+  const ANSWER = "D";
+  document.querySelectorAll("#opts .opt").forEach(function(el){
+    el.addEventListener("click", function(){
+      document.querySelectorAll("#opts .opt").forEach(o=>o.classList.remove("correct"));
+      if(el.dataset.opt === ANSWER) el.classList.add("correct");
+      else{
+        el.style.borderColor = "#ef4444";
+        el.style.background = "#fee2e2";
+        setTimeout(()=>{el.style.borderColor="";el.style.background="";},900);
+      }
+    });
+  });
+
+  /* ---------- Step reveal ---------- */
+  document.querySelectorAll(".card").forEach(function(card){
+    const steps = card.querySelectorAll(".step");
+    const btn = card.querySelector("[data-next]");
+    const counter = card.querySelector(".counter");
+    if(!btn || steps.length === 0) return;
+    let idx = 0;
+    function render(){
+      for(let i=0;i<steps.length;i++){
+        steps[i].classList.toggle("show", i<idx);
+      }
+      counter.textContent = idx + " / " + steps.length;
+      if(idx >= steps.length){
+        btn.disabled = true;
+        btn.textContent = "All steps revealed \u2713";
+      } else {
+        btn.disabled = false;
+        btn.textContent = "Next step \u2192";
+      }
+      if(window.MathJax && MathJax.typesetPromise){
+        MathJax.typesetPromise([card]).catch(function(){});
+      }
+    }
+    btn.addEventListener("click", function(){ if(idx < steps.length){ idx++; render(); } });
+    render();
+  });
+
+  /* =========================================================
+     GEOMETRY HELPERS
+     Block: A(0,0,0) B(12,0,0) C(12,8,0) D(0,8,0)
+            E(0,0,13) F(12,0,13) G(12,8,13) H(0,8,13)
+     Plane ABGF is y = 0 (the front face).
+     X on DE: X = (0,8,9) when DX=9.
+     Y foot of perp: Y = (0,0,9).
+     ========================================================= */
+  const AB = 12, BC = 8, DE = 13;
+
+  /* Simple isometric projection of 3D point (x,y,z) */
+  function iso(x, y, z){
+    const s = 0.92;
+    const kx = 1, ky = 0.5;
+    const px = x * kx + y * 0.62;
+    const py = z * kx - y * ky;
+    return { x: px*s, y: py*s };
+  }
+
+  /* Map 3D point to screen with origin offset */
+  function makeView(canvas, originX, originY, scale){
+    return function(x,y,z){
+      const p = iso(x,y,z);
+      return { x: originX + p.x*scale, y: originY + p.y*scale };
+    };
+  }
+
+  function dot(ctx,p,c,r){
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,r||5,0,Math.PI*2);
+    ctx.fillStyle=c; ctx.fill();
+    ctx.strokeStyle="#fff"; ctx.lineWidth=2; ctx.stroke();
+  }
+  function label(ctx,p,txt,c,dx,dy,size){
+    ctx.font = "bold "+(size||14)+"px ui-sans-serif,system-ui,sans-serif";
+    ctx.fillStyle = c;
+    ctx.textAlign="left";
+    ctx.textBaseline="middle";
+    ctx.fillText(txt, p.x+(dx||8), p.y+(dy||-8));
+  }
+  function seg(ctx,a,b,c,w,dash){
+    ctx.save();
+    ctx.beginPath();
+    ctx.setLineDash(dash||[]);
+    ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y);
+    ctx.strokeStyle=c; ctx.lineWidth=w||2; ctx.stroke();
+    ctx.restore();
+  }
+
+  /* ---------- Draw block with hidden edges ---------- */
+  function drawBlock(ctx,V,opts){
+    const A=V(0,0,0), B=V(12,0,0), C=V(12,8,0), D=V(0,8,0);
+    const E=V(0,0,13), F=V(12,0,13), G=V(12,8,13), H=V(0,8,13);
+
+    // plane ABGF shading (front face y=0)
+    if(opts.shadePlane){
+      ctx.beginPath();
+      ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,B.y);
+      ctx.lineTo(F.x,F.y); ctx.lineTo(E.x,E.y);
+      ctx.closePath();
+      ctx.fillStyle = "rgba(14,165,233,0.16)";
+      ctx.fill();
+      ctx.strokeStyle="rgba(14,165,233,0.7)";
+      ctx.setLineDash([]);
+      ctx.lineWidth=1.5; ctx.stroke();
+    }
+
+    // hidden edges (dashed): D-C, D-A? A visible. D-H hidden, D-C hidden, D-A visible, C-G hidden
+    seg(ctx, D, C, "#94a3b8", 1.8, [6,6]);
+    seg(ctx, D, H, "#94a3b8", 1.8, [6,6]);
+    seg(ctx, C, G, "#94a3b8", 1.8, [6,6]);
+
+    // visible outer edges
+    const edges = [
+      [A,B],[B,C],[C,D],[D,A],           // bottom
+      [E,F],[F,G],[G,H],[H,E],           // top
+      [A,E],[B,F],[C,G]                  // verticals (D-H hidden drawn)
+    ];
+    edges.forEach(function(e){
+      seg(ctx, V(...e[0].__v||[]), V(...e[1].__v||[]), "#1e40af", 2.4);
+    });
+  }
+
+  /* Cleaner: draw block from coordinate arrays directly */
+  function blockEdges(){
+    return {
+      A:[0,0,0], B:[12,0,0], C:[12,8,0], D:[0,8,0],
+      E:[0,0,13], F:[12,0,13], G:[12,8,13], H:[0,8,13]
+    };
+  }
+
+  function drawBox(ctx, V, shadePlane){
+    const P = blockEdges();
+    const p = {};
+    for(const k in P) p[k] = V(P[k][0],P[k][1],P[k][2]);
+
+    if(shadePlane){
+      ctx.beginPath();
+      ctx.moveTo(p.A.x,p.A.y); ctx.lineTo(p.B.x,p.B.y);
+      ctx.lineTo(p.F.x,p.F.y); ctx.lineTo(p.E.x,p.E.y);
+      ctx.closePath();
+      ctx.fillStyle = "rgba(14,165,233,0.15)";
+      ctx.fill();
+    }
+
+    // hidden edges
+    seg(ctx,p.D,p.C,"#a3b1c6",1.8,[7,6]);
+    seg(ctx,p.D,p.H,"#a3b1c6",1.8,[7,6]);
+    seg(ctx,p.C,p.G,"#a3b1c6",1.8,[7,6]);
+
+    // visible edges
+    const vis=[["A","B"],["B","C"],["C","D"],["D","A"],
+               ["E","F"],["F","G"],["G","H"],["H","E"],
+               ["A","E"],["B","F"],["C","G"]];
+    vis.forEach(function(e){ seg(ctx,p[e[0]],p[e[1]],"#1e40af",2.6); });
+
+    return p;
+  }
+
+  /* =========================================================
+     CANVAS 1 : locating Y, showing angle XBY
+     ========================================================= */
+  const cv1 = document.getElementById("cv1");
+  const ctx1 = cv1.getContext("2d");
+  const s1 = document.getElementById("s1");
+  const s1out = document.getElementById("s1out");
+  const c1a = document.getElementById("c1a");
+  const c1b = document.getElementById("c1b");
+  const r1a = document.getElementById("r1a");
+  const r1b = document.getElementById("r1b");
+  const r1c = document.getElementById("r1c");
+
+  function draw1(){
+    const W = cv1.width, H = cv1.height;
+    ctx1.clearRect(0,0,W,H);
+    // background subtle grid
+    ctx1.save();
+    ctx1.strokeStyle="#eef3f9"; ctx1.lineWidth=1;
+    for(let gx=0;gx<W;gx+=34){ctx1.beginPath();ctx1.moveTo(gx,0);ctx1.lineTo(gx,H);ctx1.stroke();}
+    for(let gy=0;gy<H;gy+=34){ctx1.beginPath();ctx1.moveTo(0,gy);ctx1.lineTo(W,gy);ctx1.stroke();}
+    ctx1.restore();
+
+    const V = makeView(cv1, 175, 405, 1.0);
+    const p = drawBox(ctx1, V, c1a.checked);
+
+    const dx = parseFloat(s1.value);
+    const ex = DE - dx; // 13 - dx
+    s1out.textContent = dx.toFixed(1);
+
+    // X on DE
+    const X = V(0, 8, dx);
+    const Y = V(0, 0, dx);
+
+    // XY perpendicular segment
+    seg(ctx1, X, Y, "#059669", 2.6, [7,5]);
+
+    // right angle mark at Y (between YX vertical and YB)
+    if(c1b.checked){
+      const sz = 13;
+      ctx1.save();
+      ctx1.strokeStyle="#059669"; ctx1.lineWidth=2;
+      ctx1.beginPath();
+      ctx1.moveTo(Y.x+sz, Y.y - 2);
+      ctx1.lineTo(Y.x+sz, Y.y - sz);
+      ctx1.lineTo(Y.x+2, Y.y - sz);
+      ctx1.stroke();
+      ctx1.restore();
+    }
+
+    // line BX (red)
+    seg(ctx1, p.B, X, "#dc2626", 3.2, []);
+    // projection BY (green)
+    seg(ctx1, p.B, Y, "#059669", 3, []);
+    // AY along bottom front
+    seg(ctx1, p.A, Y, "#f59e0b", 2.6, [4,4]);
+
+    // angle arc at B between BY and BX
+    if(c1b.checked){
+      const a1 = Math.atan2(Y.y-p.B.y, Y.x-p.B.x);
+      const a2 = Math.atan2(X.y-p.B.y, X.x-p.B.x);
+      ctx1.save();
+      ctx1.beginPath();
+      ctx1.arc(p.B.x, p.B.y, 40, Math.min(a1,a2), Math.max(a1,a2));
+      ctx1.strokeStyle="#dc2626"; ctx1.lineWidth=2.4; ctx1.stroke();
+      ctx1.restore();
+      // theta label
+      const mid = (a1+a2)/2;
+      label(ctx1, {x:p.B.x+Math.cos(mid)*58, y:p.B.y+Math.sin(mid)*58}, "\u03B8", "#dc2626", 0,0,18);
+    }
+
+    // points
+    const pts = [
+      [p.A,"A","#1e3a8a",-24,14], [p.B,"B","#1e3a8a",10,14],
+      [p.C,"C","#1e3a8a",10,10],  [p.D,"D","#1e3a8a",-24,10],
+      [p.E,"E","#1e3a8a",-24,-8], [p.F,"F","#1e3a8a",10,-8],
+      [p.G,"G","#1e3a8a",10,6],   [p.H,"H","#1e3a8a",-22,6]
+    ];
+    pts.forEach(function(q){ dot(ctx1,q[0],q[2],5); label(ctx1,q[0],q[1],q[2],q[3],q[4],14); });
+
+    dot(ctx1, X, "#dc2626", 6.5);
+    label(ctx1, X, "X", "#dc2626", 12, -12, 15);
+    dot(ctx1, Y, "#059669", 6);
+    label(ctx1, Y, "Y", "#059669", 12, 14, 15);
+
+    // side length labels
+    label(ctx1, {x:(p.A.x+p.B.x)/2, y:(p.A.y+p.B.y)/2}, "12 cm", "#1e3a8a", -22, 24, 13);
+    ctx1.save();
+    ctx1.font="bold 12px ui-sans-serif"; ctx1.fillStyle="#2563eb";
+    ctx1.save(); ctx1.translate((p.B.x+p.C.x)/2+16,(p.B.y+p.C.y)/2);
+    ctx1.rotate(-0.42); ctx1.fillText("8 cm", -14, 0); ctx1.restore();
+    ctx1.restore();
+    // DX / EX labels
+    label(ctx1, {x:(p.D.x+X.x)/2-40, y:(p.D.y+X.y)/2}, "DX="+dx.toFixed(1)+"cm", "#dc2626", -6, 0, 12);
+    label(ctx1, {x:(X.x+p.E.x)/2-40, y:(X.y+p.E.y)/2-4}, "EX="+ex.toFixed(1)+"cm", "#7c3aed", -6, 0, 12);
+
+    // title
+    ctx1.save();
+    ctx1.font="bold 15px ui-sans-serif"; ctx1.fillStyle="#1e3a8a";
+    ctx1.fillText("Plane ABGF (front face) \u2014 projection of X is Y", 24, 30);
+    ctx1.restore();
+
+    // readouts
+    r1a.textContent = "EX = " + ex.toFixed(1) + " cm";
+    r1b.textContent = "XY = 8.0 cm";
+    r1c.textContent = "AY = " + dx.toFixed(1) + " cm";
+  }
+
+  /* =========================================================
+     CANVAS 2 : the right triangle XBY (2D)
+     ========================================================= */
+  const cv2 = document.getElementById("cv2");
+  const ctx2 = cv2.getContext("2d");
+  const s2 = document.getElementById("s2");
+  const s2out = document.getElementById("s2out");
+  const c2 = document.getElementById("c2");
+  const r2a = document.getElementById("r2a");
+  const r2b = document.getElementById("r2b");
+
+  function draw2(){
+    const W = cv2.width, H = cv2.height;
+    ctx2.clearRect(0,0,W,H);
+    ctx2.fillStyle="#ffffff"; ctx2.fillRect(0,0,W,H);
+
+    const AY = parseFloat(s2.value);
+    s2out.textContent = AY.toFixed(1);
+
+    // Triangle ABY in plane y=0
+    const ABx = 12, AYy = AY, XY = 8;
+    const BY = Math.sqrt(ABx*ABx + AYy*AYy);
+    const BX = Math.sqrt(BY*BY + XY*XY);
+
+    // --- left panel: triangle ABY ---
+    const originA = {x:70, y:H-70};
+    const scale1 = 300/Math.max(12, Math.max(AY,12));
+    const By = {x: originA.x + ABx*scale1, y: originA.y};
+    const Ay = {x: originA.x, y: originA.y - AYy*scale1};
+
+    // triangle
+    ctx2.beginPath();
+    ctx2.moveTo(originA.x, originA.y);
+    ctx2.lineTo(By.x, By.y);
+    ctx2.lineTo(Ay.x, Ay.y);
+    ctx2.closePath();
+    ctx2.fillStyle="rgba(37,99,235,0.10)"; ctx2.fill();
+    ctx2.strokeStyle="#2563eb"; ctx2.lineWidth=2.6; ctx2.stroke();
+
+    // right angle at A
+    const ra=13;
+    ctx2.beginPath();
+    ctx2.moveTo(originA.x+ra, originA.y);
+    ctx2.lineTo(originA.x+ra, originA.y-ra);
+    ctx2.lineTo(originA.x, originA.y-ra);
+    ctx2.strokeStyle="#2563eb"; ctx2.lineWidth=2; ctx2.stroke();
+
+    ctx2.font="bold 14px ui-sans-serif";
+    ctx2.fillStyle="#1e3a8a";
+    ctx2.beginPath(); ctx2.arc(originA.x,originA.y,5,0,7); ctx2.fill();
+    ctx2.beginPath(); ctx2.arc(By.x,By.y,5,0,7); ctx2.fill();
+    ctx2.beginPath(); ctx2.arc(Ay.x,Ay.y,5,0,7); ctx2.fill();
+    ctx2.fillText("A", originA.x-18, originA.y+6);
+    ctx2.fillText("B", By.x+8, By.y+6);
+    ctx2.fillText("Y", Ay.x-6, Ay.y-10);
+
+    ctx2.fillStyle="#059669"; ctx2.font="bold 13px ui-sans-serif";
+    ctx2.fillText("AY = "+AY.toFixed(1)+" cm", Ay.x+8, (Ay.y+originA.y)/2);
+    ctx2.fillText("AB = 12 cm", (originA.x+By.x)/2-30, originA.y+22);
+    ctx2.fillStyle="#dc2626";
+    ctx2.fillText("BY = \u221A(12\u00B2+AY\u00B2) = "+BY.toFixed(2)+" cm", (Ay.x+By.x)/2+6, (Ay.y+By.y)/2-14);
+
+    ctx2.save();
+    ctx2.font="bold 15px ui-sans-serif"; ctx2.fillStyle="#1e3a8a";
+    ctx2.fillText("Right triangle ABY (in plane ABGF)", 40, 34);
+    ctx2.restore();
+
+    // --- right panel: triangle XBY ---
+    const ox = W*0.58, oy = H-80;
+    const sc = 300/Math.max(BX, BY, 1);
+    const B = {x: ox, y: oy};
+    const Yp = {x: ox + BY*sc, y: oy};
+    const Xp = {x: ox + BY*sc, y: oy - XY*sc};
+
+    ctx2.beginPath();
+    ctx2.moveTo(B.x,B.y); ctx2.lineTo(Yp.x,Yp.y); ctx2.lineTo(Xp.x,Xp.y);
+    ctx2.closePath();
+    ctx2.fillStyle="rgba(220,38,38,0.09)"; ctx2.fill();
+    ctx2.strokeStyle="#dc2626"; ctx2.lineWidth=2.6; ctx2.stroke();
+
+    if(c2.checked){
+      const r2=13;
+      ctx2.beginPath();
+      ctx2.moveTo(Yp.x-r2, Yp.y);
+      ctx2.lineTo(Yp.x-r2, Yp.y-r2);
+      ctx2.lineTo(Yp.x, Yp.y-r2);
+      ctx2.strokeStyle="#059669"; ctx2.lineWidth=2; ctx2.stroke();
+    }
+
+    // angle arc at B
+    const a1 = Math.atan2(Yp.y-B.y, Yp.x-B.x);
+    const a2 = Math.atan2(Xp.y-B.y, Xp.x-B.x);
+    ctx2.beginPath();
+    ctx2.arc(B.x,B.y, 40, Math.min(a1,a2), Math.max(a1,a2));
+    ctx2.strokeStyle="#f59e0b"; ctx2.lineWidth=2.6; ctx2.stroke();
+    ctx2.fillStyle="#92400e"; ctx2.font="bold 16px ui-sans-serif";
+    ctx2.fillText("\u03B8", B.x+50, B.y-22);
+
+    ctx2.fillStyle="#1e3a8a"; ctx2.font="bold 14px ui-sans-serif";
+    [[B,"B",-18,10],[Yp,"Y",10,10],[Xp,"X",8,-10]].forEach(function(q){
+      ctx2.beginPath(); ctx2.arc(q[0].x,q[0].y,5,0,7); ctx2.fill();
+      ctx2.fillText(q[1], q[0].x+q[2], q[0].y+q[3]);
+    });
+
+    ctx2.fillStyle="#059669"; ctx2.font="bold 13px ui-sans-serif";
+    ctx2.fillText("BY = "+BY.toFixed(2)+" cm", (B.x+Yp.x)/2-40, B.y+20);
+    ctx2.fillStyle="#dc2626";
+    ctx2.fillText("BX = \u221A(BY\u00B2+8\u00B2) = "+BX.toFixed(2)+" cm", (B.x+Xp.x)/2+6, (B.y+Xp.y)/2-6);
+    ctx2.fillStyle="#7c3aed";
+    ctx2.fillText("XY = 8 cm", Xp.x+10, (Xp.y+Yp.y)/2);
+
+    ctx2.save();
+    ctx2.font="bold 15px ui-sans-serif"; ctx2.fillStyle="#dc2626";
+    ctx2.fillText("Right triangle XBY (angles in 3D)", W*0.56, 34);
+    ctx2.restore();
+
+    r2a.textContent = "BY = \u221A(12\u00B2+AY\u00B2) = " + BY.toFixed(2) + " cm";
+    r2b.textContent = "BX = \u221A(BY\u00B2+XY\u00B2) = " + BX.toFixed(2) + " cm";
+  }
+
+  /* =========================================================
+     CANVAS 3 : cos theta readout + angle visual
+     ========================================================= */
+  const cv3 = document.getElementById("cv3");
+  const ctx3 = cv3.getContext("2d");
+  const s3 = document.getElementById("s3");
+  const s3out = document.getElementById("s3out");
+  const c3 = document.getElementById("c3");
+  const r3a = document.getElementById("r3a");
+  const r3b = document.getElementById("r3b");
+
+  function draw3(){
+    const W = cv3.width, H = cv3.height;
+    ctx3.clearRect(0,0,W,H);
+    ctx3.fillStyle="#ffffff"; ctx3.fillRect(0,0,W,H);
+
+    const AY = parseFloat(s3.value);
+    s3out.textContent = AY.toFixed(1);
+    const BY = Math.sqrt(144 + AY*AY);
+    const BX = Math.sqrt(BY*BY + 64);
+    const cosT = BY / BX;
+    const theta = Math.acos(cosT) * 180/Math.PI;
+
+    // --- unit circle style diagram ---
+    const cx = 250, cy = 250, R = 175;
+    // axes
+    ctx3.strokeStyle="#cbd5e1"; ctx3.lineWidth=1.6;
+    ctx3.beginPath(); ctx3.moveTo(40,cy); ctx3.lineTo(W-40,cy); ctx3.stroke();
+    ctx3.beginPath(); ctx3.moveTo(cx,40); ctx3.lineTo(cx,H-40); ctx3.stroke();
+    // circle
+    ctx3.beginPath(); ctx3.arc(cx,cy,R,0,Math.PI*2);
+    ctx3.strokeStyle="#e2e8f0"; ctx3.lineWidth=2; ctx3.stroke();
+
+    // angle theta drawn
+    const a = -theta*Math.PI/180;
+    const px = cx + R*Math.cos(a);
+    const py = cy + R*Math.sin(a);
+
+    // cos segment (adjacent) along x-axis
+    ctx3.beginPath(); ctx3.moveTo(cx,cy); ctx3.lineTo(px,cy);
+    ctx3.strokeStyle="#059669"; ctx3.lineWidth=3.4; ctx3.stroke();
+    // sin segment
+    ctx3.beginPath(); ctx3.moveTo(px,cy); ctx3.lineTo(px,py);
+    ctx3.strokeStyle="#f59e0b"; ctx3.lineWidth=3.4; ctx3.stroke();
+    // radius
+    ctx3.beginPath(); ctx3.moveTo(cx,cy); ctx3.lineTo(px,py);
+    ctx3.strokeStyle="#dc2626"; ctx3.lineWidth=3; ctx3.stroke();
+
+    if(c3.checked){
+      ctx3.beginPath();
+      ctx3.arc(cx,cy,64, a, 0, false);
+      ctx3.strokeStyle="#2563eb"; ctx3.lineWidth=2.4; ctx3.stroke();
+      ctx3.fillStyle="#2563eb"; ctx3.font="bold 18px ui-sans-serif";
+      ctx3.fillText("\u03B8", cx+72, cy-24);
+    }
+
+    ctx3.fillStyle="#059669"; ctx3.font="bold 14px ui-sans-serif";
+    ctx3.fillText("cos\u03B8 = "+cosT.toFixed(4), cx+ (px-cx)/2 - 40, cy + 24);
+    ctx3.fillStyle="#dc2626";
+    ctx3.fillText("1", cx + (px-cx)/2 + 6, cy + (py-cy)/2 - 6);
+
+    ctx3.save();
+    ctx3.font="bold 15px ui-sans-serif"; ctx3.fillStyle="#1e3a8a";
+    ctx3.fillText("cos \u03B8 = BY / BX (unit-circle view)", 24, 30);
+    ctx3.restore();
+
+    // --- fraction bar display ---
+    const fx = W - 300, fy = 120;
+    ctx3.save();
+    ctx3.strokeStyle="#cbd5e1"; ctx3.lineWidth=1.4;
+    ctx3.beginPath(); ctx3.moveTo(fx,fy); ctx3.lineTo(fx+230,fy); ctx3.stroke();
+    ctx3.restore();
+    ctx3.fillStyle="#059669"; ctx3.font="bold 22px ui-sans-serif";
+    ctx3.fillText("BY = "+BY.toFixed(2), fx+10, fy-16);
+    ctx3.fillStyle="#dc2626";
+    ctx3.fillText("BX = "+BX.toFixed(2), fx+10, fy+38);
+    ctx3.fillStyle="#0f172a"; ctx3.font="bold 17px ui-sans-serif";
+    ctx3.fillText("cos\u03B8 = "+cosT.toFixed(4), fx+10, fy+90);
+
+    // highlight target value
+    ctx3.fillStyle="#eff6ff";
+    ctx3.strokeStyle="#2563eb"; ctx3.lineWidth=2;
+    ctx3.beginPath();
+    if(ctx3.roundRect) ctx3.roundRect(fx, fy+120, 230, 54, 12);
+    else ctx3.rect(fx, fy+120, 230, 54);
+    ctx3.fill(); ctx3.stroke();
+    ctx3.fillStyle="#1e3a8a"; ctx3.font="bold 17px ui-sans-serif";
+    ctx3.fillText("Target on figure:", fx+12, fy+142);
+    ctx3.fillStyle="#dc2626"; ctx3.font="bold 20px ui-sans-serif";
+    ctx3.fillText("15 / 17 = 0.8824", fx+12, fy+166);
+    ctx3.restore();
+
+    r3a.textContent = "\u03B8 = " + theta.toFixed(2) + "\u00B0";
+    r3b.textContent = "cos\u03B8 = 15 / 17 = 0.8824";
+  }
+
+  /* ---------- wire up sliders ---------- */
+  [s1,s2,s3].forEach(function(sl){
+    sl.addEventListener("input", function(){
+      if(sl===s1) draw1();
+      if(sl===s2) draw2();
+      if(sl===s3) draw3();
+    });
+  });
+  c1a.addEventListener("change", draw1);
+  c1b.addEventListener("change", draw1);
+  c2.addEventListener("change", draw2);
+  c3.addEventListener("change", draw3);
+
+  /* ---------- initial render ---------- */
+  function init(){
+    draw1(); draw2(); draw3();
+  }
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+  window.addEventListener("resize", function(){/* canvas fixed internal size, scales via CSS */});
+
+  /* Polyfill roundRect just in case */
+  if(!CanvasRenderingContext2D.prototype.roundRect){
+    CanvasRenderingContext2D.prototype.roundRect = function(x,y,w,h,r){
+      this.beginPath();
+      this.moveTo(x+r,y);
+      this.arcTo(x+w,y,x+w,y+h,r);
+      this.arcTo(x+w,y+h,x,y+h,r);
+      this.arcTo(x,y+h,x,y,r);
+      this.arcTo(x,y,x+w,y,r);
+      this.closePath();
+      return this;
+    };
+  }
+})();
+</script>
+</body>
+</html>

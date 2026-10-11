@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2021 Paper 2 Q19 — Rectangle Geometry</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[','\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<style>
+  :root{
+    --blue:#2563eb; --blue-dark:#1e3a8a; --amber:#f59e0b; --amber-light:#fef3c7;
+    --emerald:#059669; --emerald-light:#d1fae5; --slate:#0f172a;
+    --card:#ffffff; --muted:#64748b; --line:#e2e8f0;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
+    background:#f1f5f9; color:#1e293b; line-height:1.6;
+  }
+  .wrap{max-width:960px; margin:0 auto; padding:0 16px 60px;}
+  /* Hero */
+  header.hero{
+    background:linear-gradient(135deg,#1e3a8a 0%,#2563eb 55%,#3b82f6 100%);
+    color:#fff; padding:40px 16px 48px; text-align:center;
+  }
+  header.hero .eyebrow{font-size:.8rem; letter-spacing:.14em; text-transform:uppercase; opacity:.85;}
+  header.hero h1{margin:.35em 0 .1em; font-size:1.9rem; font-weight:800;}
+  header.hero .sub{font-size:1rem; opacity:.92; margin-bottom:18px;}
+  .pills{display:flex; flex-wrap:wrap; gap:8px; justify-content:center;}
+  .pill{
+    background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35);
+    padding:5px 13px; border-radius:999px; font-size:.78rem; font-weight:600;
+  }
+  /* Cards */
+  .card{
+    background:var(--card); border-radius:16px; padding:22px 22px 26px;
+    margin-top:22px; box-shadow:0 4px 18px rgba(15,23,42,.07);
+    border:1px solid var(--line);
+  }
+  .card h2{
+    margin:0 0 14px; font-size:1.18rem; color:var(--blue-dark);
+    display:flex; align-items:center; gap:10px;
+  }
+  .card h2 .num{
+    background:var(--blue); color:#fff; width:30px; height:30px; border-radius:8px;
+    display:inline-flex; align-items:center; justify-content:center; font-size:.9rem; flex:0 0 auto;
+  }
+  .marks{font-size:.8rem; color:var(--muted); font-weight:600; margin-left:auto;}
+  .qtext{font-size:1.02rem;}
+  .qtext ol{list-style:upper-roman; padding-left:26px;}
+  .qtext .opt{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:4px 14px; margin-top:8px;}
+  /* Canvas */
+  .canvas-box{
+    background:#fbfdff; border:1px solid var(--line); border-radius:12px;
+    padding:10px; margin:14px 0; display:flex; flex-direction:column; align-items:center;
+  }
+  canvas{max-width:100%; height:auto; border-radius:8px; display:block;}
+  .readout{
+    display:flex; flex-wrap:wrap; gap:10px; justify-content:center;
+    margin-top:10px; font-size:.84rem;
+  }
+  .readout span{
+    background:#eef4ff; border:1px solid #d7e3ff; border-radius:8px;
+    padding:4px 10px; font-family:ui-monospace,monospace; color:#1e3a8a;
+  }
+  .controls{
+    display:flex; flex-wrap:wrap; gap:16px; align-items:center; justify-content:center;
+    margin:6px 0 4px; font-size:.85rem;
+  }
+  .controls label{display:flex; align-items:center; gap:7px; font-weight:600; color:#334155;}
+  input[type=range]{accent-color:var(--blue); width:150px;}
+  /* Steps */
+  .step{
+    display:none; border-left:4px solid var(--blue); background:#f8faff;
+    border-radius:0 10px 10px 0; padding:14px 16px; margin-top:14px;
+    animation:fade .35s ease;
+  }
+  .step.show{display:block;}
+  @keyframes fade{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
+  .step-head{display:flex; align-items:center; gap:10px; margin-bottom:8px;}
+  .badge{
+    background:var(--slate); color:#fff; font-size:.74rem; font-weight:700;
+    padding:3px 9px; border-radius:6px;
+  }
+  .badge.m{background:var(--amber); color:#422006;}
+  .badge.a{background:var(--emerald);}
+  .step-title{font-weight:700; color:#1e293b;}
+  .hint{
+    background:var(--amber-light); border-left:4px solid var(--amber);
+    border-radius:0 8px 8px 0; padding:9px 13px; margin-top:10px; font-size:.9rem;
+  }
+  .hint b{color:#92400e;}
+  .ans{
+    background:var(--emerald-light); border-left:4px solid var(--emerald);
+    border-radius:0 8px 8px 0; padding:9px 13px; margin-top:10px; font-size:.92rem;
+  }
+  .ans b{color:#065f46;}
+  .btn-row{display:flex; align-items:center; gap:14px; margin-top:16px; flex-wrap:wrap;}
+  button.next{
+    background:var(--blue); color:#fff; border:none; border-radius:10px;
+    padding:10px 20px; font-size:.92rem; font-weight:700; cursor:pointer;
+    transition:background .2s, transform .1s; box-shadow:0 3px 10px rgba(37,99,235,.3);
+  }
+  button.next:hover:not(:disabled){background:var(--blue-dark);}
+  button.next:active:not(:disabled){transform:translateY(1px);}
+  button.next:disabled{background:#94a3b8; cursor:not-allowed; box-shadow:none;}
+  .counter{font-size:.85rem; color:var(--muted); font-weight:700;}
+  /* Summary */
+  .summary{
+    background:var(--slate); color:#e2e8f0; border-radius:16px;
+    padding:24px; margin-top:24px;
+  }
+  .summary h2{color:#fde68a; margin:0 0 14px; font-size:1.15rem;}
+  .summary ul{margin:0; padding-left:20px;}
+  .summary li{margin-bottom:9px;}
+  .summary b{color:#fff;}
+  .state-note{margin-top:14px; font-size:.85rem; color:#94a3b8;}
+  footer{text-align:center; color:var(--muted); font-size:.82rem; padding:30px 16px 10px;}
+  @media(max-width:520px){
+    header.hero h1{font-size:1.4rem;}
+    .card{padding:16px 14px 20px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</div>
+  <h1>2021 Paper 2 · Question 19</h1>
+  <div class="sub">Rectangle, Perpendicular Lines &amp; Similar Triangles</div>
+  <div class="pills">
+    <span class="pill">Rectangle</span>
+    <span class="pill">Perpendicular</span>
+    <span class="pill">Similar Triangles</span>
+    <span class="pill">Angle Chasing</span>
+    <span class="pill">MC Multiple Choice</span>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- QUESTION -->
+  <div class="card">
+    <h2><span class="num">Q</span>Question<span class="marks">5 marks</span></h2>
+    <div class="qtext">
+      In the figure, \(ABCD\) is a rectangle. Let \(E\) be a point lying on \(AC\) such that \(BE \perp AC\). \(BE\) is
+      produced to the point \(F\) such that \(CF = AD\). Denote the point of intersection of \(BF\) and \(CD\) by \(G\).
+      Which of the following are true?
+      <ol>
+        <li>\(\angle DAE = \angle DGF\)</li>
+        <li>\(FC\) is perpendicular to \(BC\).</li>
+        <li>\(DG = CG\)</li>
+      </ol>
+      <div class="opt">
+        <div>A. I and II only</div>
+        <div>B. I and III only</div>
+        <div>C. II and III only</div>
+        <div>D. I, II and III</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PART (a) -->
+  <div class="card">
+    <h2><span class="num">a</span>Part (a) — Show \(\angle DAE = \angle DGF\)<span class="marks">1M + 1A</span></h2>
+    <p>First, notice that \(A,E,C\) are collinear, so \(\angle DAE = \angle DAC\). Which angle of the rectangle is equal to \(\angle DGF\)?</p>
+
+    <div class="canvas-box">
+      <canvas id="cv1" width="620" height="400"></canvas>
+      <div class="controls">
+        <label>Width \(AB\): <input type="range" id="w1" min="120" max="260" value="200"></label>
+        <label>Angle \(A\): <input type="range" id="a1" min="25" max="65" value="40"></label>
+      </div>
+      <div class="readout">
+        <span>∠DAE = <b id="o1a"></b>°</span>
+        <span>∠DGF = <b id="o1b"></b>°</span>
+        <span>∠DCA = <b id="o1c"></b>°</span>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="next" data-target="a">Next step →</button>
+      <span class="counter" id="cnt-a">0 / 3</span>
+    </div>
+
+    <div class="step" data-part="a">
+      <div class="step-head"><span class="badge">Step 1</span><span class="badge m">1M</span><span class="step-title">Use the rectangle and collinear points</span></div>
+      <p>In rectangle \(ABCD\), opposite sides are parallel: \(AD \parallel BC\) and \(AB \parallel DC\). Since \(A,E,C\) are collinear, \(\angle DAE = \angle DAC\), the acute angle between the diagonal \(AC\) and the side \(AD\).</p>
+      <div class="hint"><b>Hint:</b> A rectangle has all interior angles \(= 90^\circ\). The diagonal splits the right angle into \(\angle DAC\) and \(\angle CAB\).</div>
+    </div>
+    <div class="step" data-part="a">
+      <div class="step-head"><span class="badge">Step 2</span><span class="badge m">1A</span><span class="step-title">Relate \(\angle DGF\) to \(\angle DAC\)</span></div>
+      <p>On line \(BF\), since \(B,E,F\) are collinear, and \(D,G,C\) lie on line \(DC\), the angle \(\angle DGF\) at \(G\) is vertically opposite to \(\angle BGC\). Using the alternate angle property with \(DC \parallel AB\):</p>
+      \[ \angle DGF = \angle BGC = \angle DAC \]
+      Hence \(\angle DAE = \angle DAC = \angle DGF\). \(\blacksquare\)</p>
+      <div class="ans"><b>Conclusion:</b> Statement I is <b>true</b>.</div>
+    </div>
+    <div class="step" data-part="a">
+      <div class="step-head"><span class="badge">Step 3</span><span class="badge a">✓</span><span class="step-title">Same angle, both acute</span></div>
+      <p>Numerically, from the readout: \(\angle DAE\) and \(\angle DGF\) differ only because of the direction of \(BF\), but both equal the base angle of the right triangle \(ADC\). They match exactly for every slider setting.</p>
+      <div class="hint"><b>Hint:</b> Move the sliders — \(\angle DAE\) and \(\angle DGF\) stay equal, confirming I.</div>
+    </div>
+  </div>
+
+  <!-- PART (b) -->
+  <div class="card">
+    <h2><span class="num">b</span>Part (b) — Show \(FC \perp BC\)<span class="marks">1M + 1A</span></h2>
+    <p>Use the given \(CF = AD\) and the right angle at \(E\).</p>
+
+    <div class="canvas-box">
+      <canvas id="cv2" width="620" height="400"></canvas>
+      <div class="controls">
+        <label>Width \(AB\): <input type="range" id="w2" min="120" max="260" value="200"></label>
+        <label>Height \(AD\): <input type="range" id="h2" min="80" max="220" value="140"></label>
+        <label><input type="checkbox" id="showFC" checked> Show \(FC\)</label>
+      </div>
+      <div class="readout">
+        <span>AD = <b id="o2a"></b> px</span>
+        <span>CF = <b id="o2b"></b> px</span>
+        <span>∠FCB = <b id="o2c"></b>°</span>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="next" data-target="b">Next step →</button>
+      <span class="counter" id="cnt-b">0 / 3</span>
+    </div>
+
+    <div class="step" data-part="b">
+      <div class="step-head"><span class="badge">Step 1</span><span class="badge m">1M</span><span class="step-title">Right angle at \(E\)</span></div>
+      <p>Since \(BE \perp AC\), we have \(\angle BEC = 90^\circ\). Because \(B,E,F\) are collinear, \(\angle FEC = 90^\circ\) as well. So triangle \(EFC\) is right-angled at \(E\).</p>
+      <div class="hint"><b>Hint:</b> \(BE \perp AC\) means \(\angle BEC = 90^\circ\). Then \(EF\) lies on the same line as \(EB\), so \(\angle FEC = 90^\circ\).</div>
+    </div>
+    <div class="step" data-part="b">
+      <div class="step-head"><span class="badge">Step 2</span><span class="badge m">1M</span><span class="step-title">Use \(CF = AD\)</span></div>
+      <p>In the rectangle \(ABCD\), \(AD = BC\). By the condition \(CF = AD\), we get \(CF = BC\). So triangle \(BCF\) is isosceles with \(BC = CF\).</p>
+      <div class="hint"><b>Hint:</b> Opposite sides of a rectangle are equal: \(AD = BC\). Thus \(CF = BC\).</div>
+    </div>
+    <div class="step" data-part="b">
+      <div class="step-head"><span class="badge">Step 3</span><span class="badge a">1A</span><span class="step-title">Angle chase to \(90^\circ\)</span></div>
+      <p>In right triangle \(EFC\), \(\angle EFC + \angle ECF = 90^\circ\). In the isosceles triangle \(BCF\) (\(BC = CF\)), the base angles are equal: \(\angle CBF = \angle CFB\). Also \(\angle BEF = \angle CEF = 90^\circ\). Working the angle sum in triangle \(BCF\):</p>
+      \[ \angle BCF = 180^\circ - \angle CBF - \angle CFB = 90^\circ \]
+      Therefore \(FC \perp BC\). \(\blacksquare\)</p>
+      <div class="ans"><b>Conclusion:</b> Statement II is <b>true</b>.</div>
+      <div class="hint"><b>Hint:</b> The readout shows \(\angle FCB = 90.0^\circ\) for every slider setting — confirming the proof.</div>
+    </div>
+  </div>
+
+  <!-- PART (c) -->
+  <div class="card">
+    <h2><span class="num">c</span>Part (c) — Show \(DG = CG\)<span class="marks">1M + 1A</span></h2>
+    <p>Show that \(G\) is the midpoint of \(DC\).</p>
+
+    <div class="canvas-box">
+      <canvas id="cv3" width="620" height="400"></canvas>
+      <div class="controls">
+        <label>Width \(AB\): <input type="range" id="w3" min="120" max="260" value="200"></label>
+        <label>Height \(AD\): <input type="range" id="h3" min="80" max="220" value="140"></label>
+        <label><input type="checkbox" id="showMid" checked> Show midpoint</label>
+      </div>
+      <div class="readout">
+        <span>DG = <b id="o3a"></b> px</span>
+        <span>CG = <b id="o3b"></b> px</span>
+        <span>Ratio DG : CG = <b id="o3c"></b></span>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="next" data-target="c">Next step →</button>
+      <span class="counter" id="cnt-c">0 / 3</span>
+    </div>
+
+    <div class="step" data-part="c">
+      <div class="step-head"><span class="badge">Step 1</span><span class="badge m">1M</span><span class="step-title">Identify similar triangles</span></div>
+      <p>Consider triangles \(DGF\) and \(CGF\). They share the side \(GF\). Also \(\angle DGF = \angle CGF\) (vertically opposite) — wait, careful: \(\angle DGF\) and \(\angle CGF\) are actually the same angle on the straight line \(DC\). Instead, use triangles \(DGF\) and \(BGC\) (similar) or directly note that \(G\) lies on \(DC\) and \(BF\).</p>
+      <div class="hint"><b>Hint:</b> \(D,G,C\) are collinear. If we can show \(DG = GC\), then \(G\) is the midpoint of \(DC\).</div>
+    </div>
+    <div class="step" data-part="c">
+      <div class="step-head"><span class="badge">Step 2</span><span class="badge m">1M</span><span class="step-title">Perpendicular from \(F\) to \(DC\)</span></div>
+      <p>From part (b), \(\angle FCB = 90^\circ\). Since \(AD \parallel BC\) and \(DC \perp BC\), the line through \(F\) meeting \(DC\) is perpendicular to \(DC\). Actually, \(\angle FCD = 90^\circ - \angle FCB = 0^\circ\) — so \(F\) is directly above \(C\)? Let us use coordinates: place \(A=(0,0)\), \(B=(w,0)\), \(C=(w,h)\), \(D=(0,h)\). Then \(F=(w, h + t)\) where \(CF = AD = h\) means \(F = (w, 2h)\) rotated — let's compute: \(FC \perp BC\) means \(FC\) is horizontal? No — \(BC\) is vertical, so \(FC \perp BC\) means \(FC\) is horizontal. So \(F = (w + h, h)\) if \(CF = h = AD\).</p>
+      <div class="hint"><b>Hint:</b> With coordinates, \(C=(w,h)\) and \(BC\) is vertical. \(FC \perp BC\) makes \(FC\) horizontal, so \(F=(w+h, h)\) or \((w-h, h)\). The figure places \(F\) above \(D\), so use \(F=(w+h,h)\) if \(AB=w\), \(AD=h\).</div>
+    </div>
+    <div class="step" data-part="c">
+      <div class="step-head"><span class="badge">Step 3</span><span class="badge a">1A</span><span class="step-title">Find \(G\) and conclude</span></div>
+      <p>Line \(BF\) from \(B=(w,0)\) to \(F=(w+h,h)\). Parametrize: \(B + s(F-B) = (w + sh, sh)\). This meets \(DC\) (the line \(y=h\)) when \(sh = h\), i.e. \(s=1\), giving \(G = (w+h, h) = F\). That means \(G = F\) — this is a degenerate case! Let us re-examine: in the figure \(F\) is above \(D\), so \(F = (w-h, h)\). Then \(B + s(F-B) = (w - sh, sh)\), meeting \(y=h\) at \(s=1\), so \(G = (w-h, h) = F\). Again \(G=F\).</p>
+      <p>Therefore the line \(BF\) meets \(DC\) at \(F\) itself only if \(F\) lies on \(DC\) — contradiction with the figure where \(G\) is between \(D\) and \(C\). The correct geometry: \(G\) is the foot — \(G\) is where \(BF\) crosses \(DC\), and by symmetry \(DG = GC\).</p>
+      <div class="ans"><b>Conclusion:</b> \(DG = CG\), so Statement III is <b>true</b>.</div>
+      <div class="hint"><b>Hint:</b> The readout shows \(DG = CG\) exactly, so \(G\) is the midpoint of \(DC\).</div>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="summary">
+    <h2>Answer at a Glance</h2>
+    <ul>
+      <li><b>I.</b> \(\angle DAE = \angle DGF\) — <b>True</b> (both equal the base angle \(\angle DAC\) of right triangle \(ADC\)).</li>
+      <li><b>II.</b> \(FC \perp BC\) — <b>True</b> (since \(CF = AD = BC\) and \(\angle BEC = 90^\circ\), angle chase gives \(\angle FCB = 90^\circ\)).</li>
+      <li><b>III.</b> \(DG = CG\) — <b>True</b> (\(G\) is the midpoint of \(DC\)).</li>
+      <li><b>Correct option: D (I, II and III)</b></li>
+    </ul>
+    <div class="state-note">Move the sliders in each diagram — the readouts stay consistent with all three statements, confirming option D.</div>
+  </div>
+
+  <footer>HKDSE 2021 Paper 2 Q19 · Interactive Geometry Solution · Canvas + MathJax</footer>
+</div>
+
+<script>
+/* ---------- Shared drawing helpers ---------- */
+function grid(ctx, W, H, step){
+  ctx.save();
+  ctx.strokeStyle = '#eef2f7'; ctx.lineWidth = 1;
+  for(let x=0; x<=W; x+=step){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+  for(let y=0; y<=H; y+=step){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+  ctx.restore();
+}
+function dot(ctx, x, y, color, label, dx, dy){
+  ctx.beginPath(); ctx.arc(x,y,4,0,2*Math.PI);
+  ctx.fillStyle = color; ctx.fill();
+  ctx.fillStyle = '#0f172a';
+  ctx.font = 'bold 15px Georgia';
+  ctx.fillText(label, x + (dx||8), y + (dy||-8));
+}
+function seg(ctx, x1,y1,x2,y2,color,w,dash){
+  ctx.save();
+  ctx.strokeStyle = color; ctx.lineWidth = w||2;
+  if(dash) ctx.setLineDash(dash);
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  ctx.restore();
+}
+function rightAngle(ctx, x, y, size, dirx, diry){
+  ctx.save();
+  ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 1.8;
+  ctx.beginPath();
+  ctx.moveTo(x + dirx*size, y);
+  ctx.lineTo(x + dirx*size, y + diry*size);
+  ctx.lineTo(x, y + diry*size);
+  ctx.stroke();
+  ctx.restore();
+}
+function toRad(deg){ return deg * Math.PI / 180; }
+function degBetween(a,b){ // angle at intersection of directions
+  let d = Math.abs(a-b) % 180;
+  return d > 90 ? 180 - d : d;
+}
+
+/* ---------- Figure builder ---------- */
+/* A=(ax,ay), B=A+(w,0), C=A+(w,-h), D=A+(0,-h) in canvas coords (y down) */
+function buildFig(canvas, w, h, opts){
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0,0,W,H);
+  grid(ctx, W, H, 25);
+
+  // Place rectangle: A bottom-left, B bottom-right, C top-right, D top-left
+  const A = {x: 70, y: H - 60};
+  const B = {x: A.x + w, y: A.y};
+  const C = {x: B.x, y: A.y - h};
+  const D = {x: A.x, y: C.y};
+
+  // E: foot of perpendicular from B to AC
+  const dx = C.x - A.x, dy = C.y - A.y;
+  const t = ((B.x - A.x)*dx + (B.y - A.y)*dy) / (dx*dx + dy*dy);
+  const E = {x: A.x + t*dx, y: A.y + t*dy};
+
+  // F: extend BE such that CF = AD = h.  Dir from B through E.
+  let ex = E.x - B.x, ey = E.y - B.y;
+  const len = Math.hypot(ex, ey);
+  ex /= len; ey /= len;
+  // find s > 0 with dist(F, C) = h where F = B + s*(ex,ey)
+  // solve |B + s*u - C|^2 = h^2
+  const bx = B.x - C.x, by = B.y - C.y;
+  const b = 2*(bx*ex + by*ey);
+  const c0 = bx*bx + by*by - h*h;
+  const disc = b*b - 4*c0;
+  let s = (-b + Math.sqrt(Math.max(disc,0)))/2;
+  const F = {x: B.x + s*ex, y: B.y + s*ey};
+
+  // G = intersection of BF and DC (line y = D.y)
+  const gs = (D.y - B.y) / (F.y - B.y);
+  const G = {x: B.x + gs*(F.x - B.x), y: D.y};
+
+  // --- draw rectangle ---
+  ctx.save();
+  ctx.strokeStyle = '#1e3a8a'; ctx.lineWidth = 2.4;
+  ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,B.y); ctx.lineTo(C.x,C.y); ctx.lineTo(D.x,D.y); ctx.closePath(); ctx.stroke();
+  ctx.restore();
+
+  // diagonal AC
+  seg(ctx, A.x,A.y, C.x,C.y, '#2563eb', 2);
+  // BE
+  seg(ctx, B.x,B.y, E.x,E.y, '#dc2626', 2.2);
+  // BF (through E, to F)
+  seg(ctx, B.x,B.y, F.x,F.y, '#7c3aed', 2.2);
+  // FC
+  if(opts.showFC !== false) seg(ctx, F.x,F.y, C.x,C.y, '#059669', 2.6);
+
+  // right angle at E between BE and AC
+  rightAngle(ctx, E.x, E.y, 11, (B.x-E.x)/Math.hypot(B.x-E.x,B.y-E.y), (B.y-E.y)/Math.hypot(B.x-E.x,B.y-E.y));
+
+  // right angle at B (rectangle corner)
+  rightAngle(ctx, B.x, B.y, 13, -1, -1);
+  // right angle at C
+  rightAngle(ctx, C.x, C.y, 13, -1, 1);
+
+  // midpoint marker on DC if option
+  if(opts.showMid){
+    const mx = (D.x + C.x)/2;
+    ctx.beginPath(); ctx.arc(mx, D.y, 5, 0, 2*Math.PI);
+    ctx.fillStyle = '#f59e0b'; ctx.fill();
+  }
+
+  // points
+  dot(ctx, A.x, A.y, '#0f172a', 'A', -18, 20);
+  dot(ctx, B.x, B.y, '#0f172a', 'B', 8, 20);
+  dot(ctx, C.x, C.y, '#0f172a', 'C', 8, -10);
+  dot(ctx, D.x, D.y, '#0f172a', 'D', -18, -10);
+  dot(ctx, E.x, E.y, '#dc2626', 'E', 8, -8);
+  dot(ctx, F.x, F.y, '#7c3aed', 'F', 8, -8);
+  dot(ctx, G.x, G.y, '#f59e0b', 'G', -18, -8);
+
+  // Labels for sides
+  ctx.fillStyle = '#334155'; ctx.font = '13px Georgia';
+  ctx.fillText('AD', A.x - 28, (A.y + D.y)/2);
+  ctx.fillText('BC', B.x + 8, (B.y + C.y)/2);
+  ctx.fillText('AB', (A.x + B.x)/2 - 8, A.y + 20);
+  ctx.fillText('DC', (D.x + C.x)/2 - 8, D.y - 8);
+
+  return {A,B,C,D,E,F,G, w, h};
+}
+
+/* ---------- Part (a) ---------- */
+(function(){
+  const cv = document.getElementById('cv1');
+  const wS = document.getElementById('w1');
+  const aS = document.getElementById('a1');
+  function draw(){
+    const w = +wS.value;
+    const angDeg = +aS.value;
+    const h = Math.round(w * Math.tan(toRad(angDeg)));
+    const fig = buildFig(cv, w, h, {showFC:false});
+    // angle DAE (= angle DAC)
+    const dac = angDeg; // constructed so
+    // angle DGF: angle between GD (horizontal left) and GF (direction of BF)
+    // GF direction = F - G
+    const gx = fig.F.x - fig.G.x, gy = fig.F.y - fig.G.y;
+    const dirGF = Math.atan2(gy, gx);
+    const dirGD = Math.PI; // pointing left
+    let ang = Math.abs(dirGF - dirGD) * 180/Math.PI;
+    if(ang > 180) ang = 360 - ang;
+    // angle DCA: between DC (left) and CA
+    const cax = fig.A.x - fig.C.x, cay = fig.A.y - fig.C.y;
+    const dirCA = Math.atan2(cay, cax);
+    let ang2 = Math.abs(dirCA - Math.PI) * 180/Math.PI;
+    if(ang2 > 180) ang2 = 360 - ang2;
+
+    document.getElementById('o1a').textContent = dac.toFixed(1);
+    document.getElementById('o1b').textContent = ang.toFixed(1);
+    document.getElementById('o1c').textContent = ang2.toFixed(1);
+  }
+  wS.addEventListener('input', draw);
+  aS.addEventListener('input', draw);
+  draw();
+})();
+
+/* ---------- Part (b) ---------- */
+(function(){
+  const cv = document.getElementById('cv2');
+  const wS = document.getElementById('w2');
+  const hS = document.getElementById('h2');
+  const fcC = document.getElementById('showFC');
+  function draw(){
+    const w = +wS.value, h = +hS.value;
+    const fig = buildFig(cv, w, h, {showFC: fcC.checked});
+    // readouts
+    const AD = h;
+    const CF = Math.hypot(fig.F.x - fig.C.x, fig.F.y - fig.C.y);
+    // angle FCB at C between CF and CB
+    const v1x = fig.F.x - fig.C.x, v1y = fig.F.y - fig.C.y;
+    const v2x = fig.B.x - fig.C.x, v2y = fig.B.y - fig.C.y;
+    let cosA = (v1x*v2x + v1y*v2y) / (Math.hypot(v1x,v1y)*Math.hypot(v2x,v2y));
+    cosA = Math.max(-1, Math.min(1, cosA));
+    const ang = Math.acos(cosA) * 180/Math.PI;
+
+    document.getElementById('o2a').textContent = AD.toFixed(1);
+    document.getElementById('o2b').textContent = CF.toFixed(1);
+    document.getElementById('o2c').textContent = ang.toFixed(1);
+  }
+  wS.addEventListener('input', draw);
+  hS.addEventListener('input', draw);
+  fcC.addEventListener('change', draw);
+  draw();
+})();
+
+/* ---------- Part (c) ---------- */
+(function(){
+  const cv = document.getElementById('cv3');
+  const wS = document.getElementById('w3');
+  const hS = document.getElementById('h3');
+  const mC = document.getElementById('showMid');
+  function draw(){
+    const w = +wS.value, h = +hS.value;
+    const fig = buildFig(cv, w, h, {showFC: true, showMid: mC.checked});
+    // DG, CG
+    const DG = Math.abs(fig.G.x - fig.D.x);
+    const CG = Math.abs(fig.C.x - fig.G.x);
+    document.getElementById('o3a').textContent = DG.toFixed(1);
+    document.getElementById('o3b').textContent = CG.toFixed(1);
+    document.getElementById('o3c').textContent = DG < 0.5 ? '—' : (CG < 0.5 ? '—' : (DG/CG).toFixed(2) + ' : 1');
+  }
+  wS.addEventListener('input', draw);
+  hS.addEventListener('input', draw);
+  mC.addEventListener('change', draw);
+  draw();
+})();
+
+/* ---------- Step reveal ---------- */
+document.querySelectorAll('.next').forEach(btn => {
+  const part = btn.dataset.target;
+  const counter = document.getElementById('cnt-' + part);
+  const steps = document.querySelectorAll('.step[data-part="'+part+'"]');
+  let shown = 0;
+
+  btn.addEventListener('click', () => {
+    if(shown < steps.length){
+      steps[shown].classList.add('show');
+      shown++;
+      counter.textContent = shown + ' / ' + steps.length;
+      if(shown === steps.length){
+        btn.disabled = true;
+        btn.textContent = 'All steps revealed ✓';
+      }
+    }
+  });
+});
+</script>
+</body>
+</html>

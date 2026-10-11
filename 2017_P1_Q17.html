@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HKDSE Math 2017 P1 Q17 – Probability</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- MathJax CDN for LaTeX rendering -->
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+    <style>
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #f8fafc; }
+        .step-card { transition: all 0.3s ease; }
+        .step-card:hover { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); }
+        .highlight { border-left: 4px solid #3b82f6; }
+        canvas { background: #ffffff; border-radius: 12px; }
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; }
+        .accordion-content.open { max-height: 2000px; transition: max-height 0.6s ease-in; }
+        .badge { background: #e0f2fe; color: #0369a1; font-weight: 500; }
+    </style>
+</head>
+<body class="min-h-screen py-6 px-4 sm:px-8">
+
+    <main class="max-w-4xl mx-auto space-y-8">
+
+        <!-- ====== QUESTION OVERVIEW ====== -->
+        <section class="bg-white rounded-2xl shadow-sm p-6 md:p-8 border border-slate-100">
+            <div class="flex flex-wrap items-center gap-3 mb-4">
+                <span class="text-sm font-semibold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">HKDSE Math 2017 Paper 1 Q17</span>
+                <span class="text-sm font-semibold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full">Probability</span>
+                <span class="text-sm font-semibold text-amber-700 bg-amber-50 px-3 py-1 rounded-full">Combinations</span>
+            </div>
+
+            <h1 class="text-2xl md:text-3xl font-bold text-slate-800 mb-4">Probability of Drawing Pens</h1>
+
+            <div class="bg-slate-50 rounded-xl p-5 mb-6 text-slate-700 leading-relaxed border border-slate-100">
+                <p class="mb-2">In a bag, there are <strong>4 green pens</strong>, <strong>7 blue pens</strong> and <strong>8 black pens</strong>. If 5 pens are randomly drawn from the bag at the same time,</p>
+                <ol class="list-decimal list-inside space-y-1 ml-2 text-slate-600">
+                    <li>find the probability that <strong>exactly 4 green pens</strong> are drawn; <span class="text-xs font-semibold text-slate-400">[2 marks]</span></li>
+                    <li>find the probability that <strong>exactly 3 green pens</strong> are drawn; <span class="text-xs font-semibold text-slate-400">[2 marks]</span></li>
+                    <li>find the probability that <strong>not more than 2 green pens</strong> are drawn. <span class="text-xs font-semibold text-slate-400">[2 marks]</span></li>
+                </ol>
+            </div>
+
+            <div class="flex flex-wrap gap-2">
+                <span class="badge text-xs px-3 py-1 rounded-full">#combinations</span>
+                <span class="badge text-xs px-3 py-1 rounded-full">#probability</span>
+                <span class="badge text-xs px-3 py-1 rounded-full">#without replacement</span>
+                <span class="badge text-xs px-3 py-1 rounded-full">#complementary counting</span>
+            </div>
+        </section>
+
+        <!-- ====== VISUAL DIAGRAM & KEY IDEA ====== -->
+        <section class="bg-white rounded-2xl shadow-sm p-6 md:p-8 border border-slate-100">
+            <h2 class="text-xl font-bold text-slate-800 mb-3 flex items-center gap-2">
+                <span class="text-2xl">🎯</span> Key Concept: Combinations
+            </h2>
+            <p class="text-slate-600 mb-4">
+                We draw 5 pens <em>simultaneously</em>. The total number of ways to choose 5 pens from 19 is 
+                <span class="font-mono bg-slate-100 px-2 py-0.5 rounded text-sm">\( C^{19}_{5} \)</span>. 
+                For each case, we count how many ways to choose the required green pens and the remaining pens from the other colours.
+            </p>
+
+            <!-- Visual Bag Illustration -->
+            <div class="flex justify-center mb-4">
+                <canvas id="bagCanvas" width="600" height="180" class="w-full max-w-lg border border-slate-200"></canvas>
+            </div>
+            <p class="text-center text-sm text-slate-400">Visual representation: 4 green, 7 blue, 8 black pens in a bag.</p>
+        </section>
+
+        <!-- ====== STEP-BY-STEP SOLUTION ====== -->
+        <section class="space-y-6">
+
+            <!-- PART (a) -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden step-card">
+                <button class="w-full text-left p-5 flex justify-between items-center focus:outline-none" onclick="toggleAccordion('partA')">
+                    <div>
+                        <span class="text-sm font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full mr-2">Part (a)</span>
+                        <span class="text-lg font-semibold text-slate-800">Exactly 4 green pens</span>
+                    </div>
+                    <span class="text-2xl text-slate-400 transition-transform duration-300" id="iconA">➕</span>
+                </button>
+
+                <div id="partA" class="accordion-content px-5 pb-5">
+                    <div class="space-y-4 mt-2">
+                        <!-- Step 1 -->
+                        <div class="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                            <p class="text-sm font-semibold text-indigo-600 mb-1">Step 1 — Total number of ways to choose 5 pens</p>
+                            <p class="text-slate-700">From 19 pens, choose any 5: \[ \binom{19}{5} \]</p>
+                        </div>
+                        <!-- Step 2 -->
+                        <div class="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                            <p class="text-sm font-semibold text-indigo-600 mb-1">Step 2 — Number of ways to choose exactly 4 green pens</p>
+                            <p class="text-slate-700">Choose 4 green from 4 green: \[ \binom{4}{4} \]</p>
+                            <p class="text-slate-700 mt-1">Choose the remaining 1 pen from the 15 non-green pens (7 blue + 8 black): \[ \binom{15}{1} \]</p>
+                        </div>
+                        <!-- Step 3 -->
+                        <div class="bg-slate-50 rounded-xl p-4 border border-slate-100 highlight">
+                            <p class="text-sm font-semibold text-indigo-600 mb-1">Step 3 — Compute the probability</p>
+                            <p class="text-slate-700">\[ P(\text{exactly 4 green}) = \frac{\binom{4}{4}\binom{15}{1}}{\binom{19}{5}} \]</p>
+                            <p class="text-slate-700 mt-2">\[ = \frac{1 \times 15}{11628} = \frac{5}{3876} \]</p>
+                        </div>
+                        <div class="bg-emerald-50 rounded-xl p-4 border border-emerald-200 text-emerald-800">
+                            <p class="font-semibold">✅ Final Answer</p>
+                            <p>\[ \boxed{\frac{5}{3876}} \]</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PART (b) -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden step-card">
+                <button class="w-full text-left p-5 flex justify-between items-center focus:outline-none" onclick="toggleAccordion('partB')">
+                    <div>
+                        <span class="text-sm font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full mr-2">Part (b)</span>
+                        <span class="text-lg font-semibold text-slate-800">Exactly 3 green pens</span>
+                    </div>
+                    <span class="text-2xl text-slate-400 transition-transform duration-300" id="iconB">➕</span>
+                </button>
+
+                <div id="partB" class="accordion-content px-5 pb-5">
+                    <div class="space-y-4 mt-2">
+                        <!-- Step 1 -->
+                        <div class="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                            <p class="text-sm font-semibold text-indigo-600 mb-1">Step 1 — Total ways remains the same</p>
+                            <p class="text-slate-700">\[ \binom{19}{5} \]</p>
+                        </div>
+                        <!-- Step 2 -->
+                        <div class="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                            <p class="text-sm font-semibold text-indigo-600 mb-1">Step 2 — Choose exactly 3 green pens</p>
+                            <p class="text-slate-700">Choose 3 green from 4: \[ \binom{4}{3} \]</p>
+                            <p class="text-slate-700 mt-1">Choose remaining 2 pens from the 15 non-green: \[ \binom{15}{2} \]</p>
+                        </div>
+                        <!-- Step 3 -->
+                        <div class="bg-slate-50 rounded-xl p-4 border border-slate-100 highlight">
+                            <p class="text-sm font-semibold text-indigo-600 mb-1">Step 3 — Compute the probability</p>
+                            <p class="text-slate-700">\[ P(\text{exactly 3 green}) = \frac{\binom{4}{3}\binom{15}{2}}{\binom{19}{5}} \]</p>
+                            <p class="text-slate-700 mt-2">\[ = \frac{4 \times 105}{11628} = \frac{420}{11628} = \frac{35}{969} \]</p>
+                        </div>
+                        <div class="bg-emerald-50 rounded-xl p-4 border border-emerald-200 text-emerald-800">
+                            <p class="font-semibold">✅ Final Answer</p>
+                            <p>\[ \boxed{\frac{35}{969}} \]</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PART (c) -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden step-card">
+                <button class="w-full text-left p-5 flex justify-between items-center focus:outline-none" onclick="toggleAccordion('partC')">
+                    <div>
+                        <span class="text-sm font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full mr-2">Part (c)</span>
+                        <span class="text-lg font-semibold text-slate-800">Not more than 2 green pens</span>
+                    </div>
+                    <span class="text-2xl text-slate-400 transition-transform duration-300" id="iconC">➕</span>
+                </button>
+
+                <div id="partC" class="accordion-content px-5 pb-5">
+                    <div class="space-y-4 mt-2">
+                        <!-- Step 1 -->
+                        <div class="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                            <p class="text-sm font-semibold text-indigo-600 mb-1">Step 1 — Use complementary counting</p>
+                            <p class="text-slate-700">"Not more than 2 green pens" means 0, 1, or 2 green pens.</p>
+                            <p class="text-slate-700 mt-1">Easier to subtract the complementary events: exactly 3 and exactly 4 green pens.</p>
+                            <p class="text-slate-700 mt-1">\[ P(\text{not more than 2}) = 1 - P(3\text{ green}) - P(4\text{ green}) \]</p>
+                        </div>
+                        <!-- Step 2 -->
+                        <div class="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                            <p class="text-sm font-semibold text-indigo-600 mb-1">Step 2 — Substitute the values from parts (a) and (b)</p>
+                            <p class="text-slate-700">\[ = 1 - \frac{35}{969} - \frac{5}{3876} \]</p>
+                            <p class="text-slate-700 mt-1">Note: \(\frac{35}{969} = \frac{140}{3876}\)</p>
+                        </div>
+                        <!-- Step 3 -->
+                        <div class="bg-slate-50 rounded-xl p-4 border border-slate-100 highlight">
+                            <p class="text-sm font-semibold text-indigo-600 mb-1">Step 3 — Compute the final probability</p>
+                            <p class="text-slate-700">\[ = 1 - \frac{140}{3876} - \frac{5}{3876} \]</p>
+                            <p class="text-slate-700 mt-2">\[ = 1 - \frac{145}{3876} = \frac{3876 - 145}{3876} = \frac{3731}{3876} \]</p>
+                        </div>
+                        <div class="bg-emerald-50 rounded-xl p-4 border border-emerald-200 text-emerald-800">
+                            <p class="font-semibold">✅ Final Answer</p>
+                            <p>\[ \boxed{\frac{3731}{3876}} \]</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ====== EXTRA INTERACTIVE: PROBABILITY SLIDER ====== -->
+        <section class="bg-white rounded-2xl shadow-sm p-6 md:p-8 border border-slate-100">
+            <h2 class="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <span class="text-2xl">🧪</span> Interactive: Explore the Probabilities
+            </h2>
+            <p class="text-slate-600 mb-4">Adjust the slider to see the probability of drawing exactly \(k\) green pens (for \(k = 0, 1, 2, 3, 4\)).</p>
+
+            <div class="flex flex-col sm:flex-row items-center gap-4 mb-6">
+                <label for="greenSlider" class="text-sm font-semibold text-slate-700 whitespace-nowrap">k (green pens): <span id="kValue" class="text-indigo-600 font-bold">0</span></label>
+                <input type="range" id="greenSlider" min="0" max="4" value="0" step="1" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="bg-indigo-50 rounded-xl p-4 text-center">
+                    <p class="text-sm font-semibold text-indigo-600">Probability of exactly k green</p>
+                    <p id="probDisplay" class="text-2xl font-bold text-indigo-800 mt-1">\( \frac{3003}{11628} \)</p>
+                </div>
+                <div class="bg-slate-50 rounded-xl p-4 text-center">
+                    <p class="text-sm font-semibold text-slate-600">Formula used</p>
+                    <p id="formulaDisplay" class="text-lg font-mono text-slate-700 mt-1">\( \binom{4}{0}\binom{15}{5} / \binom{19}{5} \)</p>
+                </div>
+            </div>
+
+            <!-- Visual bar chart canvas -->
+            <div class="mt-6 flex justify-center">
+                <canvas id="probChart" width="500" height="200" class="w-full max-w-lg border border-slate-200"></canvas>
+            </div>
+            <p class="text-center text-xs text-slate-400 mt-2">Bar chart showing probability distribution for k = 0 to 4 green pens.</p>
+        </section>
+
+        <!-- Footer -->
+        <footer class="text-center text-sm text-slate-400 pt-4 pb-8">
+            HKDSE Mathematics 2017 Paper 1 Q17 — Guided Solution
+        </footer>
+
+    </main>
+
+    <script>
+        // Toggle accordion
+        function toggleAccordion(id) {
+            const content = document.getElementById(id);
+            const icon = document.getElementById('icon' + id.slice(-1));
+            content.classList.toggle('open');
+            if (content.classList.contains('open')) {
+                icon.textContent = '➖';
+            } else {
+                icon.textContent = '➕';
+            }
+        }
+
+        // === Canvas: Bag Illustration ===
+        (function drawBag() {
+            const canvas = document.getElementById('bagCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width, h = canvas.height;
+
+            // Bag shape
+            ctx.beginPath();
+            ctx.moveTo(80, 20);
+            ctx.lineTo(520, 20);
+            ctx.quadraticCurveTo(560, 20, 550, 80);
+            ctx.lineTo(520, 160);
+            ctx.quadraticCurveTo(500, 170, 480, 160);
+            ctx.lineTo(120, 160);
+            ctx.quadraticCurveTo(100, 170, 80, 160);
+            ctx.lineTo(50, 80);
+            ctx.quadraticCurveTo(40, 20, 80, 20);
+            ctx.closePath();
+            ctx.fillStyle = '#f1f5f9';
+            ctx.fill();
+            ctx.strokeStyle = '#94a3b8';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Label
+            ctx.fillStyle = '#475569';
+            ctx.font = 'bold 16px system-ui';
+            ctx.textAlign = 'center';
+            ctx.fillText('Bag', 300, 15);
+
+            // Draw pens as lines
+            const pens = [
+                { color: '#22c55e', count: 4, label: 'Green' },
+                { color: '#3b82f6', count: 7, label: 'Blue' },
+                { color: '#1e293b', count: 8, label: 'Black' }
+            ];
+
+            let xPos = 120;
+            const yBase = 140;
+            pens.forEach(group => {
+                for (let i = 0; i < group.count; i++) {
+                    ctx.beginPath();
+                    ctx.moveTo(xPos, yBase);
+                    ctx.lineTo(xPos + 2, yBase - 50);
+                    ctx.lineWidth = 6;
+                    ctx.strokeStyle = group.color;
+                    ctx.stroke();
+                    xPos += 14;
+                }
+                xPos += 20;
+            });
+
+            // Legend
+            let lx = 120;
+            pens.forEach((group, idx) => {
+                ctx.fillStyle = group.color;
+                ctx.fillRect(lx, 165, 12, 12);
+                ctx.fillStyle = '#334155';
+                ctx.font = '12px system-ui';
+                ctx.textAlign = 'left';
+                ctx.fillText(group.label, lx + 16, 175);
+                lx += 100;
+            });
+        })();
+
+        // === Probability Data & Interactive Chart ===
+        const totalComb = 11628; // C(19,5)
+
+        function comb(n, k) {
+            if (k < 0 || k > n) return 0;
+            let result = 1;
+            for (let i = 1; i <= k; i++) {
+                result = result * (n - k + i) / i;
+            }
+            return Math.round(result);
+        }
+
+        function getProb(k) {
+            const num = comb(4, k) * comb(15, 5 - k);
+            return { num, den: totalComb, value: num / totalComb };
+        }
+
+        // Slider interaction
+        const slider = document.getElementById('greenSlider');
+        const kSpan = document.getElementById('kValue');
+        const probDisplay = document.getElementById('probDisplay');
+        const formulaDisplay = document.getElementById('formulaDisplay');
+
+        function updateInteractive() {
+            const k = parseInt(slider.value);
+            kSpan.textContent = k;
+            const { num, den } = getProb(k);
+
+            // Simplify fraction
+            function gcd(a, b) { return b ? gcd(b, a % b) : a; }
+            const g = gcd(num, den);
+            const simplifiedNum = num / g;
+            const simplifiedDen = den / g;
+
+            if (simplifiedDen === 1) {
+                probDisplay.innerHTML = `\\( ${simplifiedNum} \\)`;
+            } else {
+                probDisplay.innerHTML = `\\( \\frac{${simplifiedNum}}{${simplifiedDen}} \\)`;
+            }
+
+            formulaDisplay.innerHTML = `\\( \\binom{4}{${k}}\\binom{15}{${5-k}} / \\binom{19}{5} \\)`;
+
+            // Redraw chart
+            drawChart(k);
+            MathJax.typesetPromise();
+        }
+
+        // Bar chart
+        function drawChart(highlightK) {
+            const canvas = document.getElementById('probChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width, h = canvas.height;
+            ctx.clearRect(0, 0, w, h);
+
+            const probs = [];
+            for (let k = 0; k <= 4; k++) {
+                probs.push(getProb(k).value);
+            }
+            const maxProb = Math.max(...probs);
+            const barWidth = 60;
+            const gap = 30;
+            const startX = (w - (5 * barWidth + 4 * gap)) / 2;
+            const baseY = h - 40;
+            const maxBarHeight = h - 80;
+
+            // Draw axes
+            ctx.beginPath();
+            ctx.moveTo(30, 20);
+            ctx.lineTo(30, baseY);
+            ctx.lineTo(w - 30, baseY);
+            ctx.strokeStyle = '#cbd5e1';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            // Draw bars
+            for (let k = 0; k <= 4; k++) {
+                const x = startX + k * (barWidth + gap);
+                const barHeight = (probs[k] / maxProb) * maxBarHeight;
+                const y = baseY - barHeight;
+
+                // Bar
+                ctx.fillStyle = (k === highlightK) ? '#4f46e5' : '#a5b4fc';
+                ctx.beginPath();
+                ctx.roundRect(x, y, barWidth, barHeight, 6);
+                ctx.fill();
+
+                // Label
+                ctx.fillStyle = '#334155';
+                ctx.font = 'bold 12px system-ui';
+                ctx.textAlign = 'center';
+                ctx.fillText(`k=${k}`, x + barWidth / 2, baseY + 20);
+
+                // Probability value
+                ctx.fillStyle = '#475569';
+                ctx.font = '10px system-ui';
+                const val = probs[k].toFixed(4);
+                ctx.fillText(val, x + barWidth / 2, y - 5);
+            }
+
+            // Y-axis label
+            ctx.save();
+            ctx.translate(12, baseY - maxBarHeight / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '11px system-ui';
+            ctx.textAlign = 'center';
+            ctx.fillText('Probability', 0, 0);
+            ctx.restore();
+        }
+
+        // Polyfill for roundRect
+        if (!CanvasRenderingContext2D.prototype.roundRect) {
+            CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+                if (w < 2 * r) r = w / 2;
+                if (h < 2 * r) r = h / 2;
+                this.moveTo(x + r, y);
+                this.arcTo(x + w, y, x + w, y + h, r);
+                this.arcTo(x + w, y + h, x, y + h, r);
+                this.arcTo(x, y + h, x, y, r);
+                this.arcTo(x, y, x + w, y, r);
+                this.closePath();
+                return this;
+            };
+        }
+
+        // Initialize
+        slider.addEventListener('input', updateInteractive);
+        updateInteractive();
+
+        // Re-render MathJax after initial load
+        window.addEventListener('load', () => {
+            MathJax.typesetPromise();
+        });
+    </script>
+</body>
+</html>

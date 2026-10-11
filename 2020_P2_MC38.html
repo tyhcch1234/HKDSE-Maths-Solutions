@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2020 Paper 2 Q38 — Triangular Prism Area</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[', '\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+<style>
+  :root{
+    --blue:#1e40af; --blue2:#3b82f6; --sky:#e0f2fe;
+    --amber:#f59e0b; --amberbg:#fffbeb;
+    --emerald:#059669; --embg:#ecfdf5;
+    --ink:#0f172a; --muted:#64748b;
+    --card:#ffffff; --bg:#f1f5f9;
+    --line:#e2e8f0;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    background:var(--bg); color:var(--ink); line-height:1.6;
+  }
+  .wrap{max-width:960px; margin:0 auto; padding:0 16px 60px;}
+
+  /* Hero */
+  .hero{
+    background:linear-gradient(135deg,#1e3a8a 0%,#2563eb 45%,#0ea5e9 100%);
+    color:#fff; padding:38px 16px 34px; position:relative; overflow:hidden;
+  }
+  .hero::after{
+    content:""; position:absolute; right:-80px; top:-80px; width:300px; height:300px;
+    background:radial-gradient(circle,rgba(255,255,255,.18),transparent 65%);
+  }
+  .hero-inner{max-width:960px; margin:0 auto; position:relative; z-index:2;}
+  .eyebrow{font-size:.82rem; letter-spacing:.14em; text-transform:uppercase; opacity:.85; font-weight:600;}
+  .hero h1{margin:6px 0 4px; font-size:clamp(1.5rem,4.4vw,2.25rem); font-weight:800;}
+  .hero .sub{opacity:.95; font-size:1rem;}
+  .pills{margin-top:16px; display:flex; flex-wrap:wrap; gap:8px;}
+  .pill{
+    background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35);
+    padding:5px 13px; border-radius:999px; font-size:.78rem; font-weight:600; backdrop-filter:blur(3px);
+  }
+
+  /* Cards */
+  .card{
+    background:var(--card); border-radius:16px; padding:22px; margin-top:22px;
+    box-shadow:0 4px 16px rgba(15,23,42,.06); border:1px solid var(--line);
+  }
+  .card h2{margin:0 0 14px; font-size:1.18rem; color:var(--blue); display:flex; align-items:center; gap:10px;}
+  .card h2 .num{
+    background:var(--blue); color:#fff; font-size:.8rem; font-weight:700;
+    width:28px; height:28px; border-radius:8px; display:inline-flex; align-items:center; justify-content:center; flex:0 0 auto;
+  }
+  .qtext{font-size:1.02rem;}
+  .marks{color:var(--amber); font-weight:700; white-space:nowrap;}
+
+  /* Controls */
+  .controls{
+    display:flex; flex-wrap:wrap; gap:16px; align-items:center; justify-content:center;
+    background:#f8fafc; border:1px dashed var(--line); border-radius:12px; padding:12px 16px; margin:14px 0;
+  }
+  .ctrl{display:flex; align-items:center; gap:9px; font-size:.88rem; font-weight:600; color:#334155;}
+  input[type=range]{width:150px; accent-color:var(--blue2);}
+  input[type=checkbox]{width:17px; height:17px; accent-color:var(--emerald);}
+  canvas{
+    width:100%; height:auto; display:block; margin:6px auto; border-radius:12px;
+    background:#ffffff; border:1px solid var(--line); touch-action:manipulation;
+  }
+  .readout{
+    display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:8px;
+  }
+  .chip{
+    background:#eff6ff; border:1px solid #bfdbfe; color:#1e40af; border-radius:9px;
+    padding:5px 12px; font-size:.83rem; font-weight:600; font-variant-numeric:tabular-nums;
+  }
+  .chip.g{background:var(--embg); border-color:#a7f3d0; color:#065f46;}
+  .chip.a{background:var(--amberbg); border-color:#fde68a; color:#92400e;}
+
+  /* Steps */
+  .step{
+    display:none; border-left:4px solid var(--blue2); background:#f8fafc;
+    border-radius:0 12px 12px 0; padding:14px 16px; margin:14px 0; animation:fade .35s ease;
+  }
+  .step.show{display:block;}
+  @keyframes fade{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;}}
+  .step-head{display:flex; align-items:center; gap:10px; margin-bottom:8px; flex-wrap:wrap;}
+  .badge{
+    background:var(--blue); color:#fff; font-size:.75rem; font-weight:700;
+    padding:3px 10px; border-radius:999px;
+  }
+  .badge.mk{background:var(--amber);}
+  .hint{
+    background:var(--amberbg); border-left:4px solid var(--amber); border-radius:8px;
+    padding:9px 13px; margin:11px 0; font-size:.9rem; color:#78350f;
+  }
+  .hint b{color:#92400e;}
+  .ans{
+    background:var(--embg); border-left:4px solid var(--emerald); border-radius:8px;
+    padding:10px 13px; margin-top:11px; font-size:.95rem; color:#064e3b; font-weight:600;
+  }
+  .btnrow{display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-top:6px;}
+  button.reveal{
+    background:linear-gradient(135deg,#2563eb,#0ea5e9); color:#fff; border:none;
+    padding:10px 22px; border-radius:10px; font-size:.93rem; font-weight:700; cursor:pointer;
+    box-shadow:0 3px 10px rgba(37,99,235,.3); transition:.18s;
+  }
+  button.reveal:hover:not(:disabled){transform:translateY(-1px); box-shadow:0 6px 16px rgba(37,99,235,.38);}
+  button.reveal:disabled{background:#cbd5e1; box-shadow:none; cursor:not-allowed; color:#64748b;}
+  .counter{font-size:.85rem; font-weight:700; color:var(--muted);}
+
+  /* Summary */
+  .summary{background:linear-gradient(135deg,#0f172a,#1e293b); color:#e2e8f0; border:none;}
+  .summary h2{color:#7dd3fc;}
+  .summary ul{margin:0; padding-left:0; list-style:none;}
+  .summary li{padding:9px 0 9px 30px; position:relative; border-bottom:1px solid rgba(255,255,255,.08);}
+  .summary li:last-child{border-bottom:none;}
+  .summary li::before{
+    content:"✓"; position:absolute; left:2px; top:9px; color:#34d399; font-weight:800;
+  }
+  .summary .hi{color:#fbbf24; font-weight:700;}
+
+  footer{text-align:center; color:var(--muted); font-size:.82rem; padding:26px 10px 8px;}
+
+  @media (max-width:600px){
+    .card{padding:16px;}
+    .controls{gap:10px;}
+    input[type=range]{width:120px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</div>
+    <h1>2020 Paper 2 · Question 38</h1>
+    <div class="sub">Trigonometry · Area of a triangle in a right triangular prism</div>
+    <div class="pills">
+      <span class="pill">Right Triangular Prism</span>
+      <span class="pill">Pythagoras' Theorem</span>
+      <span class="pill">Heron's Formula</span>
+      <span class="pill">3-D Geometry</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- QUESTION -->
+  <section class="card">
+    <h2><span class="num">Q</span>The Question</h2>
+    <div class="qtext">
+      <p><strong>[2020MC#38]</strong></p>
+      <p>In the figure, \(ABCDEF\) is a right triangular prism. \(P\) is a point lying on \(AE\). If \(AB = AC = 12\) cm, \(AP = 9\) cm, \(EP = 5\) cm and \(BD = 2k\) cm, find the area of \(\Delta BDP\).</p>
+      <p>
+        A. \(\sqrt{(k^2-1)(196-k^2)}\) <br>
+        B. \(\sqrt{(k^2-1)(196+k^2)}\) <br>
+        C. \(\sqrt{(k^2+1)(196-k^2)}\) <br>
+        D. \(\sqrt{(k^2+1)(196+k^2)}\)
+      </p>
+    </div>
+  </section>
+
+  <!-- PART 1: BP -->
+  <section class="card">
+    <h2><span class="num">1</span>Length \(BP\) in \(\triangle ABP\)</h2>
+    <p>Since \(ABCDEF\) is a right triangular prism, \(AB\) is perpendicular to \(AE\). Drag the slider to see how \(P\) moves along \(AE\).</p>
+
+    <div class="controls">
+      <label class="ctrl">\(AP\) = <span id="apVal">9</span> cm
+        <input type="range" id="apSlider" min="0" max="14" step="1" value="9">
+      </label>
+      <label class="ctrl"><input type="checkbox" id="showHyp" checked> Show right triangle \(ABP\)</label>
+    </div>
+
+    <canvas id="cv1" width="720" height="330"></canvas>
+
+    <div class="readout">
+      <span class="chip">\(AB = 12\) cm</span>
+      <span class="chip">\(AE = AP+EP = 14\) cm</span>
+      <span class="chip g" id="bpChip">\(BP = 15.00\) cm</span>
+    </div>
+
+    <div class="btnrow">
+      <button class="reveal" data-target="s1">Next step →</button>
+      <span class="counter" id="c1">0 / 3</span>
+    </div>
+
+    <div class="step" id="s1-1">
+      <div class="step-head"><span class="badge">Step 1</span><span class="badge mk">1M</span></div>
+      <p>In the right-angled triangle \(ABP\), since \(AB \perp AE\):</p>
+      \[ BP = \sqrt{AB^2 + AP^2} = \sqrt{12^2 + 9^2} \]
+      <div class="hint"><b>Hint:</b> A right prism has all lateral edges perpendicular to the base, so \(AB \perp AE\) and hence \(AB \perp AP\).</div>
+    </div>
+
+    <div class="step" id="s1-2">
+      <div class="step-head"><span class="badge">Step 2</span><span class="badge mk">1A</span></div>
+      \[ BP = \sqrt{144 + 81} = \sqrt{225} = 15 \text{ cm} \]
+      <div class="hint"><b>Hint:</b> \(12\text{–}9\text{–}15\) is a scaled \(4\text{–}3\text{–}5\) Pythagorean triple.</div>
+      <div class="ans">\(BP = 15\) cm</div>
+    </div>
+
+    <div class="step" id="s1-3">
+      <div class="step-head"><span class="badge">Step 3</span><span class="badge mk">1A</span></div>
+      <p>Also note \(AE = AP + EP = 9 + 5 = 14\) cm — this full edge length will be needed for \(DP\).</p>
+      <div class="hint"><b>Hint:</b> The lateral edge joins the two parallel triangular faces \(ABC\) and \(DEF\).</div>
+      <div class="ans">\(AE = 14\) cm</div>
+    </div>
+  </section>
+
+  <!-- PART 2: DP -->
+  <section class="card">
+    <h2><span class="num">2</span>Length \(DP\) in \(\triangle DEP\)</h2>
+    <p>The apex \(D\) sits above \(C\). Here \(DE = 12\) cm (matching \(AB\)) and \(EP = AE - AP = 5\) cm.</p>
+
+    <div class="controls">
+      <label class="ctrl">\(EP\) = <span id="epVal">5</span> cm
+        <input type="range" id="epSlider" min="0" max="14" step="1" value="5">
+      </label>
+      <label class="ctrl"><input type="checkbox" id="showDP" checked> Show right triangle \(DEP\)</label>
+    </div>
+
+    <canvas id="cv2" width="720" height="330"></canvas>
+
+    <div class="readout">
+      <span class="chip">\(DE = 12\) cm</span>
+      <span class="chip">\(AE = 14\) cm</span>
+      <span class="chip g" id="dpChip">\(DP = 13.00\) cm</span>
+    </div>
+
+    <div class="btnrow">
+      <button class="reveal" data-target="s2">Next step →</button>
+      <span class="counter" id="c2">0 / 2</span>
+    </div>
+
+    <div class="step" id="s2-1">
+      <div class="step-head"><span class="badge">Step 1</span><span class="badge mk">1M</span></div>
+      <p>In the right-angled triangle \(DEP\), \(DE \perp EP\):</p>
+      \[ DP = \sqrt{DE^2 + EP^2} = \sqrt{12^2 + 5^2} \]
+      <div class="hint"><b>Hint:</b> \(DE\) is a lateral edge parallel to \(AB\), and \(EP\) lies along \(AE\), so the angle at \(E\) is \(90^\circ\).</div>
+    </div>
+
+    <div class="step" id="s2-2">
+      <div class="step-head"><span class="badge">Step 2</span><span class="badge mk">1A</span></div>
+      \[ DP = \sqrt{144 + 25} = \sqrt{169} = 13 \text{ cm} \]
+      <div class="hint"><b>Hint:</b> \(12\text{–}5\text{–}13\) is a standard Pythagorean triple.</div>
+      <div class="ans">\(DP = 13\) cm</div>
+    </div>
+  </section>
+
+  <!-- PART 3: HERON -->
+  <section class="card">
+    <h2><span class="num">3</span>Area of \(\triangle BDP\) via Heron's Formula</h2>
+    <p>We now have all three sides of \(\triangle BDP\): \(BD = 2k\), \(BP = 15\), \(DP = 13\). Adjust \(k\) to see the triangle change shape.</p>
+
+    <div class="controls">
+      <label class="ctrl">\(k\) = <span id="kVal">7.0</span> cm (half of \(BD\))
+        <input type="range" id="kSlider" min="6.5" max="14" step="0.1" value="7">
+      </label>
+      <label class="ctrl"><input type="checkbox" id="showHalf" checked> Show half-perimeter &amp; labels</label>
+    </div>
+
+    <canvas id="cv3" width="720" height="380"></canvas>
+
+    <div class="readout">
+      <span class="chip">\(BD = 2k\)</span>
+      <span class="chip">\(BP = 15\)</span>
+      <span class="chip">\(DP = 13\)</span>
+      <span class="chip a" id="sChip">\(s = k+14\)</span>
+      <span class="chip g" id="areaChip">Area = 47.62 cm²</span>
+    </div>
+
+    <div class="btnrow">
+      <button class="reveal" data-target="s3">Next step →</button>
+      <span class="counter" id="c3">0 / 3</span>
+    </div>
+
+    <div class="step" id="s3-1">
+      <div class="step-head"><span class="badge">Step 1</span><span class="badge mk">1M</span></div>
+      <p>The semi-perimeter of \(\triangle BDP\) is:</p>
+      \[ s = \frac{BD+BP+DP}{2} = \frac{2k+15+13}{2} = k+14 \text{ cm} \]
+      <div class="hint"><b>Hint:</b> Add the three sides and halve. The \(k\) terms simplify neatly.</div>
+    </div>
+
+    <div class="step" id="s3-2">
+      <div class="step-head"><span class="badge">Step 2</span><span class="badge mk">1M</span></div>
+      <p>By Heron's formula, \(\text{Area} = \sqrt{s(s-BD)(s-BP)(s-DP)}\):</p>
+      \[ = \sqrt{(k+14)\big[(k+14)-2k\big]\big[(k+14)-15\big]\big[(k+14)-13\big]} \]
+      \[ = \sqrt{(k+14)(14-k)(k-1)(k+1)} \]
+      <div class="hint"><b>Hint:</b> \((k+14)-2k = 14-k\) and \((k+14)-13 = k+1\). This requires the triangle inequality, i.e. \(1 < k < 14\).</div>
+    </div>
+
+    <div class="step" id="s3-3">
+      <div class="step-head"><span class="badge">Step 3</span><span class="badge mk">1A</span></div>
+      <p>Group the factors:</p>
+      \[ = \sqrt{\big[(k-1)(k+1)\big]\big[(14-k)(14+k)\big]} \]
+      \[ = \sqrt{(k^2-1)(196-k^2)} \text{ cm}^2 \]
+      <div class="hint"><b>Hint:</b> Use the difference of squares: \((k-1)(k+1)=k^2-1\) and \((14-k)(14+k)=196-k^2\).</div>
+      <div class="ans">Area \(= \sqrt{(k^2-1)(196-k^2)}\) cm² &nbsp;⟹&nbsp; Answer <strong>A</strong></div>
+    </div>
+  </section>
+
+  <!-- SUMMARY -->
+  <section class="card summary">
+    <h2><span class="num" style="background:#38bdf8;">✓</span>Final Answers at a Glance</h2>
+    <ul>
+      <li>\(AE = AP + EP = 9 + 5 = <span class="hi">14\) cm</span></li>
+      <li>\(BP = \sqrt{12^2+9^2} = \sqrt{225} = <span class="hi">15\) cm</span></li>
+      <li>\(DP = \sqrt{12^2+5^2} = \sqrt{169} = <span class="hi">13\) cm</span></li>
+      <li>Semi-perimeter \(s = \dfrac{2k+15+13}{2} = <span class="hi">k+14\) cm</span></li>
+      <li>Area of \(\triangle BDP = \sqrt{(k^2-1)(196-k^2)}\) cm²</li>
+      <li>Correct option: <span class="hi">A</span></li>
+    </ul>
+  </section>
+
+  <footer>
+    HKDSE Mathematics (Compulsory Part) · Paper 2 · 2020 Q38 — Interactive Solution
+  </footer>
+</main>
+
+<script>
+/* ------------------ Shared drawing helpers ------------------ */
+function arrowLine(ctx,x1,y1,x2,y2,color,w){
+  ctx.strokeStyle=color; ctx.lineWidth=w||2;
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+}
+function dot(ctx,x,y,color,r,label,dx,dy){
+  ctx.fillStyle=color; ctx.beginPath(); ctx.arc(x,y,r||4.5,0,Math.PI*2); ctx.fill();
+  if(label){
+    ctx.fillStyle='#0f172a'; ctx.font='bold 14px Segoe UI, sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(label,x+(dx||0),y+(dy||0));
+  }
+}
+function rightAngle(ctx,x,y,ux,uy,vx,vy,size,color){
+  // draw small square at vertex (x,y) using unit dirs (ux,uy) and (vx,vy)
+  const p1x=x+ux*size, p1y=y+uy*size;
+  const p2x=x+ux*size+vx*size, p2y=y+uy*size+vy*size;
+  const p3x=x+vx*size, p3y=y+vy*size;
+  ctx.strokeStyle=color||'#94a3b8'; ctx.lineWidth=1.8;
+  ctx.beginPath(); ctx.moveTo(p1x,p1y); ctx.lineTo(p2x,p2y); ctx.lineTo(p3x,p3y); ctx.stroke();
+}
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r); ctx.closePath();
+}
+function labelBox(ctx,x,y,text,bg,fg){
+  ctx.font='bold 13px Segoe UI, sans-serif';
+  const w=ctx.measureText(text).width+16, h=22;
+  ctx.fillStyle=bg; roundRect(ctx,x-w/2,y-h/2,w,h,7); ctx.fill();
+  ctx.fillStyle=fg; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(text,x,y);
+}
+
+/* ------------------ DIAGRAM 1 : triangle ABP ------------------ */
+const cv1=document.getElementById('cv1'), ctx1=cv1.getContext('2d');
+const apSlider=document.getElementById('apSlider'), apValEl=document.getElementById('apVal');
+const showHyp=document.getElementById('showHyp'), bpChip=document.getElementById('bpChip');
+
+function draw1(){
+  const W=cv1.width,H=cv1.height;
+  ctx1.clearRect(0,0,W,H);
+  ctx1.fillStyle='#ffffff'; ctx1.fillRect(0,0,W,H);
+
+  const AP=+apSlider.value;
+  apValEl.textContent=AP;
+
+  // Coordinate mapping: A at (140,270), B at (140,70) [AB=12 -> 200px], E above A along AE
+  const scale=200/12;                 // px per cm
+  const Ax=140, Ay=270;
+  const Bx=140, By=Ay-12*scale;       // B directly above A (AB vertical) -> 70
+  const Ex=Ax, Ey=Ay-14*scale;        // E at 14 cm above A
+  const Px=Ax, Py=Ay-AP*scale;
+
+  // prism hint (light)
+  ctx1.strokeStyle='#e2e8f0'; ctx1.lineWidth=1;
+  ctx1.setLineDash([5,5]);
+  ctx1.beginPath(); ctx1.moveTo(Ax,Ay); ctx1.lineTo(Ax,Ey); ctx1.stroke();
+  ctx1.setLineDash([]);
+
+  // Triangle ABP
+  ctx1.fillStyle='rgba(59,130,246,.12)';
+  ctx1.beginPath(); ctx1.moveTo(Ax,Ay); ctx1.lineTo(Bx,By); ctx1.lineTo(Px,Py); ctx1.closePath(); ctx1.fill();
+
+  arrowLine(ctx1,Ax,Ay,Bx,By,'#1e40af',2.6);      // AB
+  arrowLine(ctx1,Ax,Ay,Px,Py,'#1e40af',2.6);      // AP
+  if(showHyp.checked) arrowLine(ctx1,Bx,By,Px,Py,'#f59e0b',3);   // BP
+
+  // right angle at A
+  rightAngle(ctx1,Ax,Ay,0,-1,0,-1,0,0); // placeholder (not used)
+  // manual right angle between AB(up) and AP(up) -> they're collinear, so show angle at A between AB and BP instead? 
+  // Actually AB and AP are collinear; the right angle is at A between AB and... no. AB ⟂ AE, so right angle at A between AB and AE.
+  // Since AB and AP are along the same vertical line, the right angle is between AB (vertical) and the horizontal at A... 
+  // Wait: AB is vertical, AE is vertical too? No — AB is perpendicular to AE. So AE is horizontal.
+  // Let's re-orient: A at origin, AB vertical (12), AE horizontal (14).
+  ctx1.setTransform(1,0,0,1,0,0);
+  ctx1.clearRect(0,0,W,H); ctx1.fillStyle='#fff'; ctx1.fillRect(0,0,W,H);
+
+  const scale2=200/14; // fit 14cm in 200px
+  const A2x=90, A2y=280;
+  const B2x=A2x, B2y=A2y-12*scale2;          // AB vertical
+  const E2x=A2x+14*scale2, E2y=A2y;          // AE horizontal
+  const P2x=A2x+AP*scale2, P2y=A2y;
+
+  // light prism edges
+  ctx1.strokeStyle='#e2e8f0'; ctx1.lineWidth=1.2; ctx1.setLineDash([6,5]);
+  ctx1.beginPath(); ctx1.moveTo(A2x,A2y); ctx1.lineTo(E2x,E2y); ctx1.stroke();
+  ctx1.setLineDash([]);
+
+  // triangle ABP
+  ctx1.fillStyle='rgba(59,130,246,.13)';
+  ctx1.beginPath(); ctx1.moveTo(A2x,A2y); ctx1.lineTo(B2x,B2y); ctx1.lineTo(P2x,P2y); ctx1.closePath(); ctx1.fill();
+
+  arrowLine(ctx1,A2x,A2y,B2x,B2y,'#1e40af',3);   // AB
+  arrowLine(ctx1,A2x,A2y,P2x,P2y,'#1e40af',3);   // AP
+  if(showHyp.checked) arrowLine(ctx1,B2x,B2y,P2x,P2y,'#f59e0b',3.4); // BP
+
+  // right angle symbol at A between AB (up) and AP (right)
+  rightAngle(ctx1,A2x,A2y,0,-1,1,0,18,'#334155');
+
+  // points
+  dot(ctx1,A2x,A2y,'#1e40af',5.5,'A',-16,16);
+  dot(ctx1,B2x,B2y,'#1e40af',5.5,'B',-16,-4);
+  dot(ctx1,P2x,P2y,'#ef4444',5.5,'P',0,20);
+  dot(ctx1,E2x,E2y,'#94a3b8',5,'E',16,14);
+
+  // labels
+  labelBox(ctx1,(A2x+B2x)/2-30,(A2y+B2y)/2,'12 cm','#dbeafe','#1e40af');
+  labelBox(ctx1,(A2x+P2x)/2,(A2y+P2y)/2+26,AP+' cm','#fee2e2','#b91c1c');
+  if(showHyp.checked){
+    const bp=Math.sqrt(144+AP*AP);
+    labelBox(ctx1,(B2x+P2x)/2+14,(B2y+P2y)/2-14,'BP = '+bp.toFixed(2)+' cm','#fef3c7','#92400e');
+  }
+
+  // title
+  ctx1.fillStyle='#0f172a'; ctx1.font='bold 15px Segoe UI, sans-serif'; ctx1.textAlign='left';
+  ctx1.fillText('Right triangle ABP  (AB ⟂ AE)',20,28);
+  ctx1.fillStyle='#64748b'; ctx1.font='12px Segoe UI, sans-serif';
+  ctx1.fillText('AB = 12 cm,  AP = '+AP+' cm',20,48);
+
+  // live readout
+  const bp=Math.sqrt(144+AP*AP);
+  bpChip.textContent='BP = '+bp.toFixed(2)+' cm';
+}
+
+/* ------------------ DIAGRAM 2 : triangle DEP ------------------ */
+const cv2=document.getElementById('cv2'), ctx2=cv2.getContext('2d');
+const epSlider=document.getElementById('epSlider'), epValEl=document.getElementById('epVal');
+const showDP=document.getElementById('showDP'), dpChip=document.getElementById('dpChip');
+
+function draw2(){
+  const W=cv2.width,H=cv2.height;
+  ctx2.clearRect(0,0,W,H);
+  ctx2.fillStyle='#fff'; ctx2.fillRect(0,0,W,H);
+
+  const EP=+epSlider.value;
+  epValEl.textContent=EP;
+
+  const scale=200/14;
+  const E2x=90, E2y=280;
+  const D2x=E2x, D2y=E2y-12*scale;              // DE vertical 12
+  const A2x=E2x, A2y=E2y-14*scale;              // AE total 14
+  const P2x=E2x+EP*scale, P2y=E2y;              // P along AE from A... careful: P is AP from A. EP = 5 means P is 5 from E.
+  // Set E as base right end: E at (90,280), A at (90-14*scale? ) Hmm.
+  // Let's place E at left, A at right: AE horizontal.
+  const Ex=90, Ey=280;
+  const Ax=Ex+14*scale, Ay=280;
+  const Px=Ex+EP*scale, Py=280;                 // distance EP from E
+  const Dx=Ex, Dy=280-12*scale;                 // D above E, DE=12
+
+  // light edges
+  ctx2.strokeStyle='#e2e8f0'; ctx2.lineWidth=1.2; ctx2.setLineDash([6,5]);
+  ctx2.beginPath(); ctx2.moveTo(Ex,Ey); ctx2.lineTo(Ax,Ay); ctx2.stroke();
+  ctx2.setLineDash([]);
+
+  // triangle DEP
+  ctx2.fillStyle='rgba(16,185,129,.13)';
+  ctx2.beginPath(); ctx2.moveTo(Dx,Dy); ctx2.lineTo(Ex,Ey); ctx2.lineTo(Px,Py); ctx2.closePath(); ctx2.fill();
+
+  arrowLine(ctx2,Dx,Dy,Ex,Ey,'#047857',3);    // DE
+  arrowLine(ctx2,Ex,Ey,Px,Py,'#047857',3);    // EP
+  if(showDP.checked) arrowLine(ctx2,Dx,Dy,Px,Py,'#f59e0b',3.4); // DP
+
+  // right angle at E between ED (up) and EP (right)
+  rightAngle(ctx2,Ex,Ey,0,-1,1,0,18,'#334155');
+
+  dot(ctx2,Dx,Dy,'#047857',5.5,'D',-16,-4);
+  dot(ctx2,Ex,Ey,'#047857',5.5,'E',-6,20);
+  dot(ctx2,Px,Py,'#ef4444',5.5,'P',0,20);
+  dot(ctx2,Ax,Ay,'#94a3b8',5,'A',16,16);
+
+  labelBox(ctx2,(Dx+Ex)/2-30,(Dy+Ey)/2,'12 cm','#d1fae5','#065f46');
+  labelBox(ctx2,(Ex+Px)/2,(Ey+Py)/2+26,EP+' cm','#fee2e2','#b91c1c');
+  if(showDP.checked){
+    const dp=Math.sqrt(144+EP*EP);
+    labelBox(ctx2,(Dx+Px)/2+16,(Dy+Py)/2-14,'DP = '+dp.toFixed(2)+' cm','#fef3c7','#92400e');
+  }
+
+  ctx2.fillStyle='#0f172a'; ctx2.font='bold 15px Segoe UI, sans-serif'; ctx2.textAlign='left';
+  ctx2.fillText('Right triangle DEP  (DE ⟂ EP)',20,28);
+  ctx2.fillStyle='#64748b'; ctx2.font='12px Segoe UI, sans-serif';
+  ctx2.fillText('DE = 12 cm,  EP = '+EP+' cm',20,48);
+
+  const dp=Math.sqrt(144+EP*EP);
+  dpChip.textContent='DP = '+dp.toFixed(2)+' cm';
+}
+
+/* ------------------ DIAGRAM 3 : triangle BDP + Heron ------------------ */
+const cv3=document.getElementById('cv3'), ctx3=cv3.getContext('2d');
+const kSlider=document.getElementById('kSlider'), kValEl=document.getElementById('kVal');
+const showHalf=document.getElementById('showHalf');
+const sChip=document.getElementById('sChip'), areaChip=document.getElementById('areaChip');
+
+function draw3(){
+  const W=cv3.width, H=cv3.height;
+  ctx3.clearRect(0,0,W,H);
+  ctx3.fillStyle='#fff'; ctx3.fillRect(0,0,W,H);
+
+  const k=+kSlider.value;
+  kValEl.textContent=k.toFixed(1);
+
+  const BD=2*k, BP=15, DP=13;
+
+  // Place B at left-bottom, D at right-bottom with BD length; compute P by two-circle intersection.
+  const margin=60, topMargin=60;
+  const maxLen=Math.max(BD,BP,DP);
+  const scale=Math.min((W-2*margin)/maxLen,(H-2*topMargin)/13); // fit
+
+  const Bx=margin, By=H-topMargin;
+  const Dx=Bx+BD*scale, Dy=By;
+
+  // intersection of circle centred B radius BP*scale and centred D radius DP*scale
+  const a=(BP*BP - DP*DP + BD*BD)/(2*BD);
+  const h=Math.sqrt(Math.max(BP*BP - a*a,0));
+  const Px=Bx + a*scale;
+  const Py=By - h*scale;
+
+  // triangle fill
+  ctx3.fillStyle='rgba(139,92,246,.12)';
+  ctx3.beginPath(); ctx3.moveTo(Bx,By); ctx3.lineTo(Dx,Dy); ctx3.lineTo(Px,Py); ctx3.closePath(); ctx3.fill();
+
+  // sides
+  arrowLine(ctx3,Bx,By,Dx,Dy,'#7c3aed',3);    // BD
+  arrowLine(ctx3,Bx,By,Px,Py,'#f59e0b',3);    // BP
+  arrowLine(ctx3,Dx,Dy,Px,Py,'#0ea5e9',3);    // DP
+
+  // grid hint for Heron
+  if(showHalf.checked){
+    // show semi-perimeter as a dashed reference
+    ctx3.setLineDash([5,5]); ctx3.strokeStyle='#cbd5e1'; ctx3.lineWidth=1.2;
+    ctx3.beginPath(); ctx3.moveTo(Bx,By-8); ctx3.lineTo(Dx,Dy-8); ctx3.stroke();
+    ctx3.setLineDash([]);
+    const s=k+14;
+    labelBox(ctx3,(Bx+Dx)/2,By-24,'s = '+s.toFixed(1)+' cm','#e0e7ff','#3730a3');
+  }
+
+  // points
+  dot(ctx3,Bx,By,'#7c3aed',6,'B',-16,14);
+  dot(ctx3,Dx,Dy,'#7c3aed',6,'D',16,14);
+  dot(ctx3,Px,Py,'#ef4444',6,'P',0,-18);
+
+  // labels on sides
+  labelBox(ctx3,(Bx+Dx)/2,By+24,'BD = '+BD.toFixed(1)+' cm','#ede9fe','#6d28d9');
+  labelBox(ctx3,(Bx+Px)/2-24,(By+Py)/2,'BP = 15 cm','#fef3c7','#92400e');
+  labelBox(ctx3,(Dx+Px)/2+24,(Dy+Py)/2,'DP = 13 cm','#e0f2fe','#0369a1');
+
+  // compute area
+  const s=(BD+BP+DP)/2;
+  const areaSq=s*(s-BD)*(s-BP)*(s-DP);
+  const area=Math.sqrt(Math.max(areaSq,0));
+
+  // title
+  ctx3.fillStyle='#0f172a'; ctx3.font='bold 15px Segoe UI, sans-serif'; ctx3.textAlign='left';
+  ctx3.fillText('Triangle BDP  —  Heron\'s Formula',20,26);
+  ctx3.fillStyle='#64748b'; ctx3.font='12px Segoe UI, sans-serif';
+  ctx3.fillText('BD = 2k = '+BD.toFixed(1)+' cm,   BP = 15 cm,   DP = 13 cm',20,46);
+
+  // readouts
+  sChip.textContent='s = '+s.toFixed(2)+' cm';
+  areaChip.textContent='Area = '+area.toFixed(2)+' cm²';
+  // exact formula value check
+  const exact=Math.sqrt(Math.max((k*k-1)*(196-k*k),0));
+  if(!isNaN(exact)) areaChip.title='Exact formula: '+exact.toFixed(2);
+}
+
+/* ------------------ Reveal logic ------------------ */
+function initReveal(btnId, containerId, counterId){
+  const btn=document.getElementById(btnId);
+  const container=document.getElementById(containerId);
+  const counter=document.getElementById(counterId);
+  const steps=container.querySelectorAll('.step');
+  let idx=0;
+  function update(){
+    counter.textContent=idx+' / '+steps.length;
+    if(idx>=steps.length){
+      btn.disabled=true; btn.textContent='All steps revealed ✓';
+    }
+  }
+  btn.addEventListener('click',()=>{
+    if(idx<steps.length){
+      steps[idx].classList.add('show');
+      idx++;
+      update();
+      if(window.MathJax && MathJax.typesetPromise){ MathJax.typesetPromise([steps[idx-1]]); }
+    }
+  });
+  update();
+}
+
+// Unique IDs for each part's button/container/counter
+document.addEventListener('DOMContentLoaded',()=>{
+  // Part 1
+  const b1=document.querySelectorAll('.btnrow')[0].querySelector('button.reveal');
+  const c1=document.getElementById('c1');
+  let idx1=0; const steps1=document.querySelectorAll('#s1-1,#s1-2,#s1-3');
+  b1.addEventListener('click',()=>{
+    if(idx1<steps1.length){ steps1[idx1].classList.add('show'); idx1++;
+      c1.textContent=idx1+' / '+steps1.length;
+      if(idx1>=steps1.length){b1.disabled=true; b1.textContent='All steps revealed ✓';}
+      if(MathJax.typesetPromise) MathJax.typesetPromise([steps1[idx1-1]]);
+    }
+  });
+  c1.textContent='0 / '+steps1.length;
+
+  // Part 2
+  const b2=document.querySelectorAll('.btnrow')[1].querySelector('button.reveal');
+  const c2=document.getElementById('c2');
+  let idx2=0; const steps2=document.querySelectorAll('#s2-1,#s2-2');
+  b2.addEventListener('click',()=>{
+    if(idx2<steps2.length){ steps2[idx2].classList.add('show'); idx2++;
+      c2.textContent=idx2+' / '+steps2.length;
+      if(idx2>=steps2.length){b2.disabled=true; b2.textContent='All steps revealed ✓';}
+      if(MathJax.typesetPromise) MathJax.typesetPromise([steps2[idx2-1]]);
+    }
+  });
+  c2.textContent='0 / '+steps2.length;
+
+  // Part 3
+  const b3=document.querySelectorAll('.btnrow')[2].querySelector('button.reveal');
+  const c3=document.getElementById('c3');
+  let idx3=0; const steps3=document.querySelectorAll('#s3-1,#s3-2,#s3-3');
+  b3.addEventListener('click',()=>{
+    if(idx3<steps3.length){ steps3[idx3].classList.add('show'); idx3++;
+      c3.textContent=idx3+' / '+steps3.length;
+      if(idx3>=steps3.length){b3.disabled=true; b3.textContent='All steps revealed ✓';}
+      if(MathJax.typesetPromise) MathJax.typesetPromise([steps3[idx3-1]]);
+    }
+  });
+  c3.textContent='0 / '+steps3.length;
+
+  // Draw initially
+  draw1(); draw2(); draw3();
+
+  // Listeners
+  apSlider.addEventListener('input',draw1);
+  epSlider.addEventListener('input',draw2);
+  kSlider.addEventListener('input',draw3);
+  showHyp.addEventListener('change',draw1);
+  showDP.addEventListener('change',draw2);
+  showHalf.addEventListener('change',draw3);
+});
+
+// Also attach directly in case DOMContentLoaded already fired
+apSlider.addEventListener('input',draw1);
+epSlider.addEventListener('input',draw2);
+kSlider.addEventListener('input',draw3);
+showHyp.addEventListener('change',draw1);
+showDP.addEventListener('change',draw2);
+showHalf.addEventListener('change',draw3);
+</script>
+</body>
+</html>

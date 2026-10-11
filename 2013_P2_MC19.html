@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2013 Paper 2 Q19 · Circle Geometry</title>
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[', '\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+  :root{
+    --blue:#1e3a8a; --blue2:#2563eb; --sky:#38bdf8;
+    --amber:#f59e0b; --amberbg:#fffbeb;
+    --green:#059669; --greenbg:#ecfdf5;
+    --ink:#0f172a; --muted:#64748b;
+    --card:#ffffff; --bg:#f1f5f9;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    background:var(--bg); color:var(--ink); line-height:1.55; -webkit-font-smoothing:antialiased;
+  }
+  /* ---------- HERO ---------- */
+  .hero{
+    background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 45%,#2563eb 75%,#38bdf8 100%);
+    color:#fff; padding:34px 20px 42px; position:relative; overflow:hidden;
+  }
+  .hero:after{
+    content:""; position:absolute; right:-80px; top:-80px; width:280px; height:280px;
+    border-radius:50%; background:radial-gradient(circle,rgba(255,255,255,.20),transparent 70%);
+  }
+  .hero-inner{max-width:900px; margin:0 auto; position:relative; z-index:2;}
+  .eyebrow{font-size:.78rem; letter-spacing:.16em; text-transform:uppercase; opacity:.85; font-weight:600;}
+  .hero h1{
+    font-size:1.95rem; margin:.35rem 0 .2rem; font-weight:800; letter-spacing:-.01em;
+  }
+  .hero h2{font-size:1.02rem; font-weight:500; opacity:.92; margin:0 0 .9rem;}
+  .pills{display:flex; flex-wrap:wrap; gap:8px;}
+  .pill{
+    background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.36);
+    padding:4px 12px; border-radius:999px; font-size:.76rem; font-weight:600; backdrop-filter:blur(4px);
+  }
+  /* ---------- LAYOUT ---------- */
+  main{max-width:900px; margin:0 auto; padding:22px 16px 50px;}
+  .card{
+    background:var(--card); border-radius:16px; padding:20px 20px 24px; margin-bottom:20px;
+    box-shadow:0 4px 18px rgba(15,23,42,.07); border:1px solid #e2e8f0;
+  }
+  .card h3{
+    margin:0 0 .5rem; font-size:1.14rem; font-weight:800; color:var(--blue);
+    display:flex; align-items:center; gap:.5rem; flex-wrap:wrap;
+  }
+  .badge-part{
+    background:var(--blue2); color:#fff; font-size:.72rem; font-weight:700;
+    border-radius:8px; padding:2px 9px; letter-spacing:.04em;
+  }
+  .badge-marks{
+    background:#dbeafe; color:#1d4ed8; font-size:.72rem; font-weight:800;
+    border-radius:999px; padding:2px 10px;
+  }
+  .qtext{font-size:1.02rem;}
+  .qtext ol{margin:.4rem 0 .2rem 1.1rem; padding:0;}
+  .qtext li{margin:.28rem 0;}
+  .figure-note{font-size:.82rem; color:var(--muted); margin:.3rem 0 .9rem;}
+  /* ---------- CANVAS ---------- */
+  .canvas-wrap{
+    background:#f8fafc; border:1px solid #e2e8f0; border-radius:14px; padding:10px;
+    margin:.6rem 0 1rem; display:flex; justify-content:center;
+  }
+  canvas{max-width:100%; height:auto; display:block; touch-action:none;}
+  .controls{
+    display:flex; flex-wrap:wrap; gap:14px; align-items:center;
+    margin:.15rem 0 1.1rem; padding:12px 14px; background:#f8fafc;
+    border:1px solid #e2e8f0; border-radius:12px;
+  }
+  .ctrl{display:flex; flex-direction:column; gap:3px; min-width:190px; flex:1;}
+  .ctrl label{font-size:.78rem; font-weight:700; color:#334155;}
+  .ctrl .val{font-size:.78rem; color:var(--blue2); font-weight:800;}
+  input[type=range]{width:100%; accent-color:var(--blue2);}
+  .chkrow{display:flex; flex-wrap:wrap; gap:14px;}
+  .chkrow label{display:flex; align-items:center; gap:6px; font-size:.82rem; font-weight:600; color:#334155; cursor:pointer;}
+  input[type=checkbox]{width:16px; height:16px; accent-color:var(--green);}
+  .readout{
+    display:flex; flex-wrap:wrap; gap:8px; margin-top:4px;
+  }
+  .chip{
+    background:#eff6ff; border:1px solid #bfdbfe; color:#1e40af;
+    border-radius:10px; padding:4px 10px; font-size:.78rem; font-weight:700;
+    font-variant-numeric:tabular-nums;
+  }
+  .chip.g{background:var(--greenbg); border-color:#a7f3d0; color:#047857;}
+  .chip.a{background:var(--amberbg); border-color:#fde68a; color:#b45309;}
+  /* ---------- STEPS ---------- */
+  .step{
+    display:none; border-left:4px solid var(--blue2); background:#f8fafc;
+    border-radius:0 12px 12px 0; padding:12px 14px; margin:.85rem 0;
+    animation:fade .35s ease;
+  }
+  .step.show{display:block;}
+  @keyframes fade{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
+  .step-head{display:flex; align-items:center; gap:.5rem; flex-wrap:wrap; margin-bottom:.35rem;}
+  .num{
+    background:var(--blue2); color:#fff; width:26px; height:26px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; font-size:.8rem; font-weight:800; flex:0 0 auto;
+  }
+  .mk{background:#fef3c7; color:#b45309; border-radius:6px; padding:1px 8px; font-size:.72rem; font-weight:800;}
+  .step-title{font-weight:700; font-size:.94rem; color:#1e293b;}
+  .hint{
+    background:var(--amberbg); border:1px solid #fde68a; border-left:4px solid var(--amber);
+    border-radius:8px; padding:8px 11px; margin:.6rem 0; font-size:.87rem; color:#78350f;
+  }
+  .hint b{color:#92400e;}
+  .answer{
+    background:var(--greenbg); border:1px solid #a7f3d0; border-left:4px solid var(--green);
+    border-radius:8px; padding:8px 11px; margin:.6rem 0 .1rem; font-size:.9rem; color:#065f46;
+    font-weight:600;
+  }
+  .answer b{color:#047857;}
+  .btnrow{display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-top:1rem;}
+  button{
+    background:linear-gradient(135deg,var(--blue2),var(--blue)); color:#fff; border:none;
+    border-radius:10px; padding:10px 18px; font-size:.88rem; font-weight:700; cursor:pointer;
+    box-shadow:0 3px 10px rgba(37,99,235,.28); transition:transform .12s ease, box-shadow .12s ease;
+    font-family:inherit;
+  }
+  button:hover:not(:disabled){transform:translateY(-1px); box-shadow:0 6px 16px rgba(37,99,235,.34);}
+  button:disabled{background:#cbd5e1; color:#64748b; box-shadow:none; cursor:default;}
+  .counter{font-size:.82rem; font-weight:700; color:var(--muted);}
+  /* ---------- SUMMARY ---------- */
+  .summary{
+    background:linear-gradient(135deg,#0f172a,#1e3a8a); color:#e2e8f0;
+    border-radius:16px; padding:22px 24px; box-shadow:0 8px 26px rgba(15,23,42,.22);
+  }
+  .summary h3{color:#7dd3fc; margin:0 0 .7rem; font-size:1.12rem; font-weight:800;}
+  .summary ul{margin:0; padding-left:1.15rem;}
+  .summary li{margin:.42rem 0; font-size:.95rem;}
+  .summary .key{color:#fbbf24; font-weight:800;}
+  footer{
+    text-align:center; font-size:.79rem; color:var(--muted); padding:0 16px 34px;
+  }
+  @media(max-width:560px){
+    .hero h1{font-size:1.5rem;}
+    .card{padding:16px 14px 18px;}
+    .ctrl{min-width:150px;}
+    .summary{padding:18px 16px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2 · Multiple Choice</div>
+    <h1>2013 Paper 2 · Question 19</h1>
+    <h2>Circle Geometry — Angles in the Same Segment, Isosceles &amp; Parallel Lines</h2>
+    <div class="pills">
+      <span class="pill">Cyclic Quadrilateral</span>
+      <span class="pill">Angles in Same Segment</span>
+      <span class="pill">Isosceles Triangle</span>
+      <span class="pill">Alternate Angles</span>
+      <span class="pill">Exterior Angle of Δ</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ============ QUESTION ============ -->
+  <section class="card">
+    <h3><span class="badge-part">Question</span> Full Statement</h3>
+    <p class="figure-note">Refer to the figure (interactive diagram in Part (a) below).</p>
+    <div class="qtext">
+      <p>
+        In the figure, \(ABCD\) is a circle. \(AC\) and \(BD\) intersect at \(E\).
+        If \(AB = AD\) and \(AD \parallel BC\), then \(\angle BAE =\)
+      </p>
+      <ol type="A">
+        <li>57°</li>
+        <li>74°</li>
+        <li>69°</li>
+        <li>37°</li>
+      </ol>
+      <p style="font-size:.88rem;color:#64748b;">
+        (The angle \(\angle CED = 74^\circ\) is marked on the figure at \(E\).)
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ PART (a) ============ -->
+  <section class="card" id="partA">
+    <h3><span class="badge-part">Part (a)</span> Explore the Figure <span class="badge-marks">Setup</span></h3>
+    <p>
+      Drag the slider to change the marked angle \(\angle CED\) and watch how the whole configuration
+      adjusts. Toggle the layers to see the key relationships: the isosceles triangle \(ABD\), the
+      parallel lines \(AD \parallel BC\), and the equal angles in the same segment.
+    </p>
+
+    <div class="canvas-wrap">
+      <canvas id="cvA" width="720" height="560"></canvas>
+    </div>
+
+    <div class="controls">
+      <div class="ctrl">
+        <label for="sldA">Marked angle ∠CED = <span class="val" id="valA">74°</span></label>
+        <input type="range" id="sldA" min="40" max="110" value="74" step="1">
+      </div>
+      <div class="chkrow">
+        <label><input type="checkbox" id="ckIsos" checked> Show isosceles △ABD</label>
+        <label><input type="checkbox" id="ckPar" checked> Show parallel markers</label>
+        <label><input type="checkbox" id="ckSeg" checked> Highlight equal segment angles</label>
+      </div>
+      <div class="readout">
+        <span class="chip a">∠CED = <span id="roCED">74°</span></span>
+        <span class="chip">∠ABD = <span id="roABD">–</span></span>
+        <span class="chip">∠ADB = <span id="roADB">–</span></span>
+        <span class="chip">∠CAD = <span id="roCAD">–</span></span>
+        <span class="chip g">∠BAE = <span id="roBAE">–</span></span>
+      </div>
+    </div>
+
+    <div class="btnrow">
+      <button id="btnA" data-target="stepsA">Next step →</button>
+      <span class="counter" id="cntA">0 / 4</span>
+    </div>
+
+    <div id="stepsA">
+      <div class="step">
+        <div class="step-head">
+          <span class="num">1</span><span class="step-title">Let the equal angles be \(a\)</span><span class="mk">1M</span>
+        </div>
+        <p>Since \(AB = AD\), triangle \(ABD\) is isosceles with vertex at \(A\). Let</p>
+        \[ \angle ABD = a. \]
+        <p>Then the base angles of the isosceles triangle \(ABD\) are equal:</p>
+        \[ \angle ADB = \angle ABD = a \quad (\text{base } \angle\text{s, isos. } \triangle). \]
+        <div class="hint"><b>Hint:</b> In an isosceles triangle, the two base angles (the angles opposite the equal sides) are always equal.</div>
+      </div>
+
+      <div class="step">
+        <div class="step-head">
+          <span class="num">2</span><span class="step-title">Use the parallel lines \(AD \parallel BC\)</span><span class="mk">1M</span>
+        </div>
+        <p>\(BD\) acts as a transversal cutting the parallel lines \(AD\) and \(BC\). The alternate angles are equal:</p>
+        \[ \angle CBD = \angle ADB = a \quad (\text{alt. } \angle\text{s, } BC \parallel AD). \]
+        <div class="hint"><b>Hint:</b> Alternate angles (Z-angles) lie on opposite sides of the transversal between the two parallel lines.</div>
+      </div>
+
+      <div class="step">
+        <div class="step-head">
+          <span class="num">3</span><span class="step-title">Angles in the same segment</span><span class="mk">1M</span>
+        </div>
+        <p>\(\angle CAD\) and \(\angle CBD\) both subtend the chord \(CD\) (they sit in the same segment):</p>
+        \[ \angle CAD = \angle CBD = a \quad (\angle\text{s in the same segment}). \]
+        <p>Combining with Steps 1–2:</p>
+        \[ \angle ABD = \angle ADB = \angle CBD = \angle CAD = a. \]
+        <div class="hint"><b>Hint:</b> Angles in the same segment subtended by the same chord are equal.</div>
+      </div>
+
+      <div class="step">
+        <div class="step-head">
+          <span class="num">4</span><span class="step-title">Exterior angle of \(\triangle ADE\)</span><span class="mk">1M</span>
+        </div>
+        <p>In triangle \(ADE\), the exterior angle at \(E\) equals the sum of the two interior opposite angles:</p>
+        \[ \angle ADE + \angle DAE = \angle CED, \]
+        \[ a + a = 74^\circ \quad\Rightarrow\quad a = 37^\circ. \]
+        <div class="hint"><b>Hint:</b> The exterior angle of a triangle equals the sum of the two opposite interior angles.</div>
+        <div class="answer">
+          <b>So far:</b> \(a = 37^\circ\), i.e. \(\angle ABD = \angle ADB = \angle CAD = 37^\circ\).
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PART (b) ============ -->
+  <section class="card" id="partB">
+    <h3><span class="badge-part">Part (b)</span> Find \(\angle BAE\) <span class="badge-marks">1A</span></h3>
+    <p>
+      Now use the angle sum of triangle \(ABD\) to isolate \(\angle BAE\). The canvas below shows
+      triangle \(ABD\) with all its angles labelled — move the slider to see how the angles change,
+      and note that the three angles always sum to \(180^\circ\).
+    </p>
+
+    <div class="canvas-wrap">
+      <canvas id="cvB" width="720" height="420"></canvas>
+    </div>
+
+    <div class="controls">
+      <div class="ctrl">
+        <label for="sldB">Marked angle ∠CED = <span class="val" id="valB">74°</span></label>
+        <input type="range" id="sldB" min="40" max="110" value="74" step="1">
+      </div>
+      <div class="chkrow">
+        <label><input type="checkbox" id="ckSplit" checked> Show ∠BAD split into ∠BAE + ∠EAD</label>
+      </div>
+      <div class="readout">
+        <span class="chip a">∠ABD = <span id="roB_ABD">–</span></span>
+        <span class="chip a">∠ADB = <span id="roB_ADB">–</span></span>
+        <span class="chip">∠BAD = <span id="roB_BAD">–</span></span>
+        <span class="chip g">∠BAE = <span id="roB_BAE">–</span></span>
+      </div>
+    </div>
+
+    <div class="btnrow">
+      <button id="btnB" data-target="stepsB">Next step →</button>
+      <span class="counter" id="cntB">0 / 3</span>
+    </div>
+
+    <div id="stepsB">
+      <div class="step">
+        <div class="step-head">
+          <span class="num">1</span><span class="step-title">Angle sum of \(\triangle ABD\)</span><span class="mk">1M</span>
+        </div>
+        <p>In triangle \(ABD\):</p>
+        \[ \angle ABD + \angle ADB + \angle BAD = 180^\circ \quad (\angle \text{ sum of } \triangle). \]
+        <p>Substitute the known values:</p>
+        \[ 37^\circ + 37^\circ + \angle BAD = 180^\circ \quad\Rightarrow\quad \angle BAD = 106^\circ. \]
+        <div class="hint"><b>Hint:</b> The three interior angles of any triangle add up to \(180^\circ\).</div>
+      </div>
+
+      <div class="step">
+        <div class="step-head">
+          <span class="num">2</span><span class="step-title">Write \(\angle BAD\) as a sum</span><span class="mk">1M</span>
+        </div>
+        <p>At vertex \(A\), the ray \(AE\) (which lies along \(AC\)) splits \(\angle BAD\) into two parts:</p>
+        \[ \angle BAD = \angle BAE + \angle EAD. \]
+        <p>But \(\angle EAD = \angle CAD = a = 37^\circ\) (from Part (a)). So</p>
+        \[ 106^\circ = \angle BAE + 37^\circ. \]
+        <div class="hint"><b>Hint:</b> \(E\) lies on \(AC\), so \(\angle EAD\) is exactly the same angle as \(\angle CAD\), which we already know equals \(37^\circ\).</div>
+      </div>
+
+      <div class="step">
+        <div class="step-head">
+          <span class="num">3</span><span class="step-title">Solve for \(\angle BAE\)</span><span class="mk">1A</span>
+        </div>
+        \[ \angle BAE = 106^\circ - 37^\circ = 69^\circ. \]
+        <div class="answer">
+          <b>Answer:</b> \(\angle BAE = 69^\circ\) — option <b>C</b>.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SUMMARY ============ -->
+  <section class="summary">
+    <h3>Summary of Answers</h3>
+    <ul>
+      <li>Let \(a = \angle ABD = \angle ADB\) (isosceles \(\triangle ABD\)).</li>
+      <li>\(\angle CBD = \angle ADB = a\) (alt. \(\angle\)s, \(BC \parallel AD\)).</li>
+      <li>\(\angle CAD = \angle CBD = a\) (\(\angle\)s in the same segment).</li>
+      <li>In \(\triangle ADE\): \(a + a = 74^\circ \Rightarrow a = 37^\circ\) (ext. \(\angle\) of \(\triangle\)).</li>
+      <li>In \(\triangle ABD\): \(\angle BAD = 180^\circ - 37^\circ - 37^\circ = 106^\circ\).</li>
+      <li>\(\angle BAE = \angle BAD - \angle EAD = 106^\circ - 37^\circ\).</li>
+      <li>\(\displaystyle \angle BAE = \boxed{69^\circ}\) &nbsp;→&nbsp; <span class="key">Answer C</span></li>
+    </ul>
+  </section>
+
+</main>
+
+<footer>
+  HKDSE Mathematics (Compulsory Part) · 2013 Paper 2 · Q19 — Interactive Solution · Built with HTML5 Canvas &amp; MathJax
+</footer>
+
+<script>
+/* ============================================================
+   SHARED GEOMETRY MODEL
+   ============================================================
+   Construct a cyclic quadrilateral ABCD on a circle of radius R
+   centred at O, such that:
+     - AB = AD  (so A is on the perpendicular bisector of BD)
+     - AD ∥ BC
+     - ∠CED = given value θ (the marked angle on the figure)
+
+   We place the figure with B and D symmetric about the vertical axis,
+   A on the circle on the vertical axis (top), and then determine C
+   by meeting the line through B parallel to AD with the circle on
+   the other side.
+
+   Actually, the cleanest analytic construction: choose angles on the
+   circle. Because all angles are determined by ∠CED, we can build
+   the exact configuration purely from the angle relations, and the
+   resulting figure is a valid circle. We use a fixed reference circle
+   and map angles directly.
+   ============================================================ */
+
+const DEG = Math.PI / 180;
+const R = 170;               // pixel radius
+
+/* Given θ = ∠CED (the marked angle at E), the geometry forces:
+      a = θ / 2                      (angle ABD = ADB = CAD = CBD)
+      ∠BAE = 180° − 3a − ... 
+   Let's derive the full angular layout carefully.
+
+   From the solution:
+      ∠ABD = ∠ADB = ∠CBD = ∠CAD = a,  where  a = θ/2.
+      ∠BAD = 180° − 2a.
+      ∠BAE = ∠BAD − ∠CAD = 180° − 2a − a = 180° − 3a.
+   With θ = 74°, a = 37°, ∠BAE = 180 − 111 = 69°. ✓
+
+   Now the arc/inscribed-angle layout on the circle:
+     ∠ABD = a  subtends arc AD  ⇒ arc AD = 2a.
+     ∠ADB = a  subtends arc AB  ⇒ arc AB = 2a.
+     ∠CAD = a  subtends arc CD  ⇒ arc CD = 2a.
+     ∠CBD = a  subtends arc CD  ⇒ arc CD = 2a. (consistent)
+
+   Going around the circle A → B → C → D → A:
+     arc AB = 2a
+     arc BC = total − AB − CD − DA = 360° − 2a − 2a − 2a = 360° − 6a
+     arc CD = 2a
+     arc DA = 2a
+
+   Wait, order on the circle: going around A, B, C, D. Check arc BC
+   from remaining: 360 − 2a − 2a − 2a = 360 − 6a. For a = 37°, that's
+   360 − 222 = 138°. Fine.
+
+   Each arc central angle = 2 × inscribed angle.
+   
+   Let's set the angular positions on the circle (degrees, measured
+   from 12 o'clock, clockwise) for drawing:
+     Position of A = 0° (top).
+     Position of B = 2a (clockwise).
+     Position of C = 2a + (360 − 6a) = 360 − 4a ... 
+     
+   Hmm, careful — the arc from B to C is (360−6a). So C is at
+     2a + (360 − 6a) = 360 − 4a.
+   Then D is at 360 − 4a + 2a = 360 − 2a ≡ −2a.
+   Then back to A: −2a + 2a = 0. ✓
+
+   So positions (clockwise from top):
+     A: 0°
+     B: +2a
+     C: 360° − 4a   (= −4a)
+     D: −2a
+
+   Sanity check with a = 37°:
+     A: 0
+     B: 74
+     C: 360 − 148 = 212
+     D: −74 ≡ 286
+   Going clockwise: A(0) → B(74) → C(212) → D(286) → A(360). 
+   Arcs: AB=74, BC=138, CD=74, DA=74. Sum = 360. ✓
+   ============================================================ */
+
+function circlePoint(cx, cy, degFromTop, r) {
+  // degFromTop: 0 = top, increasing clockwise
+  const ang = (degFromTop - 90) * DEG;   // convert to standard math angle
+  return { x: cx + r * Math.cos(ang), y: cy + r * Math.sin(ang) };
+}
+
+function buildModel(thetaDeg) {
+  const a = thetaDeg / 2;
+  return {
+    theta: thetaDeg,
+    a: a,
+    posA: 0,
+    posB: 2 * a,
+    posC: 360 - 4 * a,
+    posD: -2 * a,
+    angleABD: a,
+    angleADB: a,
+    angleCAD: a,
+    angleCBD: a,
+    angleBAD: 180 - 2 * a,
+    angleBAE: 180 - 3 * a
+  };
+}
+
+/* Draw a nicely labelled circle figure.
+   opts: { cx, cy, r, model, showIsos, showPar, showSeg,
+           highlightTri, splitAngle } */
+function drawFigure(ctx, W, H, opts) {
+  const { cx, cy, r, m } = opts;
+  ctx.clearRect(0, 0, W, H);
+
+  // background grid
+  ctx.save();
+  ctx.strokeStyle = '#eef2f7';
+  ctx.lineWidth = 1;
+  for (let x = 0; x < W; x += 30) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+  }
+  for (let y = 0; y < H; y += 30) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+  }
+  ctx.restore();
+
+  const A = circlePoint(cx, cy, m.posA, r);
+  const B = circlePoint(cx, cy, m.posB, r);
+  const C = circlePoint(cx, cy, m.posC, r);
+  const D = circlePoint(cx, cy, m.posD, r);
+
+  // E = intersection of AC and BD
+  const E = lineIntersect(A, C, B, D);
+
+  // circle
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, 2 * Math.PI);
+  ctx.strokeStyle = '#334155';
+  ctx.lineWidth = 2.4;
+  ctx.stroke();
+  ctx.fillStyle = 'rgba(219,234,254,0.35)';
+  ctx.fill();
+
+  // centre O
+  ctx.beginPath();
+  ctx.arc(cx, cy, 3, 0, 2 * Math.PI);
+  ctx.fillStyle = '#94a3b8';
+  ctx.fill();
+  ctx.fillStyle = '#94a3b8';
+  ctx.font = '13px sans-serif';
+  ctx.fillText('O', cx + 6, cy - 6);
+
+  // Highlight triangle ABD if requested
+  if (opts.showIsos) {
+    ctx.beginPath();
+    ctx.moveTo(A.x, A.y); ctx.lineTo(B.x, B.y);
+    ctx.lineTo(D.x, D.y); ctx.closePath();
+    ctx.fillStyle = 'rgba(16,185,129,0.12)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(16,185,129,0.55)';
+    ctx.lineWidth = 1.6;
+    ctx.stroke();
+  }
+
+  // chords
+  drawLine(ctx, A, B, '#f59e0b', 2.6);   // AB
+  drawLine(ctx, B, C, '#2563eb', 2.2);   // BC
+  drawLine(ctx, C, D, '#8b5cf6', 2.2);   // CD
+  drawLine(ctx, D, A, '#f59e0b', 2.6);   // DA
+  // diagonals
+  drawLine(ctx, A, C, '#dc2626', 2.0);   // AC
+  drawLine(ctx, B, D, '#0891b2', 2.0);   // BD
+
+  // equal-length ticks on AB and AD
+  drawTick(ctx, A, B, '#b45309', 1);
+  drawTick(ctx, A, D, '#b45309', 1);
+
+  // parallel arrows on AD and BC
+  if (opts.showPar) {
+    drawArrow(ctx, A, D, '#7c3aed');
+    drawArrow(ctx, B, C, '#7c3aed');
+  }
+
+  // Right-angle / equal angle markers
+  if (opts.showSeg) {
+    // equal segment angles: mark ∠CAD and ∠CBD with small arcs
+    drawArcAt(ctx, A, D, C, 26, '#16a34a');   // ∠CAD
+    drawArcAt(ctx, B, C, D, 26, '#16a34a');   // ∠CBD
+    // base angles of isosceles
+    drawArcAt(ctx, B, A, D, 22, '#b45309');   // ∠ABD
+    drawArcAt(ctx, D, A, B, 22, '#b45309');   // ∠ADB
+  }
+
+  // Marked angle at E: ∠CED
+  drawAngleAt(ctx, E, C, D, 34, '#dc2626', m.theta + '°');
+
+  // Points
+  labelPoint(ctx, A, 'A', '#0f172a');
+  labelPoint(ctx, B, 'B', '#0f172a');
+  labelPoint(ctx, C, 'C', '#0f172a');
+  labelPoint(ctx, D, 'D', '#0f172a');
+
+  // E label
+  ctx.beginPath();
+  ctx.arc(E.x, E.y, 4, 0, 2 * Math.PI);
+  ctx.fillStyle = '#dc2626';
+  ctx.fill();
+  ctx.fillStyle = '#dc2626';
+  ctx.font = 'bold 15px sans-serif';
+  ctx.fillText('E', E.x + 8, E.y - 8);
+
+  return { A, B, C, D, E };
+}
+
+/* ---------- drawing helpers ---------- */
+function drawLine(ctx, p, q, color, w) {
+  ctx.beginPath();
+  ctx.moveTo(p.x, p.y);
+  ctx.lineTo(q.x, q.y);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = w;
+  ctx.lineCap = 'round';
+  ctx.stroke();
+}
+
+function drawTick(ctx, p, q, color, count) {
+  const mx = (p.x + q.x) / 2, my = (p.y + q.y) / 2;
+  const dx = q.x - p.x, dy = q.y - p.y;
+  const len = Math.hypot(dx, dy);
+  if (len < 1) return;
+  const nx = -dy / len * 6, ny = dx / len * 6;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2.2;
+  for (let k = 0; k < count; k++) {
+    const off = (k - (count - 1) / 2) * 6;
+    const bx = mx + dx / len * off, by = my + dy / len * off;
+    ctx.beginPath();
+    ctx.moveTo(bx - nx, by - ny);
+    ctx.lineTo(bx + nx, by + ny);
+    ctx.stroke();
+  }
+}
+
+function drawArrow(ctx, p, q, color) {
+  const mx = (p.x + q.x) / 2, my = (p.y + q.y) / 2;
+  const dx = q.x - p.x, dy = q.y - p.y;
+  const len = Math.hypot(dx, dy);
+  if (len < 1) return;
+  const ux = dx / len, uy = dy / len;
+  const nx = -uy * 7, ny = ux * 7;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2.4;
+  ctx.beginPath();
+  ctx.moveTo(mx - nx, my - ny);
+  ctx.lineTo(mx + nx, my + ny);
+  ctx.stroke();
+  // small arrowhead
+  ctx.beginPath();
+  ctx.moveTo(mx + nx - ux * 8, my + ny - uy * 8);
+  ctx.lineTo(mx + nx, my + ny);
+  ctx.lineTo(mx + nx + ux * 4, my + ny + uy * 4);
+  ctx.stroke();
+}
+
+function drawArcAt(ctx, vertex, p1, p2, rad, color) {
+  const a1 = Math.atan2(p1.y - vertex.y, p1.x - vertex.x);
+  const a2 = Math.atan2(p2.y - vertex.y, p2.x - vertex.x);
+  let start = a1, end = a2;
+  let diff = end - start;
+  while (diff > Math.PI) diff -= 2 * Math.PI;
+  while (diff < -Math.PI) diff += 2 * Math.PI;
+  ctx.beginPath();
+  ctx.arc(vertex.x, vertex.y, rad, start, start + diff, diff < 0);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2.4;
+  ctx.stroke();
+}
+
+function drawAngleAt(ctx, vertex, p1, p2, rad, color, text) {
+  const a1 = Math.atan2(p1.y - vertex.y, p1.x - vertex.x);
+  const a2 = Math.atan2(p2.y - vertex.y, p2.x - vertex.x);
+  let diff = a2 - a1;
+  while (diff > Math.PI) diff -= 2 * Math.PI;
+  while (diff < -Math.PI) diff += 2 * Math.PI;
+  ctx.beginPath();
+  ctx.arc(vertex.x, vertex.y, rad, a1, a1 + diff, diff < 0);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2.4;
+  ctx.stroke();
+  if (text) {
+    const mid = a1 + diff / 2;
+    const lx = vertex.x + Math.cos(mid) * (rad + 20);
+    const ly = vertex.y + Math.sin(mid) * (rad + 20);
+    ctx.fillStyle = color;
+    ctx.font = 'bold 14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, lx, ly);
+    ctx.textAlign = 'start';
+    ctx.textBaseline = 'alphabetic';
+  }
+}
+
+function labelPoint(ctx, p, txt, color) {
+  ctx.beginPath();
+  ctx.arc(p.x, p.y, 4.5, 0, 2 * Math.PI);
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.fillStyle = color;
+  ctx.font = 'bold 16px sans-serif';
+  const dx = p.x > 360 ? 10 : -20;
+  const dy = p.y < 100 ? 24 : (p.y > 400 ? -14 : 6);
+  ctx.fillText(txt, p.x + dx, p.y + dy);
+}
+
+function lineIntersect(p1, p2, p3, p4) {
+  const d = (p1.x - p2.x) * (p3.y - p4.y) - (p1.y - p2.y) * (p3.x - p4.x);
+  if (Math.abs(d) < 1e-9) return { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
+  const t = ((p1.x - p3.x) * (p3.y - p4.y) - (p1.y - p3.y) * (p3.x - p4.x)) / d;
+  return { x: p1.x + t * (p2.x - p1.x), y: p1.y + t * (p2.y - p1.y) };
+}
+
+/* ============================================================
+   CANVAS A — full figure with controls
+   ============================================================ */
+const cvA = document.getElementById('cvA');
+const ctxA = cvA.getContext('2d');
+const sldA = document.getElementById('sldA');
+const ckIsos = document.getElementById('ckIsos');
+const ckPar = document.getElementById('ckPar');
+const ckSeg = document.getElementById('ckSeg');
+
+function renderA() {
+  const theta = +sldA.value;
+  document.getElementById('valA').textContent = theta + '°';
+  const m = buildModel(theta);
+  drawFigure(ctxA, cvA.width, cvA.height, {
+    cx: 360, cy: 280, r: R, m,
+    showIsos: ckIsos.checked,
+    showPar: ckPar.checked,
+    showSeg: ckSeg.checked
+  });
+  // readouts
+  document.getElementById('roCED').textContent = theta.toFixed(0) + '°';
+  document.getElementById('roABD').textContent = m.angleABD.toFixed(1) + '°';
+  document.getElementById('roADB').textContent = m.angleADB.toFixed(1) + '°';
+  document.getElementById('roCAD').textContent = m.angleCAD.toFixed(1) + '°';
+  document.getElementById('roBAE').textContent = m.angleBAE.toFixed(1) + '°';
+}
+[sldA, ckIsos, ckPar, ckSeg].forEach(el => el.addEventListener('input', renderA));
+renderA();
+
+/* ============================================================
+   CANVAS B — triangle ABD angle breakdown
+   ============================================================ */
+const cvB = document.getElementById('cvB');
+const ctxB = cvB.getContext('2d');
+const sldB = document.getElementById('sldB');
+const ckSplit = document.getElementById('ckSplit');
+
+function renderB() {
+  const theta = +sldB.value;
+  document.getElementById('valB').textContent = theta + '°';
+  const m = buildModel(theta);
+  const W = cvB.width, H = cvB.height;
+  ctxB.clearRect(0, 0, W, H);
+
+  // background
+  ctxB.fillStyle = '#f8fafc';
+  ctxB.fillRect(0, 0, W, H);
+
+  // Scale the triangle to fit nicely
+  const cx = W / 2, cy = H / 2 + 30;
+  const scale = 2.2;
+  const A = circlePoint(cx, cy, m.posA, R * scale / 2.4);
+  const B = circlePoint(cx, cy, m.posB, R * scale / 2.4);
+  const D = circlePoint(cx, cy, m.posD, R * scale / 2.4);
+
+  // triangle fill
+  ctxB.beginPath();
+  ctxB.moveTo(A.x, A.y); ctxB.lineTo(B.x, B.y); ctxB.lineTo(D.x, D.y);
+  ctxB.closePath();
+  ctxB.fillStyle = 'rgba(16,185,129,0.10)';
+  ctxB.fill();
+  ctxB.strokeStyle = '#0f172a';
+  ctxB.lineWidth = 2.4;
+  ctxB.stroke();
+
+  // base AB and AD in amber (equal sides)
+  drawLine(ctxB, A, B, '#f59e0b', 3.2);
+  drawLine(ctxB, A, D, '#f59e0b', 3.2);
+  drawLine(ctxB, B, D, '#0891b2', 2.6);
+
+  // tick marks on equal sides
+  drawTick(ctxB, A, B, '#b45309', 1);
+  drawTick(ctxB, A, D, '#b45309', 1);
+
+  // The point E lies on BD (in this triangle BD is the base, E is on it).
+  // Actually E is on BD and AC, but for triangle ABD we show the ray AE.
+  // We need the actual E from the full figure: intersection of AC & BD.
+  // In the triangle-only view, E is where line AC meets BD. 
+  // We can compute E using the full circle points scaled.
+  const Cfull = circlePoint(cx, cy, m.posC, R * scale / 2.4);
+  const E = lineIntersect(A, Cfull, B, D);
+
+  // Draw ray AE (to C)
+  ctxB.setLineDash([6, 5]);
+  ctxB.beginPath();
+  ctxB.moveTo(A.x, A.y);
+  ctxB.lineTo(Cfull.x, Cfull.y);
+  ctxB.strokeStyle = '#dc2626';
+  ctxB.lineWidth = 1.8;
+  ctxB.stroke();
+  ctxB.setLineDash([]);
+
+  // E dot
+  ctxB.beginPath();
+  ctxB.arc(E.x, E.y, 4.5, 0, 2 * Math.PI);
+  ctxB.fillStyle = '#dc2626';
+  ctxB.fill();
+  ctxB.fillStyle = '#dc2626';
+  ctxB.font = 'bold 14px sans-serif';
+  ctxB.fillText('E', E.x + 8, E.y - 8);
+
+  // Angle arcs & labels
+  // ∠ABD at B
+  drawArcAt(ctxB, B, A, D, 30, '#b45309');
+  angleLabel(ctxB, B, A, D, 48, m.angleABD.toFixed(1) + '°', '#b45309');
+  // ∠ADB at D
+  drawArcAt(ctxB, D, A, B, 30, '#b45309');
+  angleLabel(ctxB, D, A, B, 48, m.angleADB.toFixed(1) + '°', '#b45309');
+
+  if (ckSplit.checked) {
+    // ∠BAE at A (between AB and AE)
+    drawArcAt(ctxB, A, B, E, 46, '#059669');
+    angleLabel(ctxB, A, B, E, 70, 'BAE ' + m.angleBAE.toFixed(1) + '°', '#059669');
+    // ∠EAD at A (between AE and AD)
+    drawArcAt(ctxB, A, E, D, 34, '#2563eb');
+    angleLabel(ctxB, A, E, D, 58, 'EAD ' + m.angleCAD.toFixed(1) + '°', '#2563eb');
+  } else {
+    drawArcAt(ctxB, A, B, D, 46, '#059669');
+    angleLabel(ctxB, A, B, D, 70, 'BAD ' + m.angleBAD.toFixed(1) + '°', '#059669');
+  }
+
+  // vertex labels
+  labelVert(ctxB, A, 'A');
+  labelVert(ctxB, B, 'B');
+  labelVert(ctxB, D, 'D');
+
+  // readouts
+  document.getElementById('roB_ABD').textContent = m.angleABD.toFixed(1) + '°';
+  document.getElementById('roB_ADB').textContent = m.angleADB.toFixed(1) + '°';
+  document.getElementById('roB_BAD').textContent = m.angleBAD.toFixed(1) + '°';
+  document.getElementById('roB_BAE').textContent = m.angleBAE.toFixed(1) + '°';
+
+  // info text
+  ctxB.fillStyle = '#475569';
+  ctxB.font = '13px sans-serif';
+  ctxB.fillText('Triangle ABD:  ∠ABD + ∠ADB + ∠BAD = ' +
+    (m.angleABD + m.angleADB + m.angleBAD).toFixed(1) + '°', 18, 26);
+}
+
+function angleLabel(ctx, vertex, p1, p2, rad, text, color) {
+  const a1 = Math.atan2(p1.y - vertex.y, p1.x - vertex.x);
+  const a2 = Math.atan2(p2.y - vertex.y, p2.x - vertex.x);
+  let diff = a2 - a1;
+  while (diff > Math.PI) diff -= 2 * Math.PI;
+  while (diff < -Math.PI) diff += 2 * Math.PI;
+  const mid = a1 + diff / 2;
+  const lx = vertex.x + Math.cos(mid) * rad;
+  const ly = vertex.y + Math.sin(mid) * rad;
+  ctx.fillStyle = color;
+  ctx.font = 'bold 13px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, lx, ly);
+  ctx.textAlign = 'start';
+  ctx.textBaseline = 'alphabetic';
+}
+
+function labelVert(ctx, p, txt) {
+  ctx.beginPath();
+  ctx.arc(p.x, p.y, 5, 0, 2 * Math.PI);
+  ctx.fillStyle = '#0f172a';
+  ctx.fill();
+  ctx.fillStyle = '#0f172a';
+  ctx.font = 'bold 16px sans-serif';
+  const dx = p === p ? (p.x > 360 ? 12 : -22) : 0;
+  const dy = p.y < 80 ? 26 : (p.y > 340 ? -16 : 8);
+  ctx.fillText(txt, p.x + dx, p.y + dy);
+}
+
+[sldB, ckSplit].forEach(el => el.addEventListener('input', renderB));
+renderB();
+
+/* ============================================================
+   STEP REVEAL LOGIC
+   ============================================================ */
+document.querySelectorAll('.btnrow').forEach(row => {
+  const btn = row.querySelector('button');
+  const counter = row.querySelector('.counter');
+  const targetId = btn.getAttribute('data-target');
+  const steps = document.querySelectorAll('#' + targetId + ' .step');
+  let idx = 0;
+
+  function update() {
+    counter.textContent = idx + ' / ' + steps.length;
+    if (idx >= steps.length) {
+      btn.disabled = true;
+      btn.textContent = 'All steps revealed ✓';
+    } else {
+      btn.disabled = false;
+      btn.textContent = 'Next step →';
+    }
+  }
+
+  btn.addEventListener('click', () => {
+    if (idx < steps.length) {
+      steps[idx].classList.add('show');
+      idx++;
+      update();
+    }
+  });
+  update();
+});
+</script>
+</body>
+</html>

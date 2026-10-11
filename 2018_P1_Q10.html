@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2018 Paper 1 Q10 — Box-and-Whisker Diagram</title>
+<script>
+  MathJax = {
+    tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  :root{
+    --blue:#1d4ed8;
+    --blue-dark:#1e3a8a;
+    --amber:#f59e0b;
+    --emerald:#059669;
+    --slate:#0f172a;
+    --bg:#f1f5f9;
+    --card:#ffffff;
+    --muted:#64748b;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);
+    color:#1e293b;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  /* ---------- HERO ---------- */
+  .hero{
+    background:linear-gradient(135deg,#1e3a8a 0%,#1d4ed8 45%,#3b82f6 100%);
+    color:#fff;
+    padding:38px 22px 40px;
+    box-shadow:0 6px 22px rgba(15,23,42,.28);
+  }
+  .hero-inner{max-width:960px;margin:0 auto;}
+  .eyebrow{
+    font-size:.78rem;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    opacity:.82;
+    font-weight:600;
+  }
+  .hero h1{
+    font-size:clamp(1.5rem,4.4vw,2.2rem);
+    margin:.35rem 0 .2rem;
+    font-weight:800;
+    letter-spacing:-.01em;
+  }
+  .hero .subtitle{
+    font-size:1rem;
+    opacity:.92;
+    margin-bottom:1rem;
+  }
+  .pills{display:flex;flex-wrap:wrap;gap:.5rem;}
+  .pill{
+    display:inline-block;
+    background:rgba(255,255,255,.16);
+    border:1px solid rgba(255,255,255,.35);
+    color:#fff;
+    padding:.28rem .8rem;
+    border-radius:999px;
+    font-size:.78rem;
+    font-weight:600;
+    backdrop-filter:blur(3px);
+  }
+  /* ---------- LAYOUT ---------- */
+  .wrap{max-width:960px;margin:0 auto;padding:26px 16px 10px;}
+  .card{
+    background:var(--card);
+    border-radius:16px;
+    padding:24px 22px;
+    margin-bottom:26px;
+    box-shadow:0 4px 16px rgba(15,23,42,.08);
+    border:1px solid #e2e8f0;
+  }
+  .card h2{
+    font-size:1.22rem;
+    margin:0 0 .9rem;
+    color:var(--blue-dark);
+    display:flex;
+    align-items:center;
+    gap:.55rem;
+    font-weight:800;
+  }
+  .card h2 .num{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:32px;height:32px;
+    background:linear-gradient(135deg,var(--blue),#3b82f6);
+    color:#fff;
+    border-radius:9px;
+    font-size:.9rem;
+    font-weight:800;
+    flex:0 0 auto;
+  }
+  .qtext{font-size:1.02rem;}
+  .marks{
+    display:inline-block;
+    background:#eff6ff;
+    color:var(--blue-dark);
+    border:1px solid #bfdbfe;
+    border-radius:8px;
+    padding:.1rem .5rem;
+    font-size:.85rem;
+    font-weight:700;
+    white-space:nowrap;
+  }
+  /* ---------- CANVAS ---------- */
+  .canvas-box{
+    background:#f8fafc;
+    border:1px solid #e2e8f0;
+    border-radius:14px;
+    padding:12px;
+    margin:1rem 0 1.2rem;
+  }
+  canvas{
+    display:block;
+    width:100%;
+    height:auto;
+    border-radius:10px;
+    background:#ffffff;
+  }
+  .controls{
+    display:flex;
+    flex-wrap:wrap;
+    gap:1rem 1.4rem;
+    align-items:center;
+    margin-top:.85rem;
+    padding:.7rem .9rem;
+    background:#fff;
+    border:1px solid #e2e8f0;
+    border-radius:10px;
+    font-size:.88rem;
+  }
+  .ctrl{display:flex;align-items:center;gap:.55rem;}
+  .ctrl label{font-weight:600;color:#334155;white-space:nowrap;}
+  input[type=range]{width:150px;accent-color:var(--blue);cursor:pointer;}
+  input[type=checkbox]{width:17px;height:17px;accent-color:var(--emerald);cursor:pointer;}
+  .readout{
+    display:flex;flex-wrap:wrap;gap:.5rem .9rem;
+    margin-top:.8rem;
+  }
+  .ro{
+    background:#0f172a;
+    color:#e2e8f0;
+    border-radius:8px;
+    padding:.32rem .7rem;
+    font-size:.82rem;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  .ro b{color:#fbbf24;}
+  .ro.green b{color:#34d399;}
+  /* ---------- STEPS ---------- */
+  .step{
+    display:none;
+    border-left:4px solid var(--blue);
+    background:#f8fafc;
+    border-radius:0 12px 12px 0;
+    padding:14px 16px;
+    margin:14px 0;
+    animation:fade .35s ease;
+  }
+  .step.show{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(7px);}to{opacity:1;transform:none;}}
+  .step-head{
+    display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;
+    margin-bottom:.5rem;
+  }
+  .badge-num{
+    background:linear-gradient(135deg,var(--blue),#3b82f6);
+    color:#fff;font-weight:800;font-size:.78rem;
+    border-radius:8px;padding:.22rem .6rem;
+  }
+  .badge-mark{
+    background:var(--amber);color:#422006;
+    font-weight:800;font-size:.75rem;
+    border-radius:7px;padding:.2rem .55rem;
+  }
+  .step-title{font-weight:700;color:var(--slate);font-size:.97rem;}
+  .hint{
+    background:#fefce8;
+    border:1px solid #fde68a;
+    border-left:4px solid var(--amber);
+    border-radius:8px;
+    padding:.6rem .8rem;
+    margin-top:.7rem;
+    font-size:.91rem;
+    color:#713f12;
+  }
+  .hint b{color:#92400e;}
+  .answer-box{
+    background:#ecfdf5;
+    border:1px solid #a7f3d0;
+    border-left:4px solid var(--emerald);
+    border-radius:8px;
+    padding:.6rem .8rem;
+    margin-top:.7rem;
+    font-size:.95rem;
+    color:#065f46;
+    font-weight:600;
+  }
+  .btn-row{
+    display:flex;align-items:center;gap:1rem;flex-wrap:wrap;
+    margin-top:1rem;
+  }
+  button{
+    font-family:inherit;font-size:.93rem;font-weight:700;
+    border:none;border-radius:10px;
+    padding:.6rem 1.25rem;cursor:pointer;
+    background:linear-gradient(135deg,var(--blue),#2563eb);
+    color:#fff;
+    box-shadow:0 3px 10px rgba(29,78,216,.32);
+    transition:.18s;
+  }
+  button:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 5px 14px rgba(29,78,216,.4);}
+  button:disabled{
+    background:#cbd5e1;color:#64748b;cursor:default;box-shadow:none;
+  }
+  .counter{font-size:.88rem;color:var(--muted);font-weight:700;}
+  /* ---------- SUMMARY ---------- */
+  .summary{
+    background:linear-gradient(140deg,#0f172a,#1e293b);
+    color:#e2e8f0;
+    border:none;
+  }
+  .summary h2{color:#fbbf24;}
+  .summary h2 .num{background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#422006;}
+  .summary ul{margin:.4rem 0 0;padding-left:1.15rem;}
+  .summary li{margin-bottom:.55rem;font-size:.99rem;}
+  .summary li b{color:#fbbf24;}
+  .summary li code{
+    background:rgba(255,255,255,.12);
+    padding:.08rem .4rem;border-radius:5px;
+    font-family:ui-monospace,Menlo,monospace;font-size:.92em;
+  }
+  footer{
+    text-align:center;
+    padding:26px 16px 40px;
+    color:var(--muted);
+    font-size:.85rem;
+  }
+  @media(max-width:560px){
+    .card{padding:18px 15px;}
+    input[type=range]{width:110px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= HERO ================= -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 1</div>
+    <h1>2018 Paper 1 · Question 10</h1>
+    <p class="subtitle">Statistics — Box-and-Whisker Diagram, Range &amp; Inter-quartile Range</p>
+    <div class="pills">
+      <span class="pill">Box-and-Whisker Diagram</span>
+      <span class="pill">Quartiles</span>
+      <span class="pill">Range</span>
+      <span class="pill">Inter-quartile Range</span>
+      <span class="pill">Data Combination</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ================= QUESTION ================= -->
+  <section class="card">
+    <h2><span class="num">Q</span>Question</h2>
+    <div class="qtext">
+      <p>
+        The box-and-whisker diagram below shows the distribution of the ages of the clerks in team \(X\) of a company.
+        It is given that the range and the inter-quartile range of this distribution are \(43\) and \(21\) respectively.
+      </p>
+
+      <div class="canvas-box">
+        <canvas id="qCanvas" width="880" height="230"></canvas>
+        <div class="readout">
+          <span class="ro">Min = <b>19</b></span>
+          <span class="ro">\(Q_1\) = <b>27</b></span>
+          <span class="ro">Median = <b>38</b></span>
+          <span class="ro">\(Q_3\) = <b>a</b></span>
+          <span class="ro green">Max = <b>b</b></span>
+        </div>
+      </div>
+
+      <p><b>(a)</b> Find \(a\) and \(b\). <span class="marks">[3 marks]</span></p>
+      <p>
+        <b>(b)</b> There are five clerks in team \(Y\) of the company and three of them are of age \(38\).
+        It is given that the range of the ages of the clerks in team \(Y\) is \(20\).
+        Team \(X\) and team \(Y\) are now combined to form a section.
+        The manager of the company claims that the range of the ages of the clerks in the section
+        and the range of the ages of the clerks in team \(X\) must be the same.
+        Do you agree? Explain your answer. <span class="marks">[2 marks]</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- ================= PART (a) ================= -->
+  <section class="card">
+    <h2><span class="num">a</span>Part (a) — Find \(a\) and \(b\)</h2>
+
+    <div class="canvas-box">
+      <canvas id="aCanvas" width="880" height="330"></canvas>
+      <div class="controls">
+        <div class="ctrl">
+          <label for="aSlider">\(a\) (in years):</label>
+          <input type="range" id="aSlider" min="39" max="60" step="1" value="39">
+        </div>
+        <div class="ctrl">
+          <label for="bSlider">\(b\) (in years):</label>
+          <input type="range" id="bSlider" min="55" max="70" step="1" value="55">
+        </div>
+        <div class="ctrl">
+          <input type="checkbox" id="showIQR" checked>
+          <label for="showIQR">Show IQR = 21</label>
+        </div>
+      </div>
+      <div class="readout">
+        <span class="ro">\(Q_3-Q_1 = a-27\) = <b id="roIQR">12</b> &nbsp;(want 21)</span>
+        <span class="ro green">\(b-19\) = <b id="roRange">36</b> &nbsp;(want 43)</span>
+        <span class="ro" id="roStatus">✗ not yet</span>
+      </div>
+    </div>
+
+    <div class="step" data-part="a">
+      <div class="step-head">
+        <span class="badge-num">Step 1</span>
+        <span class="step-title">Use the inter-quartile range to find \(a\)</span>
+        <span class="badge-mark">1M</span>
+      </div>
+      <p>The inter-quartile range is \(Q_3-Q_1\). From the diagram \(Q_1=27\) and \(Q_3=a\):</p>
+      \[
+        a-27 = 21
+      \]
+      <div class="hint">
+        <b>Hint:</b> The inter-quartile range is the length of the box (from \(Q_1\) to \(Q_3\)). It ignores the whiskers entirely.
+      </div>
+    </div>
+
+    <div class="step" data-part="a">
+      <div class="step-head">
+        <span class="badge-num">Step 2</span>
+        <span class="step-title">Therefore \(a = 48\)</span>
+        <span class="badge-mark">1A</span>
+      </div>
+      \[
+        a = 21+27 = 48
+      \]
+      <div class="answer-box">\(a = 48\)</div>
+      <div class="hint">
+        <b>Hint:</b> Always add \(Q_1\) to the IQR — a very common slip is to answer \(a=21\).
+      </div>
+    </div>
+
+    <div class="step" data-part="a">
+      <div class="step-head">
+        <span class="badge-num">Step 3</span>
+        <span class="step-title">Use the range to find \(b\)</span>
+        <span class="badge-mark">1A</span>
+      </div>
+      <p>The range is \(\text{Max}-\text{Min}\). The smallest value is \(19\) and the largest value is \(b\):</p>
+      \[
+        b-19 = 43
+      \]
+      \[
+        b = 43+19 = 62
+      \]
+      <div class="answer-box">\(a = 48\) , &nbsp; \(b = 62\)</div>
+      <div class="hint">
+        <b>Hint:</b> The range uses the two ends of the whiskers (minimum and maximum), never the median or the quartiles.
+        So the five-number summary of team \(X\) is \(19,\ 27,\ 38,\ 48,\ 62\).
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="nextBtn" data-part="a">Next step →</button>
+      <span class="counter" data-counter="a">0 / 3</span>
+    </div>
+  </section>
+
+  <!-- ================= PART (b) ================= -->
+  <section class="card">
+    <h2><span class="num">b</span>Part (b) — Is the manager's claim correct?</h2>
+
+    <div class="canvas-box">
+      <canvas id="bCanvas" width="880" height="400"></canvas>
+      <div class="controls">
+        <div class="ctrl">
+          <label for="yMin">Smallest age in \(Y\):</label>
+          <input type="range" id="yMin" min="18" max="42" step="1" value="18">
+        </div>
+        <div class="ctrl">
+          <label for="yMax">Largest age in \(Y\):</label>
+          <input type="range" id="yMax" min="38" max="52" step="1" value="38">
+        </div>
+        <div class="ctrl">
+          <input type="checkbox" id="lock" checked>
+          <label for="lock">Keep range of \(Y\) = 20</label>
+        </div>
+      </div>
+      <div class="readout">
+        <span class="ro">Range of \(Y\) = <b id="roYRange">20</b></span>
+        <span class="ro green">Smallest possible age in \(Y\) (3 clerks aged 38) = <b>18</b></span>
+        <span class="ro">Combined range = <b id="roComb">44</b> &nbsp; vs &nbsp; Range of \(X\) = <b>43</b></span>
+      </div>
+    </div>
+
+    <div class="step" data-part="b">
+      <div class="step-head">
+        <span class="badge-num">Step 1</span>
+        <span class="step-title">How small can the youngest clerk in team \(Y\) be?</span>
+        <span class="badge-mark">1M</span>
+      </div>
+      <p>
+        Three of the five clerks in \(Y\) are aged \(38\). Since the range of \(Y\) is \(20\), the youngest clerk's age is
+      </p>
+      \[
+        38-20 = 18
+      \]
+      <div class="hint">
+        <b>Hint:</b> To <i>minimise</i> the combined range we want \(Y\) to reach as low as possible. Because someone in \(Y\) is \(38\) and the range is \(20\), the minimum of \(Y\) can be as low as \(18\). Move the sliders above to see this.
+      </div>
+    </div>
+
+    <div class="step" data-part="b">
+      <div class="step-head">
+        <span class="badge-num">Step 2</span>
+        <span class="step-title">Greatest possible range of the section</span>
+        <span class="badge-mark">1A</span>
+      </div>
+      <p>
+        Combining \(X\) with \(Y\), the smallest age in the section is \(18\), while the largest age in team \(X\) is \(62\).
+        So the greatest possible range of the section is
+      </p>
+      \[
+        62-18 = 44
+      \]
+      <div class="hint">
+        <b>Hint:</b> \(44 \neq 43\). The range of team \(X\) alone is \(62-19=43\). Adding team \(Y\) can extend the range downward by one year, so the two ranges need <i>not</i> be the same.
+      </div>
+      <div class="answer-box">Thus, the claim is <b>disagreed</b>: the range of the section can be \(44\), which is different from \(43\).</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="nextBtn" data-part="b">Next step →</button>
+      <span class="counter" data-counter="b">0 / 2</span>
+    </div>
+  </section>
+
+  <!-- ================= SUMMARY ================= -->
+  <section class="card summary">
+    <h2><span class="num">✓</span>Summary of Answers</h2>
+    <ul>
+      <li><b>(a)</b> Inter-quartile range: \(a-27=21 \Rightarrow a = 48\).<br>
+          Range: \(b-19=43 \Rightarrow b = 62\).</li>
+      <li><b>(b)</b> The smallest possible age in team \(Y\) is \(38-20=18\).</li>
+      <li>The greatest possible range of the combined section is \(62-18=44\).</li>
+      <li>Since \(44 \neq 43\), the manager's claim is <b>not agreed</b> (disagreed).</li>
+      <li>Five-number summary of team \(X\): \(19,\ 27,\ 38,\ 48,\ 62\).</li>
+    </ul>
+  </section>
+
+</div>
+
+<footer>
+  HKDSE Mathematics (Compulsory Part) · Paper 1 · 2018 Question 10 · Interactive Solution
+</footer>
+
+<script>
+/* ============================================================
+   UTILITIES
+   ============================================================ */
+function fitCanvas(canvas, cssHeight){
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width  = Math.round(rect.width * dpr);
+  canvas.height = Math.round(cssHeight * dpr);
+  canvas.style.height = cssHeight + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  return ctx;
+}
+
+/* ============================================================
+   DIAGRAM 1 — QUESTION FIGURE (static)
+   ============================================================ */
+function drawQuestion(){
+  const canvas = document.getElementById('qCanvas');
+  const W = canvas.clientWidth, H = 230;
+  const ctx = fitCanvas(canvas, H);
+
+  const L = 60, R = W - 40;
+  const x0 = 19, x1 = 62;                    // age domain
+  const X = v => L + (v - x0) / (x1 - x0) * (R - L);
+
+  const boxTop = 70, boxBot = 130, mid = (boxTop+boxBot)/2;
+
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = '#fff'; ctx.fillRect(0,0,W,H);
+
+  // axis
+  ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(L,170); ctx.lineTo(R+18,170); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(R+18,170); ctx.lineTo(R+11,166); ctx.lineTo(R+11,174); ctx.closePath();
+  ctx.fillStyle = '#64748b'; ctx.fill();
+
+  // ticks
+  const ticks = [19,27,38,48,62];
+  ctx.font = '600 12px -apple-system,Segoe UI,Roboto,sans-serif';
+  ctx.textAlign = 'center';
+  ticks.forEach(t=>{
+    ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(X(t),170); ctx.lineTo(X(t),176); ctx.stroke();
+    ctx.fillStyle = '#475569';
+    ctx.fillText(t, X(t), 192);
+  });
+  ctx.textAlign='left';
+  ctx.fillStyle='#64748b';
+  ctx.font='600 13px -apple-system,Segoe UI,Roboto,sans-serif';
+  ctx.fillText('Age', R+20, 196);
+
+  // whiskers
+  ctx.strokeStyle = '#1d4ed8'; ctx.lineWidth = 1.6;
+  ctx.beginPath(); ctx.moveTo(X(19),mid); ctx.lineTo(X(27),mid); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(X(48),mid); ctx.lineTo(X(62),mid); ctx.stroke();
+  // whisker caps
+  ctx.beginPath(); ctx.moveTo(X(19),boxTop+8); ctx.lineTo(X(19),boxBot-8); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(X(62),boxTop+8); ctx.lineTo(X(62),boxBot-8); ctx.stroke();
+
+  // box
+  ctx.fillStyle = 'rgba(59,130,246,.18)';
+  ctx.fillRect(X(27), boxTop, X(48)-X(27), boxBot-boxTop);
+  ctx.strokeStyle = '#1d4ed8'; ctx.lineWidth = 2;
+  ctx.strokeRect(X(27), boxTop, X(48)-X(27), boxBot-boxTop);
+
+  // median line
+  ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 2.4;
+  ctx.beginPath(); ctx.moveTo(X(38),boxTop); ctx.lineTo(X(38),boxBot); ctx.stroke();
+
+  // labels
+  const labels = [
+    {v:19,t:'19',c:'#0f172a'},
+    {v:27,t:'27',c:'#1d4ed8'},
+    {v:38,t:'38',c:'#dc2626'},
+    {v:48,t:'a',c:'#1d4ed8'},
+    {v:62,t:'b',c:'#059669'}
+  ];
+  ctx.textAlign='center';
+  labels.forEach(o=>{
+    ctx.fillStyle=o.c;
+    ctx.font='800 14px -apple-system,Segoe UI,Roboto,sans-serif';
+    ctx.fillText(o.t, X(o.v), boxTop-12);
+  });
+
+  // footnote keys
+  ctx.textAlign='left';
+  ctx.font='600 12.5px -apple-system,Segoe UI,Roboto,sans-serif';
+  ctx.fillStyle='#dc2626'; ctx.fillText('— median', L, 30);
+  ctx.fillStyle='#1d4ed8'; ctx.fillText('— quartiles / whiskers', L+110, 30);
+  ctx.fillStyle='#64748b'; ctx.fillText('Range = b − 19 = 43    IQR = a − 27 = 21', L, 48);
+}
+
+/* ============================================================
+   DIAGRAM 2 — PART (a) INTERACTIVE
+   ============================================================ */
+let aVal = 39, bVal = 55;
+function drawA(){
+  const canvas = document.getElementById('aCanvas');
+  const W = canvas.clientWidth, H = 330;
+  const ctx = fitCanvas(canvas, H);
+
+  const L = 62, R = W - 44;
+  const x0 = 15, x1 = 70;
+  const X = v => L + (v - x0) / (x1 - x0) * (R - L);
+
+  const boxTop = 110, boxBot = 190, mid = (boxTop+boxBot)/2;
+
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,H);
+
+  // horizontal grid
+  ctx.strokeStyle='#f1f5f9'; ctx.lineWidth=1;
+  for(let v=15; v<=70; v+=5){
+    ctx.beginPath(); ctx.moveTo(X(v),60); ctx.lineTo(X(v),230); ctx.stroke();
+  }
+
+  // axis
+  ctx.strokeStyle='#94a3b8'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(L,230); ctx.lineTo(R+16,230); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(R+16,230); ctx.lineTo(R+9,226); ctx.lineTo(R+9,234); ctx.closePath();
+  ctx.fillStyle='#64748b'; ctx.fill();
+
+  // ticks
+  ctx.font='600 11px -apple-system,Segoe UI,Roboto,sans-serif';
+  ctx.textAlign='center';
+  for(let v=20; v<=70; v+=5){
+    ctx.strokeStyle='#cbd5e1'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(X(v),230); ctx.lineTo(X(v),235); ctx.stroke();
+    ctx.fillStyle='#94a3b8';
+    ctx.fillText(v, X(v), 249);
+  }
+  ctx.textAlign='left'; ctx.fillStyle='#64748b';
+  ctx.font='600 13px -apple-system,Segoe UI,Roboto,sans-serif';
+  ctx.fillText('Age', R+20, 254);
+
+  // whiskers
+  ctx.strokeStyle='#1d4ed8'; ctx.lineWidth=1.8;
+  ctx.beginPath(); ctx.moveTo(X(19),mid); ctx.lineTo(X(27),mid); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(X(aVal),mid); ctx.lineTo(X(bVal),mid); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(X(19),boxTop+10); ctx.lineTo(X(19),boxBot-10); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(X(bVal),boxTop+10); ctx.lineTo(X(bVal),boxBot-10); ctx.stroke();
+
+  // box
+  ctx.fillStyle='rgba(59,130,246,.16)';
+  ctx.fillRect(X(27),boxTop,X(aVal)-X(27),boxBot-boxTop);
+  ctx.strokeStyle='#1d4ed8'; ctx.lineWidth=2;
+  ctx.strokeRect(X(27),boxTop,X(aVal)-X(27),boxBot-boxTop);
+
+  // median
+  ctx.strokeStyle='#dc2626'; ctx.lineWidth=2.4;
+  ctx.beginPath(); ctx.moveTo(X(38),boxTop); ctx.lineTo(X(38),boxBot); ctx.stroke();
+
+  // IQR arrow (Q1 -> Q3)
+  if(document.getElementById('showIQR').checked){
+    const y = 76;
+    ctx.strokeStyle='#f59e0b'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(X(27),y); ctx.lineTo(X(aVal),y); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(X(27),y); ctx.lineTo(X(27)+9,y-5); ctx.lineTo(X(27)+9,y+5); ctx.closePath();
+    ctx.fillStyle='#f59e0b'; ctx.fill();
+    ctx.beginPath(); ctx.moveTo(X(aVal),y); ctx.lineTo(X(aVal)-9,y-5); ctx.lineTo(X(aVal)-9,y+5); ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle='#b45309';
+    ctx.font='800 12.5px -apple-system,Segoe UI,Roboto,sans-serif';
+    ctx.textAlign='center';
+    ctx.fillText('IQR = a − 27 = ' + (aVal-27), (X(27)+X(aVal))/2, y-10);
+  }
+
+  // range arrow (19 -> b)
+  const y2 = 268;
+  ctx.strokeStyle='#059669'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(X(19),y2); ctx.lineTo(X(bVal),y2); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(X(19),y2); ctx.lineTo(X(19)+9,y2-5); ctx.lineTo(X(19)+9,y2+5); ctx.closePath();
+  ctx.fillStyle='#059669'; ctx.fill();
+  ctx.beginPath(); ctx.moveTo(X(bVal),y2); ctx.lineTo(X(bVal)-9,y2-5); ctx.lineTo(X(bVal)-9,y2+5); ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle='#047857';
+  ctx.font='800 12.5px -apple-system,Segoe UI,Roboto,sans-serif';
+  ctx.textAlign='center';
+  ctx.fillText('Range = b − 19 = ' + (bVal-19), (X(19)+X(bVal))/2, y2+18);
+
+  // point labels
+  const pts=[{v:19,t:'19',c:'#0f172a'},{v:27,t:'27',c:'#1d4ed8'},{v:38,t:'38',c:'#dc2626'}];
+  ctx.textAlign='center';
+  pts.forEach(o=>{
+    ctx.fillStyle=o.c;
+    ctx.font='800 13px -apple-system,Segoe UI,Roboto,sans-serif';
+    ctx.fillText(o.t, X(o.v), boxTop-14);
+  });
+  // a & b labels with live values
+  ctx.fillStyle='#b45309';
+  ctx.font='800 13px -apple-system,Segoe UI,Roboto,sans-serif';
+  ctx.fillText('a = '+aVal, X(aVal), boxTop-14);
+  ctx.fillStyle=(bVal===62)?'#059669':'#b45309';
+  ctx.fillText('b = '+bVal, X(bVal), boxTop-14);
+
+  // highlight dots at target
+  function targetDot(v, correct, col){
+    if(!correct) return;
+    ctx.beginPath(); ctx.arc(X(v), mid, 6, 0, Math.PI*2);
+    ctx.fillStyle=col; ctx.globalAlpha=.85; ctx.fill(); ctx.globalAlpha=1;
+    ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
+  }
+  targetDot(aVal, aVal===48, '#059669');
+  targetDot(bVal, bVal===62, '#059669');
+
+  // readouts
+  document.getElementById('roIQR').textContent = (aVal-27);
+  document.getElementById('roRange').textContent = (bVal-19);
+  const ok = (aVal===48 && bVal===62);
+  const st = document.getElementById('roStatus');
+  if(ok){ st.innerHTML='✓ both conditions satisfied!'; st.style.background='#065f46'; }
+  else { st.innerHTML='✗ not yet'; st.style.background='#0f172a'; }
+}
+
+/* ============================================================
+   DIAGRAM 3 — PART (b) INTERACTIVE
+   ============================================================ */
+let yMin = 18, yMax = 38;
+function drawB(){
+  const canvas = document.getElementById('bCanvas');
+  const W = canvas.clientWidth, H = 400;
+  const ctx = fitCanvas(canvas, H);
+
+  const L = 62, R = W - 44;
+  const x0 = 14, x1 = 66;
+  const X = v => L + (v - x0) / (x1 - x0) * (R - L);
+
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,H);
+
+  // ---- grid ----
+  ctx.strokeStyle='#f1f5f9'; ctx.lineWidth=1;
+  for(let v=15; v<=65; v+=5){
+    ctx.beginPath(); ctx.moveTo(X(v),40); ctx.lineTo(X(v),330); ctx.stroke();
+  }
+  ctx.font='600 11px -apple-system,Segoe UI,Roboto,sans-serif';
+  ctx.textAlign='center';
+  for(let v=20; v<=65; v+=5){
+    ctx.fillStyle='#cbd5e1';
+    ctx.fillText(v, X(v), 350);
+  }
+  ctx.fillStyle='#94a3b8';
+  ctx.font='600 12.5px -apple-system,Segoe UI,Roboto,sans-serif';
+  ctx.fillText('Age', W-26, 350);
+
+  // ---- TEAM X boxplot (top row) ----
+  const xTop = 80, xBot = 130, xMid = 105;
+  const aValX = 48, bValX = 62, q1=27, med=38, minX=19;
+
+  ctx.strokeStyle='#1d4ed8'; ctx.lineWidth=1.6;
+  ctx.beginPath(); ctx.moveTo(X(minX),xMid); ctx.lineTo(X(q1),xMid); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(X(aValX),xMid); ctx.lineTo(X(bValX),xMid); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(X(minX),xTop+8); ctx.lineTo(X(minX),xBot-8); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(X(bValX),xTop+8); ctx.lineTo(X(bValX),xBot-8); ctx.stroke();
+
+  ctx.fillStyle='rgba(59,130,246,.16)';
+  ctx.fillRect(X(q1),xTop,X(aValX)-X(q1),xBot-xTop);
+  ctx.strokeStyle='#1d4ed8'; ctx.lineWidth=2;
+  ctx.strokeRect(X(q1),xTop,X(aValX)-X(q1),xBot-xTop);
+
+  ctx.strokeStyle='#dc2626'; ctx.lineWidth=2.2;
+  ctx.beginPath(); ctx.moveTo(X(med),xTop); ctx.lineTo(X(med),xBot); ctx.stroke();
+
+  // team X labels
+  ctx.textAlign='center';
+  ctx.font='800 12.5px -apple-system,Segoe UI,Roboto,sans-serif';
+  ctx.fillStyle='#0f172a'; ctx.fillText('19', X(minX), xTop-8);
+  ctx.fillStyle='#1d4ed8'; ctx.fillText('27', X(q1), xTop-8);
+  ctx.fillStyle='#dc2626'; ctx.fillText('38', X(med), xTop-8);
+  ctx.fillStyle='#1d4ed8'; ctx.fillText('48', X(aValX), xTop-8);
+  ctx.fillStyle='#059669'; ctx.fillText('62', X(bValX), xTop-8);
+  ctx.textAlign='left';
+  ctx.fillStyle='#1d4ed8';
+  ctx.font='800 13.5px -apple-system,Segoe UI,Roboto,sans-serif';
+  ctx.fillText('Team X', 8, xMid+5);
+
+  // team X range arrow
+  ctx.strokeStyle='#94a3b8'; ctx.lineWidth=1.6;
+  ctx.beginPath(); ctx.moveTo(X(minX),xBot+16); ctx.lineTo(X(bValX),xBot+16); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(X(minX),xBot+16); ctx.lineTo(X(minX)+8,xBot+11); ctx.lineTo(X(minX)+8,xBot+21); ctx.closePath();
+  ctx.fillStyle='#94a3b8'; ctx.fill();
+  ctx.beginPath(); ctx.moveTo(X(bValX),xBot+16); ctx.lineTo(X(bValX)-8,xBot+11); ctx.lineTo(X(bValX)-8,xBot+21); ctx.closePath();
+  ctx.fill();
+  ctx.textAlign='center';
+  ctx.fillStyle='#64748b';
+  ctx.font='700 12px -apple-system,Segoe UI,Roboto,sans-serif';
+  ctx.fillText('range of X = 43', (X(minX)+X(bValX))/2, xBot+34);
+
+  // ---- TEAM Y dot plot (bottom row, five dots) ----
+  const yRow = 250;
+  const yAges = [yMin, 38, 38, 38, yMax];
+
+  ctx.textAlign='left';
+  ctx.fillStyle='#7c3aed';
+  ctx.font='800 13.5px -apple-system,Segoe UI,Roboto,sans-serif';
+  ctx.fillText('Team Y', 8, yRow+5);
+
+  // baseline for Y
+  ctx.strokeStyle='#ddd6fe'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(X(yMin),yRow); ctx.lineTo(X(yMax),yRow); ctx.stroke();
+
+  // 5 dots
+  const counts = {};
+  yAges.forEach(v=>{counts[v]=(counts[v]||0)+1;});
+  Object.keys(counts).forEach(k=>{
+    const v=+k, n=counts[k];
+    for(let i=0;i<n;i++){
+      const yy = yRow - (n-1)*11 + i*22;
+      ctx.beginPath(); ctx.arc(X(v), yy, 7, 0, Math.PI*2);
+      ctx.fillStyle = (v===38) ? '#f59e0b' : '#7c3aed';
+      ctx.fill();
+      ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
+    }
+    ctx.fillStyle='#6d28d9';
+    ctx.font='800 12px -apple-system,Segoe UI,Roboto,sans-serif';
+    ctx.textAlign='center';
+    ctx.fillText(v, X(v), yRow - (n-1)*11 - 14);
+  });
+  ctx.textAlign='center';
+
+  // range arrow for Y
+  const yArr = yRow + 62;
+  ctx.strokeStyle='#7c3aed'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(X(yMin),yArr); ctx.lineTo(X(yMax),yArr); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(X(yMin),yArr); ctx.lineTo(X(yMin)+9,yArr-5); ctx.lineTo(X(yMin)+9,yArr+5); ctx.closePath();
+  ctx.fillStyle='#7c3aed'; ctx.fill();
+  ctx.beginPath(); ctx.moveTo(X(yMax),yArr); ctx.lineTo(X(yMax)-9,yArr-5); ctx.lineTo(X(yMax)-9,yArr+5); ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle='#6d28d9';
+  ctx.font='800 12.5px -apple-system,Segoe UI,Roboto,sans-serif';
+  ctx.fillText('range of Y = ' + (yMax-yMin), (X(yMin)+X(yMax))/2, yArr+18);
+
+  // ---- combined range bracket ----
+  const cMin = Math.min(19, yMin);
+  const cMax = Math.max(bValX, yMax);
+  const yC = 382;
+  ctx.strokeStyle='#f59e0b'; ctx.lineWidth=2.2;
+  ctx.beginPath(); ctx.moveTo(X(cMin),yC); ctx.lineTo(X(cMax),yC); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(X(cMin),yC); ctx.lineTo(X(cMin)+10,yC-6); ctx.lineTo(X(cMin)+10,yC+6); ctx.closePath();
+  ctx.fillStyle='#f59e0b'; ctx.fill();
+  ctx.beginPath(); ctx.moveTo(X(cMax),yC); ctx.lineTo(X(cMax)-10,yC-6); ctx.lineTo(X(cMax)-10,yC+6); ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle='#b45309';
+  ctx.font='800 12.5px -apple-system,Segoe UI,Roboto,sans-serif';
+  ctx.textAlign='center';
+  ctx.fillText('range of section = ' + (cMax-cMin), (X(cMin)+X(cMax))/2, yC+20);
+
+  // highlight the critical 18 vs 19
+  ctx.setLineDash([5,4]);
+  ctx.strokeStyle='#ef4444'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(X(yMin),yRow+12); ctx.lineTo(X(yMin),yC-4); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // readouts
+  document.getElementById('roYRange').textContent = (yMax-yMin);
+  document.getElementById('roComb').textContent = (cMax-cMin);
+}
+
+/* ============================================================
+   STEP REVEAL LOGIC
+   ============================================================ */
+document.querySelectorAll('.nextBtn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const part = btn.dataset.part;
+    const steps = Array.from(document.querySelectorAll(`.step[data-part="${part}"]`));
+    const next  = steps.find(s=>!s.classList.contains('show'));
+    if(next){
+      next.classList.add('show');
+      if(window.MathJax && MathJax.typesetPromise){
+        MathJax.typesetPromise([next]).catch(()=>{});
+      }
+    }
+    const shown = steps.filter(s=>s.classList.contains('show')).length;
+    const counter = document.querySelector(`.counter[data-counter="${part}"]`);
+    counter.textContent = shown + ' / ' + steps.length;
+    if(shown === steps.length){
+      btn.disabled = true;
+      btn.textContent = 'All steps revealed ✓';
+    }
+  });
+});
+
+/* ============================================================
+   SLIDER / CHECKBOX WIRING
+   ============================================================ */
+const aSlider = document.getElementById('aSlider');
+const bSlider = document.getElementById('bSlider');
+const showIQR = document.getElementById('showIQR');
+aSlider.addEventListener('input', ()=>{ aVal = +aSlider.value; drawA(); });
+bSlider.addEventListener('input', ()=>{ bVal = +bSlider.value; drawA(); });
+showIQR.addEventListener('change', drawA);
+
+const yMinS = document.getElementById('yMin');
+const yMaxS = document.getElementById('yMax');
+const lockC = document.getElementById('lock');
+
+yMinS.addEventListener('input', ()=>{
+  yMin = +yMinS.value;
+  if(lockC.checked){
+    const nv = Math.min(42, yMin+20);
+    yMax = nv; yMaxS.value = nv;
+  }
+  if(yMax - yMin < 1){ yMax = yMin + 1; yMaxS.value = yMax; }
+  drawB();
+});
+yMaxS.addEventListener('input', ()=>{
+  yMax = +yMaxS.value;
+  if(lockC.checked){
+    const nv = Math.max(18, yMax-20);
+    yMin = nv; yMinS.value = nv;
+  }
+  if(yMax - yMin < 1){ yMin = yMax - 1; yMinS.value = yMin; }
+  drawB();
+});
+lockC.addEventListener('change', ()=>{
+  if(lockC.checked){ yMaxS.value = yMax; yMinS.value = yMin; }
+});
+
+/* ============================================================
+   INIT + RESIZE
+   ============================================================ */
+function renderAll(){ drawQuestion(); drawA(); drawB(); }
+
+window.addEventListener('resize', ()=>{
+  clearTimeout(window.__rz);
+  window.__rz = setTimeout(renderAll, 120);
+});
+
+window.addEventListener('load', ()=>{
+  renderAll();
+  if(window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise().catch(()=>{});
+});
+document.addEventListener('DOMContentLoaded', renderAll);
+renderAll();
+</script>
+</body>
+</html>

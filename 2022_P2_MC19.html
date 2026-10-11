@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2022 Paper 2 Q19 — Equilateral Triangle</title>
+<script>
+MathJax = {
+  tex: { inlineMath: [['\\(', '\\)'], ['$', '$']], displayMath: [['\\[','\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<style>
+  :root{
+    --blue:#1e3a8a; --blue2:#2563eb; --sky:#0ea5e9;
+    --amber:#f59e0b; --amber-bg:#fffbeb; --amber-bd:#fcd34d;
+    --green:#059669; --green-bg:#ecfdf5; --green-bd:#6ee7b7;
+    --dark:#0f172a; --dark2:#1e293b;
+    --ink:#1f2937; --muted:#6b7280; --line:#e5e7eb; --card:#ffffff;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    color:var(--ink); background:#f1f5f9; line-height:1.6;
+  }
+  .wrap{max-width:960px; margin:0 auto; padding:0 16px 60px;}
+
+  /* Hero */
+  header.hero{
+    background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 45%,#2563eb 100%);
+    color:#fff; padding:52px 20px 46px; text-align:center; position:relative; overflow:hidden;
+  }
+  header.hero::after{
+    content:""; position:absolute; inset:0;
+    background:radial-gradient(circle at 82% 18%, rgba(56,189,248,.32), transparent 45%),
+               radial-gradient(circle at 12% 88%, rgba(245,158,11,.22), transparent 45%);
+    pointer-events:none;
+  }
+  .hero-inner{position:relative; z-index:1;}
+  .eyebrow{font-size:.78rem; letter-spacing:.18em; text-transform:uppercase; opacity:.85;}
+  .hero h1{margin:.28em 0 .18em; font-size:clamp(1.5rem,4.4vw,2.2rem); font-weight:800;}
+  .hero .sub{opacity:.92; font-size:1rem;}
+  .pills{margin-top:18px; display:flex; flex-wrap:wrap; gap:8px; justify-content:center;}
+  .pill{
+    background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.34);
+    padding:5px 13px; border-radius:999px; font-size:.8rem; backdrop-filter:blur(4px);
+  }
+
+  /* Cards */
+  .card{
+    background:var(--card); border-radius:16px; padding:22px 22px 26px; margin-top:22px;
+    box-shadow:0 4px 18px rgba(15,23,42,.07); border:1px solid var(--line);
+  }
+  .card h2{margin:0 0 12px; font-size:1.12rem; color:var(--blue); display:flex; align-items:center; gap:9px;}
+  .card h2 .num{
+    background:var(--blue2); color:#fff; width:27px; height:27px; border-radius:8px;
+    display:inline-flex; align-items:center; justify-content:center; font-size:.84rem; font-weight:700; flex:0 0 auto;
+  }
+  .qtext{background:#f8fafc; border-left:4px solid var(--sky); border-radius:10px; padding:14px 16px; margin-top:4px;}
+  .marks{display:inline-block; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe;
+         font-size:.72rem; font-weight:700; padding:1px 8px; border-radius:999px; margin-left:6px; vertical-align:middle;}
+
+  /* Canvas blocks */
+  .diagram-wrap{
+    background:#f8fafc; border:1px solid var(--line); border-radius:12px; padding:12px; margin:14px 0;
+  }
+  canvas{width:100%; height:auto; display:block; border-radius:8px; background:#fff; touch-action:manipulation;}
+  .ctrl{display:flex; flex-wrap:wrap; gap:14px; align-items:center; margin-top:10px; font-size:.85rem; color:var(--muted);}
+  .ctrl label{display:flex; align-items:center; gap:7px; font-weight:600; color:#334155;}
+  input[type=range]{width:150px; accent-color:var(--blue2);}
+  input[type=checkbox]{width:16px; height:16px; accent-color:var(--green);}
+  .readout{margin-top:10px; display:flex; flex-wrap:wrap; gap:8px;}
+  .chip{
+    background:#fff; border:1px solid var(--line); border-radius:8px; padding:5px 11px;
+    font-size:.8rem; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; color:#334155;
+  }
+  .chip b{color:var(--blue2);}
+
+  /* Steps */
+  .step{
+    border-radius:12px; padding:14px 16px; margin:12px 0; display:none;
+    animation:fade .35s ease;
+  }
+  .step.show{display:block;}
+  @keyframes fade{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
+  .step.work{background:#f8fafc; border:1px solid var(--line); border-left:4px solid var(--blue2);}
+  .step .head{display:flex; align-items:center; gap:9px; margin-bottom:6px; flex-wrap:wrap;}
+  .badge{
+    background:var(--blue); color:#fff; font-size:.72rem; font-weight:700;
+    padding:2px 9px; border-radius:6px; letter-spacing:.02em;
+  }
+  .badge.m{background:var(--amber); color:#3b2600;}
+  .badge.a{background:var(--green);}
+  .hint{
+    background:var(--amber-bg); border:1px solid var(--amber-bd); border-radius:10px;
+    padding:9px 13px; margin-top:10px; font-size:.9rem; color:#78350f;
+  }
+  .hint::before{content:"💡 Hint: "; font-weight:700;}
+  .answer{
+    background:var(--green-bg); border:1px solid var(--green-bd); border-radius:10px;
+    padding:10px 14px; margin-top:10px; color:#065f46; font-weight:600;
+  }
+  .answer::before{content:"✓ "; font-weight:800;}
+
+  /* Buttons */
+  .btn-row{display:flex; align-items:center; gap:14px; margin-top:16px; flex-wrap:wrap;}
+  .btn{
+    background:linear-gradient(135deg,var(--blue2),var(--sky)); color:#fff; border:none;
+    padding:10px 20px; border-radius:10px; font-size:.9rem; font-weight:700; cursor:pointer;
+    box-shadow:0 3px 10px rgba(37,99,235,.32); transition:.18s;
+  }
+  .btn:hover:not(:disabled){transform:translateY(-1px); box-shadow:0 6px 16px rgba(37,99,235,.4);}
+  .btn:disabled{background:#cbd5e1; color:#64748b; cursor:not-allowed; box-shadow:none;}
+  .counter{font-size:.85rem; color:var(--muted); font-weight:600; font-variant-numeric:tabular-nums;}
+  .reset{
+    background:#fff; color:var(--blue2); border:1px solid #bfdbfe; padding:8px 15px;
+    border-radius:10px; font-size:.82rem; font-weight:700; cursor:pointer;
+  }
+  .reset:hover{background:#eff6ff;}
+
+  /* Summary */
+  .summary{background:linear-gradient(135deg,#0f172a,#1e293b); color:#e2e8f0; border-radius:16px; padding:24px; margin-top:24px;
+           box-shadow:0 8px 26px rgba(15,23,42,.3);}
+  .summary h2{color:#7dd3fc; margin-top:0;}
+  .summary ul{margin:10px 0 0; padding-left:20px;}
+  .summary li{margin:7px 0;}
+  .summary b{color:#fcd34d;}
+
+  footer{text-align:center; color:var(--muted); font-size:.8rem; padding:34px 16px 10px;}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</div>
+    <h1>2022 Paper 2 · Question 19</h1>
+    <div class="sub">Geometry — Equilateral Triangle &amp; Congruent Triangles</div>
+    <div class="pills">
+      <span class="pill">Equilateral Triangle</span>
+      <span class="pill">Congruent Triangles (SAS)</span>
+      <span class="pill">Angle Sum of Triangle</span>
+      <span class="pill">Corresponding Angles</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- Question -->
+  <section class="card">
+    <h2><span class="num">Q</span>Question</h2>
+    <div class="qtext">
+      In the figure, \(ABC\) is an equilateral triangle. Let \(D\) and \(E\) be points lying on \(AC\) and \(BC\)
+      respectively such that \(AD = CE\). If \(\angle CBD = 38^\circ\), then \(\angle AEB = \)
+      <div style="margin-top:10px; display:flex; flex-wrap:wrap; gap:10px;">
+        <span class="chip">A. 73°</span>
+        <span class="chip">B. 75°</span>
+        <span class="chip">C. 78°</span>
+        <span class="chip" style="border-color:#6ee7b7; background:#ecfdf5;">D. 82°</span>
+      </div>
+    </div>
+    <p style="color:var(--muted); font-size:.86rem; margin-top:10px;">
+      (This is a multiple-choice question; the full working is shown below as a demonstration of the reasoning.)
+    </p>
+  </section>
+
+  <!-- Part A -->
+  <section class="card">
+    <h2><span class="num">A</span>Part (a) — Exploring the Configuration</h2>
+    <p>Drag the slider to move point \(D\) along \(AC\) (and \(E\) along \(BC\) so that \(AD = CE\)) and watch how the angles change.</p>
+
+    <div class="diagram-wrap">
+      <canvas id="cv1" width="720" height="460"></canvas>
+      <div class="ctrl">
+        <label>Position AD (= CE):
+          <input type="range" id="sliderAD" min="0" max="1" step="0.005" value="0.35">
+        </label>
+        <label><input type="checkbox" id="chkAngles" checked> Show angle labels</label>
+        <label><input type="checkbox" id="chkCBD"> Highlight \(\angle CBD\)</label>
+      </div>
+      <div class="readout">
+        <span class="chip">AD = CE = <b id="roAD">—</b></span>
+        <span class="chip">∠ABE = <b id="roABE">—</b></span>
+        <span class="chip">∠CBD = <b id="roCBD">—</b></span>
+        <span class="chip">∠BAE = <b id="roBAE">—</b></span>
+        <span class="chip">∠AEB = <b id="roAEB">—</b></span>
+      </div>
+    </div>
+
+    <div class="step work" id="a1">
+      <div class="head"><span class="badge">Step 1</span><span class="badge m">1M</span></div>
+      <p>Since \(ABC\) is equilateral, all sides are equal and all interior angles are \(60^\circ\):</p>
+      \[ AB = BC = CA, \qquad \angle ABC = \angle BCA = \angle CAB = 60^\circ. \]
+      <div class="hint">Equilateral \(\triangle\) = equiangular \(\triangle\): every interior angle is \(60^\circ\).</div>
+    </div>
+
+    <div class="step work" id="a2">
+      <div class="head"><span class="badge">Step 2</span><span class="badge m">1A</span></div>
+      <p>From the slider diagram, \(D\) lies on \(AC\) and \(E\) lies on \(BC\). The condition \(AD = CE\) means \(BE = BC - CE = AC - AD = CD\).</p>
+      \[ BE = CD \]
+      <div class="hint">Subtract equal lengths from equal sides of the equilateral triangle.</div>
+      <div class="answer">\(BE = CD\)</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn" id="btnA" onclick="nextStep('A')">Next step →</button>
+      <span class="counter" id="cntA">0 / 2</span>
+      <button class="reset" onclick="resetSteps('A')">Reset</button>
+    </div>
+  </section>
+
+  <!-- Part B -->
+  <section class="card">
+    <h2><span class="num">B</span>Part (b) — Proving \(\triangle ABE \cong \triangle BCD\)</h2>
+    <p>This is the key step of the solution: show the two triangles are congruent by <b>SAS</b>.</p>
+
+    <div class="diagram-wrap">
+      <canvas id="cv2" width="720" height="460"></canvas>
+      <div class="ctrl">
+        <label>Move D:
+          <input type="range" id="sliderAD2" min="0" max="1" step="0.005" value="0.35">
+        </label>
+        <label><input type="checkbox" id="chkABE" checked> Highlight \(\triangle ABE\)</label>
+        <label><input type="checkbox" id="chkBCD" checked> Highlight \(\triangle BCD\)</label>
+        <label><input type="checkbox" id="chkMarks"> Show equal-side ticks</label>
+      </div>
+      <div class="readout">
+        <span class="chip">AB = <b id="roAB">—</b></span>
+        <span class="chip">BC = <b id="roBC">—</b></span>
+        <span class="chip">BE = <b id="roBE">—</b></span>
+        <span class="chip">CD = <b id="roCD">—</b></span>
+      </div>
+    </div>
+
+    <div class="step work" id="b1">
+      <div class="head"><span class="badge">Step 1</span><span class="badge m">1M</span></div>
+      <p>In \(\triangle ABE\) and \(\triangle BCD\):</p>
+      \[ AB = BC \qquad (\text{given, equilateral } \triangle) \]
+      \[ \angle ABE = \angle BCD \qquad (\text{prop. of equilateral } \triangle) \]
+      \[ BE = CD \qquad (\text{proved in part (a)}) \]
+      <div class="hint">Look for two sides and the included angle in the two triangles.</div>
+    </div>
+
+    <div class="step work" id="b2">
+      <div class="head"><span class="badge">Step 2</span><span class="badge a">1A</span></div>
+      <p>Therefore, by the SAS congruence criterion:</p>
+      \[ \triangle ABE \cong \triangle BCD \]
+      <div class="hint">SAS: two sides and the included angle of one triangle equal the corresponding parts of the other.</div>
+      <div class="answer">\(\triangle ABE \cong \triangle BCD\) (SAS)</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn" id="btnB" onclick="nextStep('B')">Next step →</button>
+      <span class="counter" id="cntB">0 / 2</span>
+      <button class="reset" onclick="resetSteps('B')">Reset</button>
+    </div>
+  </section>
+
+  <!-- Part C -->
+  <section class="card">
+    <h2><span class="num">C</span>Part (c) — Finding \(\angle AEB\)</h2>
+    <p>Use corresponding angles of the congruent triangles, then the angle sum of \(\triangle ABE\).</p>
+
+    <div class="diagram-wrap">
+      <canvas id="cv3" width="720" height="460"></canvas>
+      <div class="ctrl">
+        <label>Move D:
+          <input type="range" id="sliderAD3" min="0" max="1" step="0.005" value="0.35">
+        </label>
+        <label><input type="checkbox" id="chkAE" checked> Show ABE angles</label>
+        <label><input type="checkbox" id="chkBCD2" checked> Show BCD angles</label>
+      </div>
+      <div class="readout">
+        <span class="chip">∠ABE = <b id="roABE3">—</b></span>
+        <span class="chip">∠BAE = <b id="roBAE3">—</b></span>
+        <span class="chip">∠AEB = <b id="roAEB3">—</b></span>
+      </div>
+    </div>
+
+    <div class="step work" id="c1">
+      <div class="head"><span class="badge">Step 1</span><span class="badge m">1M</span></div>
+      <p>Since \(\triangle ABE \cong \triangle BCD\), corresponding angles are equal:</p>
+      \[ \angle BAE = \angle CBD = 38^\circ \qquad (\text{corr. } \angle s,\ \cong \triangle s) \]
+      <div class="hint">Match the vertices in the same order: \(A \leftrightarrow B\), \(B \leftrightarrow C\), \(E \leftrightarrow D\).</div>
+    </div>
+
+    <div class="step work" id="c2">
+      <div class="head"><span class="badge">Step 2</span><span class="badge m">1M</span></div>
+      <p>Also, in the equilateral triangle:</p>
+      \[ \angle ABE = 60^\circ \qquad (\text{prop. of equilateral } \triangle) \]
+      <div class="hint">\(\angle ABE\) is the angle at \(B\) between \(BA\) and \(BE\), i.e. an interior angle of the equilateral triangle.</div>
+    </div>
+
+    <div class="step work" id="c3">
+      <div class="head"><span class="badge">Step 3</span><span class="badge m">1M</span></div>
+      <p>In \(\triangle ABE\), using the angle sum of a triangle:</p>
+      \[ \angle AEB = 180^\circ - \angle ABE - \angle BAE \qquad (\angle \text{ sum of } \triangle) \]
+      \[ = 180^\circ - 60^\circ - 38^\circ = 82^\circ \]
+      <div class="hint">The three angles of any triangle add up to \(180^\circ\).</div>
+      <div class="answer">\(\angle AEB = 82^\circ\) (Option D)</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn" id="btnC" onclick="nextStep('C')">Next step →</button>
+      <span class="counter" id="cntC">0 / 3</span>
+      <button class="reset" onclick="resetSteps('C')">Reset</button>
+    </div>
+  </section>
+
+  <!-- Summary -->
+  <section class="summary">
+    <h2>Summary of Answers</h2>
+    <ul>
+      <li><b>Part (a):</b> \(BE = CD\) (since \(AD = CE\) and \(AB = BC = CA\))</li>
+      <li><b>Part (b):</b> \(\triangle ABE \cong \triangle BCD\) (SAS)</li>
+      <li><b>Part (c):</b> \(\angle BAE = 38^\circ\), \(\angle ABE = 60^\circ\), so \(\angle AEB = 82^\circ\)</li>
+      <li><b>Final answer:</b> <b>Option D</b> — \(82^\circ\)</li>
+    </ul>
+  </section>
+
+  <footer>
+    HKDSE Mathematics (Compulsory Part) · 2022 Paper 2 Q19 · Interactive Solution<br>
+    Built with HTML5 Canvas &amp; MathJax
+  </footer>
+</div>
+
+<script>
+/* ============================================================
+   Geometry setup
+   Equilateral triangle ABC:
+     B = (0, 0), C = (1, 0), A = (0.5, sqrt(3)/2)
+   D on AC with AD = t * AC  (t in [0,1])
+   E on BC with CE = t * BC, so E = C - t*(C-B) = (1-t, 0)
+   ============================================================ */
+const SQ3 = Math.sqrt(3);
+const B = {x:0, y:0};
+const Cv = {x:1, y:0};
+const A = {x:0.5, y:SQ3/2};
+
+function lerp(P, Q, t){ return {x:P.x + (Q.x-P.x)*t, y:P.y + (Q.y-P.y)*t}; }
+
+function computeGeom(t){
+  const D = lerp(A, Cv, t);           // D on AC, AD = t*AC
+  const E = {x: 1 - t, y: 0};         // E on BC, CE = t*BC
+  return {D, E};
+}
+
+/* ---------- Canvas helpers ---------- */
+function setupCanvas(cv){
+  const dpr = window.devicePixelRatio || 1;
+  const rect = cv.getBoundingClientRect();
+  const cssW = rect.width;
+  // keep internal aspect from width/height attributes
+  const ratio = cv.height / cv.width;
+  cv.width = Math.round(cssW * dpr);
+  cv.height = Math.round(cssW * ratio * dpr);
+  cv.style.height = (cssW * ratio) + 'px';
+  const ctx = cv.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  return {ctx, W: cssW, H: cssW * ratio};
+}
+
+function makeTransform(W, H){
+  // world coords: x in [-0.15, 1.15], y in [-0.15, 1.0]
+  const padX = 0.14, padY = 0.10;
+  const minX = -padX, maxX = 1 + padX;
+  const minY = -padY, maxY = SQ3/2 + padY;
+  const sx = W / (maxX - minX);
+  const sy = H / (maxY - minY);
+  const s = Math.min(sx, sy);
+  const ox = (W - s*(maxX - minX)) / 2 - s*minX;
+  const oy = (H - s*(maxY - minY)) / 2 + s*maxY; // flip y
+  return {
+    toX: x => ox + s*x,
+    toY: y => oy - s*y,
+    s: s
+  };
+}
+
+function drawGridAxes(ctx, T, W, H){
+  // light grid in world coords every 0.1
+  ctx.save();
+  ctx.strokeStyle = '#eef2f7';
+  ctx.lineWidth = 1;
+  for(let x=-0.1; x<=1.11; x+=0.1){
+    ctx.beginPath();
+    ctx.moveTo(T.toX(x), 0);
+    ctx.lineTo(T.toX(x), H);
+    ctx.stroke();
+  }
+  for(let y=-0.1; y<=1.01; y+=0.1){
+    ctx.beginPath();
+    ctx.moveTo(0, T.toY(y));
+    ctx.lineTo(W, T.toY(y));
+    ctx.stroke();
+  }
+  // axes
+  ctx.strokeStyle = '#cbd5e1';
+  ctx.lineWidth = 1.4;
+  ctx.beginPath();
+  ctx.moveTo(0, T.toY(0)); ctx.lineTo(W, T.toY(0)); ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(T.toX(0), 0); ctx.lineTo(T.toX(0), H); ctx.stroke();
+  ctx.restore();
+}
+
+function drawPoint(ctx, T, P, label, color, dx, dy){
+  const x = T.toX(P.x), y = T.toY(P.y);
+  ctx.save();
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(x, y, 5, 0, Math.PI*2);
+  ctx.fill();
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 1.6;
+  ctx.stroke();
+  if(label){
+    ctx.fillStyle = color;
+    ctx.font = 'bold 16px system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(label, x + (dx||0), y + (dy||0));
+  }
+  ctx.restore();
+}
+
+function drawEdge(ctx, T, P, Q, color, width, dash){
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width || 2.5;
+  if(dash) ctx.setLineDash(dash);
+  ctx.beginPath();
+  ctx.moveTo(T.toX(P.x), T.toY(P.y));
+  ctx.lineTo(T.toX(Q.x), T.toY(Q.y));
+  ctx.stroke();
+  ctx.restore();
+}
+
+/* Draw an angle arc at vertex V between rays V->P1 and V->P2 */
+function drawAngle(ctx, T, V, P1, P2, color, radiusPx, label, labelOff){
+  const vx = T.toX(V.x), vy = T.toY(V.y);
+  const a1 = Math.atan2(T.toY(P1.y)-vy, T.toX(P1.x)-vx);
+  const a2 = Math.atan2(T.toY(P2.y)-vy, T.toX(P2.x)-vx);
+  let start = a1, end = a2;
+  // ensure we sweep the smaller angle (< PI)
+  let diff = end - start;
+  while(diff <= -Math.PI) diff += 2*Math.PI;
+  while(diff > Math.PI) diff -= 2*Math.PI;
+  if(diff < 0){ // clockwise, swap and make positive
+    const tmp = start; start = end; end = tmp;
+    diff = -diff;
+  }
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2.2;
+  ctx.beginPath();
+  ctx.arc(vx, vy, radiusPx, start, start + diff);
+  ctx.stroke();
+  if(label){
+    const midA = start + diff/2;
+    const r = radiusPx + 16 + (labelOff||0);
+    const lx = vx + r*Math.cos(midA);
+    const ly = vy + r*Math.sin(midA);
+    ctx.fillStyle = color;
+    ctx.font = 'bold 13px system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(label, lx, ly);
+  }
+  ctx.restore();
+}
+
+/* Tick marks for equal sides */
+function drawTicks(ctx, T, P, Q, count, color){
+  const mx = (T.toX(P.x)+T.toX(Q.x))/2;
+  const my = (T.toY(P.y)+T.toY(Q.y))/2;
+  const dx = T.toX(Q.x)-T.toX(P.x);
+  const dy = T.toY(Q.y)-T.toY(P.y);
+  const len = Math.hypot(dx,dy) || 1;
+  const ux = dx/len, uy = dy/len;    // along edge
+  const px = -uy, py = ux;            // perpendicular
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2.4;
+  for(let i=0;i<count;i++){
+    const off = (i - (count-1)/2) * 7;
+    const bx = mx + ux*off, by = my + uy*off;
+    ctx.beginPath();
+    ctx.moveTo(bx - px*6, by - py*6);
+    ctx.lineTo(bx + px*6, by + py*6);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+/* Draw triangle fill (translucent) */
+function fillTri(ctx, T, P, Q, R, color){
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(T.toX(P.x), T.toY(P.y));
+  ctx.lineTo(T.toX(Q.x), T.toY(Q.y));
+  ctx.lineTo(T.toX(R.x), T.toY(R.y));
+  ctx.closePath();
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawBaseTriangle(ctx, T, opts){
+  opts = opts || {};
+  // outline
+  drawEdge(ctx, T, B, Cv, '#1e3a8a', 3);
+  drawEdge(ctx, T, Cv, A, '#1e3a8a', 3);
+  drawEdge(ctx, T, A, B, '#1e3a8a', 3);
+}
+
+function clearAndTitle(ctx, W, H, title){
+  ctx.clearRect(0,0,W,H);
+  if(title){
+    ctx.save();
+    ctx.fillStyle = '#1e3a8a';
+    ctx.font = 'bold 15px system-ui, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    ctx.fillText(title, 12, 10);
+    ctx.restore();
+  }
+}
+
+/* ============================================================
+   Diagram 1: Explore configuration
+   ============================================================ */
+let cv1State = {t:0.35, showAngles:true, highlightCBD:false};
+
+function drawCV1(){
+  const cv = document.getElementById('cv1');
+  const {ctx, W, H} = setupCanvas(cv);
+  const T = makeTransform(W, H);
+  clearAndTitle(ctx, W, H, 'Interactive: drag the slider to move D and E');
+
+  drawGridAxes(ctx, T, W, H);
+  drawBaseTriangle(ctx, T);
+
+  const t = cv1State.t;
+  const {D, E} = computeGeom(t);
+
+  // shaded triangles ABE / BCD
+  fillTri(ctx, T, A, B, E, 'rgba(37,99,235,0.12)');
+  fillTri(ctx, T, B, Cv, D, 'rgba(245,158,11,0.14)');
+
+  // segments BE (blue) and CD (amber) equal
+  drawEdge(ctx, T, B, E, '#2563eb', 3.4);
+  drawEdge(ctx, T, Cv, D, '#f59e0b', 3.4);
+  // segments AE and BD
+  drawEdge(ctx, T, A, E, '#0ea5e9', 2);
+  drawEdge(ctx, T, B, D, '#0ea5e9', 2);
+
+  // highlight CBD if requested
+  if(cv1State.highlightCBD){
+    drawEdge(ctx, T, B, D, '#dc2626', 3.6);
+    drawEdge(ctx, T, B, Cv, '#dc2626', 3.6);
+    drawAngle(ctx, T, B, D, Cv, '#dc2626', 34, '', 0);
+  }
+
+  // angle arcs
+  if(cv1State.showAngles){
+    drawAngle(ctx, T, B, A, E, '#7c3aed', 30, '60°', 2);
+    if(t > 0.05 && t < 0.95){
+      drawAngle(ctx, T, A, B, E, '#059669', 34, '38°', 0);
+      drawAngle(ctx, T, B, Cv, D, '#dc2626', 40, '', 0);
+    }
+    drawAngle(ctx, T, E, A, B, '#be123c', 30, '?', 0);
+  }
+
+  drawPoint(ctx, T, A, 'A', '#1e3a8a', 0, -20);
+  drawPoint(ctx, T, B, 'B', '#1e3a8a', -18, 16);
+  drawPoint(ctx, T, Cv, 'C', '#1e3a8a', 18, 16);
+  drawPoint(ctx, T, D, 'D', '#b45309', 18, -10);
+  drawPoint(ctx, T, E, 'E', '#2563eb', 0, 20);
+
+  // readouts
+  const AD = t; // since AC = 1 in world units
+  const CE = t;
+  // angles
+  // angle ABE = 60 always
+  const ABE = 60;
+  // angle CBD computed
+  const angCBD = angleAt(B, Cv, D) * 180/Math.PI;
+  const angBAE = angleAt(A, B, E) * 180/Math.PI;
+  const angAEB = angleAt(E, A, B) * 180/Math.PI;
+
+  document.getElementById('roAD').textContent  = AD.toFixed(3);
+  document.getElementById('roABE').textContent = ABE.toFixed(1) + '°';
+  document.getElementById('roCBD').textContent = angCBD.toFixed(1) + '°';
+  document.getElementById('roBAE').textContent = angBAE.toFixed(1) + '°';
+  document.getElementById('roAEB').textContent = angAEB.toFixed(1) + '°';
+}
+
+function angleAt(V, P, Q){
+  const v1x = P.x - V.x, v1y = P.y - V.y;
+  const v2x = Q.x - V.x, v2y = Q.y - V.y;
+  const d = v1x*v2x + v1y*v2y;
+  const n1 = Math.hypot(v1x, v1y), n2 = Math.hypot(v2x, v2y);
+  let c = d/(n1*n2);
+  c = Math.max(-1, Math.min(1, c));
+  return Math.acos(c);
+}
+
+/* ============================================================
+   Diagram 2: Congruent triangles ABE and BCD
+   ============================================================ */
+let cv2State = {t:0.35, showABE:true, showBCD:true, showTicks:false};
+
+function drawCV2(){
+  const cv = document.getElementById('cv2');
+  const {ctx, W, H} = setupCanvas(cv);
+  const T = makeTransform(W, H);
+  clearAndTitle(ctx, W, H, 'Congruent triangles: △ABE ≅ △BCD (SAS)');
+
+  drawGridAxes(ctx, T, W, H);
+
+  const t = cv2State.t;
+  const {D, E} = computeGeom(t);
+
+  if(cv2State.showABE) fillTri(ctx, T, A, B, E, 'rgba(37,99,235,0.20)');
+  if(cv2State.showBCD) fillTri(ctx, T, B, Cv, D, 'rgba(245,158,11,0.22)');
+
+  drawBaseTriangle(ctx, T);
+
+  // triangle outlines
+  if(cv2State.showABE){
+    drawEdge(ctx, T, A, B, '#2563eb', 3);
+    drawEdge(ctx, T, B, E, '#2563eb', 3);
+    drawEdge(ctx, T, E, A, '#2563eb', 3);
+  }
+  if(cv2State.showBCD){
+    drawEdge(ctx, T, B, Cv, '#d97706', 3);
+    drawEdge(ctx, T, Cv, D, '#d97706', 3);
+    drawEdge(ctx, T, D, B, '#d97706', 3);
+  }
+
+  // angle arcs
+  drawAngle(ctx, T, B, A, E, '#2563eb', 30, '60°', 0);
+  drawAngle(ctx, T, Cv, B, D, '#d97706', 30, '60°', 0);
+
+  // tick marks for equal sides
+  if(cv2State.showTicks){
+    // AB and BC equal (3 ticks)
+    drawTicks(ctx, T, A, B, 3, '#1e3a8a');
+    drawTicks(ctx, T, B, Cv, 3, '#1e3a8a');
+    // BE and CD equal (2 ticks) — but BE and BC overlap partially; draw BE in blue, CD in amber
+    drawTicks(ctx, T, B, E, 2, '#2563eb');
+    drawTicks(ctx, T, Cv, D, 2, '#d97706');
+  }
+
+  drawPoint(ctx, T, A, 'A', '#1e3a8a', 0, -20);
+  drawPoint(ctx, T, B, 'B', '#1e3a8a', -18, 16);
+  drawPoint(ctx, T, Cv, 'C', '#1e3a8a', 18, 16);
+  drawPoint(ctx, T, D, 'D', '#b45309', 18, -10);
+  drawPoint(ctx, T, E, 'E', '#2563eb', 0, 20);
+
+  // readouts (world units)
+  document.getElementById('roAB').textContent = '1.000';
+  document.getElementById('roBC').textContent = '1.000';
+  document.getElementById('roBE').textContent = (1 - t).toFixed(3);
+  document.getElementById('roCD').textContent = (1 - t).toFixed(3);
+}
+
+/* ============================================================
+   Diagram 3: Angle chase — highlight ∠BAE = ∠CBD = 38°
+   ============================================================ */
+let cv3State = {t:0.35, showAE:true, showBCD:true};
+
+function drawCV3(){
+  const cv = document.getElementById('cv3');
+  const {ctx, W, H} = setupCanvas(cv);
+  const T = makeTransform(W, H);
+  clearAndTitle(ctx, W, H, 'Angle chase: ∠BAE = ∠CBD = 38°, ∠ABE = 60°');
+
+  drawGridAxes(ctx, T, W, H);
+
+  const t = cv3State.t;
+  const {D, E} = computeGeom(t);
+
+  drawBaseTriangle(ctx, T);
+  drawEdge(ctx, T, A, E, '#0ea5e9', 2.5);
+  drawEdge(ctx, T, B, D, '#0ea5e9', 2.5);
+
+  if(cv3State.showAE){
+    fillTri(ctx, T, A, B, E, 'rgba(37,99,235,0.12)');
+    drawAngle(ctx, T, A, B, E, '#059669', 36, '38°', 0);
+    drawAngle(ctx, T, B, A, E, '#7c3aed', 30, '60°', 0);
+    drawAngle(ctx, T, E, A, B, '#be123c', 32, '?', 0);
+  }
+  if(cv3State.showBCD){
+    fillTri(ctx, T, B, Cv, D, 'rgba(245,158,11,0.12)');
+    drawAngle(ctx, T, B, Cv, D, '#dc2626', 38, '38°', 0);
+  }
+
+  drawPoint(ctx, T, A, 'A', '#1e3a8a', 0, -20);
+  drawPoint(ctx, T, B, 'B', '#1e3a8a', -18, 16);
+  drawPoint(ctx, T, Cv, 'C', '#1e3a8a', 18, 16);
+  drawPoint(ctx, T, D, 'D', '#b45309', 18, -10);
+  drawPoint(ctx, T, E, 'E', '#2563eb', 0, 20);
+
+  const angABE = angleAt(B, A, E) * 180/Math.PI;
+  const angBAE = angleAt(A, B, E) * 180/Math.PI;
+  const angAEB = angleAt(E, A, B) * 180/Math.PI;
+
+  document.getElementById('roABE3').textContent = angABE.toFixed(1) + '°';
+  document.getElementById('roBAE3').textContent = angBAE.toFixed(1) + '°';
+  document.getElementById('roAEB3').textContent = angAEB.toFixed(1) + '°';
+}
+
+/* ============================================================
+   Step reveal logic
+   ============================================================ */
+const stepGroups = {
+  A: {steps:['a1','a2'], idx:0, btn:'btnA', cnt:'cntA'},
+  B: {steps:['b1','b2'], idx:0, btn:'btnB', cnt:'cntB'},
+  C: {steps:['c1','c2','c3'], idx:0, btn:'btnC', cnt:'cntC'}
+};
+
+function updateCounter(g){
+  const gs = stepGroups[g];
+  document.getElementById(gs.cnt).textContent = gs.idx + ' / ' + gs.steps.length;
+  const btn = document.getElementById(gs.btn);
+  if(gs.idx >= gs.steps.length){
+    btn.disabled = true;
+    btn.textContent = 'All steps revealed ✓';
+  } else {
+    btn.disabled = false;
+    btn.textContent = 'Next step →';
+  }
+}
+
+function nextStep(g){
+  const gs = stepGroups[g];
+  if(gs.idx < gs.steps.length){
+    document.getElementById(gs.steps[gs.idx]).classList.add('show');
+    gs.idx++;
+    updateCounter(g);
+    if(window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise();
+  }
+}
+
+function resetSteps(g){
+  const gs = stepGroups[g];
+  gs.steps.forEach(id => document.getElementById(id).classList.remove('show'));
+  gs.idx = 0;
+  updateCounter(g);
+}
+
+/* ============================================================
+   Wire up sliders & checkboxes
+   ============================================================ */
+function initInteractive(){
+  // CV1
+  const s1 = document.getElementById('sliderAD');
+  const c1a = document.getElementById('chkAngles');
+  const c1b = document.getElementById('chkCBD');
+  s1.addEventListener('input', e => { cv1State.t = parseFloat(e.target.value); drawCV1(); });
+  c1a.addEventListener('change', e => { cv1State.showAngles = e.target.checked; drawCV1(); });
+  c1b.addEventListener('change', e => { cv1State.highlightCBD = e.target.checked; drawCV1(); });
+
+  // CV2
+  const s2 = document.getElementById('sliderAD2');
+  const c2a = document.getElementById('chkABE');
+  const c2b = document.getElementById('chkBCD');
+  const c2c = document.getElementById('chkMarks');
+  s2.addEventListener('input', e => { cv2State.t = parseFloat(e.target.value); drawCV2(); });
+  c2a.addEventListener('change', e => { cv2State.showABE = e.target.checked; drawCV2(); });
+  c2b.addEventListener('change', e => { cv2State.showBCD = e.target.checked; drawCV2(); });
+  c2c.addEventListener('change', e => { cv2State.showTicks = e.target.checked; drawCV2(); });
+
+  // CV3
+  const s3 = document.getElementById('sliderAD3');
+  const c3a = document.getElementById('chkAE');
+  const c3b = document.getElementById('chkBCD2');
+  s3.addEventListener('input', e => { cv3State.t = parseFloat(e.target.value); drawCV3(); });
+  c3a.addEventListener('change', e => { cv3State.showAE = e.target.checked; drawCV3(); });
+  c3b.addEventListener('change', e => { cv3State.showBCD = e.target.checked; drawCV3(); });
+
+  // init counters
+  updateCounter('A'); updateCounter('B'); updateCounter('C');
+
+  // draw all
+  drawCV1(); drawCV2(); drawCV3();
+}
+
+window.addEventListener('load', initInteractive);
+window.addEventListener('resize', () => { drawCV1(); drawCV2(); drawCV3(); });
+</script>
+</body>
+</html>

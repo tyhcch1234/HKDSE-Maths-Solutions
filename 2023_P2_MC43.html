@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HKDSE Math 2023 Paper 2 Q43 — Probability</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: #f4f7fb;
+    color: #1f2937;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  header {
+    background: linear-gradient(135deg, #2563eb, #4f46e5);
+    color: #fff;
+    padding: 22px 18px 18px;
+    text-align: center;
+  }
+  header h1 { margin: 0 0 4px; font-size: 1.25rem; letter-spacing: .2px; }
+  header p { margin: 0; font-size: .85rem; opacity: .9; }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 18px 14px 60px; }
+  .card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 18px 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 14px rgba(30, 64, 175, .08);
+    border: 1px solid #e5eaf3;
+  }
+  .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+  .tag {
+    background: #e0e7ff; color: #3730a3;
+    font-size: .72rem; font-weight: 600;
+    padding: 4px 10px; border-radius: 999px;
+  }
+  .question-text { font-size: 1rem; margin: 6px 0 0; }
+  .options { list-style: none; padding: 0; margin: 12px 0 0; display: grid; grid-template-columns: 1fr; gap: 8px; }
+  @media (min-width: 480px) { .options { grid-template-columns: 1fr 1fr; } }
+  .options li {
+    background: #f8fafc; border: 1px solid #e2e8f0;
+    border-radius: 10px; padding: 10px 12px; font-size: .95rem;
+  }
+  .options li.correct { background: #dcfce7; border-color: #86efac; font-weight: 600; }
+  .options li .key { font-weight: 700; color: #2563eb; margin-right: 6px; }
+  .options li.correct .key { color: #15803d; }
+
+  h2.section-title {
+    font-size: 1.05rem; margin: 0 0 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  h2.section-title .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: #4f46e5; display: inline-block;
+  }
+  .step {
+    border: 1px solid #e5eaf3; border-radius: 14px;
+    background: #fdfdff; margin-bottom: 10px; overflow: hidden;
+    transition: box-shadow .2s;
+  }
+  .step.open { box-shadow: 0 3px 12px rgba(79,70,229,.13); }
+  .step-head {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 14px; cursor: pointer;
+    background: #f8faff;
+    font-weight: 600; font-size: .95rem;
+    user-select: none;
+  }
+  .step-head .num {
+    flex: 0 0 26px; height: 26px; border-radius: 50%;
+    background: #4f46e5; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .8rem; font-weight: 700;
+  }
+  .step-head .arrow { margin-left: auto; transition: transform .25s; color: #6b7280; }
+  .step.open .step-head .arrow { transform: rotate(180deg); }
+  .step-body {
+    display: none; padding: 4px 14px 14px 14px;
+    font-size: .93rem; color: #374151;
+    animation: fadeIn .3s ease;
+  }
+  .step.open .step-body { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px);} to { opacity: 1; transform: none;} }
+
+  .hint {
+    margin-top: 10px; background: #fffbeb; border-left: 4px solid #f59e0b;
+    border-radius: 8px; padding: 10px 12px; font-size: .85rem; color: #78350f;
+  }
+  .hint strong { color: #b45309; }
+  .formula-box {
+    background: #eef2ff; border-radius: 10px; padding: 12px 14px;
+    margin: 10px 0; text-align: center; font-size: .95rem;
+  }
+  .btn {
+    display: inline-block; border: none; cursor: pointer;
+    background: #2563eb; color: #fff;
+    padding: 10px 18px; border-radius: 10px;
+    font-size: .92rem; font-weight: 600;
+    transition: background .2s, transform .1s;
+  }
+  .btn:hover { background: #1d4ed8; }
+  .btn:active { transform: scale(.97); }
+  .btn.ghost { background: #e2e8f0; color: #1e293b; }
+  .btn.ghost:hover { background: #cbd5e1; }
+  .nav { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
+
+  /* Interactive simulation */
+  .sim-note { font-size: .85rem; color: #4b5563; margin-bottom: 10px; }
+  .slider-row { display: flex; align-items: center; gap: 12px; margin: 14px 0; flex-wrap: wrap; }
+  .slider-row label { font-size: .88rem; font-weight: 600; min-width: 96px; }
+  input[type=range] { -webkit-appearance: none; flex: 1 1 180px; height: 6px; border-radius: 6px; background: #dbeafe; outline: none; }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%;
+    background: #2563eb; cursor: pointer; border: 3px solid #fff;
+    box-shadow: 0 1px 5px rgba(0,0,0,.25);
+  }
+  input[type=range]::-moz-range-thumb {
+    width: 20px; height: 20px; border-radius: 50%;
+    background: #2563eb; cursor: pointer; border: 3px solid #fff;
+  }
+  .p-val { font-weight: 700; color: #1d4ed8; min-width: 58px; text-align: right; font-variant-numeric: tabular-nums; }
+
+  .bars { display: flex; align-items: flex-end; gap: 10px; height: 170px; margin: 16px 0 6px; padding: 0 4px; }
+  .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; }
+  .bar {
+    width: 78%; max-width: 54px; border-radius: 8px 8px 0 0;
+    background: linear-gradient(180deg, #60a5fa, #2563eb);
+    transition: height .35s cubic-bezier(.4,0,.2,1);
+    position: relative;
+  }
+  .bar.highlight { background: linear-gradient(180deg, #34d399, #059669); }
+  .bar-label { font-size: .78rem; color: #4b5563; margin-top: 6px; font-weight: 600; }
+  .bar-pct { font-size: .74rem; color: #1e3a8a; font-weight: 700; margin-bottom: 3px; font-variant-numeric: tabular-nums; }
+
+  .result-panel {
+    background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 12px;
+    padding: 14px; margin-top: 14px; text-align: center;
+  }
+  .result-panel .big {
+    font-size: 1.6rem; font-weight: 800; color: #047857;
+    font-variant-numeric: tabular-nums;
+  }
+  .result-panel .sub { font-size: .82rem; color: #065f46; }
+
+  details.final {
+    background: #fff; border: 1px dashed #c7d2fe; border-radius: 12px;
+    padding: 10px 14px; margin-top: 6px;
+  }
+  details.final summary { cursor: pointer; font-weight: 700; color: #3730a3; }
+  details.final[open] summary { margin-bottom: 8px; }
+
+  footer { text-align: center; font-size: .75rem; color: #94a3b8; padding: 10px 0 30px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>HKDSE Math 2023 Paper 2 &mdash; Q43</h1>
+  <p>Topic 14 &middot; Probability</p>
+</header>
+
+<div class="wrap">
+
+  <!-- QUESTION -->
+  <section class="card">
+    <div class="tags">
+      <span class="tag">Probability</span>
+      <span class="tag">Complementary Events</span>
+      <span class="tag">Binomial Setting</span>
+      <span class="tag">Independent Trials</span>
+    </div>
+    <h2 class="section-title"><span class="dot"></span>Question</h2>
+    <p class="question-text">
+      When a boy throws a dart, the probability that he hits the target is $0.6$.
+      If this boy throws the dart $4$ times, find the probability that he hits the
+      target <strong>at least 2 times</strong>.
+    </p>
+    <ul class="options">
+      <li><span class="key">A.</span> 0.5248</li>
+      <li><span class="key">B.</span> 0.7056</li>
+      <li class="correct"><span class="key">C.</span> 0.8208</li>
+      <li><span class="key">D.</span> 0.8464</li>
+    </ul>
+  </section>
+
+  <!-- STEP-BY-STEP -->
+  <section class="card">
+    <h2 class="section-title"><span class="dot"></span>Step-by-Step Guided Solution</h2>
+    <p class="sim-note">Tap each step to reveal the reasoning. Try to predict the next line before opening it!</p>
+
+    <!-- Step 1 -->
+    <div class="step" data-step="1">
+      <div class="step-head"><span class="num">1</span> Set up the probability model
+        <span class="arrow">&#9660;</span></div>
+      <div class="step-body">
+        <p>Each throw is an <strong>independent</strong> trial with only two outcomes:
+        hit (H) or miss (M).</p>
+        <div class="formula-box">
+          $p = P(\text{hit}) = 0.6 \qquad q = P(\text{miss}) = 1 - 0.6 = 0.4$
+        </div>
+        <p>The number of hits $X$ in $4$ throws follows a binomial distribution
+        $X \sim B(4,\ 0.6)$.</p>
+        <div class="hint"><strong>Hint:</strong> Since the throws are independent,
+        the probability of one specific sequence (e.g. H M H M) is found by
+        <em>multiplying</em> the probabilities of each throw.</div>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step" data-step="2">
+      <div class="step-head"><span class="num">2</span> Recognise "at least 2" is many cases
+        <span class="arrow">&#9660;</span></div>
+      <div class="step-body">
+        <p>"At least 2 times" means $X \ge 2$, i.e. the possible cases are
+        $X = 2,\ 3,\ 4$.</p>
+        <div class="hint"><strong>Hint:</strong> Adding three separate cases is long
+        and error-prone. Look for a shortcut &mdash; the <em>complement</em>!</div>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="step" data-step="3">
+      <div class="step-head"><span class="num">3</span> Use the complement rule
+        <span class="arrow">&#9660;</span></div>
+      <div class="step-body">
+        <p>Every outcome is either "at least 2 hits" or its complement
+        "fewer than 2 hits". Fewer than 2 means $X = 0$ or $X = 1$.</p>
+        <div class="formula-box">
+          $P(X \ge 2) = 1 - P(X = 0) - P(X = 1)$
+        </div>
+        <div class="hint"><strong>Hint:</strong> For any event $E$, $P(E) = 1 - P(E')$.
+        Choosing the complement here reduces the work to only <strong>two</strong> cases.</div>
+      </div>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="step" data-step="4">
+      <div class="step-head"><span class="num">4</span> Compute $P(X = 0)$ — all misses
+        <span class="arrow">&#9660;</span></div>
+      <div class="step-body">
+        <p>All 4 throws must be misses:</p>
+        <div class="formula-box">
+          $P(X = 0) = (0.4)^4 = 0.0256$
+        </div>
+        <div class="hint"><strong>Hint:</strong> There is only one arrangement (M M M M),
+        so no multiplication by a binomial coefficient is needed.</div>
+      </div>
+    </div>
+
+    <!-- Step 5 -->
+    <div class="step" data-step="5">
+      <div class="step-head"><span class="num">5</span> Compute $P(X = 1)$ — exactly one hit
+        <span class="arrow">&#9660;</span></div>
+      <div class="step-body">
+        <p>The single hit can occur on the 1st, 2nd, 3rd <em>or</em> 4th throw, giving
+        <strong>4 equally likely arrangements</strong>, each with probability $(0.6)(0.4)^3$:</p>
+        <div class="formula-box">
+          $P(X = 1) = 4 \times (0.6)(0.4)^3 = 4 \times 0.0384 = 0.1536$
+        </div>
+        <div class="hint"><strong>Hint (Binomial formula):</strong>
+          $P(X = k) = \binom{n}{k} p^k (1-p)^{n-k}$ with $n = 4$, $p = 0.6$.
+          Here $k = 1$, so $\binom{4}{1} = 4$.</div>
+      </div>
+    </div>
+
+    <!-- Step 6 -->
+    <div class="step" data-step="6">
+      <div class="step-head"><span class="num">6</span> Combine and obtain the answer
+        <span class="arrow">&#9660;</span></div>
+      <div class="step-body">
+        <div class="formula-box">
+          $P(X \ge 2) = 1 - 0.0256 - 0.1536 = 1 - 0.1792 = \mathbf{0.8208}$
+        </div>
+        <p>The answer is <strong>C. 0.8208</strong>.</p>
+        <div class="hint"><strong>Hint:</strong> Always check your final value lies between
+        $0$ and $1$, and that it is larger than the probability of a single case
+        (here $0.6$ for one hit) &mdash; a good sanity check.</div>
+      </div>
+    </div>
+
+    <div class="nav">
+      <button class="btn" id="nextBtn">Next Step</button>
+      <button class="btn ghost" id="resetBtn">Reset</button>
+    </div>
+  </section>
+
+  <!-- VISUAL DEMO -->
+  <section class="card">
+    <h2 class="section-title"><span class="dot"></span>Visual Demo: Distribution of Hits</h2>
+    <p class="sim-note">
+      Change the hit probability $p$. The bars show $P(X = k)$ for $k = 0,1,2,3,4$ throws.
+      The green bars are the cases counted in "at least 2 hits", and the red bars are the
+      complement we subtract.
+    </p>
+
+    <div class="slider-row">
+      <label for="pSlider">Hit prob $p$</label>
+      <input type="range" id="pSlider" min="0" max="1" step="0.01" value="0.6">
+      <span class="p-val" id="pVal">0.60</span>
+    </div>
+
+    <div class="bars" id="bars"></div>
+
+    <div class="result-panel">
+      <div class="sub">$P(X \ge 2) = 1 - P(X=0) - P(X=1)$</div>
+      <div class="big" id="atLeast2">0.8208</div>
+      <div class="sub" id="complement">$P(X = 0) + P(X = 1) = 0.1792$</div>
+    </div>
+
+    <details class="final">
+      <summary>Show the full textbook working</summary>
+      <p>
+        The required probability
+        $= P(\text{hits at least 2 times})$<br>
+        $= 1 - P(\text{hits 0 times}) - P(\text{hits 1 time})$<br>
+        $= 1 - P(\text{no darts hit}) - \big[\,P(\text{only 1st dart hits}) + P(\text{only 2nd dart hits})$<br>
+        $\quad + P(\text{only 3rd dart hits}) + P(\text{only 4th dart hits})\,\big]$<br>
+        $= 1 - (1-0.6)^4 - \big[(0.6)(1-0.6)^3 + (1-0.6)(0.6)(1-0.6)^2$<br>
+        $\quad + (1-0.6)^2(0.6)(1-0.6) + (1-0.6)^3(0.6)\big]$<br>
+        $= 0.8208$
+      </p>
+    </details>
+  </section>
+
+  <footer>HKDSE Mathematics (Compulsory Part) — Paper 2 Question Bank &middot; Interactive Solution</footer>
+</div>
+
+<script>
+  /* ===== Accordion Steps ===== */
+  const steps = Array.from(document.querySelectorAll('.step'));
+
+  function openStep(i) {
+    if (i < 0 || i >= steps.length) return;
+    steps[i].classList.add('open');
+    steps[i].scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+  function firstClosedIndex() {
+    return steps.findIndex(s => !s.classList.contains('open'));
+  }
+
+  steps.forEach((s, i) => {
+    s.querySelector('.step-head').addEventListener('click', () => {
+      s.classList.toggle('open');
+    });
+  });
+
+  document.getElementById('nextBtn').addEventListener('click', () => {
+    const i = firstClosedIndex();
+    if (i === -1) {
+      steps.forEach(s => s.classList.remove('open'));
+    } else {
+      openStep(i);
+    }
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    steps.forEach(s => s.classList.remove('open'));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  /* ===== Interactive Binomial Bar Chart ===== */
+  const slider = document.getElementById('pSlider');
+  const pVal   = document.getElementById('pVal');
+  const barsEl = document.getElementById('bars');
+  const atLeast2El = document.getElementById('atLeast2');
+  const complementEl = document.getElementById('complement');
+
+  function binom(n, k) {
+    let r = 1;
+    for (let i = 1; i <= k; i++) r = r * (n - k + i) / i;
+    return r;
+  }
+  function pdf(n, k, p) {
+    return binom(n, k) * Math.pow(p, k) * Math.pow(1 - p, n - k);
+  }
+
+  function render() {
+    const p = parseFloat(slider.value);
+    pVal.textContent = p.toFixed(2);
+
+    const n = 4;
+    const probs = [];
+    for (let k = 0; k <= n; k++) probs.push(pdf(n, k, p));
+    const maxP = Math.max(...probs, 0.0001);
+
+    barsEl.innerHTML = '';
+    probs.forEach((pr, k) => {
+      const col = document.createElement('div');
+      col.className = 'bar-col';
+
+      const pct = document.createElement('div');
+      pct.className = 'bar-pct';
+      pct.textContent = pr.toFixed(4);
+      col.appendChild(pct);
+
+      const bar = document.createElement('div');
+      bar.className = 'bar' + (k >= 2 ? ' highlight' : '');
+      const h = Math.max((pr / maxP) * 130, 2); // px height
+      bar.style.height = h + 'px';
+      bar.style.background = k >= 2
+        ? 'linear-gradient(180deg,#34d399,#059669)'
+        : 'linear-gradient(180deg,#fda4af,#e11d48)';
+      col.appendChild(bar);
+
+      const lab = document.createElement('div');
+      lab.className = 'bar-label';
+      lab.textContent = 'X=' + k;
+      col.appendChild(lab);
+
+      barsEl.appendChild(col);
+    });
+
+    const p0 = probs[0], p1 = probs[1];
+    const ans = 1 - p0 - p1;
+    atLeast2El.textContent = ans.toFixed(4);
+    complementEl.innerHTML =
+      '$P(X = 0) + P(X = 1) = ' + p0.toFixed(4) + ' + ' + p1.toFixed(4) +
+      ' = ' + (p0 + p1).toFixed(4) + '$';
+    if (window.MathJax && MathJax.typesetPromise) {
+      MathJax.typesetPromise([complementEl]);
+    }
+  }
+
+  slider.addEventListener('input', render);
+
+  /* Initial state: open step 1 and draw chart */
+  openStep(0);
+  render();
+</script>
+
+</body>
+</html>

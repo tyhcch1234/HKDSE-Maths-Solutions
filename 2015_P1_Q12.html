@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2015 Paper 1 Q12 — Statistics</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[', '\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root{
+    --blue:#1d4ed8; --blue-d:#1e3a8a; --blue-l:#dbeafe;
+    --amber:#f59e0b; --amber-l:#fef3c7;
+    --emerald:#059669; --emerald-l:#d1fae5;
+    --ink:#0f172a; --muted:#475569; --line:#e2e8f0;
+    --bg:#f1f5f9; --card:#ffffff;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg); color:var(--ink); line-height:1.6;
+  }
+  .wrap{max-width:1000px; margin:0 auto; padding:0 16px 60px;}
+
+  /* ---------- HERO ---------- */
+  header.hero{
+    background:linear-gradient(135deg,#1e3a8a 0%, #1d4ed8 45%, #3b82f6 100%);
+    color:#fff; padding:44px 16px 52px; position:relative; overflow:hidden;
+  }
+  header.hero::after{
+    content:""; position:absolute; right:-80px; top:-80px; width:320px; height:320px;
+    border-radius:50%; background:rgba(255,255,255,.08);
+  }
+  header.hero::before{
+    content:""; position:absolute; left:-60px; bottom:-120px; width:280px; height:280px;
+    border-radius:50%; background:rgba(255,255,255,.06);
+  }
+  .hero-inner{max-width:1000px; margin:0 auto; position:relative; z-index:2;}
+  .eyebrow{
+    font-size:.8rem; letter-spacing:.16em; text-transform:uppercase;
+    color:#bfdbfe; font-weight:700; margin-bottom:10px;
+  }
+  .qno{font-size:2.1rem; font-weight:800; margin:0 0 6px; letter-spacing:-.5px;}
+  .hero h1{font-size:1.15rem; font-weight:500; margin:0 0 18px; color:#e0ecff;}
+  .pills{display:flex; flex-wrap:wrap; gap:8px;}
+  .pill{
+    background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35);
+    padding:5px 13px; border-radius:999px; font-size:.78rem; font-weight:600; color:#fff;
+  }
+
+  /* ---------- CARDS ---------- */
+  .card{
+    background:var(--card); border-radius:18px; padding:26px 24px; margin-top:26px;
+    box-shadow:0 4px 20px rgba(15,23,42,.07); border:1px solid var(--line);
+  }
+  .card h2{
+    font-size:1.25rem; margin:0 0 4px; display:flex; align-items:center; gap:10px;
+    color:var(--blue-d); font-weight:800;
+  }
+  .card h2 .num{
+    background:var(--blue); color:#fff; width:32px; height:32px; border-radius:9px;
+    display:inline-flex; align-items:center; justify-content:center; font-size:.95rem; flex:0 0 auto;
+  }
+  .sub{color:var(--muted); font-size:.9rem; margin:0 0 16px;}
+  .marks{
+    display:inline-block; background:var(--amber-l); color:#92400e; border:1px solid #fcd34d;
+    border-radius:999px; padding:2px 11px; font-size:.76rem; font-weight:700; margin-left:auto;
+  }
+
+  /* ---------- STEM-LEAF ---------- */
+  .stemleaf{
+    font-family:"Consolas","Menlo",monospace; background:#0f172a; color:#e2e8f0;
+    border-radius:14px; padding:18px 20px; display:inline-block; font-size:1rem; margin:8px 0 6px;
+    border:1px solid #1e293b;
+  }
+  .stemleaf .rows{display:grid; grid-template-columns:auto auto auto; gap:2px 14px;}
+  .stemleaf .st{color:#fcd34d; font-weight:700;}
+  .stemleaf .lv{color:#cbd5e1;}
+  .stemleaf .hd{color:#60a5fa; font-weight:700; border-bottom:1px solid #334155; padding-bottom:5px; margin-bottom:5px;}
+
+  /* ---------- CANVAS ---------- */
+  .canvas-box{
+    background:#f8fafc; border:1px solid var(--line); border-radius:14px;
+    padding:14px; margin:16px 0;
+  }
+  canvas{width:100%; display:block; border-radius:10px; background:#fff; touch-action:none;}
+  .controls{display:flex; flex-wrap:wrap; gap:16px; align-items:center; margin-top:12px;}
+  .ctrl{display:flex; align-items:center; gap:9px; font-size:.85rem; font-weight:600; color:var(--muted);}
+  input[type=range]{width:150px; accent-color:var(--blue);}
+  .readout{
+    background:var(--blue-l); color:var(--blue-d); border:1px solid #bfdbfe;
+    border-radius:10px; padding:8px 14px; font-size:.85rem; font-weight:700; font-family:monospace;
+  }
+  .readout.green{background:var(--emerald-l); color:#065f46; border-color:#a7f3d0;}
+  .chk{display:flex; align-items:center; gap:7px; font-size:.85rem; font-weight:600; color:var(--muted); cursor:pointer;}
+  input[type=checkbox]{width:17px; height:17px; accent-color:var(--blue); cursor:pointer;}
+
+  /* ---------- STEPS ---------- */
+  .step{
+    display:none; border-left:4px solid var(--blue); background:#f8fafc;
+    border-radius:0 12px 12px 0; padding:16px 18px; margin-top:14px;
+    animation:fadeIn .35s ease;
+  }
+  .step.show{display:block;}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;}}
+  .step-head{display:flex; align-items:center; gap:10px; margin-bottom:8px; flex-wrap:wrap;}
+  .badge{
+    background:var(--blue); color:#fff; font-size:.74rem; font-weight:800;
+    padding:3px 10px; border-radius:999px; letter-spacing:.03em;
+  }
+  .badge.mark{background:var(--amber); color:#3b2503;}
+  .step-body{font-size:.98rem;}
+  .hint{
+    background:var(--amber-l); border-left:4px solid var(--amber); border-radius:8px;
+    padding:10px 14px; margin-top:12px; font-size:.9rem; color:#78350f;
+  }
+  .hint b{color:#92400e;}
+  .answer{
+    background:var(--emerald-l); border-left:4px solid var(--emerald); border-radius:8px;
+    padding:10px 14px; margin-top:12px; font-size:.95rem; color:#065f46; font-weight:600;
+  }
+  .answer b{color:#047857;}
+  .stepnav{display:flex; align-items:center; gap:14px; margin-top:18px; flex-wrap:wrap;}
+  button.next{
+    background:var(--blue); color:#fff; border:none; border-radius:11px; padding:11px 22px;
+    font-size:.92rem; font-weight:700; cursor:pointer; transition:.2s;
+    box-shadow:0 3px 10px rgba(29,78,216,.3);
+  }
+  button.next:hover:not(:disabled){background:var(--blue-d); transform:translateY(-1px);}
+  button.next:disabled{background:#cbd5e1; color:#64748b; cursor:not-allowed; box-shadow:none;}
+  .counter{font-size:.85rem; font-weight:700; color:var(--muted); font-variant-numeric:tabular-nums;}
+
+  /* ---------- SUMMARY ---------- */
+  .summary{
+    background:linear-gradient(135deg,#0f172a,#1e293b); color:#e2e8f0; border-radius:18px;
+    padding:28px 26px; margin-top:26px; box-shadow:0 8px 30px rgba(15,23,42,.28);
+  }
+  .summary h2{color:#fff; font-size:1.25rem; margin:0 0 16px; display:flex; gap:10px; align-items:center;}
+  .summary h2 .num{background:#f59e0b; color:#1c1917; width:32px; height:32px; border-radius:9px;
+    display:inline-flex; align-items:center; justify-content:center; font-size:.95rem;}
+  .summary ul{list-style:none; padding:0; margin:0;}
+  .summary li{
+    padding:11px 0; border-bottom:1px solid rgba(255,255,255,.1); display:flex; gap:12px; align-items:baseline;
+  }
+  .summary li:last-child{border-bottom:none;}
+  .summary .k{color:#60a5fa; font-weight:800; flex:0 0 auto;}
+  .summary .v{color:#f1f5f9;}
+
+  footer{
+    text-align:center; color:var(--muted); font-size:.82rem; padding:34px 16px 10px;
+  }
+  @media(max-width:640px){
+    .qno{font-size:1.6rem;}
+    .card{padding:20px 16px;}
+    canvas{height:280px !important;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 1</div>
+    <div class="qno">2015 Paper 1 · Question 12</div>
+    <h1>Statistics — Mean, Median, Range &amp; Solving from Changes in Averages</h1>
+    <div class="pills">
+      <span class="pill">Stem-and-Leaf Diagram</span>
+      <span class="pill">Mean</span>
+      <span class="pill">Median</span>
+      <span class="pill">Range</span>
+      <span class="pill">Case Analysis</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ---------- QUESTION ---------- -->
+  <section class="card">
+    <h2><span class="num">Q</span> The Question</h2>
+    <p class="sub">The stem-and-leaf diagram below shows the distribution of the weights (in kg) of the students in a football club.</p>
+
+    <div class="stemleaf">
+      <div class="rows">
+        <div class="hd">Stem (tens)</div><div class="hd">Leaf (units)</div><div class="hd"></div>
+        <div class="st">4</div><div class="lv">0 &nbsp; 2 &nbsp; 3 &nbsp; 3 &nbsp; 3 &nbsp; 3 &nbsp; 9</div><div></div>
+        <div class="st">5</div><div class="lv">1 &nbsp; 1 &nbsp; 2 &nbsp; 2 &nbsp; 3 &nbsp; 7 &nbsp; 9</div><div></div>
+        <div class="st">6</div><div class="lv">3 &nbsp; 5 &nbsp; 8 &nbsp; 9</div><div></div>
+        <div class="st">7</div><div class="lv">8 &nbsp; 9</div><div></div>
+      </div>
+    </div>
+
+    <p><b>(a)</b> Find the mean, the median and the range of the above distribution. &nbsp;<span class="marks">3 marks</span></p>
+    <p><b>(b)</b> Two more students now join the club. It is found that both the mean and the range of the distribution of the weights are increased by \(1 \text{ kg}\). Find the weight of each of these two students. &nbsp;<span class="marks">4 marks</span></p>
+  </section>
+
+  <!-- ---------- PART (a) ---------- -->
+  <section class="card">
+    <h2><span class="num">a</span> Part (a) — Mean, Median, Range</h2>
+    <p class="sub">Read the 20 values off the stem-and-leaf diagram, then compute the three statistics.</p>
+
+    <div class="canvas-box">
+      <canvas id="cvsA" height="330"></canvas>
+      <div class="controls">
+        <label class="chk"><input type="checkbox" id="showOrder" checked> Show ordered data line</label>
+        <label class="chk"><input type="checkbox" id="showMean" checked> Show mean</label>
+        <label class="chk"><input type="checkbox" id="showMedian" checked> Show median</label>
+        <label class="chk"><input type="checkbox" id="showRange" checked> Show range</label>
+        <div class="readout" id="roA"></div>
+      </div>
+    </div>
+
+    <div class="step" id="a1">
+      <div class="step-head"><span class="badge">Step 1</span><span class="badge mark">1M</span></div>
+      <div class="step-body">
+        List the data and count them. Each stem \(s\) with leaf \(\ell\) gives the weight \(10s+\ell\).
+        \[ \text{Data: } 40,42,43,43,43,43,49,\;51,51,52,52,53,57,59,\;63,65,68,69,\;78,79 \]
+        Total number of students \(n = 20\).
+      </div>
+      <div class="hint"><b>Hint:</b> Read each row carefully — the stem is the tens digit, the leaf is the units digit. So stem 4 leaf 0 means \(40\text{ kg}\).</div>
+    </div>
+
+    <div class="step" id="a2">
+      <div class="step-head"><span class="badge">Step 2</span><span class="badge mark">1A</span></div>
+      <div class="step-body">
+        Sum of all weights:
+        \[ \sum x = 40+42+43+43+43+43+49+51+51+52+52+53+57+59+63+65+68+69+78+79 = 1100 \]
+        \[ \text{Mean} = \frac{1100}{20} = 55 \text{ kg} \]
+      </div>
+      <div class="answer"><b>Mean = 55 kg</b></div>
+    </div>
+
+    <div class="step" id="a3">
+      <div class="step-head"><span class="badge">Step 3</span><span class="badge mark">1A</span></div>
+      <div class="step-body">
+        With \(n = 20\) (even), the median is the average of the \(10^{\text{th}}\) and \(11^{\text{th}}\) values.
+        \[ \text{10}^{\text{th}} = 52, \quad \text{11}^{\text{th}} = 52 \]
+        \[ \text{Median} = \frac{52+52}{2} = 52 \text{ kg} \]
+      </div>
+      <div class="answer"><b>Median = 52 kg</b></div>
+    </div>
+
+    <div class="step" id="a4">
+      <div class="step-head"><span class="badge">Step 4</span><span class="badge mark">1A</span></div>
+      <div class="step-body">
+        Largest value \(=79\), smallest value \(=40\).
+        \[ \text{Range} = 79 - 40 = 39 \text{ kg} \]
+      </div>
+      <div class="hint"><b>Hint:</b> The median is a positional measure — it does not depend on the actual leaf values, only on their order.</div>
+      <div class="answer"><b>Range = 39 kg</b> &nbsp; (Mean \(=55\) kg, Median \(=52\) kg)</div>
+    </div>
+
+    <div class="stepnav">
+      <button class="next" data-target="a">Next step →</button>
+      <span class="counter" id="cnt-a">0 / 4</span>
+    </div>
+  </section>
+
+  <!-- ---------- PART (b) ---------- -->
+  <section class="card">
+    <h2><span class="num">b</span> Part (b) — The Two New Students</h2>
+    <p class="sub">Both the mean and the range increase by \(1\text{ kg}\). Let the new weights be \(a\) and \(b\), with \(a \le b\).</p>
+
+    <div class="canvas-box">
+      <canvas id="cvsB" height="330"></canvas>
+      <div class="controls">
+        <label class="ctrl">Lower weight \(a\): <input type="range" id="slA" min="35" max="95" step="1" value="52"></label>
+        <div class="readout green" id="roB"></div>
+      </div>
+      <p class="sub" style="margin-top:8px; font-size:.82rem;">Drag \(a\) and watch \(b\) adjust so that the new mean is \(56\text{ kg}\). The new range must also become \(40\text{ kg}\) — only one value of \(a\) works!</p>
+    </div>
+
+    <div class="step" id="b1">
+      <div class="step-head"><span class="badge">Step 1</span><span class="badge mark">1M</span></div>
+      <div class="step-body">
+        The original total sum is \(1100\) and there were \(20\) students. After adding \(a\) and \(b\), there are \(22\) students and the new mean is
+        \[ \frac{1100 + a + b}{22} = 55 + 1 = 56 \]
+        \[ \Rightarrow \; 1100 + a + b = 56 \times 22 = 1232 \]
+        \[ \therefore \; a + b = 132 \]
+      </div>
+      <div class="hint"><b>Hint:</b> "Mean increased by \(1\text{ kg}\)" means the new mean is \(55+1=56\text{ kg}\). Use: new total \(=\) new mean \(\times\) new count.</div>
+    </div>
+
+    <div class="step" id="b2">
+      <div class="step-head"><span class="badge">Step 2</span><span class="badge mark">1M</span></div>
+      <div class="step-body">
+        The original range is \(39\text{ kg}\). Since the range increases by \(1\text{ kg}\),
+        \[ \text{New range} = 40 \text{ kg} \]
+        The smallest original weight is \(40\) and the largest is \(79\), so the new maximum must be
+        \[ \max\{79,\,a,\,b\} = 40 + 40 = 80 \]
+        Hence \(b = 80\), and from Step 1, \(a = 132 - 80 = 52\).
+      </div>
+      <div class="hint"><b>Hint:</b> There are two cases to consider: (i) the new smallest value is \(a < 40\), or (ii) the new smallest value stays \(40\). Check which case is consistent.</div>
+    </div>
+
+    <div class="step" id="b3">
+      <div class="step-head"><span class="badge">Step 3</span><span class="badge mark">1A</span></div>
+      <div class="step-body">
+        <b>Case 1: \(a = 39\)</b> (i.e. the new minimum is below the old minimum \(40\)).<br>
+        For the new range to be \(40\), we would need the new maximum to be \(39 + 40 = 79\).<br>
+        But then \(b = 79\), and
+        \[ a + b = 39 + 79 = 118 \neq 132 \]
+        So this contradicts Step 1 — <b>impossible</b>.
+      </div>
+      <div class="hint"><b>Hint:</b> If \(a < 40\), the new range is \(b - a\). Setting \(b-a = 40\) with \(a+b=132\) gives \(b = 86,\ a = 46\) — but then the maximum would be \(86\), not \(79\), so the minimum really is \(a\)... test carefully which case satisfies <em>both</em> maximum and minimum conditions.</div>
+    </div>
+
+    <div class="step" id="b4">
+      <div class="step-head"><span class="badge">Step 4</span><span class="badge mark">1A</span></div>
+      <div class="step-body">
+        <b>Case 2: \(40 \le a \le 80\).</b> The minimum stays \(40\), so the new range is determined by the new maximum, which must be \(80\).
+        \[ \therefore b = 80 \]
+        Then from \(a + b = 132\):
+        \[ a = 132 - 80 = 52 \]
+        Check: \(40 \le 52 \le 80\) ✓. The new range is \(80 - 40 = 40\text{ kg}\) ✓, and the new mean is \(1232/22 = 56\text{ kg}\) ✓.
+      </div>
+      <div class="answer"><b>The two weights are 52 kg and 80 kg.</b></div>
+    </div>
+
+    <div class="stepnav">
+      <button class="next" data-target="b">Next step →</button>
+      <span class="counter" id="cnt-b">0 / 4</span>
+    </div>
+  </section>
+
+  <!-- ---------- SUMMARY ---------- -->
+  <section class="summary">
+    <h2><span class="num">✓</span> Final Answers at a Glance</h2>
+    <ul>
+      <li><span class="k">(a) Mean</span><span class="v">\(= \dfrac{1100}{20} = 55 \text{ kg}\)</span></li>
+      <li><span class="k">(a) Median</span><span class="v">\(= \dfrac{52+52}{2} = 52 \text{ kg}\)</span></li>
+      <li><span class="k">(a) Range</span><span class="v">\(= 79 - 40 = 39 \text{ kg}\)</span></li>
+      <li><span class="k">(b) Weights</span><span class="v">\(\boxed{52 \text{ kg and } 80 \text{ kg}}\)</span></li>
+      <li><span class="k">Key idea (b)</span><span class="v">\(a+b = 1232-1100 = 132\); reject the case \(a=39\), then \(b = 40+40 = 80\).</span></li>
+    </ul>
+  </section>
+
+  <footer>
+    HKDSE Mathematics (Compulsory Part) · 2015 Paper 1 Question 12 · Interactive Solution<br>
+    Built with HTML5 Canvas &amp; MathJax
+  </footer>
+</div>
+
+<script>
+/* ============================================================
+   PART (a) CANVAS — ordered data line with mean / median / range
+   ============================================================ */
+const data = [40,42,43,43,43,43,49,51,51,52,52,53,57,59,63,65,68,69,78,79];
+
+const cvsA = document.getElementById('cvsA');
+const ctxA = cvsA.getContext('2d');
+const showOrder  = document.getElementById('showOrder');
+const showMean   = document.getElementById('showMean');
+const showMedian = document.getElementById('showMedian');
+const showRange  = document.getElementById('showRange');
+const roA = document.getElementById('roA');
+
+function setupCanvas(c){
+  const dpr = window.devicePixelRatio || 1;
+  const rect = c.getBoundingClientRect();
+  c.width  = rect.width  * dpr;
+  c.height = rect.height * dpr;
+  const ctx = c.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  return {ctx, w: rect.width, h: rect.height};
+}
+
+function drawA(){
+  const {ctx, w, h} = setupCanvas(cvsA);
+  ctx.clearRect(0,0,w,h);
+
+  const padL = 46, padR = 24, padT = 40, padB = 52;
+  const plotW = w - padL - padR;
+  const plotH = h - padT - padB;
+
+  const minV = 35, maxV = 85;
+  const X = v => padL + (v - minV)/(maxV - minV) * plotW;
+
+  // --- axes + grid ---
+  ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1;
+  ctx.fillStyle = '#94a3b8'; ctx.font = '11px monospace'; ctx.textAlign = 'center';
+  for(let v = 35; v <= 85; v += 5){
+    const x = X(v);
+    ctx.beginPath(); ctx.moveTo(x, padT); ctx.lineTo(x, padT + plotH); ctx.stroke();
+    ctx.fillText(v, x, padT + plotH + 18);
+  }
+  ctx.strokeStyle = '#334155'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(padL, padT + plotH); ctx.lineTo(padL + plotW, padT + plotH); ctx.stroke();
+
+  ctx.fillStyle = '#334155'; ctx.font = 'bold 12px sans-serif';
+  ctx.fillText('Weight (kg)', padL + plotW/2, h - 12);
+  ctx.textAlign = 'left';
+  ctx.fillText('Frequency (dot plot of 20 students)', padL, 22);
+
+  // --- bars (counts) ---
+  const counts = {};
+  data.forEach(v => counts[v] = (counts[v]||0) + 1);
+  const barH = 16;
+  const maxCount = Math.max(...Object.values(counts));
+
+  if(showOrder.checked){
+    // dot plot: one dot per student, stacked
+    const stack = {};
+    data.forEach(v => {
+      stack[v] = (stack[v]||0);
+      const x = X(v);
+      const y = padT + plotH - 14 - stack[v]*13;
+      ctx.beginPath();
+      ctx.arc(x, y, 5, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(29,78,216,.55)';
+      ctx.fill();
+      stack[v]++;
+    });
+  }
+
+  // --- mean line ---
+  if(showMean.checked){
+    const xm = X(55);
+    ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 2.5;
+    ctx.setLineDash([7,5]);
+    ctx.beginPath(); ctx.moveTo(xm, padT); ctx.lineTo(xm, padT + plotH); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#b45309'; ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('Mean 55', xm, padT - 10);
+  }
+
+  // --- median line ---
+  if(showMedian.checked){
+    const xmed = X(52);
+    ctx.strokeStyle = '#7c3aed'; ctx.lineWidth = 2.5;
+    ctx.setLineDash([3,4]);
+    ctx.beginPath(); ctx.moveTo(xmed, padT); ctx.lineTo(xmed, padT + plotH); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#6d28d9'; ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('Median 52', xmed, padT + plotH + 36);
+  }
+
+  // --- range arrows ---
+  if(showRange.checked){
+    const x1 = X(40), x2 = X(79);
+    const y = padT + 24;
+    ctx.strokeStyle = '#059669'; ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.moveTo(x1, y); ctx.lineTo(x2, y); ctx.stroke();
+    // arrow heads
+    ctx.beginPath(); ctx.moveTo(x1, y); ctx.lineTo(x1+9, y-5); ctx.lineTo(x1+9, y+5); ctx.closePath(); ctx.fillStyle = '#059669'; ctx.fill();
+    ctx.beginPath(); ctx.moveTo(x2, y); ctx.lineTo(x2-9, y-5); ctx.lineTo(x2-9, y+5); ctx.closePath(); ctx.fill();
+    // small vertical ticks
+    ctx.beginPath(); ctx.moveTo(x1, y-9); ctx.lineTo(x1, y+9); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x2, y-9); ctx.lineTo(x2, y+9); ctx.stroke();
+    ctx.fillStyle = '#047857'; ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('Range = 79 − 40 = 39', (x1+x2)/2, y - 14);
+  }
+
+  roA.textContent = 'n = 20   Σx = 1100   Mean = 55   Median = 52   Range = 39';
+}
+
+showOrder.addEventListener('change', drawA);
+showMean.addEventListener('change', drawA);
+showMedian.addEventListener('change', drawA);
+showRange.addEventListener('change', drawA);
+
+/* ============================================================
+   PART (b) CANVAS — slider for a, b determined by a+b=132
+   ============================================================ */
+const cvsB = document.getElementById('cvsB');
+const slA = document.getElementById('slA');
+const roB = document.getElementById('roB');
+
+function drawB(){
+  const {ctx, w, h} = setupCanvas(cvsB);
+  ctx.clearRect(0,0,w,h);
+
+  const a = parseInt(slA.value, 10);
+  const b = 132 - a;
+  const newMean = (1100 + a + b)/22;      // always 56
+  const newMax = Math.max(79, a, b);
+  const newMin = Math.min(40, a, b);
+  const newRange = newMax - newMin;
+  const valid = (newRange === 40 && Math.abs(newMean - 56) < 1e-9);
+
+  const padL = 46, padR = 24, padT = 46, padB = 54;
+  const plotW = w - padL - padR;
+  const plotH = h - padT - padB;
+
+  const minV = 30, maxV = 100;
+  const X = v => padL + (v - minV)/(maxV - minV) * plotW;
+
+  // grid
+  ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1;
+  ctx.fillStyle = '#94a3b8'; ctx.font = '11px monospace'; ctx.textAlign = 'center';
+  for(let v = 30; v <= 100; v += 5){
+    const x = X(v);
+    ctx.beginPath(); ctx.moveTo(x, padT); ctx.lineTo(x, padT + plotH); ctx.stroke();
+    if(v % 10 === 0) ctx.fillText(v, x, padT + plotH + 18);
+  }
+  ctx.strokeStyle = '#334155'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(padL, padT + plotH); ctx.lineTo(padL + plotW, padT + plotH); ctx.stroke();
+  ctx.fillStyle = '#334155'; ctx.font = 'bold 12px sans-serif';
+  ctx.fillText('Weight (kg)', padL + plotW/2, h - 12);
+
+  // --- original distribution as faint dots on a lower track ---
+  const baseY = padT + plotH - 22;
+  data.forEach(v => {
+    ctx.beginPath();
+    ctx.arc(X(v), baseY, 3.2, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(148,163,184,.6)';
+    ctx.fill();
+  });
+  ctx.fillStyle = '#64748b'; ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'left';
+  ctx.fillText('Original 20 students', padL, baseY - 14);
+
+  // --- new students a and b on an upper track ---
+  const topY = padT + 44;
+  // connecting line
+  ctx.strokeStyle = valid ? '#059669' : '#cbd5e1';
+  ctx.lineWidth = 3; ctx.setLineDash([6,5]);
+  ctx.beginPath(); ctx.moveTo(X(a), topY); ctx.lineTo(X(b), topY); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // a marker
+  ctx.beginPath(); ctx.arc(X(a), topY, 9, 0, Math.PI*2);
+  ctx.fillStyle = '#1d4ed8'; ctx.fill();
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+  ctx.fillStyle = '#1e3a8a'; ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText('a = ' + a, X(a), topY - 17);
+
+  // b marker
+  ctx.beginPath(); ctx.arc(X(b), topY, 9, 0, Math.PI*2);
+  ctx.fillStyle = '#db2777'; ctx.fill();
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+  ctx.fillStyle = '#9d174d'; ctx.font = 'bold 12px sans-serif';
+  ctx.fillText('b = ' + b, X(b), topY - 17);
+
+  // --- target max line at 80 ---
+  if(newMax === 80){
+    ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 2; ctx.setLineDash([4,4]);
+    ctx.beginPath(); ctx.moveTo(X(80), padT + 12); ctx.lineTo(X(80), padT + plotH); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#b45309'; ctx.font = 'bold 11px sans-serif';
+    ctx.fillText('target max 80', X(80), padT + 8);
+  }
+
+  // --- range visualization ---
+  ctx.strokeStyle = valid ? '#059669' : '#94a3b8';
+  ctx.lineWidth = 2.5;
+  const yR = padT + plotH + 34;
+  ctx.beginPath(); ctx.moveTo(X(newMin), yR); ctx.lineTo(X(newMax), yR); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(X(newMin), yR-6); ctx.lineTo(X(newMin), yR+6); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(X(newMax), yR-6); ctx.lineTo(X(newMax), yR+6); ctx.stroke();
+  ctx.fillStyle = valid ? '#047857' : '#64748b';
+  ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText('New range = ' + newRange + (valid ? '  ✓' : '  ✗ (need 40)'), (X(newMin)+X(newMax))/2, yR + 20);
+
+  // status banner
+  ctx.textAlign = 'left';
+  ctx.font = 'bold 12px monospace';
+  if(valid){
+    ctx.fillStyle = '#059669';
+    ctx.fillText('✓ Both mean (56 kg) and range (40 kg) requirements satisfied!', padL, 22);
+  } else {
+    ctx.fillStyle = '#dc2626';
+    ctx.fillText('Mean = ' + newMean.toFixed(2) + ' kg  |  Range = ' + newRange + ' kg  →  not yet valid', padL, 22);
+  }
+
+  roB.textContent = 'a = ' + a + '   b = ' + b + '   new mean = ' + newMean.toFixed(2) + '   new range = ' + newRange;
+}
+
+slA.addEventListener('input', drawB);
+
+/* ============================================================
+   Step reveal logic
+   ============================================================ */
+const stepGroups = {
+  a: ['a1','a2','a3','a4'],
+  b: ['b1','b2','b3','b4']
+};
+const state = {a:0, b:0};
+
+document.querySelectorAll('button.next').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const key = btn.dataset.target;
+    const ids = stepGroups[key];
+    const counter = document.getElementById('cnt-' + key);
+    if(state[key] < ids.length){
+      document.getElementById(ids[state[key]]).classList.add('show');
+      state[key]++;
+      counter.textContent = state[key] + ' / ' + ids.length;
+      if(state[key] === ids.length){
+        btn.disabled = true;
+        btn.textContent = 'All steps revealed ✓';
+      }
+    }
+  });
+});
+
+/* ============================================================
+   Init + resize
+   ============================================================ */
+function drawAll(){ drawA(); drawB(); }
+window.addEventListener('resize', drawAll);
+window.addEventListener('load', () => {
+  drawAll();
+  if(window.MathJax && MathJax.typesetPromise){ MathJax.typesetPromise(); }
+});
+// initial draw (fonts/DOM ready)
+setTimeout(drawAll, 60);
+</script>
+</body>
+</html>

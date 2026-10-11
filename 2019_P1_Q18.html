@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2019 Paper 1 Q18 — Trigonometry in a Tetrahedron</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[', '\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root{
+    --blue:#1d4ed8; --blue-d:#1e3a8a; --blue-l:#dbeafe;
+    --amber:#d97706; --amber-l:#fef3c7;
+    --emerald:#047857; --emerald-l:#d1fae5;
+    --ink:#0f172a; --muted:#64748b; --line:#e2e8f0;
+    --bg:#f1f5f9;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    line-height:1.6;
+  }
+  .wrap{max-width:980px;margin:0 auto;padding:0 16px 60px;}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    background:linear-gradient(135deg,#1e3a8a 0%,#2563eb 45%,#0ea5e9 100%);
+    color:#fff; padding:44px 16px 52px; position:relative; overflow:hidden;
+  }
+  .hero::after{
+    content:""; position:absolute; right:-80px; top:-80px; width:320px; height:320px;
+    background:radial-gradient(circle,rgba(255,255,255,.18),transparent 70%); border-radius:50%;
+  }
+  .hero-inner{max-width:980px;margin:0 auto;position:relative;z-index:1;}
+  .eyebrow{
+    font-size:.78rem; letter-spacing:.16em; text-transform:uppercase;
+    opacity:.85; font-weight:600; margin-bottom:10px;
+  }
+  .hero h1{
+    margin:0 0 8px; font-size:clamp(1.6rem,4.5vw,2.5rem); line-height:1.15; font-weight:800;
+  }
+  .hero h1 span{color:#fde68a;}
+  .hero .sub{font-size:1rem; opacity:.92; margin:0 0 18px; max-width:640px;}
+  .pills{display:flex;flex-wrap:wrap;gap:8px;}
+  .pill{
+    background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35);
+    padding:5px 13px; border-radius:999px; font-size:.78rem; font-weight:600; backdrop-filter:blur(4px);
+  }
+
+  /* ---------- CARDS ---------- */
+  .card{
+    background:#fff; border-radius:18px; padding:24px 22px; margin-top:22px;
+    box-shadow:0 4px 18px rgba(15,23,42,.07); border:1px solid var(--line);
+  }
+  .card h2{
+    margin:0 0 14px; font-size:1.18rem; font-weight:800; color:var(--blue-d);
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  }
+  .card h2 .badge-num{
+    background:var(--blue); color:#fff; font-size:.8rem; padding:2px 11px; border-radius:8px; font-weight:700;
+  }
+  .marks-tag{
+    margin-left:auto; background:var(--amber-l); color:var(--amber);
+    font-size:.75rem; font-weight:800; padding:3px 11px; border-radius:999px; border:1px solid #fcd34d;
+    white-space:nowrap;
+  }
+  .qtext{font-size:1.02rem;}
+  .qtext p{margin:.5em 0;}
+  .qpart{margin:.7em 0 .7em 1.1em;}
+  .qpart b{color:var(--blue-d);}
+
+  /* ---------- CANVAS BOX ---------- */
+  .canvas-box{
+    background:linear-gradient(180deg,#f8fafc,#eef2f7);
+    border:1px solid var(--line); border-radius:14px; padding:14px; margin:14px 0;
+  }
+  canvas{width:100%; display:block; border-radius:10px; background:#fff; touch-action:none;}
+  .controls{
+    display:flex; flex-wrap:wrap; gap:14px 22px; align-items:center; margin-top:12px;
+    font-size:.86rem; font-weight:600; color:#334155;
+  }
+  .ctrl{display:flex; align-items:center; gap:8px;}
+  input[type=range]{width:150px; accent-color:var(--blue);}
+  input[type=checkbox]{accent-color:var(--emerald); width:16px; height:16px;}
+  .val{
+    display:inline-block; min-width:58px; background:var(--blue-l); color:var(--blue-d);
+    padding:1px 8px; border-radius:6px; font-family:ui-monospace,Menlo,monospace; font-size:.82rem;
+    text-align:center;
+  }
+  .readout{
+    display:flex; flex-wrap:wrap; gap:10px; margin-top:12px;
+  }
+  .ro{
+    background:#fff; border:1px solid var(--line); border-radius:10px; padding:6px 12px;
+    font-size:.84rem; font-family:ui-monospace,Menlo,monospace; color:#1e293b;
+    box-shadow:0 1px 3px rgba(15,23,42,.05);
+  }
+  .ro b{color:var(--blue-d);}
+  .ro.ok{border-color:#6ee7b7; background:var(--emerald-l);}
+  .ro.bad{border-color:#fca5a5; background:#fee2e2;}
+
+  /* ---------- STEPS ---------- */
+  .steps{margin-top:16px;}
+  .step{
+    display:none; border-left:4px solid var(--blue); background:#f8fafc;
+    border-radius:0 12px 12px 0; padding:14px 16px; margin-bottom:12px;
+    animation:fade .35s ease;
+  }
+  .step.show{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+  .step-head{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:8px;}
+  .snum{
+    background:var(--blue); color:#fff; font-size:.74rem; font-weight:800;
+    padding:3px 10px; border-radius:8px; letter-spacing:.03em;
+  }
+  .tagm{
+    font-size:.72rem; font-weight:800; padding:3px 9px; border-radius:999px;
+    background:var(--amber-l); color:var(--amber); border:1px solid #fcd34d;
+  }
+  .tagm.a{background:#ede9fe;color:#6d28d9;border-color:#c4b5fd;}
+  .working{font-size:1rem; overflow-x:auto;}
+  .hint{
+    background:var(--amber-l); border-left:4px solid var(--amber);
+    padding:9px 13px; border-radius:8px; margin-top:10px; font-size:.9rem; color:#78350f;
+  }
+  .hint b{color:#92400e;}
+  .answer{
+    background:var(--emerald-l); border-left:4px solid var(--emerald);
+    padding:9px 13px; border-radius:8px; margin-top:10px; font-size:.95rem; color:#065f46; font-weight:600;
+  }
+  .answer b{color:#064e3b;}
+
+  /* ---------- BUTTON ---------- */
+  .btnrow{display:flex; align-items:center; gap:14px; margin-top:6px; flex-wrap:wrap;}
+  button.next{
+    background:linear-gradient(135deg,#2563eb,#1d4ed8); color:#fff; border:none;
+    padding:10px 22px; border-radius:11px; font-size:.92rem; font-weight:700; cursor:pointer;
+    box-shadow:0 3px 10px rgba(37,99,235,.35); transition:.2s;
+  }
+  button.next:hover:not(:disabled){transform:translateY(-1px); box-shadow:0 6px 16px rgba(37,99,235,.45);}
+  button.next:disabled{
+    background:#cbd5e1; color:#64748b; box-shadow:none; cursor:not-allowed;
+  }
+  .counter{font-size:.85rem; font-weight:700; color:var(--muted); font-family:ui-monospace,monospace;}
+
+  /* ---------- SUMMARY ---------- */
+  .card.dark{
+    background:linear-gradient(135deg,#0f172a,#1e293b); color:#e2e8f0; border:none;
+  }
+  .card.dark h2{color:#fde68a;}
+  .card.dark ul{margin:0; padding-left:20px;}
+  .card.dark li{margin:9px 0; font-size:.98rem;}
+  .card.dark li b{color:#7dd3fc;}
+
+  footer{
+    text-align:center; color:var(--muted); font-size:.8rem; margin-top:32px; padding:18px 0;
+  }
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:.8rem;font-weight:600;margin-top:8px;color:#475569;}
+  .legend i{display:inline-block;width:14px;height:4px;border-radius:2px;margin-right:5px;vertical-align:middle;}
+</style>
+</head>
+<body>
+
+<!-- ================= HERO ================= -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 1</div>
+    <h1>2019 Paper 1 · Question <span>18</span></h1>
+    <p class="sub">3-D Trigonometry — angles, distances and the dihedral angle in a tetrahedron</p>
+    <div class="pills">
+      <span class="pill">Sine Formula</span>
+      <span class="pill">Cosine Formula</span>
+      <span class="pill">Tetrahedron</span>
+      <span class="pill">Dihedral Angle</span>
+      <span class="pill">3-D Visualisation</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+<!-- ================= QUESTION ================= -->
+<section class="card">
+  <h2>📄 The Question <span class="marks-tag">7 marks</span></h2>
+  <div class="qtext">
+    <p>Figure 3 shows a tetrahedron \(ABCD\). Let \(P\) be a point lying on \(AD\) such that \(BP\) is perpendicular to \(AD\). A craftsman finds that \(AC = AD = CD = 13\) cm, \(BC = 8\) cm, \(BD = 12\) cm and \(\angle ABD = 72^\circ\).</p>
+    <div class="qpart">
+      <b>(a)</b> Find
+      <div style="margin-left:1.2em">
+        (i) \(\angle BAD\),<br>
+        (ii) \(CP\). &nbsp;&nbsp;<em>[5 marks]</em>
+      </div>
+    </div>
+    <div class="qpart">
+      <b>(b)</b> The craftsman claims that \(\angle BPC\) is the angle between the face \(ABD\) and the face \(ACD\). Is the claim correct? Explain your answer. &nbsp;&nbsp;<em>[2 marks]</em>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PART (a)(i) ================= -->
+<section class="card">
+  <h2><span class="badge-num">(a)(i)</span> Find \(\angle BAD\) <span class="marks-tag">2 marks</span></h2>
+  <p>Use the <b>sine formula</b> in triangle \(ABD\). We know \(BD = 12\), \(AD = 13\) and the angle opposite \(AD\) is \(\angle ABD = 72^\circ\).</p>
+
+  <div class="canvas-box">
+    <canvas id="cv1" width="880" height="400"></canvas>
+    <div class="legend">
+      <span><i style="background:#2563eb"></i>Known sides</span>
+      <span><i style="background:#dc2626"></i>Unknown angle target</span>
+      <span><i style="background:#059669"></i>Given angle 72°</span>
+    </div>
+    <div class="controls">
+      <div class="ctrl"><label for="s1">Adjust \(\angle ABD\):</label>
+        <input type="range" id="s1" min="20" max="150" value="72" step="1">
+        <span class="val" id="v1">72°</span>
+      </div>
+    </div>
+    <div class="readout">
+      <div class="ro" id="r1a">BD = 12 cm</div>
+      <div class="ro" id="r1b">AD = 13 cm</div>
+      <div class="ro" id="r1c">∠BAD ≈ ?</div>
+    </div>
+  </div>
+
+  <div class="steps" id="steps1">
+    <div class="step">
+      <div class="step-head"><span class="snum">Step 1</span><span class="tagm">1M</span></div>
+      <div class="working">Apply the sine formula in \(\triangle ABD\):
+        \[ \frac{\sin \angle BAD}{BD} = \frac{\sin \angle ABD}{AD} \]</div>
+      <div class="hint"><b>Hint:</b> Match each side with the angle <em>opposite</em> to it. \(BD\) is opposite \(\angle BAD\); \(AD\) is opposite \(\angle ABD\).</div>
+    </div>
+    <div class="step">
+      <div class="step-head"><span class="snum">Step 2</span><span class="tagm">1A</span></div>
+      <div class="working">Substitute the values:
+        \[ \frac{\sin \angle BAD}{12} = \frac{\sin 72^\circ}{13} \]
+        \[ \sin \angle BAD = \frac{12\sin 72^\circ}{13} \approx 0.8779 \]
+        \[ \angle BAD \approx 61.39^\circ \quad \text{or} \quad 118.61^\circ \]</div>
+      <div class="hint"><b>Hint:</b> \(\sin \theta\) has two solutions in \(0^\circ \!-\!180^\circ\). Reject \(118.61^\circ\) because the sum of angles in \(\triangle ABD\) would exceed \(180^\circ\) (\(118.61^\circ + 72^\circ > 180^\circ\)).</div>
+      <div class="answer"><b>Answer (a)(i):</b> \(\angle BAD \approx 61.4^\circ\)</div>
+    </div>
+  </div>
+
+  <div class="btnrow">
+    <button class="next" id="btn1">Next step →</button>
+    <span class="counter" id="cnt1">0 / 2</span>
+  </div>
+</section>
+
+<!-- ================= PART (a)(ii) ================= -->
+<section class="card">
+  <h2><span class="badge-num">(a)(ii)</span> Find \(CP\) <span class="marks-tag">3 marks</span></h2>
+  <p>Work in \(\triangle ABD\) first to get \(AP\), then use \(\triangle ACD\) (equilateral!) to get the angle \(\angle CAP = 60^\circ\), and finally apply the cosine formula in \(\triangle ACP\).</p>
+
+  <div class="canvas-box">
+    <canvas id="cv2" width="880" height="420"></canvas>
+    <div class="legend">
+      <span><i style="background:#2563eb"></i>△ABD (finding AP)</span>
+      <span><i style="background:#7c3aed"></i>△ACD (equilateral)</span>
+      <span><i style="background:#dc2626"></i>△ACP (finding CP)</span>
+    </div>
+    <div class="controls">
+      <div class="ctrl"><label for="s2">Move \(P\) along \(AD\):</label>
+        <input type="range" id="s2" min="0" max="100" value="37" step="1">
+        <span class="val" id="v2">AP</span>
+      </div>
+      <div class="ctrl"><input type="checkbox" id="c2" checked><label for="c2">Show perpendicular \(BP \perp AD\)</label></div>
+      <div class="ctrl"><input type="checkbox" id="c2b" checked><label for="c2b">Show equilateral △ACD</label></div>
+    </div>
+    <div class="readout">
+      <div class="ro" id="r2a">AP = ?</div>
+      <div class="ro" id="r2b">∠CAP = 60°</div>
+      <div class="ro" id="r2c">CP = ?</div>
+    </div>
+  </div>
+
+  <div class="steps" id="steps2">
+    <div class="step">
+      <div class="step-head"><span class="snum">Step 1</span><span class="tagm">1M</span></div>
+      <div class="working">In \(\triangle ABD\), find \(\angle ADB\) using the angle sum:
+        \[ \angle ADB \approx 180^\circ - 72^\circ - 61.39^\circ \approx 46.61^\circ \]
+        Since \(BP \perp AD\), \(\triangle ABP\) is right-angled at \(P\):
+        \[ \cos \angle ADB = \frac{AP}{AD} \;\Rightarrow\; AP = 13\cos 46.61^\circ \approx 8.93 \]</div>
+      <div class="hint"><b>Hint:</b> \(P\) lies on \(AD\) and \(BP \perp AD\), so in the right triangle \(ABP\) the side adjacent to \(\angle ADB\) is \(AP\).</div>
+    </div>
+    <div class="step">
+      <div class="step-head"><span class="snum">Step 2</span><span class="tagm">1M</span></div>
+      <div class="working">In \(\triangle ACD\): \(AC = AD = CD = 13\), so it is <b>equilateral</b> and
+        \[ \angle CAP = 60^\circ. \]
+        Apply the cosine formula in \(\triangle ACP\):
+        \[ CP^2 = AC^2 + AP^2 - 2(AC)(AP)\cos \angle CAP \]</div>
+      <div class="hint"><b>Hint:</b> The included angle between \(AC\) and \(AP\) is \(\angle CAP\), which is exactly the \(60^\circ\) angle of the equilateral triangle.</div>
+    </div>
+    <div class="step">
+      <div class="step-head"><span class="snum">Step 3</span><span class="tagm">1A</span></div>
+      <div class="working">Substitute:
+        \[ CP^2 \approx 13^2 + 8.93^2 - 2(13)(8.93)\cos 60^\circ \]
+        \[ CP^2 \approx 169 + 79.74 - 116.09 \approx 132.65 \]
+        \[ CP \approx 11.5 \text{ cm} \]</div>
+      <div class="hint"><b>Hint:</b> Keep the full-precision value of \(AP\) (do not round early) to avoid a final answer that is off by 0.1 cm. Using \(AP \approx 8.927\) cm gives \(CP \approx 11.52\) cm.</div>
+      <div class="answer"><b>Answer (a)(ii):</b> \(CP \approx 11.4\) cm &nbsp;(accept \(11.4 - 11.5\))</div>
+    </div>
+  </div>
+
+  <div class="btnrow">
+    <button class="next" id="btn2">Next step →</button>
+    <span class="counter" id="cnt2">0 / 3</span>
+  </div>
+</section>
+
+<!-- ================= PART (b) ================= -->
+<section class="card">
+  <h2><span class="badge-num">(b)</span> Is \(\angle BPC\) the angle between the faces? <span class="marks-tag">2 marks</span></h2>
+  <p>The angle between two planes is measured by the angle between two lines, <b>one in each plane</b>, both perpendicular to the line of intersection. Here the intersection of faces \(ABD\) and \(ACD\) is the line \(AD\).</p>
+
+  <div class="canvas-box">
+    <canvas id="cv3" width="880" height="440"></canvas>
+    <div class="legend">
+      <span><i style="background:#dc2626"></i>\(BP \perp AD\) (true)</span>
+      <span><i style="background:#f59e0b"></i>\(CP\) (not \(\perp AD\))</span>
+      <span><i style="background:#7c3aed"></i>Correct angle needs \(CP' \perp AD\)</span>
+    </div>
+    <div class="controls">
+      <div class="ctrl"><input type="checkbox" id="c3" checked><label for="c3">Show step (a)(ii) triangle \(ACP\)</label></div>
+      <div class="ctrl"><input type="checkbox" id="c3b"><label for="c3b">Show the correct perpendicular \(CP'\)</label></div>
+    </div>
+    <div class="readout">
+      <div class="ro" id="r3a">\(AP^2 + CP^2 = ?\)</div>
+      <div class="ro" id="r3b">\(AC^2 = 169\)</div>
+      <div class="ro" id="r3c">Is \(\angle APC = 90^\circ\)?</div>
+    </div>
+  </div>
+
+  <div class="steps" id="steps3">
+    <div class="step">
+      <div class="step-head"><span class="snum">Step 1</span><span class="tagm">1M</span></div>
+      <div class="working">Test whether \(CP \perp AD\) — i.e. whether \(\angle APC = 90^\circ\). Use the converse of Pythagoras:
+        \[ AP^2 + CP^2 \approx 8.93^2 + 11.5^2 \approx 79.7 + 132.3 \approx 212 \]
+        But \(AC^2 = 13^2 = 169\).</div>
+      <div class="hint"><b>Hint:</b> If \(\angle APC = 90^\circ\), then \(AP^2 + CP^2\) must equal \(AC^2\). Here \(AP^2 + CP^2 \neq AC^2\), so the right angle fails.</div>
+    </div>
+    <div class="step">
+      <div class="step-head"><span class="snum">Step 2</span><span class="tagm">1A</span></div>
+      <div class="working">Since \(\angle APC\) is <b>not</b> a right angle, \(CP\) is not perpendicular to \(AD\).<br><br>
+        Therefore \(BP\) and \(CP\) are not both perpendicular to the common line \(AD\), so \(\angle BPC\) is <b>not</b> the angle between face \(ABD\) and face \(ACD\).</div>
+      <div class="hint"><b>Hint:</b> The correct dihedral angle would use \(BP\) and the foot of the perpendicular from \(C\) to \(AD\), say \(P'\) (where \(P'\) is the midpoint of \(AD\) since \(\triangle ACD\) is equilateral).</div>
+      <div class="answer"><b>Answer (b):</b> The claim is <b>not correct</b>. \(\angle APC \neq 90^\circ\), so \(CP\) is not perpendicular to \(AD\); the angle between the two faces requires both lines to be perpendicular to the line of intersection \(AD\).</div>
+    </div>
+  </div>
+
+  <div class="btnrow">
+    <button class="next" id="btn3">Next step →</button>
+    <span class="counter" id="cnt3">0 / 2</span>
+  </div>
+</section>
+
+<!-- ================= SUMMARY ================= -->
+<section class="card dark">
+  <h2>✅ Summary of Answers</h2>
+  <ul>
+    <li><b>(a)(i)</b> &nbsp; \(\angle BAD \approx 61.4^\circ\)</li>
+    <li><b>(a)(ii)</b> &nbsp; \(AP \approx 8.93\) cm, \(\angle CAP = 60^\circ\), \(CP \approx 11.4\) cm</li>
+    <li><b>(b)</b> &nbsp; The claim is <b>not correct</b>. \(AP^2 + CP^2 \approx 212 \neq 169 = AC^2\), so \(\angle APC \neq 90^\circ\); hence \(CP\) is not perpendicular to \(AD\) and \(\angle BPC\) is not the angle between the two faces.</li>
+  </ul>
+</section>
+
+<footer>
+  HKDSE Mathematics (Compulsory Part) · 2019 Paper 1 Question 18 · Interactive Solution
+</footer>
+
+</div>
+
+<script>
+/* ============================================================
+   UTILITIES
+   ============================================================ */
+function pt(x,y){return {x:x,y:y};}
+function dist(a,b){return Math.hypot(a.x-b.x, a.y-b.y);}
+function lerp(a,b,t){return {x:a.x+(b.x-a.x)*t, y:a.y+(b.y-a.y)*t};}
+
+function setupCanvas(id){
+  const c=document.getElementById(id);
+  const dpr=window.devicePixelRatio||1;
+  const rect=c.getBoundingClientRect();
+  c.width=rect.width*dpr; c.height=rect.height*dpr;
+  const ctx=c.getContext('2d');
+  ctx.scale(dpr,dpr);
+  c.style.width=rect.width+'px'; c.style.height=rect.height+'px';
+  return {c,ctx,w:rect.width,h:rect.height};
+}
+
+function clearScene(ctx,w,h){
+  ctx.clearRect(0,0,w,h);
+}
+
+function grid(ctx,w,h,step){
+  ctx.save(); ctx.strokeStyle='#eef2f7'; ctx.lineWidth=1;
+  for(let x=0;x<w;x+=step){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke();}
+  for(let y=0;y<h;y+=step){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke();}
+  ctx.restore();
+}
+
+function line(ctx,a,b,color,width,dash){
+  ctx.save(); ctx.strokeStyle=color; ctx.lineWidth=width||2;
+  if(dash) ctx.setLineDash(dash);
+  ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+  ctx.restore();
+}
+
+function dot(ctx,p,color,r,label,dx,dy,sub){
+  ctx.save();
+  ctx.fillStyle=color; ctx.beginPath(); ctx.arc(p.x,p.y,r||4.5,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle='#fff'; ctx.lineWidth=1.6; ctx.stroke();
+  ctx.fillStyle='#0f172a';
+  ctx.font='bold 14px system-ui, sans-serif';
+  ctx.textAlign='left'; ctx.textBaseline='middle';
+  let txt=label;
+  if(txt) ctx.fillText(txt, p.x+(dx||8), p.y+(dy||-8));
+  if(sub){
+    ctx.font='12px system-ui, sans-serif'; ctx.fillStyle='#64748b';
+    ctx.fillText(sub, p.x+(dx||8), p.y+(dy||-8)+16);
+  }
+  ctx.restore();
+}
+
+function angleArc(ctx,v,a,b,r,color,transStart){
+  ctx.save();
+  const ang1=Math.atan2(a.y-v.y,a.x-v.x);
+  const ang2=Math.atan2(b.y-v.y,b.x-v.x);
+  let start=ang1, end=ang2;
+  // choose the smaller arc
+  let diff=end-start;
+  while(diff>Math.PI) diff-=2*Math.PI;
+  while(diff<-Math.PI) diff+=2*Math.PI;
+  ctx.strokeStyle=color; ctx.lineWidth=2;
+  ctx.beginPath();
+  ctx.arc(v.x,v.y,r,start,start+diff,diff<0);
+  ctx.stroke();
+  // label
+  const mid=start+diff/2;
+  const lx=v.x+Math.cos(mid)*(r+13), ly=v.y+Math.sin(mid)*(r+13);
+  if(transStart!==undefined){
+    ctx.fillStyle=color; ctx.font='bold 13px system-ui,sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(transStart, lx, ly);
+  }
+  ctx.restore();
+}
+
+function rightAngleMark(ctx,v,p1,p2,size,color){
+  ctx.save(); ctx.strokeStyle=color||'#111'; ctx.lineWidth=2;
+  const u1={x:(p1.x-v.x)/dist(v,p1), y:(p1.y-v.y)/dist(v,p1)};
+  const u2={x:(p2.x-v.x)/dist(v,p2), y:(p2.y-v.y)/dist(v,p2)};
+  const s=size||10;
+  const a={x:v.x+u1.x*s, y:v.y+u1.y*s};
+  const b={x:v.x+u2.x*s, y:v.y+u2.y*s};
+  const c={x:a.x+u2.x*s, y:a.y+u2.y*s};
+  ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(c.x,c.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+  ctx.restore();
+}
+
+/* vertex label for a triangle with a text string */
+function vtext(ctx,p,txt,dx,dy,color,size){
+  ctx.save();
+  ctx.fillStyle=color||'#0f172a';
+  ctx.font='bold '+(size||15)+'px system-ui, sans-serif';
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(txt, p.x+dx, p.y+dy);
+  ctx.restore();
+}
+
+/* ============================================================
+   PART (a)(i) — Triangle ABD, sine formula
+   ============================================================ */
+const P1={A:pt(120,330), B:pt(600,330)};
+let angABD=72;
+function drawCV1(){
+  const {ctx,w,h}=setupCanvas('cv1');
+  clearScene(ctx,w,h); grid(ctx,w,h,40);
+
+  const B=P1.B, A=P1.A;
+  const rad=angABD*Math.PI/180;
+  const AB=13; // AD = 13, use scale
+  const scale=340/13; // 13 cm -> 340 px
+  const ADlen=13*scale;
+  const BDlen=12*scale;
+
+  // place D: from B, direction making angle angABD with BA, distance BD
+  // BA points left (angle 180deg). We want D above-right of B? Let's just construct.
+  // Angle ABD is between BA and BD.
+  const baAng=Math.atan2(A.y-B.y, A.x-B.x); // ~180deg
+  const bdAng=baAng - rad; // rotate clockwise (upward) so D is above
+  const D={x:B.x+BDlen*Math.cos(bdAng), y:B.y+BDlen*Math.sin(bdAng)};
+
+  // Verify AD length should be 13 (we'll draw actual computed geometry, but enforce)
+  // We'll scale so AD matches exactly using actual positions
+  // Recompute: place D such that BD=12 and angle at B = angABD, then AD is whatever.
+  // For drawing realism, scale from BD=12.
+  const sc=340/12;
+  const Dp={x:B.x+12*sc*Math.cos(bdAng), y:B.y+12*sc*Math.sin(bdAng)};
+  const Ad=pt(A.x, A.y);
+
+  // triangle fill
+  ctx.save();
+  ctx.beginPath(); ctx.moveTo(Ad.x,Ad.y); ctx.lineTo(B.x,B.y); ctx.lineTo(Dp.x,Dp.y); ctx.closePath();
+  ctx.fillStyle='rgba(37,99,235,0.06)'; ctx.fill();
+  ctx.restore();
+
+  line(ctx,Ad,B,'#2563eb',3);
+  line(ctx,B,Dp,'#2563eb',3);
+  line(ctx,Ad,Dp,'#2563eb',3);
+
+  // angle arc at B
+  angleArc(ctx,B,Ad,Dp,42,'#059669','72°');
+  // angle arc at A
+  const angleA=Math.asin(12*Math.sin(rad)/dist(Ad,Dp))*180/Math.PI;
+  angleArc(ctx,Ad,B,Dp,46,'#dc2626',angleA.toFixed(1)+'°');
+
+  dot(ctx,Ad,'#1d4ed8',5,'A',-20,4);
+  dot(ctx,B,'#1d4ed8',5,'B',-8,22);
+  dot(ctx,Dp,'#1d4ed8',5,'D',10,-14);
+
+  // side labels
+  ctx.save();
+  ctx.fillStyle='#1e40af'; ctx.font='bold 14px system-ui,sans-serif';
+  ctx.textAlign='center';
+  ctx.fillText('AD = 13 cm', (Ad.x+Dp.x)/2 - 60, (Ad.y+Dp.y)/2 + 12);
+  ctx.fillText('BD = 12 cm', (B.x+Dp.x)/2 + 55, (B.y+Dp.y)/2 + 6);
+  ctx.fillText('AB = ?', (Ad.x+B.x)/2, Ad.y+26);
+  ctx.restore();
+
+  // readouts
+  document.getElementById('r1c').innerHTML='∠BAD ≈ <b>'+angleA.toFixed(2)+'°</b>';
+}
+drawCV1();
+window.addEventListener('resize',()=>{drawCV1();drawCV2();drawCV3();});
+
+/* ============================================================
+   PART (a)(ii) — triangle ACD + point P
+   ============================================================ */
+let apRatio=0.37;
+function drawCV2(){
+  const {ctx,w,h}=setupCanvas('cv2');
+  clearScene(ctx,w,h); grid(ctx,w,h,40);
+
+  // Triangle ABD schematic on the left, ACD on the right
+  // LEFT: A-B-D with P on AD
+  const A=pt(80,300), B=pt(360,300);
+  // Build using BD=12, angle B=72, AD=13 (approx)
+  const rad=72*Math.PI/180;
+  const sc=250/12;
+  const BAang=Math.atan2(A.y-B.y,A.x-B.x);
+  const BDang=BAang-rad;
+  const D={x:B.x+12*sc*Math.cos(BDang), y:B.y+12*sc*Math.sin(BDang)};
+
+  // Equilateral ACD on the right
+  const Ae=pt(560,300);
+  const side=250;
+  const D3={x:Ae.x+side*Math.cos(-60*Math.PI/180 - Math.PI/2 +Math.PI/2), y:0};
+  // simpler: C above, D to the right of A forming equilateral
+  // place Ca at top, Da to the left-down
+  const Db=pt(Ae.x+side, Ae.y);
+  const Cb=pt(Ae.x+side*0.5, Ae.y - side*Math.sin(60*Math.PI/180));
+
+  // Draw equilateral if checkbox
+  const showEq=document.getElementById('c2b').checked;
+  if(showEq){
+    ctx.save();
+    ctx.beginPath(); ctx.moveTo(Ae.x,Ae.y); ctx.lineTo(Db.x,Db.y); ctx.lineTo(Cb.x,Cb.y); ctx.closePath();
+    ctx.fillStyle='rgba(124,58,237,0.08)'; ctx.fill();
+    ctx.restore();
+    line(ctx,Ae,Db,'#7c3aed',2.5);
+    line(ctx,Db,Cb,'#7c3aed',2.5);
+    line(ctx,Cb,Ae,'#7c3aed',2.5);
+    // 60 deg at A
+    angleArc(ctx,Ae,Db,Cb,34,'#7c3aed','60°');
+    dot(ctx,Ae,'#7c3aed',5,'A',-20,6);
+    dot(ctx,Db,'#7c3aed',5,'D',14,4);
+    dot(ctx,Cb,'#7c3aed',5,'C',0,-16);
+    ctx.save();
+    ctx.fillStyle='#5b21b6'; ctx.font='bold 13px system-ui,sans-serif'; ctx.textAlign='center';
+    ctx.fillText('Equilateral △ACD', (Ae.x+Db.x)/2, Ae.y+40);
+    ctx.restore();
+  }
+
+  // Left triangle ABD
+  ctx.save();
+  ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,B.y); ctx.lineTo(D.x,D.y); ctx.closePath();
+  ctx.fillStyle='rgba(37,99,235,0.07)'; ctx.fill();
+  ctx.restore();
+  line(ctx,A,B,'#2563eb',2.5);
+  line(ctx,B,D,'#2563eb',2.5);
+  line(ctx,A,D,'#2563eb',2.5);
+
+  // Point P along AD
+  const Pp=lerp(A,D,apRatio);
+  dot(ctx,Pp,'#dc2626',5.5,'P',8,14);
+  dot(ctx,A,'#1d4ed8',5,'A',-20,4);
+  dot(ctx,B,'#1d4ed8',5,'B',-6,22);
+  dot(ctx,D,'#1d4ed8',5,'D',12,-12);
+
+  // perpendicular BP
+  if(document.getElementById('c2').checked){
+    line(ctx,B,Pp,'#059669',2,[6,4]);
+    rightAngleMark(ctx,Pp,A,B,12,'#059669');
+  }
+
+  // angle at A in left triangle (angle BAD)
+  const angA=Math.asin(12*Math.sin(rad)/13)*180/Math.PI;
+  angleArc(ctx,A,B,D,40,'#dc2626',angA.toFixed(1)+'°');
+
+  // angle at D
+  angleArc(ctx,D,A,B,36,'#f59e0b','');
+
+  // Labels
+  ctx.save();
+  ctx.fillStyle='#1e40af'; ctx.font='bold 13px system-ui,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('AD = 13', (A.x+D.x)/2 - 40, (A.y+D.y)/2);
+  ctx.fillText('BD = 12', (B.x+D.x)/2 + 50, (B.y+D.y)/2);
+  ctx.fillStyle='#b91c1c';
+  ctx.fillText('AP = '+(13*apRatio).toFixed(2)+' cm', (A.x+Pp.x)/2 - 34, (A.y+Pp.y)/2 + 8);
+  ctx.restore();
+
+  // readouts
+  document.getElementById('v2').textContent='AP='+(13*apRatio).toFixed(2);
+  document.getElementById('r2a').innerHTML='AP ≈ <b>'+(13*apRatio).toFixed(2)+' cm</b>';
+  // CP calculation using law of cosines with angle CAP = 60
+  const cp=Math.sqrt(13*13 + (13*apRatio)*(13*apRatio) - 2*13*(13*apRatio)*Math.cos(Math.PI/3));
+  document.getElementById('r2c').innerHTML='CP ≈ <b>'+cp.toFixed(2)+' cm</b>';
+}
+drawCV2();
+
+/* ============================================================
+   PART (b) — angle between faces, CP vs CP'
+   ============================================================ */
+function drawCV3(){
+  const {ctx,w,h}=setupCanvas('cv3');
+  clearScene(ctx,w,h); grid(ctx,w,h,40);
+
+  // Draw the region around A-D with B and C
+  const A=pt(180,340), D=pt(620,340);
+  const Ad=A, Dd=D;
+  // P in the middle-ish (foot from B)
+  const Pp=lerp(Ad,Dd,0.68); // AP ~ 8.93 of 13
+  const Pprime=lerp(Ad,Dd,0.5); // midpoint (foot from C for equilateral)
+
+  // B below, C above (3D perspective)
+  const B=pt(430,420);
+  const C=pt(480,120);
+
+  // Triangle ABD (face)
+  if(document.getElementById('c3').checked || true){
+    ctx.save();
+    ctx.beginPath(); ctx.moveTo(Ad.x,Ad.y); ctx.lineTo(B.x,B.y); ctx.lineTo(Dd.x,Dd.y); ctx.closePath();
+    ctx.fillStyle='rgba(37,99,235,0.055)'; ctx.fill();
+    ctx.restore();
+  }
+  // Triangle ACD (face)
+  if(document.getElementById('c3').checked){
+    ctx.save();
+    ctx.beginPath(); ctx.moveTo(Ad.x,Ad.y); ctx.lineTo(C.x,C.y); ctx.lineTo(Dd.x,Dd.y); ctx.closePath();
+    ctx.fillStyle='rgba(124,58,237,0.055)'; ctx.fill();
+    ctx.restore();
+  }
+
+  line(ctx,Ad,Dd,'#334155',3);
+  line(ctx,Ad,B,'#2563eb',2.5);
+  line(ctx,B,Dd,'#2563eb',2.5);
+  line(ctx,Ad,C,'#7c3aed',2.5);
+  line(ctx,C,Dd,'#7c3aed',2.5);
+
+  // BP perpendicular to AD (true)
+  line(ctx,B,Pp,'#dc2626',3);
+  rightAngleMark(ctx,Pp,Ad,B,14,'#dc2626');
+
+  // CP
+  line(ctx,C,Pp,'#f59e0b',3);
+
+  if(document.getElementById('c3b').checked){
+    // correct perpendicular CP' where P' is midpoint of AD
+    line(ctx,C,Pprime,'#7c3aed',3,[7,5]);
+    rightAngleMark(ctx,Pprime,Ad,C,14,'#7c3aed');
+  }
+
+  dot(ctx,Ad,'#1d4ed8',5.5,'A',-6,-18);
+  dot(ctx,Dd,'#1d4ed8',5.5,'D',16,-8);
+  dot(ctx,B,'#1d4ed8',5.5,'B',-6,20);
+  dot(ctx,C,'#1d4ed8',5.5,'C',-6,-18);
+  dot(ctx,Pp,'#dc2626',5.5,'P',10,20);
+  if(document.getElementById('c3b').checked){
+    dot(ctx,Pprime,'#7c3aed',5,'P′',-32,20);
+  }
+
+  // angle BPC
+  angleArc(ctx,Pp,B,C,44,'#0891b2','∠BPC');
+
+  // labels
+  ctx.save();
+  ctx.fillStyle='#334155'; ctx.font='bold 13px system-ui,sans-serif'; ctx.textAlign='center';
+  ctx.fillText('common line AD', (Ad.x+Dd.x)/2, Ad.y+26);
+  ctx.fillStyle='#dc2626'; ctx.fillText('BP ⟂ AD ✓', (B.x+Pp.x)/2 - 70, (B.y+Pp.y)/2);
+  ctx.fillStyle='#f59e0b'; ctx.fillText('CP', (C.x+Pp.x)/2 + 20, (C.y+Pp.y)/2);
+  if(document.getElementById('c3b').checked){
+    ctx.fillStyle='#7c3aed'; ctx.fillText("correct: CP′ ⟂ AD", (C.x+Pprime.x)/2 - 30, (C.y+Pprime.y)/2 - 12);
+  }
+  ctx.restore();
+
+  // readouts
+  const ap=8.927, cp=11.52;
+  document.getElementById('r3a').innerHTML='\(AP^2 + CP^2\) ≈ <b>'+(ap*ap+cp*cp).toFixed(1)+'</b>';
+  document.getElementById('r3c').innerHTML='∠APC = 90°? <b>No ✗</b>';
+  document.getElementById('r3c').className='ro bad';
+}
+drawCV3();
+
+/* ============================================================
+   STEP REVEAL LOGIC
+   ============================================================ */
+function setupSteps(stepId, btnId, cntId, total){
+  const steps=document.querySelectorAll('#'+stepId+' .step');
+  const btn=document.getElementById(btnId);
+  const cnt=document.getElementById(cntId);
+  let idx=0;
+  cnt.textContent='0 / '+total;
+  btn.addEventListener('click',()=>{
+    if(idx<steps.length){
+      steps[idx].classList.add('show');
+      idx++;
+      cnt.textContent=idx+' / '+steps.length;
+      if(idx===steps.length){
+        btn.disabled=true;
+        btn.textContent='All steps revealed ✓';
+      }
+    }
+  });
+}
+setupSteps('steps1','btn1','cnt1',2);
+setupSteps('steps2','btn2','cnt2',3);
+setupSteps('steps3','btn3','cnt3',2);
+
+/* ============================================================
+   SLIDER / CHECKBOX LISTENERS
+   ============================================================ */
+document.getElementById('s1').addEventListener('input',function(){
+  angABD=parseFloat(this.value);
+  document.getElementById('v1').textContent=angABD+'°';
+  drawCV1();
+});
+document.getElementById('s2').addEventListener('input',function(){
+  apRatio=parseFloat(this.value)/100;
+  drawCV2();
+});
+['c2','c2b'].forEach(id=>{
+  document.getElementById(id).addEventListener('change',drawCV2);
+});
+['c3','c3b'].forEach(id=>{
+  document.getElementById(id).addEventListener('change',drawCV3);
+});
+
+/* re-render on resize */
+let rz;
+window.addEventListener('resize',()=>{
+  clearTimeout(rz);
+  rz=setTimeout(()=>{drawCV1();drawCV2();drawCV3();},180);
+});
+
+/* Re-render after MathJax typesetting (fonts settle) */
+if(window.MathJax && MathJax.startup){
+  MathJax.startup.promise.then(()=>{drawCV1();drawCV2();drawCV3();});
+}
+</script>
+</body>
+</html>

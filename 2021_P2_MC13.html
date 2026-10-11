@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE Math 2021 Paper 2 Q13 — Dots &amp; Sequences</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<style>
+  :root{
+    --bg:#f4f7fb;
+    --card:#ffffff;
+    --ink:#1e2a3a;
+    --ink-soft:#51617a;
+    --brand:#2563eb;
+    --brand-dark:#1d4ed8;
+    --brand-light:#e8f0fe;
+    --accent:#f59e0b;
+    --accent-light:#fff7e6;
+    --good:#16a34a;
+    --good-light:#e9f9ef;
+    --line:#dfe6f0;
+    --shadow:0 6px 24px rgba(30,42,58,.08);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,"PingFang HK","Microsoft JhengHei",sans-serif;
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:960px;margin:0 auto;padding:18px 14px 60px;}
+  header.top{
+    background:linear-gradient(135deg,#2563eb 0%,#1e40af 100%);
+    color:#fff;border-radius:18px;padding:20px 20px 18px;box-shadow:var(--shadow);
+  }
+  header.top .qnum{
+    display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);
+    font-size:.82rem;letter-spacing:.04em;padding:4px 12px;border-radius:999px;font-weight:600;
+  }
+  header.top h1{font-size:1.15rem;margin:12px 0 4px;font-weight:700;}
+  header.top p{margin:0;font-size:.9rem;color:#dbe6ff;}
+  .tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;}
+  .tag{
+    background:#fff;color:var(--brand-dark);font-size:.76rem;font-weight:700;
+    padding:5px 12px;border-radius:999px;box-shadow:0 2px 8px rgba(0,0,0,.12);
+  }
+  .card{
+    background:var(--card);border-radius:16px;padding:18px;margin-top:16px;
+    box-shadow:var(--shadow);border:1px solid var(--line);
+  }
+  .card h2{
+    font-size:1.02rem;margin:0 0 10px;font-weight:800;color:var(--brand-dark);
+    display:flex;align-items:center;gap:8px;
+  }
+  .card h2 .dot{width:10px;height:10px;border-radius:50%;background:var(--brand);display:inline-block;}
+  .qtext{font-size:.98rem;}
+  .qtext b{color:var(--brand-dark);}
+  .formula-box{
+    background:var(--brand-light);border-left:4px solid var(--brand);
+    padding:10px 14px;border-radius:10px;margin:12px 0;font-size:.95rem;
+  }
+  /* Choices */
+  .choices{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px;}
+  .choice{
+    border:2px solid var(--line);border-radius:12px;padding:12px;background:#fbfcff;
+    cursor:pointer;font-weight:600;font-size:.95rem;text-align:left;color:var(--ink);
+    transition:.18s;display:flex;gap:10px;align-items:center;
+  }
+  .choice .k{
+    width:26px;height:26px;flex:0 0 26px;border-radius:8px;background:#e3ebf8;color:var(--brand-dark);
+    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.85rem;
+  }
+  .choice:hover{border-color:#b9cdf5;transform:translateY(-1px);}
+  .choice.correct{border-color:var(--good);background:var(--good-light);}
+  .choice.correct .k{background:var(--good);color:#fff;}
+  .choice.wrong{border-color:#ef4444;background:#fdeaea;}
+  .choice.wrong .k{background:#ef4444;color:#fff;}
+  .feedback{margin-top:12px;font-weight:600;font-size:.9rem;min-height:1.3em;}
+  .feedback.ok{color:var(--good);}
+  .feedback.no{color:#dc2626;}
+  /* Slider demo */
+  .demo-head{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px;}
+  .demo-head .val{font-weight:800;color:var(--brand-dark);font-size:1.05rem;}
+  input[type=range]{
+    width:100%;margin:14px 0 4px;-webkit-appearance:none;appearance:none;
+    height:8px;border-radius:999px;background:linear-gradient(90deg,#2563eb,#60a5fa);outline:none;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;
+    background:#fff;border:3px solid var(--brand);cursor:pointer;box-shadow:0 2px 8px rgba(37,99,235,.4);
+  }
+  input[type=range]::-moz-range-thumb{
+    width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid var(--brand);cursor:pointer;
+  }
+  .scale{display:flex;justify-content:space-between;font-size:.72rem;color:var(--ink-soft);font-weight:600;}
+  canvas{width:100%;max-width:100%;display:block;border-radius:12px;background:#fbfdff;}
+  .canvas-note{font-size:.8rem;color:var(--ink-soft);margin-top:8px;}
+  /* Steps */
+  .step{
+    border:1px solid var(--line);border-radius:14px;margin-top:12px;overflow:hidden;background:#fff;
+    transition:.2s;
+  }
+  .step.open{box-shadow:0 4px 18px rgba(37,99,235,.12);border-color:#c7d8f8;}
+  .step-head{
+    display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;background:#f8faff;
+    user-select:none;
+  }
+  .step.open .step-head{background:var(--brand-light);}
+  .step-no{
+    width:30px;height:30px;flex:0 0 30px;border-radius:50%;background:var(--brand);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.85rem;
+  }
+  .step.open .step-no{background:var(--brand-dark);}
+  .step-title{font-weight:700;font-size:.94rem;flex:1;}
+  .step-arrow{font-size:1rem;color:var(--brand);transition:transform .25s;}
+  .step.open .step-arrow{transform:rotate(90deg);}
+  .step-body{padding:0 16px;max-height:0;overflow:hidden;transition:max-height .35s ease,padding .25s;}
+  .step.open .step-body{max-height:900px;padding:14px 16px 18px;}
+  .step-body p{margin:0 0 10px;font-size:.93rem;}
+  .hint{
+    background:var(--accent-light);border:1px dashed #f0c46a;border-radius:10px;
+    padding:10px 13px;font-size:.88rem;margin:10px 0;color:#8a5a00;
+  }
+  .hint b{color:#b45309;}
+  .eq{
+    background:#f5f8ff;border:1px solid #dbe6ff;border-radius:10px;padding:10px 12px;margin:8px 0;
+    overflow-x:auto;font-size:1rem;
+  }
+  .hl{background:#fff3cd;padding:1px 5px;border-radius:5px;font-weight:700;}
+  .final-ans{
+    background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;border-radius:14px;
+    padding:16px;text-align:center;font-weight:800;font-size:1.1rem;margin-top:16px;letter-spacing:.02em;
+  }
+  .final-ans small{display:block;font-weight:600;font-size:.82rem;color:#d7f5e1;margin-top:4px;}
+  .controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;}
+  button.btn{
+    border:none;border-radius:11px;padding:11px 18px;font-weight:700;font-size:.9rem;cursor:pointer;
+    transition:.18s;font-family:inherit;
+  }
+  button.primary{background:var(--brand);color:#fff;box-shadow:0 4px 14px rgba(37,99,235,.32);}
+  button.primary:hover{background:var(--brand-dark);}
+  button.ghost{background:#fff;color:var(--brand-dark);border:2px solid var(--line);}
+  button.ghost:hover{border-color:#b9cdf5;background:#f8faff;}
+  .table-wrap{overflow-x:auto;}
+  table{border-collapse:collapse;width:100%;font-size:.88rem;min-width:420px;}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:center;}
+  th{background:var(--brand-light);color:var(--brand-dark);font-weight:800;}
+  tr:nth-child(even) td{background:#fafcff;}
+  tr.hi td{background:#fff3cd;font-weight:800;color:#8a5a00;}
+  @media (max-width:560px){
+    header.top{padding:16px;}
+    header.top h1{font-size:1.02rem;}
+    .choices{grid-template-columns:1fr;}
+    .card{padding:14px;}
+    .step-body.open{padding:12px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <span class="qnum">HKDSE MATH 2021 · PAPER 2 · Q13</span>
+    <h1>Number of dots in the 8th pattern</h1>
+    <p>Formulas and Sequences — Recurrence relations &amp; summation</p>
+    <div class="tags">
+      <span class="tag">Sequences</span>
+      <span class="tag">Recurrence Relation</span>
+      <span class="tag">Arithmetic Series</span>
+      <span class="tag">Summation</span>
+    </div>
+  </header>
+
+  <!-- QUESTION -->
+  <section class="card">
+    <h2><span class="dot"></span>Question</h2>
+    <div class="qtext">
+      <p>In the figure, the 1st pattern consists of <b>3 dots</b>. For any positive integer $n$, the $(n+1)$th pattern is formed by adding $(2n+3)$ dots to the $n$th pattern.</p>
+      <p>Find the number of dots in the <b>8th pattern</b>.</p>
+    </div>
+    <div class="formula-box">
+      <b>Key relation:</b> $\;T(1)=3\;$ and $\;T(n+1)=T(n)+(2n+3)\;$ for all positive integers $n$.
+    </div>
+    <div class="choices" id="choices">
+      <button class="choice" data-k="A"><span class="k">A</span> 63</button>
+      <button class="choice" data-k="B"><span class="k">B</span> 75</button>
+      <button class="choice" data-k="C"><span class="k">C</span> 80</button>
+      <button class="choice" data-k="D"><span class="k">D</span> 99</button>
+    </div>
+    <div class="feedback" id="feedback"></div>
+  </section>
+
+  <!-- INTERACTIVE DEMO -->
+  <section class="card">
+    <h2><span class="dot"></span>Visual Exploration — Build the Patterns</h2>
+    <div class="demo-head">
+      <div>Drag the slider to change the pattern number.</div>
+      <div class="val" id="demoVal">Pattern 1 · 3 dots</div>
+    </div>
+    <input type="range" id="slider" min="1" max="8" value="1" step="1">
+    <div class="scale"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span></div>
+    <canvas id="cv" width="900" height="340" aria-label="Pattern of dots"></canvas>
+    <div class="canvas-note">
+      Each pattern keeps all previous dots and adds a new triangular block with $(2n+3)$ extra dots — the total grows quickly!
+    </div>
+    <div class="formula-box" style="margin-top:14px;">
+      <b>Live calculation:</b> <span id="liveCalc">$T(1)=3$</span>
+    </div>
+  </section>
+
+  <!-- STEP BY STEP -->
+  <section class="card">
+    <h2><span class="dot"></span>Step-by-Step Guided Solution</h2>
+    <p style="font-size:.9rem;color:var(--ink-soft);margin-top:-2px;">Tap each step to reveal the reasoning. Try to predict the next line before opening it!</p>
+
+    <!-- Step 1 -->
+    <div class="step" data-step="1">
+      <div class="step-head">
+        <div class="step-no">1</div>
+        <div class="step-title">Name the unknown &amp; restate the given information</div>
+        <div class="step-arrow">▶</div>
+      </div>
+      <div class="step-body">
+        <p>Let $T(m)$ be the number of dots in the $m$th pattern.</p>
+        <p>We are told:</p>
+        <div class="eq">(1) $\;T(1)=3$</div>
+        <div class="eq">(2) $\;T(n+1)=T(n)+(2n+3)\;$ for any positive integer $n$</div>
+        <div class="hint">
+          <b>Hint — What is a recurrence relation?</b><br>
+          It does <i>not</i> give a formula for $T(m)$ directly. Instead it tells us how to move from one term to the <b>next</b> term by adding a known amount $(2n+3)$. So we must "climb" from $T(1)$ up to $T(8)$, one step at a time.
+        </div>
+        <p>Goal: find $T(8)$, the number of dots in the 8th pattern.</p>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step" data-step="2">
+      <div class="step-head">
+        <div class="step-no">2</div>
+        <div class="step-title">Work out the "extra dots added" at each step</div>
+        <div class="step-arrow">▶</div>
+      </div>
+      <div class="step-body">
+        <p>The extra dots added from the $n$th to the $(n+1)$th pattern is $(2n+3)$. Substitute $n=1,2,\dots,7$:</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>$n$</th><th>Extra added to reach next pattern: $2n+3$</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>$2(1)+3=5$</td></tr>
+              <tr><td>2</td><td>$2(2)+3=7$</td></tr>
+              <tr><td>3</td><td>$2(3)+3=9$</td></tr>
+              <tr><td>4</td><td>$2(4)+3=11$</td></tr>
+              <tr><td>5</td><td>$2(5)+3=13$</td></tr>
+              <tr><td>6</td><td>$2(6)+3=15$</td></tr>
+              <tr><td>7</td><td>$2(7)+3=17$</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>The extra dots form an <b>arithmetic sequence</b>: $5,7,9,11,13,15,17$ with common difference $2$.</p>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="step" data-step="3">
+      <div class="step-head">
+        <div class="step-no">3</div>
+        <div class="step-title">Build the chain of equations</div>
+        <div class="step-arrow">▶</div>
+      </div>
+      <div class="step-body">
+        <p>Start from $T(1)=3$ and apply relation (2) repeatedly:</p>
+        <div class="eq">$T(2)=T(1)+5$</div>
+        <div class="eq">$T(3)=T(2)+7$</div>
+        <div class="eq">$T(4)=T(3)+9$</div>
+        <div class="eq">$T(5)=T(4)+11$</div>
+        <div class="eq">$T(6)=T(5)+13$</div>
+        <div class="eq">$T(7)=T(6)+15$</div>
+        <div class="eq">$T(8)=T(7)+17$</div>
+        <p>Substituting each equation into the next one (a chain substitution) gives:</p>
+        <div class="eq">$T(8)=T(1)+5+7+9+11+13+15+17$</div>
+      </div>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="step" data-step="4">
+      <div class="step-head">
+        <div class="step-no">4</div>
+        <div class="step-title">Evaluate the sum</div>
+        <div class="step-arrow">▶</div>
+      </div>
+      <div class="step-body">
+        <p>Now $T(1)=3$, so</p>
+        <div class="eq">$T(8)=3+5+7+9+11+13+15+17$</div>
+        <p>Add the terms:</p>
+        <div class="eq">$3+5=8,\;8+7=15,\;15+9=24,\;24+11=35,$<br>$35+13=48,\;48+15=63,\;63+17=\mathbf{80}$</div>
+        <p>Or cleverly rearrange: the eight numbers $3,5,7,9,11,13,15,17$ are an arithmetic series, so</p>
+        <div class="eq">$S=\dfrac{8}{2}\big(3+17\big)=4\times20=80$</div>
+        <div class="hint">
+          <b>Hint — Arithmetic series formula:</b> $S_n=\dfrac{n}{2}\big(a+\ell\big)$, where $a$ is the first term and $\ell$ is the last term. Here $n=8$, $a=3$, $\ell=17$. This is much faster than adding one by one!
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 5 -->
+    <div class="step" data-step="5">
+      <div class="step-head">
+        <div class="step-no">5</div>
+        <div class="step-title">Conclusion &amp; trap to avoid</div>
+        <div class="step-arrow">▶</div>
+      </div>
+      <div class="step-body">
+        <p>Therefore the number of dots in the 8th pattern is $80$, answer <b>C</b>.</p>
+        <div class="hint">
+          <b>Common mistake:</b> Using the formula with the wrong $n$. For example, $T(8)=T(7)+(2\times8+3)=T(7)+19$ would be <b>incorrect</b>, because the relation is defined for $n$ going <i>from</i> the $n$th pattern. To reach the 8th pattern we use $n=7$, so the added amount is $2(7)+3=17$, not $19$.
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Pattern $m$</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th></tr></thead>
+            <tbody>
+              <tr><td>$T(m)$</td><td>3</td><td>8</td><td>15</td><td>24</td><td>35</td><td>48</td><td>63</td><td class="hl">80</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="btn primary" id="btnNext">Open Next Step ▸</button>
+      <button class="btn ghost" id="btnAll">Reveal All Steps</button>
+      <button class="btn ghost" id="btnReset">Collapse All</button>
+    </div>
+
+    <div class="final-ans" id="finalAns" style="display:none;">
+      Answer: C · 80 dots
+      <small>$T(8)=3+5+7+9+11+13+15+17=80$</small>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* ---------- MCQ interactivity ---------- */
+const choices = document.querySelectorAll('.choice');
+const feedback = document.getElementById('feedback');
+choices.forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const k = btn.dataset.k;
+    choices.forEach(b=>b.classList.remove('correct','wrong'));
+    if(k==='C'){
+      btn.classList.add('correct');
+      feedback.textContent = "Correct! 80 dots. Check the steps below for the full method.";
+      feedback.className = "feedback ok";
+    }else{
+      btn.classList.add('wrong');
+      document.querySelector('.choice[data-k="C"]').classList.add('correct');
+      feedback.textContent = "Not quite — the answer is C (80). See the steps below for the reasoning.";
+      feedback.className = "feedback no";
+    }
+  });
+});
+
+/* ---------- Step accordion ---------- */
+const steps = document.querySelectorAll('.step');
+steps.forEach(s=>{
+  s.querySelector('.step-head').addEventListener('click',()=>s.classList.toggle('open'));
+});
+let nextIdx = 0;
+document.getElementById('btnNext').addEventListener('click',()=>{
+  const list = document.querySelectorAll('.step');
+  if(nextIdx < list.length){
+    list[nextIdx].classList.add('open');
+    nextIdx++;
+    if(nextIdx === list.length) revealFinal();
+    list[Math.min(nextIdx-1,list.length-1)].scrollIntoView({behavior:'smooth',block:'center'});
+  }else{
+    revealFinal();
+  }
+});
+document.getElementById('btnAll').addEventListener('click',()=>{
+  document.querySelectorAll('.step').forEach(s=>s.classList.add('open'));
+  nextIdx = steps.length; revealFinal();
+});
+document.getElementById('btnReset').addEventListener('click',()=>{
+  document.querySelectorAll('.step').forEach(s=>s.classList.remove('open'));
+  nextIdx = 0;
+  document.getElementById('finalAns').style.display='none';
+});
+function revealFinal(){
+  document.getElementById('finalAns').style.display='block';
+}
+
+/* ---------- Slider + canvas visualisation ---------- */
+const slider = document.getElementById('slider');
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+const demoVal = document.getElementById('demoVal');
+const liveCalc = document.getElementById('liveCalc');
+
+/* Recurrence: T(1)=3 ; T(n+1)=T(n)+(2n+3) */
+function T(m){ let t=3; for(let n=1;n<m;n++) t += (2*n+3); return t; }
+
+function drawPattern(m){
+  const dpr = window.devicePixelRatio || 1;
+  const W = cv.clientWidth, H = 340;
+  cv.width = W*dpr; cv.height = H*dpr;
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,W,H);
+
+  /* Build a triangular-ish arrangement: row i has (i+? ) ... we simply draw
+     T(m) dots arranged in rows of growing length, then highlight the newly added
+     dots of block n=m-1 in orange. */
+  const prev = T(m-1); // dots before adding the last block (0 when m=1)
+  const total = T(m);
+
+  /* arrange in rows: row lengths grow like 1,2,3,... but we cap width */
+  const rows = [];
+  let remaining = total, len = 2;
+  while(remaining > 0){
+    const take = Math.min(len, remaining);
+    rows.push(take);
+    remaining -= take;
+    len++;
+  }
+  const maxLen = Math.max(...rows);
+  const padX = 26, padY = 26;
+  const gapX = Math.min( (W - 2*padX) / maxLen, 30 );
+  const gapY = Math.min( (H - 2*padY) / rows.length, 30 );
+  const r = Math.max(3.2, Math.min(gapX,gapY)/2.6);
+
+  /* cumulative index to know which dots are "new" */
+  let idx = 0;
+  const startY = padY + (H - 2*padY - rows.length*gapY)/2 + gapY/2;
+  for(let ri=0; ri<rows.length; ri++){
+    const cnt = rows[ri];
+    const totalW = (cnt-1)*gapX;
+    const startX = W/2 - totalW/2;
+    for(let ci=0; ci<cnt; ci++){
+      const x = startX + ci*gapX;
+      const y = startY + ri*gapY;
+      const isNew = idx >= prev;
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI*2);
+      if(isNew){
+        ctx.fillStyle = '#f59e0b';
+        ctx.strokeStyle = '#b45309';
+      }else{
+        ctx.fillStyle = '#2563eb';
+        ctx.strokeStyle = '#1d4ed8';
+      }
+      ctx.fill();
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+      idx++;
+    }
+  }
+
+  /* legend */
+  ctx.font = '600 13px "Segoe UI", Arial, sans-serif';
+  ctx.fillStyle = '#1e2a3a';
+  ctx.textAlign = 'left';
+  ctx.fillText('Pattern ' + m + ' : ' + total + ' dots', 16, 22);
+  /* legend swatches */
+  ctx.beginPath(); ctx.arc(W-150, 17, 6, 0, Math.PI*2); ctx.fillStyle='#2563eb'; ctx.fill();
+  ctx.fillStyle='#51617a'; ctx.font='500 12px "Segoe UI", Arial, sans-serif';
+  ctx.fillText('earlier dots', W-138, 21);
+  if(m>1){
+    ctx.beginPath(); ctx.arc(W-64, 17, 6, 0, Math.PI*2); ctx.fillStyle='#f59e0b'; ctx.fill();
+    ctx.fillStyle='#51617a';
+    ctx.fillText('+'+(2*(m-1)+3), W-52, 21);
+  }
+
+  demoVal.textContent = 'Pattern ' + m + ' · ' + total + ' dots';
+  /* live calc line */
+  if(m===1){
+    liveCalc.innerHTML = '$T(1)=3$';
+  }else{
+    const extras = [];
+    for(let n=1;n<m;n++) extras.push(2*n+3);
+    liveCalc.innerHTML = '$T('+m+')=3+' + extras.join('+') + '=' + total + '$';
+  }
+  if(window.MathJax && window.MathJax.typesetPromise){
+    MathJax.typesetPromise([liveCalc]).catch(()=>{});
+  }
+}
+
+slider.addEventListener('input', ()=>drawPattern(parseInt(slider.value,10)));
+window.addEventListener('resize', ()=>drawPattern(parseInt(slider.value,10)));
+drawPattern(1);
+</script>
+</body>
+</html>

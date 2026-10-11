@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2024 Paper 1 Q8 — Congruent Triangles & Pentagon Area</title>
+<script>
+MathJax = { tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[','\\]']] } };
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  :root{
+    --blue:#1d4ed8; --blue-d:#1e3a8a; --amber:#f59e0b; --amber-l:#fef3c7;
+    --emerald:#059669; --emerald-l:#d1fae5; --slate:#0f172a; --muted:#64748b;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+    background:#f1f5f9; color:var(--slate); line-height:1.6;
+  }
+  /* ---------- Hero ---------- */
+  .hero{
+    background:linear-gradient(135deg,#1e3a8a 0%,#1d4ed8 45%,#0ea5e9 100%);
+    color:#fff; padding:44px 22px 38px; box-shadow:0 8px 24px rgba(2,6,23,.25);
+  }
+  .hero-inner{max-width:1000px;margin:0 auto;}
+  .eyebrow{font-size:.8rem;letter-spacing:.18em;text-transform:uppercase;opacity:.85;font-weight:600;}
+  .hero h1{margin:.35rem 0 .3rem;font-size:clamp(1.5rem,3.6vw,2.3rem);font-weight:800;letter-spacing:-.01em;}
+  .hero .sub{opacity:.92;font-size:1rem;margin-bottom:1rem;}
+  .pills{display:flex;flex-wrap:wrap;gap:.5rem;}
+  .pill{
+    background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35);
+    padding:.28rem .8rem; border-radius:999px; font-size:.78rem; font-weight:600; backdrop-filter:blur(4px);
+  }
+  /* ---------- Layout ---------- */
+  main{max-width:1000px;margin:-22px auto 40px;padding:0 18px;}
+  .card{
+    background:#fff;border-radius:18px;padding:22px 24px;margin-bottom:22px;
+    box-shadow:0 4px 18px rgba(15,23,42,.08); border:1px solid #e2e8f0;
+  }
+  .card h2{
+    margin:0 0 .6rem;font-size:1.22rem;color:var(--blue-d);
+    display:flex;align-items:center;gap:.55rem;flex-wrap:wrap;
+  }
+  .badge-num{
+    display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:34px;
+    background:linear-gradient(135deg,#1d4ed8,#0ea5e9);color:#fff;border-radius:10px;
+    font-size:.95rem;font-weight:800;box-shadow:0 3px 8px rgba(29,78,216,.35);
+  }
+  .marks-tag{margin-left:auto;background:var(--amber-l);color:#92400e;border-radius:999px;
+    padding:.18rem .7rem;font-size:.76rem;font-weight:700;border:1px solid #fcd34d;white-space:nowrap;}
+  .qtext{background:#f8fafc;border-left:4px solid var(--blue);border-radius:10px;padding:14px 18px;margin:.4rem 0;}
+  /* ---------- Steps ---------- */
+  .step{
+    display:none; border:1px solid #e2e8f0; border-left:5px solid var(--blue);
+    border-radius:12px; padding:14px 16px; margin-top:14px; background:#fcfdff;
+    animation:fade .35s ease;
+  }
+  .step.show{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+  .step-head{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-bottom:.5rem;}
+  .snum{background:var(--blue);color:#fff;font-weight:800;font-size:.78rem;border-radius:8px;padding:.2rem .55rem;}
+  .stag{background:#e0e7ff;color:#3730a3;font-weight:700;font-size:.74rem;border-radius:999px;padding:.16rem .6rem;border:1px solid #c7d2fe;}
+  .hint{
+    background:var(--amber-l);border:1px solid #fcd34d;border-radius:10px;
+    padding:9px 13px;margin-top:10px;font-size:.92rem;color:#78350f;
+  }
+  .hint b{color:#92400e;}
+  .answer{
+    background:var(--emerald-l);border:1px solid #6ee7b7;border-radius:10px;
+    padding:9px 13px;margin-top:10px;font-size:.95rem;color:#065f46;font-weight:600;
+  }
+  .controls{display:flex;align-items:center;gap:12px;margin-top:16px;flex-wrap:wrap;}
+  button{
+    font-family:inherit;font-size:.9rem;font-weight:700;border:none;border-radius:10px;
+    padding:.6rem 1.15rem;cursor:pointer;transition:.18s;
+    background:linear-gradient(135deg,#1d4ed8,#2563eb);color:#fff;box-shadow:0 4px 12px rgba(29,78,216,.32);
+  }
+  button:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 7px 16px rgba(29,78,216,.4);}
+  button:disabled{background:#cbd5e1;color:#64748b;cursor:not-allowed;box-shadow:none;}
+  .counter{font-size:.85rem;font-weight:700;color:var(--muted);}
+  /* ---------- Canvas ---------- */
+  .canvas-wrap{background:#f8fafc;border:1px solid #dbe3ec;border-radius:14px;padding:10px;margin:12px 0;}
+  canvas{width:100%;height:auto;display:block;border-radius:10px;background:#fff;touch-action:none;}
+  .ctrls{display:flex;flex-wrap:wrap;gap:14px 20px;align-items:center;margin-top:12px;padding:10px 12px;background:#f1f5f9;border-radius:10px;font-size:.86rem;}
+  .ctrls label{font-weight:600;color:#334155;display:flex;align-items:center;gap:.45rem;}
+  input[type=range]{accent-color:var(--blue);width:140px;}
+  input[type=checkbox]{accent-color:var(--blue);width:16px;height:16px;}
+  .readout{font-family:ui-monospace,Consolas,monospace;font-size:.84rem;background:#0f172a;color:#7dd3fc;
+    padding:.2rem .6rem;border-radius:7px;}
+  /* ---------- Summary ---------- */
+  .summary{background:linear-gradient(135deg,#0f172a,#1e293b);color:#e2e8f0;border:none;}
+  .summary h2{color:#fff;}
+  .summary ul{margin:.6rem 0 0;padding-left:1.15rem;}
+  .summary li{margin-bottom:.5rem;}
+  .summary .hl{color:#7dd3fc;font-weight:700;}
+  footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 18px 40px;}
+  @media(max-width:560px){
+    .card{padding:18px 15px;}
+    .marks-tag{margin-left:0;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 1</div>
+    <h1>2024 Paper 1 · Question 8</h1>
+    <div class="sub">Geometry — Congruent triangles (RHS) &amp; area of a pentagon</div>
+    <div class="pills">
+      <span class="pill">Congruent Triangles</span>
+      <span class="pill">RHS Condition</span>
+      <span class="pill">Isosceles Triangle</span>
+      <span class="pill">Area Decomposition</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ================= QUESTION ================= -->
+  <section class="card">
+    <h2><span class="badge-num">Q8</span> The Question <span class="marks-tag">5 marks</span></h2>
+    <div class="qtext">
+      <p>In the figure, \(E\) is the point of intersection of \(AC\) and \(BD\). It is given that
+      \(\angle ACB=\angle ADB=90^\circ\) and \(BC=AD\).</p>
+      <p><b>(a)</b> Prove that \(\Delta ABC \cong \Delta BAD\). &nbsp;<span style="color:#92400e;font-weight:700;">(2 marks)</span></p>
+      <p><b>(b)</b> If \(AD=12\text{ cm}\) and \(DE=9\text{ cm}\), find the area of the pentagon \(ABCDE\). &nbsp;<span style="color:#92400e;font-weight:700;">(3 marks)</span></p>
+    </div>
+  </section>
+
+  <!-- ================= PART (a) ================= -->
+  <section class="card">
+    <h2><span class="badge-num">a</span> Part (a) — Proving \(\Delta ABC \cong \Delta BAD\)
+      <span class="marks-tag">2 marks</span></h2>
+
+    <div class="canvas-wrap">
+      <canvas id="cvA" width="820" height="470"></canvas>
+    </div>
+    <div class="ctrls">
+      <label><input type="checkbox" id="a-share" checked> Show common side \(AB\) (highlight)</label>
+      <label><input type="checkbox" id="a-right" checked> Show right angles at \(C,D\)</label>
+      <label><input type="checkbox" id="a-slide"> Slide \(\Delta BAD\) onto \(\Delta ABC\)</label>
+      <span class="readout" id="a-out">AD = 12.0 cm · BC = 12.0 cm</span>
+    </div>
+
+    <div class="controls">
+      <button data-next="a">Next step →</button>
+      <span class="counter" id="cnt-a">0 / 4 steps</span>
+    </div>
+
+    <div class="step" data-part="a">
+      <div class="step-head"><span class="snum">Step 1</span><span class="stag">1M</span></div>
+      <p>List the <b>given</b> information. Both right angles and one pair of equal legs are given:</p>
+      \[ \angle ACB=\angle ADB=90^\circ \quad (\text{given}) \]
+      \[ BC=AD \quad (\text{given}) \]
+      <div class="hint"><b>Hint:</b> Tick the boxes on the diagram to highlight each given fact one at a time.</div>
+    </div>
+
+    <div class="step" data-part="a">
+      <div class="step-head"><span class="snum">Step 2</span><span class="stag">1M</span></div>
+      <p>Identify the <b>common side</b> shared by the two triangles:</p>
+      \[ AB=AB \quad (\text{common side}) \]
+      <div class="hint"><b>Hint:</b> \(AB\) is the hypotenuse of <em>both</em> right-angled triangles — it belongs to the pair.</div>
+    </div>
+
+    <div class="step" data-part="a">
+      <div class="step-head"><span class="snum">Step 3</span><span class="stag">1A</span></div>
+      <p>Combine the three facts. We have a <b>right angle</b>, a <b>hypotenuse</b> and another <b>side</b> in each triangle:</p>
+      \[ \text{Right angle} + \text{Hypotenuse} + \text{Side} \Rightarrow \text{RHS condition} \]
+      <div class="hint"><b>Hint:</b> RHS = Right angle, Hypotenuse, Side. It only applies to right-angled triangles — exactly our case here.</div>
+    </div>
+
+    <div class="step" data-part="a">
+      <div class="step-head"><span class="snum">Step 4</span><span class="stag">1A</span></div>
+      <p>Conclude the congruence with full reasons:</p>
+      \[ \Delta ABC \cong \Delta BAD \quad (\text{RHS}) \]
+      <div class="answer">✔ \(\Delta ABC \cong \Delta BAD\) &nbsp;(RHS)</div>
+      <div class="hint"><b>Hint:</b> The order of letters matters: \(A\leftrightarrow B\), \(B\leftrightarrow A\), \(C\leftrightarrow D\).</div>
+    </div>
+  </section>
+
+  <!-- ================= PART (b) ================= -->
+  <section class="card">
+    <h2><span class="badge-num">b</span> Part (b) — Area of pentagon \(ABCDE\)
+      <span class="marks-tag">3 marks</span></h2>
+
+    <div class="canvas-wrap">
+      <canvas id="cvB" width="820" height="470"></canvas>
+    </div>
+    <div class="ctrls">
+      <label>DE = <span id="b-deval">9.0</span> cm
+        <input type="range" id="b-de" min="4" max="12" step="0.5" value="9">
+      </label>
+      <label><input type="checkbox" id="b-fill" checked> Shade the pentagon \(ABCDE\)</label>
+      <label><input type="checkbox" id="b-split" checked> Show the two triangles \(ABD\) &amp; \(BCD\)</label>
+      <span class="readout" id="b-out">AE = 15.0 cm · BE = 15.0 cm · CE = 9.0 cm</span>
+    </div>
+
+    <div class="controls">
+      <button data-next="b">Next step →</button>
+      <span class="counter" id="cnt-b">0 / 4 steps</span>
+    </div>
+
+    <div class="step" data-part="b">
+      <div class="step-head"><span class="snum">Step 1</span><span class="stag">1M</span></div>
+      <p>In the right-angled triangle \(ADE\), apply Pythagoras' theorem (note \(AE\) is the hypotenuse):</p>
+      \[ AE=\sqrt{AD^2+DE^2}=\sqrt{12^2+9^2}=\sqrt{144+81}=\sqrt{225}=15\text{ cm} \]
+      <div class="hint"><b>Hint:</b> The right angle is at \(D\) because \(AD\perp DB\) (same given right angle \(\angle ADB=90^\circ\)).</div>
+    </div>
+
+    <div class="step" data-part="b">
+      <div class="step-head"><span class="snum">Step 2</span><span class="stag">1M</span></div>
+      <p>From part (a), \(\Delta ABC \cong \Delta BAD\), so corresponding angles are equal:</p>
+      \[ \angle ABE=\angle BAE \]
+      <p>Hence \(\Delta ABE\) is isosceles with \(AE=BE\):</p>
+      \[ BE=AE=15\text{ cm} \]
+      <div class="hint"><b>Hint:</b> Equal angles \(\Rightarrow\) equal opposite sides. \(\angle BAE\) is opposite \(BE\), \(\angle ABE\) is opposite \(AE\).</div>
+    </div>
+
+    <div class="step" data-part="b">
+      <div class="step-head"><span class="snum">Step 3</span><span class="stag">1M</span></div>
+      <p>Also by the congruence, \(AC=BD\). Since \(E\) is the intersection point, the remaining short pieces are equal too:</p>
+      \[ CE=DE=9\text{ cm} \]
+      \[ BD = BE+DE = 15+9 = 24\text{ cm} \]
+      <div class="hint"><b>Hint:</b> \(AC = AE+CE\) and \(BD = BE+DE\). Once \(AE=BE\) and \(AC=BD\), subtract to get \(CE=DE\).</div>
+    </div>
+
+    <div class="step" data-part="b">
+      <div class="step-head"><span class="snum">Step 4</span><span class="stag">1A</span></div>
+      <p>Split the pentagon along \(BD\) into \(\Delta ABD\) and \(\Delta BCD\), then sum the areas:</p>
+      \[ \text{Area}=\tfrac12(AD)(BD)+\tfrac12(BC)(CE) \]
+      \[ =\tfrac12(12)(9+15)+\tfrac12(12)(9) \]
+      \[ =144+54=198\text{ cm}^2 \]
+      <div class="answer">✔ Area of pentagon \(ABCDE=198\text{ cm}^2\)</div>
+      <div class="hint"><b>Hint:</b> Both triangles are right-angled: \(\angle ADB=90^\circ\) for \(\Delta ABD\), and \(\angle BCE=90^\circ\) because \(\angle ACB=90^\circ\).</div>
+    </div>
+  </section>
+
+  <!-- ================= SUMMARY ================= -->
+  <section class="card summary">
+    <h2><span class="badge-num">Σ</span> Final Answers at a Glance</h2>
+    <ul>
+      <li><span class="hl">Part (a):</span> \(\angle ACB=\angle ADB=90^\circ\) (given), \(BC=AD\) (given), \(AB=AB\) (common side) \(\Rightarrow \Delta ABC \cong \Delta BAD\) <span class="hl">(RHS)</span></li>
+      <li><span class="hl">Part (b) — key lengths:</span> \(AE=15\text{ cm}\), \(\;BE=15\text{ cm}\), \(\;CE=DE=9\text{ cm}\), \(\;BD=24\text{ cm}\)</li>
+      <li><span class="hl">Part (b) — answer:</span> Area of pentagon \(ABCDE = \dfrac12(12)(24)+\dfrac12(12)(9)=\mathbf{198\text{ cm}^2}\)</li>
+      <li><span class="hl">Core idea:</span> Congruent right triangles give equal corresponding sides, which converts the pentagon into two right triangles whose areas add up.</li>
+    </ul>
+  </section>
+
+</main>
+
+<footer>HKDSE Mathematics (Compulsory Part) · 2024 Paper 1, Question 8 · Interactive Solution</footer>
+
+<script>
+/* =========================================================
+   Step-reveal engine
+   ========================================================= */
+document.querySelectorAll('[data-next]').forEach(btn=>{
+  const part = btn.dataset.next;
+  const steps = document.querySelectorAll('.step[data-part="'+part+'"]');
+  const counter = document.getElementById('cnt-'+part);
+  let shown = 0;
+  const total = steps.length;
+  counter.textContent = '0 / '+total+' steps';
+  btn.addEventListener('click', ()=>{
+    if(shown < total){
+      steps[shown].classList.add('show');
+      shown++;
+      counter.textContent = shown+' / '+total+' steps';
+      if(shown === total){
+        btn.disabled = true;
+        btn.textContent = 'All steps revealed ✓';
+      }
+    }
+  });
+});
+
+/* =========================================================
+   Helper drawing utilities
+   ========================================================= */
+function arrow(ctx,x1,y1,x2,y2,col){
+  ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=1.6;
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+  const a=Math.atan2(y2-y1,x2-x1),s=8;
+  ctx.beginPath();ctx.moveTo(x2,y2);
+  ctx.lineTo(x2-s*Math.cos(a-0.4),y2-s*Math.sin(a-0.4));
+  ctx.lineTo(x2-s*Math.cos(a+0.4),y2-s*Math.sin(a+0.4));
+  ctx.closePath();ctx.fill();
+}
+function rightAngle(ctx,x,y,dx,dy,size,col){
+  ctx.strokeStyle=col;ctx.lineWidth=1.8;
+  ctx.beginPath();
+  ctx.moveTo(x+dx*size,y);
+  ctx.lineTo(x+dx*size,y+dy*size);
+  ctx.lineTo(x,y+dy*size);
+  ctx.stroke();
+}
+function tick(ctx,x1,y1,x2,y2,n,col){
+  const mx=(x1+x2)/2,my=(y1+y2)/2;
+  const a=Math.atan2(y2-y1,x2-x1)+Math.PI/2;
+  const h=7;
+  ctx.strokeStyle=col;ctx.lineWidth=2.4;
+  for(let i=0;i<n;i++){
+    const off=(i-(n-1)/2)*6;
+    const cx=mx+Math.cos(a)*off, cy=my+Math.sin(a)*off;
+    ctx.beginPath();
+    ctx.moveTo(cx-Math.cos(a-Math.PI/2)*h, cy-Math.sin(a-Math.PI/2)*h);
+    ctx.lineTo(cx+Math.cos(a-Math.PI/2)*h, cy+Math.sin(a-Math.PI/2)*h);
+    ctx.stroke();
+  }
+}
+
+/* =========================================================
+   DIAGRAM (a) — congruent triangles (RHS)
+   ========================================================= */
+const cvA = document.getElementById('cvA');
+const ctxA = cvA.getContext('2d');
+let slideA = 0, slideDir = 1, slideRAF = null;
+
+// Geometry: A(70,400) B(760,400); C above B at (760,150); D above A at (70,150)
+// E = intersection of AC and BD = (415, 275)
+const P = {
+  A:{x:70,  y:400, label:'A'},
+  B:{x:760, y:400, label:'B'},
+  C:{x:760, y:150, label:'C'},
+  D:{x:70,  y:150, label:'D'},
+  E:{x:415, y:275, label:'E'}
+};
+
+function drawA(){
+  const w=cvA.width, h=cvA.height;
+  ctxA.clearRect(0,0,w,h);
+  ctxA.fillStyle='#fff';ctxA.fillRect(0,0,w,h);
+
+  const showShare = document.getElementById('a-share').checked;
+  const showRight = document.getElementById('a-right').checked;
+  const slideOn   = document.getElementById('a-slide').checked;
+
+  // slide offset for triangle BAD moving onto ABC (shift by +dx)
+  const dx = slideOn ? slideA : 0;
+  const shift = {  // move BAD so that its A,B coincide with the ABC triangle
+    A:{x:P.B.x, y:P.B.y},
+    B:{x:P.A.x, y:P.A.y},
+    D:{x:P.C.x, y:P.C.y}
+  };
+  // interpolate
+  const t = dx; // 0..1
+  const SA = {x:P.A.x+(shift.A.x-P.A.x)*t, y:P.A.y+(shift.A.y-P.A.y)*t};
+  const SB = {x:P.B.x+(shift.B.x-P.B.x)*t, y:P.B.y+(shift.B.y-P.B.y)*t};
+  const SD = {x:P.D.x+(shift.D.x-P.D.x)*t, y:P.D.y+(shift.D.y-P.D.y)*t};
+
+  // ---- Faint grid ----
+  ctxA.strokeStyle='#eef2f7';ctxA.lineWidth=1;
+  for(let x=0;x<=w;x+=40){ctxA.beginPath();ctxA.moveTo(x,0);ctxA.lineTo(x,h);ctxA.stroke();}
+  for(let y=0;y<=h;y+=40){ctxA.beginPath();ctxA.moveTo(0,y);ctxA.lineTo(w,y);ctxA.stroke();}
+
+  // ---- Triangle ABC (blue) ----
+  ctxA.beginPath();
+  ctxA.moveTo(P.A.x,P.A.y);ctxA.lineTo(P.B.x,P.B.y);ctxA.lineTo(P.C.x,P.C.y);ctxA.closePath();
+  ctxA.fillStyle='rgba(37,99,235,.10)';ctxA.fill();
+  ctxA.strokeStyle='#2563eb';ctxA.lineWidth=3;ctxA.stroke();
+
+  // ---- Triangle BAD (amber), possibly sliding ----
+  ctxA.beginPath();
+  ctxA.moveTo(SA.x,SA.y);ctxA.lineTo(SB.x,SB.y);ctxA.lineTo(SD.x,SD.y);ctxA.closePath();
+  ctxA.fillStyle='rgba(245,158,11,.12)';ctxA.fill();
+  ctxA.strokeStyle='#d97706';ctxA.lineWidth=3;ctxA.stroke();
+
+  // ---- Common side AB highlight ----
+  if(showShare && t<0.02){
+    tick(ctxA,P.A.x,P.A.y,P.B.x,P.B.y,2,'#dc2626');
+  }
+
+  // ---- Right angle markers ----
+  if(showRight){
+    rightAngle(ctxA,P.C.x,P.C.y,-1,0,26,'#2563eb'); // at C: CB vertical, CA down-left
+    ctxA.save();
+    // at C the two sides are CB (vertical) and CA (diagonal). Draw a small square manually.
+    ctxA.restore();
+    rightAngle(ctxA,P.C.x,P.C.y,-1,0,26,'#2563eb');
+    // marker at C using CA direction
+    ctxA.strokeStyle='#2563eb';ctxA.lineWidth=2;
+    const ux=-1, uy=0; // toward B direction is up
+    const vx=(P.A.x-P.C.x), vy=(P.A.y-P.C.y);
+    const vl=Math.hypot(vx,vy); const nvx=vx/vl, nvy=vy/vl;
+    const s=26;
+    ctxA.beginPath();
+    ctxA.moveTo(P.C.x + 0*s, P.C.y - s);
+    ctxA.lineTo(P.C.x + nvx*s - 0*s*0 + 0, P.C.y - s + nvy*s + s*0);
+    ctxA.stroke();
+    // simpler robust marker at C
+    ctxA.beginPath();
+    ctxA.moveTo(P.C.x, P.C.y);
+    ctxA.lineTo(P.C.x, P.C.y-26);
+    ctxA.lineTo(P.C.x+nvx*26, P.C.y-26+nvy*26);
+    ctxA.stroke();
+
+    // marker at D (for original triangle BAD)
+    const dvx=(SB.x-P.D.x), dvy=(SB.y-P.D.y);
+    const dvl=Math.hypot(dvx,dvy); const ndvx=dvx/dvl, ndvy=dvy/dvl;
+    ctxA.strokeStyle='#d97706';ctxA.lineWidth=2;
+    ctxA.beginPath();
+    ctxA.moveTo(SD.x, SD.y);
+    ctxA.lineTo(SD.x, SD.y+ (t<0.5?26:-26));
+    ctxA.lineTo(SD.x+ndvx*26, SD.y + (t<0.5?26:-26) + ndvy*26);
+    ctxA.stroke();
+  }
+
+  // ---- dot at E ----
+  if(t<0.02){
+    ctxA.beginPath();ctxA.arc(P.E.x,P.E.y,5,0,7);ctxA.fillStyle='#0f172a';ctxA.fill();
+    ctxA.fillStyle='#0f172a';ctxA.font='bold 19px Segoe UI';
+    ctxA.fillText('E',P.E.x+8,P.E.y-8);
+  }
+
+  // ---- labels ----
+  ctxA.font='bold 20px Segoe UI';
+  ctxA.fillStyle='#1e3a8a';
+  ctxA.fillText('A',P.A.x-24,P.A.y+26);
+  ctxA.fillText('B',P.B.x+8,P.B.y+26);
+  ctxA.fillStyle='#2563eb';
+  ctxA.fillText('C',P.C.x+8,P.C.y-10);
+  ctxA.fillStyle='#b45309';
+  ctxA.fillText('D',(t<0.02?P.D.x-24:P.C.x-30),P.D.y-10);
+
+  // side equality tick marks BC and AD
+  if(t<0.02){
+    tick(ctxA,P.B.x,P.B.y,P.C.x,P.C.y,1,'#2563eb');  // BC
+    tick(ctxA,P.A.x,P.A.y,P.D.x,P.D.y,1,'#d97706');  // AD
+    // equal-hypotenuse ticks on AB
+    tick(ctxA,P.A.x,P.A.y,P.B.x,P.B.y,2,'#dc2626');
+  }
+
+  // titles
+  ctxA.font='bold 15px Segoe UI';
+  ctxA.fillStyle='#1e3a8a';ctxA.fillText('△ABC  (blue)',  20, 32);
+  ctxA.fillStyle='#b45309';ctxA.fillText('△BAD  (amber)',  20, 56);
+  ctxA.fillStyle='#334155';ctxA.font='14px Segoe UI';
+  ctxA.fillText('∠ACB = ∠ADB = 90°,  BC = AD,  AB common  →  RHS', 20, h-16);
+}
+
+/* slide animation */
+let slideActive=false;
+function animateSlide(){
+  if(!slideActive){return;}
+  slideA += 0.012*slideDir;
+  if(slideA>=1){slideA=1;slideDir=-1;}
+  if(slideA<=0){slideA=0;slideDir=1;}
+  drawA();
+  slideRAF=requestAnimationFrame(animateSlide);
+}
+
+['a-share','a-right','a-slide'].forEach(id=>{
+  document.getElementById(id).addEventListener('change', e=>{
+    if(id==='a-slide'){
+      slideActive = e.target.checked;
+      if(slideActive){ if(!slideRAF) animateSlide(); }
+      else { slideA=0; drawA(); }
+    } else drawA();
+  });
+});
+drawA();
+
+/* =========================================================
+   DIAGRAM (b) — pentagon area decomposition
+   ========================================================= */
+const cvB = document.getElementById('cvB');
+const ctxB = cvB.getContext('2d');
+
+const AD = 12;            // cm
+let DE = 9;               // cm, adjustable
+const SCALE = 15;         // px per cm
+
+function drawB(){
+  const w=cvB.width, h=cvB.height;
+  ctxB.clearRect(0,0,w,h);
+  ctxB.fillStyle='#fff';ctxB.fillRect(0,0,w,h);
+
+  const fillOn = document.getElementById('b-fill').checked;
+  const splitOn= document.getElementById('b-split').checked;
+
+  const AE = Math.sqrt(AD*AD+DE*DE);
+  const BE = AE;                       // isosceles
+  const CE = DE;
+  const BD = BE + DE;
+  const BC = AD;
+
+  document.getElementById('b-deval').textContent = DE.toFixed(1);
+  document.getElementById('b-out').textContent =
+     'AE = '+AE.toFixed(1)+' cm · BE = '+BE.toFixed(1)+' cm · CE = '+CE.toFixed(1)+' cm';
+
+  // Place D at origin of the drawing (x0,y0), A below, B to the right
+  const x0 = 130, y0 = 120;                // D
+  const D = {x:x0, y:y0};
+  const A = {x:x0, y:y0 + AD*SCALE};       // A below D  (AD vertical)
+  const B = {x:x0 + BD*SCALE, y:y0};       // B right of D (DB horizontal)
+
+  // E lies on DB at distance DE from D
+  const E = {x:x0 + DE*SCALE, y:y0};
+  // C lies on CB; angle ACB = 90° with BC = AD. C is vertically above B by BC.
+  const C = {x:B.x, y:B.y - BC*SCALE};
+
+  // ---- faint grid ----
+  ctxB.strokeStyle='#eef2f7';ctxB.lineWidth=1;
+  for(let x=0;x<=w;x+=30){ctxB.beginPath();ctxB.moveTo(x,0);ctxB.lineTo(x,h);ctxB.stroke();}
+  for(let y=0;y<=h;y+=30){ctxB.beginPath();ctxB.moveTo(0,y);ctxB.lineTo(w,y);ctxB.stroke();}
+
+  // ---- pentagon fill ----
+  if(fillOn){
+    ctxB.beginPath();
+    ctxB.moveTo(A.x,A.y);ctxB.lineTo(B.x,B.y);ctxB.lineTo(C.x,C.y);
+    ctxB.lineTo(D.x,D.y);ctxB.lineTo(E.x,E.y);ctxB.closePath();
+    ctxB.fillStyle='rgba(16,185,129,.10)';ctxB.fill();
+  }
+
+  // ---- triangles ABD and BCD ----
+  if(splitOn){
+    // ABD (right-angled at D)
+    ctxB.beginPath();
+    ctxB.moveTo(A.x,A.y);ctxB.lineTo(B.x,B.y);ctxB.lineTo(D.x,D.y);ctxB.closePath();
+    ctxB.fillStyle='rgba(37,99,235,.13)';ctxB.fill();
+    ctxB.strokeStyle='#2563eb';ctxB.lineWidth=2.6;ctxB.stroke();
+
+    // BCD (right-angled at C)
+    ctxB.beginPath();
+    ctxB.moveTo(B.x,B.y);ctxB.lineTo(C.x,C.y);ctxB.lineTo(E.x,E.y);ctxB.closePath();
+    ctxB.fillStyle='rgba(245,158,11,.16)';ctxB.fill();
+    ctxB.strokeStyle='#d97706';ctxB.lineWidth=2.6;ctxB.stroke();
+  }
+
+  // ---- BD line thicker (the split line) ----
+  ctxB.strokeStyle='#059669';ctxB.lineWidth=3.4;
+  ctxB.beginPath();ctxB.moveTo(B.x,B.y);ctxB.lineTo(D.x,D.y);ctxB.stroke();
+
+  // ---- pentagon outline ----
+  ctxB.beginPath();
+  ctxB.moveTo(A.x,A.y);ctxB.lineTo(B.x,B.y);ctxB.lineTo(C.x,C.y);
+  ctxB.lineTo(D.x,D.y);ctxB.lineTo(E.x,E.y);ctxB.closePath();
+  ctxB.strokeStyle='#0f172a';ctxB.lineWidth=3;ctxB.stroke();
+
+  // ---- right angles ----
+  // at D (AD perpendicular DB)
+  rightAngle(ctxB, D.x, D.y, 0, 1, 22, '#2563eb');
+  // at C (AC perpendicular CB) -- use B direction and A direction
+  ctxB.strokeStyle='#d97706';ctxB.lineWidth=2;
+  ctxB.beginPath();
+  ctxB.moveTo(C.x, C.y + 22);
+  ctxB.lineTo(C.x - 22, C.y + 22);
+  ctxB.lineTo(C.x - 22, C.y);
+  ctxB.stroke();
+
+  // ---- marks: BC = AD ----
+  tick(ctxB, D.x, D.y, A.x, A.y, 1, '#2563eb');   // AD
+  tick(ctxB, B.x, B.y, C.x, C.y, 1, '#d97706');   // BC
+  // AE = BE
+  tick(ctxB, A.x, A.y, E.x, E.y, 3, '#7c3aed');   // AE
+  tick(ctxB, B.x, B.y, E.x, E.y, 3, '#7c3aed');   // BE
+  // CE = DE
+  tick(ctxB, C.x, C.y, E.x, E.y, 2, '#059669');   // CE
+  tick(ctxB, D.x, D.y, E.x, E.y, 2, '#059669');   // DE
+
+  // ---- points & labels ----
+  [[A,'A'],[B,'B'],[C,'C'],[D,'D'],[E,'E']].forEach(([pt,lab])=>{
+    ctxB.beginPath();ctxB.arc(pt.x,pt.y,6,0,7);
+    ctxB.fillStyle='#0f172a';ctxB.fill();
+    ctxB.fillStyle='#0f172a';ctxB.font='bold 20px Segoe UI';
+    const off = {A:[ -26, 24],B:[14,24],C:[14,-14],D:[-28,-14],E:[-8,-16]}[lab];
+    ctxB.fillText(lab, pt.x+off[0], pt.y+off[1]);
+  });
+
+  // ---- numeric length labels ----
+  ctxB.font='bold 14px Segoe UI';
+  function midLabel(p1,p2,txt,col,dx,dy){
+    const mx=(p1.x+p2.x)/2, my=(p1.y+p2.y)/2;
+    ctxB.fillStyle='#fff';
+    const tw=ctxB.measureText(txt).width+8;
+    ctxB.fillRect(mx+dx-tw/2, my+dy-12, tw, 18);
+    ctxB.fillStyle=col;ctxB.textAlign='center';
+    ctxB.fillText(txt, mx+dx, my+dy+2);
+    ctxB.textAlign='left';
+  }
+  midLabel(D,A,'AD = 12','#1d4ed8',-52,0);
+  midLabel(B,C,'BC = 12','#b45309',44,0);
+  midLabel(D,E,'DE = '+DE.toFixed(1),'#059669',0,-14);
+  midLabel(E,B,'BE = '+BE.toFixed(1),'#7c3aed',0,22);
+  midLabel(A,E,'AE = '+AE.toFixed(1),'#7c3aed',-46,-8);
+  midLabel(C,E,'CE = '+CE.toFixed(1),'#059669',52,-12);
+  midLabel(D,B,'BD = '+BD.toFixed(1),'#0f172a',0,-14);
+
+  // ---- titles ----
+  ctxB.font='bold 15px Segoe UI';
+  ctxB.fillStyle='#1d4ed8';
+  ctxB.fillText('△ABD area = ½(12)('+BD.toFixed(1)+') = '+(0.5*AD*BD).toFixed(1), 20, 32);
+  ctxB.fillStyle='#b45309';
+  ctxB.fillText('△BCD area = ½(12)('+CE.toFixed(1)+') = '+(0.5*BC*CE).toFixed(1), 20, 54);
+  ctxB.fillStyle='#065f46';
+  ctxB.font='bold 16px Segoe UI';
+  ctxB.fillText('Total pentagon area = '+(0.5*AD*BD+0.5*BC*CE).toFixed(1)+' cm²', 20, h-16);
+}
+
+document.getElementById('b-de').addEventListener('input', drawB);
+document.getElementById('b-fill').addEventListener('change', drawB);
+document.getElementById('b-split').addEventListener('change', drawB);
+drawB();
+</script>
+</body>
+</html>

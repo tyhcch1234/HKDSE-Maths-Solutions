@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE Math 2013 Paper 2 Q44 – Permutations &amp; Counting</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- MathJax -->
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+  .step-card { transition: all 0.35s ease; }
+  .step-content { max-height: 0; overflow: hidden; transition: max-height 0.45s ease, padding 0.3s ease; }
+  .step-content.open { max-height: 1200px; }
+  .digit-box {
+    width: 2.4rem; height: 2.8rem; display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 1.1rem; border-radius: 0.5rem; transition: all 0.25s;
+  }
+  .digit-static { background: #e0e7ff; color: #3730a3; border: 2px solid #a5b4fc; }
+  .digit-perm  { background: #fef3c7; color: #92400e; border: 2px solid #fcd34d; cursor: pointer; user-select: none; }
+  .digit-perm:hover { background: #fde68a; transform: scale(1.1); }
+  .digit-perm.assigned { background: #bbf7d0; color: #166534; border-color: #4ade80; }
+  .glow { box-shadow: 0 0 0 4px rgba(99,102,241,0.25); }
+  @media (max-width: 640px) {
+    .digit-box { width: 2rem; height: 2.4rem; font-size: 0.95rem; }
+  }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen">
+
+<!-- ================= HEADER ================= -->
+<header class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg">
+  <div class="max-w-4xl mx-auto px-4 py-6 sm:py-8">
+    <p class="text-indigo-200 text-sm font-semibold tracking-wide">HKDSE Mathematics (Compulsory Part) · Paper 2</p>
+    <h1 class="text-2xl sm:text-3xl font-bold mt-1">2013 Paper 2 — Question 44</h1>
+    <div class="flex flex-wrap gap-2 mt-4">
+      <span class="bg-white/20 rounded-full px-3 py-1 text-xs sm:text-sm font-medium">Permutations</span>
+      <span class="bg-white/20 rounded-full px-3 py-1 text-xs sm:text-sm font-medium">Counting Principle</span>
+      <span class="bg-white/20 rounded-full px-3 py-1 text-xs sm:text-sm font-medium">Factorial</span>
+      <span class="bg-white/20 rounded-full px-3 py-1 text-xs sm:text-sm font-medium">Probability / Counting</span>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-4xl mx-auto px-4 py-8 space-y-8">
+
+  <!-- ================= QUESTION OVERVIEW ================= -->
+  <section class="bg-white rounded-2xl shadow-md border border-slate-200 p-5 sm:p-8">
+    <h2 class="text-lg sm:text-xl font-bold text-indigo-700 flex items-center gap-2">
+      <span class="inline-block w-1.5 h-6 bg-indigo-500 rounded-full"></span>
+      The Question
+    </h2>
+    <p class="mt-4 leading-relaxed text-slate-700 text-base sm:text-lg">
+      If the <strong class="text-indigo-700">first three digits</strong> and the
+      <strong class="text-purple-700">last five digits</strong> of an eight-digit phone number
+      are formed by a permutation of <strong>5, 6, 9</strong> and a permutation of
+      <strong>2, 3, 4, 7, 8</strong> respectively, how many different eight-digit
+      phone numbers can be formed?
+    </p>
+
+    <!-- Options -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6">
+      <button class="option-btn bg-slate-100 hover:bg-indigo-100 border-2 border-slate-200 hover:border-indigo-400 rounded-xl py-3 font-bold text-slate-700 transition"
+              data-opt="A">A. 15</button>
+      <button class="option-btn bg-slate-100 hover:bg-indigo-100 border-2 border-slate-200 hover:border-indigo-400 rounded-xl py-3 font-bold text-slate-700 transition"
+              data-opt="B">B. 126</button>
+      <button class="option-btn bg-slate-100 hover:bg-indigo-100 border-2 border-slate-200 hover:border-indigo-400 rounded-xl py-3 font-bold text-slate-700 transition"
+              data-opt="C">C. 720</button>
+      <button class="option-btn bg-slate-100 hover:bg-indigo-100 border-2 border-slate-200 hover:border-indigo-400 rounded-xl py-3 font-bold text-slate-700 transition"
+              data-opt="D">D. 40 320</button>
+    </div>
+    <div id="option-feedback" class="mt-4 hidden rounded-xl px-4 py-3 text-sm font-medium"></div>
+  </section>
+
+  <!-- ================= VISUALISATION ================= -->
+  <section class="bg-white rounded-2xl shadow-md border border-slate-200 p-5 sm:p-8">
+    <h2 class="text-lg sm:text-xl font-bold text-indigo-700 flex items-center gap-2">
+      <span class="inline-block w-1.5 h-6 bg-indigo-500 rounded-full"></span>
+      Interactive Visualiser — Build a Phone Number
+    </h2>
+    <p class="mt-2 text-slate-600 text-sm sm:text-base">
+      Drag the sliders to choose <em>which</em> permutation of the first block and the second block
+      is used. The digits update in real time.
+    </p>
+
+    <!-- Phone display -->
+    <div class="mt-6 flex flex-wrap justify-center gap-1 sm:gap-2">
+      <!-- first block -->
+      <div class="flex gap-1 sm:gap-2 p-2 rounded-xl bg-indigo-50 border-2 border-indigo-200">
+        <div class="digit-box digit-static" id="f0">5</div>
+        <div class="digit-box digit-static" id="f1">6</div>
+        <div class="digit-box digit-static" id="f2">9</div>
+      </div>
+      <div class="flex items-center px-1 text-slate-400 font-bold hidden sm:flex">|</div>
+      <!-- second block -->
+      <div class="flex gap-1 sm:gap-2 p-2 rounded-xl bg-purple-50 border-2 border-purple-200">
+        <div class="digit-box digit-static" id="s0">2</div>
+        <div class="digit-box digit-static" id="s1">3</div>
+        <div class="digit-box digit-static" id="s2">4</div>
+        <div class="digit-box digit-static" id="s3">7</div>
+        <div class="digit-box digit-static" id="s4">8</div>
+      </div>
+    </div>
+
+    <!-- Sliders -->
+    <div class="mt-6 space-y-5">
+      <div>
+        <label class="block text-sm font-semibold text-slate-700 mb-1">
+          Permutation index for <span class="text-indigo-700">first three digits</span> —
+          <span id="p1-label" class="font-mono text-indigo-600">1 / 6</span>
+        </label>
+        <input type="range" id="p1-slider" min="0" max="5" value="0" step="1"
+               class="w-full h-2 accent-indigo-600 cursor-pointer">
+      </div>
+      <div>
+        <label class="block text-sm font-semibold text-slate-700 mb-1">
+          Permutation index for <span class="text-purple-700">last five digits</span> —
+          <span id="p2-label" class="font-mono text-purple-600">1 / 120</span>
+        </label>
+        <input type="range" id="p2-slider" min="0" max="119" value="0" step="1"
+               class="w-full h-2 accent-purple-600 cursor-pointer">
+      </div>
+    </div>
+
+    <!-- Counters -->
+    <div class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3 text-center">
+      <div class="bg-indigo-50 rounded-xl p-3 border border-indigo-200">
+        <p class="text-xs text-indigo-500 font-semibold uppercase">First-block ways</p>
+        <p class="text-2xl font-extrabold text-indigo-700" id="count-first">3! = 6</p>
+      </div>
+      <div class="bg-purple-50 rounded-xl p-3 border border-purple-200">
+        <p class="text-xs text-purple-500 font-semibold uppercase">Second-block ways</p>
+        <p class="text-2xl font-extrabold text-purple-700" id="count-second">5! = 120</p>
+      </div>
+      <div class="bg-green-50 rounded-xl p-3 border border-green-200">
+        <p class="text-xs text-green-600 font-semibold uppercase">Total numbers</p>
+        <p class="text-2xl font-extrabold text-green-700" id="count-total">720</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= STEP-BY-STEP SOLUTION ================= -->
+  <section class="space-y-4">
+    <h2 class="text-lg sm:text-xl font-bold text-indigo-700 flex items-center gap-2">
+      <span class="inline-block w-1.5 h-6 bg-indigo-500 rounded-full"></span>
+      Step-by-Step Guided Solution
+    </h2>
+
+    <!-- STEP 1 -->
+    <div class="step-card bg-white rounded-2xl shadow border border-slate-200 overflow-hidden">
+      <button class="step-toggle w-full flex items-center justify-between px-5 py-4 text-left hover:bg-slate-50 transition">
+        <span class="flex items-center gap-3">
+          <span class="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-sm">1</span>
+          <span class="font-semibold text-slate-800">Understand what is fixed and what varies</span>
+        </span>
+        <span class="text-indigo-500 text-xl font-bold step-arrow transition-transform duration-300">+</span>
+      </button>
+      <div class="step-content px-5 pb-0">
+        <div class="pb-5 text-slate-700 leading-relaxed space-y-3">
+          <p>
+            An <strong>eight-digit phone number</strong> is split into two independent blocks:
+          </p>
+          <ul class="list-disc list-inside space-y-1 ml-2">
+            <li>Positions 1–3 are <em>some permutation</em> of the digits \(\{5, 6, 9\}\).</li>
+            <li>Positions 4–8 are <em>some permutation</em> of the digits \(\{2, 3, 4, 7, 8\}\).</li>
+          </ul>
+          <p>
+            No digit is repeated inside a block, and no digit crosses from one block to the other —
+            so we can count each block separately and multiply.
+          </p>
+          <div class="bg-amber-50 border-l-4 border-amber-400 rounded-r-lg p-3 text-sm">
+            <strong>💡 Hint:</strong> When a task splits into stages, the
+            <em>Multiplication Principle</em> says:
+            \[ \text{Total} = (\text{ways for stage 1}) \times (\text{ways for stage 2}). \]
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step-card bg-white rounded-2xl shadow border border-slate-200 overflow-hidden">
+      <button class="step-toggle w-full flex items-center justify-between px-5 py-4 text-left hover:bg-slate-50 transition">
+        <span class="flex items-center gap-3">
+          <span class="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-sm">2</span>
+          <span class="font-semibold text-slate-800">Count the arrangements of the first three digits</span>
+        </span>
+        <span class="text-indigo-500 text-xl font-bold step-arrow transition-transform duration-300">+</span>
+      </button>
+      <div class="step-content px-5 pb-0">
+        <div class="pb-5 text-slate-700 leading-relaxed space-y-3">
+          <p>We have 3 distinct digits: \(5, 6, 9\). We want to fill 3 positions.</p>
+          <p>Using the <strong>factorial</strong> for permutations of \(n\) distinct objects:</p>
+          \[ P(n,n) = n! = n \times (n-1) \times \dots \times 1. \]
+          <p>So the number of ways to arrange the first block is:</p>
+          \[ 3! = 3 \times 2 \times 1 = 6. \]
+          <div class="bg-amber-50 border-l-4 border-amber-400 rounded-r-lg p-3 text-sm">
+            <strong>💡 Hint:</strong> \(3!\) counts every possible ordering of three distinct items.
+            For example: \(569,\ 596,\ 659,\ 695,\ 956,\ 965\).
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="step-card bg-white rounded-2xl shadow border border-slate-200 overflow-hidden">
+      <button class="step-toggle w-full flex items-center justify-between px-5 py-4 text-left hover:bg-slate-50 transition">
+        <span class="flex items-center gap-3">
+          <span class="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-sm">3</span>
+          <span class="font-semibold text-slate-800">Count the arrangements of the last five digits</span>
+        </span>
+        <span class="text-indigo-500 text-xl font-bold step-arrow transition-transform duration-300">+</span>
+      </button>
+      <div class="step-content px-5 pb-0">
+        <div class="pb-5 text-slate-700 leading-relaxed space-y-3">
+          <p>We have 5 distinct digits: \(2, 3, 4, 7, 8\). We want to fill 5 positions.</p>
+          <p>Again using the factorial:</p>
+          \[ 5! = 5 \times 4 \times 3 \times 2 \times 1 = 120. \]
+          <div class="bg-amber-50 border-l-4 border-amber-400 rounded-r-lg p-3 text-sm">
+            <strong>💡 Hint:</strong> \(5! = 120\) counts every possible ordering of five distinct items.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="step-card bg-white rounded-2xl shadow border border-slate-200 overflow-hidden">
+      <button class="step-toggle w-full flex items-center justify-between px-5 py-4 text-left hover:bg-slate-50 transition">
+        <span class="flex items-center gap-3">
+          <span class="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-sm">4</span>
+          <span class="font-semibold text-slate-800">Combine the two independent choices</span>
+        </span>
+        <span class="text-indigo-500 text-xl font-bold step-arrow transition-transform duration-300">+</span>
+      </button>
+      <div class="step-content px-5 pb-0">
+        <div class="pb-5 text-slate-700 leading-relaxed space-y-3">
+          <p>
+            Because the first block and the second block do not share any digits, choosing
+            an arrangement for the first block does not restrict the second block.
+          </p>
+          <p>Therefore, by the <strong>Multiplication Principle</strong>:</p>
+          \[ \text{Total} = 3! \times 5! = 6 \times 120 = 720. \]
+          <div class="mt-4 bg-green-50 border-2 border-green-300 rounded-xl p-4 text-center">
+            <p class="text-sm text-green-700 font-semibold">Answer</p>
+            <p class="text-3xl font-extrabold text-green-700 mt-1">C. 720</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= KEY TAKEAWAYS ================= -->
+  <section class="bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl shadow-lg p-6 sm:p-8 text-white">
+    <h2 class="text-lg sm:text-xl font-bold flex items-center gap-2">
+      <span class="text-2xl">🔑</span> Key Takeaways
+    </h2>
+    <ul class="mt-4 space-y-3 text-sm sm:text-base text-indigo-100">
+      <li class="flex gap-3">
+        <span class="flex-shrink-0 w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-xs font-bold">1</span>
+        <span>If \(n\) distinct objects must fill \(n\) positions, the number of permutations is \(n!\).</span>
+      </li>
+      <li class="flex gap-3">
+        <span class="flex-shrink-0 w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-xs font-bold">2</span>
+        <span>When stages are independent, multiply the number of choices: \(3! \times 5! = 720\).</span>
+      </li>
+      <li class="flex gap-3">
+        <span class="flex-shrink-0 w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-xs font-bold">3</span>
+        <span>Watch out for false distractors: \(3! + 5! = 126\) and \(5! \times 336 = 40320\) — check what each answer represents!</span>
+      </li>
+    </ul>
+  </section>
+
+  <!-- ================= RESET ================= -->
+  <div class="text-center pb-10">
+    <button id="reset-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold px-6 py-3 rounded-xl transition">
+      ↺ Reset page
+    </button>
+  </div>
+</main>
+
+<script>
+/* ---------- Accordion ---------- */
+document.querySelectorAll('.step-toggle').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const content = btn.nextElementSibling;
+    const arrow = btn.querySelector('.step-arrow');
+    const isOpen = content.classList.contains('open');
+    if (isOpen) {
+      content.classList.remove('open');
+      arrow.style.transform = 'rotate(0deg)';
+    } else {
+      content.classList.add('open');
+      arrow.style.transform = 'rotate(45deg)';
+    }
+  });
+});
+
+/* ---------- Permutation Generators ---------- */
+function permutations(arr) {
+  if (arr.length <= 1) return [arr.slice()];
+  const result = [];
+  for (let i = 0; i < arr.length; i++) {
+    const rest = arr.slice(0, i).concat(arr.slice(i + 1));
+    const sub = permutations(rest);
+    for (const p of sub) result.push([arr[i], ...p]);
+  }
+  return result;
+}
+
+const perm1 = permutations([5, 6, 9]);       // 6 permutations
+const perm2 = permutations([2, 3, 4, 7, 8]); // 120 permutations
+
+/* ---------- Visualiser ---------- */
+const p1Slider = document.getElementById('p1-slider');
+const p2Slider = document.getElementById('p2-slider');
+const p1Label  = document.getElementById('p1-label');
+const p2Label  = document.getElementById('p2-label');
+
+function updateVisualiser() {
+  const i1 = parseInt(p1Slider.value, 10);
+  const i2 = parseInt(p2Slider.value, 10);
+
+  // first block
+  perm1[i1].forEach((d, idx) => {
+    const el = document.getElementById('f' + idx);
+    el.textContent = d;
+    el.classList.add('glow');
+    setTimeout(() => el.classList.remove('glow'), 300);
+  });
+
+  // second block
+  perm2[i2].forEach((d, idx) => {
+    const el = document.getElementById('s' + idx);
+    el.textContent = d;
+    el.classList.add('glow');
+    setTimeout(() => el.classList.remove('glow'), 300);
+  });
+
+  p1Label.textContent = (i1 + 1) + ' / 6';
+  p2Label.textContent = (i2 + 1) + ' / 120';
+}
+
+p1Slider.addEventListener('input', updateVisualiser);
+p2Slider.addEventListener('input', updateVisualiser);
+updateVisualiser();
+
+/* ---------- Option checking ---------- */
+const correct = 'C';
+document.querySelectorAll('.option-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const chosen = btn.dataset.opt;
+    const fb = document.getElementById('option-feedback');
+    fb.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800');
+
+    // reset styles
+    document.querySelectorAll('.option-btn').forEach(b => {
+      b.classList.remove('bg-green-200', 'border-green-500', 'bg-red-200', 'border-red-500');
+      b.classList.add('bg-slate-100', 'border-slate-200');
+    });
+
+    if (chosen === correct) {
+      fb.textContent = '✅ Correct! The total number of phone numbers is 720.';
+      fb.classList.add('bg-green-100', 'text-green-800');
+      btn.classList.remove('bg-slate-100', 'border-slate-200');
+      btn.classList.add('bg-green-200', 'border-green-500');
+    } else {
+      fb.textContent = '❌ Not quite. Think about whether the two blocks are independent, and whether you should add or multiply.';
+      fb.classList.add('bg-red-100', 'text-red-800');
+      btn.classList.remove('bg-slate-100', 'border-slate-200');
+      btn.classList.add('bg-red-200', 'border-red-500');
+    }
+    fb.classList.remove('hidden');
+  });
+});
+
+/* ---------- Reset ---------- */
+document.getElementById('reset-btn').addEventListener('click', () => {
+  p1Slider.value = 0;
+  p2Slider.value = 0;
+  updateVisualiser();
+  document.querySelectorAll('.step-content').forEach(c => c.classList.remove('open'));
+  document.querySelectorAll('.step-arrow').forEach(a => a.style.transform = 'rotate(0deg)');
+  document.querySelectorAll('.option-btn').forEach(b => {
+    b.classList.remove('bg-green-200', 'border-green-500', 'bg-red-200', 'border-red-500');
+    b.classList.add('bg-slate-100', 'border-slate-200');
+  });
+  const fb = document.getElementById('option-feedback');
+  fb.classList.add('hidden');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+/* ---------- Open first step by default ---------- */
+document.querySelector('.step-toggle').click();
+</script>
+</body>
+</html>

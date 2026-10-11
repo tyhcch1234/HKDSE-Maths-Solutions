@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE Math 2023 Paper 2 Q23 — Interactive Solution</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[','\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root{
+    --blue:#2563eb; --blue-d:#1e40af; --amber:#f59e0b; --amber-l:#fef3c7;
+    --emerald:#059669; --emerald-l:#d1fae5; --slate:#0f172a; --ink:#1e293b;
+    --muted:#64748b; --bg:#f1f5f9; --card:#ffffff; --line:#e2e8f0;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
+    line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:960px; margin:0 auto; padding:0 16px 60px;}
+
+  /* HERO */
+  header.hero{
+    background:linear-gradient(135deg,#1e3a8a 0%,#2563eb 45%,#0ea5e9 100%);
+    color:#fff; padding:38px 16px 46px; position:relative; overflow:hidden;
+  }
+  header.hero::after{
+    content:""; position:absolute; right:-80px; top:-80px; width:280px; height:280px;
+    background:radial-gradient(circle,rgba(255,255,255,.18),transparent 70%); border-radius:50%;
+  }
+  .hero-inner{max-width:960px; margin:0 auto; position:relative; z-index:2;}
+  .eyebrow{font-size:.78rem; letter-spacing:.16em; text-transform:uppercase; opacity:.85; font-weight:600;}
+  .hero h1{margin:.25em 0 .1em; font-size:clamp(1.5rem,4.5vw,2.3rem); font-weight:800; letter-spacing:-.01em;}
+  .hero .sub{opacity:.92; font-size:1rem; margin-bottom:14px;}
+  .pills{display:flex; flex-wrap:wrap; gap:8px;}
+  .pill{
+    background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35);
+    padding:5px 13px; border-radius:999px; font-size:.78rem; font-weight:600; backdrop-filter:blur(4px);
+  }
+
+  /* CARDS */
+  .card{
+    background:var(--card); border-radius:18px; padding:22px 22px 24px; margin-top:24px;
+    box-shadow:0 4px 22px rgba(15,23,42,.07); border:1px solid var(--line);
+  }
+  .card h2{
+    font-size:1.12rem; margin:0 0 14px; display:flex; align-items:center; gap:10px; color:var(--blue-d);
+    font-weight:750; letter-spacing:-.01em;
+  }
+  .card h2 .tag{
+    font-size:.68rem; background:var(--blue); color:#fff; padding:3px 9px; border-radius:6px;
+    font-weight:700; letter-spacing:.04em;
+  }
+  .qtext{font-size:1.02rem;}
+  .part-label{font-weight:800; color:var(--blue-d);}
+  .marks{
+    display:inline-block; font-size:.72rem; font-weight:700; color:#92400e;
+    background:var(--amber-l); border:1px solid #fcd34d; padding:1px 7px; border-radius:6px; margin-left:4px;
+  }
+
+  /* CANVAS */
+  .canvas-box{
+    background:#f8fafc; border:1px solid var(--line); border-radius:14px;
+    padding:12px; margin:14px 0;
+  }
+  canvas{width:100%; height:auto; display:block; border-radius:8px; touch-action:none;}
+  .controls{display:flex; flex-wrap:wrap; gap:16px; align-items:center; margin-top:12px; font-size:.86rem;}
+  .ctrl{display:flex; align-items:center; gap:8px; background:#fff; border:1px solid var(--line);
+        padding:7px 12px; border-radius:10px;}
+  .ctrl label{font-weight:600; color:var(--ink); white-space:nowrap;}
+  input[type=range]{width:130px; accent-color:var(--blue);}
+  input[type=checkbox]{width:17px; height:17px; accent-color:var(--emerald);}
+  .readout{
+    font-family:'Consolas','Monaco',monospace; font-size:.82rem; background:#0f172a; color:#38bdf8;
+    padding:8px 12px; border-radius:10px; display:inline-block; margin-top:10px; letter-spacing:.02em;
+  }
+  .readout span{color:#fbbf24;}
+
+  /* STEPS */
+  .steps{margin-top:16px;}
+  .step{
+    display:none; background:#f8fafc; border-left:4px solid var(--blue);
+    border-radius:0 12px 12px 0; padding:14px 16px; margin-bottom:12px;
+    animation:fade .45s ease;
+  }
+  .step.show{display:block;}
+  @keyframes fade{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;}}
+  .step-head{display:flex; align-items:center; gap:10px; margin-bottom:8px;}
+  .badge{
+    background:var(--blue); color:#fff; font-weight:700; font-size:.74rem;
+    padding:3px 10px; border-radius:999px; white-space:nowrap;
+  }
+  .mk{background:var(--amber); color:#fff; font-size:.7rem; font-weight:700; padding:2px 8px; border-radius:6px;}
+  .hint{
+    background:var(--amber-l); border-left:4px solid var(--amber); padding:8px 12px;
+    border-radius:0 8px 8px 0; font-size:.88rem; margin-top:10px;
+  }
+  .hint b{color:#92400e;}
+  .ans{
+    background:var(--emerald-l); border-left:4px solid var(--emerald); padding:8px 12px;
+    border-radius:0 8px 8px 0; font-size:.92rem; margin-top:10px; font-weight:600; color:#065f46;
+  }
+  .btnrow{display:flex; align-items:center; gap:14px; margin-top:12px; flex-wrap:wrap;}
+  button.next{
+    background:linear-gradient(135deg,#2563eb,#1d4ed8); color:#fff; border:none;
+    padding:10px 22px; border-radius:10px; font-size:.92rem; font-weight:700; cursor:pointer;
+    box-shadow:0 4px 14px rgba(37,99,235,.32); transition:all .2s;
+  }
+  button.next:hover:not(:disabled){transform:translateY(-2px); box-shadow:0 7px 20px rgba(37,99,235,.4);}
+  button.next:disabled{background:#cbd5e1; box-shadow:none; cursor:not-allowed; color:#64748b;}
+  .counter{font-size:.84rem; color:var(--muted); font-weight:600;}
+
+  /* SUMMARY */
+  .summary{background:linear-gradient(135deg,#0f172a,#1e293b); color:#e2e8f0; border:none;}
+  .summary h2{color:#7dd3fc;}
+  .summary ul{margin:0; padding-left:20px;}
+  .summary li{margin-bottom:9px;}
+  .summary b{color:#fbbf24;}
+  .summary .big{
+    display:inline-block; background:rgba(251,191,36,.15); border:1px solid #fbbf24;
+    color:#fde68a; padding:6px 16px; border-radius:10px; font-size:1.15rem; font-weight:800; margin-top:6px;
+  }
+  footer{text-align:center; color:var(--muted); font-size:.82rem; padding:26px 16px 10px;}
+  .opt{font-size:.95rem;}
+  .opt.correct{background:#ecfdf5; border-radius:8px; padding:2px 8px; font-weight:700; color:#065f46;}
+
+  @media(max-width:560px){
+    .card{padding:16px 14px 18px; border-radius:14px;}
+    .ctrl{width:100%; justify-content:space-between;}
+    input[type=range]{width:100%;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">HKDSE Mathematics (Compulsory Part) &middot; Paper 2</div>
+    <h1>2023 Paper 2 &middot; Question 23</h1>
+    <div class="sub">Trigonometry &mdash; ratios in right-angled triangles inside a trapezium</div>
+    <div class="pills">
+      <span class="pill">Trapezium</span>
+      <span class="pill">Right-angled Triangles</span>
+      <span class="pill">Sine &amp; Cosine Ratios</span>
+      <span class="pill">Angle Sum of Triangle</span>
+      <span class="pill">Mid-point</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- QUESTION CARD -->
+  <div class="card">
+    <h2><span class="tag">QUESTION</span> Full statement &amp; options</h2>
+    <div class="qtext">
+      <p>In the figure, \(ABCD\) is a trapezium with \(AD \parallel BC\). Let \(E\) be the mid-point of \(AD\). It is given that \(\angle ABE = \angle BCE = 90^\circ\).</p>
+      <p>Find \(\dfrac{CE}{DE}\). <span class="marks">(1 mark)</span></p>
+      <p class="opt">A. &nbsp;\(\dfrac{1}{2}\) &nbsp;&nbsp;&nbsp; B. &nbsp;\(1\) &nbsp;&nbsp;&nbsp; C. &nbsp;\(\tan\alpha\) &nbsp;&nbsp;&nbsp; D. &nbsp;\(\sin\alpha\cos\alpha\)</p>
+      <p style="font-size:.88rem;color:var(--muted);">Here \(\alpha = \angle BAE\) (angle at \(A\) in the figure).</p>
+    </div>
+  </div>
+
+  <!-- PART (i): SETUP / EXPLORE -->
+  <div class="card">
+    <h2><span class="tag">STEP 1</span> Set up the figure &amp; label the angles</h2>
+    <div class="canvas-box">
+      <canvas id="cv1" width="900" height="420"></canvas>
+      <div class="controls">
+        <div class="ctrl">
+          <label for="sA">Angle \(\alpha =\) <b id="aVal">35</b>&deg;</label>
+          <input type="range" id="sA" min="15" max="75" value="35" step="1">
+        </div>
+        <div class="ctrl">
+          <input type="checkbox" id="cH">
+          <label for="cH">Show angle marks</label>
+        </div>
+        <div class="ctrl">
+          <input type="checkbox" id="cL" checked>
+          <label for="cL">Show lengths</label>
+        </div>
+      </div>
+      <div class="readout">
+        AE = DE = <span id="rAE">–</span> &nbsp;|&nbsp;
+        BE = <span id="rBE">–</span> &nbsp;|&nbsp;
+        CE = <span id="rCE">–</span> &nbsp;|&nbsp;
+        CE/DE = <span id="rRatio">–</span>
+      </div>
+    </div>
+    <p>Drag the slider to change \(\alpha\) and watch the whole configuration adjust. The trapezium's shape is completely determined by \(\alpha\) because of the right angles.</p>
+  </div>
+
+  <!-- PART (a) -->
+  <div class="card">
+    <h2><span class="tag">Part (a)</span> Find \(\angle AEC\) using \(AD \parallel BC\)</h2>
+    <div class="canvas-box">
+      <canvas id="cv2" width="900" height="380"></canvas>
+    </div>
+    <div class="steps" id="steps1">
+      <div class="step">
+        <div class="step-head"><span class="badge">Step 1</span><span class="mk">1M</span></div>
+        <p>Since \(BC \perp CE\) (given \(\angle BCE = 90^\circ\)) and \(AD \parallel BC\), the transversal \(CE\) makes the same angle with \(AD\) as with \(BC\).</p>
+        <div class="hint"><b>Hint:</b> Corresponding angles / interior angles on the same side of a transversal between parallel lines.</div>
+      </div>
+      <div class="step">
+        <div class="step-head"><span class="badge">Step 2</span><span class="mk">1A</span></div>
+        <p>\(\angle AEC = 180^\circ - \angle BCE = 180^\circ - 90^\circ = 90^\circ\).</p>
+        <div class="hint"><b>Hint:</b> So \(CE\) is perpendicular to \(AD\) as well — it is an altitude of the trapezium.</div>
+        <div class="ans">\(\angle AEC = 90^\circ\)</div>
+      </div>
+    </div>
+    <div class="btnrow">
+      <button class="next" data-target="steps1">Next step &rarr;</button>
+      <span class="counter" id="cnt1">0 / 2</span>
+    </div>
+  </div>
+
+  <!-- PART (b)(i) -->
+  <div class="card">
+    <h2><span class="tag">Part (b)(i)</span> Angle sum in \(\triangle ABE\) &mdash; find \(\angle BEC\)</h2>
+    <div class="canvas-box">
+      <canvas id="cv3" width="900" height="380"></canvas>
+    </div>
+    <div class="steps" id="steps2">
+      <div class="step">
+        <div class="step-head"><span class="badge">Step 1</span><span class="mk">1M</span></div>
+        <p>In \(\triangle ABE\): \(\angle ABE = 90^\circ\) (given), \(\angle BAE = \alpha\). So
+        \[\angle AEB = 180^\circ - 90^\circ - \alpha = 90^\circ - \alpha.\]</p>
+        <div class="hint"><b>Hint:</b> Sum of angles of a triangle \(= 180^\circ\).</div>
+      </div>
+      <div class="step">
+        <div class="step-head"><span class="badge">Step 2</span><span class="mk">1M</span></div>
+        <p>Since \(A, E, D\) are collinear and \(\angle AEC = 90^\circ\):
+        \[\angle BEC = \angle AEC - \angle AEB = 90^\circ - (90^\circ - \alpha).\]</p>
+        <div class="hint"><b>Hint:</b> \(EB\) and \(EC\) lie on the same side of \(AE\).</div>
+      </div>
+      <div class="step">
+        <div class="step-head"><span class="badge">Step 3</span><span class="mk">1A</span></div>
+        <p>Simplifying: \(\angle BEC = \alpha\).</p>
+        <div class="hint"><b>Hint:</b> A neat coincidence: \(\angle BEC = \angle BAE = \alpha\), so triangles \(ABE\) and \(BCE\) share the same acute angle at \(B\) and \(E\) respectively.</div>
+        <div class="ans">\(\angle BEC = \alpha\)</div>
+      </div>
+    </div>
+    <div class="btnrow">
+      <button class="next" data-target="steps2">Next step &rarr;</button>
+      <span class="counter" id="cnt2">0 / 3</span>
+    </div>
+  </div>
+
+  <!-- PART (b)(ii) -->
+  <div class="card">
+    <h2><span class="tag">Part (b)(ii)</span> Use trigonometry in the two right triangles</h2>
+    <div class="canvas-box">
+      <canvas id="cv4" width="900" height="380"></canvas>
+    </div>
+    <div class="steps" id="steps3">
+      <div class="step">
+        <div class="step-head"><span class="badge">Step 1</span><span class="mk">1M</span></div>
+        <p>In \(\triangle ABE\) (right-angled at \(B\)):
+        \[\sin\angle BAE = \frac{BE}{AE} \quad\Rightarrow\quad BE = AE\sin\alpha.\]</p>
+        <div class="hint"><b>Hint:</b> \(\angle ABE = 90^\circ\), so \(AE\) is the hypotenuse of triangle \(ABE\).</div>
+      </div>
+      <div class="step">
+        <div class="step-head"><span class="badge">Step 2</span><span class="mk">1M</span></div>
+        <p>In \(\triangle BCE\) (right-angled at \(C\)):
+        \[\cos\angle BEC = \frac{CE}{BE} \quad\Rightarrow\quad CE = BE\cos\alpha.\]</p>
+        <div class="hint"><b>Hint:</b> \(\angle BCE = 90^\circ\) makes \(BE\) the hypotenuse of triangle \(BCE\); and \(\angle BEC = \alpha\) from part (b)(i).</div>
+      </div>
+      <div class="step">
+        <div class="step-head"><span class="badge">Step 3</span><span class="mk">1A</span></div>
+        <p>Combining: \(CE = AE\sin\alpha\,\cos\alpha\). Since \(E\) is the mid-point of \(AD\), \(DE = AE\).</p>
+        <div class="hint"><b>Hint:</b> \(DE = AE\) is the crucial use of the mid-point condition.</div>
+        <div class="ans">\(CE = AE\sin\alpha\cos\alpha\) and \(DE = AE\)</div>
+      </div>
+    </div>
+    <div class="btnrow">
+      <button class="next" data-target="steps3">Next step &rarr;</button>
+      <span class="counter" id="cnt3">0 / 3</span>
+    </div>
+  </div>
+
+  <!-- PART (b)(iii) -->
+  <div class="card">
+    <h2><span class="tag">Part (b)(iii)</span> Find the ratio \(\dfrac{CE}{DE}\)</h2>
+    <div class="canvas-box">
+      <canvas id="cv5" width="900" height="420"></canvas>
+      <div class="controls">
+        <div class="ctrl">
+          <label for="sA2">Angle \(\alpha =\) <b id="aVal2">35</b>&deg;</label>
+          <input type="range" id="sA2" min="10" max="80" value="35" step="1">
+        </div>
+        <div class="ctrl">
+          <input type="checkbox" id="cBar" checked>
+          <label for="cBar">Show ratio bar</label>
+        </div>
+      </div>
+      <div class="readout">
+        \(\sin\alpha\cos\alpha\) = <span id="rSC">–</span> &nbsp;|&nbsp; \(\tfrac{CE}{DE}\) = <span id="rRatio2">–</span>
+      </div>
+    </div>
+    <div class="steps" id="steps4">
+      <div class="step">
+        <div class="step-head"><span class="badge">Step 1</span><span class="mk">1M</span></div>
+        <p>Substitute the results from (b)(ii):
+        \[\frac{CE}{DE} = \frac{AE\sin\alpha\cos\alpha}{AE} = \sin\alpha\cos\alpha.\]</p>
+        <div class="hint"><b>Hint:</b> The common factor \(AE\) cancels — the answer is independent of the length of \(AD\).</div>
+      </div>
+      <div class="step">
+        <div class="step-head"><span class="badge">Step 2</span><span class="mk">1A</span></div>
+        <p>Therefore \(\dfrac{CE}{DE} = \sin\alpha\cos\alpha\), which matches option D.</p>
+        <div class="hint"><b>Hint:</b> You can also think of it as \(\frac{CE}{BE}\cdot\frac{BE}{DE} = \cos\alpha\cdot\sin\alpha\) — a chain of ratios.</div>
+        <div class="ans">\(\dfrac{CE}{DE} = \sin\alpha\cos\alpha\) &nbsp;&rarr;&nbsp; <b>Answer: D</b></div>
+      </div>
+    </div>
+    <div class="btnrow">
+      <button class="next" data-target="steps4">Next step &rarr;</button>
+      <span class="counter" id="cnt4">0 / 2</span>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="card summary">
+    <h2>Summary of answers</h2>
+    <ul>
+      <li>\(\angle AEC = 90^\circ\) &nbsp;(since \(AD \parallel BC\) and \(\angle BCE = 90^\circ\)).</li>
+      <li>\(\angle BEC = \alpha\) &nbsp;(angle sum in \(\triangle ABE\), then subtract from \(90^\circ\)).</li>
+      <li>\(BE = AE\sin\alpha\) &nbsp;and&nbsp; \(CE = BE\cos\alpha\).</li>
+      <li>\(DE = AE\) &nbsp;(\(E\) is the mid-point of \(AD\)).</li>
+      <li>\[\frac{CE}{DE} = \frac{AE\sin\alpha\cos\alpha}{AE} = \sin\alpha\cos\alpha.\]</li>
+    </ul>
+    <div class="big">Correct option: D &nbsp;·&nbsp; \(\dfrac{CE}{DE} = \sin\alpha\cos\alpha\)</div>
+  </div>
+
+</div>
+
+<footer>HKDSE Mathematics (Compulsory Part) &middot; Paper 2 &middot; 2023 Q23 &middot; Interactive solution</footer>
+
+<script>
+/* ---------- Geometry model ---------- */
+// E at origin. A = (L, 0). D = (-L, 0). AD on x-axis.
+// BE perpendicular to AD at B: B = (b, 0)? No -> triangle ABE right-angled at B.
+// We place A=(L,0), E=(0,0). ABE right angle at B means B lies on circle with diameter AE, B=(L cos^2 a? ) 
+// Simpler: In right triangle ABE with angle A = alpha, hypotenuse AE = L.
+// AB = L cos a, BE = L sin a. Put B = (AB cos a, -AB sin a)?? 
+// Coordinates: A at origin-ish; better: place E=(0,0), A=(L,0) along +x.
+// AB = L cos a, and angle at A is a, so B = A + L cos a * (cos(180-a), sin(180-a))... 
+// Let's do: direction from A into the trapezium is angle (180 - a) measured from +x axis (downwards-left).
+// B = A + L cos a * (cos(180-a), -sin(180-a))?? Let's just construct B from right angle: 
+// AB perpendicular to BE, angle BAE = a => AB = L cos a, BE = L sin a.
+// Use E=(0,0), A=(L,0). B is such that |AB| = L cos a, |EB| = L sin a.
+// Solve: (x-L)^2 + y^2 = L^2 cos^2 a ; x^2 + y^2 = L^2 sin^2 a.
+// Subtract: (x-L)^2 - x^2 = L^2 cos^2 a - L^2 sin^2 a => -2Lx + L^2 = L^2 cos 2a
+// => x = L(1 - cos2a)/2 = L sin^2 a. Then y^2 = L^2 sin^2 a - L^2 sin^4 a = L^2 sin^2 a cos^2 a -> |y| = L sin a cos a.
+// Take B below AD: B = (L sin^2 a, -L sin a cos a).
+// Then C is on BC with BC horizontal (AD//BC) and angle BCE = 90 => C directly above B vertically? No: angle at C right.
+// Since AD // BC horizontal, BC is a horizontal line through B. C lies on BC: C = (xc, yB).
+// angle BCE = 90 means EC perpendicular to CB. CB horizontal => EC vertical => C and E have same x. C=(0, yB).
+// Then BC = |L sin^2 a| = L sin^2 a. Check angle BEC: vector EB=(L sin^2 a, -L sin a cos a), EC=(0,-L sin a cos a).
+// angle BEC = angle between EB and EC = angle between (sin a, -cos a) and (0,-1) = a. Good, matches theory.
+// So CE = L sin a cos a. DE = L. ratio = sin a cos a. 
+
+const L = 200; // base half-length AE (pixels will scale)
+
+function model(deg){
+  const a = deg * Math.PI/180;
+  const A = {x: L, y: 0};
+  const E = {x: 0, y: 0};
+  const D = {x: -L, y: 0};
+  const B = {x: L*Math.sin(a)*Math.sin(a), y: -L*Math.sin(a)*Math.cos(a)};
+  const C = {x: 0, y: B.y};
+  return {A,E,D,B,C,a,
+    AE:L, DE:L,
+    BE:L*Math.sin(a),
+    CE:L*Math.sin(a)*Math.cos(a),
+    ratio:Math.sin(a)*Math.cos(a)};
+}
+
+/* ---------- generic drawing helpers ---------- */
+function setup(ctx, w, h){
+  ctx.clearRect(0,0,w,h);
+  // background grid
+  ctx.save();
+  ctx.strokeStyle="#e8eef5"; ctx.lineWidth=1;
+  for(let x=0;x<w;x+=30){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke();}
+  for(let y=0;y<h;y+=30){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke();}
+  ctx.restore();
+}
+
+function point(ctx, p, label, dx, dy, color){
+  ctx.fillStyle=color||"#1e293b";
+  ctx.beginPath(); ctx.arc(p.x,p.y,4.5,0,Math.PI*2); ctx.fill();
+  ctx.font="bold 15px Segoe UI, sans-serif";
+  ctx.fillStyle=color||"#1e293b";
+  ctx.fillText(label, p.x+(dx||8), p.y+(dy||-10));
+}
+
+function seg(ctx,p,q,color,width,dash){
+  ctx.save();
+  ctx.strokeStyle=color; ctx.lineWidth=width||2.5;
+  if(dash) ctx.setLineDash(dash);
+  ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(q.x,q.y); ctx.stroke();
+  ctx.restore();
+}
+
+function rightAngle(ctx, vertex, p1, p2, size, color){
+  const u1 = norm({x:p1.x-vertex.x, y:p1.y-vertex.y});
+  const u2 = norm({x:p2.x-vertex.x, y:p2.y-vertex.y});
+  const s = size||14;
+  const a = {x:vertex.x+u1.x*s, y:vertex.y+u1.y*s};
+  const b = {x:vertex.x+u1.x*s+u2.x*s, y:vertex.y+u1.y*s+u2.y*s};
+  const c = {x:vertex.x+u2.x*s, y:vertex.y+u2.y*s};
+  ctx.save();
+  ctx.strokeStyle=color||"#dc2626"; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.lineTo(c.x,c.y); ctx.stroke();
+  ctx.restore();
+}
+
+function norm(v){const m=Math.hypot(v.x,v.y)||1;return {x:v.x/m,y:v.y/m};}
+
+function arcAngle(ctx, vertex, p1, p2, radius, color, label, off){
+  const a1 = Math.atan2(p1.y-vertex.y, p1.x-vertex.x);
+  const a2 = Math.atan2(p2.y-vertex.y, p2.x-vertex.x);
+  ctx.save();
+  ctx.strokeStyle=color; ctx.lineWidth=2;
+  ctx.beginPath();
+  // draw smaller arc
+  let d = a2-a1;
+  while(d>Math.PI) d-=2*Math.PI;
+  while(d<-Math.PI) d+=2*Math.PI;
+  ctx.arc(vertex.x, vertex.y, radius, a1, a1+d, d<0);
+  ctx.stroke();
+  if(label){
+    const mid = a1 + d/2;
+    ctx.fillStyle=color;
+    ctx.font="bold 14px Segoe UI, sans-serif";
+    ctx.fillText(label, vertex.x+Math.cos(mid)*(radius+(off||16)), vertex.y+Math.sin(mid)*(radius+(off||16)));
+  }
+  ctx.restore();
+}
+
+function lengthLabel(ctx, p, q, color, text, offx, offy){
+  const mx=(p.x+q.x)/2, my=(p.y+q.y)/2;
+  ctx.save();
+  ctx.font="bold 13px Segoe UI, sans-serif";
+  const t = text|| (Math.hypot(p.x-q.x,p.y-q.y)).toFixed(0);
+  const w = ctx.measureText(t).width;
+  // white halo
+  ctx.fillStyle="rgba(255,255,255,.9)";
+  ctx.fillRect(mx+(offx||6)-3, my+(offy||-6)-12, w+6, 16);
+  ctx.fillStyle=color;
+  ctx.fillText(t, mx+(offx||6), my+(offy||-6));
+  ctx.restore();
+}
+
+/* ---------- Canvas 1 : main figure explorer ---------- */
+const cv1 = document.getElementById('cv1');
+const ctx1 = cv1.getContext('2d');
+let scale1=1;
+
+function fitScale(m, w, h, this_scale){
+  const s = this_scale;
+  return {
+    A:{x:w/2 + m.A.x*s, y:h/2 + m.A.y*s - 30},
+    E:{x:w/2 + m.E.x*s, y:h/2 + m.E.y*s - 30},
+    D:{x:w/2 + m.D.x*s, y:h/2 + m.D.y*s - 30},
+    B:{x:w/2 + m.B.x*s, y:h/2 + m.B.y*s - 30},
+    C:{x:w/2 + m.C.x*s, y:h/2 + m.C.y*s - 30}
+  };
+}
+
+function drawMain(){
+  const deg = +document.getElementById('sA').value;
+  document.getElementById('aVal').textContent = deg;
+  const m0 = model(deg);
+  const W=cv1.width, H=cv1.height;
+  setup(ctx1, W, H);
+  const s = 1.0;
+  const m = fitScale(m0, W, H, s);
+  const showH = document.getElementById('cH').checked;
+  const showL = document.getElementById('cL').checked;
+
+  // trapezium fill
+  ctx1.save();
+  ctx1.beginPath();
+  ctx1.moveTo(m.A.x,m.A.y); ctx1.lineTo(m.B.x,m.B.y); ctx1.lineTo(m.C.x,m.C.y); ctx1.lineTo(m.D.x,m.D.y);
+  ctx1.closePath();
+  ctx1.fillStyle="rgba(37,99,235,.07)";
+  ctx1.fill();
+  ctx1.restore();
+
+  // edges
+  seg(ctx1, m.A, m.B, "#2563eb", 3);
+  seg(ctx1, m.B, m.C, "#2563eb", 3);
+  seg(ctx1, m.C, m.D, "#2563eb", 3);
+  seg(ctx1, m.D, m.A, "#2563eb", 3);
+
+  // internal segments
+  seg(ctx1, m.E, m.B, "#dc2626", 3);
+  seg(ctx1, m.E, m.C, "#059669", 3);
+
+  // right angles
+  rightAngle(ctx1, m.B, m.A, m.E, 14, "#dc2626");
+  rightAngle(ctx1, m.C, m.B, m.E, 14, "#059669");
+  rightAngle(ctx1, m.E, m.A, m.C, 14, "#7c3aed");
+  rightAngle(ctx1, m.E, m.C, m.D, 14, "#7c3aed");
+
+  // angle marks
+  if(showH){
+    arcAngle(ctx1, m.A, m.E, m.B, 34, "#f59e0b", "\u03b1", 14);
+    arcAngle(ctx1, m.B, m.E, m.C, 30, "#f59e0b", "\u03b1", 14);
+    arcAngle(ctx1, m.E, m.A, m.B, 40, "#0891b2", "\u03b2", 14);
+    arcAngle(ctx1, m.E, m.B, m.C, 52, "#0891b2", "\u03b1", 14);
+  }
+
+  // points
+  point(ctx1, m.A, "A", 8, -10, "#1e40af");
+  point(ctx1, m.B, "B", 6, 22, "#1e40af");
+  point(ctx1, m.C, "C", -22, 20, "#1e40af");
+  point(ctx1, m.D, "D", -22, -10, "#1e40af");
+  point(ctx1, m.E, "E", -6, -12, "#b91c1c");
+
+  // lengths
+  if(showL){
+    lengthLabel(ctx1, m.A, m.E, "#7c3aed", "AE = "+m0.AE.toFixed(0), 0, 22);
+    lengthLabel(ctx1, m.D, m.E, "#7c3aed", "DE = "+m0.DE.toFixed(0), -30, 22);
+    lengthLabel(ctx1, m.E, m.B, "#dc2626", "BE", -38, 0);
+    lengthLabel(ctx1, m.E, m.C, "#059669", "CE", 10, 0);
+    lengthLabel(ctx1, m.B, m.C, "#2563eb", "BC", 0, 22);
+  }
+
+  // readouts
+  document.getElementById('rAE').textContent = m0.AE.toFixed(0);
+  document.getElementById('rBE').textContent = m0.BE.toFixed(1);
+  document.getElementById('rCE').textContent = m0.CE.toFixed(1);
+  document.getElementById('rRatio').textContent = m0.ratio.toFixed(3);
+}
+
+/* ---------- Canvas 2 : parallel-line angle chase ---------- */
+const cv2 = document.getElementById('cv2');
+const ctx2 = cv2.getContext('2d');
+function drawParallel(){
+  const W=cv2.width, H=cv2.height;
+  setup(ctx2, W, H);
+  // AD (bottom) and BC (top) as parallel lines with transversal CE
+  const yAD = H*0.78, yBC = H*0.30;
+  const xE = W*0.52, xC = W*0.52;
+  ctx2.save();
+  // lines
+  ctx2.strokeStyle="#2563eb"; ctx2.lineWidth=3.5;
+  ctx2.beginPath(); ctx2.moveTo(W*0.08,yAD); ctx2.lineTo(W*0.92,yAD); ctx2.stroke();
+  ctx2.beginPath(); ctx2.moveTo(W*0.16,yBC); ctx2.lineTo(W*0.88,yBC); ctx2.stroke();
+  // transversal
+  ctx2.strokeStyle="#059669"; ctx2.lineWidth=3.5;
+  ctx2.beginPath(); ctx2.moveTo(xE-40,yAD-60); ctx2.lineTo(xC+40,yBC+60); ctx2.stroke();
+  ctx2.restore();
+  // slightly slanted transversal for clarity
+  const T1 = {x:xE-46,y:yAD-70}, T2 = {x:xC+30,y:yBC+70};
+
+  // labels
+  ctx2.font="bold 16px Segoe UI, sans-serif";
+  ctx2.fillStyle="#1e40af";
+  ctx2.fillText("A", W*0.90, yAD+26);
+  ctx2.fillText("D", W*0.06, yAD+26);
+  ctx2.fillText("B", W*0.86, yBC-14);
+  ctx2.fillText("C", W*0.14, yBC-14);
+  ctx2.fillStyle="#b91c1c";
+  ctx2.fillText("E", xE-30, yAD+26);
+
+  // right angles
+  const px = xC+16; // intersection
+  // draw right-angle at C (on BC between B and C, and CE)
+  (function(){
+    const v = {x:xC, y:yBC};
+    const p1 = {x:W*0.86, y:yBC};
+    const p2 = {x:xE-46, y:yAD-70};
+    rightAngle(ctx2, v, p1, p2, 20, "#dc2626");
+    rightAngle(ctx2, {x:xE,y:yAD}, p1, p2, 20, "#7c3aed");
+  })();
+  // small text
+  ctx2.fillStyle="#dc2626"; ctx2.font="bold 14px Segoe UI, sans-serif";
+  ctx2.fillText("90\u00b0", xC+30, yBC-8);
+  ctx2.fillStyle="#7c3aed";
+  ctx2.fillText("90\u00b0", xE+14, yAD-10);
+  // angle labels
+  ctx2.fillStyle="#f59e0b"; ctx2.font="bold 15px Segoe UI, sans-serif";
+  ctx2.fillText("\u2220AEC", xC-120, yAD-16);
+  ctx2.fillText("\u2220BCE", xC+30, yBC+34);
+  ctx2.fillStyle="#0f172a"; ctx2.font="italic 15px Segoe UI, sans-serif";
+  ctx2.fillText("AD \u2225 BC", W*0.70, yBC-40);
+}
+
+/* ---------- Canvas 3 : triangle ABE angles ---------- */
+const cv3 = document.getElementById('cv3');
+const ctx3 = cv3.getContext('2d');
+function drawTri(){
+  const deg = 35;
+  document.getElementById('aVal') && null;
+  const m0 = model(deg);
+  const W=cv3.width, H=cv3.height;
+  setup(ctx3, W, H);
+  const m = fitScale(m0, W, H, 0.95);
+  // triangle ABE
+  ctx3.save();
+  ctx3.beginPath();
+  ctx3.moveTo(m.A.x,m.A.y); ctx3.lineTo(m.B.x,m.B.y); ctx3.lineTo(m.E.x,m.E.y);
+  ctx3.closePath();
+  ctx3.fillStyle="rgba(37,99,235,.10)"; ctx3.fill();
+  ctx3.restore();
+  seg(ctx3, m.A, m.B, "#2563eb", 3);
+  seg(ctx3, m.B, m.E, "#dc2626", 3);
+  seg(ctx3, m.E, m.A, "#7c3aed", 3);
+  rightAngle(ctx3, m.B, m.A, m.E, 18, "#dc2626");
+  // angle alpha at A
+  arcAngle(ctx3, m.A, m.E, m.B, 46, "#f59e0b", "\u03b1", 16);
+  // angle at E of ABE
+  arcAngle(ctx3, m.E, m.A, m.B, 46, "#0891b2", "90\u00b0\u2212\u03b1", 16);
+  // angle AEB + BEC = 90
+  point(ctx3, m.A, "A", 10, -12, "#1e40af");
+  point(ctx3, m.B, "B", 10, 24, "#1e40af");
+  point(ctx3, m.E, "E", -14, 22, "#b91c1c");
+  ctx3.font="bold 15px Segoe UI, sans-serif";
+  ctx3.fillStyle="#dc2626";
+  ctx3.fillText("right angle", m.B.x+18, m.B.y-14);
+  ctx3.fillStyle="#0f172a";
+  ctx3.font="italic 15px Segoe UI, sans-serif";
+  ctx3.fillText("Angle sum of \u25b3ABE: \u03b1 + 90\u00b0 + (90\u00b0 \u2212 \u03b1) = 180\u00b0", W*0.55, H*0.92);
+}
+
+/* ---------- Canvas 4 : two triangles side by side ---------- */
+const cv4 = document.getElementById('cv4');
+const ctx4 = cv4.getContext('2d');
+function drawTwo(){
+  const W=cv4.width, H=cv4.height;
+  setup(ctx4, W, H);
+  const deg=35;
+  const m0 = model(deg);
+  const s = 0.85;
+  const m = fitScale(m0, W, H, s);
+
+  // highlight triangle ABE
+  ctx4.save();
+  ctx4.beginPath();
+  ctx4.moveTo(m.A.x,m.A.y); ctx4.lineTo(m.B.x,m.B.y); ctx4.lineTo(m.E.x,m.E.y);
+  ctx4.closePath();
+  ctx4.fillStyle="rgba(220,38,38,.16)"; ctx4.fill();
+  ctx4.restore();
+  // highlight triangle BCE
+  ctx4.save();
+  ctx4.beginPath();
+  ctx4.moveTo(m.B.x,m.B.y); ctx4.lineTo(m.C.x,m.C.y); ctx4.lineTo(m.E.x,m.E.y);
+  ctx4.closePath();
+  ctx4.fillStyle="rgba(5,150,105,.16)"; ctx4.fill();
+  ctx4.restore();
+
+  seg(ctx4, m.A, m.B, "#2563eb", 3);
+  seg(ctx4, m.B, m.E, "#dc2626", 3);
+  seg(ctx4, m.E, m.C, "#059669", 3);
+  seg(ctx4, m.C, m.B, "#2563eb", 3);
+  seg(ctx4, m.E, m.A, "#7c3aed", 3);
+  seg(ctx4, m.C, m.D, "#94a3b8", 2, [6,5]);
+  seg(ctx4, m.D, m.A, "#94a3b8", 2, [6,5]);
+
+  rightAngle(ctx4, m.B, m.A, m.E, 16, "#dc2626");
+  rightAngle(ctx4, m.C, m.B, m.E, 16, "#059669");
+  arcAngle(ctx4, m.A, m.E, m.B, 40, "#f59e0b", "\u03b1", 16);
+  arcAngle(ctx4, m.E, m.B, m.C, 44, "#f59e0b", "\u03b1", 16);
+
+  point(ctx4, m.A, "A", 10, -10, "#1e40af");
+  point(ctx4, m.B, "B", 10, 24, "#1e40af");
+  point(ctx4, m.C, "C", -22, 22, "#1e40af");
+  point(ctx4, m.D, "D", -22, -10, "#94a3b8");
+  point(ctx4, m.E, "E", -16, 22, "#b91c1c");
+
+  // useful lengths
+  lengthLabel(ctx4, m.A, m.B, "#7c3aed", "AB = AE\u00b7cos\u03b1", -20, 0);
+  lengthLabel(ctx4, m.B, m.E, "#dc2626", "BE = AE\u00b7sin\u03b1", 0, 0);
+  lengthLabel(ctx4, m.E, m.C, "#059669", "CE = BE\u00b7cos\u03b1", 12, 0);
+  lengthLabel(ctx4, m.E, m.D, "#94a3b8", "DE = AE", 0, -8);
+  lengthLabel(ctx4, m.E, m.A, "#7c3aed", "AE", 0, -8);
+
+  ctx4.font="bold 15px Segoe UI, sans-serif";
+  ctx4.fillStyle="#0f172a";
+  ctx4.fillText("Right triangles ABE and BCE share the angle \u03b1", W*0.30, H*0.94);
+}
+
+/* ---------- Canvas 5 : CE/DE vs alpha + ratio bar ---------- */
+const cv5 = document.getElementById('cv5');
+const ctx5 = cv5.getContext('2d');
+function drawRatio(){
+  const deg = +document.getElementById('sA2').value;
+  document.getElementById('aVal2').textContent = deg;
+  const a = deg*Math.PI/180;
+  const ratio = Math.sin(a)*Math.cos(a);
+  const W=cv5.width, H=cv5.height;
+  setup(ctx5, W, H);
+
+  const showBar = document.getElementById('cBar').checked;
+
+  // --- left: plot sin a cos a on [0,90] ---
+  const ox = 70, oy = H-70, wplot = W-160, hplot = H-160;
+  ctx5.save();
+  ctx5.strokeStyle="#94a3b8"; ctx5.lineWidth=2;
+  ctx5.beginPath(); ctx5.moveTo(ox,oy); ctx5.lineTo(ox+wplot,oy); ctx5.stroke();
+  ctx5.beginPath(); ctx5.moveTo(ox,oy); ctx5.lineTo(ox,oy-hplot); ctx5.stroke();
+  ctx5.restore();
+
+  // curve y = sin a cos a
+  ctx5.save();
+  ctx5.strokeStyle="#2563eb"; ctx5.lineWidth=3.5;
+  ctx5.beginPath();
+  for(let d=0; d<=90; d+=1){
+    const aa = d*Math.PI/180;
+    const y = Math.sin(aa)*Math.cos(aa);
+    const px = ox + (d/90)*wplot;
+    const py = oy - (y/0.5)*hplot;
+    if(d===0) ctx5.moveTo(px,py); else ctx5.lineTo(px,py);
+  }
+  ctx5.stroke();
+  ctx5.restore();
+
+  // marker
+  const px = ox + (deg/90)*wplot;
+  const py = oy - (ratio/0.5)*hplot;
+  ctx5.save();
+  ctx5.strokeStyle="#f59e0b"; ctx5.lineWidth=2; ctx5.setLineDash([5,4]);
+  ctx5.beginPath(); ctx5.moveTo(px,oy); ctx5.lineTo(px,py); ctx5.lineTo(ox,py); ctx5.stroke();
+  ctx5.restore();
+  ctx5.fillStyle="#f59e0b";
+  ctx5.beginPath(); ctx5.arc(px,py,6,0,Math.PI*2); ctx5.fill();
+
+  // axis labels
+  ctx5.fillStyle="#475569"; ctx5.font="13px Segoe UI, sans-serif";
+  ctx5.fillText("0\u00b0", ox-6, oy+20);
+  ctx5.fillText("45\u00b0", ox+wplot/2-14, oy+20);
+  ctx5.fillText("90\u00b0", ox+wplot-16, oy+20);
+  ctx5.fillText("\u03b1", ox+wplot/2-4, oy+40);
+  ctx5.save();
+  ctx5.translate(ox-30, oy-hplot/2+10);
+  ctx5.rotate(-Math.PI/2);
+  ctx5.fillText("CE / DE", -28, 0);
+  ctx5.restore();
+  ctx5.fillStyle="#2563eb"; ctx5.font="bold 14px Segoe UI, sans-serif";
+  ctx5.fillText("y = sin\u03b1 cos\u03b1", ox+wplot-190, oy-hplot+20);
+
+  // --- right: bar comparison ---
+  if(showBar){
+    const bx = ox+wplot+40;
+    const bw = 60;
+    const baseY = oy;
+    const maxH = hplot * 0.85;
+    const ceH = (Math.sin(a)*Math.cos(a)/0.5)*maxH; // scaled relative to red (BE)
+    const beH = (Math.sin(a)/1)*maxH;
+    const deH = maxH; // DE relative
+
+    // DE bar (scale to maxH)
+    ctx5.fillStyle="#7c3aed";
+    ctx5.fillRect(bx, baseY-deH, bw, deH);
+    ctx5.fillStyle="#7c3aed"; ctx5.font="bold 13px Segoe UI, sans-serif";
+    ctx5.fillText("DE", bx+20, baseY-deH-8);
+
+    // CE bar
+    ctx5.fillStyle="#059669";
+    ctx5.fillRect(bx+80, baseY-ceH, bw, ceH);
+    ctx5.fillStyle="#059669";
+    ctx5.fillText("CE", bx+100, baseY-ceH-8);
+
+    ctx5.fillStyle="#0f172a"; ctx5.font="bold 15px Segoe UI, sans-serif";
+    ctx5.fillText("CE", bx+18, baseY+22);
+    ctx5.fillText("DE", bx+98, baseY+22);
+    ctx5.fillStyle="#f59e0b";
+    ctx5.fillText("ratio = "+ratio.toFixed(3), bx-10, baseY-6);
+  }
+
+  document.getElementById('rSC').textContent = ratio.toFixed(3);
+  document.getElementById('rRatio2').textContent = ratio.toFixed(3);
+}
+
+/* ---------- Step reveal engine ---------- */
+function initSteps(id, counterId){
+  const container = document.getElementById(id);
+  const steps = container.querySelectorAll('.step');
+  const btn = document.querySelector('button[data-target="'+id+'"]');
+  const cnt = document.getElementById(counterId);
+  let idx = 0;
+  cnt.textContent = "0 / "+steps.length;
+  btn.addEventListener('click', ()=>{
+    if(idx < steps.length){
+      steps[idx].classList.add('show');
+      idx++;
+      cnt.textContent = idx+" / "+steps.length;
+      if(idx===steps.length){
+        btn.disabled = true;
+        btn.textContent = "All steps revealed \u2713";
+      }
+    }
+  });
+}
+initSteps('steps1','cnt1');
+initSteps('steps2','cnt2');
+initSteps('steps3','cnt3');
+initSteps('steps4','cnt4');
+
+/* ---------- Event wiring ---------- */
+document.getElementById('sA').addEventListener('input', ()=>{ drawMain(); drawTri(); });
+document.getElementById('cH').addEventListener('change', drawMain);
+document.getElementById('cL').addEventListener('change', drawMain);
+document.getElementById('sA2').addEventListener('input', drawRatio);
+document.getElementById('cBar').addEventListener('change', drawRatio);
+
+/* ---------- Initial draw ---------- */
+function drawAll(){
+  drawMain();
+  drawParallel();
+  drawTri();
+  drawTwo();
+  drawRatio();
+}
+drawAll();
+window.addEventListener('resize', ()=>{ /* canvases use fixed internal resolution */ });
+
+if(window.MathJax && MathJax.startup){
+  MathJax.startup.promise.then(()=>{});
+}
+</script>
+</body>
+</html>

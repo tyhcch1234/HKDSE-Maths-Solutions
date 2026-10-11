@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2023 Paper 1 Q7 · Interactive Solution</title>
+<script>
+  MathJax = {
+    tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root{
+    --blue:#1d4ed8; --blue-d:#1e3a8a; --sky:#0ea5e9;
+    --amber:#f59e0b; --amber-l:#fef3c7;
+    --emerald:#059669; --emerald-l:#d1fae5;
+    --rose:#e11d48;
+    --ink:#0f172a; --muted:#475569; --line:#e2e8f0;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    color:var(--ink); background:#f1f5f9; line-height:1.6;
+  }
+  header.hero{
+    background:linear-gradient(135deg,#1e3a8a 0%,#1d4ed8 45%,#0ea5e9 100%);
+    color:#fff; padding:38px 22px 46px; position:relative; overflow:hidden;
+  }
+  header.hero::after{
+    content:""; position:absolute; right:-80px; top:-80px; width:320px; height:320px;
+    border-radius:50%; background:rgba(255,255,255,.10);
+  }
+  header.hero::before{
+    content:""; position:absolute; left:-60px; bottom:-120px; width:260px; height:260px;
+    border-radius:50%; background:rgba(255,255,255,.07);
+  }
+  .wrap{max-width:1000px; margin:0 auto; position:relative; z-index:2;}
+  .eyebrow{font-size:.8rem; letter-spacing:.16em; text-transform:uppercase; opacity:.85; margin:0 0 6px;}
+  h1.qnum{margin:0; font-size:clamp(1.5rem,4vw,2.15rem); font-weight:800; letter-spacing:.5px;}
+  .subtitle{margin:8px 0 16px; font-size:1rem; opacity:.95;}
+  .pills{display:flex; flex-wrap:wrap; gap:8px;}
+  .pill{
+    background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.4);
+    padding:4px 13px; border-radius:999px; font-size:.78rem; font-weight:600; letter-spacing:.3px;
+  }
+  main{max-width:1000px; margin:-26px auto 0; padding:0 16px 40px; position:relative; z-index:3;}
+  .card{
+    background:#fff; border-radius:16px; padding:22px 22px 24px; margin-bottom:22px;
+    box-shadow:0 6px 22px rgba(15,23,42,.08); border:1px solid var(--line);
+  }
+  .card h2{
+    margin:0 0 6px; font-size:1.15rem; color:var(--blue-d); display:flex; align-items:center; gap:10px;
+  }
+  .card h2 .badge{
+    background:var(--blue); color:#fff; border-radius:8px; font-size:.78rem; padding:2px 9px; font-weight:700;
+  }
+  .marks{
+    display:inline-block; background:var(--amber-l); color:#92400e; border:1px solid #fcd34d;
+    border-radius:999px; font-size:.75rem; font-weight:700; padding:1px 9px; margin-left:8px;
+  }
+  .qtext{background:#f8fafc; border-left:5px solid var(--blue); border-radius:0 12px 12px 0; padding:14px 16px; margin:12px 0 4px;}
+  .qtext p{margin:6px 0;}
+  canvas{
+    display:block; width:100%; max-width:560px; margin:14px auto 6px;
+    background:#fff; border:1px solid var(--line); border-radius:12px;
+    touch-action:none; box-shadow:0 2px 10px rgba(15,23,42,.06);
+  }
+  .controls{
+    display:flex; flex-wrap:wrap; gap:14px 22px; align-items:center; justify-content:center;
+    background:#f8fafc; border:1px dashed #cbd5e1; border-radius:12px; padding:12px 16px; margin:6px 0 4px;
+  }
+  .ctrl{display:flex; align-items:center; gap:9px; font-size:.86rem; font-weight:600; color:var(--muted);}
+  input[type=range]{width:150px; accent-color:var(--blue);}
+  input[type=checkbox]{width:17px; height:17px; accent-color:var(--emerald);}
+  .readout{
+    display:inline-block; background:#0f172a; color:#7dd3fc; font-family:ui-monospace,Menlo,Consolas,monospace;
+    font-size:.82rem; padding:5px 11px; border-radius:8px; margin:4px 6px 0 0;
+  }
+  .step{
+    display:none;
+    border-left:4px solid var(--emerald); background:#f8fafc; border-radius:0 12px 12px 0;
+    padding:14px 16px; margin-top:14px; animation:fade .35s ease;
+  }
+  .step.shown{display:block;}
+  @keyframes fade{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);}}
+  .step-head{display:flex; align-items:center; gap:10px; margin-bottom:6px; flex-wrap:wrap;}
+  .stepno{
+    background:var(--emerald); color:#fff; font-size:.75rem; font-weight:800;
+    border-radius:6px; padding:2px 9px; letter-spacing:.4px;
+  }
+  .mks{background:#e0e7ff; color:#3730a3; border:1px solid #a5b4fc; border-radius:999px; font-size:.72rem; font-weight:800; padding:1px 8px;}
+  .hint{
+    background:var(--amber-l); border-left:4px solid var(--amber); border-radius:0 8px 8px 0;
+    padding:9px 13px; font-size:.88rem; margin:10px 0 0; color:#78350f;
+  }
+  .hint b{color:#92400e;}
+  .ansbox{
+    background:var(--emerald-l); border:1px solid #6ee7b7; border-radius:10px;
+    padding:10px 14px; margin-top:10px; font-weight:700; color:#065f46;
+  }
+  .btnrow{display:flex; align-items:center; gap:14px; margin-top:16px; flex-wrap:wrap;}
+  button.next{
+    background:var(--blue); color:#fff; border:none; border-radius:10px; padding:10px 20px;
+    font-size:.9rem; font-weight:700; cursor:pointer; transition:.18s; box-shadow:0 3px 10px rgba(29,78,216,.3);
+  }
+  button.next:hover:not(:disabled){background:var(--blue-d); transform:translateY(-1px);}
+  button.next:disabled{background:#cbd5e1; color:#64748b; cursor:not-allowed; box-shadow:none;}
+  .counter{font-size:.85rem; font-weight:700; color:var(--muted);}
+  .summary{background:#0f172a; color:#e2e8f0; border-radius:16px; padding:22px; box-shadow:0 8px 26px rgba(15,23,42,.25);}
+  .summary h2{color:#7dd3fc; border-bottom:1px solid #334155; padding-bottom:8px;}
+  .summary ul{margin:12px 0 0; padding-left:4px; list-style:none;}
+  .summary li{padding:8px 0 8px 28px; position:relative; border-bottom:1px dashed #1e293b;}
+  .summary li:last-child{border-bottom:none;}
+  .summary li::before{content:"▸"; position:absolute; left:8px; color:var(--amber); font-weight:900;}
+  .summary .val{color:#6ee7b7; font-weight:800;}
+  footer{text-align:center; color:var(--muted); font-size:.82rem; padding:10px 16px 36px;}
+  .legend{display:flex; flex-wrap:wrap; gap:8px 16px; justify-content:center; font-size:.78rem; color:var(--muted); margin-top:2px;}
+  .legend span{display:flex; align-items:center; gap:6px;}
+  .sw{width:14px; height:3px; border-radius:2px; display:inline-block;}
+  @media(max-width:600px){
+    .card{padding:18px 14px 20px;}
+    canvas{max-width:100%;}
+    input[type=range]{width:110px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 1</p>
+    <h1 class="qnum">2023 Paper 1 · Question 7</h1>
+    <p class="subtitle">Circle Geometry — angles in a semi-circle, exterior angle of a triangle &amp; angles in the same segment</p>
+    <div class="pills">
+      <span class="pill">Circle Geometry</span>
+      <span class="pill">Diameter &amp; Right Angle</span>
+      <span class="pill">Exterior Angle of △</span>
+      <span class="pill">Angles in the Same Segment</span>
+      <span class="pill">Angle Sum of △</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ================= QUESTION ================= -->
+  <section class="card">
+    <h2><span class="badge">Q7</span> The Question <span class="marks">4 marks</span></h2>
+    <div class="qtext">
+      <p>In Figure 1, \(PR\) is a diameter of the circle \(PQRS\). Denote the point of intersection of \(PR\) and \(QS\) by \(T\).</p>
+      <p>If \(\angle PSQ = 41^\circ\) and \(\angle PTQ = 68^\circ\), find \(\angle RQS\) and \(\angle PQS\).</p>
+      <p style="color:#475569;font-size:.9rem;">(4 marks)</p>
+    </div>
+    <p style="font-size:.9rem;color:var(--muted);margin-bottom:0;">
+      \(\angle PSQ\) is an <em>inscribed</em> angle at \(S\); \(\angle PTQ\) is the angle between the two chords \(PR\) and \(QS\) measured at the intersection point \(T\) inside the circle.
+    </p>
+  </section>
+
+  <!-- ================= PART (a) ================= -->
+  <section class="card">
+    <h2><span class="badge">Part (a)</span> Find \(\angle RQS\) <span class="marks">1M + 1A</span></h2>
+
+    <p style="font-size:.92rem;color:var(--muted);margin-top:4px;">
+      Key idea: \(\angle PTQ\) is the <strong>exterior angle</strong> of \(\triangle PST\) at vertex \(T\), so it equals the sum of the two opposite interior angles \(\angle PST\) and \(\angle PST\)… Drag the slider to watch the two interior angles always add up to the exterior angle.
+    </p>
+
+    <canvas id="cvA" width="560" height="470"></canvas>
+
+    <div class="controls">
+      <label class="ctrl">\(\angle PSQ\): <input type="range" id="slPSQ" min="20" max="70" value="41" step="1"><span id="valPSQ">41°</span></label>
+      <label class="ctrl">\(\angle PTQ\): <input type="range" id="slPTQ" min="46" max="100" value="68" step="1"><span id="valPTQ">68°</span></label>
+    </div>
+    <div style="text-align:center;margin-top:6px;">
+      <span class="readout" id="roA">∠RPS = ∠PTQ − ∠PSQ = 68° − 41° = 27°</span>
+      <span class="readout" id="roA2">∠RQS = ∠RPS (same segment) = 27°</span>
+    </div>
+    <div class="legend">
+      <span><i class="sw" style="background:#1d4ed8"></i>diameter / chords</span>
+      <span><i class="sw" style="background:#f59e0b"></i>△PST (interior angles)</span>
+      <span><i class="sw" style="background:#059669"></i>∠RQS</span>
+      <span><i class="sw" style="background:#e11d48"></i>∠RPS</span>
+    </div>
+
+    <div class="btnrow">
+      <button class="next" id="btnA" onclick="nextStep('A')">Next step →</button>
+      <span class="counter" id="cntA">0 / 3</span>
+    </div>
+
+    <div class="step" id="A1">
+      <div class="step-head"><span class="stepno">STEP 1</span><span class="mks">1M</span></div>
+      <p>Consider \(\triangle PST\). \(T\) lies on the line \(PR\), so \(\angle PTS = 180^\circ\) (straight line). Hence \(\angle PTQ\) is the <strong>exterior angle</strong> of \(\triangle PST\) at \(T\):</p>
+      \[ \angle PTQ = \angle PST + \angle TPS = \angle PSQ + \angle RPS \]
+      <div class="hint"><b>Hint:</b> \(\angle PST = \angle PSQ\) because \(T\) lies on the line \(QS\); and \(\angle TPS = \angle RPS\) because \(T\) lies on the diameter \(PR\).</div>
+    </div>
+
+    <div class="step" id="A2">
+      <div class="step-head"><span class="stepno">STEP 2</span><span class="mks">—</span></div>
+      <p>Substitute the given values and solve for \(\angle RPS\):</p>
+      \[ \angle RPS = \angle PTQ - \angle PSQ = 68^\circ - 41^\circ = 27^\circ \]
+      <div class="hint"><b>Hint:</b> This is a direct subtraction — one line, no extra construction needed.</div>
+    </div>
+
+    <div class="step" id="A3">
+      <div class="step-head"><span class="stepno">STEP 3</span><span class="mks">1A</span></div>
+      <p>Both \(\angle RQS\) and \(\angle RPS\) subtend the same chord \(RS\) (they are <strong>angles in the same segment</strong>):</p>
+      \[ \angle RQS = \angle RPS = 27^\circ \]
+      <div class="hint"><b>Hint:</b> Angles in the same segment subtended by the same chord are equal — the classic "butterfly" pair here is \(\angle RPS\) and \(\angle RQS\), both standing on chord \(RS\).</div>
+      <div class="ansbox">\(\angle RQS = 27^\circ\)</div>
+    </div>
+  </section>
+
+  <!-- ================= PART (b) ================= -->
+  <section class="card">
+    <h2><span class="badge">Part (b)</span> Find \(\angle PQS\) <span class="marks">1M + 1A</span></h2>
+
+    <p style="font-size:.92rem;color:var(--muted);margin-top:4px;">
+      Since \(PR\) is a diameter, the angle in a semi-circle at \(Q\) is a right angle. Toggle the layers and drag \(\angle RQS\) to see how \(\angle PQS\) changes.
+    </p>
+
+    <canvas id="cvB" width="560" height="470"></canvas>
+
+    <div class="controls">
+      <label class="ctrl">\(\angle RQS\): <input type="range" id="slRQS" min="10" max="60" value="27" step="1"><span id="valRQS">27°</span></label>
+      <label class="ctrl"><input type="checkbox" id="cbRight" checked> show \(\angle PQR = 90^\circ\)</label>
+      <label class="ctrl"><input type="checkbox" id="cbSplit" checked> show split</label>
+    </div>
+    <div style="text-align:center;margin-top:6px;">
+      <span class="readout" id="roB">∠PQR = 90° (angle in semi-circle)</span>
+      <span class="readout" id="roB2">∠PQS = 90° − ∠RQS</span>
+    </div>
+
+    <div class="btnrow">
+      <button class="next" id="btnB" onclick="nextStep('B')">Next step →</button>
+      <span class="counter" id="cntB">0 / 3</span>
+    </div>
+
+    <div class="step" id="B1">
+      <div class="step-head"><span class="stepno">STEP 1</span><span class="mks">1M</span></div>
+      <p>\(PR\) is a diameter and \(Q\) lies on the circle. By the <strong>angle in a semi-circle</strong> (converse of the angle in a semi-circle theorem):</p>
+      \[ \angle PQR = 90^\circ \]
+      <div class="hint"><b>Hint:</b> An angle in a semi-circle is a right angle — this is the single most used circle theorem in this question. Look at \(\triangle PQR\): the side \(PR\) passes through the centre \(O\).</div>
+    </div>
+
+    <div class="step" id="B2">
+      <div class="step-head"><span class="stepno">STEP 2</span><span class="mks">—</span></div>
+      <p>The chord \(QS\) splits the right angle \(\angle PQR\) into two parts: \(\angle PQS\) and \(\angle RQS\):</p>
+      \[ \angle PQS = \angle PQR - \angle RQS \]
+      <div class="hint"><b>Hint:</b> The segment \(QS\) lies <em>inside</em> the right angle \(\angle PQR\), so the two smaller angles are complementary.</div>
+    </div>
+
+    <div class="step" id="B3">
+      <div class="step-head"><span class="stepno">STEP 3</span><span class="mks">1A</span></div>
+      <p>Substitute \(\angle PQR = 90^\circ\) and the result of Part (a):</p>
+      \[ \angle PQS = 90^\circ - 27^\circ = 63^\circ \]
+      <div class="ansbox">\(\angle PQS = 63^\circ\)</div>
+    </div>
+  </section>
+
+  <!-- ================= SUMMARY ================= -->
+  <section class="card summary">
+    <h2>Summary of Answers</h2>
+    <ul>
+      <li>\(\angle RPS = \angle PTQ - \angle PSQ = 68^\circ - 41^\circ = 27^\circ\) &nbsp;<span class="val">(1M)</span></li>
+      <li>\(\angle RQS = \angle RPS = \mathbf{27^\circ}\) &nbsp;<span class="val">(1A)</span></li>
+      <li>\(\angle PQR = 90^\circ\) (angle in semi-circle) &nbsp;<span class="val">(1M)</span></li>
+      <li>\(\angle PQS = \angle PQR - \angle RQS = 90^\circ - 27^\circ = \mathbf{63^\circ}\) &nbsp;<span class="val">(1A)</span></li>
+    </ul>
+    <p style="margin:14px 0 0;font-size:.86rem;color:#94a3b8;">
+      Core theorems used: exterior angle of a triangle · angles in the same segment · angle in a semi-circle.
+    </p>
+  </section>
+
+</main>
+
+<footer>
+  HKDSE Mathematics (Compulsory Part) · 2023 Paper 1 · Question 7 — Interactive Solution<br>
+  Built with HTML5 Canvas &amp; MathJax. Drag the sliders to explore the geometry.
+</footer>
+
+<script>
+/* =========================================================
+   STEP REVEAL
+   ========================================================= */
+const stepState = { A:0, B:0 };
+const stepTotals = { A:3, B:3 };
+
+function nextStep(key){
+  const cur = stepState[key];
+  if(cur >= stepTotals[key]) return;
+  stepState[key] = cur + 1;
+  const el = document.getElementById(key + stepState[key]);
+  if(el) el.classList.add('shown');
+  updateBtn(key);
+}
+function updateBtn(key){
+  const cur = stepState[key], tot = stepTotals[key];
+  document.getElementById('cnt'+key).textContent = cur + ' / ' + tot;
+  const btn = document.getElementById('btn'+key);
+  if(cur >= tot){
+    btn.disabled = true;
+    btn.textContent = 'All steps revealed ✓';
+  } else {
+    btn.disabled = false;
+    btn.textContent = 'Next step →';
+  }
+}
+
+/* =========================================================
+   GEOMETRY ENGINE
+   The cyclic quadrilateral PQRS with PR as diameter.
+   We place the circle of radius 1 centred at O=(0,0).
+   P = (-1, 0)  (left end of diameter)
+   R = ( 1, 0)  (right end of diameter)
+   Q is on the upper-left arc, S on the lower-right arc,
+   and Q, S, T are chosen so that the angles work out.
+
+   Instead of hard-coding exact coordinates, we parametrise by
+   the angles we want and solve for Q and S so that
+   ∠PSQ = a  and  ∠PTQ = b.
+   ========================================================= */
+
+function deg(d){ return d * Math.PI / 180; }
+
+/* point on unit circle at polar angle t (measured from +x axis, CCW) */
+function circPt(t){ return { x: Math.cos(t), y: Math.sin(t) }; }
+
+/* angle at vertex V between rays V->A and V->B, in degrees */
+function angleAt(V, A, B){
+  const a1 = Math.atan2(A.y - V.y, A.x - V.x);
+  const a2 = Math.atan2(B.y - V.y, B.x - V.x);
+  let d = Math.abs(a1 - a2);
+  if(d > Math.PI) d = 2*Math.PI - d;
+  return d * 180 / Math.PI;
+}
+
+/* line intersection of P1+t*(P2-P1) and P3+s*(P4-P3) */
+function lineInt(P1,P2,P3,P4){
+  const d1x=P2.x-P1.x, d1y=P2.y-P1.y, d2x=P4.x-P3.x, d2y=P4.y-P3.y;
+  const den = d1x*d2y - d1y*d2x;
+  if(Math.abs(den) < 1e-12) return null;
+  const t = ((P3.x-P1.x)*d2y - (P3.y-P1.y)*d2x)/den;
+  return { x:P1.x + t*d1x, y:P1.y + t*d1y };
+}
+
+/* Build the configuration for given PSQ (deg) and PTQ (deg).
+   Standard fact:  ∠PTQ = ∠PSQ + ∠RPS  =>  ∠RPS = PTQ - PSQ.
+   So ∠RPS is fixed.  ∠RPS is the angle at P between PR and PS.
+   Since PR is the +x direction, S must lie on the ray from P
+   making angle (PTQ - PSQ) above the +x axis.
+   S is on the unit circle => solve for the intersection of that ray
+   with the circle (other than P).
+*/
+function buildConfig(psqDeg, ptqDeg){
+  const rpsDeg = ptqDeg - psqDeg;        // angle RPS
+  const rps = deg(rpsDeg);
+  const P = { x:-1, y:0 };
+  const R = { x: 1, y:0 };
+
+  /* ray from P at angle rps: X(t) = P + t*(cos rps, sin rps) */
+  const dx = Math.cos(rps), dy = Math.sin(rps);
+  /* intersection with unit circle x^2+y^2=1 */
+  /* (-1 + t dx)^2 + (t dy)^2 = 1 => 1 - 2 t dx + t^2 = 1 => t(t - 2dx)=0 */
+  const t = 2*dx;
+  const S = { x: P.x + t*dx, y: P.y + t*dy };
+
+  /* Now find Q.  Q must lie on the circle such that ∠PSQ = psqDeg.
+     The locus of points seeing chord PS under angle psqDeg is an arc.
+     We use the inscribed-angle theorem: the central angle subtending
+     chord PS equals 2*psqDeg (for Q on the major arc).
+     So the arc from P to S not containing Q has measure 2*psqDeg.
+     Easier: use the inscribed angle to place Q.  We know angle PQR? no.
+     Direct approach: parametrise Q by polar angle q and require
+     angleAt(S, P, Q) = psqDeg.  Solve numerically by bisection on q.
+  */
+  const tP = Math.atan2(P.y, P.x);   // pi
+  const tS = Math.atan2(S.y, S.x);   // in (0, pi) typically
+
+  /* Q lies on the arc from P going CCW (upper-left) to R.
+     Parametrise q in (tS + small, tP + 2pi) ... but let's just search. */
+  function f(q){
+    const Q = circPt(q);
+    return angleAt(S, P, Q) - psqDeg;
+  }
+  /* Q must be on the upper arc between P (angle pi) and R (angle 0),
+     i.e. q in (tS, tP) if tS < tP, going CCW from S through ... 
+     Actually the arc P->Q->R is the upper arc. P is at pi, R at 0/2pi.
+     S has tS in (0, pi).  Q on upper arc between S and P (going CCW):
+     q in (tS, tP).  Check angles. */
+  let lo = tS + 1e-4, hi = tP - 1e-4;
+  /* ensure f(lo) and f(hi) have opposite signs; if not expand */
+  let flo = f(lo), fhi = f(hi);
+  let qS = null;
+  if(flo * fhi < 0){
+    for(let i=0;i<80;i++){
+      const mid = (lo+hi)/2, fm = f(mid);
+      if(flo * fm <= 0){ hi = mid; fhi = fm; } else { lo = mid; flo = fm; }
+    }
+    qS = (lo+hi)/2;
+  } else {
+    /* fallback: scan */
+    let best = null, bestErr = 1e9;
+    for(let i=1;i<2000;i++){
+      const q = tS + (tP-tS)*i/2000;
+      const e = Math.abs(f(q));
+      if(e < bestErr){ bestErr = e; best = q; }
+    }
+    qS = best;
+  }
+
+  const Q = circPt(qS);
+  /* T = intersection of PR (x-axis) and QS */
+  const T = lineInt(P, R, Q, S);
+
+  return { P, R, Q, S, T, rpsDeg, psqDeg, ptqDeg };
+}
+
+/* =========================================================
+   DRAWING HELPERS
+   ========================================================= */
+const COL = {
+  circle:'#94a3b8', dia:'#1d4ed8', chord:'#0ea5e9',
+  qs:'#7c3aed', triangle:'#f59e0b', rps:'#e11d48',
+  rqs:'#059669', pqs:'#d97706', grid:'#eef2f7',
+  text:'#0f172a', muted:'#64748b', right:'#dc2626'
+};
+
+function setupCanvas(cv){
+  const ctx = cv.getContext('2d');
+  ctx.clearRect(0,0,cv.width,cv.height);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0,0,cv.width,cv.height);
+  return ctx;
+}
+
+/* map from math coords (unit circle, x in [-1.4,1.4]) to pixels */
+function makeMap(cv, scale){
+  const cx = cv.width/2, cy = cv.height/2 + 10;
+  return {
+    X: x => cx + x*scale,
+    Y: y => cy - y*scale,
+    cx, cy, scale
+  };
+}
+
+function drawGrid(ctx, M, step){
+  const s = M.scale;
+  ctx.strokeStyle = COL.grid;
+  ctx.lineWidth = 1;
+  for(let x=-1.4; x<=1.4001; x+=0.2){
+    ctx.beginPath();
+    ctx.moveTo(M.X(x), M.Y(-1.4));
+    ctx.lineTo(M.X(x), M.Y(1.4));
+    ctx.stroke();
+  }
+  for(let y=-1.4; y<=1.4001; y+=0.2){
+    ctx.beginPath();
+    ctx.moveTo(M.X(-1.4), M.Y(y));
+    ctx.lineTo(M.X(1.4), M.Y(y));
+    ctx.stroke();
+  }
+}
+
+function drawAxes(ctx, M){
+  ctx.strokeStyle = '#cbd5e1';
+  ctx.lineWidth = 1.2;
+  ctx.beginPath();
+  ctx.moveTo(M.X(-1.45), M.Y(0)); ctx.lineTo(M.X(1.45), M.Y(0));
+  ctx.moveTo(M.X(0), M.Y(-1.45)); ctx.lineTo(M.X(0), M.Y(1.45));
+  ctx.stroke();
+}
+
+function drawCircle(ctx, M){
+  ctx.strokeStyle = COL.circle;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(M.X(0), M.Y(0), M.scale, 0, 2*Math.PI);
+  ctx.stroke();
+}
+
+function drawLine(ctx, M, A, B, color, width, dash){
+  ctx.save();
+  ctx.strokeStyle = color; ctx.lineWidth = width || 2;
+  if(dash) ctx.setLineDash(dash);
+  ctx.beginPath();
+  ctx.moveTo(M.X(A.x), M.Y(A.y));
+  ctx.lineTo(M.X(B.x), M.Y(B.y));
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawPoint(ctx, M, P, label, color, off){
+  const x = M.X(P.x), y = M.Y(P.y);
+  ctx.fillStyle = color || COL.text;
+  ctx.beginPath(); ctx.arc(x,y,5,0,2*Math.PI); ctx.fill();
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.6; ctx.stroke();
+  if(label){
+    ctx.fillStyle = color || COL.text;
+    ctx.font = 'bold 16px Georgia, serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    const o = off || {x:0,y:0};
+    ctx.fillText(label, x + o.x, y + o.y);
+  }
+}
+
+/* draw an angle arc at vertex V between rays V->A and V->B */
+function drawAngle(ctx, M, V, A, B, radius, color, label, labelDist){
+  const a1 = Math.atan2(A.y - V.y, A.x - V.x);
+  const a2 = Math.atan2(B.y - V.y, B.x - V.x);
+  let d = a2 - a1;
+  while(d > Math.PI) d -= 2*Math.PI;
+  while(d < -Math.PI) d += 2*Math.PI;
+  const vx = M.X(V.x), vy = M.Y(V.y);
+  ctx.strokeStyle = color; ctx.lineWidth = 2.2;
+  ctx.beginPath();
+  /* canvas y is flipped, so angles negate */
+  ctx.arc(vx, vy, radius, -a1, -a2, d > 0);
+  ctx.stroke();
+  /* label */
+  if(label){
+    const mid = a1 + d/2;
+    const lx = M.X(V.x + (labelDist||radius+18)/M.scale * Math.cos(mid));
+    const ly = M.Y(V.y + (labelDist||radius+18)/M.scale * Math.sin(mid));
+    ctx.fillStyle = color;
+    ctx.font = 'bold 14px Segoe UI, sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    /* small white halo */
+    ctx.save();
+    ctx.lineWidth = 4; ctx.strokeStyle = '#fff';
+    ctx.strokeText(label, lx, ly);
+    ctx.restore();
+    ctx.fillText(label, lx, ly);
+  }
+}
+
+function drawRightAngle(ctx, M, V, A, B, color, size){
+  const a1 = Math.atan2(A.y - V.y, A.x - V.x);
+  const a2 = Math.atan2(B.y - V.y, B.x - V.x);
+  let d = a2 - a1;
+  while(d > Math.PI) d -= 2*Math.PI;
+  while(d < -Math.PI) d += 2*Math.PI;
+  const s = size || 16;
+  const u1 = { x: Math.cos(a1), y: Math.sin(a1) };
+  const u2 = { x: Math.cos(a2), y: Math.sin(a2) };
+  const p1 = { x: V.x + u1.x*s/M.scale, y: V.y + u1.y*s/M.scale };
+  const p2 = { x: V.x + u2.x*s/M.scale, y: V.y + u2.y*s/M.scale };
+  const p3 = { x: p1.x + u2.x*s/M.scale, y: p1.y + u2.y*s/M.scale };
+  ctx.strokeStyle = color; ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(M.X(p1.x), M.Y(p1.y));
+  ctx.lineTo(M.X(p3.x), M.Y(p3.y));
+  ctx.lineTo(M.X(p2.x), M.Y(p2.y));
+  ctx.stroke();
+}
+
+/* =========================================================
+   CANVAS A — Part (a)
+   ========================================================= */
+const cvA = document.getElementById('cvA');
+let psqSl = document.getElementById('slPSQ');
+let ptqSl = document.getElementById('slPTQ');
+
+function drawA(){
+  const psq = +psqSl.value;
+  const ptq = +ptqSl.value;
+  document.getElementById('valPSQ').textContent = psq + '°';
+  document.getElementById('valPTQ').textContent = ptq + '°';
+
+  const cfg = buildConfig(psq, ptq);
+  const ctx = setupCanvas(cvA);
+  const M = makeMap(cvA, 158);
+
+  drawGrid(ctx, M);
+  drawAxes(ctx, M);
+  drawCircle(ctx, M);
+
+  /* triangle PST filled */
+  ctx.save();
+  ctx.fillStyle = 'rgba(245,158,11,0.14)';
+  ctx.beginPath();
+  ctx.moveTo(M.X(cfg.P.x), M.Y(cfg.P.y));
+  ctx.lineTo(M.X(cfg.S.x), M.Y(cfg.S.y));
+  ctx.lineTo(M.X(cfg.T.x), M.Y(cfg.T.y));
+  ctx.closePath(); ctx.fill();
+  ctx.restore();
+
+  /* chords */
+  drawLine(ctx, M, cfg.P, cfg.R, COL.dia, 3);            // diameter
+  drawLine(ctx, M, cfg.Q, cfg.S, COL.qs, 2.2);            // QS
+  drawLine(ctx, M, cfg.P, cfg.S, COL.chord, 2);           // PS
+  drawLine(ctx, M, cfg.P, cfg.Q, '#94a3b8', 1.6, [6,5]);  // PQ dashed
+  drawLine(ctx, M, cfg.Q, cfg.R, '#94a3b8', 1.6, [6,5]);  // QR dashed
+  drawLine(ctx, M, cfg.R, cfg.S, COL.chord, 2);           // RS
+  drawLine(ctx, M, cfg.P, cfg.T, COL.triangle, 2.6);      // PT of triangle
+
+  /* angles */
+  drawAngle(ctx, M, cfg.S, cfg.P, cfg.Q, 26, COL.triangle, '∠PSQ='+psq+'°', 48);
+  drawAngle(ctx, M, cfg.T, cfg.P, cfg.Q, 34, COL.rps, '∠PTQ='+ptq+'°', 60);
+  /* ∠RPS */
+  drawAngle(ctx, M, cfg.P, cfg.R, cfg.S, 40, COL.rps, '∠RPS='+(ptq-psq)+'°', 62);
+  /* ∠RQS at S? no, ∠RQS is at Q between R and S */
+  drawAngle(ctx, M, cfg.Q, cfg.R, cfg.S, 26, COL.rqs, '∠RQS='+(ptq-psq)+'°', 48);
+
+  /* points */
+  drawPoint(ctx, M, cfg.P, 'P', COL.dia, {x:-20,y:12});
+  drawPoint(ctx, M, cfg.R, 'R', COL.dia, {x:20,y:12});
+  drawPoint(ctx, M, cfg.Q, 'Q', '#7c3aed', {x:-14,y:-18});
+  drawPoint(ctx, M, cfg.S, 'S', '#0ea5e9', {x:16,y:18});
+  drawPoint(ctx, M, cfg.T, 'T', COL.rps, {x:6,y:-14});
+
+  /* centre */
+  ctx.fillStyle='#94a3b8';
+  ctx.beginPath(); ctx.arc(M.X(0),M.Y(0),3.5,0,2*Math.PI); ctx.fill();
+  ctx.fillStyle='#94a3b8'; ctx.font='12px Segoe UI';
+  ctx.textAlign='left'; ctx.fillText('O', M.X(0)+7, M.Y(0)+14);
+
+  /* readouts */
+  document.getElementById('roA').textContent =
+    '∠RPS = ∠PTQ − ∠PSQ = ' + ptq + '° − ' + psq + '° = ' + (ptq-psq) + '°';
+  document.getElementById('roA2').textContent =
+    '∠RQS = ∠RPS (same segment) = ' + (ptq-psq) + '°';
+
+  /* title */
+  ctx.fillStyle = COL.muted; ctx.font = '13px Segoe UI';
+  ctx.textAlign = 'left';
+  ctx.fillText('Part (a): exterior angle of △PST', 12, 20);
+}
+
+psqSl.addEventListener('input', drawA);
+ptqSl.addEventListener('input', drawA);
+
+/* =========================================================
+   CANVAS B — Part (b)
+   ========================================================= */
+const cvB = document.getElementById('cvB');
+let rqsSl = document.getElementById('slRQS');
+let cbRight = document.getElementById('cbRight');
+let cbSplit = document.getElementById('cbSplit');
+
+function drawB(){
+  const rqsDeg = +rqsSl.value;
+  document.getElementById('valRQS').textContent = rqsDeg + '°';
+
+  /* For Part (b) we want a clean picture:
+     PR diameter, Q on upper arc, S on lower arc, and ∠RQS = rqsDeg.
+     ∠RQS subtends chord RS.  ∠RPS also subtends RS, so ∠RPS = rqsDeg.
+     Then ∠PSQ = ∠PTQ - ∠RPS ... but easier: use the fact that
+     ∠PQS = 90 - ∠RQS.  We construct Q and S so that ∠RQS = rqsDeg.
+     Chord RS subtends ∠RPS at P, so the ray PS makes angle rqsDeg with PR.
+     Also Q is determined by ∠PQR = 90 (semi-circle) and the requirement
+     that ∠RQS = rqsDeg.  We simply build a config with
+        PSQ = 90 - rqsDeg - ?  ... 
+     Cleaner: pick PSQ so that PTQ = PSQ + RPS, with RPS = rqsDeg,
+     and choose PTQ reasonably.  But actually the simplest faithful
+     construction: P=(-1,0), R=(1,0), S on lower arc chosen so that
+     ∠RPS = rqsDeg  (i.e. ray from P at angle -rqsDeg hits circle at S).
+     Q on upper arc chosen so that ∠RQS = rqsDeg.
+  */
+  const P = { x:-1, y:0 };
+  const R = { x: 1, y:0 };
+
+  /* S on lower arc: ray from P at angle -rqsDeg (below x-axis) */
+  const rps = deg(rqsDeg);
+  const dxS = Math.cos(rps), dyS = -Math.sin(rps);
+  const tS = 2*dxS;
+  const S = { x: P.x + tS*dxS, y: P.y + tS*dyS };
+
+  /* Q on upper arc such that ∠RQS = rqsDeg.
+     ∠RQS is angle at Q between Q->R and Q->S.
+     Parametrise Q by polar angle q in (0, pi) (upper semicircle).
+     Use bisection on f(q) = angleAt(Q, R, S) - rqsDeg.
+     Q must be to the left of the vertical through... let's just search q in (0.1, pi-0.1).
+  */
+  function f(q){
+    const Q = circPt(q);
+    return angleAt(Q, R, S) - rqsDeg;
+  }
+  let lo = 0.05, hi = Math.PI - 0.05;
+  let flo = f(lo), fhi = f(hi);
+  let qQ = null;
+  if(flo*fhi < 0){
+    for(let i=0;i<80;i++){
+      const mid=(lo+hi)/2, fm=f(mid);
+      if(flo*fm <= 0){ hi=mid; fhi=fm; } else { lo=mid; flo=fm; }
+    }
+    qQ = (lo+hi)/2;
+  } else {
+    let best=null, bestErr=1e9;
+    for(let i=1;i<2000;i++){
+      const q = lo + (hi-lo)*i/2000;
+      const e = Math.abs(f(q));
+      if(e<bestErr){bestErr=e;best=q;}
+    }
+    qQ = best;
+  }
+  const Q = circPt(qQ);
+  const T = lineInt(P, R, Q, S);
+
+  const ctx = setupCanvas(cvB);
+  const M = makeMap(cvB, 158);
+
+  drawGrid(ctx, M);
+  drawAxes(ctx, M);
+  drawCircle(ctx, M);
+
+  /* fill right angle region at Q if checkbox on */
+  if(cbRight.checked){
+    ctx.save();
+    ctx.fillStyle = 'rgba(220,38,38,0.08)';
+    ctx.beginPath();
+    ctx.moveTo(M.X(Q.x), M.Y(Q.y));
+    ctx.lineTo(M.X(P.x), M.Y(P.y));
+    ctx.lineTo(M.X(R.x), M.Y(R.y));
+    ctx.closePath(); ctx.fill();
+    ctx.restore();
+  }
+
+  /* chords */
+  drawLine(ctx, M, P, R, COL.dia, 3);
+  drawLine(ctx, M, Q, S, COL.qs, 2.2);
+  drawLine(ctx, M, Q, P, COL.chord, 2);
+  drawLine(ctx, M, Q, R, COL.chord, 2);
+  drawLine(ctx, M, R, S, '#94a3b8', 1.6, [6,5]);
+  drawLine(ctx, M, P, S, '#94a3b8', 1.6, [6,5]);
+
+  /* right angle marker at Q */
+  if(cbRight.checked){
+    drawRightAngle(ctx, M, Q, P, R, COL.right, 20);
+    const midx = (M.X(Q.x)+M.X(P.x)+M.X(R.x))/3;
+    const midy = (M.Y(Q.y)+M.Y(P.y)+M.Y(R.y))/3;
+    ctx.fillStyle = COL.right;
+    ctx.font = 'bold 14px Segoe UI';
+    ctx.textAlign='center';
+    ctx.save();
+    ctx.lineWidth=4; ctx.strokeStyle='#fff';
+    ctx.strokeText('∠PQR = 90°', midx, midy+34);
+    ctx.restore();
+    ctx.fillText('∠PQR = 90°', midx, midy+34);
+  }
+
+  /* split angles if checkbox */
+  if(cbSplit.checked){
+    drawAngle(ctx, M, Q, P, S, 30, COL.pqs, '∠PQS='+(90-rqsDeg)+'°', 56);
+    drawAngle(ctx, M, Q, S, R, 52, COL.rqs, '∠RQS='+rqsDeg+'°', 78);
+  } else {
+    drawAngle(ctx, M, Q, P, R, 34, '#7c3aed', '∠PQR=90°', 60);
+  }
+
+  /* points */
+  drawPoint(ctx, M, P, 'P', COL.dia, {x:-20,y:12});
+  drawPoint(ctx, M, R, 'R', COL.dia, {x:20,y:12});
+  drawPoint(ctx, M, Q, 'Q', '#7c3aed', {x:-14,y:-18});
+  drawPoint(ctx, M, S, 'S', '#0ea5e9', {x:16,y:18});
+  if(T) drawPoint(ctx, M, T, 'T', '#e11d48', {x:6,y:-14});
+
+  /* centre */
+  ctx.fillStyle='#94a3b8';
+  ctx.beginPath(); ctx.arc(M.X(0),M.Y(0),3.5,0,2*Math.PI); ctx.fill();
+  ctx.fillStyle='#94a3b8'; ctx.font='12px Segoe UI';
+  ctx.textAlign='left'; ctx.fillText('O', M.X(0)+7, M.Y(0)+14);
+
+  /* readouts */
+  document.getElementById('roB').textContent =
+    '∠PQR = 90°  (PR is a diameter)';
+  document.getElementById('roB2').textContent =
+    '∠PQS = 90° − ' + rqsDeg + '° = ' + (90-rqsDeg) + '°';
+
+  /* title */
+  ctx.fillStyle = COL.muted; ctx.font = '13px Segoe UI';
+  ctx.textAlign = 'left';
+  ctx.fillText('Part (b): angle in a semi-circle splits at Q', 12, 20);
+}
+
+rqsSl.addEventListener('input', drawB);
+cbRight.addEventListener('change', drawB);
+cbSplit.addEventListener('change', drawB);
+
+/* =========================================================
+   INIT
+   ========================================================= */
+window.addEventListener('load', function(){
+  drawA();
+  drawB();
+  updateBtn('A');
+  updateBtn('B');
+  if(window.MathJax && MathJax.typesetPromise){
+    MathJax.typesetPromise();
+  }
+});
+/* also draw immediately in case load already fired */
+drawA(); drawB(); updateBtn('A'); updateBtn('B');
+</script>
+</body>
+</html>

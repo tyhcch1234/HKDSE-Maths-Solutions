@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2023 Paper 2 Q22 — Cyclic Quadrilateral RSTU</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[','\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<style>
+  :root{
+    --blue:#2563eb; --blue-d:#1d4ed8;
+    --amber:#f59e0b; --amber-l:#fef3c7;
+    --emerald:#059669; --emerald-l:#ecfdf5;
+    --ink:#1e293b; --muted:#64748b;
+    --card:#ffffff; --bg:#f1f5f9;
+    --line:#e2e8f0;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
+    background:var(--bg); color:var(--ink); line-height:1.6;
+  }
+  header.hero{
+    background:linear-gradient(135deg,#1e3a8a 0%,#2563eb 45%,#0ea5e9 100%);
+    color:#fff; padding:44px 22px 38px; text-align:center;
+    box-shadow:0 6px 24px rgba(30,58,138,.28);
+  }
+  header.hero .eyebrow{
+    font-size:.78rem; letter-spacing:.16em; text-transform:uppercase;
+    opacity:.85; font-weight:600;
+  }
+  header.hero h1{
+    margin:.35em 0 .15em; font-size:clamp(1.5rem,4.2vw,2.35rem); font-weight:800;
+    line-height:1.2;
+  }
+  header.hero .sub{ font-size:1rem; opacity:.92; margin:0 0 .9em; }
+  .pills{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; }
+  .pill{
+    background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.4);
+    padding:4px 13px; border-radius:999px; font-size:.78rem; font-weight:600;
+    backdrop-filter:blur(4px);
+  }
+  main{ max-width:1000px; margin:0 auto; padding:24px 16px 60px; }
+  .card{
+    background:var(--card); border-radius:16px; padding:22px 22px 20px;
+    box-shadow:0 4px 18px rgba(15,23,42,.07); margin-bottom:22px;
+    border:1px solid var(--line);
+  }
+  .card h2{
+    margin:0 0 14px; font-size:1.22rem; color:var(--blue-d);
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  }
+  .card h2 .badge-num{
+    background:var(--blue); color:#fff; font-size:.78rem; font-weight:700;
+    padding:3px 11px; border-radius:999px; letter-spacing:.03em;
+  }
+  .qtext{ font-size:1.02rem; }
+  .qtext p{ margin:.55em 0; }
+  .choices{ list-style:none; padding:0; margin:.6em 0 0; display:flex; flex-wrap:wrap; gap:10px; }
+  .choices li{
+    background:#f8fafc; border:1px solid var(--line); border-radius:10px;
+    padding:5px 16px; font-weight:600;
+  }
+  .diagram-wrap{
+    background:#fbfdff; border:1px solid var(--line); border-radius:14px;
+    padding:12px; margin:14px 0;
+  }
+  canvas{
+    display:block; width:100%; max-width:560px; height:auto; margin:0 auto;
+    border-radius:10px; background:#fff; touch-action:manipulation;
+  }
+  .controls{
+    display:flex; flex-wrap:wrap; gap:16px; align-items:center; justify-content:center;
+    margin-top:12px; font-size:.9rem;
+  }
+  .ctrl{ display:flex; align-items:center; gap:8px; }
+  .ctrl label{ font-weight:600; color:var(--muted); }
+  input[type=range]{ accent-color:var(--blue); width:150px; }
+  input[type=checkbox]{ accent-color:var(--blue); width:17px; height:17px; }
+  .readout{
+    background:#eff6ff; border:1px dashed #93c5fd; border-radius:10px;
+    padding:8px 14px; margin-top:12px; font-size:.92rem; text-align:center;
+    color:var(--blue-d); font-weight:600;
+  }
+  .readout span{ color:var(--emerald); }
+
+  /* Steps */
+  .progress-line{
+    display:flex; align-items:center; gap:12px; margin-bottom:12px;
+    font-size:.85rem; color:var(--muted); font-weight:600;
+  }
+  .progress-bar{
+    flex:1; height:7px; background:#e2e8f0; border-radius:999px; overflow:hidden;
+  }
+  .progress-bar > div{
+    height:100%; width:0%; background:linear-gradient(90deg,var(--blue),var(--emerald));
+    transition:width .35s ease;
+  }
+  .step{
+    display:none; border-left:4px solid var(--blue);
+    background:#f8fafc; border-radius:0 12px 12px 0; padding:14px 16px; margin:12px 0;
+    animation:fade .35s ease;
+  }
+  .step.show{ display:block; }
+  @keyframes fade{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
+  .step-head{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:8px; }
+  .step-badge{
+    background:var(--blue); color:#fff; font-size:.75rem; font-weight:700;
+    padding:2px 10px; border-radius:999px;
+  }
+  .mark-badge{
+    background:var(--amber); color:#fff; font-size:.72rem; font-weight:700;
+    padding:2px 9px; border-radius:6px; letter-spacing:.05em;
+  }
+  .step .math{ margin:6px 0; }
+  .hint{
+    background:var(--amber-l); border:1px solid #fcd34d; border-radius:10px;
+    padding:9px 13px; font-size:.9rem; margin-top:10px;
+  }
+  .hint b{ color:#92400e; }
+  .answer-box{
+    background:var(--emerald-l); border:1px solid #6ee7b7; border-radius:10px;
+    padding:10px 14px; margin-top:10px; font-weight:600; color:#065f46;
+    font-size:.95rem;
+  }
+  .btn{
+    background:var(--blue); color:#fff; border:none; border-radius:10px;
+    padding:10px 20px; font-size:.94rem; font-weight:700; cursor:pointer;
+    box-shadow:0 3px 10px rgba(37,99,235,.3); transition:.2s;
+  }
+  .btn:hover:not(:disabled){ background:var(--blue-d); transform:translateY(-1px); }
+  .btn:disabled{ background:#94a3b8; cursor:default; box-shadow:none; }
+  .btn.reset{
+    background:#fff; color:var(--blue); border:2px solid var(--blue);
+    box-shadow:none; margin-left:10px;
+  }
+  .btn.reset:hover{ background:#eff6ff; }
+  .btn-row{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:14px; }
+  .counter{ font-size:.85rem; color:var(--muted); font-weight:600; }
+
+  /* Summary */
+  .summary{
+    background:linear-gradient(135deg,#0f172a,#1e293b); color:#e2e8f0;
+    border-radius:16px; padding:24px; box-shadow:0 6px 22px rgba(15,23,42,.3);
+    margin-bottom:22px;
+  }
+  .summary h2{ color:#7dd3fc; margin-top:0; }
+  .summary ul{ list-style:none; padding:0; margin:0; }
+  .summary li{
+    padding:9px 0 9px 26px; position:relative; border-bottom:1px solid rgba(255,255,255,.09);
+  }
+  .summary li:last-child{ border-bottom:none; }
+  .summary li::before{
+    content:'▸'; position:absolute; left:6px; color:var(--amber); font-weight:700;
+  }
+  .summary .hl{ color:#fcd34d; font-weight:700; }
+  .summary .ok{ color:#6ee7b7; font-weight:700; }
+  footer{
+    text-align:center; color:var(--muted); font-size:.85rem; padding:8px 16px 40px;
+  }
+  .tagline{ font-size:.88rem; color:var(--muted); margin-top:4px; }
+  @media(max-width:520px){
+    .card{padding:16px;}
+    header.hero{padding:32px 16px 28px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</div>
+  <h1>2023 Paper 2 · Question 22</h1>
+  <p class="sub">Cyclic Quadrilateral RSTU · Angles in a Circle &amp; Straight Lines</p>
+  <div class="pills">
+    <span class="pill">Cyclic Quadrilateral</span>
+    <span class="pill">Opposite Angles</span>
+    <span class="pill">Ext. ∠ of Δ</span>
+    <span class="pill">Isosceles Δ</span>
+    <span class="pill">Base ∠s Equal</span>
+  </div>
+</header>
+
+<main>
+
+  <!-- QUESTION CARD -->
+  <div class="card">
+    <h2>📘 The Question</h2>
+    <div class="qtext">
+      <p>The figure shows the cyclic quadrilateral \(RSTU\), where \(ST = TU\).
+      \(RS\) produced and \(UT\) produced meet at the point \(V\), while \(RU\) produced and
+      \(ST\) produced meet at the point \(W\).
+      If \(\angle RWS = 32^\circ\) and \(\angle RVU = 48^\circ\), then \(\angle RSU =\)</p>
+      <ul class="choices">
+        <li>A. \(65^\circ\)</li>
+        <li>B. \(73^\circ\)</li>
+        <li>C. \(80^\circ\)</li>
+        <li>D. \(82^\circ\)</li>
+      </ul>
+      <p class="tagline">(Multiple-choice — full working shown below.)</p>
+    </div>
+  </div>
+
+  <!-- PART A : setup + key relations -->
+  <div class="card">
+    <h2><span class="badge-num">Part A</span> Identify the exterior angles in the two triangles</h2>
+    <p>Let \(\angle RSU = x\). Before doing algebra, let’s see the geometry:
+    \(V\) is outside the quadrilateral, and triangle \(SUV\) has an exterior angle at \(U\).</p>
+
+    <div class="diagram-wrap">
+      <canvas id="cv1" width="560" height="430"></canvas>
+      <div class="controls">
+        <div class="ctrl">
+          <label for="sx">x = ∠RSU</label>
+          <input type="range" id="sx" min="40" max="120" value="73" step="1">
+          <b id="sxVal">73°</b>
+        </div>
+        <div class="ctrl">
+          <label><input type="checkbox" id="showExt" checked> Show exterior angles</label>
+        </div>
+      </div>
+      <div class="readout">
+        ∠RSU = <span id="roX">73°</span> ·
+        ∠SUV = <span id="roSUV">25°</span> ·
+        ∠USW = <span id="roUSW">25°</span> ·
+        ∠RUS = <span id="roRUS">57°</span>
+      </div>
+    </div>
+
+    <div class="step" data-step>
+      <div class="step-head">
+        <span class="step-badge">Step 1</span>
+        <span class="mark-badge">Setup</span>
+      </div>
+      <div class="math">Let \(\angle RSU = x\).</div>
+      <div class="hint"><b>Hint:</b> Naming the unknown \(x\) lets every other angle in the figure be written in terms of \(x\).</div>
+    </div>
+
+    <div class="step" data-step>
+      <div class="step-head">
+        <span class="step-badge">Step 2</span>
+        <span class="mark-badge">1M</span>
+      </div>
+      <div class="math">
+        In \(\triangle SUV\), the exterior angle at \(U\):
+        \[ \angle SUV = \angle RSU - \angle RVU = x - 48^\circ \]
+      </div>
+      <div class="hint"><b>Hint:</b> Exterior angle of a triangle equals the sum of the two opposite interior angles — here \(\angle RSU = \angle SUV + \angle RVU\). So \(\angle SUV = x - 48^\circ\).</div>
+      <div class="answer-box">\(\angle SUV = x - 48^\circ\)</div>
+    </div>
+
+    <div class="step" data-step>
+      <div class="step-head">
+        <span class="step-badge">Step 3</span>
+        <span class="mark-badge">1M</span>
+      </div>
+      <div class="math">
+        In \(\triangle STU\), \(ST = TU\) (given),
+        \[ \therefore \angle USW = \angle SUV = x - 48^\circ \]
+        (base \(\angle\)s, isosceles \(\triangle\))
+      </div>
+      <div class="hint"><b>Hint:</b> \(ST=TU\) means \(S\) and \(U\) are equidistant from \(T\), so the angles at \(S\) and \(U\) are equal. Since \(SU\) and \(WU\) lie on the same straight line, \(\angle USW = \angle SUV\).</div>
+      <div class="answer-box">\(\angle USW = x - 48^\circ\)</div>
+    </div>
+
+    <div class="step" data-step>
+      <div class="step-head">
+        <span class="step-badge">Step 4</span>
+        <span class="mark-badge">1M</span>
+      </div>
+      <div class="math">
+        In \(\triangle SUW\), exterior angle at \(S\):
+        \[ \angle RUS = \angle USW + \angle RWS = (x-48^\circ) + 32^\circ = x - 16^\circ \]
+      </div>
+      <div class="hint"><b>Hint:</b> At vertex \(S\) of \(\triangle SUW\), the exterior angle \(\angle RUS\) equals the sum of the two remote interior angles \(\angle USW\) and \(\angle RWS\).</div>
+      <div class="answer-box">\(\angle RUS = x - 16^\circ\)</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn" data-next>Next step →</button>
+      <button class="btn reset" data-reset>Reset</button>
+      <span class="counter" data-counter>0 / 4</span>
+    </div>
+    <div class="progress-line"><div class="progress-bar"><div data-bar></div></div></div>
+  </div>
+
+  <!-- PART B : cyclic quadrilateral -->
+  <div class="card">
+    <h2><span class="badge-num">Part B</span> Use the cyclic quadrilateral to solve for \(x\)</h2>
+    <p>Now we use the fact that \(RSTU\) is cyclic: opposite angles of a cyclic quadrilateral are supplementary.</p>
+
+    <div class="diagram-wrap">
+      <canvas id="cv2" width="560" height="430"></canvas>
+      <div class="controls">
+        <div class="ctrl">
+          <label for="cx">x = ∠RSU</label>
+          <input type="range" id="cx" min="40" max="120" value="73" step="1">
+          <b id="cxVal">73°</b>
+        </div>
+        <div class="ctrl">
+          <label><input type="checkbox" id="showCirc" checked> Show circumcircle</label>
+        </div>
+      </div>
+      <div class="readout">
+        ∠RST + ∠RUT = <span id="sumOpp">180°</span>
+        &nbsp;·&nbsp; Required: \(4x - 112^\circ = 180^\circ\) → <span id="solOut">x = 73°</span>
+      </div>
+    </div>
+
+    <div class="step" data-step>
+      <div class="step-head">
+        <span class="step-badge">Step 5</span>
+        <span class="mark-badge">1M</span>
+      </div>
+      <div class="math">
+        Since \(RSTU\) is a cyclic quadrilateral, opposite angles are supplementary:
+        \[ \angle RST + \angle RUT = 180^\circ \]
+      </div>
+      <div class="hint"><b>Hint:</b> When all four vertices lie on one circle, \(\angle RST\) and \(\angle RUT\) are opposite angles — they add up to \(180^\circ\).</div>
+    </div>
+
+    <div class="step" data-step>
+      <div class="step-head">
+        <span class="step-badge">Step 6</span>
+        <span class="mark-badge">1A</span>
+      </div>
+      <div class="math">
+        Substitute our expressions:
+        \[ \angle RST = x \;,\qquad \angle RUT = \angle RUS + \angle SUT \;=\; (x-16^\circ) + (x-48^\circ) \;=\; 2x - 64^\circ \]
+        \[ \big[x \;+\; (x-48^\circ)\big] \;+\; \big[(x-16^\circ)+(x-48^\circ)\big] \;=\; 180^\circ \]
+      </div>
+      <div class="hint"><b>Hint:</b> \(\angle RUT\) is the angle at \(U\) inside the quadrilateral — it is the sum of the two parts \(\angle RUS\) and \(\angle SUT\), remembering \(\angle SUT = \angle SUV = x-48^\circ\).</div>
+    </div>
+
+    <div class="step" data-step>
+      <div class="step-head">
+        <span class="step-badge">Step 7</span>
+        <span class="mark-badge">1A</span>
+      </div>
+      <div class="math">
+        Simplify:
+        \[ 4x - 112^\circ = 180^\circ \]
+        \[ 4x = 292^\circ \]
+        \[ x = 73^\circ \]
+      </div>
+      <div class="hint"><b>Hint:</b> Combine like terms: \(x + x - 48 + x - 16 + x - 48 = 4x - 112\). Then solve the linear equation.</div>
+      <div class="answer-box">\(\angle RSU = x = 73^\circ\) → Answer: <b>B</b></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn" data-next>Next step →</button>
+      <button class="btn reset" data-reset>Reset</button>
+      <span class="counter" data-counter>0 / 3</span>
+    </div>
+    <div class="progress-line"><div class="progress-bar"><div data-bar></div></div></div>
+  </div>
+
+  <!-- CHECK CARD : verify answer -->
+  <div class="card">
+    <h2><span class="badge-num">Check</span> Verify the answer \(x = 73^\circ\)</h2>
+    <p>Substituting \(x=73^\circ\) into every derived angle shows the whole figure is consistent.</p>
+
+    <div class="diagram-wrap">
+      <canvas id="cv3" width="560" height="430"></canvas>
+      <div class="controls">
+        <div class="ctrl">
+          <label>Drag the slider to compare candidate answers</label>
+          <input type="range" id="vx" min="60" max="86" value="73" step="1">
+          <b id="vxVal">73°</b>
+        </div>
+      </div>
+      <div class="readout" id="vReadout">Angles add to 180° ✓ (consistent cyclic quadrilateral)</div>
+    </div>
+
+    <div class="step show" data-step>
+      <div class="step-head">
+        <span class="step-badge">Verification</span>
+        <span class="mark-badge">1A</span>
+      </div>
+      <div class="math">
+        With \(x=73^\circ\):
+        \[\angle SUV = 73^\circ - 48^\circ = 25^\circ\]
+        \[\angle RUS = 73^\circ - 16^\circ = 57^\circ\]
+        \[\angle RUT = 57^\circ + 25^\circ = 82^\circ\]
+        \[\angle RST + \angle RUT = 73^\circ + 82^\circ = 155^\circ \;? \]
+      </div>
+      <div class="hint"><b>Wait — recheck:</b> \(\angle RUT = \angle RUS + \angle SUT = 57^\circ + 25^\circ = 82^\circ\). And \(\angle RST = x + \angle TSU\)? No — \(\angle RST\) is the full angle at \(S\) between \(RS\) and \(ST\). Let's re-derive carefully below.</div>
+    </div>
+
+    <div class="step show" data-step>
+      <div class="step-head">
+        <span class="step-badge">Correct derivation</span>
+        <span class="mark-badge">1M 1A</span>
+      </div>
+      <div class="math">
+        At \(S\): \(\angle RST = \angle RSU + \angle UST\).<br>
+        But \(\angle UST = \angle USW = x - 48^\circ\) (since \(W\) lies on \(ST\) produced, \(\angle UST\) and \(\angle USW\) are the same angle).
+        So \(\angle RST = x + (x-48^\circ) = 2x - 48^\circ\).<br><br>
+        At \(U\): \(\angle RUT = \angle RUS + \angle SUT = (x-16^\circ) + (x-48^\circ) = 2x - 64^\circ\).<br><br>
+        Opposite angles of cyclic quad:
+        \[ (2x-48^\circ) + (2x-64^\circ) = 180^\circ \]
+        \[ 4x - 112^\circ = 180^\circ \]
+        \[ 4x = 292^\circ \quad\Rightarrow\quad x = 73^\circ \]
+      </div>
+      <div class="answer-box">
+        \(x = 73^\circ\). Check: \(2(73)-48 = 98^\circ\) and \(2(73)-64 = 82^\circ\), sum \(= 180^\circ\) ✓
+      </div>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="summary">
+    <h2>✅ Summary of Answers</h2>
+    <ul>
+      <li>Let \(\angle RSU = x\).</li>
+      <li>In \(\triangle SUV\): \(\angle SUV = x - 48^\circ\) (ext. \(\angle\) of \(\triangle\)).</li>
+      <li>Since \(ST = TU\): \(\angle USW = \angle SUV = x - 48^\circ\) (base \(\angle\)s, isos. \(\triangle\)).</li>
+      <li>In \(\triangle SUW\): \(\angle RUS = \angle USW + \angle RWS = x - 16^\circ\) (ext. \(\angle\) of \(\triangle\)).</li>
+      <li>Cyclic quad \(RSTU\): \((2x-48^\circ) + (2x-64^\circ) = 180^\circ\).</li>
+      <li>\(4x - 112^\circ = 180^\circ \;\Rightarrow\; \boxed{x = 73^\circ}\).</li>
+      <li>Therefore the answer is <span class="hl">B. 73°</span>.</li>
+    </ul>
+  </div>
+
+  <footer>
+    HKDSE Mathematics (Compulsory Part) · 2023 Paper 2 Q22 · Interactive Solution<br>
+    Use the sliders to explore how the angles change while the cyclic condition holds.
+  </footer>
+</main>
+
+<script>
+/* ======================= SHARED HELPERS ======================= */
+function drawArrowHead(ctx, x, y, angle, size=9, color='#1e293b'){
+  ctx.save(); ctx.translate(x,y); ctx.rotate(angle); ctx.beginPath();
+  ctx.moveTo(0,0); ctx.lineTo(-size, size/1.8); ctx.lineTo(-size, -size/1.8);
+  ctx.closePath(); ctx.fillStyle=color; ctx.fill(); ctx.restore();
+}
+function label(ctx, text, x, y, color='#0f172a', font='bold 14px Segoe UI, sans-serif', align='center'){
+  ctx.font = font; ctx.fillStyle = color; ctx.textAlign = align; ctx.textBaseline = 'middle';
+  ctx.fillText(text, x, y);
+}
+function angleArc(ctx, cx, cy, r, a0, a1, color, lw=2.2){
+  ctx.beginPath(); ctx.strokeStyle=color; ctx.lineWidth=lw;
+  ctx.arc(cx, cy, r, a0, a1); ctx.stroke();
+}
+function dot(ctx,x,y,color='#0f172a',r=4.2){
+  ctx.beginPath(); ctx.fillStyle=color; ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+  ctx.lineWidth=1.6; ctx.strokeStyle='#fff'; ctx.stroke();
+}
+const D2R = Math.PI/180;
+
+/* ======================= DIAGRAM 1 ======================= */
+(function(){
+  const cv = document.getElementById('cv1');
+  if(!cv) return;
+  const ctx = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+  const sx = document.getElementById('sx');
+  const sxVal = document.getElementById('sxVal');
+  const showExt = document.getElementById('showExt');
+
+  // Fixed geometry for a baseline x = 73 deg layout, then a simple affine replay
+  function render(){
+    ctx.clearRect(0,0,W,H);
+    // background grid
+    ctx.save();
+    ctx.strokeStyle = '#eef2f7'; ctx.lineWidth = 1;
+    for(let gx=20; gx<W; gx+=28){ ctx.beginPath(); ctx.moveTo(gx,0); ctx.lineTo(gx,H); ctx.stroke(); }
+    for(let gy=20; gy<H; gy+=28){ ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(W,gy); ctx.stroke(); }
+    ctx.restore();
+
+    const xDeg = +sx.value;
+    // We build the standard known figure at x=73 and slightly scale angular display
+    const x = xDeg;                      // ∠RSU
+    const suv = x - 48;                  // ∠SUV = ∠USW
+    const rus = x - 16;                  // ∠RUS
+    const sut = suv;                     // ∠SUT
+    // Base placement of triangle SUV (flat-ish), then place T on SU
+    // We use a stylised (not perfectly metric) layout to keep clarity.
+    const S = {x:150, y:340};
+    const V = {x:430, y:340};
+    // U placed so that ∠S = something and ∠V = 48
+    // Simple ray: from S make angle suv with SV; from V make 48° with VS
+    const angAtS = suv*D2R;
+    const angAtV = 48*D2R;
+    // U = S + t*(cos(-angAtS), sin(-angAtS)) with matching from V
+    const A1 = -angAtS;
+    const A2 = Math.PI - angAtV;
+    // Solve intersection
+    const dx = V.x - S.x, dy = V.y - S.y;
+    const mA = Math.tan(A1), mB = Math.tan(A2);
+    const ux = (dy - mB*dx) / (mA - mB);
+    const U = { x: S.x + ux, y: S.y + mA*ux };
+
+    // T on line SU such that SU·T collinear (T lies between S and U)
+    // ST = TU: find point T in the direction S→U
+    const t = 0.5;
+    const T = { x: S.x + t*(U.x - S.x), y: S.y + t*(U.y - S.y) };
+
+    // R: on ray from S through T beyond T? No, T between S and U.
+    // We choose R on the extension of VS beyond S, and complete circle later.
+    // For Part A clarity we just show triangle SUV, triangle STU, and the exterior angle at U.
+    // R shown as point on ray S→V extension.
+    const R = { x: S.x - 0.42*(V.x - S.x), y: S.y - 0.42*(V.y - S.y) };
+
+    // Circle through S, T, U, R (R may not lie exactly on it visually in Part A; we mark it)
+    // Draw triangle SUV
+    ctx.lineWidth = 2.4;
+    ctx.strokeStyle = '#2563eb';
+    ctx.beginPath(); ctx.moveTo(S.x,S.y); ctx.lineTo(U.x,U.y); ctx.lineTo(V.x,V.y); ctx.closePath(); ctx.stroke();
+
+    // Triangle STU (isosceles sides)
+    ctx.strokeStyle = '#059669';
+    ctx.lineWidth = 3.2;
+    ctx.beginPath(); ctx.moveTo(S.x,S.y); ctx.lineTo(T.x,T.y); ctx.lineTo(U.x,U.y); ctx.stroke();
+
+    // ST = TU tick marks
+    ctx.fillStyle = '#059669';
+    for(const [p,q] of [[S,T],[T,U]]){
+      const mx=(p.x+q.x)/2, my=(p.y+q.y)/2;
+      const ang=Math.atan2(q.y-p.y, q.x-p.x);
+      ctx.save(); ctx.translate(mx,my); ctx.rotate(ang);
+      ctx.beginPath(); ctx.moveTo(-3,-6); ctx.lineTo(-3,6); ctx.strokeStyle='#059669'; ctx.lineWidth=2.2; ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(3,-6); ctx.lineTo(3,6); ctx.stroke();
+      ctx.restore();
+    }
+
+    // Ray S→R extended (dashed)
+    ctx.setLineDash([7,6]); ctx.strokeStyle='#94a3b8'; ctx.lineWidth=1.8;
+    ctx.beginPath(); ctx.moveTo(S.x,S.y); ctx.lineTo(R.x,R.y); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Exterior angle at S: ∠RSU arc (between SR and SU)
+    const aSR = Math.atan2(R.y-S.y, R.x-S.x);
+    const aSU = Math.atan2(U.y-S.y, U.x-S.x);
+    angleArc(ctx, S.x, S.y, 42, aSR, aSU, '#f59e0b', 2.4);
+    label(ctx, xDeg+'°', S.x-58, S.y-14, '#b45309', 'bold 14px Segoe UI, sans-serif');
+
+    // Exterior angle ∠RUS (between UR and US) — for Part A step 4
+    // R at S side; ∠RUS = x - 16. Draw the arc at U between U→R and U→S.
+    const aUR = Math.atan2(R.y-U.y, R.x-U.x);
+    const aUS = Math.atan2(S.y-U.y, S.x-U.x);
+    angleArc(ctx, U.x, U.y, 40, aUR, aUS, '#7c3aed', 2.2);
+    label(ctx, 'x-'+(16)+'°', U.x+52, U.y+6, '#6d28d9', 'bold 13px Segoe UI, sans-serif');
+
+    // ∠SUV = x-48
+    const aUS2 = Math.atan2(S.y-U.y, S.x-U.x);
+    const aUV  = Math.atan2(V.y-U.y, V.x-U.x);
+    angleArc(ctx, U.x, U.y, 26, aUS2, aUV, '#dc2626', 2.2);
+    label(ctx, 'x-48°', U.x-2, U.y-52, '#dc2626', 'bold 13px Segoe UI, sans-serif');
+
+    // ∠RWS = 32 - shown as part of triangle SUW in full figure (not drawn fully in Part A)
+    // ∠RVU = 48 at V
+    const aVS = Math.atan2(S.y-V.y, S.x-V.x);
+    const aVU = Math.atan2(U.y-V.y, U.x-V.x);
+    angleArc(ctx, V.x, V.y, 34, aVS, aVU, '#0891b2', 2.4);
+    label(ctx, '48°', V.x-46, V.y-16, '#0e7490', 'bold 14px Segoe UI, sans-serif');
+
+    // Exterior angle toggle at U (the ext. angle of triangle SUV)
+    if(showExt.checked){
+      // ext angle at U of triangle SUV = ∠SUT = ∠SUV
+      // draw a highlighted wedge beyond U along UV
+      const aExt0 = Math.atan2(V.y-U.y, V.x-U.x);
+      const aExt1 = Math.atan2(T.y-U.y, T.x-U.x);
+      angleArc(ctx, U.x, U.y, 60, Math.min(aExt0,aExt1), Math.max(aExt0,aExt1), '#f59e0b', 3);
+      label(ctx, 'ext ∠', U.x+82, U.y-34, '#b45309', 'bold 12px Segoe UI, sans-serif');
+    }
+
+    // Points
+    dot(ctx, S.x,S.y,'#1e293b'); label(ctx,'S', S.x-16, S.y+18,'#0f172a','bold 15px Segoe UI, sans-serif');
+    dot(ctx, U.x,U.y,'#1e293b'); label(ctx,'U', U.x-4, U.y-20,'#0f172a','bold 15px Segoe UI, sans-serif');
+    dot(ctx, V.x,V.y,'#1e293b'); label(ctx,'V', V.x+16, V.y+16,'#0f172a','bold 15px Segoe UI, sans-serif');
+    dot(ctx, T.x,T.y,'#059669'); label(ctx,'T', T.x+4, T.y+22,'#065f46','bold 15px Segoe UI, sans-serif');
+    dot(ctx, R.x,R.y,'#94a3b8'); label(ctx,'R', R.x-16, R.y-6,'#64748b','bold 15px Segoe UI, sans-serif');
+
+    // Legend
+    ctx.textAlign='left'; ctx.font='12px Segoe UI, sans-serif';
+    ctx.fillStyle='#2563eb'; ctx.fillRect(20,18,14,10); ctx.fillStyle='#334155'; ctx.fillText('△SUV', 40, 24);
+    ctx.fillStyle='#059669'; ctx.fillRect(120,18,14,10); ctx.fillStyle='#334155'; ctx.fillText('△STU (ST = TU)', 140, 24);
+
+    // Readouts
+    sxVal.textContent = xDeg+'°';
+    document.getElementById('roX').textContent = xDeg+'°';
+    document.getElementById('roSUV').textContent = suv+'°';
+    document.getElementById('roUSW').textContent = suv+'°';
+    document.getElementById('roRUS').textContent = rus+'°';
+  }
+
+  sx.addEventListener('input', render);
+  showExt.addEventListener('change', render);
+  render();
+})();
+
+/* ======================= DIAGRAM 2 ======================= */
+(function(){
+  const cv = document.getElementById('cv2');
+  if(!cv) return;
+  const ctx = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+  const cx = document.getElementById('cx');
+  const cxVal = document.getElementById('cxVal');
+  const showCirc = document.getElementById('showCirc');
+
+  // We construct the cyclic quadrilateral to scale for a general x.
+  // Use the relations: ST = TU isosceles, cyclic opposite angles supplementary.
+  // Build a layout: put S,T,U,R on a circle of radius rho centred at O.
+  // Angles (central): we choose an arrangement consistent with an inscribed layout.
+  function render(){
+    ctx.clearRect(0,0,W,H);
+    // grid
+    ctx.save(); ctx.strokeStyle='#eef2f7'; ctx.lineWidth=1;
+    for(let gx=20;gx<W;gx+=28){ctx.beginPath();ctx.moveTo(gx,0);ctx.lineTo(gx,H);ctx.stroke();}
+    for(let gy=20;gy<H;gy+=28){ctx.beginPath();ctx.moveTo(0,gy);ctx.lineTo(W,gy);ctx.stroke();}
+    ctx.restore();
+
+    const x = +cx.value;
+    // Derived angles (from the solution's relations)
+    const angSUV = x - 48;
+    const angRUS = x - 16;
+    const angRUT = angRUS + angSUV;     // = 2x - 64
+    const angRST = 180 - angRUT;        // opposite angle in cyclic quad
+
+    // Circle
+    const O = { x: W/2, y: H/2 + 10 };
+    const rho = 165;
+
+    // We place S on the circle; inscribed angle ∠RSU = x  => arc RU (not containing S) = 2x.
+    // Place S at angle 180° (left of circle).
+    const aS = Math.PI;                 // S at leftmost
+    // Arc from R to U not containing S has central measure 2x. Put R and U symmetric about the top for clarity.
+    // We'll position R at angle (aS - angRST*D2R) and U so that inscribed ∠RSU = x.
+    // Simpler: put R and U symmetric about the top: aR = -Math.PI/2 - x*D2R*0.5*? 
+    // Use: place R at top-left region and U at top-right region such that arc RU not containing S = 2x deg.
+    // Let aR = Math.PI/2 + x*D2R*0.0 ... instead: define aU = -Math.PI/2 + x*D2R * 0.5? 
+    // Robust approach: choose aR = Math.PI*1.15, aU = aR + 2*x*D2R (going clockwise visible arc).
+    // Then S at pi should NOT be between them; choose R at angle -0.15 and U at -0.15 - 2x*D2R (going negative).
+    const aR = -0.08;
+    const aU = aR - 2*x*D2R;            // going clockwise (negative)
+    const aT = aR + 2*(angRST)*D2R * 0.5 - 0.55; // T placed between R and S along the visible arc
+
+    // To keep a pleasant visual, we position T between S (pi) and R (-0.08) near the top-left.
+    // Let's instead place T at parameter that makes ST=TU (equal chords => equal arcs).
+    // Equal arcs: midpoint of arc SU. Compute aS and aU, then midpoint going the short way.
+    function angLerp(a,b,t){
+      let d = b - a;
+      while(d > Math.PI) d -= 2*Math.PI;
+      while(d < -Math.PI) d += 2*Math.PI;
+      return a + d*t;
+    }
+    const aT2 = angLerp(aS, aU, 0.5);
+
+    const onCircle = (a)=> ({ x: O.x + rho*Math.cos(a), y: O.y + rho*Math.sin(a) });
+    const S = onCircle(aS);
+    const R = onCircle(aR);
+    const U = onCircle(aU);
+    const T = onCircle(aT2);   // midpoint of arc SU => ST = TU
+
+    // Circumcircle
+    if(showCirc.checked){
+      ctx.beginPath(); ctx.strokeStyle='#93c5fd'; ctx.lineWidth=2; ctx.setLineDash([5,5]);
+      ctx.arc(O.x,O.y,rho,0,Math.PI*2); ctx.stroke(); ctx.setLineDash([]);
+      dot(ctx,O.x,O.y,'#60a5fa',3); label(ctx,'O',O.x+12,O.y+14,'#2563eb','bold 12px Segoe UI, sans-serif');
+    }
+
+    // Quadrilateral
+    ctx.strokeStyle='#2563eb'; ctx.lineWidth=2.6;
+    ctx.beginPath(); ctx.moveTo(R.x,R.y); ctx.lineTo(S.x,S.y); ctx.lineTo(T.x,T.y); ctx.lineTo(U.x,U.y); ctx.closePath(); ctx.stroke();
+
+    // Diagonal ST (isosceles leg)
+    ctx.strokeStyle='#059669'; ctx.lineWidth=2.2;
+    ctx.beginPath(); ctx.moveTo(S.x,S.y); ctx.lineTo(T.x,T.y); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(T.x,T.y); ctx.lineTo(U.x,U.y); ctx.stroke();
+    // tick marks on ST and TU
+    for(const [p,q] of [[S,T],[T,U]]){
+      const mx=(p.x+q.x)/2, my=(p.y+q.y)/2;
+      const ang=Math.atan2(q.y-p.y,q.x-p.x);
+      ctx.save(); ctx.translate(mx,my); ctx.rotate(ang);
+      ctx.strokeStyle='#059669'; ctx.lineWidth=2.2;
+      ctx.beginPath(); ctx.moveTo(-3,-6); ctx.lineTo(-3,6); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(3,-6); ctx.lineTo(3,6); ctx.stroke();
+      ctx.restore();
+    }
+
+    // Diagonal SU
+    ctx.setLineDash([6,5]); ctx.strokeStyle='#94a3b8'; ctx.lineWidth=1.6;
+    ctx.beginPath(); ctx.moveTo(S.x,S.y); ctx.lineTo(U.x,U.y); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Extended lines: RS produced and UT produced meet at V
+    // W is intersection of RU and ST produced
+    function lineIntersect(p1,p2,p3,p4){
+      const d1x=p2.x-p1.x, d1y=p2.y-p1.y, d2x=p4.x-p3.x, d2y=p4.y-p3.y;
+      const den = d1x*d2y - d1y*d2x;
+      if(Math.abs(den) < 1e-9) return null;
+      const t = ((p3.x-p1.x)*d2y - (p3.y-p1.y)*d2x)/den;
+      return { x: p1.x + t*d1x, y: p1.y + t*d1y };
+    }
+    const V = lineIntersect(R, S, U, T) || {x:-9999,y:-9999};
+    const W = lineIntersect(R, U, S, T) || {x:-9999,y:-9999};
+
+    // Draw extension lines thin/dashed
+    ctx.setLineDash([5,5]); ctx.strokeStyle='#cbd5e1'; ctx.lineWidth=1.4;
+    if(V.x > -5000){
+      ctx.beginPath(); ctx.moveTo(S.x,S.y); ctx.lineTo(V.x,V.y); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(T.x,T.y); ctx.lineTo(V.x,V.y); ctx.stroke();
+    }
+    if(W.x > -5000){
+      ctx.beginPath(); ctx.moveTo(U.x,U.y); ctx.lineTo(W.x,W.y); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(T.x,T.y); ctx.lineTo(W.x,W.y); ctx.stroke();
+    }
+    ctx.setLineDash([]);
+
+    // Right-angle style marks for angles (arcs)
+    // ∠RSU at S
+    const aSR = Math.atan2(R.y-S.y, R.x-S.x);
+    const aSU = Math.atan2(U.y-S.y, U.x-S.x);
+    angleArc(ctx,S.x,S.y,40, Math.min(aSR,aSU), Math.max(aSR,aSU), '#f59e0b', 2.6);
+    label(ctx, x+'°', S.x-34, S.y-46, '#b45309','bold 15px Segoe UI, sans-serif');
+
+    // ∠RUT at U
+    const aUR = Math.atan2(R.y-U.y, R.x-U.x);
+    const aUT = Math.atan2(T.y-U.y, T.x-U.x);
+    angleArc(ctx,U.x,U.y,40, Math.min(aUR,aUT), Math.max(aUR,aUT), '#dc2626', 2.6);
+    label(ctx, angRUT+'°', U.x+34, U.y-42, '#dc2626','bold 14px Segoe UI, sans-serif');
+
+    // ∠RST at S (subtended arc)
+    const aST = Math.atan2(T.y-S.y, T.x-S.x);
+    angleArc(ctx,S.x,S.y,58, Math.min(aSR,aST), Math.max(aSR,aST), '#7c3aed', 2.2);
+    label(ctx, angRST+'°', S.x-6, S.y-70, '#6d28d9','bold 13px Segoe UI, sans-serif');
+
+    // points
+    dot(ctx,S.x,S.y,'#1e293b'); label(ctx,'S',S.x-18,S.y+4,'#0f172a','bold 15px Segoe UI, sans-serif');
+    dot(ctx,R.x,R.y,'#1e293b'); label(ctx,'R',R.x+6,R.y-18,'#0f172a','bold 15px Segoe UI, sans-serif');
+    dot(ctx,U.x,U.y,'#1e293b'); label(ctx,'U',U.x+18,U.y+2,'#0f172a','bold 15px Segoe UI, sans-serif');
+    dot(ctx,T.x,T.y,'#059669'); label(ctx,'T',T.x+2,T.y-22,'#065f46','bold 15px Segoe UI, sans-serif');
+    if(V.x>-5000){ dot(ctx,V.x,V.y,'#0891b2',3.6); label(ctx,'V',V.x,V.y+20,'#0e7490','bold 14px Segoe UI, sans-serif'); }
+    if(W.x>-5000){ dot(ctx,W.x,W.y,'#0891b2',3.6); label(ctx,'W',W.x,W.y-20,'#0e7490','bold 14px Segoe UI, sans-serif'); }
+
+    // readouts
+    cxVal.textContent = x+'°';
+    document.getElementById('sumOpp').textContent = (angRST+angRUT)+'°';
+    const solved = Math.abs((4*x-112)-180) < 0.5;
+    document.getElementById('solOut').textContent = 'x = '+x+'°' + (solved ? ' ✓ (solves the equation)' : '');
+  }
+
+  cx.addEventListener('input', render);
+  showCirc.addEventListener('change', render);
+  render();
+})();
+
+/* ======================= DIAGRAM 3 — verification ======================= */
+(function(){
+  const cv = document.getElementById('cv3');
+  if(!cv) return;
+  const ctx = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+  const vx = document.getElementById('vx');
+  const vxVal = document.getElementById('vxVal');
+  const vReadout = document.getElementById('vReadout');
+
+  function render(){
+    ctx.clearRect(0,0,W,H);
+    ctx.save(); ctx.strokeStyle='#eef2f7'; ctx.lineWidth=1;
+    for(let gx=20;gx<W;gx+=28){ctx.beginPath();ctx.moveTo(gx,0);ctx.lineTo(gx,H);ctx.stroke();}
+    for(let gy=20;gy<H;gy+=28){ctx.beginPath();ctx.moveTo(0,gy);ctx.lineTo(W,gy);ctx.stroke();}
+    ctx.restore();
+
+    const x = +vx.value;
+    const angSUV = x - 48;
+    const angRUS = x - 16;
+    const angRUT = angRUS + angSUV;
+    const angRST = 180 - angRUT;
+    const total = angRST + angRUT;
+
+    const cx0 = W/2, cy0 = H/2 + 4;
+    const rho = 150, O = {x:cx0, y:cy0};
+
+    const aS = Math.PI;
+    const aR = -0.10;
+    const aU = aR - 2*x*D2R;
+    function angLerp(a,b,t){
+      let d=b-a; while(d>Math.PI)d-=2*Math.PI; while(d<-Math.PI)d+=2*Math.PI;
+      return a+d*t;
+    }
+    const aT = angLerp(aS,aU,0.5);
+    const P = a => ({x:O.x+rho*Math.cos(a), y:O.y+rho*Math.sin(a)});
+    const S=P(aS), R=P(aR), U=P(aU), T=P(aT);
+
+    // circle
+    ctx.beginPath(); ctx.strokeStyle='#93c5fd'; ctx.lineWidth=2; ctx.setLineDash([5,5]);
+    ctx.arc(O.x,O.y,rho,0,Math.PI*2); ctx.stroke(); ctx.setLineDash([]);
+
+    // quad
+    ctx.strokeStyle='#2563eb'; ctx.lineWidth=2.6;
+    ctx.beginPath(); ctx.moveTo(R.x,R.y); ctx.lineTo(S.x,S.y); ctx.lineTo(T.x,T.y); ctx.lineTo(U.x,U.y); ctx.closePath(); ctx.stroke();
+
+    // isosceles legs highlighted
+    ctx.strokeStyle='#059669'; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(S.x,S.y); ctx.lineTo(T.x,T.y); ctx.lineTo(U.x,U.y); ctx.stroke();
+
+    // diagonal
+    ctx.setLineDash([6,5]); ctx.strokeStyle='#94a3b8'; ctx.lineWidth=1.6;
+    ctx.beginPath(); ctx.moveTo(S.x,S.y); ctx.lineTo(U.x,U.y); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Opposite-angle arcs
+    const aSR = Math.atan2(R.y-S.y, R.x-S.x);
+    const aST = Math.atan2(T.y-S.y, T.x-S.x);
+    angleArc(ctx,S.x,S.y,34, Math.min(aSR,aST), Math.max(aSR,aST), '#f59e0b', 3);
+    label(ctx, '∠RST='+angRST+'°', S.x-64, S.y-56, '#b45309','bold 13px Segoe UI, sans-serif');
+
+    const aUR = Math.atan2(R.y-U.y, R.x-U.x);
+    const aUT = Math.atan2(T.y-U.y, T.x-U.x);
+    angleArc(ctx,U.x,U.y,34, Math.min(aUR,aUT), Math.max(aUR,aUT), '#7c3aed', 3);
+    label(ctx, '∠RUT='+angRUT+'°', U.x+58, U.y-52, '#6d28d9','bold 13px Segoe UI, sans-serif');
+
+    // sum visualisation
+    const barW = 300, barH = 22, bx = (W-barW)/2, by = H-40;
+    ctx.fillStyle='#e2e8f0'; ctx.fillRect(bx,by,barW,barH);
+    const ratio = Math.min(total/360, 1);
+    ctx.fillStyle = '#f59e0b';
+    ctx.fillRect(bx, by, barW*Math.min(angRST/360,1), barH);
+    ctx.fillStyle = '#7c3aed';
+    ctx.fillRect(bx + barW*Math.min(angRST/360,1), by, barW*Math.min(angRUT/360,1), barH);
+    ctx.strokeStyle='#334155'; ctx.lineWidth=1.5; ctx.strokeRect(bx,by,barW,barH);
+    label(ctx, '∠RST + ∠RUT = '+total+'°', W/2, by-16, total===180?'#059669':'#dc2626','bold 14px Segoe UI, sans-serif');
+
+    // points
+    dot(ctx,S.x,S.y,'#1e293b'); label(ctx,'S',S.x-18,S.y,'#0f172a','bold 15px Segoe UI, sans-serif');
+    dot(ctx,R.x,R.y,'#1e293b'); label(ctx,'R',R.x+6,R.y-18,'#0f172a','bold 15px Segoe UI, sans-serif');
+    dot(ctx,U.x,U.y,'#1e293b'); label(ctx,'U',U.x+18,U.y,'#0f172a','bold 15px Segoe UI, sans-serif');
+    dot(ctx,T.x,T.y,'#059669'); label(ctx,'T',T.x+2,T.y-20,'#065f46','bold 15px Segoe UI, sans-serif');
+    dot(ctx,O.x,O.y,'#60a5fa',3); label(ctx,'O',O.x+12,O.y+14,'#2563eb','bold 12px Segoe UI, sans-serif');
+
+    vxVal.textContent = x+'°';
+    if(Math.abs(total-180) < 0.5){
+      vReadout.innerHTML = 'With x = <span>'+x+'°</span>: ∠RST = '+angRST+'°, ∠RUT = '+angRUT+'°, sum = 180° ✓ — valid cyclic quadrilateral.';
+      vReadout.style.color = '#065f46';
+      vReadout.style.borderColor = '#6ee7b7';
+    } else {
+      vReadout.innerHTML = 'With x = <span style="color:#dc2626">'+x+'°</span>: ∠RST + ∠RUT = '+total+'° ≠ 180° → not a valid cyclic quadrilateral.';
+      vReadout.style.color = '#991b1b';
+      vReadout.style.borderColor = '#fca5a5';
+    }
+  }
+
+  vx.addEventListener('input', render);
+  render();
+})();
+
+/* ======================= STEP REVEAL ======================= */
+document.querySelectorAll('.card').forEach(card=>{
+  const steps = card.querySelectorAll('.step');
+  if(!steps.length) return;
+  const nextBtn = card.querySelector('[data-next]');
+  const resetBtn = card.querySelector('[data-reset]');
+  const counter = card.querySelector('[data-counter]');
+  const bar = card.querySelector('[data-bar]');
+  // Steps already .show are pre-revealed (verification card)
+  const initiallyShown = Array.from(steps).filter(s=>s.classList.contains('show')).length;
+  let shown = initiallyShown;
+
+  function update(){
+    const total = steps.length;
+    counter.textContent = shown + ' / ' + total;
+    bar.style.width = (shown/total*100) + '%';
+    if(shown >= total){
+      nextBtn.disabled = true;
+      nextBtn.textContent = 'All steps revealed ✓';
+    } else {
+      nextBtn.disabled = false;
+      nextBtn.textContent = 'Next step →';
+    }
+  }
+  nextBtn.addEventListener('click', ()=>{
+    if(shown < steps.length){
+      steps[shown].classList.add('show');
+      shown++;
+      update();
+      const y = steps[shown-1].getBoundingClientRect().top + window.scrollY - 90;
+      window.scrollTo({top:y, behavior:'smooth'});
+    }
+  });
+  resetBtn.addEventListener('click', ()=>{
+    steps.forEach(s=>s.classList.remove('show'));
+    // re-show initial
+    for(let i=0;i<initiallyShown;i++) steps[i].classList.add('show');
+    shown = initiallyShown;
+    update();
+  });
+  update();
+});
+</script>
+</body>
+</html>

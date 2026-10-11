@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2020 Paper 2 Q29 — Inter-quartile Range</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<style>
+  :root{
+    --blue:#1d4ed8;
+    --blue-soft:#e0ecff;
+    --amber:#b45309;
+    --amber-soft:#fef3c7;
+    --emerald:#047857;
+    --emerald-soft:#d1fae5;
+    --ink:#0f172a;
+    --muted:#475569;
+    --line:#e2e8f0;
+    --card:#ffffff;
+    --bg:#f1f5f9;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  /* ---------- HERO ---------- */
+  .hero{
+    background:linear-gradient(135deg,#0f172a 0%,#1d4ed8 55%,#2563eb 100%);
+    color:#fff;
+    padding:38px 20px 46px;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero::after{
+    content:"";
+    position:absolute;
+    right:-70px;top:-70px;
+    width:260px;height:260px;
+    border-radius:50%;
+    background:radial-gradient(circle,rgba(255,255,255,.18),rgba(255,255,255,0) 70%);
+  }
+  .hero-inner{max-width:980px;margin:0 auto;position:relative;z-index:2;}
+  .eyebrow{
+    font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;
+    color:#bfdbfe;font-weight:700;margin:0 0 6px;
+  }
+  .hero h1{
+    margin:0;font-size:clamp(1.45rem,3.6vw,2.15rem);font-weight:800;letter-spacing:-.01em;
+  }
+  .hero .sub{margin:8px 0 16px;color:#dbeafe;font-size:1rem;}
+  .pills{display:flex;flex-wrap:wrap;gap:8px;}
+  .pill{
+    background:rgba(255,255,255,.16);
+    border:1px solid rgba(255,255,255,.32);
+    padding:5px 13px;border-radius:999px;
+    font-size:.8rem;font-weight:600;color:#f8fafc;
+    backdrop-filter:blur(4px);
+  }
+  /* ---------- LAYOUT ---------- */
+  .wrap{max-width:980px;margin:-26px auto 40px;padding:0 16px;}
+  .card{
+    background:var(--card);
+    border-radius:16px;
+    box-shadow:0 6px 22px rgba(15,23,42,.08), 0 1px 3px rgba(15,23,42,.06);
+    padding:22px 22px 24px;
+    margin-bottom:20px;
+    border:1px solid var(--line);
+  }
+  .card h2{
+    margin:0 0 4px;font-size:1.18rem;font-weight:800;color:#0b2447;
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  }
+  .card h2 .tag{
+    font-size:.7rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+    background:var(--blue-soft);color:#1e40af;padding:3px 9px;border-radius:6px;
+  }
+  .card p.lead{margin:6px 0 14px;color:var(--muted);font-size:.95rem;}
+  /* ---------- QUESTION ---------- */
+  .qbox{
+    background:linear-gradient(180deg,#fbfdff,#f6f9ff);
+    border:1px solid #dbe6f6;border-left:5px solid var(--blue);
+    border-radius:12px;padding:16px 18px;
+  }
+  .qbox .marks{
+    float:right;font-size:.78rem;font-weight:700;color:#1e40af;
+    background:var(--blue-soft);padding:2px 10px;border-radius:999px;
+  }
+  .options{margin-top:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;}
+  .opt{
+    border:1px solid var(--line);border-radius:10px;padding:7px 12px;
+    background:#fff;font-weight:600;font-size:.93rem;
+  }
+  /* ---------- CANVAS ---------- */
+  .canvas-wrap{
+    background:#fcfdff;border:1px solid var(--line);border-radius:12px;
+    padding:10px;margin:14px 0 6px;
+  }
+  canvas{width:100%;height:auto;display:block;border-radius:8px;touch-action:pan-y;}
+  .controls{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+    gap:12px;margin-top:12px;
+  }
+  .ctrl{
+    background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:10px 12px;
+  }
+  .ctrl label{font-size:.83rem;font-weight:700;color:#334155;display:block;margin-bottom:6px;}
+  .ctrl input[type=range]{width:100%;accent-color:var(--blue);}
+  .ctrl .val{font-variant-numeric:tabular-nums;font-weight:800;color:var(--blue);}
+  .readout{
+    display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;
+  }
+  .ro{
+    flex:1 1 150px;background:#0f172a;color:#e2e8f0;border-radius:10px;
+    padding:9px 12px;font-size:.84rem;
+  }
+  .ro b{display:block;color:#93c5fd;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px;}
+  .ro span{font-size:1.02rem;font-weight:800;font-variant-numeric:tabular-nums;}
+  .chkrow{display:flex;flex-wrap:wrap;gap:14px;margin-top:10px;}
+  .chkrow label{display:flex;align-items:center;gap:7px;font-size:.85rem;font-weight:600;color:#334155;cursor:pointer;}
+  /* ---------- STEPS ---------- */
+  .step{
+    display:none;
+    border:1px solid var(--line);border-left:5px solid var(--emerald);
+    border-radius:12px;padding:14px 16px;margin-top:12px;background:#fcfffd;
+    animation:reveal .35s ease-out;
+  }
+  .step.show{display:block;}
+  @keyframes reveal{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+  .step-head{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;}
+  .badge{
+    background:var(--emerald);color:#fff;font-size:.75rem;font-weight:800;
+    padding:3px 10px;border-radius:999px;letter-spacing:.04em;
+  }
+  .markbadge{
+    background:#fff7ed;color:#b45309;border:1px solid #fed7aa;
+    font-size:.72rem;font-weight:800;padding:2px 9px;border-radius:999px;
+  }
+  .hint{
+    background:var(--amber-soft);border-left:4px solid #f59e0b;
+    border-radius:8px;padding:9px 12px;margin-top:10px;font-size:.9rem;color:#78350f;
+  }
+  .hint b{color:#92400e;}
+  .answer{
+    background:var(--emerald-soft);border-left:4px solid var(--emerald);
+    border-radius:8px;padding:10px 12px;margin-top:10px;font-size:.95rem;color:#064e3b;
+    font-weight:700;
+  }
+  .btnrow{display:flex;align-items:center;gap:14px;margin-top:16px;flex-wrap:wrap;}
+  button.next{
+    background:linear-gradient(135deg,#1d4ed8,#2563eb);color:#fff;border:none;
+    padding:11px 22px;border-radius:10px;font-size:.92rem;font-weight:700;cursor:pointer;
+    box-shadow:0 4px 12px rgba(29,78,216,.28);transition:transform .12s, box-shadow .12s;
+  }
+  button.next:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 16px rgba(29,78,216,.36);}
+  button.next:disabled{
+    background:#cbd5e1;color:#64748b;box-shadow:none;cursor:not-allowed;
+  }
+  .counter{font-size:.86rem;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums;}
+  .progress{height:6px;background:#e2e8f0;border-radius:999px;overflow:hidden;margin-top:12px;}
+  .progress > i{display:block;height:100%;width:0;background:linear-gradient(90deg,#10b981,#1d4ed8);transition:width .3s;}
+  /* ---------- SUMMARY ---------- */
+  .summary{
+    background:linear-gradient(140deg,#0f172a,#1e293b);
+    color:#e2e8f0;border:none;
+  }
+  .summary h2{color:#fff;}
+  .summary ul{margin:12px 0 0;padding-left:20px;}
+  .summary li{margin-bottom:9px;font-size:.96rem;}
+  .summary .hl{color:#6ee7b7;font-weight:800;}
+  footer{
+    text-align:center;color:#94a3b8;font-size:.8rem;padding:10px 16px 34px;
+  }
+  .kbd{
+    font-family:ui-monospace,Menlo,Consolas,monospace;background:#eef2ff;color:#3730a3;
+    border-radius:5px;padding:1px 6px;font-size:.85em;
+  }
+  @media (max-width:520px){
+    .card{padding:17px 15px 19px;}
+    .hero{padding:28px 16px 38px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= HERO ================= -->
+<header class="hero">
+  <div class="hero-inner">
+    <p class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</p>
+    <h1>2020 Paper 2 · Question 29</h1>
+    <p class="sub">Statistics — Finding the inter-quartile range from a bar chart</p>
+    <div class="pills">
+      <span class="pill">Bar Chart</span>
+      <span class="pill">Median &amp; Quartiles</span>
+      <span class="pill">Inter-quartile Range</span>
+      <span class="pill">Ordered Data</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ================= QUESTION ================= -->
+  <section class="card">
+    <h2><span class="tag">Question</span> Multiple Choice</h2>
+    <div class="qbox">
+      <span class="marks">1 mark</span>
+      <p style="margin:0 0 8px;">
+        The bar chart below shows the distribution of the numbers of pens owned by some students.
+        Find the inter-quartile range of the distribution.
+      </p>
+      <p style="margin:0;color:#475569;font-size:.9rem;">
+        Number of pens: \(4,\;5,\;6,\;7,\;8\). &nbsp; Frequency (number of students): \(6,\;8,\;8,\;4,\;2\).
+      </p>
+      <div class="options">
+        <div class="opt">A. \(1\)</div>
+        <div class="opt">B. \(2\)</div>
+        <div class="opt">C. \(4\)</div>
+        <div class="opt">D. \(6\)</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= PART (a) ================= -->
+  <section class="card">
+    <h2>Part (a) <span class="tag">Read the chart</span></h2>
+    <p class="lead">
+      Read the heights of the bars and total the number of data values. Use the slider to “walk”
+      through the students and watch the cumulative count grow.
+    </p>
+
+    <div class="canvas-wrap">
+      <canvas id="chartCanvas" width="900" height="480"></canvas>
+    </div>
+
+    <div class="controls">
+      <div class="ctrl">
+        <label>Data values included: <span class="val" id="kVal">28</span> / 28</label>
+        <input type="range" id="kSlider" min="0" max="28" value="28" step="1">
+      </div>
+      <div class="ctrl">
+        <label>Cumulative count readout</label>
+        <div id="cumText" style="font-size:.9rem;color:#334155;">
+          4 pens: 6 students · running total 6
+        </div>
+      </div>
+    </div>
+
+    <div class="readout">
+      <div class="ro"><b>Total students \(n\)</b><span id="roTotal">28</span></div>
+      <div class="ro"><b>Mean</b><span id="roMean">5.46</span></div>
+      <div class="ro"><b>Mode</b><span id="roMode">5 &amp; 6</span></div>
+    </div>
+
+    <button class="next" data-target="a">Next step →</button>
+    <span class="counter" data-count="a">0 / 3</span>
+    <div class="progress"><i data-bar="a"></i></div>
+
+    <div class="step" data-group="a">
+      <div class="step-head"><span class="badge">Step 1</span><span class="markbadge">1M</span></div>
+      <p style="margin:0;">Read each bar height (the number of students) from the chart:</p>
+      \[ \text{pens }4:6,\quad \text{pens }5:8,\quad \text{pens }6:8,\quad \text{pens }7:4,\quad \text{pens }8:2 \]
+      <div class="hint"><b>Hint:</b> The horizontal axis lists <em>number of pens owned</em>; the vertical axis lists <em>number of students</em>. Each bar height is a frequency.</div>
+    </div>
+
+    <div class="step" data-group="a">
+      <div class="step-head"><span class="badge">Step 2</span><span class="markbadge">1M</span></div>
+      <p style="margin:0;">Add the frequencies to get the total number of data values:</p>
+      \[ n = 6+8+8+4+2 = 28 \]
+      <div class="hint"><b>Hint:</b> The total number of students is the total number of data values. Always find \(n\) first — the position of the quartiles depends on it.</div>
+    </div>
+
+    <div class="step" data-group="a">
+      <div class="step-head"><span class="badge">Step 3</span><span class="markbadge">1A</span></div>
+      <p style="margin:0;">The distribution has \(28\) data values, so the ordered data can be written as a list of 28 numbers.</p>
+      <div class="answer">\(n = 28\) &nbsp;→&nbsp; there are 28 students in total.</div>
+    </div>
+  </section>
+
+  <!-- ================= PART (b)(i) ================= -->
+  <section class="card">
+    <h2>Part (b)(i) <span class="tag">Lower quartile</span></h2>
+    <p class="lead">
+      With 28 data values, the lower quartile \(Q_1\) is the mean of the 7th and 8th ordered values.
+      Move the slider to highlight the 7th and 8th values.
+    </p>
+
+    <div class="canvas-wrap">
+      <canvas id="q1Canvas" width="900" height="460"></canvas>
+    </div>
+
+    <div class="controls">
+      <div class="ctrl">
+        <label>Highlight position \(k\): <span class="val" id="k1Val">7</span></label>
+        <input type="range" id="k1Slider" min="1" max="28" value="7" step="1">
+      </div>
+      <div class="ctrl">
+        <label>Value at the highlighted position</label>
+        <div id="val1Text" style="font-size:.9rem;color:#334155;">Position 7 → 5 pens</div>
+      </div>
+    </div>
+
+    <div class="readout">
+      <div class="ro"><b>Position of \(Q_1\)</b><span>7th &amp; 8th</span></div>
+      <div class="ro"><b>7th value</b><span>5</span></div>
+      <div class="ro"><b>8th value</b><span>5</span></div>
+      <div class="ro"><b>\(Q_1\)</b><span id="roQ1">5</span></div>
+    </div>
+
+    <button class="next" data-target="b1">Next step →</button>
+    <span class="counter" data-count="b1">0 / 4</span>
+    <div class="progress"><i data-bar="b1"></i></div>
+
+    <div class="step" data-group="b1">
+      <div class="step-head"><span class="badge">Step 1</span><span class="markbadge">1M</span></div>
+      <p style="margin:0;">Arrange the 28 values in ascending order. Counting from the left, the first 6 values are \(4\) and the next 8 values are \(5\):</p>
+      \[ \underbrace{4,\ldots,4}_{6\text{ values}},\ \underbrace{5,\ldots,5}_{8\text{ values}},\ \underbrace{6,\ldots,6}_{8\text{ values}},\ \underbrace{7,\ldots,7}_{4\text{ values}},\ \underbrace{8,\ldots,8}_{2\text{ values}} \]
+      <div class="hint"><b>Hint:</b> The cumulative counts are \(6,\ 14,\ 22,\ 26,\ 28\). This tells you exactly which positions hold which value.</div>
+    </div>
+
+    <div class="step" data-group="b1">
+      <div class="step-head"><span class="badge">Step 2</span><span class="markbadge">1M</span></div>
+      <p style="margin:0;">The lower quartile is the \(\dfrac{n}{4}=\dfrac{28}{4}=7\)th ordered value… but since \(n\) is even, take the mean of the 7th and 8th values.</p>
+      <div class="hint"><b>Hint:</b> For \(n\) data values, the lower quartile uses position \(\frac{n+1}{4}\) in the “smooth” convention; with a discrete frequency table the DSE convention is to average the two middle values of the lower half when \(\frac{n}{4}\) is an integer.</div>
+    </div>
+
+    <div class="step" data-group="b1">
+      <div class="step-head"><span class="badge">Step 3</span><span class="markbadge">1A</span></div>
+      <p style="margin:0;">Locate the values using the cumulative counts: positions \(1\text{–}6\) are \(4\); positions \(7\text{–}14\) are \(5\). So the 7th and 8th values are both \(5\):</p>
+      \[ Q_1 = \frac{5+5}{2} = 5 \]
+      <div class="answer">\(Q_1 = 5\) pens</div>
+    </div>
+
+    <div class="step" data-group="b1">
+      <div class="step-head"><span class="badge">Step 4</span><span class="markbadge">1A</span></div>
+      <p style="margin:0;">Check with the diagram: the highlighted 7th and 8th bars both sit on the “5” column.</p>
+      <div class="hint"><b>Hint:</b> Both values are the same, so averaging them simply returns \(5\). A common error is to use the 6th value (\(4\)) or the 14th value.</div>
+    </div>
+  </section>
+
+  <!-- ================= PART (b)(ii) ================= -->
+  <section class="card">
+    <h2>Part (b)(ii) <span class="tag">Upper quartile</span></h2>
+    <p class="lead">
+      The upper quartile \(Q_3\) is the mean of the 21st and 22nd ordered values. Move the slider to
+      see the cumulative count reach the upper half.
+    </p>
+
+    <div class="canvas-wrap">
+      <canvas id="q3Canvas" width="900" height="460"></canvas>
+    </div>
+
+    <div class="controls">
+      <div class="ctrl">
+        <label>Highlight position \(k\): <span class="val" id="k3Val">21</span></label>
+        <input type="range" id="k3Slider" min="1" max="28" value="21" step="1">
+      </div>
+      <div class="ctrl">
+        <label>Value at the highlighted position</label>
+        <div id="val3Text" style="font-size:.9rem;color:#334155;">Position 21 → 6 pens</div>
+      </div>
+    </div>
+
+    <div class="readout">
+      <div class="ro"><b>Position of \(Q_3\)</b><span>21st &amp; 22nd</span></div>
+      <div class="ro"><b>21st value</b><span>6</span></div>
+      <div class="ro"><b>22nd value</b><span>6</span></div>
+      <div class="ro"><b>\(Q_3\)</b><span id="roQ3">6</span></div>
+    </div>
+
+    <button class="next" data-target="b2">Next step →</button>
+    <span class="counter" data-count="b2">0 / 3</span>
+    <div class="progress"><i data-bar="b2"></i></div>
+
+    <div class="step" data-group="b2">
+      <div class="step-head"><span class="badge">Step 1</span><span class="markbadge">1M</span></div>
+      <p style="margin:0;">Use cumulative counts to find where the 21st and 22nd values sit:</p>
+      \[ 6+8=14,\quad 14+8=22 \]
+      So positions \(15\text{–}22\) all hold the value \(6\).
+      <div class="hint"><b>Hint:</b> The upper quartile position is \(\frac{3n}{4}=\frac{3\times28}{4}=21\). Again we take the mean of the 21st and 22nd values.</div>
+    </div>
+
+    <div class="step" data-group="b2">
+      <div class="step-head"><span class="badge">Step 2</span><span class="markbadge">1A</span></div>
+      <p style="margin:0;">Both the 21st and 22nd ordered values are \(6\):</p>
+      \[ Q_3 = \frac{6+6}{2} = 6 \]
+    </div>
+
+    <div class="step" data-group="b2">
+      <div class="step-head"><span class="badge">Step 3</span><span class="markbadge">1A</span></div>
+      <div class="answer">\(Q_3 = 6\) pens</div>
+      <div class="hint"><b>Hint:</b> Do not confuse \(Q_3\) with the maximum value (\(8\)) or the 3rd quartile position \(21\). The quartile is the <em>value</em>, not the position.</div>
+    </div>
+  </section>
+
+  <!-- ================= PART (b)(iii) ================= -->
+  <section class="card">
+    <h2>Part (b)(iii) <span class="tag">Inter-quartile range</span></h2>
+    <p class="lead">
+      The inter-quartile range measures the spread of the middle 50% of the data:
+      \( \mathrm{IQR} = Q_3 - Q_1 \). Drag the slider to change the assumed \(Q_1\) and \(Q_3\)
+      and see the IQR update live.
+    </p>
+
+    <div class="canvas-wrap">
+      <canvas id="iqrCanvas" width="900" height="440"></canvas>
+    </div>
+
+    <div class="controls">
+      <div class="ctrl">
+        <label>Lower quartile \(Q_1\): <span class="val" id="q1SliderVal">5</span></label>
+        <input type="range" id="iqrQ1" min="4" max="6" value="5" step="1">
+      </div>
+      <div class="ctrl">
+        <label>Upper quartile \(Q_3\): <span class="val" id="q3SliderVal">6</span></label>
+        <input type="range" id="iqrQ3" min="6" max="8" value="6" step="1">
+      </div>
+    </div>
+
+    <div class="readout">
+      <div class="ro"><b>\(Q_1\)</b><span id="roIqrQ1">5</span></div>
+      <div class="ro"><b>\(Q_3\)</b><span id="roIqrQ3">6</span></div>
+      <div class="ro"><b>IQR \(=Q_3-Q_1\)</b><span id="roIqr">1</span></div>
+    </div>
+
+    <button class="next" data-target="b3">Next step →</button>
+    <span class="counter" data-count="b3">0 / 3</span>
+    <div class="progress"><i data-bar="b3"></i></div>
+
+    <div class="step" data-group="b3">
+      <div class="step-head"><span class="badge">Step 1</span><span class="markbadge">1M</span></div>
+      <p style="margin:0;">Use the quartiles found earlier:</p>
+      \[ Q_1 = 5,\qquad Q_3 = 6 \]
+      <div class="hint"><b>Hint:</b> The inter-quartile range always uses \(Q_3 - Q_1\) (upper minus lower).</div>
+    </div>
+
+    <div class="step" data-group="b3">
+      <div class="step-head"><span class="badge">Step 2</span><span class="markbadge">1A</span></div>
+      <p style="margin:0;">Substitute into the formula:</p>
+      \[ \mathrm{IQR} = Q_3 - Q_1 = 6 - 5 = 1 \]
+    </div>
+
+    <div class="step" data-group="b3">
+      <div class="step-head"><span class="badge">Step 3</span><span class="markbadge">1A</span></div>
+      <div class="answer">Inter-quartile range \(= 1\) &nbsp;→&nbsp; Answer: <strong>A</strong></div>
+      <div class="hint"><b>Hint:</b> Option B (\(2\)) would be the range of the middle two quartile positions if the data were spread differently; here both quartile values happen to be adjacent integers, giving \(1\).</div>
+    </div>
+  </section>
+
+  <!-- ================= SUMMARY ================= -->
+  <section class="card summary">
+    <h2>Summary of Answers</h2>
+    <ul>
+      <li>Total number of data values: <span class="hl">\(n = 28\)</span></li>
+      <li>Lower quartile: <span class="hl">\(Q_1 = \dfrac{5+5}{2} = 5\)</span></li>
+      <li>Upper quartile: <span class="hl">\(Q_3 = \dfrac{6+6}{2} = 6\)</span></li>
+      <li>Inter-quartile range: <span class="hl">\(Q_3 - Q_1 = 6 - 5 = 1\)</span></li>
+      <li>Correct option: <span class="hl">A. \(1\)</span></li>
+    </ul>
+  </section>
+
+  <footer>
+    HKDSE Mathematics (Compulsory Part) · Paper 2 · 2020 Q29 — interactive solution
+  </footer>
+</div>
+
+<script>
+/* =========================================================
+   SHARED DATA
+   ========================================================= */
+const VALUES = [4,5,6,7,8];
+const FREQ   = [6,8,8,4,2];
+const TOTAL  = FREQ.reduce((a,b)=>a+b,0); // 28
+
+// Build ordered data array
+const ORDERED = [];
+for (let i=0;i<VALUES.length;i++){
+  for (let j=0;j<FREQ[i];j++) ORDERED.push(VALUES[i]);
+}
+// cumulative counts
+const CUM = FREQ.reduce((acc,f)=>{ acc.push((acc.length? acc[acc.length-1]:0)+f); return acc; },[]);
+
+/* =========================================================
+   HELPER: rounded rect
+   ========================================================= */
+function roundRect(ctx,x,y,w,h,r){
+  r = Math.min(r, w/2, h/2);
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+
+/* =========================================================
+   DIAGRAM 1 : BAR CHART with cumulative slider
+   ========================================================= */
+(function(){
+  const canvas = document.getElementById('chartCanvas');
+  const ctx = canvas.getContext('2d');
+  const slider = document.getElementById('kSlider');
+  const kVal = document.getElementById('kVal');
+  const cumText = document.getElementById('cumText');
+
+  const W = canvas.width, H = canvas.height;
+  const padL = 70, padR = 40, padT = 40, padB = 70;
+  const plotW = W - padL - padR;
+  const plotH = H - padT - padB;
+  const yMax = 9;
+  const xMax = 9;
+
+  function barX(i){
+    const step = plotW / xMax;
+    return padL + step * (0.5 + i*1.6);
+  }
+  function barW(){ return (plotW/xMax) * 1.0; }
+  function yOf(v){ return padT + plotH - (v/yMax)*plotH; }
+
+  function draw(){
+    const k = +slider.value;
+    kVal.textContent = k;
+
+    ctx.clearRect(0,0,W,H);
+    // background
+    ctx.fillStyle = '#fcfdff';
+    ctx.fillRect(0,0,W,H);
+
+    // grid lines (horizontal)
+    ctx.strokeStyle = '#e2e8f0';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4,4]);
+    for (let v=0; v<=yMax; v+=2){
+      const y = yOf(v);
+      ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(padL+plotW,y); ctx.stroke();
+    }
+    ctx.setLineDash([]);
+
+    // axes
+    ctx.strokeStyle = '#0f172a';
+    ctx.lineWidth = 2.4;
+    ctx.beginPath();
+    ctx.moveTo(padL, padT);
+    ctx.lineTo(padL, padT+plotH);
+    ctx.lineTo(padL+plotW, padT+plotH);
+    ctx.stroke();
+
+    // y ticks & labels
+    ctx.fillStyle = '#334155';
+    ctx.font = '600 15px Segoe UI, Arial';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    for (let v=0; v<=yMax; v+=2){
+      const y = yOf(v);
+      ctx.fillText(v, padL-10, y);
+      // small tick
+      ctx.beginPath();
+      ctx.moveTo(padL-4,y); ctx.lineTo(padL,y); ctx.strokeStyle='#0f172a'; ctx.lineWidth=2;
+      ctx.stroke();
+    }
+    ctx.save();
+    ctx.translate(20, padT+plotH/2);
+    ctx.rotate(-Math.PI/2);
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillStyle='#0f172a'; ctx.font='700 15px Segoe UI, Arial';
+    ctx.fillText('Number of students', 0, 0);
+    ctx.restore();
+
+    // x labels
+    ctx.fillStyle = '#0f172a';
+    ctx.font = '700 16px Segoe UI, Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    for (let i=0;i<VALUES.length;i++){
+      const x = barX(i);
+      ctx.fillText(VALUES[i], x, padT+plotH+14);
+    }
+    ctx.fillStyle = '#0f172a';
+    ctx.font = '700 15px Segoe UI, Arial';
+    ctx.fillText('Number of pens', padL+plotW/2, padT+plotH+44);
+
+    // Draw bars
+    let running = 0;
+    for (let i=0;i<VALUES.length;i++){
+      const x = barX(i);
+      const w = barW();
+      const h = (FREQ[i]/yMax)*plotH;
+      const y = padT+plotH-h;
+
+      // determine how many of this bar are "counted"
+      const counted = Math.max(0, Math.min(FREQ[i], k - running));
+
+      // outline bar
+      ctx.fillStyle = '#dbeafe';
+      ctx.strokeStyle = '#1d4ed8';
+      ctx.lineWidth = 2;
+      roundRect(ctx, x-w/2, y, w, h, 4);
+      ctx.fill(); ctx.stroke();
+
+      // filled counted part (bottom-up)
+      if (counted > 0){
+        const ch = (counted/yMax)*plotH;
+        ctx.fillStyle = '#2563eb';
+        ctx.save();
+        roundRect(ctx, x-w/2, padT+plotH-ch, w, ch, 4);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // frequency label
+      ctx.fillStyle = '#0f172a';
+      ctx.font = '800 16px Segoe UI, Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'bottom';
+      ctx.fillText(FREQ[i], x, y-6);
+
+      running += FREQ[i];
+
+      // cumulative tick markers at each bar's right side
+      ctx.fillStyle = '#64748b';
+      ctx.font = '600 12px Segoe UI, Arial';
+      ctx.textBaseline = 'top';
+      ctx.fillText('∑'+CUM[i], x, padT+plotH+30);
+    }
+
+    // caption
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    ctx.fillStyle = '#1e40af';
+    ctx.font = '700 15px Segoe UI, Arial';
+    ctx.fillText('Bars filled = first '+k+' of the '+TOTAL+' ordered data values', padL, 10);
+
+    // cumulative text readout
+    let msg = '';
+    let run = 0;
+    for (let i=0;i<VALUES.length;i++){
+      run += FREQ[i];
+      if (k <= run){
+        msg = VALUES[i]+' pens: '+FREQ[i]+' students · running total '+run;
+        break;
+      }
+    }
+    if (k===0) msg = 'None included yet.';
+    cumText.textContent = msg;
+
+    // readouts
+    document.getElementById('roTotal').textContent = TOTAL;
+    let sum = VALUES.reduce((a,v,i)=>a+v*FREQ[i],0);
+    document.getElementById('roMean').textContent = (sum/TOTAL).toFixed(2);
+    document.getElementById('roMode').textContent = '5 & 6';
+  }
+
+  slider.addEventListener('input', draw);
+  draw();
+  window.addEventListener('resize', ()=>{});
+})();
+
+/* =========================================================
+   DIAGRAM 2 : LOWER QUARTILE — ordered strip plot
+   ========================================================= */
+function drawStrip(canvasId, sliderId, valId, valTextId, accent, highlightPositions, showQuartileLabel){
+  const canvas = document.getElementById(canvasId);
+  const ctx = canvas.getContext('2d');
+  const slider = document.getElementById(sliderId);
+  const valEl = document.getElementById(valId);
+  const valText = document.getElementById(valTextId);
+
+  const W = canvas.width, H = canvas.height;
+  const padL = 55, padR = 55, padT = 90, padB = 90;
+  const plotW = W - padL - padR;
+
+  function xOf(pos){
+    // pos from 1..28
+    return padL + (pos-1)/(TOTAL-1) * plotW;
+  }
+
+  function draw(){
+    const k = +slider.value;
+    valEl.textContent = k;
+
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle = '#fcfdff';
+    ctx.fillRect(0,0,W,H);
+
+    // title
+    ctx.fillStyle = accent;
+    ctx.font = '700 15px Segoe UI, Arial';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    ctx.fillText(showQuartileLabel, padL, 18);
+
+    // baseline axis
+    const yAxis = padT + 110;
+    ctx.strokeStyle = '#0f172a';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(padL-14, yAxis);
+    ctx.lineTo(padL+plotW+14, yAxis);
+    ctx.stroke();
+
+    // dotted guides for quartile positions
+    if (highlightPositions){
+      ctx.setLineDash([5,5]);
+      ctx.strokeStyle = accent;
+      ctx.lineWidth = 1.6;
+      highlightPositions.forEach(p=>{
+        const x = xOf(p);
+        ctx.beginPath();
+        ctx.moveTo(x, padT+40);
+        ctx.lineTo(x, yAxis);
+        ctx.stroke();
+      });
+      ctx.setLineDash([]);
+    }
+
+    // draw each ordered data value as a small square
+    for (let i=0;i<TOTAL;i++){
+      const pos = i+1;
+      const val = ORDERED[i];
+      const x = xOf(pos);
+      const size = 20;
+      const y = padT + 70 - (val-3)*18; // small vertical offset by value
+
+      const isHi = (pos === k) || (highlightPositions && highlightPositions.includes(pos));
+
+      ctx.fillStyle = isHi ? accent : '#bfdbfe';
+      ctx.strokeStyle = isHi ? '#0f172a' : '#60a5fa';
+      ctx.lineWidth = isHi ? 2.4 : 1.2;
+      roundRect(ctx, x-size/2, y-size/2, size, size, 5);
+      ctx.fill(); ctx.stroke();
+
+      // value text
+      ctx.fillStyle = isHi ? '#ffffff' : '#1e3a8a';
+      ctx.font = '700 12px Segoe UI, Arial';
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText(val, x, y);
+
+      // position tick every 2
+      if (pos % 2 === 1 || pos===TOTAL){
+        ctx.fillStyle = '#64748b';
+        ctx.font = '600 10px Segoe UI, Arial';
+        ctx.textAlign='center'; ctx.textBaseline='top';
+        ctx.fillText(pos, x, yAxis+6);
+      }
+    }
+
+    // position axis label
+    ctx.fillStyle = '#334155';
+    ctx.font = '700 13px Segoe UI, Arial';
+    ctx.textAlign='left'; ctx.textBaseline='top';
+    ctx.fillText('Position in ordered data (1 → 28)', padL, yAxis+30);
+
+    // value readout for the highlighted position
+    const v = ORDERED[k-1];
+    valText.textContent = 'Position '+k+' → '+v+' pens';
+
+    // if this is the Q1 canvas, update roQ1
+    if (canvasId === 'q1Canvas'){
+      document.getElementById('roQ1').textContent = '5';
+    }
+    if (canvasId === 'q3Canvas'){
+      document.getElementById('roQ3').textContent = '6';
+    }
+  }
+
+  slider.addEventListener('input', draw);
+  draw();
+}
+
+// Q1 diagram
+drawStrip('q1Canvas','k1Slider','k1Val','val1Text','#047857',[7,8],'Lower quartile: mean of 7th and 8th values');
+// Q3 diagram
+drawStrip('q3Canvas','k3Slider','k3Val','val3Text','#b45309',[21,22],'Upper quartile: mean of 21st and 22nd values');
+
+/* =========================================================
+   DIAGRAM 3 : IQR visualiser
+   ========================================================= */
+(function(){
+  const canvas = document.getElementById('iqrCanvas');
+  const ctx = canvas.getContext('2d');
+  const q1s = document.getElementById('iqrQ1');
+  const q3s = document.getElementById('iqrQ3');
+  const q1v = document.getElementById('q1SliderVal');
+  const q3v = document.getElementById('q3SliderVal');
+
+  const W = canvas.width, H = canvas.height;
+  const padL = 90, padR = 60, padT = 90, padB = 90;
+  const plotW = W - padL - padR;
+
+  const yMaxPos = 28; // use positions as scale? No—use value scale 3..9
+
+  function xOf(value){
+    // value scale from 3 to 9 mapped across plotW
+    return padL + (value-3)/(9-3) * plotW;
+  }
+
+  function draw(){
+    let q1 = +q1s.value;
+    let q3 = +q3s.value;
+    if (q3 < q1) q3 = q1;
+    q1v.textContent = q1;
+    q3v.textContent = q3;
+
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle = '#fcfdff';
+    ctx.fillRect(0,0,W,H);
+
+    // title
+    ctx.fillStyle = '#1e40af';
+    ctx.font = '700 15px Segoe UI, Arial';
+    ctx.textAlign='left'; ctx.textBaseline='top';
+    ctx.fillText('Box-plot view of the distribution', padL, 18);
+
+    const yAxis = padT + 130;
+
+    // axis line
+    ctx.strokeStyle = '#0f172a';
+    ctx.lineWidth = 2.4;
+    ctx.beginPath();
+    ctx.moveTo(padL-20, yAxis);
+    ctx.lineTo(padL+plotW+20, yAxis);
+    ctx.stroke();
+
+    // value ticks
+    ctx.fillStyle = '#334155';
+    ctx.font = '700 14px Segoe UI, Arial';
+    ctx.textAlign='center'; ctx.textBaseline='top';
+    for (let v=3; v<=9; v++){
+      const x = xOf(v);
+      ctx.beginPath();
+      ctx.moveTo(x, yAxis-6); ctx.lineTo(x, yAxis+6);
+      ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.fillStyle = '#334155';
+      ctx.fillText(v, x, yAxis+12);
+    }
+
+    // total frequency bar drawn above as stacked small squares
+    const boxY = padT + 40;
+    const boxH = 60;
+    const x1 = xOf(q1), x3 = xOf(q3);
+    const xMin = xOf(4), xMax = xOf(8);
+
+    // whisker line
+    ctx.strokeStyle = '#94a3b8';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(xMin, boxY+boxH/2);
+    ctx.lineTo(x1, boxY+boxH/2);
+    ctx.moveTo(x3, boxY+boxH/2);
+    ctx.lineTo(xMax, boxY+boxH/2);
+    ctx.stroke();
+
+    // whisker caps
+    [xMin, xMax].forEach(x=>{
+      ctx.beginPath();
+      ctx.moveTo(x, boxY+boxH/2-14);
+      ctx.lineTo(x, boxY+boxH/2+14);
+      ctx.stroke();
+    });
+
+    // IQR box
+    ctx.fillStyle = 'rgba(29,78,216,0.18)';
+    ctx.strokeStyle = '#1d4ed8';
+    ctx.lineWidth = 2.4;
+    roundRect(ctx, x1, boxY, Math.max(2,x3-x1), boxH, 6);
+    ctx.fill(); ctx.stroke();
+
+    // Q1 & Q3 vertical lines
+    ctx.strokeStyle = '#1d4ed8';
+    ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(x1, boxY-10); ctx.lineTo(x1, boxY+boxH+10); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x3, boxY-10); ctx.lineTo(x3, boxY+boxH+10); ctx.stroke();
+
+    // Q1 Q3 labels
+    ctx.fillStyle = '#1d4ed8';
+    ctx.font = '800 15px Segoe UI, Arial';
+    ctx.textAlign='center'; ctx.textBaseline='bottom';
+    ctx.fillText('Q₁ = '+q1, x1, boxY-14);
+    ctx.fillText('Q₃ = '+q3, x3, boxY-14);
+
+    // median marker
+    const medX = xOf(6);
+    ctx.strokeStyle = '#047857';
+    ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(medX, boxY-6); ctx.lineTo(medX, boxY+boxH+6); ctx.stroke();
+    ctx.fillStyle = '#047857';
+    ctx.fillText('median = 6', medX, boxY+boxH+26);
+
+    // IQR arrow
+    const arrowY = yAxis + 40;
+    ctx.strokeStyle = '#b45309';
+    ctx.fillStyle = '#b45309';
+    ctx.lineWidth = 2.4;
+    ctx.beginPath(); ctx.moveTo(x1, arrowY); ctx.lineTo(x3, arrowY); ctx.stroke();
+    // arrowheads
+    ctx.beginPath(); ctx.moveTo(x1, arrowY); ctx.lineTo(x1+10, arrowY-6); ctx.lineTo(x1+10, arrowY+6); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(x3, arrowY); ctx.lineTo(x3-10, arrowY-6); ctx.lineTo(x3-10, arrowY+6); ctx.closePath(); ctx.fill();
+    ctx.font = '800 15px Segoe UI, Arial';
+    ctx.textAlign='center'; ctx.textBaseline='bottom';
+    ctx.fillText('IQR = Q₃ − Q₁ = '+(q3-q1), (x1+x3)/2, arrowY-8);
+
+    // readouts
+    document.getElementById('roIqrQ1').textContent = q1;
+    document.getElementById('roIqrQ3').textContent = q3;
+    document.getElementById('roIqr').textContent = q3 - q1;
+  }
+
+  q1s.addEventListener('input', draw);
+  q3s.addEventListener('input', draw);
+  draw();
+})();
+
+/* =========================================================
+   STEP-BY-STEP REVEAL
+   ========================================================= */
+document.querySelectorAll('button.next').forEach(btn=>{
+  const group = btn.dataset.target;
+  const steps = document.querySelectorAll(`.step[data-group="${group}"]`);
+  const counter = document.querySelector(`.counter[data-count="${group}"]`);
+  const bar = document.querySelector(`.progress > i[data-bar="${group}"]`);
+  let shown = 0;
+
+  function update(){
+    // reveal / hide
+    steps.forEach((s,i)=>{
+      s.classList.toggle('show', i < shown);
+    });
+    counter.textContent = shown + ' / ' + steps.length;
+    bar.style.width = (shown/steps.length*100) + '%';
+    if (shown >= steps.length){
+      btn.disabled = true;
+      btn.textContent = 'All steps revealed ✓';
+    } else {
+      btn.disabled = false;
+      btn.textContent = 'Next step →';
+    }
+    // typeset any new math
+    if (window.MathJax && MathJax.typesetPromise){
+      MathJax.typesetPromise();
+    }
+  }
+
+  btn.addEventListener('click', ()=>{
+    if (shown < steps.length){
+      shown++;
+      update();
+    }
+  });
+
+  update();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HKDSE Math 2012 Paper 2 Q12 · Interactive Solution</title>
+
+  <!-- MathJax for LaTeX rendering -->
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #f1f5f9;
+    }
+    .step-card {
+      transition: all 0.35s ease;
+    }
+    .dot {
+      display: inline-block;
+      border-radius: 9999px;
+      background: #3b82f6;
+      margin: 4px;
+    }
+    .pattern-box {
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      min-width: 80px;
+      min-height: 80px;
+      border-radius: 16px;
+      background: #ffffff;
+      border: 2px dashed #cbd5e1;
+      padding: 6px;
+      transition: all 0.3s ease;
+    }
+    .pattern-box.active {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px #bfdbfe;
+      background: #eff6ff;
+    }
+    .btn-primary {
+      background: #2563eb;
+      color: white;
+      padding: 0.6rem 1.4rem;
+      border-radius: 12px;
+      font-weight: 600;
+      transition: background 0.2s;
+      cursor: pointer;
+      border: none;
+      font-size: 1rem;
+    }
+    .btn-primary:hover {
+      background: #1d4ed8;
+    }
+    .btn-outline {
+      background: white;
+      color: #2563eb;
+      border: 2px solid #2563eb;
+      padding: 0.5rem 1.1rem;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-outline:hover {
+      background: #eff6ff;
+    }
+    .badge {
+      display: inline-block;
+      background: #dbeafe;
+      color: #1e40af;
+      border-radius: 9999px;
+      padding: 0.25rem 0.9rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin: 0.2rem;
+    }
+    .hint-box {
+      background: #fffbeb;
+      border-left: 4px solid #f59e0b;
+      border-radius: 0 12px 12px 0;
+      padding: 0.75rem 1rem;
+      margin-top: 0.5rem;
+    }
+    .slider-container {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 8px;
+      border-radius: 8px;
+      background: #e2e8f0;
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #2563eb;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(37,99,235,0.4);
+    }
+    .fade-in {
+      animation: fadeIn 0.5s ease forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .math-block {
+      overflow-x: auto;
+      padding: 0.5rem 0;
+    }
+    /* scroll for long formula */
+    .scroll-x {
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800">
+
+  <main class="max-w-3xl mx-auto px-4 py-8">
+
+    <!-- ========== HEADER ========== -->
+    <header class="text-center mb-8">
+      <p class="text-sm font-semibold tracking-widest text-blue-600 uppercase">HKDSE Mathematics</p>
+      <h1 class="text-2xl sm:text-3xl font-bold mt-1 text-slate-900">2012 Paper 2 · Q12</h1>
+      <p class="text-slate-500 mt-1 text-sm">Formulas and Sequences — Recursive Pattern</p>
+    </header>
+
+    <!-- ========== QUESTION CARD ========== -->
+    <section class="bg-white rounded-2xl shadow-sm p-6 mb-8">
+      <div class="flex flex-wrap gap-2 mb-4">
+        <span class="badge">Sequences</span>
+        <span class="badge">Recursive Formula</span>
+        <span class="badge">Summation</span>
+        <span class="badge">Arithmetic Series</span>
+      </div>
+
+      <h2 class="text-lg font-bold text-slate-900 mb-3">Question</h2>
+      <p class="leading-relaxed mb-4">
+        In the figure, the 1st pattern consists of 1 dot. For any positive integer \(n\), the \((n+1)\)th pattern is formed by adding \(n\) dots to the \(n\)th pattern. Find the number of dots in the 8th pattern.
+      </p>
+
+      <!-- Visual patterns -->
+      <div class="flex flex-wrap items-center justify-center gap-3 mb-4">
+        <div class="pattern-box" id="pv1"></div>
+        <span class="text-slate-400 text-xl">→</span>
+        <div class="pattern-box" id="pv2"></div>
+        <span class="text-slate-400 text-xl">→</span>
+        <div class="pattern-box" id="pv3"></div>
+        <span class="text-slate-400 text-xl">→</span>
+        <div class="pattern-box" id="pv4"></div>
+        <span class="text-slate-400 text-xl">…</span>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
+        <div class="bg-slate-50 rounded-xl p-3 text-center border border-slate-200">
+          <p class="text-xs text-slate-500 font-medium">A</p>
+          <p class="text-lg font-bold text-slate-700">22</p>
+        </div>
+        <div class="bg-blue-50 rounded-xl p-3 text-center border-2 border-blue-500">
+          <p class="text-xs text-blue-600 font-semibold">B</p>
+          <p class="text-lg font-bold text-blue-700">29</p>
+        </div>
+        <div class="bg-slate-50 rounded-xl p-3 text-center border border-slate-200">
+          <p class="text-xs text-slate-500 font-medium">C</p>
+          <p class="text-lg font-bold text-slate-700">36</p>
+        </div>
+        <div class="bg-slate-50 rounded-xl p-3 text-center border border-slate-200">
+          <p class="text-xs text-slate-500 font-medium">D</p>
+          <p class="text-lg font-bold text-slate-700">37</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== INTERACTIVE VISUAL ========== -->
+    <section class="bg-white rounded-2xl shadow-sm p-6 mb-8">
+      <h2 class="text-lg font-bold text-slate-900 mb-3">🔍 Interactive Pattern Explorer</h2>
+      <p class="text-sm text-slate-600 mb-4">Drag the slider to explore how the number of dots grows.</p>
+
+      <div class="slider-container mb-4">
+        <label class="text-sm font-semibold text-slate-700 whitespace-nowrap">Pattern \(n\) =</label>
+        <input type="range" id="patternSlider" min="1" max="10" value="1" step="1">
+        <span id="sliderValue" class="text-xl font-bold text-blue-600 w-10 text-center">1</span>
+      </div>
+
+      <div id="dotDisplay" class="flex flex-wrap justify-center items-center min-h-[90px] bg-slate-50 rounded-xl p-4 border border-slate-200">
+        <!-- dots injected by JS -->
+      </div>
+
+      <div class="mt-4 grid grid-cols-3 gap-3 text-center">
+        <div class="bg-slate-50 rounded-xl p-3 border border-slate-200">
+          <p class="text-xs text-slate-500">Pattern</p>
+          <p id="statPattern" class="text-xl font-bold text-slate-800">1</p>
+        </div>
+        <div class="bg-slate-50 rounded-xl p-3 border border-slate-200">
+          <p class="text-xs text-slate-500">Dots (\(T_n\))</p>
+          <p id="statDots" class="text-xl font-bold text-blue-600">1</p>
+        </div>
+        <div class="bg-slate-50 rounded-xl p-3 border border-slate-200">
+          <p class="text-xs text-slate-500">Added from previous</p>
+          <p id="statAdded" class="text-xl font-bold text-emerald-600">—</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== STEP BY STEP ========== -->
+    <section class="bg-white rounded-2xl shadow-sm p-6 mb-8">
+      <h2 class="text-lg font-bold text-slate-900 mb-4">📝 Step-by-Step Solution</h2>
+
+      <!-- Step 1 -->
+      <div class="step-card border border-slate-200 rounded-xl mb-3 overflow-hidden">
+        <button class="step-header w-full text-left px-5 py-4 bg-slate-50 hover:bg-slate-100 flex justify-between items-center" data-step="1">
+          <span class="font-semibold text-slate-800">Step 1 · Define the sequence</span>
+          <span class="step-arrow text-blue-600 font-bold text-xl transition-transform">＋</span>
+        </button>
+        <div class="step-body hidden px-5 py-4 bg-white">
+          <p class="mb-2">Let \(T(n)\) be the number of dots in the \(n\)th pattern.</p>
+          <div class="math-block">\[
+            T(1) = 1
+          \]</div>
+          <div class="hint-box">
+            <strong>🔑 Hint:</strong> We name the quantity we want to find. \(T\) stands for "total dots".
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step-card border border-slate-200 rounded-xl mb-3 overflow-hidden">
+        <button class="step-header w-full text-left px-5 py-4 bg-slate-50 hover:bg-slate-100 flex justify-between items-center" data-step="2">
+          <span class="font-semibold text-slate-800">Step 2 · Translate the rule into a formula</span>
+          <span class="step-arrow text-blue-600 font-bold text-xl transition-transform">＋</span>
+        </button>
+        <div class="step-body hidden px-5 py-4 bg-white">
+          <p class="mb-2">The rule says: <em>"the \((n+1)\)th pattern is formed by adding \(n\) dots to the \(n\)th pattern."</em></p>
+          <div class="math-block">\[
+            T(n+1) = T(n) + n \quad \text{for any positive integer } n
+          \]</div>
+          <div class="hint-box">
+            <strong>🔑 Hint:</strong> This is a <strong>recursive formula</strong> — each term is built from the previous one.
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="step-card border border-slate-200 rounded-xl mb-3 overflow-hidden">
+        <button class="step-header w-full text-left px-5 py-4 bg-slate-50 hover:bg-slate-100 flex justify-between items-center" data-step="3">
+          <span class="font-semibold text-slate-800">Step 3 · Build upward from \(T(1)\)</span>
+          <span class="step-arrow text-blue-600 font-bold text-xl transition-transform">＋</span>
+        </button>
+        <div class="step-body hidden px-5 py-4 bg-white">
+          <p class="mb-2">Apply the recursive rule with \(n = 1, 2, 3, 4, 5, 6, 7\):</p>
+          <div class="scroll-x math-block">
+            \[
+            \begin{aligned}
+              T(2) &= T(1) + 1 = 1 + 1 = 2 \\
+              T(3) &= T(2) + 2 = 2 + 2 = 4 \\
+              T(4) &= T(3) + 3 = 4 + 3 = 7 \\
+              T(5) &= T(4) + 4 = 7 + 4 = 11 \\
+              T(6) &= T(5) + 5 = 11 + 5 = 16 \\
+              T(7) &= T(6) + 6 = 16 + 6 = 22 \\
+              T(8) &= T(7) + 7 = 22 + 7 = 29
+            \end{aligned}
+            \]</div>
+          <div class="hint-box">
+            <strong>🔑 Hint:</strong> You only need 7 steps to reach the 8th pattern. Be careful — this is a common place for careless mistakes.
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="step-card border border-slate-200 rounded-xl mb-3 overflow-hidden">
+        <button class="step-header w-full text-left px-5 py-4 bg-slate-50 hover:bg-slate-100 flex justify-between items-center" data-step="4">
+          <span class="font-semibold text-slate-800">Step 4 · Unroll into a sum</span>
+          <span class="step-arrow text-blue-600 font-bold text-xl transition-transform">＋</span>
+        </button>
+        <div class="step-body hidden px-5 py-4 bg-white">
+          <p class="mb-2">Substitute repeatedly to express \(T(8)\) directly from \(T(1)\):</p>
+          <div class="scroll-x math-block">
+            \[
+            \begin{aligned}
+              T(8) &= T(7) + 7 \\
+                   &= \big(T(6) + 6\big) + 7 \\
+                   &= \big(T(5) + 5\big) + 6 + 7 \\
+                   &\;\;\vdots \\
+                   &= T(1) + 1 + 2 + 3 + 4 + 5 + 6 + 7
+            \end{aligned}
+            \]</div>
+          <div class="hint-box">
+            <strong>🔑 Hint:</strong> Every intermediate term cancels out, leaving only \(T(1)\) and the sum of added dots.
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 5 -->
+      <div class="step-card border border-slate-200 rounded-xl mb-3 overflow-hidden">
+        <button class="step-header w-full text-left px-5 py-4 bg-slate-50 hover:bg-slate-100 flex justify-between items-center" data-step="5">
+          <span class="font-semibold text-slate-800">Step 5 · Evaluate the arithmetic sum</span>
+          <span class="step-arrow text-blue-600 font-bold text-xl transition-transform">＋</span>
+        </button>
+        <div class="step-body hidden px-5 py-4 bg-white">
+          <p class="mb-2">Use the formula for the sum of the first \(m\) positive integers:</p>
+          <div class="math-block">\[
+            1 + 2 + \cdots + m = \frac{m(m+1)}{2}
+          \]</div>
+          <p class="mt-2">Here \(m = 7\):</p>
+          <div class="math-block">\[
+            1 + 2 + \cdots + 7 = \frac{7 \times 8}{2} = 28
+          \]</div>
+          <div class="hint-box">
+            <strong>🔑 Hint:</strong> The pattern shows a triangular number — recognizable by the formula \(\frac{m(m+1)}{2}\).
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 6 -->
+      <div class="step-card border border-slate-200 rounded-xl mb-3 overflow-hidden">
+        <button class="step-header w-full text-left px-5 py-4 bg-slate-50 hover:bg-slate-100 flex justify-between items-center" data-step="6">
+          <span class="font-semibold text-slate-800">Step 6 · Final answer</span>
+          <span class="step-arrow text-blue-600 font-bold text-xl transition-transform">＋</span>
+        </button>
+        <div class="step-body hidden px-5 py-4 bg-white">
+          <div class="math-block">\[
+            T(8) = T(1) + 28 = 1 + 28 = 29
+          \]</div>
+          <div class="mt-4 bg-green-50 border-2 border-green-500 rounded-xl p-4 text-center">
+            <p class="text-sm font-semibold text-green-700 uppercase tracking-wide">Correct Answer</p>
+            <p class="text-3xl font-bold text-green-700 mt-1">B · 29</p>
+          </div>
+          <div class="hint-box mt-4">
+            <strong>⚠️ Common trap:</strong> Choice C (36) is \(T(7) + 8\) — adding 8 instead of 7, or mistakenly treating the 8th additional step as adding 8. The number of dots added in the 8th step is \(n = 7\).
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== PRACTICE TOOL ========== -->
+    <section class="bg-white rounded-2xl shadow-sm p-6 mb-8">
+      <h2 class="text-lg font-bold text-slate-900 mb-3">🧠 Try It: Find \(T(n)\) for any \(n\)</h2>
+      <p class="text-sm text-slate-600 mb-4">Enter a pattern number and check your understanding of the recursive relationship.</p>
+
+      <div class="flex flex-wrap items-center gap-3 mb-4">
+        <label class="font-medium text-slate-700">\(n\) =</label>
+        <input id="practiceInput" type="number" min="1" max="20" value="8"
+               class="w-24 px-3 py-2 border-2 border-slate-300 rounded-xl focus:border-blue-500 focus:outline-none text-center text-lg font-semibold" />
+        <button id="practiceBtn" class="btn-primary">Compute \(T(n)\)</button>
+      </div>
+
+      <div id="practiceResult" class="hidden bg-slate-50 border border-slate-200 rounded-xl p-5">
+        <p class="text-sm text-slate-500 mb-1">Number of dots in pattern <span id="resN" class="font-bold text-slate-800"></span>:</p>
+        <p id="resValue" class="text-3xl font-bold text-blue-600"></p>
+        <p id="resFormula" class="text-sm text-slate-600 mt-2"></p>
+      </div>
+    </section>
+
+    <!-- ========== KEY TAKEAWAY ========== -->
+    <section class="bg-blue-50 border-2 border-blue-200 rounded-2xl p-6 mb-10">
+      <h2 class="text-lg font-bold text-blue-900 mb-3">💡 Key Takeaway</h2>
+      <ul class="list-disc list-inside space-y-2 text-slate-700">
+        <li><strong>Recursive definition:</strong> \(T(n+1) = T(n) + n\) means each step adds \(n\) new dots.</li>
+        <li><strong>Unrolling:</strong> \(T(8) = T(1) + (1 + 2 + \cdots + 7)\).</li>
+        <li><strong>Arithmetic sum:</strong> \(1 + 2 + \cdots + m = \frac{m(m+1)}{2}\).</li>
+        <li><strong>Result:</strong> \(T(8) = 1 + 28 = 29\).</li>
+      </ul>
+    </section>
+
+    <footer class="text-center text-xs text-slate-400 pb-8">
+      HKDSE Math 2012 Paper 2 Q12 · Interactive Solution
+    </footer>
+
+  </main>
+
+  <script>
+    /* ========== PATTERN PREVIEW (top static boxes) ========== */
+    function fillPreview(containerId, n) {
+      const el = document.getElementById(containerId);
+      if (!el) return;
+      el.innerHTML = '';
+      for (let i = 0; i < n; i++) {
+        const dot = document.createElement('span');
+        dot.className = 'dot';
+        dot.style.width = '12px';
+        dot.style.height = '12px';
+        el.appendChild(dot);
+      }
+    }
+    fillPreview('pv1', 1);
+    fillPreview('pv2', 2);
+    fillPreview('pv3', 4);
+    fillPreview('pv4', 7);
+
+    /* ========== INTERACTIVE SLIDER ========== */
+    const slider = document.getElementById('patternSlider');
+    const sliderValue = document.getElementById('sliderValue');
+    const dotDisplay = document.getElementById('dotDisplay');
+    const statPattern = document.getElementById('statPattern');
+    const statDots = document.getElementById('statDots');
+    const statAdded = document.getElementById('statAdded');
+
+    function T(n) {
+      // T(n) = 1 + sum_{k=1}^{n-1} k  = 1 + (n-1)n/2
+      return 1 + ((n - 1) * n) / 2;
+    }
+
+    function renderPattern(n) {
+      sliderValue.textContent = n;
+      statPattern.textContent = n;
+      const total = T(n);
+      statDots.textContent = total;
+      statAdded.textContent = n > 1 ? T(n) - T(n - 1) : '—';
+
+      // Render dots
+      dotDisplay.innerHTML = '';
+      const dotSize = 14;
+
+      // Group dots by "layers" for visual interest: add dots in rows
+      // We'll just render all dots in a wrapped flex container
+      for (let i = 0; i < total; i++) {
+        const d = document.createElement('span');
+        d.className = 'dot';
+        d.style.width = dotSize + 'px';
+        d.style.height = dotSize + 'px';
+        d.style.margin = '4px';
+        d.style.background = '#3b82f6';
+        d.style.transition = 'opacity 0.3s ease';
+        d.style.animation = `fadeIn 0.3s ease ${i * 0.02}s both`;
+        dotDisplay.appendChild(d);
+      }
+
+      // Highlight added dots in a different colour
+      if (n > 1) {
+        const prevTotal = T(n - 1);
+        const allDots = dotDisplay.querySelectorAll('.dot');
+        allDots.forEach((d, i) => {
+          if (i >= prevTotal) {
+            d.style.background = '#f59e0b'; // amber for newly added
+          }
+        });
+      }
+    }
+
+    slider.addEventListener('input', () => {
+      renderPattern(Number(slider.value));
+    });
+
+    renderPattern(1); // initial
+
+    /* ========== ACCORDION STEPS ========== */
+    document.querySelectorAll('.step-header').forEach(header => {
+      header.addEventListener('click', () => {
+        const body = header.nextElementSibling;
+        const arrow = header.querySelector('.step-arrow');
+
+        if (body.classList.contains('hidden')) {
+          // Open
+          body.classList.remove('hidden');
+          body.classList.add('fade-in');
+          arrow.textContent = '－';
+        } else {
+          // Close
+          body.classList.add('hidden');
+          body.classList.remove('fade-in');
+          arrow.textContent = '＋';
+        }
+      });
+    });
+
+    /* ========== PRACTICE TOOL ========== */
+    const practiceBtn = document.getElementById('practiceBtn');
+    const practiceInput = document.getElementById('practiceInput');
+    const practiceResult = document.getElementById('practiceResult');
+    const resN = document.getElementById('resN');
+    const resValue = document.getElementById('resValue');
+    const resFormula = document.getElementById('resFormula');
+
+    practiceBtn.addEventListener('click', () => {
+      const n = parseInt(practiceInput.value, 10);
+      if (isNaN(n) || n < 1 || n > 30) {
+        alert('Please enter an integer between 1 and 30.');
+        return;
+      }
+      const result = T(n);
+      resN.textContent = n;
+      resValue.textContent = result;
+      if (n === 1) {
+        resFormula.innerHTML = 'Your turn: \\(T(1) = 1\\)';
+      } else {
+        const sumM = n - 1;
+        const sum = (sumM * (sumM + 1)) / 2;
+        resFormula.innerHTML = `\\(T(${n}) = T(1) + (1 + 2 + \\cdots + ${sumM}) = 1 + \\frac{${sumM} \\times ${sumM + 1}}{2} = 1 + ${sum} = ${result}\\)`;
+      }
+      practiceResult.classList.remove('hidden');
+      // Re-render MathJax
+      if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise([resFormula]);
+      }
+    });
+
+    // Allow Enter key
+    practiceInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') practiceBtn.click();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE Math 2018 Paper 2 Q2 — Step-by-Step Solution</title>
+
+<!-- KaTeX for math rendering -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});"></script>
+
+<!-- Tailwind -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+  body { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  .step-card { transition: all .3s ease; }
+  .step-body { max-height: 0; overflow: hidden; transition: max-height .45s ease, opacity .35s ease; opacity: 0; }
+  .step-body.open { max-height: 1200px; opacity: 1; }
+  .badge { display:inline-flex; align-items:center; padding:.25rem .7rem; border-radius:9999px; font-size:.75rem; font-weight:600; letter-spacing:.02em; }
+  .opt { cursor:pointer; border-radius:.75rem; transition: all .2s ease; }
+  .opt:hover { background:#eef2ff; }
+  .opt.correct { background:#dcfce7; border-color:#22c55e; }
+  .opt.wrong { background:#fee2e2; border-color:#ef4444; }
+  kbd { background:#f1f5f9; border:1px solid #cbd5e1; border-radius:.35rem; padding:.05rem .4rem; font-size:.8em; }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+<div class="max-w-3xl mx-auto px-4 py-6 sm:py-10">
+
+  <!-- Header -->
+  <header class="mb-6">
+    <p class="text-xs font-semibold text-indigo-600 tracking-wide uppercase mb-1">HKDSE Mathematics</p>
+    <h1 class="text-2xl sm:text-3xl font-bold text-slate-900">2018 Paper 2 — Question 2</h1>
+    <p class="text-sm text-slate-500 mt-1">Topic 5 &middot; Formulas and Sequences</p>
+    <div class="flex flex-wrap gap-2 mt-3">
+      <span class="badge bg-indigo-100 text-indigo-700">Formula Manipulation</span>
+      <span class="badge bg-emerald-100 text-emerald-700">Change of Subject</span>
+      <span class="badge bg-amber-100 text-amber-700">Algebraic Fractions</span>
+    </div>
+  </header>
+
+  <!-- Question card -->
+  <section class="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-5 sm:p-6 mb-6">
+    <h2 class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-3">Question</h2>
+    <p class="text-lg mb-3">If
+      <span class="whitespace-nowrap">\(\displaystyle \frac{\alpha}{1-x}=\frac{\beta}{x}\)</span>,
+      then \(x=\)
+    </p>
+
+    <div id="options" class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
+      <div class="opt border border-slate-200 p-3 flex items-center gap-3" data-key="A">
+        <span class="font-bold text-slate-400 w-5">A.</span>
+        <span>\(\displaystyle \frac{\alpha}{\alpha-\beta}\)</span>
+      </div>
+      <div class="opt border border-slate-200 p-3 flex items-center gap-3" data-key="B">
+        <span class="font-bold text-slate-400 w-5">B.</span>
+        <span>\(\displaystyle \frac{\alpha}{\alpha+\beta}\)</span>
+      </div>
+      <div class="opt border border-slate-200 p-3 flex items-center gap-3" data-key="C">
+        <span class="font-bold text-slate-400 w-5">C.</span>
+        <span>\(\displaystyle \frac{\beta}{\alpha-\beta}\)</span>
+      </div>
+      <div class="opt border border-slate-200 p-3 flex items-center gap-3" data-key="D">
+        <span class="font-bold text-slate-400 w-5">D.</span>
+        <span>\(\displaystyle \frac{\beta}{\alpha+\beta}\)</span>
+      </div>
+    </div>
+    <p id="optFeedback" class="text-sm mt-3 h-5"></p>
+  </section>
+
+  <!-- Interactive visualisation -->
+  <section class="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-5 sm:p-6 mb-6">
+    <h2 class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-1">Visual Check</h2>
+    <p class="text-sm text-slate-500 mb-4">Drag the sliders to pick values of \(\alpha\) and \(\beta\). The app computes \(x\) from your answer and verifies it against the original equation.</p>
+
+    <div class="grid sm:grid-cols-2 gap-5 items-start">
+      <div>
+        <label class="text-sm font-medium flex justify-between">
+          <span>\(\alpha\)</span><span id="alphaVal" class="text-indigo-600 font-semibold">2.0</span>
+        </label>
+        <input id="alpha" type="range" min="0.5" max="6" step="0.5" value="2"
+               class="w-full accent-indigo-600">
+
+        <label class="text-sm font-medium flex justify-between mt-4">
+          <span>\(\beta\)</span><span id="betaVal" class="text-indigo-600 font-semibold">3.0</span>
+        </label>
+        <input id="beta" type="range" min="0.5" max="6" step="0.5" value="3"
+               class="w-full accent-indigo-600">
+      </div>
+
+      <div class="bg-slate-50 rounded-xl p-4 text-sm space-y-2">
+        <p>LHS \(\displaystyle \frac{\alpha}{1-x}=\) <span id="lhs" class="font-mono font-semibold text-slate-800">—</span></p>
+        <p>RHS \(\displaystyle \frac{\beta}{x}=\) <span id="rhs" class="font-mono font-semibold text-slate-800">—</span></p>
+        <p class="pt-2 border-t border-slate-200">Using \(\displaystyle x=\frac{\beta}{\alpha+\beta}=\) <span id="xval" class="font-mono font-semibold text-emerald-600">—</span></p>
+        <p id="check" class="text-xs font-semibold"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Step by step -->
+  <section class="bg-white rounded-2xl shadow-sm ring-1 ring-slate-200 p-5 sm:p-6">
+    <h2 class="text-sm font-bold text-slate-500 uppercase tracking-wide mb-4">Step-by-Step Solution</h2>
+
+    <div class="flex gap-3 mb-5">
+      <button id="nextBtn" class="flex-1 bg-indigo-600 hover:bg-indigo-700 active:scale-[.98] text-white font-semibold rounded-xl py-3 transition">
+        Next Step
+      </button>
+      <button id="revealAll" class="px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl py-3 transition text-sm">
+        Reveal All
+      </button>
+      <button id="resetBtn" class="px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl py-3 transition text-sm">
+        Reset
+      </button>
+    </div>
+
+    <div id="steps" class="space-y-3"></div>
+
+    <div id="answerBox" class="mt-5 hidden">
+      <div class="rounded-xl bg-emerald-50 ring-1 ring-emerald-200 p-4">
+        <p class="text-sm font-bold text-emerald-700 uppercase tracking-wide">Answer</p>
+        <p class="text-lg mt-1">\(x=\displaystyle \frac{\beta}{\alpha+\beta}\) &nbsp;→&nbsp; <span class="font-bold">Option D</span></p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="text-center text-xs text-slate-400 mt-8">
+    HKDSE Math 2018 Paper 2 Q2 &middot; Interactive Solution
+  </footer>
+</div>
+
+<script>
+/* ---------------- Step data ---------------- */
+const steps = [
+  {
+    title: "Step 1 — Understand the goal",
+    hint: "We must rewrite the equation so that \\(x\\) stands alone on one side.",
+    body: String.raw`We are given
+    \[\frac{\alpha}{1-x}=\frac{\beta}{x}\;.\]
+    Our target is to make \(x\) the subject of the formula. Note that \(\alpha\) and \(\beta\) are just constants (numbers), not unknowns.`
+  },
+  {
+    title: "Step 2 — Cross-multiply to clear the fractions",
+    hint: "Multiply both sides by \((1-x)\cdot x\).",
+    body: String.raw`Multiply both sides by \((1-x)x\):
+    \[\frac{\alpha}{1-x}\cdot(1-x)x=\frac{\beta}{x}\cdot(1-x)x\]
+    \[\alpha x=\beta(1-x).\]
+    The fractions disappear, leaving a simple linear equation in \(x\).`
+  },
+  {
+    title: "Step 3 — Expand the bracket",
+    hint: "Use the distributive law: \(a(b-c)=ab-ac\).",
+    body: String.raw`Expand the right-hand side:
+    \[\alpha x=\beta-\beta x.\]
+    Every term containing \(x\) will now be collected together.`
+  },
+  {
+    title: "Step 4 — Collect all \(x\) terms on one side",
+    hint: "Add \(\beta x\) to both sides.",
+    body: String.raw`Add \(\beta x\) to both sides:
+    \[\alpha x+\beta x=\beta.\]
+    Now both \(x\) terms are on the left, and the constant \(\beta\) is on the right.`
+  },
+  {
+    title: "Step 5 — Factorise the left-hand side",
+    hint: "Both terms share the factor \(x\).",
+    body: String.raw`Take out the common factor \(x\):
+    \[(\alpha+\beta)x=\beta.\]
+    This is the key step: combining the coefficients of \(x\).`
+  },
+  {
+    title: "Step 6 — Divide to isolate \(x\)",
+    hint: "Divide both sides by \((\alpha+\beta)\).",
+    body: String.raw`Divide both sides by \((\alpha+\beta)\):
+    \[x=\frac{\beta}{\alpha+\beta}.\]
+    Therefore the answer is Option **D**.`
+  }
+];
+
+/* ---------------- Build step cards ---------------- */
+const stepsEl = document.getElementById('steps');
+const nextBtn = document.getElementById('nextBtn');
+const revealAll = document.getElementById('revealAll');
+const resetBtn = document.getElementById('resetBtn');
+const answerBox = document.getElementById('answerBox');
+
+steps.forEach((s, i) => {
+  const card = document.createElement('div');
+  card.className = 'step-card border border-slate-200 rounded-xl overflow-hidden';
+  card.innerHTML = `
+    <button class="step-head w-full text-left px-4 py-3 flex items-center gap-3 bg-slate-50 hover:bg-slate-100 transition">
+      <span class="shrink-0 w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 text-sm font-bold flex items-center justify-center">${i+1}</span>
+      <span class="font-semibold text-slate-800 text-sm sm:text-base">${s.title}</span>
+      <span class="chev ml-auto text-slate-400 transition-transform">▾</span>
+    </button>
+    <div class="step-body px-4 pb-4">
+      <p class="text-xs text-amber-800 bg-amber-50 ring-1 ring-amber-200 rounded-lg p-2 mb-3">
+        <span class="font-bold">Hint:</span> ${s.hint}
+      </p>
+      <div class="text-[15px] leading-relaxed text-slate-700">${s.body}</div>
+    </div>`;
+  stepsEl.appendChild(card);
+
+  const head = card.querySelector('.step-head');
+  const body = card.querySelector('.step-body');
+  const chev = card.querySelector('.chev');
+  head.addEventListener('click', () => {
+    body.classList.toggle('open');
+    chev.style.transform = body.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
+  });
+});
+
+/* Reveal sequentially */
+let revealed = 0;
+function revealNext() {
+  if (revealed >= steps.length) return;
+  const card = stepsEl.children[revealed];
+  card.querySelector('.step-body').classList.add('open');
+  card.querySelector('.chev').style.transform = 'rotate(180deg)';
+  card.scrollIntoView({behavior:'smooth', block:'center'});
+  revealed++;
+  if (revealed === steps.length) {
+    answerBox.classList.remove('hidden');
+    nextBtn.textContent = 'All Steps Revealed ✓';
+    nextBtn.classList.remove('bg-indigo-600','hover:bg-indigo-700');
+    nextBtn.classList.add('bg-emerald-600','hover:bg-emerald-700','cursor-default');
+  }
+}
+nextBtn.addEventListener('click', revealNext);
+
+revealAll.addEventListener('click', () => {
+  while (revealed < steps.length) {
+    stepsEl.children[revealed].querySelector('.step-body').classList.add('open');
+    stepsEl.children[revealed].querySelector('.chev').style.transform = 'rotate(180deg)';
+    revealed++;
+  }
+  answerBox.classList.remove('hidden');
+  nextBtn.textContent = 'All Steps Revealed ✓';
+  nextBtn.classList.remove('bg-indigo-600','hover:bg-indigo-700');
+  nextBtn.classList.add('bg-emerald-600','hover:bg-emerald-700','cursor-default');
+});
+
+resetBtn.addEventListener('click', () => {
+  revealed = 0;
+  [...stepsEl.children].forEach(c => {
+    c.querySelector('.step-body').classList.remove('open');
+    c.querySelector('.chev').style.transform = 'rotate(0deg)';
+  });
+  answerBox.classList.add('hidden');
+  nextBtn.textContent = 'Next Step';
+  nextBtn.classList.add('bg-indigo-600','hover:bg-indigo-700');
+  nextBtn.classList.remove('bg-emerald-600','hover:bg-emerald-700','cursor-default');
+  stepsEl.scrollIntoView({behavior:'smooth', block:'start'});
+});
+
+/* ---------------- Option check ---------------- */
+const opts = document.querySelectorAll('.opt');
+const feedback = document.getElementById('optFeedback');
+
+opts.forEach(o => {
+  o.addEventListener('click', () => {
+    opts.forEach(x => x.classList.remove('correct','wrong'));
+    const key = o.dataset.key;
+    if (key === 'D') {
+      o.classList.add('correct');
+      feedback.textContent = 'Correct! Option D ✓';
+      feedback.className = 'text-sm mt-3 h-5 text-emerald-600 font-semibold';
+    } else {
+      o.classList.add('wrong');
+      const why = {
+        A: 'Close — but check the sign after moving the term across. You should get \\(\\alpha x+\\beta x\\), not \\(\\alpha x-\\beta x\\).',
+        B: 'The \\(x\\) terms were collected, but the numerator should be \\(\\beta\\) since \\((\\alpha+\\beta)x=\\beta\\).',
+        C: 'Wrong denominator: adding \\(\\beta x\\) to both sides gives \\(\\alpha+\\beta\\), not \\(\\alpha-\\beta\\).'
+      };
+      feedback.textContent = why[key];
+      feedback.className = 'text-sm mt-3 h-5 text-rose-600 font-semibold';
+      if (window.renderMathInElement) renderMathInElement(feedback);
+    }
+  });
+});
+
+/* ---------------- Slider visualisation ---------------- */
+const alphaEl = document.getElementById('alpha');
+const betaEl  = document.getElementById('beta');
+const alphaVal= document.getElementById('alphaVal');
+const betaVal = document.getElementById('betaVal');
+const lhsEl = document.getElementById('lhs');
+const rhsEl = document.getElementById('rhs');
+const xEl   = document.getElementById('xval');
+const checkEl = document.getElementById('check');
+
+function fmt(n){
+  if (!isFinite(n)) return 'undefined';
+  return n.toFixed(4);
+}
+
+function update(){
+  const a = parseFloat(alphaEl.value);
+  const b = parseFloat(betaEl.value);
+  alphaVal.textContent = a.toFixed(1);
+  betaVal.textContent  = b.toFixed(1);
+
+  const x = b / (a + b);
+  xEl.textContent = x.toFixed(4);
+
+  const lhs = a / (1 - x);
+  const rhs = b / x;
+  lhsEl.textContent = fmt(lhs);
+  rhsEl.textContent = fmt(rhs);
+
+  const diff = Math.abs(lhs - rhs);
+  if (diff < 1e-9) {
+    checkEl.textContent = '✓ LHS = RHS — the formula works.';
+    checkEl.className = 'text-xs font-semibold text-emerald-600';
+  } else {
+    checkEl.textContent = 'LHS ≠ RHS (difference ' + diff.toExponential(2) + ')';
+    checkEl.className = 'text-xs font-semibold text-rose-600';
+  }
+}
+
+alphaEl.addEventListener('input', update);
+betaEl.addEventListener('input', update);
+update();
+</script>
+</body>
+</html>

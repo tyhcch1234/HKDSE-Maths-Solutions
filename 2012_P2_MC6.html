@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HKDSE 2012 Paper 2 Q6 — Quadratic Graph</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<style>
+  :root{
+    --blue:#2563eb;
+    --blue-dark:#1e3a8a;
+    --amber:#f59e0b;
+    --emerald:#10b981;
+    --ink:#0f172a;
+    --muted:#475569;
+    --card:#ffffff;
+    --soft:#f1f5f9;
+    --radius:18px;
+    --shadow:0 10px 30px rgba(15,23,42,.08);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background:#f8fafc;
+    color:var(--ink);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:900px;margin:0 auto;padding:0 16px 60px;}
+
+  /* ---------- HERO ---------- */
+  header.hero{
+    background:linear-gradient(135deg,#1e3a8a 0%,#2563eb 55%,#3b82f6 100%);
+    color:#fff;
+    padding:42px 16px 38px;
+    position:relative;
+    overflow:hidden;
+  }
+  header.hero::after{
+    content:"";
+    position:absolute; inset:0;
+    background:
+      radial-gradient(circle at 88% 18%, rgba(255,255,255,.18), transparent 45%),
+      radial-gradient(circle at 10% 90%, rgba(245,158,11,.25), transparent 40%);
+    pointer-events:none;
+  }
+  .hero-inner{max-width:900px;margin:0 auto;position:relative;z-index:2;}
+  .eyebrow{
+    text-transform:uppercase;
+    letter-spacing:.14em;
+    font-size:.74rem;
+    font-weight:700;
+    opacity:.85;
+    margin-bottom:10px;
+  }
+  .hero h1{
+    font-size:clamp(1.5rem,4.4vw,2.3rem);
+    margin:0 0 6px;
+    font-weight:800;
+    line-height:1.2;
+  }
+  .hero h1 span{color:#fcd34d;}
+  .hero .subtitle{margin:0 0 18px;font-size:1rem;opacity:.92;}
+  .pills{display:flex;flex-wrap:wrap;gap:8px;}
+  .pill{
+    background:rgba(255,255,255,.16);
+    border:1px solid rgba(255,255,255,.3);
+    padding:5px 12px;
+    font-size:.78rem;
+    font-weight:600;
+    border-radius:999px;
+    backdrop-filter:blur(4px);
+  }
+
+  /* ---------- CARDS ---------- */
+  .card{
+    background:var(--card);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:22px;
+    margin-top:22px;
+    border:1px solid #e2e8f0;
+  }
+  .card h2{
+    font-size:1.14rem;
+    margin:0 0 14px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    color:var(--blue-dark);
+  }
+  .card h2 .num{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:30px;height:30px;
+    border-radius:9px;
+    background:var(--blue);
+    color:#fff;
+    font-size:.86rem;
+    font-weight:700;
+    flex:0 0 auto;
+  }
+
+  .question-text{
+    font-size:1rem;
+  }
+  .q-figure-note{
+    font-size:.82rem;
+    color:var(--muted);
+    margin-top:10px;
+    font-style:italic;
+  }
+
+  /* ---------- CANVAS ---------- */
+  .canvas-box{
+    margin:16px 0 6px;
+    background:#f8fafc;
+    border:1px dashed #cbd5e1;
+    border-radius:14px;
+    padding:10px;
+  }
+  canvas{
+    width:100%;
+    height:auto;
+    display:block;
+    border-radius:10px;
+    background:#ffffff;
+  }
+  .controls{
+    display:flex;
+    flex-wrap:wrap;
+    gap:16px;
+    align-items:center;
+    margin-top:12px;
+    padding:12px 14px;
+    background:var(--soft);
+    border-radius:12px;
+    font-size:.86rem;
+  }
+  .ctrl{display:flex;align-items:center;gap:9px;flex:1 1 240px;min-width:220px;}
+  .ctrl label{font-weight:600;white-space:nowrap;color:var(--muted);}
+  input[type=range]{flex:1;accent-color:var(--blue);cursor:pointer;}
+  .val{
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+    font-weight:700;
+    color:var(--blue-dark);
+    background:#dbeafe;
+    padding:2px 8px;
+    border-radius:7px;
+    min-width:52px;
+    text-align:center;
+    font-size:.82rem;
+  }
+  .chk{display:flex;align-items:center;gap:7px;font-weight:600;color:var(--muted);cursor:pointer;}
+  .chk input{accent-color:var(--amber);width:16px;height:16px;cursor:pointer;}
+
+  .readouts{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:12px;
+  }
+  .chip{
+    background:#ecfdf5;
+    border:1px solid #a7f3d0;
+    color:#065f46;
+    font-size:.8rem;
+    font-weight:700;
+    padding:5px 11px;
+    border-radius:999px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  .chip.blue{background:#eff6ff;border-color:#bfdbfe;color:#1e40af;}
+  .chip.amber{background:#fffbeb;border-color:#fde68a;color:#92400e;}
+
+  /* ---------- STEPS ---------- */
+  .step{
+    display:none;
+    margin-top:14px;
+    padding:16px;
+    border-left:4px solid var(--blue);
+    background:linear-gradient(90deg,#f8fafc,#ffffff);
+    border-radius:0 12px 12px 0;
+  }
+  .step.show{display:block;animation:fade .35s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+  .step-head{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    flex-wrap:wrap;
+    margin-bottom:8px;
+  }
+  .badge-num{
+    background:var(--blue);
+    color:#fff;
+    font-weight:800;
+    font-size:.74rem;
+    padding:4px 10px;
+    border-radius:999px;
+    letter-spacing:.03em;
+  }
+  .badge-mark{
+    background:var(--amber);
+    color:#fff;
+    font-weight:800;
+    font-size:.72rem;
+    padding:4px 9px;
+    border-radius:999px;
+  }
+  .hint{
+    background:#fef9c3;
+    border:1px solid #fde047;
+    border-radius:10px;
+    padding:10px 13px;
+    margin-top:12px;
+    font-size:.88rem;
+    color:#713f12;
+  }
+  .hint strong{color:#854d0e;}
+  .answer-box{
+    background:#ecfdf5;
+    border:1px solid #6ee7b7;
+    border-radius:10px;
+    padding:11px 14px;
+    margin-top:12px;
+    font-size:.93rem;
+    color:#065f46;
+  }
+  .answer-box strong{color:#047857;}
+
+  .next-btn{
+    margin-top:16px;
+    background:var(--blue);
+    color:#fff;
+    border:none;
+    padding:11px 22px;
+    border-radius:11px;
+    font-size:.92rem;
+    font-weight:700;
+    cursor:pointer;
+    transition:.2s;
+    box-shadow:0 5px 14px rgba(37,99,235,.3);
+  }
+  .next-btn:hover:not(:disabled){background:var(--blue-dark);transform:translateY(-1px);}
+  .next-btn:disabled{
+    background:#cbd5e1;
+    box-shadow:none;
+    cursor:not-allowed;
+    color:#64748b;
+  }
+  .counter{
+    font-size:.8rem;
+    font-weight:700;
+    color:var(--muted);
+    margin-left:12px;
+  }
+
+  /* ---------- SUMMARY ---------- */
+  .summary{
+    background:linear-gradient(135deg,#0f172a,#1e293b);
+    color:#e2e8f0;
+    border:none;
+  }
+  .summary h2{color:#fcd34d;}
+  .summary ul{margin:0;padding-left:20px;}
+  .summary li{margin-bottom:9px;}
+  .summary .key{color:#6ee7b7;font-weight:700;}
+
+  footer{
+    text-align:center;
+    color:#94a3b8;
+    font-size:.8rem;
+    padding:34px 16px 10px;
+  }
+
+  @media (max-width:520px){
+    .card{padding:17px;}
+    .controls{flex-direction:column;align-items:stretch;}
+    .ctrl{min-width:0;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= HERO ================= -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</div>
+    <h1>2012 Paper 2 · <span>Question 6</span></h1>
+    <p class="subtitle">7. Functions and Graphs — Reading off \(a\) and \(b\) from a quadratic graph</p>
+    <div class="pills">
+      <span class="pill">Quadratic Graph</span>
+      <span class="pill">Vertex Form</span>
+      <span class="pill">Sign of a &amp; b</span>
+      <span class="pill">Multiple Choice</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ================= QUESTION ================= -->
+  <section class="card">
+    <h2><span class="num">Q</span> The Question</h2>
+    <div class="question-text">
+      <p>
+        The figure shows the graph of
+        \[ y = a(x+b)^2, \]
+        where \(a\) and \(b\) are constants. Which of the following is true?
+      </p>
+      <p>
+        A. \(a > 0\ \) and \(\ b > 0\)<br/>
+        B. \(a > 0\ \) and \(\ b < 0\)<br/>
+        C. \(a < 0\ \) and \(\ b > 0\)<br/>
+        D. \(a < 0\ \) and \(\ b < 0\)
+      </p>
+      <p class="q-figure-note">
+        The given figure shows a downward-opening parabola whose vertex (turning point)
+        touches the positive \(x\)-axis.
+      </p>
+    </div>
+  </section>
+
+  <!-- ================= PART A: SIGN OF a ================= -->
+  <section class="card">
+    <h2><span class="num">a</span> Deciding the sign of \(a\) (the "shape" of the curve)</h2>
+
+    <p>
+      In \(y = a(x+b)^2\), the constant \(a\) controls <em>which way the parabola opens</em>.
+      Drag the slider to change \(a\) and watch the curve.
+    </p>
+
+    <div class="canvas-box">
+      <canvas id="cvA" width="820" height="480"></canvas>
+    </div>
+
+    <div class="controls">
+      <div class="ctrl">
+        <label for="sliderA">\(a =\)</label>
+        <input type="range" id="sliderA" min="-3" max="3" step="0.25" value="1" />
+        <span class="val" id="valA">1.00</span>
+      </div>
+      <div class="ctrl">
+        <label for="sliderB1">\(b =\)</label>
+        <input type="range" id="sliderB1" min="-4" max="4" step="0.25" value="-2" />
+        <span class="val" id="valB1">-2.00</span>
+      </div>
+      <label class="chk"><input type="checkbox" id="chkVertexA" checked /> show vertex &amp; axis</label>
+    </div>
+
+    <div class="readouts">
+      <span class="chip blue" id="aShapeChip">curves upwards</span>
+      <span class="chip amber" id="aVertChip">vertex = (2.00, 0.00)</span>
+    </div>
+
+    <div class="step" id="a-step-1">
+      <div class="step-head">
+        <span class="badge-num">Step 1</span>
+        <span class="badge-mark">1M</span>
+      </div>
+      <p>Compare \(y = a(x+b)^2\) with the given graph. The graph opens <strong>downwards</strong>, so the coefficient of \(x^2\) is negative.</p>
+      <div class="hint"><strong>Hint:</strong> Expanding, \(y=ax^2+2ab\,x+ab^2\) — the leading coefficient is exactly \(a\).</div>
+      <div class="answer-box"><strong>\(\Rightarrow\ a < 0\)</strong></div>
+    </div>
+
+    <div class="step" id="a-step-2">
+      <div class="step-head">
+        <span class="badge-num">Step 2</span>
+        <span class="badge-mark">1A</span>
+      </div>
+      <p>Test it on the canvas: when \(a>0\) the curve is a "smile "; when \(a<0\) it is a "frown ". The figure is a frown, so \(a\) is negative.</p>
+      <div class="hint"><strong>Hint:</strong> Only a frown can sit above the \(x\)-axis with its vertex touching it.</div>
+      <div class="answer-box"><strong>Confirmed: \(a < 0\)</strong></div>
+    </div>
+
+    <button class="next-btn" data-target="a">Next step →</button>
+    <span class="counter" id="cnt-a">0 / 2</span>
+  </section>
+
+  <!-- ================= PART B: SIGN OF b ================= -->
+  <section class="card">
+    <h2><span class="num">b</span> Deciding the sign of \(b\) (position of the vertex)</h2>
+
+    <p>
+      The vertex of \(y=a(x+b)^2\) is the point where \(x+b = 0\), i.e. \(x=-b\).
+      In the figure the vertex lies on the <strong>positive</strong> part of the \(x\)-axis,
+      so \(-b > 0\). Move the slider to see the vertex travelling.
+    </p>
+
+    <div class="canvas-box">
+      <canvas id="cvB" width="820" height="480"></canvas>
+    </div>
+
+    <div class="controls">
+      <div class="ctrl">
+        <label for="sliderB2">\(b =\)</label>
+        <input type="range" id="sliderB2" min="-4" max="4" step="0.25" value="-2" />
+        <span class="val" id="valB2">-2.00</span>
+      </div>
+      <div class="ctrl">
+        <label for="sliderA2">\(a =\)</label>
+        <input type="range" id="sliderA2" min="-3" max="-0.25" step="0.25" value="-1" />
+        <span class="val" id="valA2">-1.00</span>
+      </div>
+      <label class="chk"><input type="checkbox" id="chkVertexB" checked /> show vertex &amp; axis</label>
+    </div>
+
+    <div class="readouts">
+      <span class="chip" id="bVertChip">vertex x = -b = 2.00</span>
+      <span class="chip blue" id="bSignChip">-b &gt; 0</span>
+    </div>
+
+    <div class="step" id="b-step-1">
+      <div class="step-head">
+        <span class="badge-num">Step 1</span>
+        <span class="badge-mark">1M</span>
+      </div>
+      <p>Put the equation in vertex form: \(y = a\,(x - (-b))^2\).</p>
+      <p>The vertex is at \[ x = -b, \qquad y = 0. \]</p>
+      <div class="hint"><strong>Hint:</strong> \((x+b)^2 = 0 \iff x = -b\), and at that \(x\) the value \(y\) is \(0\).</div>
+      <div class="answer-box"><strong>Vertex \(= (-b,\ 0)\)</strong></div>
+    </div>
+
+    <div class="step" id="b-step-2">
+      <div class="step-head">
+        <span class="badge-num">Step 2</span>
+        <span class="badge-mark">1A</span>
+      </div>
+      <p>From the figure the vertex lies on the <strong>positive</strong> \(x\)-axis:</p>
+      <p>\[ -b > 0 \quad\Rightarrow\quad b < 0. \]</p>
+      <div class="hint"><strong>Hint:</strong> Dividing an inequality by \(-1\) flips the sign. So \(-b>0\) means \(b\) itself is negative.</div>
+      <div class="answer-box"><strong>\(\Rightarrow\ b < 0\)</strong></div>
+    </div>
+
+    <button class="next-btn" data-target="b">Next step →</button>
+    <span class="counter" id="cnt-b">0 / 2</span>
+  </section>
+
+  <!-- ================= SUMMARY ================= -->
+  <section class="card summary">
+    <h2><span class="num">✓</span> Summary &amp; Answer</h2>
+    <ul>
+      <li>Expanding \(y=a(x+b)^2 = ax^2 + 2ab\,x + ab^2\), the leading coefficient is \(a\).</li>
+      <li>Graph opens <span class="key">downwards</span> ⟹ \(a < 0\).</li>
+      <li>Vertex is at \(x = -b\); it lies on the <span class="key">positive</span> \(x\)-axis ⟹ \(-b > 0\) ⟹ \(b < 0\).</li>
+      <li>Therefore the correct choice is <span class="key">D. \(a < 0\) and \(b < 0\)</span>.</li>
+    </ul>
+  </section>
+
+  <footer>
+    HKDSE Mathematics 2012 · Paper 2 · Q6 — interactive solution page.
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ====================== SHARED DRAW HELPERS ====================== */
+  // A small graphing environment: world coords (x from xMin..xMax, y from yMin..yMax)
+  function makeGraph(cv, opts){
+    const ctx = cv.getContext('2d');
+    const W = cv.width, H = cv.height;
+    const pad = opts.pad || 52;
+    const g = {
+      ctx: ctx, W: W, H: H, pad: pad,
+      xMin: opts.xMin, xMax: opts.xMax,
+      yMin: opts.yMin, yMax: opts.yMax
+    };
+    g.X = function(x){ return pad + (x - g.xMin) / (g.xMax - g.xMin) * (W - 2*pad); };
+    g.Y = function(y){ return H - pad - (y - g.yMin) / (g.yMax - g.yMin) * (H - 2*pad); };
+    g.pX = function(x){ return g.X(x) };   // alias
+    g.pY = function(y){ return g.Y(y) };
+    return g;
+  }
+
+  function drawGrid(g, stepX, stepY){
+    const ctx = g.ctx;
+    ctx.clearRect(0,0,g.W,g.H);
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0,0,g.W,g.H);
+
+    // minor grid
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "#eef2f7";
+    for (let x = Math.ceil(g.xMin/stepX)*stepX; x <= g.xMax; x += stepX){
+      ctx.beginPath();
+      ctx.moveTo(g.X(x), g.Y(g.yMin));
+      ctx.lineTo(g.X(x), g.Y(g.yMax));
+      ctx.stroke();
+    }
+    for (let y = Math.ceil(g.yMin/stepY)*stepY; y <= g.yMax; y += stepY){
+      ctx.beginPath();
+      ctx.moveTo(g.X(g.xMin), g.Y(y));
+      ctx.lineTo(g.X(g.xMax), g.Y(y));
+      ctx.stroke();
+    }
+
+    // axes
+    ctx.strokeStyle = "#334155";
+    ctx.lineWidth = 2.2;
+    // x-axis
+    const y0 = Math.max(Math.min(0, g.yMax), g.yMin);
+    ctx.beginPath();
+    ctx.moveTo(g.X(g.xMin), g.Y(y0));
+    ctx.lineTo(g.X(g.xMax), g.Y(y0));
+    ctx.stroke();
+    // y-axis
+    const x0 = Math.max(Math.min(0, g.xMax), g.xMin);
+    ctx.beginPath();
+    ctx.moveTo(g.X(x0), g.Y(g.yMin));
+    ctx.lineTo(g.X(x0), g.Y(g.yMax));
+    ctx.stroke();
+
+    // arrow heads
+    ctx.fillStyle = "#334155";
+    // x-axis arrow
+    ctx.beginPath();
+    ctx.moveTo(g.X(g.xMax), g.Y(y0));
+    ctx.lineTo(g.X(g.xMax)-12, g.Y(y0)-5);
+    ctx.lineTo(g.X(g.xMax)-12, g.Y(y0)+5);
+    ctx.closePath(); ctx.fill();
+    // y-axis arrow
+    ctx.beginPath();
+    ctx.moveTo(g.X(x0), g.Y(g.yMax));
+    ctx.lineTo(g.X(x0)-5, g.Y(g.yMax)+12);
+    ctx.lineTo(g.X(x0)+5, g.Y(g.yMax)+12);
+    ctx.closePath(); ctx.fill();
+
+    // labels
+    ctx.fillStyle = "#0f172a";
+    ctx.font = "italic 17px Georgia, serif";
+    ctx.fillText("x", g.X(g.xMax)-6, g.Y(y0)+24);
+    ctx.fillText("y", g.X(x0)+12, g.Y(g.yMax)+6);
+    ctx.fillText("O", g.X(x0)-20, g.Y(y0)+20);
+
+    // tick numbers on x-axis
+    ctx.font = "12px ui-monospace, monospace";
+    ctx.fillStyle = "#64748b";
+    ctx.textAlign = "center";
+    for (let x = Math.ceil(g.xMin/stepX)*stepX; x <= g.xMax; x += stepX){
+      if (Math.abs(x) < 1e-9) continue;
+      ctx.fillText(x.toFixed(0), g.X(x), g.Y(y0)+18);
+    }
+    ctx.textAlign = "left";
+  }
+
+  function plotQuadratic(g, a, b, color, lw){
+    const ctx = g.ctx;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = lw || 3;
+    ctx.beginPath();
+    let first = true;
+    const N = 500;
+    for (let i = 0; i <= N; i++){
+      const x = g.xMin + (g.xMax - g.xMin) * i / N;
+      const y = a * (x + b) * (x + b);
+      if (y < g.yMin - 5 || y > g.yMax + 5){ first = true; continue; }
+      if (first){ ctx.moveTo(g.X(x), g.Y(y)); first = false; }
+      else ctx.lineTo(g.X(x), g.Y(y));
+    }
+    ctx.stroke();
+  }
+
+  function drawVertex(g, a, b, show){
+    if (!show) return;
+    const ctx = g.ctx;
+    const vx = -b, vy = 0;
+    const px = g.X(vx), py = g.Y(vy);
+
+    // vertical axis of symmetry
+    ctx.save();
+    ctx.setLineDash([6,6]);
+    ctx.strokeStyle = "#94a3b8";
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    ctx.moveTo(px, py);
+    ctx.lineTo(px, g.Y(g.yMin));
+    ctx.stroke();
+    ctx.restore();
+
+    // vertex dot
+    ctx.fillStyle = "#e11d48";
+    ctx.beginPath();
+    ctx.arc(px, py, 6, 0, Math.PI*2);
+    ctx.fill();
+    ctx.strokeStyle = "#fff";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // vertex label
+    ctx.fillStyle = "#be123c";
+    ctx.font = "bold 14px ui-monospace, monospace";
+    const label = "(" + vx.toFixed(2) + ", " + vy.toFixed(2) + ")";
+    const lx = px + 10, ly = py - 14;
+    ctx.fillText(label, lx, ly);
+
+    // dotted guides from vertex to axes
+    ctx.save();
+    ctx.setLineDash([4,5]);
+    ctx.strokeStyle = "#fca5a5";
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.moveTo(px, py);
+    ctx.lineTo(g.X(Math.max(Math.min(0,g.xMax),g.xMin)), py);
+    ctx.stroke();
+    ctx.restore();
+    ctx.fillStyle = "#be123c";
+    ctx.font = "13px ui-monospace, monospace";
+    ctx.fillText("x = " + vx.toFixed(2), px - 30, py + 22);
+  }
+
+  function drawEquationLabel(g, a, b){
+    const ctx = g.ctx;
+    const aStr = a.toFixed(2).replace(/\.00$/,'');
+    const bStr = (b >= 0 ? "+ " : "− ") + Math.abs(b).toFixed(2);
+    const text = "y = " + aStr + "(x " + bStr + ")²";
+    ctx.font = "bold 16px ui-monospace, monospace";
+    const w = ctx.measureText(text).width;
+    const bx = g.W - w - 34, by = 22;
+    ctx.fillStyle = "rgba(37,99,235,.10)";
+    ctx.strokeStyle = "#93c5fd";
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.roundRect ? ctx.roundRect(bx, by, w + 26, 36, 10) : ctx.rect(bx, by, w + 26, 36);
+    ctx.fill(); ctx.stroke();
+    ctx.fillStyle = "#1e40af";
+    ctx.fillText(text, bx + 13, by + 24);
+  }
+
+  /* ====================== CANVAS A ====================== */
+  const cvA = document.getElementById('cvA');
+  const gA = makeGraph(cvA, { xMin:-5, xMax:5, yMin:-6, yMax:6, pad:56 });
+  const sA = document.getElementById('sliderA');
+  const sB1 = document.getElementById('sliderB1');
+  const cA = document.getElementById('chkVertexA');
+  const valA = document.getElementById('valA');
+  const valB1 = document.getElementById('valB1');
+  const chipShape = document.getElementById('aShapeChip');
+  const chipVert = document.getElementById('aVertChip');
+
+  function renderA(){
+    const a = parseFloat(sA.value);
+    const b = parseFloat(sB1.value);
+    drawGrid(gA, 1, 1);
+    plotQuadratic(gA, a, b, "#2563eb", 3.4);
+    drawVertex(gA, a, b, cA.checked);
+    drawEquationLabel(gA, a, b);
+
+    valA.textContent = a.toFixed(2);
+    valB1.textContent = b.toFixed(2);
+    chipVert.textContent = "vertex = (" + (-b).toFixed(2) + ", 0.00)";
+    if (a > 0){
+      chipShape.textContent = "a > 0 → curves upwards";
+      chipShape.className = "chip amber";
+    } else if (a < 0){
+      chipShape.textContent = "a < 0 → curves downwards";
+      chipShape.className = "chip blue";
+    } else {
+      chipShape.textContent = "a = 0 → a straight line";
+      chipShape.className = "chip";
+    }
+  }
+  sA.addEventListener('input', renderA);
+  sB1.addEventListener('input', renderA);
+  cA.addEventListener('change', renderA);
+  renderA();
+
+  /* ====================== CANVAS B ====================== */
+  const cvB = document.getElementById('cvB');
+  const gB = makeGraph(cvB, { xMin:-5, xMax:5, yMin:-6, yMax:6, pad:56 });
+  const sB2 = document.getElementById('sliderB2');
+  const sA2 = document.getElementById('sliderA2');
+  const cB = document.getElementById('chkVertexB');
+  const valB2 = document.getElementById('valB2');
+  const valA2 = document.getElementById('valA2');
+  const chipBVert = document.getElementById('bVertChip');
+  const chipBSign = document.getElementById('bSignChip');
+
+  function renderB(){
+    const b = parseFloat(sB2.value);
+    const a = parseFloat(sA2.value);
+    drawGrid(gB, 1, 1);
+    plotQuadratic(gB, a, b, "#7c3aed", 3.4);
+    drawVertex(gB, a, b, cB.checked);
+    drawEquationLabel(gB, a, b);
+
+    valB2.textContent = b.toFixed(2);
+    valA2.textContent = a.toFixed(2);
+
+    const vx = -b;
+    chipBVert.textContent = "vertex x = -b = " + vx.toFixed(2);
+    if (vx > 0.001){
+      chipBSign.textContent = "-b > 0  ⇒  b < 0";
+      chipBSign.className = "chip";
+    } else if (vx < -0.001){
+      chipBSign.textContent = "-b < 0  ⇒  b > 0";
+      chipBSign.className = "chip amber";
+    } else {
+      chipBSign.textContent = "-b = 0  ⇒  b = 0";
+      chipBSign.className = "chip blue";
+    }
+
+    // extra emphasis: highlight positive x-axis region
+    const ctx = gB.ctx;
+    const y0 = gB.Y(0);
+    ctx.save();
+    ctx.strokeStyle = "rgba(16,185,129,.55)";
+    ctx.lineWidth = 7;
+    ctx.beginPath();
+    ctx.moveTo(gB.X(0), y0);
+    ctx.lineTo(gB.X(gB.xMax), y0);
+    ctx.stroke();
+    ctx.restore();
+
+    // "positive x-axis" annotation
+    ctx.fillStyle = "#047857";
+    ctx.font = "bold 13px ui-monospace, monospace";
+    ctx.fillText("positive x-axis", gB.X(0) + 18, y0 - 12);
+  }
+  sB2.addEventListener('input', renderB);
+  sA2.addEventListener('input', renderB);
+  cB.addEventListener('change', renderB);
+  renderB();
+
+  /* ====================== STEP REVEAL LOGIC ====================== */
+  function setupSteps(target){
+    const steps = [];
+    let i = 1;
+    while (true){
+      const el = document.getElementById(target + "-step-" + i);
+      if (!el) break;
+      steps.push(el);
+      i++;
+    }
+    const btn = document.querySelector('.next-btn[data-target="' + target + '"]');
+    const counter = document.getElementById('cnt-' + target);
+    let shown = 0;
+
+    function update(){
+      counter.textContent = shown + " / " + steps.length;
+      if (shown >= steps.length){
+        btn.disabled = true;
+        btn.textContent = "All steps revealed ✓";
+      } else {
+        btn.disabled = false;
+        btn.textContent = "Next step →";
+      }
+    }
+
+    btn.addEventListener('click', function(){
+      if (shown < steps.length){
+        steps[shown].classList.add('show');
+        shown++;
+        update();
+        if (window.MathJax && MathJax.typesetPromise){
+          MathJax.typesetPromise([steps[shown-1]]).catch(function(){});
+        }
+      }
+    });
+    update();
+  }
+
+  setupSteps('a');
+  setupSteps('b');
+
+  /* roundRect polyfill for older browsers */
+  if (!CanvasRenderingContext2D.prototype.roundRect){
+    CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r){
+      if (typeof r === "number") r = [r, r, r, r];
+      this.beginPath();
+      this.moveTo(x + r[0], y);
+      this.lineTo(x + w - r[1], y);
+      this.quadraticCurveTo(x + w, y, x + w, y + r[1]);
+      this.lineTo(x + w, y + h - r[2]);
+      this.quadraticCurveTo(x + w, y + h, x + w - r[2], y + h);
+      this.lineTo(x + r[3], y + h);
+      this.quadraticCurveTo(x, y + h, x, y + h - r[3]);
+      this.lineTo(x, y + r[0]);
+      this.quadraticCurveTo(x, y, x + r[0], y);
+      this.closePath();
+      return this;
+    };
+  }
+})();
+</script>
+</body>
+</html>

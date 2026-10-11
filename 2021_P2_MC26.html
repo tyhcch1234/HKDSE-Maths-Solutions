@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2021 Paper 2 Q26 — Median of a Triangle</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[','\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root{
+    --blue:#2563eb; --blue-dark:#1e3a8a; --amber:#f59e0b; --emerald:#10b981;
+    --slate:#1e293b; --light:#f1f5f9; --card:#ffffff; --muted:#64748b;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    font-family:"Segoe UI", system-ui, -apple-system, sans-serif;
+    background: linear-gradient(160deg,#eef2ff 0%, #f8fafc 40%, #ecfdf5 100%);
+    color:var(--slate); line-height:1.6; padding-bottom:40px;
+  }
+  /* ---------- HERO ---------- */
+  .hero{
+    background: linear-gradient(120deg, #1e3a8a 0%, #2563eb 45%, #0ea5e9 100%);
+    color:#fff; padding:46px 22px 54px; position:relative; overflow:hidden;
+  }
+  .hero::after{
+    content:""; position:absolute; right:-80px; top:-80px; width:280px; height:280px;
+    border-radius:50%; background:rgba(255,255,255,0.08);
+  }
+  .hero::before{
+    content:""; position:absolute; left:-60px; bottom:-90px; width:220px; height:220px;
+    border-radius:50%; background:rgba(255,255,255,0.06);
+  }
+  .hero-inner{max-width:900px; margin:0 auto; position:relative; z-index:2;}
+  .eyebrow{
+    font-size:.8rem; letter-spacing:.14em; text-transform:uppercase;
+    font-weight:600; color:#bfdbfe; margin-bottom:10px;
+  }
+  .hero h1{font-size:2.1rem; font-weight:800; line-height:1.2; margin-bottom:8px;}
+  .hero .sub{font-size:1.02rem; color:#dbeafe; max-width:640px;}
+  .pills{margin-top:18px; display:flex; flex-wrap:wrap; gap:8px;}
+  .pill{
+    background:rgba(255,255,255,0.16); border:1px solid rgba(255,255,255,0.35);
+    color:#fff; padding:5px 13px; border-radius:999px; font-size:.78rem; font-weight:600;
+    backdrop-filter: blur(4px);
+  }
+  /* ---------- LAYOUT ---------- */
+  .wrap{max-width:900px; margin:-30px auto 0; padding:0 16px; position:relative; z-index:5;}
+  .card{
+    background:var(--card); border-radius:18px; padding:24px 22px; margin-bottom:22px;
+    box-shadow:0 6px 24px rgba(15,23,42,0.08); border:1px solid #e2e8f0;
+  }
+  .card h2{
+    font-size:1.25rem; color:var(--blue-dark); font-weight:800; margin-bottom:14px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .card h2 .tag{
+    background:#dbeafe; color:var(--blue-dark); font-size:.72rem; font-weight:700;
+    padding:3px 9px; border-radius:6px; letter-spacing:.03em;
+  }
+  .qtext{font-size:1.03rem;}
+  .qtext p{margin-bottom:10px;}
+  .opts{list-style:none; margin-top:12px; display:grid; gap:8px;}
+  .opts li{
+    background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px;
+    padding:9px 14px; font-weight:600; color:#334155;
+  }
+  .opts li.correct{background:#ecfdf5; border-color:#6ee7b7; color:#065f46;}
+  /* ---------- STEPS ---------- */
+  .step{
+    display:none; border-left:4px solid var(--blue); background:#f8fafc;
+    border-radius:0 12px 12px 0; padding:14px 16px; margin-top:14px;
+    animation: fadeIn .4s ease;
+  }
+  .step.show{display:block;}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);}}
+  .step-head{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:8px;}
+  .badge{
+    background:var(--blue); color:#fff; font-size:.72rem; font-weight:700;
+    padding:3px 10px; border-radius:999px;
+  }
+  .marks{
+    background:var(--amber); color:#fff; font-size:.7rem; font-weight:800;
+    padding:3px 9px; border-radius:999px;
+  }
+  .hint{
+    background:#fefce8; border-left:4px solid var(--amber); border-radius:8px;
+    padding:9px 13px; margin-top:10px; font-size:.92rem; color:#713f12;
+  }
+  .hint b{color:#92400e;}
+  .answer{
+    background:#ecfdf5; border-left:4px solid var(--emerald); border-radius:8px;
+    padding:9px 13px; margin-top:10px; font-size:.95rem; color:#065f46; font-weight:600;
+  }
+  .controls{display:flex; align-items:center; gap:14px; margin-top:16px; flex-wrap:wrap;}
+  button.next{
+    background:linear-gradient(120deg,#2563eb,#0ea5e9); color:#fff; border:none;
+    padding:10px 22px; border-radius:999px; font-weight:700; font-size:.92rem;
+    cursor:pointer; box-shadow:0 4px 14px rgba(37,99,235,0.35); transition:.2s;
+  }
+  button.next:hover:not(:disabled){transform:translateY(-2px); box-shadow:0 7px 18px rgba(37,99,235,0.45);}
+  button.next:disabled{background:#cbd5e1; box-shadow:none; cursor:default;}
+  .counter{font-size:.85rem; color:var(--muted); font-weight:600;}
+  /* ---------- CANVAS ---------- */
+  .canvas-box{
+    background:#0f172a; border-radius:14px; padding:12px; margin:14px 0;
+    display:flex; flex-direction:column; align-items:center;
+  }
+  canvas{width:100%; max-width:520px; border-radius:10px; display:block; background:#0f172a; touch-action:none;}
+  .canvas-cap{font-size:.8rem; color:#94a3b8; margin-top:8px; text-align:center;}
+  .slider-row{
+    display:flex; align-items:center; gap:12px; margin-top:12px; flex-wrap:wrap;
+    background:#f1f5f9; padding:10px 14px; border-radius:12px; font-size:.88rem; font-weight:600;
+    width:100%; max-width:520px;
+  }
+  .slider-row input[type=range]{flex:1; min-width:120px; accent-color:var(--blue);}
+  .readout{
+    display:flex; gap:16px; flex-wrap:wrap; justify-content:center; margin-top:10px;
+    font-size:.82rem; color:#cbd5e1; width:100%; max-width:520px;
+  }
+  .readout span b{color:#38bdf8;}
+  .readout span.green b{color:#34d399;}
+  .readout span.amber b{color:#fbbf24;}
+  /* ---------- SUMMARY ---------- */
+  .summary{
+    background:linear-gradient(135deg,#0f172a,#1e293b); color:#e2e8f0; border-radius:18px;
+    padding:26px 24px; box-shadow:0 10px 30px rgba(15,23,42,0.3);
+  }
+  .summary h2{color:#fff; font-size:1.25rem; margin-bottom:14px;}
+  .summary ul{list-style:none; display:grid; gap:10px;}
+  .summary li{
+    background:rgba(255,255,255,0.07); border-radius:10px; padding:11px 15px;
+    font-size:.95rem; border-left:4px solid #38bdf8;
+  }
+  .summary li b{color:#7dd3fc;}
+  .summary li.final{border-left-color:#34d399;}
+  .summary li.final b{color:#6ee7b7;}
+  footer{text-align:center; color:var(--muted); font-size:.8rem; margin-top:26px;}
+  @media(max-width:560px){
+    .hero h1{font-size:1.55rem;}
+    .card{padding:18px 15px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</div>
+    <h1>2021 Paper 2 · Question 26</h1>
+    <div class="sub">Coordinate Geometry — the median of a triangle and the equation of a straight line.</div>
+    <div class="pills">
+      <span class="pill">Mid-point Formula</span>
+      <span class="pill">Two-point Form</span>
+      <span class="pill">Median of a Triangle</span>
+      <span class="pill">Equation of a Line</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ============ QUESTION ============ -->
+  <section class="card">
+    <h2>Question <span class="tag">Multiple Choice</span></h2>
+    <div class="qtext">
+      <p>The coordinates of the points \(A\), \(B\) and \(C\) are \((3, 3)\), \((5, 8)\) and \((9, 2)\) respectively. Let \(P\) be a point such that \(AP\) is a median of \(\triangle ABC\). Find the equation of the straight line which passes through \(A\) and \(P\).</p>
+      <ul class="opts">
+        <li>A. \(x - 2y + 3 = 0\)</li>
+        <li>B. \(2x - 3y + 1 = 0\)</li>
+        <li>C. \(2x - 3y + 3 = 0\)</li>
+        <li>D. \(3x + 2y - 15 = 0\)</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ PART A ============ -->
+  <section class="card">
+    <h2>Part (a) <span class="tag">Locate the mid-point of BC</span></h2>
+    <p>Since \(AP\) is a median of \(\triangle ABC\), the point \(P\) must be the <b>mid-point of \(BC\)</b>. Drag the slider to see the mid-point \(M\) move along \(BC\) — the median from \(A\) always passes through \(M\).</p>
+
+    <div class="canvas-box">
+      <canvas id="cv1" width="520" height="360"></canvas>
+      <div class="slider-row">
+        <label for="tSlider">Point along BC:</label>
+        <input type="range" id="tSlider" min="0" max="100" value="50">
+        <span id="tVal" style="min-width:70px; text-align:right;">t = 0.50</span>
+      </div>
+      <div class="readout">
+        <span>Mid-point \(M\): <b id="mOut">(7.00, 5.00)</b></span>
+        <span class="green">BC length: <b>\(\sqrt{52}\)</b></span>
+      </div>
+      <div class="canvas-cap">Blue = \(BC\); amber dot = current point; green star = true mid-point.</div>
+    </div>
+
+    <div class="controls">
+      <button class="next" data-target="steps-a">Next step →</button>
+      <span class="counter" id="count-a">0 / 3</span>
+    </div>
+
+    <div id="steps-a">
+      <div class="step">
+        <div class="step-head"><span class="badge">Step 1</span><span class="marks">1M</span></div>
+        <p>Since \(AP\) is a median of \(\triangle ABC\), \(P\) is the mid-point of the side \(BC\).</p>
+        <div class="hint"><b>Hint:</b> A median joins a vertex to the mid-point of the opposite side.</div>
+      </div>
+      <div class="step">
+        <div class="step-head"><span class="badge">Step 2</span><span class="marks">1M</span></div>
+        <p>By the mid-point formula, the coordinates of \(P\) are</p>
+        \[ P = \left( \frac{5+9}{2}, \frac{8+2}{2} \right) = (7, 5) \]
+        <div class="hint"><b>Hint:</b> Mid-point \(= \left(\dfrac{x_1+x_2}{2}, \dfrac{y_1+y_2}{2}\right)\).</div>
+      </div>
+      <div class="step">
+        <div class="step-head"><span class="badge">Step 3</span><span class="marks">1A</span></div>
+        <div class="answer">\(P = (7, 5)\) — the mid-point of \(BC\).</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PART B ============ -->
+  <section class="card">
+    <h2>Part (b) <span class="tag">Equation of the line through A and P</span></h2>
+    <p>Use the two-point form of a straight line. Drag the slider to move the target point \(P'\) and watch how the slope and equation change (when \(P' = P\), the slope matches the required answer).</p>
+
+    <div class="canvas-box">
+      <canvas id="cv2" width="520" height="360"></canvas>
+      <div class="slider-row">
+        <label for="pSlider">y-coordinate of \(P'\):</label>
+        <input type="range" id="pSlider" min="1" max="9" step="0.1" value="5">
+        <span id="pVal" style="min-width:70px; text-align:right;">y = 5.0</span>
+      </div>
+      <div class="readout">
+        <span>Slope \(m\): <b id="mOut2">—</b></span>
+        <span class="green">Line: <b id="eqOut">—</b></span>
+        <span class="amber">Target: <b>(7, 5)</b></span>
+      </div>
+      <div class="canvas-cap">Amber line = \(AP'\) (draggable); dashed green = required line through \(A(3,3)\) and \(P(7,5)\).</div>
+    </div>
+
+    <div class="controls">
+      <button class="next" data-target="steps-b">Next step →</button>
+      <span class="counter" id="count-b">0 / 4</span>
+    </div>
+
+    <div id="steps-b">
+      <div class="step">
+        <div class="step-head"><span class="badge">Step 1</span><span class="marks">1M</span></div>
+        <p>Slope of the line through \(A(3, 3)\) and \(P(7, 5)\):</p>
+        \[ m = \frac{5 - 3}{7 - 3} = \frac{2}{4} = \frac{1}{2} \]
+        <div class="hint"><b>Hint:</b> Slope \(m = \dfrac{y_2 - y_1}{x_2 - x_1}\).</div>
+      </div>
+      <div class="step">
+        <div class="step-head"><span class="badge">Step 2</span><span class="marks">1M</span></div>
+        <p>Using the point-slope form with point \(A(3, 3)\):</p>
+        \[ y - 3 = \frac{1}{2}(x - 3) \]
+        <div class="hint"><b>Hint:</b> \(y - y_1 = m(x - x_1)\).</div>
+      </div>
+      <div class="step">
+        <div class="step-head"><span class="badge">Step 3</span><span class="marks">1M</span></div>
+        <p>Multiply both sides by 2 and rearrange:</p>
+        \[ 2(y - 3) = x - 3 \;\Rightarrow\; 2y - 6 = x - 3 \]
+        \[ x - 2y + 3 = 0 \]
+        <div class="hint"><b>Hint:</b> Bring all terms to one side to match the standard form \(Ax + By + C = 0\).</div>
+      </div>
+      <div class="step">
+        <div class="step-head"><span class="badge">Step 4</span><span class="marks">1A</span></div>
+        <div class="answer">The equation of the line is \(x - 2y + 3 = 0\), which is <b>option A</b>.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SUMMARY ============ -->
+  <section class="summary">
+    <h2>Summary of Answers</h2>
+    <ul>
+      <li><b>P</b> is the mid-point of \(BC\): \(P = (7, 5)\).</li>
+      <li><b>Slope</b> of \(AP\): \(m = \dfrac{1}{2}\).</li>
+      <li class="final"><b>Equation:</b> \(x - 2y + 3 = 0\) → <b>Option A</b>.</li>
+    </ul>
+  </section>
+
+  <footer>HKDSE Mathematics (Compulsory Part) · Paper 2 · 2021 · Q26 — Interactive Solution</footer>
+</div>
+
+<script>
+/* =====================================================
+   CANVAS 1 — Median & Mid-point of BC
+   ===================================================== */
+(function(){
+  const cv = document.getElementById('cv1');
+  const ctx = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+  const pad = 46;
+
+  // Data
+  const A = {x:3, y:3}, B = {x:5, y:8}, C = {x:9, y:2};
+  const M = {x:7, y:5};
+
+  // World range
+  const xMin = 1, xMax = 11, yMin = -0.5, yMax = 9.5;
+
+  function X(x){ return pad + (x - xMin)/(xMax - xMin) * (W - 2*pad); }
+  function Y(y){ return H - pad - (y - yMin)/(yMax - yMin) * (H - 2*pad); }
+
+  function grid(){
+    // background
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(0,0,W,H);
+    // grid lines
+    ctx.strokeStyle = 'rgba(148,163,184,0.16)';
+    ctx.lineWidth = 1;
+    for(let x = 0; x <= 11; x++){
+      ctx.beginPath(); ctx.moveTo(X(x), Y(yMin)); ctx.lineTo(X(x), Y(yMax)); ctx.stroke();
+    }
+    for(let y = 0; y <= 10; y++){
+      ctx.beginPath(); ctx.moveTo(X(xMin), Y(y)); ctx.lineTo(X(xMax), Y(y)); ctx.stroke();
+    }
+    // axes
+    ctx.strokeStyle = '#64748b'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(X(0), Y(0)); ctx.lineTo(X(xMax), Y(0)); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(X(0), Y(yMin)); ctx.lineTo(X(0), Y(yMax)); ctx.stroke();
+    // ticks & labels
+    ctx.fillStyle = '#94a3b8'; ctx.font = '11px sans-serif'; ctx.textAlign = 'center';
+    for(let x = 2; x <= 10; x+=2){
+      ctx.fillText(x, X(x), Y(0)+16);
+    }
+    ctx.textAlign = 'right';
+    for(let y = 2; y <= 8; y+=2){
+      ctx.fillText(y, X(0)-6, Y(y)+4);
+    }
+    ctx.save();
+    ctx.fillStyle = '#64748b'; ctx.font = 'bold 12px sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText('x', X(xMax)-2, Y(0)-6);
+    ctx.textAlign = 'left';
+    ctx.fillText('y', X(0)+6, Y(yMax)+12);
+    ctx.restore();
+  }
+
+  function label(x, y, txt, color){
+    ctx.fillStyle = color;
+    ctx.font = 'bold 13px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(txt, x, y);
+  }
+
+  function dot(x, y, color, r){
+    ctx.beginPath();
+    ctx.arc(X(x), Y(y), r||5, 0, Math.PI*2);
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 2; ctx.stroke();
+  }
+
+  function drawAll(t){
+    grid();
+    // Triangle ABC
+    ctx.strokeStyle = 'rgba(56,189,248,0.85)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(X(A.x),Y(A.y));
+    ctx.lineTo(X(B.x),Y(B.y)); ctx.lineTo(X(C.x),Y(C.y));
+    ctx.closePath(); ctx.stroke();
+
+    // BC highlighted
+    ctx.strokeStyle = '#3b82f6'; ctx.lineWidth = 3.5;
+    ctx.beginPath(); ctx.moveTo(X(B.x),Y(B.y)); ctx.lineTo(X(C.x),Y(C.y)); ctx.stroke();
+
+    // Median from A through current point
+    const Px = B.x + (C.x - B.x) * t;
+    const Py = B.y + (C.y - B.y) * t;
+    ctx.strokeStyle = 'rgba(251,191,36,0.55)'; ctx.lineWidth = 2; ctx.setLineDash([7,6]);
+    ctx.beginPath(); ctx.moveTo(X(A.x),Y(A.y)); ctx.lineTo(X(Px),Y(Py)); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // True mid-point star
+    ctx.save();
+    ctx.translate(X(M.x), Y(M.y));
+    ctx.beginPath();
+    for(let i=0;i<10;i++){
+      const ang = -Math.PI/2 + i*Math.PI/5;
+      const r = (i%2===0)? 9 : 4;
+      const px = Math.cos(ang)*r, py = Math.sin(ang)*r;
+      if(i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+    }
+    ctx.closePath();
+    ctx.fillStyle = '#34d399'; ctx.fill();
+    ctx.strokeStyle = '#065f46'; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.restore();
+
+    // Current slider point
+    dot(Px, Py, '#fbbf24', 6);
+
+    // Vertices
+    dot(A.x, A.y, '#f87171');
+    dot(B.x, B.y, '#f87171');
+    dot(C.x, C.y, '#f87171');
+
+    label(X(A.x)-14, Y(A.y)-10, 'A(3,3)', '#fca5a5');
+    label(X(B.x)-2, Y(B.y)-14, 'B(5,8)', '#fca5a5');
+    label(X(C.x)+2, Y(C.y)+20, 'C(9,2)', '#fca5a5');
+    label(X(M.x)+4, Y(M.y)-18, 'M(7,5)', '#6ee7b7');
+
+    // Update readouts
+    document.getElementById('mOut').textContent = `(${Px.toFixed(2)}, ${Py.toFixed(2)})`;
+    document.getElementById('tVal').textContent = `t = ${t.toFixed(2)}`;
+  }
+
+  const slider = document.getElementById('tSlider');
+  function update(){ drawAll(slider.value/100); }
+  slider.addEventListener('input', update);
+  update();
+})();
+
+/* =====================================================
+   CANVAS 2 — Line through A and P'
+   ===================================================== */
+(function(){
+  const cv = document.getElementById('cv2');
+  const ctx = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+  const pad = 46;
+
+  const A = {x:3, y:3}, P = {x:7, y:5};
+  const xMin = 0, xMax = 11, yMin = -0.5, yMax = 10;
+
+  function X(x){ return pad + (x - xMin)/(xMax - xMin) * (W - 2*pad); }
+  function Y(y){ return H - pad - (y - yMin)/(yMax - yMin) * (H - 2*pad); }
+
+  function grid(){
+    ctx.fillStyle = '#0f172a'; ctx.fillRect(0,0,W,H);
+    ctx.strokeStyle = 'rgba(148,163,184,0.16)'; ctx.lineWidth = 1;
+    for(let x=0;x<=11;x++){ ctx.beginPath(); ctx.moveTo(X(x),Y(yMin)); ctx.lineTo(X(x),Y(yMax)); ctx.stroke(); }
+    for(let y=0;y<=10;y++){ ctx.beginPath(); ctx.moveTo(X(xMin),Y(y)); ctx.lineTo(X(xMax),Y(y)); ctx.stroke(); }
+    ctx.strokeStyle = '#64748b'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(X(xMin),Y(0)); ctx.lineTo(X(xMax),Y(0)); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(X(0),Y(yMin)); ctx.lineTo(X(0),Y(yMax)); ctx.stroke();
+    ctx.fillStyle = '#94a3b8'; ctx.font = '11px sans-serif'; ctx.textAlign = 'center';
+    for(let x=2;x<=10;x+=2) ctx.fillText(x, X(x), Y(0)+16);
+    ctx.textAlign = 'right';
+    for(let y=2;y<=8;y+=2) ctx.fillText(y, X(0)-6, Y(y)+4);
+    ctx.save(); ctx.fillStyle='#64748b'; ctx.font='bold 12px sans-serif';
+    ctx.textAlign='right'; ctx.fillText('x', X(xMax)-2, Y(0)-6);
+    ctx.textAlign='left'; ctx.fillText('y', X(0)+6, Y(yMax)+12);
+    ctx.restore();
+  }
+
+  function dot(x,y,color,r){
+    ctx.beginPath(); ctx.arc(X(x),Y(y),r||5,0,Math.PI*2);
+    ctx.fillStyle=color; ctx.fill();
+    ctx.strokeStyle='#0f172a'; ctx.lineWidth=2; ctx.stroke();
+  }
+
+  function drawLineThrough(Px, Py, color, dash){
+    const m = (Py - A.y)/(Px - A.x);
+    const x1 = xMin, y1 = A.y + m*(x1 - A.x);
+    const x2 = xMax, y2 = A.y + m*(x2 - A.x);
+    ctx.strokeStyle = color; ctx.lineWidth = 2.5;
+    ctx.setLineDash(dash||[]);
+    ctx.beginPath(); ctx.moveTo(X(x1),Y(y1)); ctx.lineTo(X(x2),Y(y2)); ctx.stroke();
+    ctx.setLineDash([]);
+    return m;
+  }
+
+  function label(x,y,txt,color){
+    ctx.fillStyle=color; ctx.font='bold 13px sans-serif'; ctx.textAlign='center';
+    ctx.fillText(txt,x,y);
+  }
+
+  function update(){
+    const Py = parseFloat(document.getElementById('pSlider').value);
+    const Px = 7; // fixed x for slider demo
+    drawAll(Px, Py);
+    document.getElementById('pVal').textContent = `y = ${Py.toFixed(1)}`;
+  }
+
+  function drawAll(Px, Py){
+    grid();
+
+    // Required line through A and P (dashed green)
+    drawLineThrough(P.x, P.y, 'rgba(52,211,153,0.7)', [8,6]);
+
+    // Draggable line through A and P'
+    const m = drawLineThrough(Px, Py, '#fbbf24');
+
+    // Points
+    dot(A.x, A.y, '#f87171', 6);
+    dot(P.x, P.y, '#34d399', 6);
+    dot(Px, Py, '#fbbf24', 6);
+
+    label(X(A.x)-14, Y(A.y)-10, 'A(3,3)', '#fca5a5');
+    label(X(P.x)+2, Y(P.y)-16, 'P(7,5)', '#6ee7b7');
+    label(X(Px)+20, Y(Py), `P'(7,${Py.toFixed(1)})`, '#fbbf24');
+
+    // Readouts
+    const mOut = document.getElementById('mOut2');
+    if(Math.abs(m - 0.5) < 0.05){ mOut.textContent = '0.5'; mOut.style.color='#34d399'; }
+    else { mOut.textContent = m.toFixed(3); mOut.style.color='#fbbf24'; }
+
+    // Equation  y - 3 = m(x-3)  => m x - y + (3 - 3m) = 0
+    // Normalise to a nice form
+    let eq = `y - 3 = ${(Math.abs(m-0.5)<0.05)?'0.5':m.toFixed(2)}(x - 3)`;
+    document.getElementById('eqOut').textContent = eq;
+  }
+
+  document.getElementById('pSlider').addEventListener('input', update);
+  update();
+})();
+
+/* =====================================================
+   STEP-BY-STEP REVEAL
+   ===================================================== */
+document.querySelectorAll('button.next').forEach(btn => {
+  btn.addEventListener('click', function(){
+    const targetId = this.dataset.target;
+    const steps = document.querySelectorAll('#' + targetId + ' .step');
+    const counter = document.getElementById('count-' + targetId.split('-')[1]);
+    let shown = 0;
+    steps.forEach(s => { if(s.classList.contains('show')) shown++; });
+    if(shown < steps.length){
+      steps[shown].classList.add('show');
+      shown++;
+      counter.textContent = shown + ' / ' + steps.length;
+      if(shown === steps.length){
+        this.disabled = true;
+        this.textContent = 'All steps revealed ✓';
+      }
+    }
+    if(window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise();
+  });
+});
+</script>
+</body>
+</html>

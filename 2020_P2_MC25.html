@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2020 Paper 2 Q25 — Locus of a Moving Point</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<style>
+  :root{
+    --blue:#1d4ed8; --blue-soft:#e3ecff; --amber:#b45309; --amber-soft:#fff4dc;
+    --emerald:#047857; --emerald-soft:#dcfbee; --ink:#0f172a; --muted:#5b6478;
+    --card:#ffffff; --line:#e2e8f0;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    background:#f4f6fb; color:var(--ink); line-height:1.55;
+  }
+  .wrap{max-width:960px;margin:0 auto;padding:0 16px 56px}
+
+  /* HERO */
+  header.hero{
+    background:linear-gradient(135deg,#0f2b6e 0%, #1d4ed8 45%, #2563eb 70%, #0ea5e9 100%);
+    color:#fff; padding:38px 16px 46px; position:relative; overflow:hidden;
+  }
+  header.hero::after{
+    content:""; position:absolute; right:-90px; top:-90px; width:300px; height:300px;
+    background:radial-gradient(circle,rgba(255,255,255,.25),transparent 65%);
+  }
+  .hero-inner{max-width:960px;margin:0 auto;position:relative;z-index:2}
+  .eyebrow{font-size:.82rem;letter-spacing:.14em;text-transform:uppercase;opacity:.85;font-weight:600}
+  .hero h1{font-size:clamp(1.45rem,4.4vw,2.2rem);margin:.35em 0 .15em;font-weight:800;letter-spacing:.2px}
+  .hero .sub{opacity:.93;font-size:1rem;margin-bottom:14px}
+  .pills{display:flex;flex-wrap:wrap;gap:8px}
+  .pill{
+    background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35);
+    padding:4px 12px;border-radius:999px;font-size:.78rem;font-weight:600;backdrop-filter:blur(2px);
+  }
+
+  /* CARDS */
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:16px;
+    box-shadow:0 6px 22px rgba(17,34,80,.07); padding:22px; margin:22px 0;
+  }
+  .card h2{
+    font-size:1.16rem;margin:0 0 12px;font-weight:800;color:#12224d;
+    display:flex;align-items:center;gap:10px;
+  }
+  .badge-num{
+    display:inline-flex;align-items:center;justify-content:center;
+    min-width:30px;height:30px;border-radius:9px;background:var(--blue-soft);color:var(--blue);
+    font-size:.85rem;font-weight:800;
+  }
+  .qtext{font-size:1.02rem}
+  .qtext ol{margin:.4em 0 0;padding-left:1.4em}
+  .qtext li{margin:.28em 0}
+  .marks{
+    display:inline-block;background:var(--amber-soft);color:var(--amber);
+    border:1px solid #f3d59a;border-radius:6px;font-size:.74rem;font-weight:700;
+    padding:1px 7px;margin-left:6px;vertical-align:middle;
+  }
+  .marks.m{background:var(--blue-soft);color:var(--blue);border-color:#bcd0f7}
+  .marks.a{background:var(--emerald-soft);color:var(--emerald);border-color:#a9e8cb}
+
+  /* CANVAS */
+  .canvas-box{
+    background:linear-gradient(180deg,#fbfdff,#eef4ff);
+    border:1px solid #d8e3fb; border-radius:14px; padding:10px; margin:14px 0;
+  }
+  canvas{width:100%;height:auto;display:block;border-radius:10px;background:#fff;touch-action:pan-y}
+  .controls{
+    display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-top:12px;
+    font-size:.86rem;color:#243055
+  }
+  .ctrl{display:flex;align-items:center;gap:8px;flex:1 1 250px}
+  .ctrl label{font-weight:600;white-space:nowrap}
+  input[type=range]{flex:1;accent-color:var(--blue);min-width:110px}
+  .val{
+    font-family:"Consolas",monospace;font-weight:700;color:var(--blue);
+    background:#eef3ff;border:1px solid #cfdcfb;border-radius:6px;padding:1px 7px;min-width:52px;text-align:center;
+  }
+  .chk{display:flex;align-items:center;gap:6px;font-weight:600;cursor:pointer}
+
+  /* READOUT */
+  .readouts{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:12px;
+  }
+  .ro{
+    background:#f8faff;border:1px dashed #c6d4f5;border-radius:10px;padding:8px 10px;font-size:.82rem;
+  }
+  .ro b{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700}
+  .ro span{font-family:"Consolas",monospace;font-size:.98rem;color:#12224d;font-weight:700}
+
+  /* STEPS */
+  .step{display:none;border-left:4px solid var(--blue);background:#f7faff;border-radius:0 12px 12px 0;
+        padding:14px 16px;margin:12px 0;animation:pop .3s ease}
+  .step.show{display:block}
+  @keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .step-head{display:flex;align-items:center;gap:9px;margin-bottom:6px;flex-wrap:wrap}
+  .stepbadge{
+    background:var(--blue);color:#fff;font-size:.74rem;font-weight:800;
+    padding:3px 10px;border-radius:999px;letter-spacing:.04em;
+  }
+  .hint{
+    background:var(--amber-soft);border-left:4px solid var(--amber);border-radius:8px;
+    padding:9px 12px;margin-top:10px;font-size:.9rem;color:#6b3f06;
+  }
+  .hint b{color:var(--amber)}
+  .answer{
+    background:var(--emerald-soft);border-left:4px solid var(--emerald);border-radius:8px;
+    padding:10px 12px;margin-top:10px;font-size:.95rem;color:#04503a;font-weight:600;
+  }
+  .answer b{color:var(--emerald);text-transform:uppercase;font-size:.75rem;letter-spacing:.07em;display:block;margin-bottom:2px}
+  .btnrow{display:flex;align-items:center;gap:12px;margin-top:14px;flex-wrap:wrap}
+  button.reveal{
+    background:linear-gradient(135deg,#1d4ed8,#3b82f6);color:#fff;border:none;
+    padding:10px 20px;border-radius:10px;font-weight:700;font-size:.9rem;cursor:pointer;
+    box-shadow:0 5px 14px rgba(29,78,216,.32);transition:transform .12s,filter .12s;
+  }
+  button.reveal:hover:not(:disabled){transform:translateY(-1px);filter:brightness(1.06)}
+  button.reveal:disabled{background:#cbd5e1;box-shadow:none;cursor:default;color:#5b6478}
+  .counter{font-size:.85rem;font-weight:700;color:var(--muted);font-family:"Consolas",monospace}
+
+  /* SUMMARY */
+  .summary{
+    background:linear-gradient(135deg,#0c1633,#132a5e);color:#e8eeff;border:none;
+  }
+  .summary h2{color:#fff}
+  .summary ul{margin:8px 0 0;padding-left:20px}
+  .summary li{margin:.5em 0}
+  .summary .hl{color:#7ee0b4;font-weight:700}
+  .summary .hl2{color:#ffd48a;font-weight:700}
+
+  footer{text-align:center;color:var(--muted);font-size:.82rem;padding:18px 0 6px}
+
+  @media(max-width:520px){
+    .card{padding:16px}
+    .hero{padding:28px 14px 36px}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</div>
+    <h1>2020 Paper 2 · Question 25</h1>
+    <div class="sub">Coordinate Geometry — Locus of a Moving Point</div>
+    <div class="pills">
+      <span class="pill">Coordinate Geometry</span>
+      <span class="pill">Locus</span>
+      <span class="pill">Intersection of Lines</span>
+      <span class="pill">Circle</span>
+      <span class="pill">Fixed Distance</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- QUESTION -->
+  <div class="card">
+    <h2><span class="badge-num">Q</span>Question</h2>
+    <div class="qtext">
+      <p>
+        Let \(A\) be the point of intersection of the straight lines
+        \[9x+4y-7=0 \quad\text{and}\quad 9x-4y+7=0.\]
+        If \(P\) is a moving point in the rectangular coordinate plane such that the distance
+        between \(P\) and \(A\) is \(8\), then the locus of \(P\) is a
+      </p>
+      <ol type="A">
+        <li>circle. <span class="marks">A</span></li>
+        <li>triangle.</li>
+        <li>quadrilateral.</li>
+        <li>regular hexagon.</li>
+      </ol>
+      <p style="margin-top:10px;color:var(--muted);font-size:.9rem">
+        (1 mark, multiple choice)
+      </p>
+    </div>
+  </div>
+
+  <!-- PART (a) -->
+  <div class="card">
+    <h2><span class="badge-num">a</span>Part (a) — Find the fixed point \(A\)</h2>
+    <p>
+      \(A\) is the intersection of the two given lines. Solve the system:
+      \[
+      \begin{cases}
+      9x+4y-7=0 \\
+      9x-4y+7=0
+      \end{cases}
+      \]
+      Use the sliders below to move the lines and watch how the intersection point \(A\) behaves.
+    </p>
+
+    <div class="canvas-box">
+      <canvas id="cvA" width="820" height="480"></canvas>
+      <div class="controls">
+        <div class="ctrl">
+          <label for="sA">Line 1 constant</label>
+          <input type="range" id="sA" min="-4" max="4" step="0.1" value="0">
+          <span class="val" id="vA">0.0</span>
+        </div>
+        <div class="ctrl">
+          <label for="sB">Line 2 constant</label>
+          <input type="range" id="sB" min="-4" max="4" step="0.1" value="0">
+          <span class="val" id="vB">0.0</span>
+        </div>
+        <label class="chk"><input type="checkbox" id="chkGrid" checked> Show grid</label>
+      </div>
+      <div class="readouts">
+        <div class="ro"><b>Intersection \(A\)</b><span id="roA">(0.00, 0.00)</span></div>
+        <div class="ro"><b>Line 1 slope</b><span id="roS1">-2.25</span></div>
+        <div class="ro"><b>Line 2 slope</b><span id="roS2">2.25</span></div>
+        <div class="ro"><b>Check \(9x_A+4y_A-7\)</b><span id="roC1">0.00</span></div>
+      </div>
+    </div>
+
+    <div class="btnrow">
+      <button class="reveal" data-target="stepsA">Next step →</button>
+      <span class="counter" id="cntA">0 / 3</span>
+    </div>
+
+    <div id="stepsA">
+      <div class="step">
+        <div class="step-head"><span class="stepbadge">Step 1</span><span class="marks m">1M</span></div>
+        <p>Add the two equations to eliminate \(y\):</p>
+        \[
+        (9x+4y-7)+(9x-4y+7)=0 \;\Rightarrow\; 18x=0 \;\Rightarrow\; x=0.
+        \]
+        <div class="hint"><b>Hint:</b> The \(y\)-terms are \(+4y\) and \(-4y\), so they cancel perfectly when adding.</div>
+      </div>
+
+      <div class="step">
+        <div class="step-head"><span class="stepbadge">Step 2</span><span class="marks m">1M</span></div>
+        <p>Substitute \(x=0\) into the first equation:</p>
+        \[
+        9(0)+4y-7=0 \;\Rightarrow\; 4y=7 \;\Rightarrow\; y=\tfrac{7}{4}.
+        \]
+        Check with the second equation: \(0-4\left(\tfrac{7}{4}\right)+7=-7+7=0\). ✓
+        <div class="hint"><b>Hint:</b> The two lines are symmetric about the \(x\)-axis, so their intersection lies on the \(x\)-axis.</div>
+      </div>
+
+      <div class="step">
+        <div class="step-head"><span class="stepbadge">Step 3</span><span class="marks a">1A</span></div>
+        <p>Therefore the fixed point is</p>
+        \[
+        A=\left(0,\; \tfrac{7}{4}\right).
+        \]
+        <div class="answer"><b>Answer (a)</b>\(A=\left(0,\dfrac{7}{4}\right)\)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PART (b) -->
+  <div class="card">
+    <h2><span class="badge-num">b</span>Part (b) — Identify the locus of \(P\)</h2>
+    <p>
+      The condition is \(AP = 8\), i.e. the distance from the moving point \(P(x,y)\) to the
+      fixed point \(A\) is constant. Drag the slider to move \(P\) around and see the locus form.
+    </p>
+
+    <div class="canvas-box">
+      <canvas id="cvB" width="820" height="480"></canvas>
+      <div class="controls">
+        <div class="ctrl">
+          <label for="sTheta">Move \(P\) around the locus</label>
+          <input type="range" id="sTheta" min="0" max="360" step="1" value="45">
+          <span class="val" id="vTheta">45°</span>
+        </div>
+        <label class="chk"><input type="checkbox" id="chkLocus" checked> Show full locus</label>
+        <label class="chk"><input type="checkbox" id="chkLines" checked> Show the two lines</label>
+        <label class="chk"><input type="checkbox" id="chkPoly"> Show polygon shapes</label>
+      </div>
+      <div class="readouts">
+        <div class="ro"><b>Moving point \(P\)</b><span id="roP">(5.66, 7.41)</span></div>
+        <div class="ro"><b>Distance \(AP\)</b><span id="roD">8.00</span></div>
+        <div class="ro"><b>Locus equation</b><span id="roEq">x²+(y−1.75)²=64</span></div>
+        <div class="ro"><b>Radius</b><span id="roR">8.00</span></div>
+      </div>
+    </div>
+
+    <div class="btnrow">
+      <button class="reveal" data-target="stepsB">Next step →</button>
+      <span class="counter" id="cntB">0 / 4</span>
+    </div>
+
+    <div id="stepsB">
+      <div class="step">
+        <div class="step-head"><span class="stepbadge">Step 1</span><span class="marks m">1M</span></div>
+        <p>Let the moving point be \(P(x,y)\). The condition is</p>
+        \[
+        AP = 8.
+        \]
+        Using the distance formula with \(A=\left(0,\tfrac{7}{4}\right)\):
+        \[
+        \sqrt{x^2+\left(y-\tfrac{7}{4}\right)^2}=8.
+        \]
+        <div class="hint"><b>Hint:</b> "The distance between \(P\) and \(A\)" is exactly \(AP\).</div>
+      </div>
+
+      <div class="step">
+        <div class="step-head"><span class="stepbadge">Step 2</span><span class="marks m">1M</span></div>
+        <p>Square both sides:</p>
+        \[
+        x^2+\left(y-\tfrac{7}{4}\right)^2 = 8^2 = 64.
+        \]
+        <div class="hint"><b>Hint:</b> Squaring removes the square root and preps the equation for a circle form.</div>
+      </div>
+
+      <div class="step">
+        <div class="step-head"><span class="stepbadge">Step 3</span><span class="marks m">1M</span></div>
+        <p>This is exactly the standard form of a circle:</p>
+        \[
+        (x-0)^2+\left(y-\tfrac{7}{4}\right)^2 = 8^2,
+        \]
+        a circle centred at \(A=\left(0,\tfrac{7}{4}\right)\) with radius \(8\).
+        <div class="hint"><b>Hint:</b> The standard circle equation is \((x-h)^2+(y-k)^2 = r^2\) with centre \((h,k)\) and radius \(r\).</div>
+      </div>
+
+      <div class="step">
+        <div class="step-head"><span class="stepbadge">Step 4</span><span class="marks a">1A</span></div>
+        <p>Since the locus is a circle, the answer is option <b>A</b>.</p>
+        <div class="answer"><b>Answer (b)</b>Locus is a circle. Correct option: <b>A</b></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="card summary">
+    <h2><span class="badge-num" style="background:rgba(255,255,255,.15);color:#fff">Σ</span>Summary — Answers at a Glance</h2>
+    <ul>
+      <li><span class="hl2">Intersection point:</span> \(A=\left(0,\dfrac{7}{4}\right)\)</li>
+      <li><span class="hl">Locus condition:</span> \(AP = 8\) → circle centred at \(A\) with radius \(8\)</li>
+      <li><span class="hl">Locus equation:</span> \(\;x^2+\left(y-\dfrac{7}{4}\right)^2=64\)</li>
+      <li><span class="hl2">Correct MC option:</span> <b>A</b> — circle</li>
+    </ul>
+  </div>
+
+  <footer>HKDSE Mathematics Compulsory Part · Interactive Solution — 2020 Paper 2 Q25 · Coordinate Geometry</footer>
+</div>
+
+<script>
+/* ---------- helpers ---------- */
+function mctx(id){return document.getElementById(id).getContext('2d');}
+
+/* ================= CANVAS A : intersection of two lines ================= */
+(function(){
+  const cv=document.getElementById('cvA'), ctx=cv.getContext('2d');
+  const W=cv.width, H=cv.height;
+  const sA=document.getElementById('sA'), sB=document.getElementById('sB');
+  const vA=document.getElementById('vA'), vB=document.getElementById('vB');
+  const chkGrid=document.getElementById('chkGrid');
+  const roA=document.getElementById('roA'), roS1=document.getElementById('roS1'),
+        roS2=document.getElementById('roS2'), roC1=document.getElementById('roC1');
+
+  const ox=W/2, oy=H/2;      // world origin in pixels
+  const scale=38;            // px per unit
+
+  function X(x){return ox + x*scale;}
+  function Y(y){return oy - y*scale;}
+
+  function draw(){
+    const k1=parseFloat(sA.value);   // offset for line 1: 9x+4y-(7+k1)=0
+    const k2=parseFloat(sB.value);   // offset for line 2: 9x-4y+(7+k2)=0
+    vA.textContent=k1.toFixed(1);
+    vB.textContent=k2.toFixed(1);
+
+    ctx.clearRect(0,0,W,H);
+
+    if(chkGrid.checked){
+      ctx.strokeStyle='#e6edfb'; ctx.lineWidth=1;
+      for(let gx=-12; gx<=12; gx++){
+        ctx.beginPath(); ctx.moveTo(X(gx),0); ctx.lineTo(X(gx),H); ctx.stroke();
+      }
+      for(let gy=-7; gy<=7; gy++){
+        ctx.beginPath(); ctx.moveTo(0,Y(gy)); ctx.lineTo(W,Y(gy)); ctx.stroke();
+      }
+    }
+
+    /* axes */
+    ctx.strokeStyle='#94a3b8'; ctx.lineWidth=1.6;
+    ctx.beginPath(); ctx.moveTo(0,Y(0)); ctx.lineTo(W,Y(0)); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(X(0),0); ctx.lineTo(X(0),H); ctx.stroke();
+    ctx.fillStyle='#64748b'; ctx.font='12px Consolas';
+    ctx.fillText('x',W-16,Y(0)-6); ctx.fillText('y',X(0)+8,14);
+
+    /* Line 1: 9x + 4y - (7+k1) = 0  -> y = ((7+k1)-9x)/4  */
+    const c1=7+k1;
+    function lineY1(x){return (c1-9*x)/4;}
+    /* Line 2: 9x - 4y + (7+k2) = 0  -> y = (9x + 7 + k2)/4 */
+    const c2=7+k2;
+    function lineY2(x){return (9*x + c2)/4;}
+
+    /* draw line1 (blue) */
+    ctx.strokeStyle='#1d4ed8'; ctx.lineWidth=2.4;
+    ctx.beginPath();
+    ctx.moveTo(X(-12), Y(lineY1(-12)));
+    ctx.lineTo(X(12),  Y(lineY1(12)));
+    ctx.stroke();
+
+    /* draw line2 (amber) */
+    ctx.strokeStyle='#d97706'; ctx.lineWidth=2.4;
+    ctx.beginPath();
+    ctx.moveTo(X(-12), Y(lineY2(-12)));
+    ctx.lineTo(X(12),  Y(lineY2(12)));
+    ctx.stroke();
+
+    /* intersection: 9x+4y=c1 and 9x-4y=-c2
+       8y = c1 + c2 -> y=(c1+c2)/8 , 18x = c1 - c2 -> x=(c1-c2)/18 */
+    const ix=(c1-c2)/18;
+    const iy=(c1+c2)/8;
+
+    /* point A */
+    ctx.fillStyle='#dc2626';
+    ctx.beginPath(); ctx.arc(X(ix),Y(iy),6,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
+
+    ctx.fillStyle='#7f1d1d'; ctx.font='bold 13px Segoe UI';
+    ctx.fillText('A ('+ix.toFixed(2)+', '+iy.toFixed(2)+')', X(ix)+10, Y(iy)-10);
+
+    roA.textContent='('+ix.toFixed(2)+', '+iy.toFixed(2)+')';
+    roS1.textContent=(-9/4).toFixed(2);
+    roS2.textContent=(9/4).toFixed(2);
+    roC1.textContent=(9*ix+4*iy-7).toFixed(2);
+
+    /* legend */
+    ctx.font='12px Segoe UI';
+    ctx.fillStyle='#1d4ed8'; ctx.fillText('■ 9x+4y−7=0',12,18);
+    ctx.fillStyle='#d97706'; ctx.fillText('■ 9x−4y+7=0',12,36);
+  }
+
+  /* initialise sliders back to the standard question values */
+  sA.value=0; sB.value=0;
+  sA.addEventListener('input',draw);
+  sB.addEventListener('input',draw);
+  chkGrid.addEventListener('change',draw);
+  draw();
+})();
+
+/* ================= CANVAS B : locus of P (circle) ================= */
+(function(){
+  const cv=document.getElementById('cvB'), ctx=cv.getContext('2d');
+  const W=cv.width, H=cv.height;
+  const sTheta=document.getElementById('sTheta');
+  const vTheta=document.getElementById('vTheta');
+  const chkLocus=document.getElementById('chkLocus');
+  const chkLines=document.getElementById('chkLines');
+  const chkPoly=document.getElementById('chkPoly');
+  const roP=document.getElementById('roP'), roD=document.getElementById('roD'),
+        roEq=document.getElementById('roEq'), roR=document.getElementById('roR');
+
+  const A={x:0, y:7/4};
+  const R=8;
+
+  const ox=W/2, oy=H/2;
+  const scale=26;              // px per unit (so radius 8 -> 208 px)
+  function X(x){return ox + x*scale;}
+  function Y(y){return oy - y*scale;}
+
+  function draw(){
+    const deg=parseFloat(sTheta.value);
+    vTheta.textContent=deg+'°';
+    const rad=deg*Math.PI/180;
+
+    ctx.clearRect(0,0,W,H);
+
+    /* grid */
+    ctx.strokeStyle='#eef2fb'; ctx.lineWidth=1;
+    for(let gx=-15;gx<=15;gx++){ctx.beginPath();ctx.moveTo(X(gx),0);ctx.lineTo(X(gx),H);ctx.stroke();}
+    for(let gy=-9;gy<=9;gy++){ctx.beginPath();ctx.moveTo(0,Y(gy));ctx.lineTo(W,Y(gy));ctx.stroke();}
+
+    /* axes */
+    ctx.strokeStyle='#94a3b8'; ctx.lineWidth=1.6;
+    ctx.beginPath(); ctx.moveTo(0,Y(0)); ctx.lineTo(W,Y(0)); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(X(0),0); ctx.lineTo(X(0),H); ctx.stroke();
+    ctx.fillStyle='#64748b'; ctx.font='12px Consolas';
+    ctx.fillText('x',W-16,Y(0)-6); ctx.fillText('y',X(0)+8,14);
+    ctx.strokeStyle='#e2e8f0'; ctx.beginPath();
+    ctx.moveTo(0,Y(1.75)); ctx.lineTo(W,Y(1.75)); ctx.stroke();
+    ctx.fillStyle='#94a3b8'; ctx.fillText('y = 1.75',X(0)+8,Y(1.75)-6);
+
+    /* the two original lines (optional, for context) */
+    if(chkLines.checked){
+      ctx.lineWidth=1.6;
+      ctx.strokeStyle='#93c5fd';
+      ctx.beginPath();
+      ctx.moveTo(X(-15), Y((7-9*(-15))/4));
+      ctx.lineTo(X(15),  Y((7-9*15)/4));
+      ctx.stroke();
+      ctx.strokeStyle='#fcd34d';
+      ctx.beginPath();
+      ctx.moveTo(X(-15), Y((9*(-15)+7)/4));
+      ctx.lineTo(X(15),  Y((9*15+7)/4));
+      ctx.stroke();
+    }
+
+    /* locus circle */
+    if(chkLocus.checked){
+      ctx.strokeStyle='#059669'; ctx.lineWidth=2.6;
+      ctx.beginPath();
+      ctx.arc(X(A.x), Y(A.y), R*scale, 0, Math.PI*2);
+      ctx.stroke();
+
+      /* faint fill */
+      ctx.fillStyle='rgba(5,150,105,.06)';
+      ctx.beginPath();
+      ctx.arc(X(A.x), Y(A.y), R*scale, 0, Math.PI*2);
+      ctx.fill();
+    }
+
+    /* optional "distractor" polygons to emphasise why they fail */
+    if(chkPoly.checked){
+      /* regular hexagon inscribed in circle */
+      ctx.strokeStyle='rgba(168,85,247,.55)'; ctx.lineWidth=1.8; ctx.setLineDash([5,4]);
+      ctx.beginPath();
+      for(let i=0;i<=6;i++){
+        const a=i*Math.PI/3;
+        const px=X(A.x+R*Math.cos(a)), py=Y(A.y+R*Math.sin(a));
+        i?ctx.lineTo(px,py):ctx.moveTo(px,py);
+      }
+      ctx.stroke();
+
+      /* a triangle */
+      ctx.strokeStyle='rgba(236,72,153,.55)';
+      ctx.beginPath();
+      for(let i=0;i<=3;i++){
+        const a=i*2*Math.PI/3 - Math.PI/2;
+        const px=X(A.x+R*Math.cos(a)), py=Y(A.y+R*Math.sin(a));
+        i?ctx.lineTo(px,py):ctx.moveTo(px,py);
+      }
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    /* point A */
+    ctx.fillStyle='#dc2626';
+    ctx.beginPath(); ctx.arc(X(A.x),Y(A.y),6,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
+    ctx.fillStyle='#7f1d1d'; ctx.font='bold 13px Segoe UI';
+    ctx.fillText('A (0, 1.75)', X(A.x)+10, Y(A.y)-10);
+
+    /* moving point P */
+    const px=A.x + R*Math.cos(rad);
+    const py=A.y + R*Math.sin(rad);
+
+    /* radius line */
+    ctx.strokeStyle='#f59e0b'; ctx.lineWidth=2.2;
+    ctx.beginPath(); ctx.moveTo(X(A.x),Y(A.y)); ctx.lineTo(X(px),Y(py)); ctx.stroke();
+
+    /* right-angle style marker with horizontal dashed line for distance visual */
+    ctx.strokeStyle='rgba(245,158,11,.5)'; ctx.setLineDash([4,4]); ctx.lineWidth=1.4;
+    ctx.beginPath(); ctx.moveTo(X(px),Y(py)); ctx.lineTo(X(px),Y(A.y)); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(X(px),Y(A.y)); ctx.lineTo(X(A.x),Y(A.y)); ctx.stroke();
+    ctx.setLineDash([]);
+
+    /* point P */
+    ctx.fillStyle='#2563eb';
+    ctx.beginPath(); ctx.arc(X(px),Y(py),6.5,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
+    ctx.fillStyle='#1e3a8a'; ctx.font='bold 13px Segoe UI';
+    ctx.fillText('P ('+px.toFixed(2)+', '+py.toFixed(2)+')', X(px)+10, Y(py)-10);
+
+    /* distance label on radius */
+    const mx=(X(A.x)+X(px))/2, my=(Y(A.y)+Y(py))/2;
+    ctx.fillStyle='#b45309'; ctx.font='bold 13px Segoe UI';
+    ctx.fillText('AP = 8', mx+6, my-6);
+
+    /* readouts */
+    roP.textContent='('+px.toFixed(2)+', '+py.toFixed(2)+')';
+    const d=Math.hypot(px-A.x, py-A.y);
+    roD.textContent=d.toFixed(2);
+    roEq.textContent='x²+(y−1.75)²=64';
+    roR.textContent='8.00';
+  }
+
+  sTheta.addEventListener('input',draw);
+  chkLocus.addEventListener('change',draw);
+  chkLines.addEventListener('change',draw);
+  chkPoly.addEventListener('change',draw);
+  draw();
+})();
+
+/* ================= STEP REVEAL SYSTEM ================= */
+(function(){
+  const configs=[
+    {btn:null, container:'stepsA', counter:'cntA'},
+    {btn:null, container:'stepsB', counter:'cntB'}
+  ];
+  configs.forEach(cfg=>{
+    const container=document.getElementById(cfg.container);
+    const steps=Array.from(container.querySelectorAll('.step'));
+    const counter=document.getElementById(cfg.counter);
+    /* the button is the sibling just before this container */
+    const btn=container.previousElementSibling.querySelector('button.reveal');
+    let idx=0;
+
+    function update(){
+      counter.textContent=idx+' / '+steps.length;
+      if(idx>=steps.length){
+        btn.disabled=true;
+        btn.textContent='All steps revealed ✓';
+      }else{
+        btn.disabled=false;
+        btn.textContent='Next step →';
+      }
+    }
+
+    btn.addEventListener('click',()=>{
+      if(idx<steps.length){
+        steps[idx].classList.add('show');
+        idx++;
+        update();
+        steps[idx-1].scrollIntoView({behavior:'smooth',block:'centre'});
+      }
+    });
+
+    update();
+  });
+})();
+</script>
+</body>
+</html>

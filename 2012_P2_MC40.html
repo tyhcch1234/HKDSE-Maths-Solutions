@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2012 Paper 2 Q40 — Regular Tetrahedron Angle</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root{
+    --blue:#2563eb; --blue-d:#1e40af; --amber:#f59e0b; --emerald:#059669;
+    --ink:#0f172a; --muted:#64748b; --paper:#f8fafc; --card:#ffffff;
+    --line:#e2e8f0;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.6;
+  }
+  /* ---------- Hero ---------- */
+  header.hero{
+    background:linear-gradient(135deg,#1e3a8a 0%,#2563eb 45%,#0ea5e9 100%);
+    color:#fff; padding:38px 22px 46px; position:relative; overflow:hidden;
+  }
+  header.hero::after{
+    content:""; position:absolute; right:-90px; top:-90px; width:320px; height:320px;
+    border-radius:50%; background:rgba(255,255,255,.08);
+  }
+  header.hero::before{
+    content:""; position:absolute; left:-60px; bottom:-120px; width:240px; height:240px;
+    border-radius:50%; background:rgba(255,255,255,.06);
+  }
+  .wrap{max-width:960px; margin:0 auto; position:relative; z-index:2}
+  .eyebrow{font-size:.82rem; letter-spacing:.14em; text-transform:uppercase; opacity:.85; font-weight:600}
+  .qnum{font-size:1.9rem; font-weight:800; margin:6px 0 4px; letter-spacing:.01em}
+  .subtitle{font-size:1.02rem; opacity:.95}
+  .pills{margin-top:16px; display:flex; flex-wrap:wrap; gap:8px}
+  .pill{
+    background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35);
+    padding:5px 13px; border-radius:999px; font-size:.79rem; font-weight:600; backdrop-filter:blur(3px);
+  }
+  /* ---------- Cards ---------- */
+  main{max-width:960px; margin:0 auto; padding:26px 16px 60px}
+  .card{
+    background:var(--card); border-radius:18px; padding:22px 22px 24px;
+    box-shadow:0 6px 26px rgba(15,23,42,.07); border:1px solid var(--line);
+    margin-bottom:26px;
+  }
+  .card h2{
+    font-size:1.16rem; margin:0 0 4px; color:var(--blue-d);
+    display:flex; align-items:center; gap:10px;
+  }
+  .card h2 .dot{
+    width:10px; height:10px; border-radius:50%; background:var(--amber);
+    box-shadow:0 0 0 4px rgba(245,158,11,.18); flex:none;
+  }
+  .card p.qtext{margin:10px 0 0; font-size:1.02rem}
+  .marks{font-size:.8rem; font-weight:700; color:var(--muted); background:#f1f5f9;
+    padding:2px 9px; border-radius:8px; margin-left:auto; white-space:nowrap}
+  .parthead{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+  /* ---------- Canvas ---------- */
+  .canvas-box{
+    background:linear-gradient(180deg,#fbfdff,#f1f6fc);
+    border:1px solid #dbe7f5; border-radius:14px; padding:12px; margin:14px 0 6px;
+  }
+  canvas{width:100%; height:auto; display:block; border-radius:10px; background:#fff}
+  .controls{
+    display:flex; flex-wrap:wrap; gap:16px; align-items:center;
+    margin-top:12px; padding-top:12px; border-top:1px dashed #d7e3f2;
+  }
+  .ctrl{display:flex; flex-direction:column; gap:4px; min-width:190px; flex:1}
+  .ctrl label{font-size:.79rem; font-weight:700; color:var(--blue-d)}
+  input[type=range]{width:100%; accent-color:var(--blue); cursor:pointer}
+  .chk{display:flex; align-items:center; gap:7px; font-size:.85rem; font-weight:600; color:#334155; cursor:pointer}
+  input[type=checkbox]{accent-color:var(--emerald); width:17px; height:17px; cursor:pointer}
+  .readout{
+    display:flex; flex-wrap:wrap; gap:8px; margin-top:12px;
+  }
+  .ro{
+    background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px;
+    padding:6px 12px; font-size:.83rem; font-weight:700; color:#1e40af;
+    font-variant-numeric:tabular-nums;
+  }
+  .ro.g{background:#ecfdf5; border-color:#a7f3d0; color:#065f46}
+  .ro.a{background:#fffbeb; border-color:#fde68a; color:#92400e}
+  /* ---------- Steps ---------- */
+  .steps{margin-top:16px}
+  .step{
+    display:none; border-left:4px solid var(--blue); background:#f8fbff;
+    border-radius:0 12px 12px 0; padding:14px 16px; margin-bottom:14px;
+    animation:fade .35s ease;
+  }
+  .step.show{display:block}
+  @keyframes fade{from{opacity:0; transform:translateY(-6px)} to{opacity:1; transform:none}}
+  .step-head{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:6px}
+  .badge{
+    background:var(--blue); color:#fff; font-size:.74rem; font-weight:800;
+    padding:3px 10px; border-radius:999px; letter-spacing:.03em; white-space:nowrap;
+  }
+  .mbadge{
+    background:var(--amber); color:#fff; font-size:.72rem; font-weight:800;
+    padding:3px 9px; border-radius:999px; white-space:nowrap;
+  }
+  .step p{margin:6px 0}
+  .hint{
+    background:#fffbeb; border:1px solid #fde68a; border-left:4px solid var(--amber);
+    border-radius:8px; padding:9px 13px; margin-top:10px; font-size:.9rem; color:#7c4a03;
+  }
+  .hint b{color:#92400e}
+  .answer{
+    background:#ecfdf5; border:1px solid #a7f3d0; border-left:4px solid var(--emerald);
+    border-radius:8px; padding:10px 13px; margin-top:10px; font-size:.95rem; color:#064e3b;
+  }
+  .answer b{color:#065f46}
+  /* ---------- Buttons ---------- */
+  .btnbar{display:flex; align-items:center; gap:14px; margin-top:14px; flex-wrap:wrap}
+  button.next{
+    background:linear-gradient(135deg,var(--blue),#1d4ed8); color:#fff; border:none;
+    padding:11px 22px; border-radius:11px; font-size:.93rem; font-weight:700; cursor:pointer;
+    box-shadow:0 4px 14px rgba(37,99,235,.32); transition:.18s;
+  }
+  button.next:hover:not(:disabled){transform:translateY(-2px); box-shadow:0 7px 20px rgba(37,99,235,.42)}
+  button.next:disabled{background:#cbd5e1; box-shadow:none; cursor:default; color:#64748b}
+  .counter{font-size:.85rem; font-weight:700; color:var(--muted); font-variant-numeric:tabular-nums}
+  /* ---------- Summary ---------- */
+  .summary{background:linear-gradient(135deg,#0f172a,#1e293b); color:#e2e8f0; border:none}
+  .summary h2{color:#fbbf24}
+  .summary ul{margin:12px 0 0; padding-left:20px}
+  .summary li{margin-bottom:9px; font-size:.98rem}
+  .summary b{color:#7dd3fc}
+  footer{
+    text-align:center; font-size:.82rem; color:var(--muted); padding:22px 16px 34px;
+  }
+  @media(max-width:600px){
+    .qnum{font-size:1.5rem}
+    .card{padding:18px 15px 20px}
+    canvas{max-height:340px}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</div>
+    <div class="qnum">2012 · Question 40</div>
+    <div class="subtitle">Angle between two planes of a regular tetrahedron</div>
+    <div class="pills">
+      <span class="pill">3D Geometry</span>
+      <span class="pill">Regular Tetrahedron</span>
+      <span class="pill">Angle between Planes</span>
+      <span class="pill">Cosine Formula</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- QUESTION CARD -->
+  <section class="card">
+    <div class="parthead">
+      <h2><span class="dot"></span>Question</h2>
+      <span class="marks">Multiple Choice</span>
+    </div>
+    <p class="qtext">
+      The figure shows a regular tetrahedron \(ABCD\). Find the angle between the plane \(ABC\) and the plane \(BCD\) correct to the nearest degree.
+    </p>
+    <p class="qtext" style="margin-top:12px">
+      A. \(48^\circ\) &nbsp;&nbsp;&nbsp; B. \(53^\circ\) &nbsp;&nbsp;&nbsp; C. \(60^\circ\) &nbsp;&nbsp;&nbsp; D. \(71^\circ\)
+    </p>
+    <p class="qtext" style="margin-top:14px; font-size:.92rem; color:#64748b">
+      A <b>regular tetrahedron</b> has four faces, each an equilateral triangle of the same side length.
+      The required angle is the <b>dihedral angle</b> between two adjacent faces — the angle you would
+      "see" when looking straight down the common edge \(BC\).
+    </p>
+  </section>
+
+  <!-- PART A: SET UP THE MODEL -->
+  <section class="card">
+    <div class="parthead">
+      <h2><span class="dot"></span>Part (a) — Set up the model</h2>
+      <span class="marks">Understanding</span>
+    </div>
+    <p class="qtext">
+      Let the side length of the regular tetrahedron be \(l\). We measure the dihedral angle along the
+      common edge \(BC\) by dropping perpendiculars from \(A\) and \(D\) to \(BC\).
+    </p>
+
+    <div class="canvas-box">
+      <canvas id="cv1" width="900" height="560"></canvas>
+      <div class="controls">
+        <div class="ctrl">
+          <label>Side length \(l\) (units): <span id="lv1">1.00</span></label>
+          <input type="range" id="s1" min="0.6" max="2.0" step="0.01" value="1.00">
+        </div>
+        <label class="chk"><input type="checkbox" id="c1a" checked> Show edge \(AD\)</label>
+        <label class="chk"><input type="checkbox" id="c1b" checked> Highlight common edge \(BC\)</label>
+      </div>
+      <div class="readout">
+        <div class="ro">Side \(l\) = <span id="ro1a">1.000</span></div>
+        <div class="ro g">Median \(AM\) = <span id="ro1b">0.866</span></div>
+        <div class="ro a">Angle between planes = <span id="ro1c">70.53°</span></div>
+      </div>
+    </div>
+
+    <div class="steps" id="steps1">
+      <div class="step">
+        <div class="step-head"><span class="badge">Step 1</span><span class="mbadge">1M</span></div>
+        <p>Each face of a regular tetrahedron is an <b>equilateral triangle</b>. In \(\triangle ABC\) with side
+        \(l = AB = BC = CA\), the median from \(A\) to the midpoint \(M\) of \(BC\) is also an altitude.</p>
+        <p>\[ AM = \sqrt{l^2 - \left(\tfrac{l}{2}\right)^2} = \sqrt{\tfrac{3l^2}{4}} = \frac{\sqrt{3}}{2}\,l \]</p>
+        <div class="hint"><b>Hint:</b> Use a slider above to change \(l\) — the median \(AM\) scales linearly, but the <em>angle</em> never changes. That is the signature of a shape-only (similar) problem.</div>
+      </div>
+      <div class="step">
+        <div class="step-head"><span class="badge">Step 2</span><span class="mbadge">1M</span></div>
+        <p>By symmetry, in \(\triangle BCD\), the median from \(D\) to the same midpoint \(M\) of \(BC\) has the same length:</p>
+        <p>\[ DM = \frac{\sqrt{3}}{2}\,l \]</p>
+        <p>The required dihedral angle between plane \(ABC\) and plane \(BCD\) is exactly the angle \(\angle AMD\).</p>
+        <div class="hint"><b>Hint:</b> \(AM \perp BC\) and \(DM \perp BC\). The angle between two planes is measured by the angle between the two lines that are perpendicular to the intersection line (here \(BC\)) at one point.</div>
+        <div class="answer"><b>Key result:</b> \(AM = DM = \dfrac{\sqrt{3}}{2}l\) and the required angle is \(\angle AMD\).</div>
+      </div>
+    </div>
+
+    <div class="btnbar">
+      <button class="next" data-target="steps1">Next step →</button>
+      <span class="counter" id="cnt1">0 / 2</span>
+    </div>
+  </section>
+
+  <!-- PART B: COSINE FORMULA -->
+  <section class="card">
+    <div class="parthead">
+      <h2><span class="dot"></span>Part (b) — Apply the cosine formula in \(\triangle AMD\)</h2>
+      <span class="marks">Calculation</span>
+    </div>
+    <p class="qtext">
+      Now look at the isosceles triangle formed by the two medians and the opposite edge \(AD = l\).
+      We apply the cosine formula to find \(\cos\angle AMD\).
+    </p>
+
+    <div class="canvas-box">
+      <canvas id="cv2" width="900" height="520"></canvas>
+      <div class="controls">
+        <div class="ctrl">
+          <label>Compare with base angle \(\theta\): <span id="lv2">70.5°</span></label>
+          <input type="range" id="s2" min="30" max="120" step="0.5" value="70.5">
+        </div>
+        <label class="chk"><input type="checkbox" id="c2a" checked> Show \(\triangle AMD\) dimensions</label>
+        <label class="chk"><input type="checkbox" id="c2b" checked> Show the cosine formula box</label>
+      </div>
+      <div class="readout">
+        <div class="ro">\(AM = DM\) = <span id="ro2a">0.866</span></div>
+        <div class="ro">\(AD = l\) = <span id="ro2b">1.000</span></div>
+        <div class="ro a">\(\cos\angle AMD\) = <span id="ro2c">0.3333</span></div>
+        <div class="ro g">\(\angle AMD\) = <span id="ro2d">70.53°</span></div>
+      </div>
+    </div>
+
+    <div class="steps" id="steps2">
+      <div class="step">
+        <div class="step-head"><span class="badge">Step 1</span><span class="mbadge">1M</span></div>
+        <p>In \(\triangle AMD\) the three sides are known:
+        \[ AM = \frac{\sqrt{3}}{2}l,\qquad DM = \frac{\sqrt{3}}{2}l,\qquad AD = l \]</p>
+        <p>Apply the cosine formula at vertex \(M\):</p>
+        <p>\[ \cos\angle AMD = \frac{AM^2 + DM^2 - AD^2}{2\cdot AM\cdot DM} \]</p>
+        <div class="hint"><b>Hint:</b> Since the two equal sides are \(AM\) and \(DM\), the angle at \(M\) is the one enclosed by them — exactly the dihedral angle we want.</div>
+      </div>
+      <div class="step">
+        <div class="step-head"><span class="badge">Step 2</span><span class="mbadge">1A</span></div>
+        <p>Substitute the side lengths:</p>
+        <p>\[ \cos\angle AMD
+        = \frac{\left(\dfrac{\sqrt{3}}{2}l\right)^2+\left(\dfrac{\sqrt{3}}{2}l\right)^2-l^2}
+        {2\cdot\dfrac{\sqrt{3}}{2}l\cdot\dfrac{\sqrt{3}}{2}l}
+        = \frac{\dfrac{3}{4}l^2+\dfrac{3}{4}l^2-l^2}{\dfrac{3}{2}l^2}
+        = \frac{\dfrac{1}{2}l^2}{\dfrac{3}{2}l^2}
+        = \frac{1}{3} \]</p>
+        <div class="hint"><b>Hint:</b> The \(l^2\) cancels completely — another sign that only the shape matters, not the size.</div>
+        <div class="answer">
+          <b>So \(\cos\angle AMD = \dfrac{1}{3}\).</b>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-head"><span class="badge">Step 3</span><span class="mbadge">1A</span></div>
+        <p>Take the inverse cosine and round to the nearest degree:</p>
+        <p>\[ \angle AMD = \cos^{-1}\!\left(\tfrac{1}{3}\right) \approx 70.52877937^\circ \approx 71^\circ \]</p>
+        <div class="hint"><b>Hint:</b> A good sanity check — the value \(70.5^\circ\) lies slightly above \(60^\circ\), which makes sense: the two faces of a tetrahedron fold back a little more than the \(60^\circ\) of a flat triangular net.</div>
+        <div class="answer">
+          <b>Answer:</b> \(\angle AMD \approx 71^\circ\), so the correct option is <b>D</b>.
+        </div>
+      </div>
+    </div>
+
+    <div class="btnbar">
+      <button class="next" data-target="steps2">Next step →</button>
+      <span class="counter" id="cnt2">0 / 3</span>
+    </div>
+  </section>
+
+  <!-- SUMMARY -->
+  <section class="card summary">
+    <h2><span class="dot"></span>Summary at a glance</h2>
+    <ul>
+      <li>Let the side of the regular tetrahedron be \(l\).</li>
+      <li>Every face is an equilateral triangle, so the median (altitude) from \(A\) to the midpoint \(M\) of \(BC\) is \(AM = \dfrac{\sqrt{3}}{2}l\).</li>
+      <li>By symmetry, \(DM = \dfrac{\sqrt{3}}{2}l\) as well.</li>
+      <li>The angle between plane \(ABC\) and plane \(BCD\) equals the angle \(\angle AMD\).</li>
+      <li>Cosine formula in \(\triangle AMD\): \(\cos\angle AMD = \dfrac{AM^2+DM^2-AD^2}{2\cdot AM\cdot DM} = \dfrac{1}{3}\).</li>
+      <li><b>\(\angle AMD = \cos^{-1}\!\left(\tfrac{1}{3}\right) \approx 71^\circ\)</b> — the answer is <b>D</b>.</li>
+    </ul>
+  </section>
+
+  <footer>
+    HKDSE Mathematics (Compulsory Part) · 2012 Paper 2 · Question 40 · Interactive solution page
+  </footer>
+</main>
+
+<script>
+/* =========================================================
+   STEP REVEAL
+   ========================================================= */
+document.querySelectorAll('button.next').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    const box = document.getElementById(btn.dataset.target);
+    const steps = box.querySelectorAll('.step');
+    const counter = document.getElementById(btn.dataset.target.replace('steps','cnt'));
+    let shown = 0;
+    for(let i = 0; i < steps.length; i++){
+      if(!steps[i].classList.contains('show')){
+        steps[i].classList.add('show');
+        shown = i + 1;
+        break;
+      }
+    }
+    counter.textContent = shown + ' / ' + steps.length;
+    if(shown === steps.length || box.querySelectorAll('.step:not(.show)').length === 0){
+      btn.disabled = true;
+      btn.textContent = 'All steps revealed ✓';
+    }
+  });
+});
+
+/* =========================================================
+   DIAGRAM 1 — 3D regular tetrahedron (isometric projection)
+   ========================================================= */
+const cv1 = document.getElementById('cv1');
+const ctx1 = cv1.getContext('2d');
+const s1 = document.getElementById('s1');
+const c1a = document.getElementById('c1a');
+const c1b = document.getElementById('c1b');
+const lv1 = document.getElementById('lv1');
+const ro1a = document.getElementById('ro1a');
+const ro1b = document.getElementById('ro1b');
+const ro1c = document.getElementById('ro1c');
+
+function drawTetra(){
+  const W = cv1.width, H = cv1.height;
+  ctx1.clearRect(0,0,W,H);
+
+  const l = parseFloat(s1.value);
+  lv1.textContent = l.toFixed(2);
+
+  // model coordinates (side l), base BCD in a plane, apex A above centroid
+  // Place base triangle BCD with circumradius R = l/sqrt(3)
+  const R = l / Math.sqrt(3);
+  const apexH = Math.sqrt(l*l - R*R);   // height of tetrahedron
+
+  // 3D -> 2D isometric-like projection
+  const scale = 150;
+  const ox = W/2, oy = H/2 + 60;
+  const cosA = Math.cos(Math.PI/9), sinA = Math.sin(Math.PI/9);
+  function proj(x,y,z){
+    // rotate around z by angle, then tilt
+    const X = x*cosA - y*sinA;
+    const Y = x*sinA + y*cosA;
+    const px = ox + (X) * scale;
+    // screen y up is negative
+    const py = oy - (Y * 0.55 * scale + z * 0.95 * scale);
+    return [px, py];
+  }
+
+  // Base points in 3D (z = 0 for B, C, D; D toward viewer)
+  const th0 = -Math.PI/2;
+  const B = proj(R*Math.cos(th0 + 2*Math.PI/3), R*Math.sin(th0 + 2*Math.PI/3), 0);
+  const C = proj(R*Math.cos(th0), R*Math.sin(th0), 0);
+  const D = proj(R*Math.cos(th0 - 2*Math.PI/3), R*Math.sin(th0 - 2*Math.PI/3), 0);
+  const A = proj(0, 0, apexH);
+
+  // Midpoint M of BC (in 3D)
+  const Mx = R*Math.cos(th0 + 2*Math.PI/3)/2 + R*Math.cos(th0)/2;
+  const My = R*Math.sin(th0 + 2*Math.PI/3)/2 + R*Math.sin(th0)/2;
+  const M = proj(Mx, My, 0);
+
+  // ---- helper: dashed/solid line
+  function line(p, q, color, width, dash){
+    ctx1.save();
+    ctx1.setLineDash(dash || []);
+    ctx1.strokeStyle = color;
+    ctx1.lineWidth = width;
+    ctx1.beginPath();
+    ctx1.moveTo(p[0],p[1]);
+    ctx1.lineTo(q[0],q[1]);
+    ctx1.stroke();
+    ctx1.restore();
+  }
+  function dot(p, color, r){
+    ctx1.beginPath();
+    ctx1.arc(p[0], p[1], r||5, 0, Math.PI*2);
+    ctx1.fillStyle = color;
+    ctx1.fill();
+    ctx1.strokeStyle = '#fff';
+    ctx1.lineWidth = 1.5;
+    ctx1.stroke();
+  }
+  function label(p, txt, dx, dy, color){
+    ctx1.font = 'bold 19px Segoe UI, sans-serif';
+    ctx1.fillStyle = color || '#0f172a';
+    ctx1.textAlign = 'center';
+    ctx1.textBaseline = 'middle';
+    ctx1.fillText(txt, p[0]+dx, p[1]+dy);
+  }
+
+  // ---- hidden edges first (dashed) ----
+  line(A, D, '#94a3b8', 2, [7,6]);
+  line(B, D, '#94a3b8', 2, [7,6]);
+
+  // ---- visible edges ----
+  const edgeColor = '#2563eb';
+  line(A, B, edgeColor, 3);
+  line(A, C, edgeColor, 3);
+
+  // common edge BC — highlighted
+  if(c1b.checked){
+    line(B, C, '#dc2626', 5);
+  } else {
+    line(B, C, edgeColor, 3);
+  }
+  line(C, D, edgeColor, 3);
+
+  // ---- edge AD toggle ----
+  if(c1a.checked){
+    line(A, D, '#059669', 3.5);
+  }
+
+  // ---- medians AM and DM (the dihedral triangle) ----
+  line(A, M, '#f59e0b', 2.6, [5,4]);
+  line(D, M, '#f59e0b', 2.6, [5,4]);
+
+  // ---- angle arc at M ----
+  (function(){
+    const v1 = [A[0]-M[0], A[1]-M[1]];
+    const v2 = [D[0]-M[0], D[1]-M[1]];
+    const a1 = Math.atan2(v1[1], v1[0]);
+    const a2 = Math.atan2(v2[1], v2[0]);
+    let start = Math.min(a1,a2), end = Math.max(a1,a2);
+    if(end - start > Math.PI){ const t = start; start = end; end = t + Math.PI*2; }
+    ctx1.beginPath();
+    ctx1.arc(M[0], M[1], 40, start, end);
+    ctx1.strokeStyle = '#dc2626';
+    ctx1.lineWidth = 2.4;
+    ctx1.stroke();
+    // angle label
+    const midA = (start + end)/2;
+    ctx1.fillStyle = '#dc2626';
+    ctx1.font = 'bold 17px Segoe UI, sans-serif';
+    ctx1.fillText('∠AMD', M[0] + 62*Math.cos(midA), M[1] + 62*Math.sin(midA));
+  })();
+
+  // ---- points ----
+  dot(A, '#1e40af'); dot(B, '#1e40af'); dot(C, '#1e40af'); dot(D, '#1e40af');
+  dot(M, '#f59e0b', 6);
+
+  label(A, 'A', 0, -22);
+  label(B, 'B', -20, 8);
+  label(C, 'C', 12, 22);
+  label(D, 'D', 22, 6);
+  label(M, 'M', 6, 20, '#b45309');
+
+  // ---- readouts ----
+  const med = Math.sqrt(3)/2 * l;
+  const angle = Math.acos(1/3) * 180/Math.PI;
+  ro1a.textContent = l.toFixed(3);
+  ro1b.textContent = med.toFixed(3);
+  ro1c.textContent = angle.toFixed(2) + '°';
+
+  // ---- caption ----
+  ctx1.font = '600 15px Segoe UI, sans-serif';
+  ctx1.fillStyle = '#64748b';
+  ctx1.textAlign = 'left';
+  ctx1.fillText('Regular tetrahedron ABCD — dihedral angle along edge BC', 20, 28);
+  ctx1.fillStyle = '#dc2626';
+  ctx1.fillText('Red: common edge BC', 20, H-42);
+  ctx1.fillStyle = '#f59e0b';
+  ctx1.fillText('Amber: medians AM and DM  (perpendicular to BC)', 20, H-20);
+}
+
+s1.addEventListener('input', drawTetra);
+c1a.addEventListener('change', drawTetra);
+c1b.addEventListener('change', drawTetra);
+drawTetra();
+
+/* =========================================================
+   DIAGRAM 2 — The isosceles triangle AMD (2D cross-section)
+   ========================================================= */
+const cv2 = document.getElementById('cv2');
+const ctx2 = cv2.getContext('2d');
+const s2 = document.getElementById('s2');
+const c2a = document.getElementById('c2a');
+const c2b = document.getElementById('c2b');
+const lv2 = document.getElementById('lv2');
+const ro2a = document.getElementById('ro2a');
+const ro2b = document.getElementById('ro2b');
+const ro2c = document.getElementById('ro2c');
+const ro2d = document.getElementById('ro2d');
+
+function drawTriangle(){
+  const W = cv2.width, H = cv2.height;
+  ctx2.clearRect(0,0,W,H);
+
+  const theta = parseFloat(s2.value) * Math.PI/180;
+  lv2.textContent = (theta*180/Math.PI).toFixed(1) + '°';
+
+  const l = 1;                 // side length for display
+  const med = Math.sqrt(3)/2 * l;
+
+  // geometry of isosceles triangle with equal sides med, base l, apex angle theta
+  // base AD horizontal at bottom, apex M on top
+  const scale = 190;
+  const apexX = W/2;
+  const apexY = 120;
+  const halfBase = (l/2) * scale;
+  const height = med * Math.cos(theta/2) * scale;
+
+  const Adc = [apexX - halfBase, apexY + height];
+  const Ddc = [apexX + halfBase, apexY + height];
+  const Mdc = [apexX, apexY];
+
+  // background
+  ctx2.fillStyle = '#f8fafc';
+  ctx2.fillRect(0,0,W,H);
+
+  // ---- triangle fill ----
+  ctx2.beginPath();
+  ctx2.moveTo(Mdc[0], Mdc[1]);
+  ctx2.lineTo(Adc[0], Adc[1]);
+  ctx2.lineTo(Ddc[0], Ddc[1]);
+  ctx2.closePath();
+  ctx2.fillStyle = 'rgba(37,99,235,0.07)';
+  ctx2.fill();
+
+  // ---- sides ----
+  ctx2.lineWidth = 3.2;
+  ctx2.strokeStyle = '#2563eb';
+  ctx2.beginPath(); ctx2.moveTo(Mdc[0],Mdc[1]); ctx2.lineTo(Adc[0],Adc[1]); ctx2.stroke(); // AM
+  ctx2.beginPath(); ctx2.moveTo(Mdc[0],Mdc[1]); ctx2.lineTo(Ddc[0],Ddc[1]); ctx2.stroke(); // DM
+  ctx2.strokeStyle = '#059669';
+  ctx2.lineWidth = 3.6;
+  ctx2.beginPath(); ctx2.moveTo(Adc[0],Adc[1]); ctx2.lineTo(Ddc[0],Ddc[1]); ctx2.stroke(); // AD
+
+  // ---- equal-side tick marks on AM and DM ----
+  function tick(p, q, frac){
+    const mx = p[0] + (q[0]-p[0])*frac;
+    const my = p[1] + (q[1]-p[1])*frac;
+    const dx = q[0]-p[0], dy = q[1]-p[1];
+    const len = Math.hypot(dx,dy) || 1;
+    const nx = -dy/len*9, ny = dx/len*9;
+    ctx2.strokeStyle = '#1e40af';
+    ctx2.lineWidth = 2.4;
+    ctx2.beginPath();
+    ctx2.moveTo(mx-nx, my-ny);
+    ctx2.lineTo(mx+nx, my+ny);
+    ctx2.stroke();
+  }
+  tick(Mdc, Adc, 0.5);
+  tick(Mdc, Ddc, 0.5);
+
+  // ---- angle arc at M ----
+  (function(){
+    const r = 52;
+    const v1 = [Adc[0]-Mdc[0], Adc[1]-Mdc[1]];
+    const v2 = [Ddc[0]-Mdc[0], Ddc[1]-Mdc[1]];
+    const a1 = Math.atan2(v1[1], v1[0]);
+    const a2 = Math.atan2(v2[1], v2[0]);
+    let start = Math.min(a1,a2), end = Math.max(a1,a2);
+    if(end - start > Math.PI){ const t = start; start = end; end = t + Math.PI*2; }
+    ctx2.beginPath();
+    ctx2.arc(Mdc[0], Mdc[1], r, start, end);
+    ctx2.strokeStyle = '#dc2626';
+    ctx2.lineWidth = 3;
+    ctx2.stroke();
+    const midA = (start+end)/2;
+    ctx2.fillStyle = '#dc2626';
+    ctx2.font = 'bold 19px Segoe UI, sans-serif';
+    ctx2.textAlign = 'center';
+    ctx2.textBaseline = 'middle';
+    ctx2.fillText('θ', Mdc[0] + 74*Math.cos(midA), Mdc[1] + 74*Math.sin(midA));
+  })();
+
+  // ---- vertices ----
+  [[Mdc,'M','#f59e0b'],[Adc,'A','#1e40af'],[Ddc,'D','#1e40af']].forEach(function(v){
+    ctx2.beginPath();
+    ctx2.arc(v[0][0], v[0][1], 7, 0, Math.PI*2);
+    ctx2.fillStyle = v[2];
+    ctx2.fill();
+    ctx2.strokeStyle = '#fff';
+    ctx2.lineWidth = 2;
+    ctx2.stroke();
+  });
+  ctx2.fillStyle = '#0f172a';
+  ctx2.font = 'bold 20px Segoe UI, sans-serif';
+  ctx2.fillText('M', Mdc[0], Mdc[1]-24);
+  ctx2.fillText('A', Adc[0]-22, Adc[1]+18);
+  ctx2.fillText('D', Ddc[0]+22, Ddc[1]+18);
+
+  // ---- side labels ----
+  if(c2a.checked){
+    ctx2.font = 'bold 17px Segoe UI, sans-serif';
+    ctx2.fillStyle = '#2563eb';
+    ctx2.textAlign = 'center';
+    // AM label
+    ctx2.fillText('AM = (√3/2)·l', (Mdc[0]+Adc[0])/2 - 82, (Mdc[1]+Adc[1])/2 - 8);
+    ctx2.fillText('DM = (√3/2)·l', (Mdc[0]+Ddc[0])/2 + 82, (Mdc[1]+Ddc[1])/2 - 8);
+    ctx2.fillStyle = '#059669';
+    ctx2.fillText('AD = l', (Adc[0]+Ddc[0])/2, Adc[1] + 34);
+  }
+
+  // ---- cosine value readouts ----
+  const cosVal = Math.cos(theta);
+  ro2a.textContent = med.toFixed(3);
+  ro2b.textContent = l.toFixed(3);
+  ro2c.textContent = cosVal.toFixed(4);
+  ro2d.textContent = (theta*180/Math.PI).toFixed(2) + '°';
+
+  // ---- formula box ----
+  if(c2b.checked){
+    const bw = 400, bh = 96;
+    const bx = W - bw - 24, by = 20;
+    ctx2.fillStyle = 'rgba(255,251,235,0.96)';
+    ctx2.strokeStyle = '#f59e0b';
+    ctx2.lineWidth = 2;
+    ctx2.beginPath();
+    if(ctx2.roundRect){ ctx2.roundRect(bx, by, bw, bh, 12); }
+    else { ctx2.rect(bx, by, bw, bh); }
+    ctx2.fill(); ctx2.stroke();
+
+    ctx2.fillStyle = '#78350f';
+    ctx2.font = 'bold 16px Segoe UI, sans-serif';
+    ctx2.textAlign = 'left';
+    ctx2.textBaseline = 'alphabetic';
+    ctx2.fillText('cos θ = (AM² + DM² − AD²)', bx+16, by+30);
+    ctx2.fillText('           ÷ (2·AM·DM)', bx+16, by+54);
+    ctx2.fillStyle = '#b45309';
+    ctx2.fillText('= 1/3  →  θ = 70.53°', bx+16, by+80);
+  }
+
+  // ---- title ----
+  ctx2.fillStyle = '#64748b';
+  ctx2.font = '600 15px Segoe UI, sans-serif';
+  ctx2.textAlign = 'left';
+  ctx2.fillText('The isosceles cross-section △AMD (M is the midpoint of BC)', 20, H-20);
+}
+
+s2.addEventListener('input', drawTriangle);
+c2a.addEventListener('change', drawTriangle);
+c2b.addEventListener('change', drawTriangle);
+drawTriangle();
+
+/* polyfill for roundRect on older browsers */
+if(!CanvasRenderingContext2D.prototype.roundRect){
+  CanvasRenderingContext2D.prototype.roundRect = function(x,y,w,h,r){
+    this.moveTo(x+r, y);
+    this.arcTo(x+w, y, x+w, y+h, r);
+    this.arcTo(x+w, y+h, x, y+h, r);
+    this.arcTo(x, y+h, x, y, r);
+    this.arcTo(x, y, x+w, y, r);
+    this.closePath();
+    return this;
+  };
+}
+</script>
+</body>
+</html>

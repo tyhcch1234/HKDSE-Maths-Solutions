@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HKDSE 2013 Paper 2 Q45 · Variance Transformations</title>
+
+<!-- MathJax -->
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script id="MathJax-script" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+<style>
+  :root{
+    --blue:#1e3a8a; --blue2:#2563eb; --blue-lt:#dbeafe;
+    --amber:#b45309; --amber-lt:#fef3c7;
+    --emerald:#047857; --emerald-lt:#d1fae5;
+    --ink:#0f172a; --muted:#475569; --line:#e2e8f0;
+    --bg:#f8fafc; --card:#ffffff;
+    --shadow:0 10px 30px rgba(15,23,42,.08);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.55;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:980px;margin:0 auto;padding:0 16px}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    background:linear-gradient(135deg,#0f172a 0%, #1e3a8a 45%, #2563eb 100%);
+    color:#fff;padding:44px 0 38px;position:relative;overflow:hidden;
+  }
+  .hero::after{
+    content:"";position:absolute;inset:auto -120px -160px auto;width:420px;height:420px;
+    background:radial-gradient(circle,rgba(255,255,255,.18),transparent 65%);border-radius:50%;
+  }
+  .eyebrow{letter-spacing:.16em;text-transform:uppercase;font-size:.72rem;font-weight:700;
+    color:#a5c8ff;margin:0 0 10px}
+  .hero h1{margin:0 0 6px;font-size:clamp(1.5rem,4.2vw,2.35rem);line-height:1.2;font-weight:800}
+  .hero .sub{margin:0;color:#dbeafe;font-size:clamp(.95rem,2.4vw,1.05rem);max-width:60ch}
+  .pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px;position:relative;z-index:1}
+  .pill{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);
+    color:#fff;padding:5px 12px;border-radius:999px;font-size:.78rem;font-weight:600;backdrop-filter:blur(4px)}
+
+  /* ---------- CARDS ---------- */
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;
+    padding:22px;margin:22px 0;box-shadow:var(--shadow)}
+  .card h2{margin:0 0 12px;font-size:1.18rem;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .badge{display:inline-block;background:var(--blue-lt);color:var(--blue);
+    font-size:.72rem;font-weight:800;padding:3px 10px;border-radius:999px;letter-spacing:.04em}
+  .marks{background:var(--amber-lt);color:var(--amber);font-size:.7rem;font-weight:800;
+    padding:3px 9px;border-radius:999px;letter-spacing:.03em}
+
+  .qtext{font-size:1.02rem;color:#1f2937}
+  .opts{list-style:none;padding:0;margin:14px 0 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+  .opts li{background:#f1f5f9;border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-weight:600}
+
+  /* ---------- CANVAS PANELS ---------- */
+  .canvas-panel{background:#fbfdff;border:1px dashed #cbd5e1;border-radius:14px;padding:12px;margin:14px 0}
+  canvas{width:100%;height:auto;display:block;border-radius:10px;background:#fff;touch-action:manipulation}
+  .controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:12px}
+  .ctrl label{display:flex;justify-content:space-between;font-size:.82rem;font-weight:700;color:var(--muted);margin-bottom:4px}
+  input[type=range]{width:100%;accent-color:var(--blue2)}
+  .readout{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+  .ro{background:#eef2ff;border:1px solid #c7d2fe;border-radius:10px;padding:7px 12px;font-size:.82rem;font-weight:700;color:#3730a3}
+  .ro span{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  .chk{display:flex;align-items:center;gap:8px;font-size:.85rem;font-weight:700;color:var(--muted)}
+  .chk input{width:18px;height:18px;accent-color:var(--emerald)}
+
+  /* ---------- STEPS ---------- */
+  .step{border-left:4px solid var(--blue2);background:#f8faff;border-radius:0 12px 12px 0;
+    padding:12px 14px;margin:12px 0;animation:slide .35s ease both}
+  @keyframes slide{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .step-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+  .num{background:var(--blue2);color:#fff;width:26px;height:26px;border-radius:50%;
+    display:inline-flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:800;flex:none}
+  .hint{background:var(--amber-lt);border-left:4px solid #f59e0b;color:#78350f;
+    border-radius:0 10px 10px 0;padding:8px 12px;margin-top:8px;font-size:.9rem}
+  .answer{background:var(--emerald-lt);border-left:4px solid #10b981;color:#065f46;
+    border-radius:0 10px 10px 0;padding:9px 12px;margin-top:8px;font-weight:700;font-size:.95rem}
+
+  .btnrow{display:flex;align-items:center;gap:14px;margin-top:14px;flex-wrap:wrap}
+  button.next{
+    background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;border:0;
+    padding:11px 20px;border-radius:12px;font-weight:800;font-size:.92rem;cursor:pointer;
+    box-shadow:0 6px 16px rgba(37,99,235,.28);transition:transform .15s,filter .15s}
+  button.next:hover:not(:disabled){transform:translateY(-1px);filter:brightness(1.06)}
+  button.next:disabled{background:#cbd5e1;color:#64748b;cursor:not-allowed;box-shadow:none}
+  .counter{font-size:.84rem;font-weight:800;color:var(--muted)}
+  .hidden{display:none}
+
+  /* ---------- SUMMARY ---------- */
+  .summary{background:linear-gradient(135deg,#0f172a,#1e3a8a);color:#e8f0ff;border:0}
+  .summary h2{color:#fff}
+  .summary ul{padding-left:20px;margin:10px 0 0}
+  .summary li{margin:7px 0}
+  .summary b{color:#fcd34d}
+
+  footer{text-align:center;color:var(--muted);font-size:.82rem;padding:26px 16px 40px}
+</style>
+</head>
+<body>
+
+<!-- ================= HERO ================= -->
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</p>
+    <h1>2013 Paper 2 · Question 45</h1>
+    <p class="sub">Statistics — how mean and variance behave under a linear transformation \(ax+b\).</p>
+    <div class="pills">
+      <span class="pill">Variance</span>
+      <span class="pill">Standard Deviation</span>
+      <span class="pill">Linear Transformation</span>
+      <span class="pill">Effect of \(a\) and \(b\)</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ================= QUESTION ================= -->
+  <section class="card">
+    <h2><span class="badge">QUESTION</span> Multiple Choice · 1 mark</h2>
+    <div class="qtext">
+      <p>If the variance of the five numbers \(x_1,\ x_2,\ x_3,\ x_4\) and \(x_5\) is \(13\), then the variance of the five numbers
+      \[3x_1+4,\quad 3x_2+4,\quad 3x_3+4,\quad 3x_4+4 \quad\text{and}\quad 3x_5+4\]
+      is</p>
+    </div>
+    <ul class="opts">
+      <li>A. 39</li>
+      <li>B. 43</li>
+      <li>C. 117</li>
+      <li>D. 121</li>
+    </ul>
+  </section>
+
+  <!-- ================= PART: KEY IDEA ================= -->
+  <section class="card">
+    <h2><span class="badge">PART (a)</span> The two key rules <span class="marks">1M + 1A</span></h2>
+    <p>Before computing, we need to know exactly what adding a constant and multiplying by a constant do to a data set. Drag the sliders below to build intuition.</p>
+
+    <div class="canvas-panel">
+      <canvas id="cv1" width="900" height="380"></canvas>
+      <div class="controls">
+        <div class="ctrl">
+          <label>Multiplier \(a\) <span id="labA">3.0</span></label>
+          <input type="range" id="sldA" min="0.2" max="4" step="0.1" value="3" />
+        </div>
+        <div class="ctrl">
+          <label>Shift \(b\) <span id="labB">4</span></label>
+          <input type="range" id="sldB" min="-10" max="10" step="1" value="4" />
+        </div>
+        <div class="ctrl">
+          <label class="chk"><input type="checkbox" id="chkMean" checked /> Show mean line</label>
+          <label class="chk"><input type="checkbox" id="chkSpread" checked /> Show spread (deviation) bars</label>
+        </div>
+      </div>
+      <div class="readout">
+        <div class="ro">Original var: <span id="roVar0">13.00</span></div>
+        <div class="ro">Original sd: <span id="roSd0">3.61</span></div>
+        <div class="ro">New var: <span id="roVar1">117.00</span></div>
+        <div class="ro">New sd: <span id="roSd1">10.82</span></div>
+        <div class="ro">\(a^2\): <span id="roA2">9.00</span></div>
+        <div class="ro">Mean shift: <span id="roShift">+4</span></div>
+      </div>
+    </div>
+
+    <div class="step hidden">
+      <div class="step-head"><span class="num">1</span> <b>Adding a constant \(b\)</b> <span class="marks">Concept</span></div>
+      <p>Every value moves by the same amount \(b\), so the mean moves too but the <em>distances</em> between values do not change:</p>
+      \[ \operatorname{Var}(x_i+b)=\operatorname{Var}(x_i) \]
+      <div class="hint"><b>Hint:</b> Try the slider \(a=1\), \(b=4\). The red dots simply slide along the number line — the spread bars stay the same length.</div>
+    </div>
+
+    <div class="step hidden">
+      <div class="step-head"><span class="num">2</span> <b>Multiplying by a constant \(a\)</b> <span class="marks">Key Rule</span></div>
+      <p>Every deviation from the mean is scaled by \(a\), so the variance — which is built from <em>squares</em> of deviations — is scaled by \(a^2\):</p>
+      \[ \operatorname{Var}(a\,x_i)=a^2\operatorname{Var}(x_i) \]
+      <div class="hint"><b>Hint:</b> Raise \(a\) to \(3\) with the slider and look at the spread bars: they triple in length, so the variance grows by \(3^2=9\) times.</div>
+    </div>
+
+    <div class="step hidden">
+      <div class="step-head"><span class="num">3</span> <b>Combine both</b> <span class="marks">1M</span></div>
+      <p>Applying \(x\mapsto ax+b\) combines the two effects. The multiplier acts on the variance, the shift does nothing:</p>
+      \[ \boxed{\operatorname{Var}(a\,x_i+b)=a^2\operatorname{Var}(x_i)} \]
+      <div class="hint"><b>Hint:</b> This is exactly the transformation \(3x_i+4\), so \(a=3\) and \(b=4\).</div>
+    </div>
+
+    <div class="btnrow">
+      <button class="next" data-target="card1">Next step →</button>
+      <span class="counter" id="cnt-card1">0 / 3</span>
+    </div>
+  </section>
+
+  <!-- ================= PART: COMPUTATION ================= -->
+  <section class="card" id="card2">
+    <h2><span class="badge">PART (b)</span> Compute the new variance <span class="marks">1A</span></h2>
+    <p>We are given \(\operatorname{Var}(x_i)=13\) and the new numbers are \(3x_i+4\). Substitute \(a=3\) and \(b=4\).</p>
+
+    <div class="canvas-panel">
+      <canvas id="cv2" width="900" height="340"></canvas>
+      <div class="controls">
+        <div class="ctrl">
+          <label>Try another value of \(a\) <span id="labA2">3.0</span></label>
+          <input type="range" id="sldA2" min="0.2" max="4" step="0.1" value="3" />
+        </div>
+        <div class="chk">
+          <label class="chk"><input type="checkbox" id="chkSq" checked /> Show \(a^2 \times 13\) vs \(a \times 13\) (the trap!)</label>
+        </div>
+      </div>
+      <div class="readout">
+        <div class="ro">\(a^2\): <span id="roA22">9.00</span></div>
+        <div class="ro">Correct: \(a^2\cdot 13\) = <span id="roCorrect">117.00</span></div>
+        <div class="ro">Trap: \(a\cdot 13\) = <span id="roTrap">39.00</span></div>
+      </div>
+    </div>
+
+    <div class="step hidden">
+      <div class="step-head"><span class="num">1</span> <b>Identify the transformation</b> <span class="marks">1M</span></div>
+      <p>Compare with \(a\,x_i+b\):</p>
+      \[ x_i \;\longmapsto\; 3x_i+4 \quad\Longrightarrow\quad a=3,\qquad b=4 \]
+      <div class="hint"><b>Hint:</b> The shift \(+4\) only moves the data; it is <em>not</em> the multiplier.</div>
+    </div>
+
+    <div class="step hidden">
+      <div class="step-head"><span class="num">2</span> <b>Apply the variance rule</b> <span class="marks">1A</span></div>
+      \[ \operatorname{Var}(3x_i+4)=3^2\operatorname{Var}(x_i)=9\times 13=117 \]
+      <div class="hint"><b>Hint:</b> Option A (39) arises if you forget to square the multiplier — the classic mistake!</div>
+      <div class="answer">New variance \(=117\) &nbsp;→&nbsp; <b>Option C</b></div>
+    </div>
+
+    <div class="btnrow">
+      <button class="next" data-target="card2">Next step →</button>
+      <span class="counter" id="cnt-card2">0 / 2</span>
+    </div>
+  </section>
+
+  <!-- ================= SUMMARY ================= -->
+  <section class="card summary">
+    <h2><span class="badge" style="background:rgba(255,255,255,.18);color:#fff">SUMMARY</span> Answers at a glance</h2>
+    <ul>
+      <li>Rule 1 (shift): \(\operatorname{Var}(x_i+b)=\operatorname{Var}(x_i)\) — adding a constant changes <b>nothing</b>.</li>
+      <li>Rule 2 (scale): \(\operatorname{Var}(a\,x_i)=a^2\operatorname{Var}(x_i)\) — the multiplier is <b>squared</b>.</li>
+      <li>Combined: \(\operatorname{Var}(a\,x_i+b)=a^2\operatorname{Var}(x_i)\).</li>
+      <li>Here \(a=3\), so \(\operatorname{Var}(3x_i+4)=3^2\times 13=9\times 13=\mathbf{117}\).</li>
+      <li>Final answer: <b>C. 117</b></li>
+    </ul>
+  </section>
+
+</main>
+
+<footer>HKDSE Mathematics · Statistics · Interactive solution — 2013 Paper 2 Q45</footer>
+
+<script>
+/* ============================================================
+   DATA MODEL: five x-values whose variance is exactly 13.
+   We pick deviations d = (-2,-1,0,1,2) scaled so that
+   var = mean of squares = (4+1+0+1+4)/5 * k^2 = 2 k^2 = 13
+   => k = sqrt(6.5) ≈ 2.5495
+   ============================================================ */
+const K = Math.sqrt(6.5);
+const BASE = [-2,-1,0,1,2].map(d => d * K);   // mean 0, var 13
+const VAR0 = 13;
+
+/* ---------- helpers ---------- */
+function mean(a){ return a.reduce((s,v)=>s+v,0)/a.length; }
+function variance(a){ const m = mean(a); return a.reduce((s,v)=>s+(v-m)*(v-m),0)/a.length; }
+function fmt(x,n=2){ return Number(x).toFixed(n); }
+
+/* ============================================================
+   CANVAS 1 : number line comparison, interactive a and b
+   ============================================================ */
+const cv1 = document.getElementById('cv1');
+const ctx1 = cv1.getContext('2d');
+
+const sldA = document.getElementById('sldA');
+const sldB = document.getElementById('sldB');
+const chkMean = document.getElementById('chkMean');
+const chkSpread = document.getElementById('chkSpread');
+
+function drawCanvas1(){
+  const W = cv1.width, H = cv1.height;
+  const a = parseFloat(sldA.value);
+  const b = parseFloat(sldB.value);
+
+  document.getElementById('labA').textContent = fmt(a,1);
+  document.getElementById('labB').textContent = fmt(b,0);
+
+  const data0 = BASE.slice();
+  const data1 = BASE.map(v => a*v + b);
+
+  const m0 = mean(data0), m1 = mean(data1);
+  const v0 = variance(data0), v1 = variance(data1);
+
+  document.getElementById('roVar0').textContent = fmt(v0);
+  document.getElementById('roSd0').textContent  = fmt(Math.sqrt(v0));
+  document.getElementById('roVar1').textContent = fmt(v1);
+  document.getElementById('roSd1').textContent  = fmt(Math.sqrt(v1));
+  document.getElementById('roA2').textContent   = fmt(a*a);
+  document.getElementById('roShift').textContent = (b>=0?'+':'') + fmt(b,0);
+
+  ctx1.clearRect(0,0,W,H);
+  ctx1.fillStyle = '#ffffff'; ctx1.fillRect(0,0,W,H);
+
+  const padL = 60, padR = 60;
+  const yTop = 130, yBot = 250;
+
+  // dynamic world range covering both data sets
+  const all = data0.concat(data1);
+  let lo = Math.min(...all) - 3;
+  let hi = Math.max(...all) + 3;
+  if (hi - lo < 12){ const c=(lo+hi)/2; lo=c-6; hi=c+6; }
+
+  const X = v => padL + (v - lo)/(hi - lo) * (W - padL - padR);
+
+  function axis(y, color, label, arr){
+    // line
+    ctx1.strokeStyle = color; ctx1.lineWidth = 1.5;
+    ctx1.beginPath(); ctx1.moveTo(padL-10, y); ctx1.lineTo(W-padR+10, y); ctx1.stroke();
+    // ticks
+    const step = niceStep((hi-lo)/8);
+    ctx1.fillStyle = '#94a3b8'; ctx1.font = '11px ui-monospace, monospace';
+    ctx1.textAlign = 'center';
+    for(let t = Math.ceil(lo/step)*step; t <= hi; t += step){
+      const px = X(t);
+      ctx1.strokeStyle = '#e2e8f0';
+      ctx1.beginPath(); ctx1.moveTo(px, y-5); ctx1.lineTo(px, y+5); ctx1.stroke();
+      ctx1.fillText(fmt(t,0), px, y + 20);
+    }
+    // label
+    ctx1.fillStyle = color; ctx1.font = 'bold 12px system-ui'; ctx1.textAlign = 'left';
+    ctx1.fillText(label, padL-50, y - 16);
+  }
+
+  axis(yTop, '#b91c1c', 'Original \(x_i\)', data0);
+  axis(yBot, '#1d4ed8', 'New \(3x_i+4\)', data1);
+
+  // spread bars
+  if (chkSpread.checked){
+    drawSpread(data0, m0, yTop, X, 'rgba(185,28,28,.35)', 'rgba(185,28,28,.9)');
+    drawSpread(data1, m1, yBot, X, 'rgba(29,78,216,.30)', 'rgba(29,78,216,.9)');
+  }
+
+  // mean lines
+  if (chkMean.checked){
+    lineAt(m0, yTop, '#b91c1c', 'mean = ' + fmt(m0,2), -1);
+    lineAt(m1, yBot, '#1d4ed8', 'mean = ' + fmt(m1,2), +1);
+  }
+
+  // points
+  drawPoints(data0, yTop, X, '#b91c1c', '#fff');
+  drawPoints(data1, yBot, X, '#1d4ed8', '#fff');
+
+  // big annotations
+  ctx1.fillStyle = '#0f172a'; ctx1.font = 'bold 13px system-ui'; ctx1.textAlign = 'left';
+  ctx1.fillText('Variance (original) = ' + fmt(v0,2), padL, 26);
+  ctx1.fillStyle = '#1d4ed8';
+  ctx1.fillText('Variance (new) = ' + fmt(v1,2) + '   =  a² × ' + fmt(v0,2) + '  with  a = ' + fmt(a,1), padL, 48);
+  ctx1.fillStyle = '#64748b'; ctx1.font = '12px system-ui';
+  ctx1.fillText('Shift b = ' + fmt(b,0) + ' only relocates the dots — it never changes the spread.', padL, 70);
+}
+
+function drawPoints(arr, y, X, color, fill){
+  arr.forEach(v=>{
+    const px = X(v);
+    ctx1.beginPath(); ctx1.arc(px, y, 6.5, 0, Math.PI*2);
+    ctx1.fillStyle = fill; ctx1.fill();
+    ctx1.lineWidth = 2.5; ctx1.strokeStyle = color; ctx1.stroke();
+  });
+}
+
+function drawSpread(arr, m, y, X, colLine, colTick){
+  ctx1.strokeStyle = colLine; ctx1.lineWidth = 1.2;
+  arr.forEach(v=>{
+    const px = X(v), pm = X(m);
+    ctx1.beginPath(); ctx1.moveTo(px, y-11); ctx1.lineTo(px, y+11); ctx1.stroke();
+    ctx1.beginPath(); ctx1.moveTo(pm, y-6); ctx1.lineTo(px, y-6); ctx1.stroke();
+  });
+}
+
+function lineAt(v, y, color, label, dir){
+  const W = cv1.width, padL = 60, padR = 60;
+  // recompute X with same range as draw — we need lo/hi. Store globally instead:
+  const X = window.__X1;
+  const px = X(v);
+  ctx1.save();
+  ctx1.setLineDash([6,4]);
+  ctx1.strokeStyle = color; ctx1.lineWidth = 2;
+  ctx1.beginPath(); ctx1.moveTo(px, y+40*dir); ctx1.lineTo(px, y-40*dir); ctx1.stroke();
+  ctx1.restore();
+  ctx1.fillStyle = color; ctx1.font = 'bold 11px system-ui';
+  ctx1.textAlign = px > W/2 ? 'right' : 'left';
+  ctx1.fillText(label, px + (px > W/2 ? -8 : 8), y - 32*dir);
+}
+
+/* expose X for lineAt */
+function makeXAccessible(fn){ window.__X1 = fn; }
+const _origDraw = drawCanvas1;
+drawCanvas1 = function(){
+  const W = cv1.width, padL = 60, padR = 60;
+  const a = parseFloat(sldA.value), b = parseFloat(sldB.value);
+  const data0 = BASE.slice(), data1 = BASE.map(v=>a*v+b);
+  const all = data0.concat(data1);
+  let lo = Math.min(...all)-3, hi = Math.max(...all)+3;
+  if (hi-lo < 12){ const c=(lo+hi)/2; lo=c-6; hi=c+6; }
+  makeXAccessible(v => padL + (v-lo)/(hi-lo)*(W-padL-padR));
+  _origDraw();
+};
+
+function niceStep(rough){
+  const p = Math.pow(10, Math.floor(Math.log10(rough)));
+  const n = rough/p;
+  if (n < 1.5) return 1*p;
+  if (n < 3)   return 2*p;
+  if (n < 7)   return 5*p;
+  return 10*p;
+}
+
+sldA.addEventListener('input', drawCanvas1);
+sldB.addEventListener('input', drawCanvas1);
+chkMean.addEventListener('change', drawCanvas1);
+chkSpread.addEventListener('change', drawCanvas1);
+drawCanvas1();
+
+/* ============================================================
+   CANVAS 2 : bar chart of variance factor, showing the trap
+   ============================================================ */
+const cv2 = document.getElementById('cv2');
+const ctx2 = cv2.getContext('2d');
+const sldA2 = document.getElementById('sldA2');
+const chkSq = document.getElementById('chkSq');
+
+function drawCanvas2(){
+  const W = cv2.width, H = cv2.height;
+  const a = parseFloat(sldA2.value);
+  document.getElementById('labA2').textContent = fmt(a,1);
+  document.getElementById('roA22').textContent = fmt(a*a);
+  document.getElementById('roCorrect').textContent = fmt(a*a*13);
+  document.getElementById('roTrap').textContent = fmt(a*13);
+
+  ctx2.clearRect(0,0,W,H);
+  ctx2.fillStyle='#ffffff'; ctx2.fillRect(0,0,W,H);
+
+  const left = 90, right = W-40, base = H-70;
+  const top = 50;
+
+  // axes
+  ctx2.strokeStyle='#cbd5e1'; ctx2.lineWidth=1.5;
+  ctx2.beginPath(); ctx2.moveTo(left, top-20); ctx2.lineTo(left, base); ctx2.lineTo(right, base); ctx2.stroke();
+
+  const maxVal = 13 * Math.max( a*a, a, 1.2 ) * 1.15;
+  const Y = v => base - (v/maxVal)*(base-top);
+
+  // y grid
+  ctx2.font='11px ui-monospace, monospace'; ctx2.fillStyle='#94a3b8'; ctx2.textAlign='right';
+  const step = niceStep(maxVal/5);
+  for(let v=0; v<=maxVal; v+=step){
+    const y = Y(v);
+    ctx2.strokeStyle='#f1f5f9';
+    ctx2.beginPath(); ctx2.moveTo(left, y); ctx2.lineTo(right, y); ctx2.stroke();
+    ctx2.fillText(fmt(v,0), left-8, y+4);
+  }
+
+  const barW = 90;
+  const gap = (right-left-barW*2)/3;
+  const x1 = left + gap;
+  const x2 = x1 + barW + gap;
+
+  // bar 1 : correct a^2 * 13
+  const vCorrect = a*a*13;
+  ctx2.fillStyle = '#10b981';
+  roundRect(ctx2, x1, Y(vCorrect), barW, base-Y(vCorrect), 8); ctx2.fill();
+  ctx2.fillStyle='#065f46'; ctx2.font='bold 13px system-ui'; ctx2.textAlign='center';
+  ctx2.fillText(fmt(vCorrect,1), x1+barW/2, Y(vCorrect)-10);
+  ctx2.fillText('a² × 13', x1+barW/2, base+22);
+  ctx2.font='11px system-ui'; ctx2.fillStyle='#047857';
+  ctx2.fillText('square first ✔', x1+barW/2, base+40);
+
+  // bar 2 : trap a * 13
+  if (chkSq.checked){
+    const vTrap = a*13;
+    ctx2.fillStyle = '#f59e0b';
+    roundRect(ctx2, x2, Y(vTrap), barW, base-Y(vTrap), 8); ctx2.fill();
+    ctx2.fillStyle='#92400e'; ctx2.font='bold 13px system-ui';
+    ctx2.fillText(fmt(vTrap,1), x2+barW/2, Y(vTrap)-10);
+    ctx2.fillText('a × 13', x2+barW/2, base+22);
+    ctx2.font='11px system-ui'; ctx2.fillStyle='#b45309';
+    ctx2.fillText('forgot to square ✘', x2+barW/2, base+40);
+  }
+
+  // when a = 3 highlight the answer
+  if (Math.abs(a-3) < 0.05){
+    ctx2.fillStyle='#1e3a8a'; ctx2.font='bold 13px system-ui'; ctx2.textAlign='left';
+    ctx2.fillText('At a = 3:  3² × 13 = 9 × 13 = 117   →   Option C', left, 26);
+  }
+}
+
+function roundRect(c,x,y,w,h,r){
+  if (h < 0){ y += h; h = -h; }
+  r = Math.min(r, h/2, w/2);
+  c.beginPath();
+  c.moveTo(x+r,y); c.arcTo(x+w,y,x+w,y+h,r);
+  c.arcTo(x+w,y+h,x,y+h,r); c.arcTo(x,y+h,x,y,r); c.arcTo(x,y,x+w,y,r);
+  c.closePath();
+}
+
+sldA2.addEventListener('input', drawCanvas2);
+chkSq.addEventListener('change', drawCanvas2);
+drawCanvas2();
+
+/* ============================================================
+   STEP REVEAL
+   ============================================================ */
+document.querySelectorAll('.card').forEach(card=>{
+  const steps = card.querySelectorAll('.step');
+  if (steps.length === 0) return;
+  const btn = card.querySelector('.next');
+  const counter = card.querySelector('.counter');
+  const total = steps.length;
+  let shown = 0;
+
+  btn.addEventListener('click', ()=>{
+    if (shown < total){
+      steps[shown].classList.remove('hidden');
+      shown++;
+      counter.textContent = shown + ' / ' + total;
+      if (shown === total){
+        btn.disabled = true;
+        btn.textContent = 'All steps revealed ✓';
+      }
+      // re-render math in newly revealed step
+      if (window.MathJax && MathJax.typesetPromise){
+        MathJax.typesetPromise([steps[shown-1]]).catch(()=>{});
+      }
+    }
+  });
+});
+
+/* re-typeset whole page once MathJax ready (in case of late layout) */
+window.addEventListener('load', ()=>{
+  if (window.MathJax && MathJax.typesetPromise){
+    MathJax.typesetPromise().catch(()=>{});
+  }
+});
+</script>
+</body>
+</html>

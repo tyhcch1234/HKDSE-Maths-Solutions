@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HKDSE Math 2016 Paper 2 Q4 – Interactive Solution</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- MathJax for LaTeX rendering -->
+  <script>
+    MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+
+  <style>
+    /* Custom smooth transitions */
+    .step-content {
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: max-height 0.6s ease, opacity 0.5s ease, padding 0.4s ease;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+    .step-content.open {
+      max-height: 1200px;
+      opacity: 1;
+      padding-top: 0.75rem;
+      padding-bottom: 0.75rem;
+    }
+    .digit-box {
+      transition: all 0.3s ease;
+      border-radius: 0.375rem;
+    }
+    .digit-box.highlight {
+      background-color: #fef08a;
+      transform: scale(1.15);
+      box-shadow: 0 0 0 3px #facc15;
+    }
+    .digit-box.correct {
+      background-color: #bbf7d0;
+      box-shadow: 0 0 0 3px #22c55e;
+    }
+    .digit-box.wrong {
+      background-color: #fecaca;
+      box-shadow: 0 0 0 3px #ef4444;
+    }
+    .option-btn {
+      transition: all 0.25s ease;
+    }
+    .option-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .option-btn.selected {
+      border-color: #3b82f6;
+      background-color: #eff6ff;
+      box-shadow: 0 0 0 3px #93c5fd;
+    }
+    .option-btn.correct-ans {
+      border-color: #22c55e;
+      background-color: #f0fdf4;
+    }
+    .option-btn.wrong-ans {
+      border-color: #ef4444;
+      background-color: #fef2f2;
+    }
+    /* Slider styling */
+    input[type=range] {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 8px;
+      border-radius: 4px;
+      background: #e2e8f0;
+      outline: none;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #3b82f6;
+      cursor: pointer;
+      border: 2px solid white;
+      box-shadow: 0 2px 6px rgba(59,130,246,0.4);
+    }
+    input[type=range]::-moz-range-thumb {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #3b82f6;
+      cursor: pointer;
+      border: 2px solid white;
+    }
+    .mono {
+      font-family: 'Courier New', Courier, monospace;
+      letter-spacing: 1px;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen antialiased">
+
+  <!-- Header -->
+  <header class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg">
+    <div class="max-w-3xl mx-auto px-4 py-6 sm:py-8">
+      <p class="text-blue-100 text-sm font-medium tracking-wide uppercase">HKDSE Mathematics</p>
+      <h1 class="text-2xl sm:text-3xl font-bold mt-1">2016 Paper 2 · Question 4</h1>
+      <div class="flex flex-wrap gap-2 mt-3">
+        <span class="bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full">Estimation</span>
+        <span class="bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full">Approximation</span>
+        <span class="bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full">Error</span>
+        <span class="bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full">Significant Figures</span>
+        <span class="bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full">Decimal Places</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-3xl mx-auto px-4 py-6 sm:py-8 space-y-8">
+
+    <!-- Question Card -->
+    <section class="bg-white rounded-2xl shadow-md p-5 sm:p-6 border border-slate-200">
+      <div class="flex items-start gap-3">
+        <span class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold text-sm flex items-center justify-center">Q</span>
+        <div>
+          <p class="text-lg sm:text-xl font-semibold text-slate-900">
+            $0.0765403 = $
+          </p>
+          <p class="text-sm text-slate-500 mt-1">Which of the following is correct?</p>
+        </div>
+      </div>
+
+      <!-- Options -->
+      <div class="mt-4 grid gap-3" id="optionsContainer">
+        <button data-option="A" class="option-btn text-left w-full border-2 border-slate-200 rounded-xl p-3 sm:p-4 hover:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
+          <span class="font-bold text-blue-700 mr-2">A.</span>
+          <span class="mono">0.076</span>
+          <span class="text-sm text-slate-500 ml-1">(correct to 2 significant figures)</span>
+        </button>
+        <button data-option="B" class="option-btn text-left w-full border-2 border-slate-200 rounded-xl p-3 sm:p-4 hover:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
+          <span class="font-bold text-blue-700 mr-2">B.</span>
+          <span class="mono">0.0765</span>
+          <span class="text-sm text-slate-500 ml-1">(correct to 3 decimal places)</span>
+        </button>
+        <button data-option="C" class="option-btn text-left w-full border-2 border-slate-200 rounded-xl p-3 sm:p-4 hover:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
+          <span class="font-bold text-blue-700 mr-2">C.</span>
+          <span class="mono">0.07654</span>
+          <span class="text-sm text-slate-500 ml-1">(correct to 4 significant figures)</span>
+        </button>
+        <button data-option="D" class="option-btn text-left w-full border-2 border-slate-200 rounded-xl p-3 sm:p-4 hover:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
+          <span class="font-bold text-blue-700 mr-2">D.</span>
+          <span class="mono">0.076540</span>
+          <span class="text-sm text-slate-500 ml-1">(correct to 5 decimal places)</span>
+        </button>
+      </div>
+
+      <div id="feedback" class="mt-4 hidden rounded-xl p-4 text-sm font-medium"></div>
+    </section>
+
+    <!-- Key Concept Box -->
+    <section class="bg-amber-50 border border-amber-200 rounded-2xl p-5">
+      <h2 class="text-base font-bold text-amber-800 flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+        Key Concept
+      </h2>
+      <p class="text-amber-900 text-sm mt-2">
+        <strong>Significant figures (s.f.)</strong> count meaningful digits from the first non-zero digit.
+        <strong>Decimal places (d.p.)</strong> count digits after the decimal point.
+        For numbers less than 1, leading zeros are <em>not</em> significant.
+      </p>
+    </section>
+
+    <!-- Step-by-Step Solution -->
+    <section class="bg-white rounded-2xl shadow-md p-5 sm:p-6 border border-slate-200">
+      <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2 mb-1">
+        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        Step-by-Step Solution
+      </h2>
+      <p class="text-sm text-slate-500 mb-4">Tap each step to reveal the reasoning.</p>
+
+      <!-- Step 1 -->
+      <div class="border border-slate-200 rounded-xl mb-3 overflow-hidden">
+        <button class="step-toggle w-full flex items-center justify-between p-4 text-left bg-slate-50 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-400" data-target="step1">
+          <span class="font-semibold text-slate-800 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center font-bold">1</span>
+            Identify the significant digits
+          </span>
+          <svg class="w-5 h-5 text-slate-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div id="step1" class="step-content px-4 text-sm text-slate-700">
+          <p class="mb-2">Look at the number:</p>
+          <p class="mono text-lg font-semibold text-slate-900 mb-3">0.0765403</p>
+          <p class="mb-2">Leading zeros (<span class="mono">0.</span>) are <strong>placeholders</strong> — they are not counted.</p>
+          <p class="mb-2">The first non-zero digit is <strong>7</strong> at the 2<sup>nd</sup> decimal place.</p>
+          <div class="bg-blue-50 rounded-lg p-3 mt-2">
+            <p class="text-blue-800 text-xs font-semibold mb-1">Significant digits in order:</p>
+            <p class="mono text-blue-900 text-base">
+              <span class="inline-block px-2 py-0.5 bg-white rounded border border-blue-300">7</span>
+              <span class="inline-block px-2 py-0.5 bg-white rounded border border-blue-300">6</span>
+              <span class="inline-block px-2 py-0.5 bg-white rounded border border-blue-300">5</span>
+              <span class="inline-block px-2 py-0.5 bg-white rounded border border-blue-300">4</span>
+              <span class="inline-block px-2 py-0.5 bg-white rounded border border-blue-300">0</span>
+              <span class="inline-block px-2 py-0.5 bg-white rounded border border-blue-300">3</span>
+            </p>
+            <p class="text-blue-700 text-xs mt-1">That's 6 significant figures in total.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="border border-slate-200 rounded-xl mb-3 overflow-hidden">
+        <button class="step-toggle w-full flex items-center justify-between p-4 text-left bg-slate-50 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-400" data-target="step2">
+          <span class="font-semibold text-slate-800 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center font-bold">2</span>
+            Check option A: 2 significant figures
+          </span>
+          <svg class="w-5 h-5 text-slate-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div id="step2" class="step-content px-4 text-sm text-slate-700">
+          <p class="mb-2">To round to <strong>2 significant figures</strong>, keep the first 2 significant digits and look at the 3<sup>rd</sup> one.</p>
+          <p class="mono text-base mb-2">
+            <span class="text-blue-700 font-bold">7</span>
+            <span class="text-blue-700 font-bold">6</span>
+            <span class="text-slate-400">5</span>
+            ...
+          </p>
+          <p class="mb-1">The 3<sup>rd</sup> significant digit is <strong>5</strong>, so we round up:</p>
+          <p class="mono text-lg font-semibold text-slate-900">0.07654… → 0.077</p>
+          <p class="text-red-600 text-sm mt-2 font-medium">✗ Option A says $0.076$, which is incorrect.</p>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="border border-slate-200 rounded-xl mb-3 overflow-hidden">
+        <button class="step-toggle w-full flex items-center justify-between p-4 text-left bg-slate-50 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-400" data-target="step3">
+          <span class="font-semibold text-slate-800 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center font-bold">3</span>
+            Check option B: 3 decimal places
+          </span>
+          <svg class="w-5 h-5 text-slate-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div id="step3" class="step-content px-4 text-sm text-slate-700">
+          <p class="mb-2">To round to <strong>3 decimal places</strong>, keep digits up to the 3<sup>rd</sup> decimal place and look at the 4<sup>th</sup> decimal digit.</p>
+          <p class="mono text-base mb-2">
+            0.076<span class="text-slate-400">5</span>
+          </p>
+          <p class="mb-1">The 4<sup>th</sup> decimal digit is <strong>5</strong>, so we round up:</p>
+          <p class="mono text-lg font-semibold text-slate-900">0.07654… → 0.077</p>
+          <p class="text-red-600 text-sm mt-2 font-medium">✗ Option B says $0.0765$, which is incorrect.</p>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="border border-slate-200 rounded-xl mb-3 overflow-hidden">
+        <button class="step-toggle w-full flex items-center justify-between p-4 text-left bg-slate-50 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-400" data-target="step4">
+          <span class="font-semibold text-slate-800 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-green-600 text-white text-xs flex items-center justify-center font-bold">4</span>
+            Check option C: 4 significant figures
+          </span>
+          <svg class="w-5 h-5 text-slate-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div id="step4" class="step-content px-4 text-sm text-slate-700">
+          <p class="mb-2">Keep the first <strong>4 significant digits</strong> and look at the 5<sup>th</sup> significant digit.</p>
+          <p class="mono text-base mb-2">
+            <span class="text-green-700 font-bold">7</span>
+            <span class="text-green-700 font-bold">6</span>
+            <span class="text-green-700 font-bold">5</span>
+            <span class="text-green-700 font-bold">4</span>
+            <span class="text-slate-400">0</span>
+            ...
+          </p>
+          <p class="mb-1">The 5<sup>th</sup> significant digit is <strong>0</strong> (less than 5), so we round down (keep as is):</p>
+          <p class="mono text-lg font-semibold text-slate-900">0.0765403 → 0.07654</p>
+          <p class="text-green-700 text-sm mt-2 font-medium">✓ Option C says $0.07654$, which is correct!</p>
+        </div>
+      </div>
+
+      <!-- Step 5 -->
+      <div class="border border-slate-200 rounded-xl mb-3 overflow-hidden">
+        <button class="step-toggle w-full flex items-center justify-between p-4 text-left bg-slate-50 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-400" data-target="step5">
+          <span class="font-semibold text-slate-800 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center font-bold">5</span>
+            Check option D: 5 decimal places
+          </span>
+          <svg class="w-5 h-5 text-slate-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div id="step5" class="step-content px-4 text-sm text-slate-700">
+          <p class="mb-2">To round to <strong>5 decimal places</strong>, keep digits up to the 5<sup>th</sup> decimal place and look at the 6<sup>th</sup> decimal digit.</p>
+          <p class="mono text-base mb-2">
+            0.07654<span class="text-slate-400">0</span>
+          </p>
+          <p class="mb-1">The 6<sup>th</sup> decimal digit is <strong>3</strong> (less than 5), so we round down:</p>
+          <p class="mono text-lg font-semibold text-slate-900">0.0765403 → 0.07654</p>
+          <p class="text-red-600 text-sm mt-2 font-medium">✗ Option D says $0.076540$, which is incorrect (it has an extra zero).</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Visualizer -->
+    <section class="bg-white rounded-2xl shadow-md p-5 sm:p-6 border border-slate-200">
+      <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2 mb-1">
+        <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+        Interactive Digit Visualizer
+      </h2>
+      <p class="text-sm text-slate-500 mb-4">Drag the slider to see how rounding affects the digits.</p>
+
+      <!-- Number display -->
+      <div class="bg-slate-100 rounded-xl p-4 mb-5 overflow-x-auto">
+        <div class="flex items-end justify-center gap-1 min-w-[300px]" id="digitStrip">
+          <!-- Digits will be generated by JS -->
+        </div>
+        <p class="text-center text-xs text-slate-500 mt-2">
+          <span class="inline-block w-3 h-3 bg-yellow-200 border border-yellow-400 rounded-sm align-middle mr-1"></span> Significant digits
+          <span class="inline-block w-3 h-3 bg-blue-100 border border-blue-300 rounded-sm align-middle ml-3 mr-1"></span> Decimal places
+        </p>
+      </div>
+
+      <!-- Slider control -->
+      <div class="mb-2">
+        <label class="text-sm font-semibold text-slate-700 flex justify-between">
+          <span>Round to:</span>
+          <span id="sliderLabel" class="text-blue-600 font-bold">2 significant figures</span>
+        </label>
+        <input type="range" id="roundSlider" min="1" max="6" value="2" class="w-full mt-2" />
+        <div class="flex justify-between text-xs text-slate-400 mt-1 px-1">
+          <span>1 s.f.</span>
+          <span>2 s.f.</span>
+          <span>3 s.f.</span>
+          <span>4 s.f.</span>
+          <span>5 s.f.</span>
+          <span>6 s.f.</span>
+        </div>
+      </div>
+
+      <!-- Result display -->
+      <div class="mt-4 bg-indigo-50 border border-indigo-200 rounded-xl p-4 text-center">
+        <p class="text-xs text-indigo-600 font-semibold uppercase tracking-wide">Rounded value</p>
+        <p class="mono text-2xl font-bold text-indigo-900 mt-1" id="roundedResult">0.076</p>
+        <p class="text-xs text-indigo-500 mt-1" id="roundDescription">correct to 2 significant figures</p>
+      </div>
+    </section>
+
+    <!-- Final Answer -->
+    <section class="bg-green-50 border-2 border-green-300 rounded-2xl p-5 text-center">
+      <p class="text-sm font-semibold text-green-700 uppercase tracking-wide">Final Answer</p>
+      <p class="text-3xl font-bold text-green-800 mt-1">C</p>
+      <p class="text-sm text-green-700 mt-1">$0.0765403 = 0.07654$ (correct to 4 significant figures)</p>
+    </section>
+
+    <!-- Footer -->
+    <footer class="text-center text-xs text-slate-400 pb-8">
+      HKDSE Mathematics 2016 Paper 2 · Question 4 · Interactive Solution
+    </footer>
+  </main>
+
+  <script>
+    // ====== ACCORDION TOGGLES ======
+    document.querySelectorAll('.step-toggle').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = document.getElementById(btn.dataset.target);
+        const icon = btn.querySelector('svg');
+        const isOpen = target.classList.contains('open');
+
+        // Close all
+        document.querySelectorAll('.step-content').forEach(el => el.classList.remove('open'));
+        document.querySelectorAll('.step-toggle svg').forEach(el => el.classList.remove('rotate-180'));
+
+        if (!isOpen) {
+          target.classList.add('open');
+          icon.classList.add('rotate-180');
+        }
+      });
+    });
+    // Open first step by default
+    document.getElementById('step1').classList.add('open');
+    document.querySelector('[data-target="step1"] svg').classList.add('rotate-180');
+
+    // ====== OPTION SELECTION ======
+    const optionsContainer = document.getElementById('optionsContainer');
+    const feedback = document.getElementById('feedback');
+    let answered = false;
+
+    optionsContainer.addEventListener('click', (e) => {
+      const btn = e.target.closest('.option-btn');
+      if (!btn || answered) return;
+      answered = true;
+
+      const selected = btn.dataset.option;
+      const correct = 'C';
+
+      // Clear previous states
+      optionsContainer.querySelectorAll('.option-btn').forEach(b => {
+        b.classList.remove('selected', 'correct-ans', 'wrong-ans');
+      });
+
+      // Mark selected
+      btn.classList.add('selected');
+
+      // Mark correct / wrong
+      optionsContainer.querySelectorAll('.option-btn').forEach(b => {
+        if (b.dataset.option === correct) b.classList.add('correct-ans');
+        if (b.dataset.option === selected && selected !== correct) b.classList.add('wrong-ans');
+      });
+
+      // Feedback
+      feedback.classList.remove('hidden');
+      if (selected === correct) {
+        feedback.className = 'mt-4 rounded-xl p-4 text-sm font-medium bg-green-100 text-green-800 border border-green-300';
+        feedback.innerHTML = '<strong>✓ Correct!</strong> Option C is right. $0.0765403$ rounded to 4 significant figures is $0.07654$.';
+      } else {
+        feedback.className = 'mt-4 rounded-xl p-4 text-sm font-medium bg-red-100 text-red-800 border border-red-300';
+        feedback.innerHTML = '<strong>✗ Not quite.</strong> The correct answer is <strong>C</strong>. Review the steps above to see why.';
+      }
+    });
+
+    // ====== DIGIT VISUALIZER ======
+    const digitStrip = document.getElementById('digitStrip');
+    const slider = document.getElementById('roundSlider');
+    const sliderLabel = document.getElementById('sliderLabel');
+    const roundedResult = document.getElementById('roundedResult');
+    const roundDescription = document.getElementById('roundDescription');
+
+    // Digits of 0.0765403 (after the decimal point)
+    const digits = ['0', '7', '6', '5', '4', '0', '3'];
+
+    // Build digit strip
+    function buildStrip() {
+      digitStrip.innerHTML = '';
+      digits.forEach((d, i) => {
+        const box = document.createElement('div');
+        box.className = 'digit-box flex flex-col items-center';
+        box.dataset.index = i;
+
+        const num = document.createElement('div');
+        num.className = 'w-9 h-11 sm:w-11 sm:h-14 flex items-center justify-center text-lg sm:text-xl font-bold bg-white border-2 border-slate-300 rounded-lg mono';
+        num.textContent = d;
+
+        const label = document.createElement('span');
+        label.className = 'text-[10px] text-slate-400 mt-1';
+        // Position label
+        if (i === 0) {
+          label.textContent = '1st d.p.';
+        } else {
+          label.textContent = i + 'th d.p.';
+        }
+        // Actually i=0 is 1st decimal place, i=6 is 7th decimal place
+        label.textContent = (i + 1) + 'th d.p.';
+
+        box.appendChild(num);
+        box.appendChild(label);
+        digitStrip.appendChild(box);
+      });
+    }
+
+    // Map slider value (n significant figures) to indices of significant digits
+    // Significant digits are at indices: 1 (7), 2 (6), 3 (5), 4 (4), 5 (0), 6 (3)
+    // (index 0 is the leading 0, not significant)
+    function getSignificantIndices(n) {
+      // For n = 1..6, return indices 1..n
+      const arr = [];
+      for (let i = 1; i <= n; i++) arr.push(i);
+      return arr;
+    }
+
+    function updateVisualizer() {
+      const n = parseInt(slider.value);
+      const sigIndices = getSignificantIndices(n);
+
+      // Update label
+      sliderLabel.textContent = n + ' significant figure' + (n > 1 ? 's' : '');
+
+      // Highlight corresponding digit boxes
+      document.querySelectorAll('.digit-box').forEach((box, i) => {
+        box.classList.remove('highlight', 'correct', 'wrong');
+        if (sigIndices.includes(i)) {
+          box.classList.add('highlight');
+        }
+      });
+
+      // Compute rounded value
+      // We need to round 0.0765403 to n significant figures
+      const numStr = '0.0765403';
+      const num = parseFloat(numStr);
+
+      // Use toPrecision for significant figures
+      let rounded;
+      if (n <= 6) {
+        rounded = num.toPrecision(n);
+      }
+
+      // Format nicely: remove trailing zeros after decimal if not needed, but keep significant figures
+      // Actually for this number, toPrecision gives e.g. 0.076 (n=2), 0.0765 (n=3), etc.
+      // But for n=2, 0.076 has 2 sig figs. toPrecision(2) gives "0.076".
+      // For n=3, toPrecision(3) gives "0.0765".
+      // For n=4, toPrecision(4) gives "0.07654".
+      // For n=5, toPrecision(5) gives "0.076540".
+      // For n=6, toPrecision(6) gives "0.0765403".
+
+      let display = rounded;
+      // If toPrecision returns scientific notation (for very small/large numbers), handle it
+      if (display.includes('e')) {
+        display = Number(display).toFixed(n); // fallback
+      }
+
+      // For n=5, toPrecision gives "0.076540" which is 5 sig figs. Good.
+      // For n=6, "0.0765403". Good.
+      // For n=4, "0.07654". Good.
+      // For n=3, "0.0765". Good.
+      // For n=2, "0.076". Good.
+      // For n=1, "0.08". Let's check: toPrecision(1) on 0.0765403 gives "0.08".
+      if (n === 1) {
+        display = '0.08';
+      }
+
+      roundedResult.textContent = display;
+
+      // Description
+      let desc = '';
+      if (n === 1) desc = 'correct to 1 significant figure';
+      else desc = 'correct to ' + n + ' significant figures';
+
+      // Also check if it matches decimal places for some
+      if (n === 2) desc += ' (or 2 decimal places)';
+      if (n === 3) desc += ' (or 3 decimal places)';
+
+      roundDescription.textContent = desc;
+
+      // Mark the digit that determined the rounding (the next one after sig figs)
+      const nextIndex = n + 1; // next significant digit index (since index 0 is leading zero)
+      // For n=6, there's no next digit
+      if (nextIndex <= 6) {
+        const nextBox = document.querySelectorAll('.digit-box')[nextIndex];
+        if (nextBox) {
+          nextBox.classList.add('wrong');
+        }
+      }
+    }
+
+    slider.addEventListener('input', updateVisualizer);
+    buildStrip();
+    updateVisualizer();
+
+    // ====== MATHJAX RERENDER ======
+    // Ensure MathJax typesets after dynamic content (in case of any)
+    if (window.MathJax && window.MathJax.typesetPromise) {
+      window.MathJax.typesetPromise();
+    }
+  </script>
+</body>
+</html>

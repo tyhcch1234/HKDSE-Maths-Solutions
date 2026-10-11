@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HKDSE Math 2023 P2 Q34 · Complex Numbers</title>
+  <!-- MathJax for LaTeX rendering -->
+  <script>
+    MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+  <!-- Tailwind CSS CDN (lightweight utility) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Custom smooth transitions & card style */
+    body {
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      background: #f8fafc;
+    }
+    .step-card {
+      transition: all 0.2s ease-in-out;
+      border-left: 6px solid #3b82f6;
+    }
+    .step-card:hover {
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+    }
+    .hint-box {
+      background: #fef9c3;
+      border-left: 6px solid #eab308;
+    }
+    .visual-container {
+      background: linear-gradient(145deg, #ffffff, #f1f5f9);
+      border-radius: 1.5rem;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.02), 0 6px 16px rgba(0,0,0,0.05);
+    }
+    /* Slider thumb */
+    input[type=range] {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 8px;
+      border-radius: 10px;
+      background: #e2e8f0;
+      outline: none;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #2563eb;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(37,99,235,0.3);
+      border: 2px solid white;
+    }
+    .formula-badge {
+      background: #eef2ff;
+      color: #3730a3;
+      font-weight: 500;
+      padding: 0.2rem 0.8rem;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      letter-spacing: 0.01em;
+    }
+    .progress-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #cbd5e1;
+      transition: background 0.3s;
+    }
+    .progress-dot.active {
+      background: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.2);
+    }
+  </style>
+</head>
+<body class="min-h-screen py-6 px-4 sm:px-6 lg:px-8 flex justify-center">
+  <main class="w-full max-w-3xl space-y-6">
+
+    <!-- ========== QUESTION HEADER ========== -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+      <div class="flex flex-wrap items-center gap-2 mb-3">
+        <span class="text-xs font-semibold text-blue-700 bg-blue-50 px-3 py-1 rounded-full">HKDSE 2023 Paper 2</span>
+        <span class="text-xs font-semibold text-slate-600 bg-slate-100 px-3 py-1 rounded-full">Q34</span>
+        <span class="text-xs font-semibold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full">Complex Numbers</span>
+      </div>
+      <h1 class="text-2xl sm:text-3xl font-bold text-slate-800 tracking-tight">Real part of a complex fraction</h1>
+      
+      <!-- Question text -->
+      <div class="mt-4 text-slate-700 text-lg">
+        <p class="font-medium">If \(k\) is a real number, then the real part of 
+          \[
+            \frac{i}{k-i} + \frac{2}{k+i}
+          \]
+          is
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-4">
+          <div class="bg-slate-50 rounded-xl px-4 py-3 border border-slate-200 text-slate-700">A. \(\displaystyle \frac{2k+1}{k^2-1}\)</div>
+          <div class="bg-blue-50 rounded-xl px-4 py-3 border border-blue-300 text-blue-800 font-semibold flex items-center justify-between">
+            <span>B. \(\displaystyle \frac{2k-1}{k^2+1}\)</span>
+            <span class="text-xs bg-blue-200 px-2 py-0.5 rounded-full text-blue-800">Correct</span>
+          </div>
+          <div class="bg-slate-50 rounded-xl px-4 py-3 border border-slate-200 text-slate-700">C. \(\displaystyle \frac{2k+1}{k^2+1}\)</div>
+          <div class="bg-slate-50 rounded-xl px-4 py-3 border border-slate-200 text-slate-700">D. \(\displaystyle \frac{2k-1}{k^2-1}\)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== VISUAL EXPLORER ========== -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 visual-container">
+      <h2 class="text-lg font-semibold text-slate-700 flex items-center gap-2">
+        <span class="text-xl">🔍</span> Real‑part explorer
+      </h2>
+      <p class="text-sm text-slate-500 mt-1 mb-4">Drag the slider to change \(k\) and see the real part of the expression (red curve) versus the candidate answer B (blue dashed).</p>
+      
+      <div class="relative" style="height: 200px;">
+        <canvas id="realPartCanvas" width="600" height="200" class="w-full h-full block rounded-xl"></canvas>
+      </div>
+      
+      <!-- Slider control -->
+      <div class="mt-5 flex items-center gap-4 flex-wrap">
+        <label class="text-sm font-medium text-slate-600">\(k =\) <span id="kValueDisplay" class="font-mono font-bold text-blue-700">1.0</span></label>
+        <input type="range" id="kSlider" min="-3" max="3" value="1" step="0.1" class="flex-1 min-w-[140px]">
+        <span class="text-xs text-slate-400">(exclude \(k = \pm 1\) if needed)</span>
+      </div>
+      <div class="mt-2 text-sm text-slate-600 flex flex-wrap gap-4">
+        <div>Real part (actual) = <span id="actualReal" class="font-mono font-semibold text-red-600">1.000</span></div>
+        <div>Option B value = <span id="optionBReal" class="font-mono font-semibold text-blue-600">1.000</span></div>
+        <div>Match: <span id="matchStatus" class="font-semibold text-emerald-600">✓</span></div>
+      </div>
+    </div>
+
+    <!-- ========== STEP-BY-STEP SOLUTION ========== -->
+    <div>
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+          <span>📘</span> Step-by-step solution
+        </h2>
+        <div class="flex items-center gap-1.5">
+          <div class="progress-dot active" id="dot0"></div>
+          <div class="progress-dot" id="dot1"></div>
+          <div class="progress-dot" id="dot2"></div>
+          <div class="progress-dot" id="dot3"></div>
+        </div>
+      </div>
+
+      <!-- Step 1 -->
+      <div class="step-card bg-white rounded-2xl p-5 mb-4 shadow-sm border border-slate-100" id="step1">
+        <div class="flex items-start justify-between">
+          <div class="flex items-center gap-3">
+            <span class="bg-blue-100 text-blue-800 text-sm font-bold w-7 h-7 rounded-full flex items-center justify-center">1</span>
+            <h3 class="font-semibold text-slate-800">Combine into a single fraction</h3>
+          </div>
+          <button class="hint-toggle text-sm text-slate-400 hover:text-blue-600 transition" data-hint="hint1">💡 Hint</button>
+        </div>
+        <div class="mt-3 pl-10">
+          <p class="text-slate-700">The common denominator is \((k-i)(k+i) = k^2 - i^2 = k^2 + 1\).</p>
+          <div class="mt-3 bg-slate-50 p-3 rounded-xl text-center text-lg">
+            \[
+              \frac{i}{k-i} + \frac{2}{k+i} = \frac{i(k+i) + 2(k-i)}{(k-i)(k+i)}
+            \]
+          </div>
+          <div id="hint1" class="hint-box rounded-xl p-3 mt-3 text-sm hidden">
+            <p class="font-semibold text-amber-800">💡 Hint</p>
+            <p class="text-amber-900">Multiply numerator and denominator of each term by the conjugate of the denominator. Note \(i^2 = -1\).</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step-card bg-white rounded-2xl p-5 mb-4 shadow-sm border border-slate-100" id="step2">
+        <div class="flex items-start justify-between">
+          <div class="flex items-center gap-3">
+            <span class="bg-blue-100 text-blue-800 text-sm font-bold w-7 h-7 rounded-full flex items-center justify-center">2</span>
+            <h3 class="font-semibold text-slate-800">Expand the numerator</h3>
+          </div>
+          <button class="hint-toggle text-sm text-slate-400 hover:text-blue-600 transition" data-hint="hint2">💡 Hint</button>
+        </div>
+        <div class="mt-3 pl-10">
+          <p class="text-slate-700">Expand \(i(k+i) + 2(k-i)\):</p>
+          <div class="mt-3 bg-slate-50 p-3 rounded-xl text-center space-y-2">
+            <p>\(= ik + i^2 + 2k - 2i\)</p>
+            <p>\(= ik - 1 + 2k - 2i\)  (since \(i^2 = -1\))</p>
+            <p>\(= (2k - 1) + (k - 2)i\)</p>
+          </div>
+          <div id="hint2" class="hint-box rounded-xl p-3 mt-3 text-sm hidden">
+            <p class="font-semibold text-amber-800">💡 Hint</p>
+            <p class="text-amber-900">Group real and imaginary terms together. Remember \(i^2 = -1\).</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="step-card bg-white rounded-2xl p-5 mb-4 shadow-sm border border-slate-100" id="step3">
+        <div class="flex items-start justify-between">
+          <div class="flex items-center gap-3">
+            <span class="bg-blue-100 text-blue-800 text-sm font-bold w-7 h-7 rounded-full flex items-center justify-center">3</span>
+            <h3 class="font-semibold text-slate-800">Simplify denominator &amp; separate real part</h3>
+          </div>
+          <button class="hint-toggle text-sm text-slate-400 hover:text-blue-600 transition" data-hint="hint3">💡 Hint</button>
+        </div>
+        <div class="mt-3 pl-10">
+          <p class="text-slate-700">Denominator: \((k-i)(k+i) = k^2 - i^2 = k^2 + 1\).</p>
+          <div class="mt-3 bg-slate-50 p-3 rounded-xl text-center space-y-2">
+            <p>\[
+              \frac{(2k-1) + (k-2)i}{k^2 + 1} = \frac{2k-1}{k^2+1} + \frac{k-2}{k^2+1}i
+            \]</p>
+          </div>
+          <p class="mt-3 font-medium text-slate-800">Therefore the real part is \(\displaystyle \frac{2k-1}{k^2+1}\).</p>
+          <div id="hint3" class="hint-box rounded-xl p-3 mt-3 text-sm hidden">
+            <p class="font-semibold text-amber-800">💡 Hint</p>
+            <p class="text-amber-900">Write the result in the form \(a + bi\). The real part is the term without \(i\).</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="step-card bg-white rounded-2xl p-5 shadow-sm border border-slate-100" id="step4">
+        <div class="flex items-start justify-between">
+          <div class="flex items-center gap-3">
+            <span class="bg-blue-100 text-blue-800 text-sm font-bold w-7 h-7 rounded-full flex items-center justify-center">4</span>
+            <h3 class="font-semibold text-slate-800">Identify the correct option</h3>
+          </div>
+        </div>
+        <div class="mt-3 pl-10">
+          <p class="text-slate-700">Comparing with the choices, we see that</p>
+          <div class="mt-3 bg-green-50 p-3 rounded-xl text-center text-lg font-semibold text-green-800">
+            \(\displaystyle \frac{2k-1}{k^2+1}\) matches option <span class="bg-green-200 px-3 py-1 rounded-full">B</span>.
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ========== JAVASCRIPT ========== -->
+  <script>
+    (function() {
+      // ---------- Canvas & Graphing ----------
+      const canvas = document.getElementById('realPartCanvas');
+      const ctx = canvas.getContext('2d');
+      
+      // Helper: actual real part of i/(k-i) + 2/(k+i)
+      function realPartActual(k) {
+        // i(k+i) + 2(k-i) = (2k-1) + (k-2)i over (k^2+1)
+        return (2*k - 1) / (k*k + 1);
+      }
+      // Option B: (2k-1)/(k^2+1) — same as actual
+      function realPartOptionB(k) {
+        return (2*k - 1) / (k*k + 1);
+      }
+      
+      // Slider elements
+      const slider = document.getElementById('kSlider');
+      const kDisplay = document.getElementById('kValueDisplay');
+      const actualDisplay = document.getElementById('actualReal');
+      const optionBDisplay = document.getElementById('optionBReal');
+      const matchStatus = document.getElementById('matchStatus');
+      
+      // Drawing state
+      let currentK = parseFloat(slider.value);
+      
+      // Map x range: [-4, 4]
+      const xMin = -4, xMax = 4;
+      
+      function drawGraph() {
+        const w = canvas.width, h = canvas.height;
+        ctx.clearRect(0, 0, w, h);
+        
+        // Background grid + axes
+        ctx.save();
+        // Grid lines
+        ctx.strokeStyle = '#e2e8f0';
+        ctx.lineWidth = 0.5;
+        for (let x = -3; x <= 3; x++) {
+          const px = ((x - xMin) / (xMax - xMin)) * w;
+          ctx.beginPath();
+          ctx.moveTo(px, 0);
+          ctx.lineTo(px, h);
+          ctx.stroke();
+        }
+        // Horizontal grid (y from -2 to 3)
+        const yMin = -2, yMax = 4;
+        for (let y = -2; y <= 4; y++) {
+          const py = h - ((y - yMin) / (yMax - yMin)) * h;
+          ctx.beginPath();
+          ctx.moveTo(0, py);
+          ctx.lineTo(w, py);
+          ctx.stroke();
+        }
+        ctx.restore();
+        
+        // Axes
+        ctx.save();
+        ctx.strokeStyle = '#94a3b8';
+        ctx.lineWidth = 1.2;
+        // x-axis
+        const y0 = h - ((0 - yMin) / (yMax - yMin)) * h;
+        ctx.beginPath();
+        ctx.moveTo(0, y0);
+        ctx.lineTo(w, y0);
+        ctx.stroke();
+        // y-axis
+        const x0 = ((0 - xMin) / (xMax - xMin)) * w;
+        ctx.beginPath();
+        ctx.moveTo(x0, 0);
+        ctx.lineTo(x0, h);
+        ctx.stroke();
+        ctx.restore();
+        
+        // Draw Option B curve (blue dashed)
+        ctx.save();
+        ctx.beginPath();
+        ctx.setLineDash([6, 4]);
+        ctx.strokeStyle = '#3b82f6';
+        ctx.lineWidth = 2.5;
+        let first = true;
+        for (let px = 0; px < w; px++) {
+          const x = xMin + (px / w) * (xMax - xMin);
+          if (Math.abs(x*x + 1) < 0.001) continue;
+          const y = realPartOptionB(x);
+          const py = h - ((y - yMin) / (yMax - yMin)) * h;
+          if (py > -100 && py < h+100) {
+            if (first) { ctx.moveTo(px, py); first = false; }
+            else { ctx.lineTo(px, py); }
+          } else { first = true; }
+        }
+        ctx.stroke();
+        ctx.restore();
+        
+        // Draw actual real part curve (red solid)
+        ctx.save();
+        ctx.beginPath();
+        ctx.strokeStyle = '#dc2626';
+        ctx.lineWidth = 3;
+        first = true;
+        for (let px = 0; px < w; px++) {
+          const x = xMin + (px / w) * (xMax - xMin);
+          if (Math.abs(x*x + 1) < 0.001) continue;
+          const y = realPartActual(x);
+          const py = h - ((y - yMin) / (yMax - yMin)) * h;
+          if (py > -100 && py < h+100) {
+            if (first) { ctx.moveTo(px, py); first = false; }
+            else { ctx.lineTo(px, py); }
+          } else { first = true; }
+        }
+        ctx.stroke();
+        ctx.restore();
+        
+        // Draw current point
+        const currentY = realPartOptionB(currentK);
+        const cx = ((currentK - xMin) / (xMax - xMin)) * w;
+        const cy = h - ((currentY - yMin) / (yMax - yMin)) * h;
+        ctx.beginPath();
+        ctx.arc(cx, cy, 7, 0, 2*Math.PI);
+        ctx.fillStyle = '#2563eb';
+        ctx.shadowColor = '#2563eb';
+        ctx.shadowBlur = 12;
+        ctx.fill();
+        ctx.shadowColor = 'transparent';
+        ctx.shadowBlur = 0;
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        
+        // Labels
+        ctx.font = '12px "Inter", sans-serif';
+        ctx.fillStyle = '#64748b';
+        ctx.fillText('k', w - 18, y0 - 8);
+        ctx.fillText('Re', x0 + 8, 16);
+      }
+      
+      // Update UI + graph when slider changes
+      function updateFromSlider() {
+        currentK = parseFloat(slider.value);
+        kDisplay.textContent = currentK.toFixed(1);
+        
+        const actualVal = realPartActual(currentK);
+        const optionBVal = realPartOptionB(currentK);
+        
+        actualDisplay.textContent = actualVal.toFixed(3);
+        optionBDisplay.textContent = optionBVal.toFixed(3);
+        
+        const match = Math.abs(actualVal - optionBVal) < 1e-9;
+        matchStatus.textContent = match ? '✓' : '✗';
+        matchStatus.className = match ? 'font-semibold text-emerald-600' : 'font-semibold text-red-500';
+        
+        drawGraph();
+      }
+      
+      // Initial draw
+      updateFromSlider();
+      
+      // Slider event
+      slider.addEventListener('input', updateFromSlider);
+      
+      // Resize canvas for high DPI
+      function resizeCanvas() {
+        const rect = canvas.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        ctx.scale(dpr, dpr);
+        // We need to adjust to logical coordinates, but simpler: we'll just redraw
+        // Actually to keep it simple, we set canvas width/height = displayed size * dpr,
+        // but we need to reset context transform. We'll use logical width/height as rect.
+        // However, our drawing code uses canvas.width/height which change.
+        // Better: use fixed logical size and scale.
+        // Simplest: we keep canvas 600x200 logical and use CSS to scale.
+        // Already set width=600 height=200 in HTML. That's fine.
+      }
+      
+      // ---------- Hint toggles ----------
+      document.querySelectorAll('.hint-toggle').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const hintId = this.dataset.hint;
+          const hintEl = document.getElementById(hintId);
+          if (hintEl) {
+            hintEl.classList.toggle('hidden');
+          }
+        });
+      });
+      
+      // ---------- Progress dots (simple visual aid) ----------
+      // Just for decoration, but we'll mark steps as seen on scroll? Not necessary.
+      // We'll keep dots as static representation of 4 steps.
+      // Optionally we can highlight based on viewport intersection.
+      // For simplicity, leave as is.
+      
+      // Re-draw on window resize (thumbnail keeps aspect)
+      window.addEventListener('resize', () => {
+        // Since canvas has fixed internal resolution, we might want to redraw
+        // but CSS will scale it. Good enough.
+        drawGraph();
+      });
+      
+      // Also ensure MathJax renders after load (async)
+      if (window.MathJax) {
+        window.MathJax.typesetPromise?.();
+      }
+    })();
+  </script>
+</body>
+</html>

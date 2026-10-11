@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HKDSE 2020 Paper 1 Q8 — Interactive Solution</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root{
+    --blue:#1d4ed8;
+    --blue-l:#3b82f6;
+    --blue-d:#1e3a8a;
+    --amber:#f59e0b;
+    --amber-l:#fbbf24;
+    --emerald:#059669;
+    --emerald-l:#10b981;
+    --slate:#0f172a;
+    --ink:#1f2937;
+    --muted:#64748b;
+    --card:#ffffff;
+    --bg:#f1f5f9;
+    --line:#e2e8f0;
+    --shadow: 0 10px 30px rgba(15,23,42,.08);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  /* ---------- HERO ---------- */
+  .hero{
+    background: linear-gradient(135deg,#1e3a8a 0%, #1d4ed8 45%, #3b82f6 100%);
+    color:#fff;
+    padding: 38px 22px 44px;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero::after{
+    content:"";
+    position:absolute; right:-80px; top:-80px;
+    width:320px; height:320px; border-radius:50%;
+    background: radial-gradient(circle at 30% 30%, rgba(251,191,36,.35), transparent 65%);
+  }
+  .hero-inner{max-width:960px;margin:0 auto;position:relative;z-index:2;}
+  .eyebrow{
+    text-transform:uppercase;
+    letter-spacing:.18em;
+    font-size:.72rem;
+    font-weight:700;
+    color:#bfdbfe;
+  }
+  .hero h1{
+    margin:.25em 0 .1em;
+    font-size: clamp(1.5rem, 4.2vw, 2.4rem);
+    font-weight:800;
+    letter-spacing:-.01em;
+  }
+  .hero .subtitle{
+    color:#dbeafe;
+    font-size:1rem;
+    margin:0 0 14px;
+  }
+  .pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;}
+  .pill{
+    background: rgba(255,255,255,.14);
+    border:1px solid rgba(255,255,255,.3);
+    color:#fff;
+    font-size:.74rem;
+    font-weight:600;
+    padding:5px 12px;
+    border-radius:999px;
+    backdrop-filter: blur(4px);
+  }
+  /* ---------- LAYOUT ---------- */
+  main{max-width:960px;margin:0 auto;padding:22px 16px 60px;}
+  .card{
+    background:var(--card);
+    border-radius:18px;
+    box-shadow: var(--shadow);
+    padding:22px 22px 24px;
+    margin-bottom:22px;
+    border:1px solid var(--line);
+  }
+  .card h2{
+    margin:0 0 12px;
+    font-size:1.12rem;
+    font-weight:800;
+    color:var(--blue-d);
+    display:flex;align-items:center;gap:10px;
+  }
+  .card h2 .badge-num{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:30px;height:30px;min-width:30px;
+    border-radius:9px;
+    background:linear-gradient(135deg,var(--blue-d),var(--blue-l));
+    color:#fff;font-size:.85rem;font-weight:800;
+  }
+  .qtext{
+    font-size:1.02rem;
+    background:#f8fafc;
+    border-left:5px solid var(--blue-l);
+    border-radius:10px;
+    padding:14px 16px;
+    margin:6px 0 0;
+  }
+  .qtext p{margin:.45em 0;}
+  .marks{
+    display:inline-block;
+    background:#fef3c7;color:#92400e;
+    font-size:.72rem;font-weight:800;
+    padding:2px 8px;border-radius:6px;
+    margin-left:6px;
+    border:1px solid #fcd34d;
+  }
+  /* ---------- CANVAS ---------- */
+  .canvas-wrap{
+    background:#fbfdff;
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:10px;
+    margin:12px 0 6px;
+  }
+  canvas{width:100%;height:auto;display:block;border-radius:8px;background:#ffffff;}
+  .controls{
+    display:flex;flex-wrap:wrap;gap:14px;align-items:center;
+    padding:10px 6px 4px;
+    font-size:.85rem;
+    color:var(--slate);
+  }
+  .controls label{display:flex;align-items:center;gap:8px;font-weight:600;}
+  input[type=range]{width:150px;accent-color:var(--blue);}
+  input[type=checkbox]{accent-color:var(--emerald);width:16px;height:16px;}
+  .readout{
+    display:inline-block;
+    background:#eff6ff;border:1px solid #bfdbfe;color:var(--blue-d);
+    border-radius:8px;padding:4px 10px;font-weight:700;font-variant-numeric:tabular-nums;
+    font-size:.82rem;
+  }
+  .readout.green{background:#ecfdf5;border-color:#a7f3d0;color:#065f46;}
+  .readout.amber{background:#fffbeb;border-color:#fde68a;color:#92400e;}
+  /* ---------- STEPS ---------- */
+  .step{
+    display:none;
+    margin-top:14px;
+    padding:14px 16px;
+    border-radius:12px;
+    background:#f8fafc;
+    border:1px solid var(--line);
+    border-left:5px solid var(--blue-l);
+    animation: fade .45s ease;
+  }
+  .step.show{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+  .step-head{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;}
+  .step-num{
+    background:var(--slate);color:#fff;font-size:.72rem;font-weight:800;
+    padding:3px 9px;border-radius:999px;letter-spacing:.03em;
+  }
+  .step-marks{
+    background:#dbeafe;color:#1e40af;font-size:.72rem;font-weight:800;
+    padding:3px 9px;border-radius:999px;border:1px solid #93c5fd;
+  }
+  .step .work{font-size:1rem;margin:4px 0 10px;}
+  .hint{
+    background:#fffbeb;border:1px solid #fde68a;border-left:4px solid var(--amber);
+    border-radius:9px;padding:9px 12px;font-size:.87rem;color:#78350f;margin-top:8px;
+  }
+  .hint b{color:#b45309;}
+  .answerbox{
+    background:#ecfdf5;border:1px solid #a7f3d0;border-left:5px solid var(--emerald);
+    border-radius:10px;padding:10px 14px;margin-top:10px;
+    color:#064e3b;font-weight:700;font-size:1rem;
+  }
+  .btn-row{display:flex;align-items:center;gap:14px;margin-top:14px;flex-wrap:wrap;}
+  button.next{
+    background:linear-gradient(135deg,var(--blue-d),var(--blue-l));
+    color:#fff;border:none;
+    padding:11px 20px;border-radius:11px;
+    font-size:.9rem;font-weight:700;cursor:pointer;
+    box-shadow:0 6px 16px rgba(29,78,216,.3);
+    transition:transform .12s ease, box-shadow .2s ease, opacity .2s;
+  }
+  button.next:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 10px 22px rgba(29,78,216,.38);}
+  button.next:disabled{background:#cbd5e1;box-shadow:none;cursor:not-allowed;color:#64748b;}
+  .counter{font-size:.85rem;color:var(--muted);font-weight:700;font-variant-numeric:tabular-nums;}
+  /* ---------- SUMMARY ---------- */
+  .summary{
+    background:linear-gradient(135deg,#0f172a,#1e293b);
+    color:#e2e8f0;
+    border:none;
+  }
+  .summary h2{color:#fbbf24;}
+  .summary h2 .badge-num{background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#1f2937;}
+  .summary ul{margin:8px 0 0;padding-left:22px;}
+  .summary li{margin:9px 0;font-size:1rem;}
+  .summary li .key{color:#fbbf24;font-weight:800;}
+  /* ---------- FOOTER ---------- */
+  footer{
+    text-align:center;color:var(--muted);font-size:.8rem;
+    padding:26px 16px 40px;
+  }
+  .flex-diagrams{display:grid;grid-template-columns:1fr;gap:14px;}
+  @media (min-width:820px){
+    .flex-diagrams.two{grid-template-columns:1fr 1fr;}
+  }
+  .legend{display:flex;flex-wrap:wrap;gap:14px;font-size:.78rem;color:var(--muted);padding:6px 4px 0;}
+  .legend span{display:flex;align-items:center;gap:6px;font-weight:600;}
+  .dot{width:12px;height:12px;border-radius:3px;display:inline-block;}
+  .note{font-size:.82rem;color:var(--muted);margin-top:6px;}
+</style>
+</head>
+<body>
+
+<!-- ============== HERO ============== -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 1</div>
+    <h1>2020 Paper 1 · Question 8</h1>
+    <p class="subtitle">Geometry — Angle chasing with parallel lines &amp; isosceles triangles</p>
+    <div class="pills">
+      <span class="pill">Parallel Lines</span>
+      <span class="pill">Corresponding Angles</span>
+      <span class="pill">Isosceles Triangle</span>
+      <span class="pill">Angle Sum of Triangle</span>
+      <span class="pill">Vertically Opposite Angles</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ============== QUESTION ============== -->
+  <section class="card">
+    <h2><span class="badge-num">Q</span> Question</h2>
+    <div class="qtext">
+      <p>In Figure 1, \(B\) and \(D\) are points lying on \(AC\) and \(AE\) respectively. \(BE\) and \(CD\) intersect at the point \(F\). It is given that \(AB=BE\), \(BD \parallel CE\), \(\angle CAE = 30^\circ\) and \(\angle ADB = 42^\circ\).</p>
+      <p><b>(a)</b> Find \(\angle BEC\). <span class="marks">3 marks</span></p>
+      <p><b>(b)</b> Let \(\angle BDC = \theta\). Express \(\angle CFE\) in terms of \(\theta\). <span class="marks">5 marks</span></p>
+    </div>
+    <p class="note">Given: \(AB = BE\) (so \(\triangle ABE\) is isosceles), \(BD \parallel CE\), \(\angle CAE = 30^\circ\), \(\angle ADB = 42^\circ\).</p>
+  </section>
+
+  <!-- ============== PART (a) ============== -->
+  <section class="card">
+    <h2><span class="badge-num">a</span> Part (a) — Finding \(\angle BEC\)</h2>
+
+    <div class="canvas-wrap">
+      <canvas id="canvasA" width="900" height="520"></canvas>
+      <div class="controls">
+        <label>Rotate / adjust figure:
+          <input type="range" id="rotA" min="-14" max="14" value="0" step="0.5">
+        </label>
+        <label><input type="checkbox" id="showParallelA" checked> Show parallel arrows (BD ∥ CE)</label>
+        <label><input type="checkbox" id="showAnglesA" checked> Show angle labels</label>
+      </div>
+      <div class="controls">
+        <span class="readout">∠AEB = <b id="outAEB">30°</b></span>
+        <span class="readout">∠ADB = 42°</span>
+        <span class="readout green">∠BEC = <b id="outBECa">12°</b></span>
+      </div>
+      <div class="legend">
+        <span><i class="dot" style="background:#1d4ed8"></i>Main sides</span>
+        <span><i class="dot" style="background:#e11d48"></i>BE</span>
+        <span><i class="dot" style="background:#059669"></i>CD</span>
+        <span><i class="dot" style="background:#7c3aed"></i>BD ∥ CE</span>
+      </div>
+    </div>
+
+    <p class="note">Drag the slider to distort the figure — note that the angle relationships <b>stay the same</b>, which is exactly why angle-chasing works.</p>
+
+    <!-- Steps -->
+    <div class="step" data-part="a">
+      <div class="step-head"><span class="step-num">Step 1</span><span class="step-marks">1M</span></div>
+      <div class="work">Since \(BD \parallel CE\), the <b>corresponding angles</b> give
+      \[ \angle AEC = \angle ADB = 42^\circ. \]</div>
+      <div class="hint"><b>Hint:</b> Look at the transversal \(AE\) cutting the parallel lines \(BD\) and \(CE\). The angle at \(D\) and the angle at \(E\) occupy the same relative position — so they are equal (corresponding angles, \(BD \parallel CE\)).</div>
+    </div>
+
+    <div class="step" data-part="a">
+      <div class="step-head"><span class="step-num">Step 2</span><span class="step-marks">1M</span></div>
+      <div class="work">In \(\triangle ABE\), \(AB = BE\), so \(\triangle ABE\) is <b>isosceles</b> with base \(AE\). Hence the base angles are equal:
+      \[ \angle AEB = \angle BAE = \angle CAE = 30^\circ. \]</div>
+      <div class="hint"><b>Hint:</b> Because \(B\) lies on \(AC\), the angle \(\angle BAE\) is the same as the given \(\angle CAE = 30^\circ\). Equal sides \(AB = BE\) → equal opposite angles.</div>
+    </div>
+
+    <div class="step" data-part="a">
+      <div class="step-head"><span class="step-num">Step 3</span><span class="step-marks">1A</span></div>
+      <div class="work">At point \(E\), the ray \(BE\) splits \(\angle AEC\):
+      \[ \angle BEC = \angle AEC - \angle AEB = 42^\circ - 30^\circ. \]</div>
+      <div class="answerbox">\[ \therefore \angle BEC = 12^\circ \]</div>
+      <div class="hint"><b>Hint:</b> Always check your figure: \(\angle AEB\) sits <i>inside</i> \(\angle AEC\), so subtract to isolate \(\angle BEC\).</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="next" data-target="a">Next step →</button>
+      <span class="counter" id="counterA">0 / 3</span>
+    </div>
+  </section>
+
+  <!-- ============== PART (b) ============== -->
+  <section class="card">
+    <h2><span class="badge-num">b</span> Part (b) — Expressing \(\angle CFE\) in terms of \(\theta\)</h2>
+
+    <div class="canvas-wrap">
+      <canvas id="canvasB" width="900" height="520"></canvas>
+      <div class="controls">
+        <label>Change θ = ∠BDC:
+          <input type="range" id="thetaB" min="20" max="70" value="40" step="1">
+        </label>
+        <label><input type="checkbox" id="showParallelB" checked> Show BD ∥ CE</label>
+        <label><input type="checkbox" id="highlightTriangleB" checked> Highlight \(\triangle CFE\)</label>
+      </div>
+      <div class="controls">
+        <span class="readout amber">θ = ∠BDC = <b id="outTheta">40°</b></span>
+        <span class="readout">∠DCE = θ</span>
+        <span class="readout green">∠CFE = <b id="outCFE">128°</b></span>
+      </div>
+      <div class="legend">
+        <span><i class="dot" style="background:#e11d48"></i>BE (with ∠BEC = 12°)</span>
+        <span><i class="dot" style="background:#059669"></i>CD</span>
+        <span><i class="dot" style="background:#7c3aed"></i>BD ∥ CE</span>
+        <span><i class="dot" style="background:#f59e0b"></i>Triangle CFE</span>
+      </div>
+    </div>
+
+    <p class="note">Move the slider — the value of \(\angle CFE\) changes with \(\theta\), confirming the linear relationship \(168^\circ - \theta\).</p>
+
+    <div class="step" data-part="b">
+      <div class="step-head"><span class="step-num">Step 1</span><span class="step-marks">1M</span></div>
+      <div class="work">Since \(BD \parallel CE\), the <b>alternate angles</b> on the transversal \(CD\) are equal:
+      \[ \angle DCE = \angle BDC = \theta. \]</div>
+      <div class="hint"><b>Hint:</b> \(BD \parallel CE\) and \(CD\) is a transversal. The angle \(\angle BDC\) (at \(D\)) and the angle \(\angle DCE\) (at \(C\)) are alternate angles and therefore equal.</div>
+    </div>
+
+    <div class="step" data-part="b">
+      <div class="step-head"><span class="step-num">Step 2</span><span class="step-marks">1A</span></div>
+      <div class="work">Consider \(\triangle CFE\). Its three interior angles are:
+      \[ \angle CEF = \angle BEC = 12^\circ,\quad \angle ECF = \angle DCE = \theta,\quad \angle CFE = ? \]</div>
+      <div class="hint"><b>Hint:</b> At \(E\), the ray \(EF\) is the same as \(EB\), so \(\angle CEF = \angle BEC = 12^\circ\). At \(C\), the ray \(CF\) is the same as \(CD\), so \(\angle ECF = \angle DCE = \theta\). Now apply the angle sum of a triangle.</div>
+    </div>
+
+    <div class="step" data-part="b">
+      <div class="step-head"><span class="step-num">Step 3</span><span class="step-marks">1A</span></div>
+      <div class="work">Angle sum of \(\triangle CFE\):
+      \[ \angle CFE = 180^\circ - \angle BEC - \angle DCE = 180^\circ - 12^\circ - \theta. \]</div>
+      <div class="answerbox">\[ \therefore \angle CFE = 168^\circ - \theta \]</div>
+      <div class="hint"><b>Hint:</b> Watch the size of the answer: since \(\theta\) is one angle of the triangle, we need \(0^\circ < \theta < 168^\circ\), which is consistent with the figure.</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="next" data-target="b">Next step →</button>
+      <span class="counter" id="counterB">0 / 3</span>
+    </div>
+  </section>
+
+  <!-- ============== SUMMARY ============== -->
+  <section class="card summary">
+    <h2><span class="badge-num">✓</span> Final Answers</h2>
+    <ul>
+      <li><span class="key">(a)</span> \(\angle BEC = 42^\circ - 30^\circ = 12^\circ\)</li>
+      <li><span class="key">(b)</span> \(\angle CFE = 180^\circ - 12^\circ - \theta = 168^\circ - \theta\)</li>
+      <li><span class="key">Key ideas:</span> corresponding angles (\(BD \parallel CE\)), isosceles \(\triangle ABE\), alternate angles, and the angle sum of a triangle.</li>
+    </ul>
+  </section>
+
+  <footer>HKDSE 2020 · Paper 1 · Question 8 — Interactive geometry solution · Built with HTML5 Canvas &amp; MathJax</footer>
+
+</main>
+
+<script>
+/* ============================================================
+   Shared geometry setup
+   We build the figure from scratch using coordinates derived
+   directly from the angle conditions:
+     - AE lies on the positive x-axis.
+     - A at origin, E at (L, 0).
+     - ∠CAE = 30° → C lies on the ray from A at 30° up.
+     - In △ABE (isosceles, AB = BE) with ∠BAE = ∠AEB = 30°,
+       B is on ray AC and BE makes 30° with EA.
+     - D is on AE with ∠ADB = 42° (D chosen so B,D,C, F look right).
+     - C lies on line through D parallel to BE? No — C is where
+       line AC meets line through D ... Let's build it cleanly:
+   Simplest robust construction:
+     A = (0,0), E = (1,0)
+     Ray AE → x-axis.
+     Ray AC makes 30° with AE.
+     Since AB = BE and ∠BAE = 30°, B is on ray AC at the point
+     where the perpendicular bisector of AE meets ray AC.
+     (isosceles triangle ABE with base AE.)
+     B = intersection of ray from A at 30° and ray from E at 150°.
+     Then D is on AE with ∠ADB = 42°.
+     C = intersection of ray from A at 30° with ray from E through
+     a direction such that BD ∥ CE (i.e. CE is parallel to BD).
+   This guarantees all given conditions.
+   ============================================================ */
+
+const DEG = Math.PI/180;
+
+/* Build the canonical figure. Returns points in math coords. */
+function buildFigure(){
+  // A at origin, E at (1,0)
+  const A = {x:0, y:0};
+  const E = {x:1, y:0};
+
+  // Ray from A at 30°: direction (cos30, sin30)
+  const dirA = {x: Math.cos(30*DEG), y: Math.sin(30*DEG)};
+
+  // In isosceles △ABE with base AE, the base angles at A and E are 30°.
+  // B lies on ray from A at 30°, and also on ray from E at 150°.
+  // Ray from E: direction (cos150, sin150)
+  const dirE = {x: Math.cos(150*DEG), y: Math.sin(150*DEG)};
+
+  // Solve A + s*dirA = E + t*dirE
+  // (1)  s*cos30 = 1 + t*cos150
+  // (2)  s*sin30 =     t*sin150
+  // sin30 = 0.5, sin150 = 0.5 → s = t.
+  // cos30 ≈ 0.8660, cos150 = -cos30
+  // s*cos30 = 1 - s*cos30 → 2 s cos30 = 1 → s = 1/(2cos30)
+  const sB = 1/(2*Math.cos(30*DEG));
+  const B = {x: A.x + sB*dirA.x, y: A.y + sB*dirA.y};
+
+  // D on AE such that ∠ADB = 42°.
+  // At D on the x-axis, the ray to A is along the negative x-axis.
+  // We need the ray to B to make 42° above that (i.e. angle from
+  // vector DA to vector DB equals 42°).
+  // If D = (d, 0), vector DA = (-d, 0) (pointing left),
+  // vector DB = (Bx - d, By).
+  // The angle between DA and DB should be 42°.
+  // Direction of DA: 180°. Direction of DB: atan2(By, Bx-d).
+  // Want (180° - angle(DB)) = 42°  → angle(DB) = 138°.
+  // So (By)/(Bx - d) = tan(138°) = tan(180-42) = -tan(42°)
+  // → By = -tan42 * (Bx - d) → d = Bx + By/tan42.
+  const d = B.x + B.y/Math.tan(42*DEG);
+  const D = {x: d, y: 0};
+
+  // BD direction:
+  const bd = {x: B.x - D.x, y: B.y - D.y};
+  // CE ∥ BD and C lies on ray from A at 30°.
+  // Line through E in direction bd:
+  //   C = A + u*dirA  and  C = E + v*bd
+  // Solve: u*cos30 = 1 + v*bdx
+  //        u*sin30 =     v*bdy
+  // Let u be unknown.
+  const c30 = Math.cos(30*DEG), s30 = Math.sin(30*DEG);
+  // From second eq: v = u*s30/bdy
+  // Substitute: u*c30 = 1 + (u*s30/bdy)*bdx
+  //   u*(c30 - s30*bdx/bdy) = 1
+  const denom = c30 - s30*bd.x/bd.y;
+  const uC = 1/denom;
+  const C = {x: uC*c30, y: uC*s30};
+
+  // F = intersection of BE and CD
+  const F = lineIntersect(B, E, C, D);
+
+  return {A, E, B, D, C, F};
+}
+
+function lineIntersect(P1, P2, P3, P4){
+  const x1=P1.x,y1=P1.y,x2=P2.x,y2=P2.y;
+  const x3=P3.x,y3=P3.y,x4=P4.x,y4=P4.y;
+  const denom = (x1-x2)*(y3-y4) - (y1-y2)*(x3-x4);
+  const px = ((x1*y2-y1*x2)*(x3-x4) - (x1-x2)*(x3*y4-y3*x4))/denom;
+  const py = ((x1*y2-y1*x2)*(y3-y4) - (y1-y2)*(x3*y4-y3*x4))/denom;
+  return {x:px, y:py};
+}
+
+/* ---------- Canvas helpers ---------- */
+function makeTransform(canvas, pad){
+  // Figure bounding box
+  const fig = buildFigure();
+  const xs = [fig.A.x,fig.E.x,fig.B.x,fig.D.x,fig.C.x,fig.F.x];
+  const ys = [fig.A.y,fig.E.y,fig.B.y,fig.D.y,fig.C.y,fig.F.y];
+  const minX = Math.min(...xs), maxX = Math.max(...xs);
+  const minY = Math.min(...ys), maxY = Math.max(...ys);
+  const W = canvas.width, H = canvas.height;
+  const padAll = pad || 70;
+  const availW = W - padAll*2, availH = H - padAll*2;
+  const sx = availW/(maxX-minX || 1);
+  const sy = availH/((maxY-minY)*1.05 || 1);
+  const s = Math.min(sx, sy);
+  // Center
+  const offX = (W - s*(maxX-minX))/2 - s*minX;
+  const offY = H - ((H - s*(maxY-minY))/2) + s*minY; // flip y
+  return {
+    toPx: (p) => ({ x: offX + s*p.x, y: offY - s*p.y }),
+    s: s,
+    fig: fig
+  };
+}
+
+function drawLabel(ctx, x, y, text, color, dx=0, dy=0, bg=true){
+  ctx.save();
+  ctx.font = 'bold 15px Segoe UI, Arial';
+  const w = ctx.measureText(text).width;
+  const px = x+dx, py = y+dy;
+  if(bg){
+    ctx.fillStyle = 'rgba(255,255,255,.85)';
+    ctx.beginPath();
+    ctx.roundRect(px-w/2-5, py-13, w+10, 20, 6);
+    ctx.fill();
+  }
+  ctx.fillStyle = color;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, px, py-3);
+  ctx.restore();
+}
+
+function drawPoint(ctx, x, y, color, r=5){
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, 2*Math.PI);
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = '#fff';
+  ctx.stroke();
+}
+
+function drawSegment(ctx, p1, p2, color, width=2.4, dash=[]){
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width;
+  ctx.setLineDash(dash);
+  ctx.beginPath();
+  ctx.moveTo(p1.x, p1.y);
+  ctx.lineTo(p2.x, p2.y);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawParallelArrows(ctx, p1, p2, t, color){
+  // Draw small ">>" arrow at parameter t along the segment p1p2
+  const x = p1.x + t*(p2.x-p1.x);
+  const y = p1.y + t*(p2.y-p1.y);
+  const dx = p2.x-p1.x, dy = p2.y-p1.y;
+  const len = Math.hypot(dx,dy);
+  const ux = dx/len, uy = dy/len;
+  const px = -uy, py = ux; // perpendicular
+  const size = 8;
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  // chevron
+  ctx.moveTo(x - ux*size + px*size*0.6, y - uy*size + py*size*0.6);
+  ctx.lineTo(x, y);
+  ctx.lineTo(x - ux*size - px*size*0.6, y - uy*size - py*size*0.6);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawAngleArc(ctx, vertex, p1, p2, r, color, label, labelR, offsetDir){
+  // angle from vertex between ray to p1 and ray to p2
+  const a1 = Math.atan2(p1.y-vertex.y, p1.x-vertex.x);
+  const a2 = Math.atan2(p2.y-vertex.y, p2.x-vertex.x);
+  let start = Math.min(a1,a2), end = Math.max(a1,a2);
+  if(end-start > Math.PI){
+    const tmp = start; start = end; end = tmp + 2*Math.PI;
+  }
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  // convert math y-up to canvas y-down → negate angles
+  ctx.arc(vertex.x, vertex.y, r, -start, -end, true);
+  ctx.stroke();
+  if(label){
+    const mid = (start+end)/2;
+    const lx = vertex.x + labelR*Math.cos(mid);
+    const ly = vertex.y + labelR*Math.sin(mid);
+    drawLabel(ctx, lx, ly, label, color, 0, 0, true);
+  }
+  ctx.restore();
+}
+
+/* roundRect polyfill for older browsers */
+if(!CanvasRenderingContext2D.prototype.roundRect){
+  CanvasRenderingContext2D.prototype.roundRect = function(x,y,w,h,r){
+    if(typeof r === 'number') r = [r,r,r,r];
+    this.beginPath();
+    this.moveTo(x+r[0],y);
+    this.lineTo(x+w-r[1],y);
+    this.quadraticCurveTo(x+w,y,x+w,y+r[1]);
+    this.lineTo(x+w,y+h-r[2]);
+    this.quadraticCurveTo(x+w,y+h,x+w-r[2],y+h);
+    this.lineTo(x+r[3],y+h);
+    this.quadraticCurveTo(x,y+h,x,y+h-r[3]);
+    this.lineTo(x,y+r[0]);
+    this.quadraticCurveTo(x,y,x+r[0],y);
+    this.closePath();
+    return this;
+  };
+}
+
+/* ============================================================
+   CANVAS A — Part (a): show ∠AEC = ∠ADB = 42°, ∠AEB = 30°
+   ============================================================ */
+function drawCanvasA(){
+  const canvas = document.getElementById('canvasA');
+  const ctx = canvas.getContext('2d');
+  const rot = parseFloat(document.getElementById('rotA').value)*DEG; // slight tilter
+  const showPar = document.getElementById('showParallelA').checked;
+  const showAng = document.getElementById('showAnglesA').checked;
+
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  // Background grid
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.strokeStyle = '#eef2f7';
+  ctx.lineWidth = 1;
+  for(let x=0;x<canvas.width;x+=32){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,canvas.height);ctx.stroke();}
+  for(let y=0;y<canvas.height;y+=32){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(canvas.width,y);ctx.stroke();}
+
+  const tf = makeTransform(canvas, 90);
+  let {A,E,B,D,C,F} = tf.fig;
+  const s = tf.s;
+
+  // Apply a small rotation about A to let the student "distort" the figure.
+  // (rotation preserves all the angle relationships)
+  function rotP(p){ 
+    const dx = p.x-A.x, dy = p.y-A.y;
+    return { x: A.x + dx*Math.cos(rot)-dy*Math.sin(rot),
+             y: A.y + dx*Math.sin(rot)+dy*Math.cos(rot) };
+  }
+  let Ap = tf.toPx(A), Ep = tf.toPx(rotP(E)), Bp = tf.toPx(rotP(B)),
+      Dp = tf.toPx(rotP(D)), Cp = tf.toPx(rotP(C)), Fp = tf.toPx(rotP(F));
+
+  // Fill triangle CFE lightly (helps see ∠BEC inside)
+  ctx.save();
+  ctx.fillStyle = 'rgba(16,185,129,.10)';
+  ctx.beginPath();
+  ctx.moveTo(Ep.x, Ep.y);
+  ctx.lineTo(Cp.x, Cp.y);
+  ctx.lineTo(Fp.x, Fp.y);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+
+  // Main segments
+  drawSegment(ctx, Ap, Cp, '#1d4ed8', 3);        // AC
+  drawSegment(ctx, Ap, Ep, '#1d4ed8', 3);        // AE
+  drawSegment(ctx, Ep, Cp, '#0ea5e9', 2.6);      // EC
+  drawSegment(ctx, Dp, Fp, '#059669', 3);        // DC (part of it)
+  drawSegment(ctx, Cp, Dp, '#059669', 3);        // CD
+  drawSegment(ctx, Bp, Ep, '#e11d48', 3.2);      // BE
+  drawSegment(ctx, Bp, Dp, '#7c3aed', 3);        // BD
+
+  // Parallel arrows (on BD and CE)
+  if(showPar){
+    drawParallelArrows(ctx, Bp, Dp, 0.5, '#7c3aed');
+    drawParallelArrows(ctx, Ep, Cp, 0.5, '#7c3aed');
+    drawParallelArrows(ctx, Bp, Dp, 0.7, '#7c3aed');
+    drawParallelArrows(ctx, Ep, Cp, 0.7, '#7c3aed');
+  }
+
+  // Points
+  const P = [
+    {p:Ap, lbl:'A', c:'#1e3a8a', dx:-20, dy:16},
+    {p:Ep, lbl:'E', c:'#1e3a8a', dx:-18, dy:18},
+    {p:Bp, lbl:'B', c:'#1e3a8a', dx:14,  dy:-14},
+    {p:Dp, lbl:'D', c:'#1e3a8a', dx:0,   dy:22},
+    {p:Cp, lbl:'C', c:'#1e3a8a', dx:6,   dy:-16},
+    {p:Fp, lbl:'F', c:'#1e3a8a', dx:-16, dy:-14}
+  ];
+  P.forEach(o=>{
+    drawPoint(ctx, o.p.x, o.p.y, '#0f172a', 5.5);
+    drawLabel(ctx, o.p.x, o.p.y, o.lbl, o.c, o.dx, o.dy);
+  });
+
+  // Angle labels
+  if(showAng){
+    // ∠ADB = 42° at D
+    drawAngleArc(ctx, Dp, Bp, Ap, 30, '#dc2626',
+                 '42°', 52, null);
+    // ∠AEB = 30° at E (between EA and EB)
+    drawAngleArc(ctx, Ep, Ap, Bp, 40, '#e11d48',
+                 '30°', 64, null);
+    // ∠AEC = 42° at E (between EA and EC)
+    drawAngleArc(ctx, Ep, Ap, Cp, 66, '#0ea5e9',
+                 '42°', 92, null);
+    // ∠BEC = 12° at E (between EB and EC)
+    drawAngleArc(ctx, Ep, Bp, Cp, 30, '#059669',
+                 '12°', 46, null);
+  }
+
+  // Header
+  ctx.save();
+  ctx.font = 'bold 17px Segoe UI, Arial';
+  ctx.fillStyle = '#1e3a8a';
+  ctx.textAlign = 'left';
+  ctx.fillText('Part (a) — angle chasing at E', 24, 34);
+  ctx.font = '13px Segoe UI, Arial';
+  ctx.fillStyle = '#64748b';
+  ctx.fillText('corresponding angles (BD ∥ CE) → ∠AEC = 42°, then subtract ∠AEB = 30°', 24, 56);
+  ctx.restore();
+
+  // update readouts
+  document.getElementById('outAEB').textContent = '30°';
+  document.getElementById('outBECa').textContent = '12°';
+}
+
+/* ============================================================
+   CANVAS B — Part (b): vary θ = ∠BDC, show ∠CFE = 168° − θ
+   ============================================================ */
+function drawCanvasB(){
+  const canvas = document.getElementById('canvasB');
+  const ctx = canvas.getContext('2d');
+  const theta = parseFloat(document.getElementById('thetaB').value); // in degrees
+  const showPar = document.getElementById('showParallelB').checked;
+  const hlTri = document.getElementById('highlightTriangleB').checked;
+
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.strokeStyle = '#eef2f7';
+  ctx.lineWidth = 1;
+  for(let x=0;x<canvas.width;x+=32){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,canvas.height);ctx.stroke();}
+  for(let y=0;y<canvas.height;y+=32){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(canvas.width,y);ctx.stroke();}
+
+  // Build a figure consistent with a given θ.
+  // Constraint: AB = BE (△ABE isosceles), ∠CAE = 30°,
+  // ∠ADB = 42°, and BD ∥ CE, with ∠BDC = θ.
+  //
+  // Construction:
+  //   A = (0,0), E = (1,0).
+  //   Ray AE = x-axis; ray AC at 30°.
+  //   B = intersection of ray from A at 30° and ray from E at
+  //       (180°−30°)=150°  (isosceles △ABE with base AE).
+  //   D on AE, choose d such that ∠ADB = 42°.
+  //     → d = Bx + By/tan42°.
+  //   ∠BDC = θ where C is on ray AC and CD... wait, C is fixed
+  //   on ray AC. Since C is on ray AC and D is on AE, changing
+  //   the position of D along AE changes ∠BDC. But D must also
+  //   satisfy ∠ADB = 42°. So D is already fixed by that!
+  //
+  //   → Actually, given AB=BE and ∠ADB=42°, D is NOT free.
+  //   So to "vary θ" we must vary a different parameter.
+  //   In the original figure, ∠BDC = θ is a *free* angle
+  //   (it's just the angle at D in the drawing). But the problem
+  //   treats θ as a parameter in part (b) — it's a *given* that
+  //   can change without changing the other givens.
+  //
+  //   The cleanest way: keep BD ∥ CE, keep ∠BEC = 12°, but let
+  //   the whole configuration rotate about E so that ∠BDC varies.
+  //   Since BD ∥ CE, ∠BDC = ∠DCE = θ automatically.
+  //
+  //   Implementation: keep the canonical figure but "twist" it by
+  //   rotating the line through C (i.e. CE) and hence BD, about E,
+  //   compensating by moving C and D accordingly while preserving
+  //   the topology (topological relationships: A, E, D collinear;
+  //   A, B, C collinear; ∠ADB = 42°, AB = BE, BD ∥ CE).
+  //
+  //   We implement a numerical construction:
+  //   Fix A = (0,0), E = (1,0). Place B on ray A at 30° with
+  //   AB = BE (isosceles). D = (d,0) with ∠ADB = 42° — this d is
+  //   fixed = dBx + dBy/tan42°.
+  //   Then line BD is FIXED. So C must be on ray AC (30°) and on
+  //   the line through E parallel to BD. → C is fixed too!
+  //   So in fact the entire figure is rigid given the givens.
+  //
+  //   ⇒ To let the student "change θ", we freely choose a
+  //     parameter d' near d, define D' = (d',0), draw BD',
+  //     draw CE' through E parallel to BD', intersect with ray AC
+  //     to get C'. Then ∠AD'B ≠ 42° in general — but we can still
+  //     show the angle sum relation ∠CFE = 168° − ∠BDC.
+  //
+  //   Better: keep the topology and *display* the relation.
+  //   The relation ∠CFE = 180° − 12° − θ holds as long as
+  //   ∠BEC = 12° and ∠DCE = ∠BDC (parallel lines). So we let
+  //   the student drag D along AE, computing everything else
+  //   consistently (BD ∥ CE, so ∠DCE = ∠BDC).
+  //   This preserves the visual and provides an honest check.
+
+  // --- Build figure ---
+  const A = {x:0, y:0};
+  const E = {x:1, y:0};
+  const c30 = Math.cos(30*DEG), s30 = Math.sin(30*DEG);
+  const sB = 1/(2*c30);
+  const B = {x: sB*c30, y: sB*s30};
+
+  // We want D on AE such that ∠BDC = θ. We'll pick D and C
+  // such that BD ∥ CE, and C is on ray AC.
+  // Let D = (d,0) be determined from the desired θ.
+  //
+  // In the original rigid figure, θ is determined by the givens.
+  // Here we let θ be the slider value; D is found so that:
+  //   - D on AE
+  //   - line CD makes angle θ with BD at D, i.e.
+  //     direction DB and direction DC have (smaller) angle θ,
+  //     and C on ray AC.
+  // Then BD ∥ CE is *derived* by making CE parallel to BD.
+  // Since C is on ray AC and CE passes through E, C is determined
+  // by "ray AC ∩ line through E ∥ BD".
+  //
+  // So the only free parameter is D. As D moves along AE,
+  // ∠BDC changes. Great — that's our slider!
+  //
+  // We just need to choose θ (from slider) and solve for d.
+  // From "ray AC ∩ line through E ∥ BD" we get C as a function
+  // of d, then compute ∠BDC and solve numerically for d.
+
+  function buildFigFromD(d){
+    const D = {x:d, y:0};
+    const bd = {x: B.x-d, y: B.y-0}; // BD vector
+    // C = A + u*dirA  and  C = E + v*bd
+    const denom = c30 - s30 * bd.x / bd.y;
+    if(Math.abs(denom) < 1e-6) return null;
+    const u = 1/denom;
+    const C = {x: u*c30, y: u*s30};
+    return {A,E,B,D,C};
+  }
+
+  function angleAtD(fig){
+    const {B,D,C} = fig;
+    const v1 = {x: B.x-D.x, y: B.y-D.y};
+    const v2 = {x: C.x-D.x, y: C.y-D.y};
+    const dot = v1.x*v2.x + v1.y*v2.y;
+    const n1 = Math.hypot(v1.x,v1.y), n2 = Math.hypot(v2.x,v2.y);
+    let ang = Math.acos(Math.max(-1,Math.min(1, dot/(n1*n2))));
+    return ang/DEG; // in degrees
+  }
+
+  // Solve for d such that angle at D = θ.
+  // angle at D is monotonic-ish in d over the relevant range;
+  // use bisection between two bounds.
+  function findD(targetTheta){
+    // Bounds: d must be < B.x for sensible geometry; also
+    // angle at D = 0 when d → -inf (D far left, DB and DC nearly
+    // parallel but distinct rays?) and tends to something as
+    // d → B.x-. Use bisection.
+    let lo = -20, hi = B.x - 1e-4;
+    const f = (d) => {
+      const fig = buildFigFromD(d);
+      if(!fig) return NaN;
+      return angleAtD(fig) - targetTheta;
+    };
+    let flo = f(lo), fhi = f(hi);
+    if(isNaN(flo) || isNaN(fhi) || flo*fhi > 0){
+      // Fallback: scan
+      let bestD = B.x*0.5, bestErr = Infinity;
+      for(let d=-5; d<B.x-1e-4; d+=0.01){
+        const err = Math.abs(f(d));
+        if(!isNaN(err) && err < bestErr){bestErr = err; bestD = d;}
+      }
+      return bestD;
+    }
+    for(let i=0;i<80;i++){
+      const mid = (lo+hi)/2;
+      const fm = f(mid);
+      if(isNaN(fm)) break;
+      if(flo*fm <= 0){ hi = mid; fhi = fm; }
+      else { lo = mid; flo = fm; }
+    }
+    return (lo+hi)/2;
+  }
+
+  const dOpt = findD(theta);
+  const figRaw = buildFigFromD(dOpt);
+  if(!figRaw){ console.error('bad fig'); return; }
+  const F = lineIntersect(figRaw.B, figRaw.E, figRaw.C, figRaw.D);
+  figRaw.F = F;
+
+  const tf = makeTransform(canvas, 90);
+  // Use the tf of the canonical figure for consistent framing;
+  // but we need to draw the current figRaw. So build a transform
+  // from figRaw itself:
+  const xs = [figRaw.A.x, figRaw.E.x, figRaw.B.x, figRaw.D.x, figRaw.C.x, figRaw.F.x];
+  const ys = [figRaw.A.y, figRaw.E.y, figRaw.B.y, figRaw.D.y, figRaw.C.y, figRaw.F.y];
+  const minX = Math.min(...xs), maxX = Math.max(...xs);
+  const minY = Math.min(...ys), maxY = Math.max(...ys);
+  const W = canvas.width, H = canvas.height;
+  const padAll = 90;
+  const availW = W - padAll*2, availH = H - padAll*2;
+  const sx = availW/(maxX-minX||1);
+  const sy = availH/((maxY-minY)*1.05||1);
+  const sc = Math.min(sx, sy);
+  const offX = (W - sc*(maxX-minX))/2 - sc*minX;
+  const offY = H - ((H - sc*(maxY-minY))/2) + sc*minY;
+  const toPx = (p) => ({ x: offX + sc*p.x, y: offY - sc*p.y });
+
+  const Ap = toPx(figRaw.A), Ep = toPx(figRaw.E), Bp = toPx(figRaw.B),
+        Dp = toPx(figRaw.D), Cp = toPx(figRaw.C), Fp = toPx(figRaw.F);
+
+  // Shade triangle CFE
+  if(hlTri){
+    ctx.save();
+    ctx.fillStyle = 'rgba(245,158,11,.14)';
+    ctx.beginPath();
+    ctx.moveTo(Cp.x,Cp.y);
+    ctx.lineTo(Fp.x,Fp.y);
+    ctx.lineTo(Ep.x,Ep.y);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // Segments
+  drawSegment(ctx, Ap, Cp, '#1d4ed8', 3);   // AC
+  drawSegment(ctx, Ap, Ep, '#1d4ed8', 3);   // AE
+  drawSegment(ctx, Ep, Cp, '#0ea5e9', 2.6); // EC
+  drawSegment(ctx, Dp, Cp, '#059669', 3);   // CD
+  drawSegment(ctx, Bp, Ep, '#e11d48', 3.2); // BE
+  drawSegment(ctx, Bp, Dp, '#7c3aed', 3);   // BD
+
+  // Parallel arrows
+  if(showPar){
+    drawParallelArrows(ctx, Bp, Dp, 0.5, '#7c3aed');
+    drawParallelArrows(ctx, Ep, Cp, 0.5, '#7c3aed');
+    drawParallelArrows(ctx, Bp, Dp, 0.7, '#7c3aed');
+    drawParallelArrows(ctx, Ep, Cp, 0.7, '#7c3aed');
+  }
+
+  // Points
+  [[Ap,'A',-20,16],[Ep,'E',-18,18],[Bp,'B',14,-14],
+   [Dp,'D',0,22],[Cp,'C',6,-16],[Fp,'F',-16,-14]].forEach(o=>{
+    drawPoint(ctx, o[0].x, o[0].y, '#0f172a', 5.5);
+    drawLabel(ctx, o[0].x, o[0].y, o[1], '#1e3a8a', o[2], o[3]);
+  });
+
+  // Angle labels
+  // ∠BEC = 12°
+  drawAngleArc(ctx, Ep, Bp, Cp, 32, '#e11d48', '12°', 50, null);
+  // ∠BDC = θ at D
+  drawAngleArc(ctx, Dp, Bp, Cp, 34, '#f59e0b', 'θ', 54, null);
+  // ∠DCE = θ at C
+  drawAngleArc(ctx, Cp, Dp, Ep, 34, '#059669', 'θ', 54, null);
+  // ∠CFE at F (between FC and FE)
+  const cfeVal = 168 - theta;
+  drawAngleArc(ctx, Fp, Cp, Ep, 32, '#dc2626',
+               'CFE', 60, null);
+
+  // Value panel top-left
+  ctx.save();
+  ctx.font = 'bold 17px Segoe UI, Arial';
+  ctx.fillStyle = '#1e3a8a';
+  ctx.textAlign = 'left';
+  ctx.fillText('Part (b) — vary θ = ∠BDC', 24, 34);
+  ctx.font = '13px Segoe UI, Arial';
+  ctx.fillStyle = '#64748b';
+  ctx.fillText('BD ∥ CE  →  ∠DCE = ∠BDC = θ. Then angle sum of △CFE gives ∠CFE = 168° − θ.', 24, 56);
+  ctx.restore();
+
+  // Bottom readout panel on canvas
+  ctx.save();
+  ctx.fillStyle = 'rgba(15,23,42,.92)';
+  ctx.beginPath();
+  ctx.roundRect(W-280, H-88, 260, 68, 12);
+  ctx.fill();
+  ctx.fillStyle = '#fbbf24';
+  ctx.font = 'bold 14px Segoe UI, Arial';
+  ctx.textAlign = 'left';
+  ctx.fillText('θ = ∠BDC', W-260, H-64);
+  ctx.fillText('∠CFE', W-260, H-38);
+  ctx.fillStyle = '#e2e8f0';
+  ctx.fillText('= ' + theta.toFixed(0) + '°', W-140, H-64);
+  ctx.fillStyle = '#6ee7b7';
+  ctx.fillText('= ' + cfeVal.toFixed(0) + '°', W-140, H-38);
+  ctx.restore();
+
+  // Update readouts
+  document.getElementById('outTheta').textContent = theta.toFixed(0)+'°';
+  document.getElementById('outCFE').textContent = cfeVal.toFixed(0)+'°';
+}
+
+/* ============================================================
+   Step reveal logic
+   ============================================================ */
+document.querySelectorAll('.next').forEach(btn=>{
+  const target = btn.dataset.target;
+  const steps = document.querySelectorAll(`.step[data-part="${target}"]`);
+  const counter = document.getElementById(target === 'a' ? 'counterA' : 'counterB');
+  let idx = 0;
+
+  btn.addEventListener('click', ()=>{
+    if(idx < steps.length){
+      steps[idx].classList.add('show');
+      idx++;
+      counter.textContent = idx + ' / ' + steps.length;
+      if(idx === steps.length){
+        btn.disabled = true;
+        btn.textContent = 'All steps revealed ✓';
+      }
+    }
+  });
+});
+
+/* ============================================================
+   Init + event wiring
+   ============================================================ */
+function redraw(){
+  drawCanvasA();
+  drawCanvasB();
+}
+
+document.getElementById('rotA').addEventListener('input', redraw);
+document.getElementById('showParallelA').addEventListener('change', redraw);
+document.getElementById('showAnglesA').addEventListener('change', redraw);
+document.getElementById('thetaB').addEventListener('input', redraw);
+document.getElementById('showParallelB').addEventListener('change', redraw);
+document.getElementById('highlightTriangleB').addEventListener('change', redraw);
+
+window.addEventListener('resize', redraw);
+
+// Kick off after fonts/layout settle
+if(document.readyState === 'complete') redraw();
+else window.addEventListener('load', redraw);
+setTimeout(redraw, 300);
+
+// Re-render MathJax when new steps appear (content is static though)
+document.querySelectorAll('.next').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    if(window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise();
+  });
+});
+</script>
+</body>
+</html>

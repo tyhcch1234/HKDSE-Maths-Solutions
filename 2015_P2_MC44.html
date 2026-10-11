@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2015 Paper 2 Q44 — Probability</title>
+
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- KaTeX for math rendering -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});"></script>
+
+<style>
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+  .ball { transition: transform .25s ease, box-shadow .25s ease; }
+  .ball:hover { transform: translateY(-4px) scale(1.08); box-shadow: 0 6px 14px rgba(0,0,0,.2); }
+  .step-card { display: none; }
+  .step-card.active { display: block; animation: fadeUp .35s ease; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(10px);} to {opacity:1; transform:translateY(0);} }
+  .hint-box { max-height: 0; overflow: hidden; transition: max-height .4s ease, padding .3s ease; }
+  .hint-box.open { max-height: 400px; padding-top: .75rem; }
+  .tree-line { stroke: #94a3b8; stroke-width: 2; }
+  .highlight { background: #fde68a; border-radius: 4px; padding: 0 3px; }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen">
+
+<!-- ================= HEADER ================= -->
+<header class="bg-gradient-to-r from-indigo-600 to-blue-500 text-white shadow-lg">
+  <div class="max-w-4xl mx-auto px-4 py-6">
+    <p class="text-sm font-medium opacity-90 tracking-wide">HKDSE Mathematics</p>
+    <h1 class="text-xl sm:text-2xl font-bold mt-1">2015 Paper 2 &middot; Q44</h1>
+    <p class="text-sm opacity-90 mt-1">Topic: 14. Probability</p>
+  </div>
+</header>
+
+<main class="max-w-4xl mx-auto px-4 py-6 space-y-6">
+
+  <!-- ================= QUESTION ================= -->
+  <section class="bg-white rounded-2xl shadow-md p-5 sm:p-6">
+    <div class="flex flex-wrap gap-2 mb-4">
+      <span class="text-xs font-semibold bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full">Probability</span>
+      <span class="text-xs font-semibold bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full">Law of Total Probability</span>
+      <span class="text-xs font-semibold bg-amber-100 text-amber-700 px-3 py-1 rounded-full">Tree Diagram</span>
+      <span class="text-xs font-semibold bg-rose-100 text-rose-700 px-3 py-1 rounded-full">Conditional Probability</span>
+    </div>
+
+    <h2 class="text-base sm:text-lg leading-relaxed">
+      Bag \(P\) contains <strong>2 red balls</strong> and <strong>4 green balls</strong> while bag \(Q\) contains
+      <strong>1 red ball</strong> and <strong>3 green balls</strong>. If a bag is randomly chosen and then a ball
+      is randomly drawn from the bag, find the probability that a green ball is drawn.
+    </h2>
+
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5">
+      <div class="border-2 border-slate-200 rounded-xl p-3 text-center font-semibold">A. \(\dfrac{3}{10}\)</div>
+      <div class="border-2 border-slate-200 rounded-xl p-3 text-center font-semibold">B. \(\dfrac{7}{10}\)</div>
+      <div class="border-2 border-slate-200 rounded-xl p-3 text-center font-semibold">C. \(\dfrac{7}{24}\)</div>
+      <div class="border-2 border-indigo-400 bg-indigo-50 rounded-xl p-3 text-center font-semibold">D. \(\dfrac{17}{24}\)</div>
+    </div>
+    <p class="text-xs text-slate-500 mt-2">Answer: <strong>D</strong> (revealed after you complete the steps).</p>
+  </section>
+
+  <!-- ================= VISUAL: THE TWO BAGS ================= -->
+  <section class="bg-white rounded-2xl shadow-md p-5 sm:p-6">
+    <h3 class="font-bold text-lg mb-4 text-indigo-700">1&nbsp;&middot;&nbsp;Visualise the two bags</h3>
+
+    <div class="grid sm:grid-cols-2 gap-5">
+      <!-- Bag P -->
+      <div class="border-2 border-indigo-200 rounded-2xl p-4 bg-indigo-50/50">
+        <div class="flex items-center justify-between mb-3">
+          <span class="font-bold text-indigo-700 text-lg">Bag \(P\)</span>
+          <span class="text-xs bg-indigo-200 text-indigo-800 px-2 py-1 rounded-full">6 balls total</span>
+        </div>
+        <div class="flex flex-wrap gap-2" id="bagP"></div>
+        <p class="mt-3 text-sm text-slate-600">\(P(\text{green}\mid P)=\dfrac{4}{6}=\dfrac{2}{3}\)</p>
+      </div>
+
+      <!-- Bag Q -->
+      <div class="border-2 border-emerald-200 rounded-2xl p-4 bg-emerald-50/50">
+        <div class="flex items-center justify-between mb-3">
+          <span class="font-bold text-emerald-700 text-lg">Bag \(Q\)</span>
+          <span class="text-xs bg-emerald-200 text-emerald-800 px-2 py-1 rounded-full">4 balls total</span>
+        </div>
+        <div class="flex flex-wrap gap-2" id="bagQ"></div>
+        <p class="mt-3 text-sm text-slate-600">\(P(\text{green}\mid Q)=\dfrac{3}{4}\)</p>
+      </div>
+    </div>
+
+    <p class="text-sm text-slate-600 mt-4 leading-relaxed">
+      Notice the two bags have <span class="highlight">different total numbers of balls</span>
+      (6 and 4). This is why we cannot simply add the numerators.
+    </p>
+  </section>
+
+  <!-- ================= PROBABILITY TREE ================= -->
+  <section class="bg-white rounded-2xl shadow-md p-5 sm:p-6">
+    <h3 class="font-bold text-lg mb-2 text-indigo-700">2&nbsp;&middot;&nbsp;Probability tree (interactive)</h3>
+    <p class="text-sm text-slate-600 mb-4">Hover / tap any probability to see which value it represents. Click a branch to trace a path.</p>
+
+    <div class="overflow-x-auto">
+      <svg viewBox="0 0 620 340" class="w-full min-w-[560px] max-w-2xl mx-auto">
+        <!-- Root -->
+        <circle cx="40" cy="170" r="8" fill="#1e293b"/>
+        <text x="40" y="200" text-anchor="middle" font-size="12" fill="#475569">start</text>
+
+        <!-- Level 1 : bag -->
+        <circle cx="200" cy="70" r="8" fill="#4f46e5"/>
+        <circle cx="200" cy="270" r="8" fill="#059669"/>
+        <line x1="48" y1="166" x2="192" y2="74" class="tree-line"/>
+        <line x1="48" y1="174" x2="192" y2="266" class="tree-line"/>
+        <text x="105" y="105" font-size="12" fill="#4f46e5" font-weight="700">½</text>
+        <text x="105" y="245" font-size="12" fill="#059669" font-weight="700">½</text>
+        <text x="210" y="60" font-size="13" fill="#1e293b" font-weight="600">Bag P</text>
+        <text x="210" y="280" font-size="13" fill="#1e293b" font-weight="600">Bag Q</text>
+
+        <!-- Level 2 : ball -->
+        <circle cx="480" cy="30" r="8" fill="#16a34a"/>
+        <circle cx="480" cy="110" r="8" fill="#dc2626"/>
+        <circle cx="480" cy="230" r="8" fill="#16a34a"/>
+        <circle cx="480" cy="310" r="8" fill="#dc2626"/>
+
+        <line x1="208" y1="66" x2="472" y2="34" class="tree-line"/>
+        <line x1="208" y1="74" x2="472" y2="106" class="tree-line"/>
+        <line x1="208" y1="266" x2="472" y2="234" class="tree-line"/>
+        <line x1="208" y1="274" x2="472" y2="306" class="tree-line"/>
+
+        <text x="290" y="60" font-size="12" fill="#16a34a" font-weight="700">4/6 = 2/3</text>
+        <text x="290" y="105" font-size="12" fill="#dc2626" font-weight="700">2/6 = 1/3</text>
+        <text x="290" y="245" font-size="12" fill="#16a34a" font-weight="700">3/4</text>
+        <text x="290" y="300" font-size="12" fill="#dc2626" font-weight="700">1/4</text>
+
+        <text x="492" y="34" font-size="12" fill="#1e293b">green → ½ · 2/3 = 1/3</text>
+        <text x="492" y="114" font-size="12" fill="#64748b">red</text>
+        <text x="492" y="234" font-size="12" fill="#1e293b">green → ½ · 3/4 = 3/8</text>
+        <text x="492" y="314" font-size="12" fill="#64748b">red</text>
+      </svg>
+    </div>
+
+    <div class="mt-4 bg-slate-100 rounded-xl p-4 text-center">
+      <p class="text-sm text-slate-600 mb-1">Total chance of drawing a green ball</p>
+      <p class="text-lg font-bold">\[ \frac{1}{3}+\frac{3}{8}=\frac{8}{24}+\frac{9}{24}=\frac{17}{24} \]</p>
+    </div>
+  </section>
+
+  <!-- ================= STEP-BY-STEP ================= -->
+  <section class="bg-white rounded-2xl shadow-md p-5 sm:p-6">
+    <h3 class="font-bold text-lg mb-4 text-indigo-700">3&nbsp;&middot;&nbsp;Step-by-step solution</h3>
+
+    <div class="flex items-center gap-2 mb-5">
+      <div class="flex-1 bg-slate-200 rounded-full h-2 overflow-hidden">
+        <div id="progressBar" class="bg-indigo-500 h-2 w-0 transition-all duration-300"></div>
+      </div>
+      <span id="progressText" class="text-xs font-semibold text-slate-500 w-12 text-right">0 / 5</span>
+    </div>
+
+    <!-- STEP 1 -->
+    <div class="step-card active" data-step="1">
+      <div class="border-l-4 border-indigo-500 pl-4 py-1">
+        <h4 class="font-bold text-indigo-700 mb-2">Step 1 — Understand what is being asked</h4>
+        <p class="text-sm leading-relaxed">A bag is chosen <strong>at random</strong>, then a ball is drawn. There are two possible “routes” to a green ball:</p>
+        <ul class="list-disc list-inside text-sm mt-2 space-y-1">
+          <li>Route 1: choose Bag \(P\) <em>and</em> draw a green ball</li>
+          <li>Route 2: choose Bag \(Q\) <em>and</em> draw a green ball</li>
+        </ul>
+        <div class="mt-3">
+          <button class="hint-toggle text-xs font-semibold text-amber-700 bg-amber-100 px-3 py-1.5 rounded-full">💡 Hint</button>
+          <div class="hint-box">
+            <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-900">
+              <strong>Law of Total Probability:</strong>
+              \[ P(G)=P(G\mid P)\,P(P)+P(G\mid Q)\,P(Q) \]
+              where \(P(P)\) and \(P(Q)\) are the probabilities of choosing each bag.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step-card" data-step="2">
+      <div class="border-l-4 border-indigo-500 pl-4 py-1">
+        <h4 class="font-bold text-indigo-700 mb-2">Step 2 — Probability of choosing each bag</h4>
+        <p class="text-sm leading-relaxed">There are two bags and the bag is chosen randomly, so each is equally likely:</p>
+        <p class="text-sm mt-2">\[ P(P)=\frac{1}{2}, \qquad P(Q)=\frac{1}{2} \]</p>
+        <div class="mt-3">
+          <button class="hint-toggle text-xs font-semibold text-amber-700 bg-amber-100 px-3 py-1.5 rounded-full">💡 Hint</button>
+          <div class="hint-box">
+            <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-900">
+              “Randomly chosen bag” ⇒ uniform choice between the two bags.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="step-card" data-step="3">
+      <div class="border-l-4 border-indigo-500 pl-4 py-1">
+        <h4 class="font-bold text-indigo-700 mb-2">Step 3 — Conditional probability of a green ball</h4>
+        <p class="text-sm leading-relaxed"><strong>Bag \(P\)</strong>: 2 red + 4 green = 6 balls</p>
+        <p class="text-sm">\[ P(G\mid P)=\frac{4}{6}=\frac{2}{3} \]</p>
+        <p class="text-sm leading-relaxed mt-3"><strong>Bag \(Q\)</strong>: 1 red + 3 green = 4 balls</p>
+        <p class="text-sm">\[ P(G\mid Q)=\frac{3}{4} \]</p>
+        <div class="mt-3">
+          <button class="hint-toggle text-xs font-semibold text-amber-700 bg-amber-100 px-3 py-1.5 rounded-full">💡 Hint</button>
+          <div class="hint-box">
+            <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-900">
+              Conditional probability given the bag ⇒ denominator = total balls <em>inside that bag only</em>.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="step-card" data-step="4">
+      <div class="border-l-4 border-indigo-500 pl-4 py-1">
+        <h4 class="font-bold text-indigo-700 mb-2">Step 4 — Multiply along each branch</h4>
+        <p class="text-sm leading-relaxed">Multiply the probability of the route by the conditional probability of green:</p>
+        <p class="text-sm mt-2">\[ P(G \cap P)=\frac{1}{2}\times\frac{2}{3}=\frac{1}{3} \]</p>
+        <p class="text-sm">\[ P(G \cap Q)=\frac{1}{2}\times\frac{3}{4}=\frac{3}{8} \]</p>
+        <div class="mt-3">
+          <button class="hint-toggle text-xs font-semibold text-amber-700 bg-amber-100 px-3 py-1.5 rounded-full">💡 Hint</button>
+          <div class="hint-box">
+            <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-900">
+              “AND” ⇒ multiply. Always multiply the <em>bag probability</em> by the <em>conditional green probability</em>.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 5 -->
+    <div class="step-card" data-step="5">
+      <div class="border-l-4 border-emerald-500 pl-4 py-1">
+        <h4 class="font-bold text-emerald-700 mb-2">Step 5 — Add the two routes (final answer)</h4>
+        <p class="text-sm leading-relaxed">The two routes are mutually exclusive, so add their probabilities:</p>
+        <p class="text-sm mt-2">\[ P(G)=\frac{1}{3}+\frac{3}{8}=\frac{8}{24}+\frac{9}{24}=\frac{17}{24} \]</p>
+        <div class="mt-4 bg-emerald-50 border-2 border-emerald-400 rounded-xl p-4 text-center">
+          <p class="text-sm text-emerald-800 font-semibold">Answer</p>
+          <p class="text-2xl font-bold text-emerald-700">\(\boxed{\text{D. } \dfrac{17}{24}}\)</p>
+        </div>
+        <div class="mt-3">
+          <button class="hint-toggle text-xs font-semibold text-amber-700 bg-amber-100 px-3 py-1.5 rounded-full">💡 Hint</button>
+          <div class="hint-box">
+            <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-900">
+              “OR” ⇒ add. The two paths cannot happen at the same time (the bag is either \(P\) or \(Q\)).
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NAV BUTTONS -->
+    <div class="flex items-center justify-between mt-6 gap-3">
+      <button id="prevBtn" class="px-5 py-3 rounded-xl bg-slate-200 text-slate-700 font-semibold text-sm hover:bg-slate-300 disabled:opacity-40 disabled:cursor-not-allowed" disabled>← Previous</button>
+      <button id="nextBtn" class="px-5 py-3 rounded-xl bg-indigo-600 text-white font-semibold text-sm hover:bg-indigo-700 shadow">Next Step →</button>
+    </div>
+  </section>
+
+  <!-- ================= QUICK SUMMARY ================= -->
+  <section class="bg-white rounded-2xl shadow-md p-5 sm:p-6">
+    <h3 class="font-bold text-lg mb-3 text-indigo-700">4&nbsp;&middot;&nbsp;Quick summary</h3>
+    <div class="grid sm:grid-cols-2 gap-4 text-sm">
+      <div class="bg-indigo-50 rounded-xl p-4">
+        <p class="font-semibold text-indigo-700 mb-1">Law of Total Probability</p>
+        <p>\[ P(G)=\sum_i P(G\mid B_i)\,P(B_i) \]</p>
+      </div>
+      <div class="bg-emerald-50 rounded-xl p-4">
+        <p class="font-semibold text-emerald-700 mb-1">Key operations</p>
+        <p>Follow the tree: <strong>multiply</strong> along a branch, <strong>add</strong> across branches.</p>
+      </div>
+    </div>
+    <p class="text-xs text-slate-500 mt-4">
+      Common trap: adding \(\frac{4}{6}+\frac{3}{4}\) directly (wrong, ignores the equal bag choice) or using \((4+3)/(6+4)\) (wrong, bags are not combined into one pool).
+    </p>
+  </section>
+
+</main>
+
+<footer class="text-center text-xs text-slate-400 py-6">
+  HKDSE Mathematics &middot; 2015 Paper 2 Q44 &middot; Interactive Solution
+</footer>
+
+<script>
+/* ---------- Render balls ---------- */
+function makeBalls(containerId, red, green) {
+  const c = document.getElementById(containerId);
+  for (let i = 0; i < red; i++) {
+    c.insertAdjacentHTML('beforeend',
+      '<span class="ball w-8 h-8 rounded-full bg-red-500 border-2 border-red-700 inline-block" title="Red"></span>');
+  }
+  for (let i = 0; i < green; i++) {
+    c.insertAdjacentHTML('beforeend',
+      '<span class="ball w-8 h-8 rounded-full bg-green-500 border-2 border-green-700 inline-block" title="Green"></span>');
+  }
+}
+makeBalls('bagP', 2, 4);
+makeBalls('bagQ', 1, 3);
+
+/* ---------- Step navigation ---------- */
+const steps = document.querySelectorAll('.step-card');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const bar = document.getElementById('progressBar');
+const pText = document.getElementById('progressText');
+let idx = 0;
+
+function update() {
+  steps.forEach((s, i) => s.classList.toggle('active', i === idx));
+  prevBtn.disabled = idx === 0;
+  nextBtn.disabled = idx === steps.length - 1;
+  nextBtn.textContent = idx === steps.length - 1 ? '✓ Completed' : 'Next Step →';
+  const pct = ((idx + 1) / steps.length) * 100;
+  bar.style.width = pct + '%';
+  pText.textContent = (idx + 1) + ' / ' + steps.length;
+}
+prevBtn.addEventListener('click', () => { if (idx > 0) { idx--; update(); } });
+nextBtn.addEventListener('click', () => { if (idx < steps.length - 1) { idx++; update(); } });
+update();
+
+/* ---------- Hint toggles (event delegation) ---------- */
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.hint-toggle');
+  if (!btn) return;
+  const box = btn.nextElementSibling;
+  box.classList.toggle('open');
+  btn.textContent = box.classList.contains('open') ? '▲ Hide Hint' : '💡 Hint';
+  // re-render KaTeX inside newly opened hint
+  if (box.classList.contains('open') && window.renderMathInElement) {
+    renderMathInElement(box, {delimiters:[{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]});
+  }
+});
+
+/* ---------- Re-render KaTeX after each step change ---------- */
+const originalUpdate = update;
+update = function() {
+  originalUpdate();
+  if (window.renderMathInElement) {
+    steps.forEach(s => renderMathInElement(s, {delimiters:[{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}]}));
+  }
+};
+update();
+</script>
+</body>
+</html>

@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2014 Paper 2 Q29 · Pie Chart Expenditure</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<style>
+  :root{
+    --blue:#1d4ed8; --blue-dark:#172554; --blue-soft:#e0ebff;
+    --amber:#d97706; --amber-soft:#fef3c7;
+    --emerald:#047857; --emerald-soft:#d1fae5;
+    --violet:#6d28d9; --violet-soft:#ede9fe;
+    --rose:#be123c; --rose-soft:#ffe4e6;
+    --ink:#0f172a; --muted:#5b6b85; --line:#e2e8f0;
+    --card:#ffffff; --bg:#f4f7fb;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+    line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1080px; margin:0 auto; padding:0 16px 56px;}
+
+  /* ---------- Hero ---------- */
+  .hero{
+    background:linear-gradient(135deg,#0b1f4b 0%,#12327c 45%,#2563eb 100%);
+    color:#fff; padding:38px 16px 46px; position:relative; overflow:hidden;
+  }
+  .hero::after{
+    content:""; position:absolute; right:-90px; top:-90px; width:320px; height:320px;
+    background:radial-gradient(circle at center, rgba(255,255,255,.22), transparent 65%);
+    border-radius:50%;
+  }
+  .hero-inner{max-width:1080px; margin:0 auto; position:relative; z-index:2;}
+  .eyebrow{
+    font-size:.78rem; letter-spacing:.16em; text-transform:uppercase;
+    color:#bfd3ff; font-weight:700; margin:0 0 8px;
+  }
+  .hero h1{font-size:clamp(1.5rem,4vw,2.3rem); margin:0 0 6px; line-height:1.2;}
+  .hero .sub{margin:0 0 16px; color:#dbe7ff; font-size:1rem;}
+  .pills{display:flex; flex-wrap:wrap; gap:8px;}
+  .pill{
+    background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.34);
+    padding:5px 13px; border-radius:999px; font-size:.8rem; font-weight:600;
+    backdrop-filter:blur(3px);
+  }
+
+  /* ---------- Cards ---------- */
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:18px;
+    box-shadow:0 6px 22px rgba(15,23,42,.07); padding:22px; margin-top:22px;
+  }
+  .card h2{
+    font-size:1.18rem; margin:0 0 12px; display:flex; align-items:center; gap:10px;
+  }
+  .card h2 .tag{
+    background:var(--blue-soft); color:var(--blue-dark); font-size:.72rem; font-weight:800;
+    letter-spacing:.06em; text-transform:uppercase; padding:4px 10px; border-radius:999px;
+  }
+  .qtext{font-size:1.04rem;}
+  .qtext p{margin:.55em 0;}
+  .marks{
+    display:inline-block; background:var(--amber-soft); color:#92400e; font-weight:800;
+    font-size:.75rem; padding:2px 9px; border-radius:999px; margin-left:4px;
+    border:1px solid #fcd34d; vertical-align:middle;
+  }
+  .options{
+    list-style:none; padding:0; margin:14px 0 0; display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px;
+  }
+  .options li{
+    border:1.5px solid var(--line); border-radius:12px; padding:10px 14px; font-weight:700;
+    background:#fbfdff; display:flex; align-items:center; gap:10px;
+  }
+  .options li .letter{
+    width:26px; height:26px; border-radius:50%; background:var(--blue-soft); color:var(--blue-dark);
+    display:grid; place-items:center; font-size:.85rem; flex:0 0 auto;
+  }
+  .options li.correct{border-color:#34d399; background:#ecfdf5;}
+  .options li.correct .letter{background:#a7f3d0; color:#065f46;}
+
+  /* ---------- Canvas area ---------- */
+  .canvas-wrap{
+    background:linear-gradient(180deg,#fbfdff,#f1f6ff);
+    border:1px dashed #bfd2f5; border-radius:14px; padding:12px; margin:6px 0 14px;
+  }
+  canvas{width:100%; height:auto; display:block; border-radius:10px; background:#fff;}
+  .controls{
+    display:flex; flex-wrap:wrap; gap:14px; align-items:center; margin-top:10px;
+    background:#f8fafc; border:1px solid var(--line); border-radius:12px; padding:10px 12px;
+  }
+  .ctrl{display:flex; flex-direction:column; gap:4px; min-width:170px; flex:1 1 170px;}
+  .ctrl label{font-size:.8rem; font-weight:700; color:var(--muted);}
+  input[type=range]{width:100%; accent-color:var(--blue);}
+  .chk{display:flex; align-items:center; gap:7px; font-size:.84rem; font-weight:600; color:var(--muted);}
+  input[type=checkbox]{width:17px; height:17px; accent-color:var(--emerald);}
+  .readout{
+    display:flex; flex-wrap:wrap; gap:10px; margin-top:10px;
+  }
+  .chip{
+    background:#fff; border:1px solid var(--line); border-radius:10px; padding:6px 12px;
+    font-size:.84rem; font-weight:700; color:var(--ink); box-shadow:0 1px 4px rgba(15,23,42,.05);
+  }
+  .chip b{color:var(--blue-dark);}
+  .chip.ok{background:var(--emerald-soft); border-color:#6ee7b7; color:#065f46;}
+  .chip.warn{background:var(--amber-soft); border-color:#fcd34d; color:#92400e;}
+
+  /* ---------- Steps ---------- */
+  .step{
+    display:none; border-left:4px solid var(--blue); background:#f8fbff;
+    border-radius:0 12px 12px 0; padding:14px 16px; margin-top:12px;
+  }
+  .step.show{display:block; animation:slide .35s ease;}
+  @keyframes slide{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;}}
+  .step-head{display:flex; align-items:center; gap:10px; margin-bottom:8px; flex-wrap:wrap;}
+  .badge-num{
+    width:28px; height:28px; border-radius:50%; background:var(--blue); color:#fff;
+    display:grid; place-items:center; font-weight:800; font-size:.86rem; flex:0 0 auto;
+  }
+  .badge-m{background:var(--amber-soft); color:#92400e; border:1px solid #fcd34d;
+    font-size:.72rem; font-weight:800; padding:2px 9px; border-radius:999px;}
+  .step-body{font-size:.98rem;}
+  .hint{
+    background:var(--amber-soft); border-left:4px solid #f59e0b; border-radius:8px;
+    padding:9px 12px; margin-top:10px; font-size:.9rem; color:#78350f;
+  }
+  .hint b{color:#92400e;}
+  .ans{
+    background:var(--emerald-soft); border-left:4px solid #10b981; border-radius:8px;
+    padding:10px 13px; margin-top:10px; font-size:.95rem; color:#065f46; font-weight:600;
+  }
+  .btn{
+    margin-top:16px; background:var(--blue); color:#fff; border:none; border-radius:11px;
+    padding:11px 22px; font-size:.95rem; font-weight:700; cursor:pointer;
+    box-shadow:0 4px 14px rgba(29,78,216,.28); transition:.2s;
+  }
+  .btn:hover:not(:disabled){background:#1e40af; transform:translateY(-1px);}
+  .btn:disabled{background:#cbd5e1; color:#64748b; box-shadow:none; cursor:not-allowed;}
+  .counter{font-size:.84rem; font-weight:700; color:var(--muted); margin-left:12px;}
+
+  /* ---------- Summary ---------- */
+  .summary{
+    background:linear-gradient(135deg,#0f172a,#1e293b); color:#e2e8f0;
+    border-radius:18px; padding:24px; margin-top:26px; box-shadow:0 10px 30px rgba(15,23,42,.25);
+  }
+  .summary h2{color:#fff; margin:0 0 14px; font-size:1.15rem;}
+  .summary ul{list-style:none; padding:0; margin:0;}
+  .summary li{
+    padding:9px 0; border-bottom:1px dashed rgba(226,232,240,.2); display:flex; gap:10px;
+    align-items:flex-start; font-size:.96rem;
+  }
+  .summary li:last-child{border-bottom:none;}
+  .summary li .k{
+    background:rgba(96,165,250,.2); color:#93c5fd; font-weight:800; border-radius:8px;
+    padding:2px 10px; font-size:.82rem; flex:0 0 auto;
+  }
+  .summary .big{
+    margin-top:16px; background:rgba(16,185,129,.16); border:1px solid rgba(16,185,129,.5);
+    border-radius:12px; padding:12px 16px; color:#a7f3d0; font-weight:800; font-size:1.06rem;
+  }
+  footer{
+    text-align:center; color:var(--muted); font-size:.82rem; margin-top:32px; padding:18px 0 0;
+    border-top:1px solid var(--line);
+  }
+  @media(max-width:600px){
+    .card{padding:16px;}
+    .hero{padding:26px 14px 34px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════ HERO ══════════ -->
+<header class="hero">
+  <div class="hero-inner">
+    <p class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</p>
+    <h1>2014 Paper 2 · Question 29</h1>
+    <p class="sub">Statistics — Reading a Pie Chart and Using Angles as Proportions</p>
+    <div class="pills">
+      <span class="pill">Pie Chart</span>
+      <span class="pill">Angles at a Point</span>
+      <span class="pill">Ratio &amp; Proportion</span>
+      <span class="pill">Multiple Choice</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ══════════ QUESTION CARD ══════════ -->
+  <section class="card">
+    <h2><span class="tag">Question</span> Full Statement <span class="marks">MC · 1 mark</span></h2>
+    <div class="qtext">
+      <p>
+        The pie chart below shows the expenditure of John in a certain week.
+        John spends \(\$240\) on clothing that week.
+        <strong>Find his expenditure on transportation that week.</strong>
+      </p>
+      <p>
+        The pie chart is divided into four sectors:
+        <em>Clothing</em> \(160^\circ\), <em>Others</em> \(50^\circ\),
+        <em>Transportation</em> (angle to be found, marked with a right angle to <em>Meals</em>),
+        and <em>Meals</em> \(90^\circ\).
+      </p>
+    </div>
+
+    <ul class="options">
+      <li><span class="letter">A</span> \(\$40\)</li>
+      <li><span class="letter">B</span> \(\$60\)</li>
+      <li class="correct"><span class="letter">C</span> \(\$90\)</li>
+      <li><span class="letter">D</span> \(\$135\)</li>
+    </ul>
+  </section>
+
+  <!-- ══════════ PART (a) — INTERACTIVE PIE CHART ══════════ -->
+  <section class="card">
+    <h2><span class="tag">Part (a)</span> Explore the Pie Chart</h2>
+    <p>
+      The whole pie represents the <strong>total expenditure</strong> of the week, i.e. \(360^\circ\).
+      Drag the slider to rotate &ldquo;Clothing&rdquo; and see how every sector keeps its own angle —
+      the angles are the key to comparing expenditures.
+    </p>
+
+    <div class="canvas-wrap">
+      <canvas id="pieCanvas" width="760" height="440" aria-label="Interactive pie chart"></canvas>
+      <div class="controls">
+        <div class="ctrl">
+          <label for="rotSlider">Rotate the chart: <span id="rotVal">0°</span></label>
+          <input type="range" id="rotSlider" min="0" max="359" value="0" step="1">
+        </div>
+        <div class="ctrl">
+          <label for="scaleSlider">Scale (total expenditure in \()\): <span id="scaleVal">100%</span></label>
+          <input type="range" id="scaleSlider" min="50" max="150" value="100" step="1">
+        </div>
+        <label class="chk"><input type="checkbox" id="showAngles" checked> Show angle labels</label>
+        <label class="chk"><input type="checkbox" id="showMoney" checked> Show money amounts</label>
+      </div>
+      <div class="readout">
+        <div class="chip">Clothing angle: <b>160°</b></div>
+        <div class="chip">Others angle: <b>50°</b></div>
+        <div class="chip">Meals angle: <b>90°</b></div>
+        <div class="chip warn">Transportation angle: <b id="transAngleOut">—</b></div>
+        <div class="chip ok">Total = <b>360°</b></div>
+      </div>
+    </div>
+
+    <div class="step" id="step-a1">
+      <div class="step-head">
+        <span class="badge-num">1</span>
+        <span class="badge-m">1M</span>
+        <span><strong>Use the angle at the centre of a circle.</strong></span>
+      </div>
+      <div class="step-body">
+        <p>The four sectors of a pie chart together form a complete circle. Hence</p>
+        \[
+          \text{Clothing} + \text{Others} + \text{Meals} + \text{Transportation} = 360^\circ .
+        \]
+        <p>Substituting the known angles:</p>
+        \[
+          160^\circ + 50^\circ + 90^\circ + \angle T = 360^\circ .
+        \]
+      </div>
+      <div class="hint">
+        <b>Hint:</b> The little square at the centre means the <em>Meals</em> sector subtends a
+        right angle, so its angle is exactly \(90^\circ\) (∠s at a point).
+      </div>
+    </div>
+
+    <div class="step" id="step-a2">
+      <div class="step-head">
+        <span class="badge-num">2</span>
+        <span class="badge-m">1A</span>
+        <span><strong>Solve for the transportation angle.</strong></span>
+      </div>
+      <div class="step-body">
+        \[
+          \angle T = 360^\circ - 160^\circ - 50^\circ - 90^\circ = 60^\circ .
+        \]
+      </div>
+      <div class="ans">
+        Answer for Part (a): The angle of the sector for transportation is \(60^\circ\).
+      </div>
+    </div>
+
+    <button class="btn" id="btn-a" data-target="a">Next step →</button>
+    <span class="counter" id="counter-a">0 / 2</span>
+  </section>
+
+  <!-- ══════════ PART (b) — PROPORTION & ANSWER ══════════ -->
+  <section class="card">
+    <h2><span class="tag">Part (b)</span> Turn the Angle into Money</h2>
+    <p>
+      In a pie chart, the <strong>angle of a sector is proportional to the amount it represents</strong>.
+      Move the slider to change the <em>clothing</em> spending given in the question and watch the
+      transportation amount change — but the <em>ratio</em> \(\dfrac{60}{160}\) never changes.
+    </p>
+
+    <div class="canvas-wrap">
+      <canvas id="barCanvas" width="760" height="360" aria-label="Bar chart of sector angles"></canvas>
+      <div class="controls">
+        <div class="ctrl">
+          <label for="clothSlider">Given clothing spending ($): <span id="clothVal">240</span></label>
+          <input type="range" id="clothSlider" min="80" max="640" value="240" step="8">
+        </div>
+        <label class="chk"><input type="checkbox" id="showRatio"> Show angle ratio bars</label>
+      </div>
+      <div class="readout">
+        <div class="chip">Angle ratio \(\frac{60}{160}\) = <b>0.375</b></div>
+        <div class="chip warn">Transportation angle = <b>60°</b></div>
+        <div class="chip ok">Transportation spending = <b id="transMoney">$90</b></div>
+      </div>
+    </div>
+
+    <div class="step" id="step-b1">
+      <div class="step-head">
+        <span class="badge-num">1</span>
+        <span class="badge-m">1M</span>
+        <span><strong>Set up the proportion using the angles.</strong></span>
+      </div>
+      <div class="step-body">
+        <p>Since angle is proportional to expenditure,</p>
+        \[
+          \frac{\text{Expenditure on transportation}}{\text{Expenditure on clothing}}
+          = \frac{\text{Angle for transportation}}{\text{Angle for clothing}}
+          = \frac{60^\circ}{160^\circ} = \frac{3}{8}.
+        \]
+      </div>
+      <div class="hint">
+        <b>Hint:</b> Simplify \(\frac{60}{160}\) by dividing both the numerator and the denominator
+        by \(20\): \(\frac{60}{160} = \frac{3}{8}\).
+      </div>
+    </div>
+
+    <div class="step" id="step-b2">
+      <div class="step-head">
+        <span class="badge-num">2</span>
+        <span class="badge-m">1A</span>
+        <span><strong>Compute the transportation expenditure.</strong></span>
+      </div>
+      <div class="step-body">
+        <p>John spends \(\$240\) on clothing, so</p>
+        \[
+          \text{Expenditure on transportation}
+          = \$240 \times \frac{3}{8}
+          = \$90 .
+        \]
+      </div>
+      <div class="ans">
+        Answer for Part (b): His expenditure on transportation that week is \(\$90\).
+        <br>Therefore the correct option is <strong>C</strong>.
+      </div>
+    </div>
+
+    <button class="btn" id="btn-b" data-target="b">Next step →</button>
+    <span class="counter" id="counter-b">0 / 2</span>
+  </section>
+
+  <!-- ══════════ SUMMARY ══════════ -->
+  <section class="summary">
+    <h2>Summary — Answers at a Glance</h2>
+    <ul>
+      <li><span class="k">Clothing</span> Angle \(=160^\circ\), spending \(=\$240\) (given).</li>
+      <li><span class="k">Meals</span> Angle \(=90^\circ\) (marked with a right angle at the centre).</li>
+      <li><span class="k">Others</span> Angle \(=50^\circ\) (given).</li>
+      <li><span class="k">Transportation</span> Angle \(=360^\circ-160^\circ-50^\circ-90^\circ=60^\circ\).</li>
+      <li><span class="k">Ratio</span> \(\dfrac{\text{Transportation}}{\text{Clothing}}=\dfrac{60}{160}=\dfrac{3}{8}\).</li>
+      <li><span class="k">Amount</span> \(240\times\dfrac{3}{8}=\$90\).</li>
+    </ul>
+    <div class="big">Final Answer: \(\$90\) — Option C</div>
+  </section>
+
+  <footer>
+    HKDSE Mathematics (Compulsory Part) · Paper 2 · 2014 Question 29 ·
+    Interactive solution · Angles at a point &amp; proportional reasoning in pie charts.
+  </footer>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   STEP-BY-STEP REVEAL
+   ═══════════════════════════════════════════════════════ */
+function setupReveal(btnId, counterId, prefix){
+  const btn = document.getElementById(btnId);
+  const counter = document.getElementById(counterId);
+  const steps = Array.from(document.querySelectorAll('.step'))
+                     .filter(s => s.id.startsWith('step-' + prefix));
+  let idx = 0;
+  function update(){
+    counter.textContent = idx + ' / ' + steps.length;
+    if(idx >= steps.length){
+      btn.disabled = true;
+      btn.textContent = 'All steps revealed ✓';
+    } else {
+      btn.disabled = false;
+      btn.textContent = 'Next step →';
+    }
+  }
+  btn.addEventListener('click', () => {
+    if(idx < steps.length){
+      steps[idx].classList.add('show');
+      idx++;
+      update();
+      if(window.MathJax && MathJax.typesetPromise){
+        MathJax.typesetPromise([steps[idx-1]]);
+      }
+    }
+  });
+  update();
+}
+setupReveal('btn-a','counter-a','a');
+setupReveal('btn-b','counter-b','b');
+
+/* ═══════════════════════════════════════════════════════
+   CANVAS 1 : INTERACTIVE PIE CHART
+   ═══════════════════════════════════════════════════════ */
+(function(){
+  const cv = document.getElementById('pieCanvas');
+  const ctx = cv.getContext('2d');
+  const rotSlider = document.getElementById('rotSlider');
+  const rotVal = document.getElementById('rotVal');
+  const scaleSlider = document.getElementById('scaleSlider');
+  const scaleVal = document.getElementById('scaleVal');
+  const showAngles = document.getElementById('showAngles');
+  const showMoney = document.getElementById('showMoney');
+  const transAngleOut = document.getElementById('transAngleOut');
+
+  // sector angles (degrees) — in drawing order
+  const sectors = [
+    { name:'Clothing',       angle:160, color:'#3b82f6', text:'#1e3a8a' },
+    { name:'Others',         angle:50,  color:'#a78bfa', text:'#4c1d95' },
+    { name:'Transportation', angle:60,  color:'#f59e0b', text:'#7c2d12' },
+    { name:'Meals',          angle:90,  color:'#10b981', text:'#064e3b' }
+  ];
+
+  function moneyFor(angle, clothMoney){
+    // clothing angle 160 <-> clothMoney
+    return clothMoney * angle / 160;
+  }
+
+  function draw(){
+    const W = cv.width, H = cv.height;
+    ctx.clearRect(0,0,W,H);
+
+    const cx = W*0.40, cy = H*0.52;
+    const R  = Math.min(W*0.30, H*0.42);
+
+    const scale = scaleSlider.value/100;   // affects displayed money only
+    const clothMoney = 240;                // fixed given value in part (a)
+
+    const rotOffset = (Number(rotSlider.value)) * Math.PI/180;
+
+    // ---- title ----
+    ctx.fillStyle = '#0f172a';
+    ctx.font = 'bold 17px Segoe UI, Arial';
+    ctx.fillText('John\u2019s weekly expenditure (pie chart)', 20, 28);
+    ctx.fillStyle = '#5b6b85';
+    ctx.font = '13px Segoe UI, Arial';
+    ctx.fillText('Whole circle = 360° = total expenditure', 20, 48);
+
+    // ---- draw sectors ----
+    let start = -Math.PI/2 + rotOffset;
+    const centers = [];
+    sectors.forEach((s, i) => {
+      const sweep = s.angle * Math.PI/180;
+      const end = start + sweep;
+
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.arc(cx, cy, R, start, end);
+      ctx.closePath();
+      ctx.fillStyle = s.color;
+      ctx.globalAlpha = 0.92;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+
+      // mid-angle for label
+      const mid = start + sweep/2;
+      centers.push({ mid, s, sweep });
+
+      start = end;
+    });
+
+    // ---- outer circle ----
+    ctx.beginPath();
+    ctx.arc(cx, cy, R, 0, Math.PI*2);
+    ctx.strokeStyle = '#1e293b';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // ---- labels ----
+    sectors.forEach((s, i) => {
+      const c = centers[i];
+      const lx = cx + Math.cos(c.mid) * R*0.66;
+      const ly = cy + Math.sin(c.mid) * R*0.66;
+
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      // name
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 14px Segoe UI, Arial';
+      ctx.fillText(s.name, lx, ly - 10);
+
+      // angle
+      if(showAngles.checked){
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 13px Segoe UI, Arial';
+        ctx.fillText(s.angle + '°', lx, ly + 9);
+      }
+
+      // money
+      if(showMoney.checked){
+        const m = moneyFor(s.angle, clothMoney) * scale;
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '12px Segoe UI, Arial';
+        ctx.fillText('$' + (Math.round(m*100)/100), lx, ly + 26);
+      }
+    });
+
+    // ---- right-angle mark for Meals sector ----
+    // find the boundary between Transportation and Meals (the "Meals" start edge is the vertical line)
+    // We draw a small square at the centre along the Meals sector's two edges.
+    // Meals is index 3 (0-based) — its start angle depends on rotation.
+    let acc = -Math.PI/2 + rotOffset;
+    for(let i=0;i<sectors.length;i++){
+      if(sectors[i].name === 'Meals'){
+        const a1 = acc;                       // Meals start
+        const a2 = acc + sectors[i].angle*Math.PI/180; // Meals end
+        const q = 18;
+        const p1 = { x: cx + Math.cos(a1)*q, y: cy + Math.sin(a1)*q };
+        const p2 = { x: cx + Math.cos(a2)*q, y: cy + Math.sin(a2)*q };
+        const p3 = { x: cx + Math.cos(a1)*q + Math.cos(a2)*q,
+                     y: cy + Math.sin(a1)*q + Math.sin(a2)*q };
+        ctx.beginPath();
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(p3.x, p3.y);
+        ctx.lineTo(p2.x, p2.y);
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+      acc += sectors[i].angle*Math.PI/180;
+    }
+
+    // ---- legend panel on the right ----
+    const px = W*0.72, py = 90;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillStyle = '#0f172a';
+    ctx.font = 'bold 14px Segoe UI, Arial';
+    ctx.fillText('Legend & Amounts', px, py);
+
+    let yy = py + 26;
+    sectors.forEach(s => {
+      ctx.fillStyle = s.color;
+      ctx.fillRect(px, yy - 11, 16, 16);
+      ctx.strokeStyle = '#cbd5e1';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(px, yy - 11, 16, 16);
+
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 12.5px Segoe UI, Arial';
+      ctx.fillText(s.name, px + 24, yy + 1);
+      ctx.fillStyle = '#5b6b85';
+      ctx.font = '12px Segoe UI, Arial';
+      const m = moneyFor(s.angle, clothMoney) * scale;
+      ctx.fillText(s.angle + '°   ($' + (Math.round(m*100)/100) + ')', px + 24, yy + 17);
+      yy += 42;
+    });
+
+    // rotation readout on canvas
+    ctx.fillStyle = '#1d4ed8';
+    ctx.font = 'bold 12.5px Segoe UI, Arial';
+    ctx.fillText('Chart rotated by ' + rotSlider.value + '°', 20, H - 14);
+
+    // update out-of-canvas chips
+    transAngleOut.textContent = '60°';
+  }
+
+  ['input','change'].forEach(ev => {
+    rotSlider.addEventListener(ev, () => { rotVal.textContent = rotSlider.value + '°'; draw(); });
+    scaleSlider.addEventListener(ev, () => { scaleVal.textContent = scaleSlider.value + '%'; draw(); });
+    showAngles.addEventListener(ev, draw);
+    showMoney.addEventListener(ev, draw);
+  });
+
+  draw();
+})();
+
+/* ═══════════════════════════════════════════════════════
+   CANVAS 2 : PROPORTION / BAR VISUAL
+   ═══════════════════════════════════════════════════════ */
+(function(){
+  const cv = document.getElementById('barCanvas');
+  const ctx = cv.getContext('2d');
+  const clothSlider = document.getElementById('clothSlider');
+  const clothVal = document.getElementById('clothVal');
+  const showRatio = document.getElementById('showRatio');
+  const transMoney = document.getElementById('transMoney');
+
+  function draw(){
+    const W = cv.width, H = cv.height;
+    ctx.clearRect(0,0,W,H);
+
+    const clothMoney = Number(clothSlider.value);
+    const transSpend = clothMoney * 60 / 160;
+
+    // ---- title ----
+    ctx.fillStyle = '#0f172a';
+    ctx.font = 'bold 17px Segoe UI, Arial';
+    ctx.fillText('Angle ∝ Expenditure', 20, 30);
+    ctx.fillStyle = '#5b6b85';
+    ctx.font = '13px Segoe UI, Arial';
+    ctx.fillText('Same ratio 60 : 160 = 3 : 8 always holds', 20, 50);
+
+    // ---- two horizontal bars ----
+    const left = 150, topY = 92, barH = 46, maxW = W - left - 140;
+    const maxMoney = 640 * 1.05;
+
+    const items = [
+      { label:'Clothing',   angle:160, money:clothMoney,  color:'#3b82f6', dark:'#1e3a8a' },
+      { label:'Transportation', angle:60, money:transSpend, color:'#f59e0b', dark:'#7c2d12' }
+    ];
+
+    items.forEach((it, i) => {
+      const y = topY + i*110;
+      const w = maxW * it.money / maxMoney;
+
+      // label
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 14px Segoe UI, Arial';
+      ctx.textAlign = 'right';
+      ctx.fillText(it.label, left - 14, y + barH/2 + 5);
+      ctx.textAlign = 'left';
+
+      // track
+      ctx.fillStyle = '#eef2f7';
+      ctx.beginPath();
+      ctx.roundRect ? ctx.roundRect(left, y, maxW, barH, 10) : ctx.rect(left, y, maxW, barH);
+      ctx.fill();
+
+      // bar
+      ctx.fillStyle = it.color;
+      ctx.beginPath();
+      ctx.roundRect ? ctx.roundRect(left, y, Math.max(w,3), barH, 10) : ctx.rect(left, y, Math.max(w,3), barH);
+      ctx.fill();
+
+      // money text inside/after bar
+      ctx.fillStyle = w > 110 ? '#ffffff' : it.dark;
+      ctx.font = 'bold 14px Segoe UI, Arial';
+      const txt = '$' + (Math.round(it.money*100)/100);
+      if(w > 110){
+        ctx.fillText(txt, left + 14, y + barH/2 + 5);
+      } else {
+        ctx.fillStyle = it.dark;
+        ctx.fillText(txt, left + Math.max(w,3) + 10, y + barH/2 + 5);
+      }
+
+      // angle annotation
+      ctx.fillStyle = '#5b6b85';
+      ctx.font = '12.5px Segoe UI, Arial';
+      ctx.fillText('angle = ' + it.angle + '°', left, y - 7);
+    });
+
+    // ---- ratio explanation panel ----
+    const by = topY + 2*110 + 10;
+    ctx.fillStyle = '#f8fafc';
+    ctx.beginPath();
+    ctx.roundRect ? ctx.roundRect(20, by, W-40, 56, 12) : ctx.rect(20, by, W-40, 56);
+    ctx.fill();
+    ctx.strokeStyle = '#e2e8f0';
+    ctx.stroke();
+
+    ctx.fillStyle = '#065f46';
+    ctx.font = 'bold 14.5px Segoe UI, Arial';
+    ctx.fillText('Transportation = $' + (Math.round(transSpend*100)/100)
+                 + '  =  ' + clothMoney + ' × (60 / 160)', 38, by + 24);
+
+    ctx.fillStyle = '#92400e';
+    ctx.font = '13px Segoe UI, Arial';
+    ctx.fillText('Ratio of angles 60 : 160 = 3 : 8  ⇒  ratio of money 3 : 8', 38, by + 44);
+
+    // ---- fixed-ratio bars (optional) ----
+    if(showRatio.checked){
+      const ry = 200;
+      // small inset showing pure angle ratio
+      const ax = 620, aw = 110;
+      ctx.fillStyle = '#3b82f6';
+      ctx.fillRect(ax, ry, aw*160/220, 16);
+      ctx.fillStyle = '#f59e0b';
+      ctx.fillRect(ax, ry+22, aw*60/220, 16);
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(ax, ry, aw*160/220, 16);
+      ctx.strokeRect(ax, ry+22, aw*60/220, 16);
+
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 11.5px Segoe UI, Arial';
+      ctx.fillText('angle ratio 160 : 60', ax, ry - 6);
+    }
+
+    // update chip
+    transMoney.textContent = '$' + (Math.round(transSpend*100)/100);
+  }
+
+  ['input','change'].forEach(ev => {
+    clothSlider.addEventListener(ev, () => { clothVal.textContent = clothSlider.value; draw(); });
+    showRatio.addEventListener(ev, draw);
+  });
+
+  draw();
+})();
+
+/* roundRect polyfill for older browsers */
+if(!CanvasRenderingContext2D.prototype.roundRect){
+  CanvasRenderingContext2D.prototype.roundRect = function(x,y,w,h,r){
+    if(w < 2*r) r = w/2;
+    if(h < 2*r) r = h/2;
+    this.moveTo(x+r,y);
+    this.arcTo(x+w,y,x+w,y+h,r);
+    this.arcTo(x+w,y+h,x,y+h,r);
+    this.arcTo(x,y+h,x,y,r);
+    this.arcTo(x,y,x+w,y,r);
+    this.closePath();
+    return this;
+  };
+}
+</script>
+</body>
+</html>

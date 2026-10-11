@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <title>DSE Math 2018 P2 Q36 · Equations (roots of quadratic)</title>
+  <!-- MathJax CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+  <!-- Tailwind CSS CDN (light version for clean EduTech look) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* custom smooth transitions & mobile-friendly buttons */
+    .step-card {
+      transition: all 0.2s ease-in-out;
+    }
+    .step-card:hover {
+      box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.15);
+    }
+    button, .btn-like {
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+    button:active {
+      transform: scale(0.97);
+    }
+    .hint-box {
+      background: #f1f5f9;
+      border-left: 6px solid #3b82f6;
+    }
+    /* number line visual */
+    .number-line {
+      position: relative;
+      height: 48px;
+      margin: 20px 0 10px;
+    }
+    .line-track {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: #cbd5e1;
+      border-radius: 2px;
+      transform: translateY(-50%);
+    }
+    .dot {
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      background: #3b82f6;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      top: 50%;
+      transition: left 0.2s ease;
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+    }
+    .dot-label {
+      position: absolute;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: #1e293b;
+      color: white;
+      padding: 2px 8px;
+      border-radius: 20px;
+      transform: translate(-50%, -140%);
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 font-sans antialiased text-slate-800">
+
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-3xl mx-auto px-4 py-6 sm:py-8 md:py-10 space-y-6">
+
+    <!-- HEADER / QUESTION OVERVIEW -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6">
+      <div class="flex flex-wrap items-start justify-between gap-3">
+        <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
+          HKDSE Math 2018 Paper 2 <span class="text-blue-600">Q36</span>
+        </h1>
+        <!-- concept tags -->
+        <div class="flex flex-wrap gap-2">
+          <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-3 py-1.5 rounded-full">Quadratic equations</span>
+          <span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-3 py-1.5 rounded-full">Sum &amp; product of roots</span>
+        </div>
+      </div>
+
+      <!-- question body -->
+      <div class="mt-4 text-base sm:text-lg leading-relaxed text-slate-700 space-y-2">
+        <p class="font-medium text-slate-900">Question:</p>
+        <p>
+          If \( m \neq n \) and \( 2m^2 + 5m = 2n^2 + 5n = 14 \), then \( (m+2)(n+2) = \)
+        </p>
+        <!-- options -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-3 text-sm font-medium">
+          <div class="bg-slate-100 rounded-xl p-2 text-center border border-slate-200">A. –8</div>
+          <div class="bg-slate-100 rounded-xl p-2 text-center border border-slate-200">B. 2</div>
+          <div class="bg-slate-100 rounded-xl p-2 text-center border border-slate-200">C. 6</div>
+          <div class="bg-slate-100 rounded-xl p-2 text-center border border-slate-200">D. 16</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VISUAL / DYNAMIC NUMBER LINE (shows m, n positions & relationship) -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6">
+      <h2 class="text-lg font-semibold text-slate-800 flex items-center gap-2">
+        <span>🔍 Interactive number line</span>
+      </h2>
+      <p class="text-sm text-slate-500 mt-1">Drag the slider to see how \(m\) and \(n\) relate to the equation \(2x^2+5x-14=0\).</p>
+      
+      <div class="number-line mt-4">
+        <div class="line-track"></div>
+        <!-- dots will be positioned by JS -->
+        <div id="dotM" class="dot" style="left: 20%;">
+          <span id="labelM" class="dot-label">m</span>
+        </div>
+        <div id="dotN" class="dot" style="left: 80%;">
+          <span id="labelN" class="dot-label">n</span>
+        </div>
+      </div>
+
+      <!-- Slider for n (m auto-calculated to satisfy sum) -->
+      <div class="flex flex-col sm:flex-row items-center gap-4 mt-2">
+        <label class="text-sm font-medium text-slate-700 whitespace-nowrap">Adjust \(n\):</label>
+        <input type="range" id="sliderN" min="-4" max="3" step="0.1" value="2" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+        <div class="flex gap-4 text-sm min-w-[110px]">
+          <span>m = <span id="mVal" class="font-mono font-bold text-blue-600">-3.5</span></span>
+          <span>n = <span id="nVal" class="font-mono font-bold text-emerald-600">2.0</span></span>
+        </div>
+      </div>
+      <p class="text-xs text-slate-400 mt-2">Note: Since m ≠ n, the two roots are distinct. Here m and n always satisfy m + n = -2.5.</p>
+    </div>
+
+    <!-- STEP BY STEP SOLUTION (ACCORDION / STEP CARDS) -->
+    <div class="space-y-3">
+      <h2 class="text-xl font-bold text-slate-900 mt-2">📘 Step-by-step solution</h2>
+      
+      <!-- STEP 1 -->
+      <div class="step-card bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <button class="w-full text-left px-5 py-4 flex justify-between items-center bg-white hover:bg-slate-50 transition" data-step="1">
+          <span class="font-semibold text-slate-800 flex items-center gap-3">
+            <span class="bg-blue-600 text-white text-xs w-6 h-6 rounded-full inline-flex items-center justify-center">1</span>
+            Recognise the quadratic equation
+          </span>
+          <span class="text-slate-400 text-xl toggle-icon">▼</span>
+        </button>
+        <div class="step-content px-5 pb-5 text-slate-700 space-y-3 border-t border-slate-100 pt-4" id="step1-content">
+          <p>Given \(2m^2 + 5m = 14\) and \(2n^2 + 5n = 14\), both \(m\) and \(n\) satisfy the same equation:</p>
+          <p class="font-mono bg-slate-50 p-3 rounded-lg text-center">\(2x^2 + 5x = 14\)</p>
+          <p>Rearranging into standard form:</p>
+          <p class="font-mono bg-slate-50 p-3 rounded-lg text-center">\(2x^2 + 5x - 14 = 0\)</p>
+          <div class="hint-box p-3 rounded-lg text-sm">
+            <span class="font-semibold text-blue-700">💡 Hint:</span> Since \(m \neq n\), they are the two distinct roots of this quadratic equation.
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="step-card bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <button class="w-full text-left px-5 py-4 flex justify-between items-center bg-white hover:bg-slate-50 transition" data-step="2">
+          <span class="font-semibold text-slate-800 flex items-center gap-3">
+            <span class="bg-blue-600 text-white text-xs w-6 h-6 rounded-full inline-flex items-center justify-center">2</span>
+            Apply sum and product of roots
+          </span>
+          <span class="text-slate-400 text-xl toggle-icon">▼</span>
+        </button>
+        <div class="step-content px-5 pb-5 text-slate-700 space-y-3 border-t border-slate-100 pt-4 hidden" id="step2-content">
+          <p>For a quadratic \(ax^2 + bx + c = 0\) with roots \(m\) and \(n\):</p>
+          <p class="font-mono bg-slate-50 p-3 rounded-lg text-center">\(m + n = -\frac{b}{a}, \quad mn = \frac{c}{a}\)</p>
+          <p>Here \(a = 2, b = 5, c = -14\).</p>
+          <p>So:</p>
+          <p class="font-mono bg-blue-50 p-3 rounded-lg text-center text-blue-800">\(m + n = -\frac{5}{2}, \quad mn = \frac{-14}{2} = -7\)</p>
+          <div class="hint-box p-3 rounded-lg text-sm">
+            <span class="font-semibold text-blue-700">💡 Hint:</span> These formulas are derived directly from expanding \(a(x-m)(x-n)=0\).
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="step-card bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <button class="w-full text-left px-5 py-4 flex justify-between items-center bg-white hover:bg-slate-50 transition" data-step="3">
+          <span class="font-semibold text-slate-800 flex items-center gap-3">
+            <span class="bg-blue-600 text-white text-xs w-6 h-6 rounded-full inline-flex items-center justify-center">3</span>
+            Expand \((m+2)(n+2)\)
+          </span>
+          <span class="text-slate-400 text-xl toggle-icon">▼</span>
+        </button>
+        <div class="step-content px-5 pb-5 text-slate-700 space-y-3 border-t border-slate-100 pt-4 hidden" id="step3-content">
+          <p>We need \((m+2)(n+2)\). Expand:</p>
+          <p class="font-mono bg-slate-50 p-3 rounded-lg">\((m+2)(n+2) = mn + 2m + 2n + 4\)</p>
+          <p>Group the terms involving \(m+n\):</p>
+          <p class="font-mono bg-slate-50 p-3 rounded-lg">\(= mn + 2(m+n) + 4\)</p>
+          <div class="hint-box p-3 rounded-lg text-sm">
+            <span class="font-semibold text-blue-700">💡 Hint:</span> Now substitute the values of \(m+n\) and \(mn\) from Step 2.
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="step-card bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <button class="w-full text-left px-5 py-4 flex justify-between items-center bg-white hover:bg-slate-50 transition" data-step="4">
+          <span class="font-semibold text-slate-800 flex items-center gap-3">
+            <span class="bg-blue-600 text-white text-xs w-6 h-6 rounded-full inline-flex items-center justify-center">4</span>
+            Substitute and compute
+          </span>
+          <span class="text-slate-400 text-xl toggle-icon">▼</span>
+        </button>
+        <div class="step-content px-5 pb-5 text-slate-700 space-y-3 border-t border-slate-100 pt-4 hidden" id="step4-content">
+          <p>Substitute \(m+n = -\frac{5}{2}\) and \(mn = -7\):</p>
+          <p class="font-mono bg-slate-50 p-3 rounded-lg">
+            \((m+2)(n+2) = (-7) + 2\left(-\frac{5}{2}\right) + 4\)
+          </p>
+          <p class="font-mono bg-slate-50 p-3 rounded-lg">
+            \(= -7 - 5 + 4 = -8\)
+          </p>
+          <p class="font-semibold text-green-700 bg-green-50 p-3 rounded-lg text-center">✅ Final answer: <span class="font-mono">–8</span> (Option A)</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXPAND / COLLAPSE ALL CONTROLS -->
+    <div class="flex justify-end gap-3 text-sm">
+      <button id="expandAll" class="px-4 py-2 rounded-xl bg-blue-50 text-blue-700 font-semibold hover:bg-blue-100 transition border border-blue-200">Expand all</button>
+      <button id="collapseAll" class="px-4 py-2 rounded-xl bg-slate-100 text-slate-600 font-semibold hover:bg-slate-200 transition border border-slate-200">Collapse all</button>
+    </div>
+
+    <!-- FINAL SUMMARY / ANSWER CARD -->
+    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-200 p-5 text-center">
+      <p class="text-sm font-medium text-blue-800 uppercase tracking-wider">Answer</p>
+      <p class="text-3xl font-extrabold text-blue-900 mt-1">A. –8</p>
+      <p class="text-sm text-slate-600 mt-2">Key: Use sum &amp; product of roots to avoid solving for m and n individually.</p>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="text-center text-xs text-slate-400 pt-4 pb-2">
+      HKDSE 2018 Paper 2 Q36 · Interactive solution · For study use
+    </footer>
+  </main>
+
+  <script>
+    (function() {
+      // ----- ACCORDION FUNCTIONALITY (step cards) -----
+      const stepButtons = document.querySelectorAll('[data-step]');
+      
+      function toggleStep(button) {
+        const step = button.getAttribute('data-step');
+        const content = document.getElementById('step' + step + '-content');
+        const icon = button.querySelector('.toggle-icon');
+        if (content) {
+          if (content.classList.contains('hidden')) {
+            content.classList.remove('hidden');
+            if (icon) icon.textContent = '▲';
+          } else {
+            content.classList.add('hidden');
+            if (icon) icon.textContent = '▼';
+          }
+        }
+      }
+
+      stepButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          toggleStep(btn);
+        });
+      });
+
+      // Expand all
+      document.getElementById('expandAll').addEventListener('click', () => {
+        stepButtons.forEach(btn => {
+          const step = btn.getAttribute('data-step');
+          const content = document.getElementById('step' + step + '-content');
+          const icon = btn.querySelector('.toggle-icon');
+          if (content && content.classList.contains('hidden')) {
+            content.classList.remove('hidden');
+            if (icon) icon.textContent = '▲';
+          }
+        });
+      });
+
+      // Collapse all
+      document.getElementById('collapseAll').addEventListener('click', () => {
+        stepButtons.forEach(btn => {
+          const step = btn.getAttribute('data-step');
+          const content = document.getElementById('step' + step + '-content');
+          const icon = btn.querySelector('.toggle-icon');
+          if (content && !content.classList.contains('hidden')) {
+            content.classList.add('hidden');
+            if (icon) icon.textContent = '▼';
+          }
+        });
+      });
+
+      // ----- NUMBER LINE VISUALISATION -----
+      const sliderN = document.getElementById('sliderN');
+      const dotM = document.getElementById('dotM');
+      const dotN = document.getElementById('dotN');
+      const mValSpan = document.getElementById('mVal');
+      const nValSpan = document.getElementById('nVal');
+
+      // Fixed sum S = m + n = -2.5
+      const SUM = -2.5;
+      // For display: range of roots we want to show from -4 to 3 (approx)
+      const MIN_X = -5.5;
+      const MAX_X = 3.5;
+      const RANGE = MAX_X - MIN_X;
+
+      // map value to percentage from left (for the line)
+      function xToPercent(x) {
+        // clamp to range
+        let val = Math.max(MIN_X, Math.min(MAX_X, x));
+        return ((val - MIN_X) / RANGE) * 100;
+      }
+
+      function updateVisual() {
+        // n from slider
+        let n = parseFloat(sliderN.value);
+        // m = SUM - n  (since m+n = -2.5)
+        let m = SUM - n;
+
+        // ensure m !== n (but they are distinct because n != m) - but we want to keep distinct
+        // if accidentally equal (n = -1.25) we adjust n slightly (but slider step 0.1 avoids exact -1.25)
+        // For safety, if |m-n| < 0.01, shift n a bit
+        if (Math.abs(m - n) < 0.01) {
+          n += 0.1;
+          m = SUM - n;
+          sliderN.value = n.toFixed(1);
+        }
+
+        // update text
+        mValSpan.textContent = m.toFixed(2);
+        nValSpan.textContent = n.toFixed(2);
+
+        // update dot positions (as percentages)
+        dotM.style.left = xToPercent(m) + '%';
+        dotN.style.left = xToPercent(n) + '%';
+
+        // update labels
+        document.getElementById('labelM').textContent = 'm';
+        document.getElementById('labelN').textContent = 'n';
+      }
+
+      // init and attach event
+      if (sliderN && dotM && dotN) {
+        // initial sync (slider default is 2 => n=2, m=-4.5? but sum = -2.5 => m = -4.5. That's okay)
+        // However slider range is -4 to 3. Let's set to a nice starting point, e.g. n = 1.5, m = -4? still okay.
+        // We'll set slider to 2, m = -4.5 which is within -5.5..3.5 okay.
+        sliderN.value = 2;
+        updateVisual();
+        sliderN.addEventListener('input', updateVisual);
+      }
+
+      // Also update if any external triggers (none)
+      // Ensure MathJax typeset after any dynamic changes (none needed)
+    })();
+  </script>
+  <!-- re-render MathJax after page load just in case -->
+  <script>
+    window.addEventListener('load', function() {
+      if (window.MathJax) {
+        MathJax.typesetPromise && MathJax.typesetPromise();
+      }
+    });
+  </script>
+</body>
+</html>

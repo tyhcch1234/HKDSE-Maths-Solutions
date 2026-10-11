@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HKDSE Math 2016 Paper 1 Q15 — Probability</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- MathJax CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: #f8fafc;
+        }
+        .math {
+            font-size: 1.05rem;
+        }
+        .step-card {
+            transition: all 0.3s ease;
+        }
+        .step-card.hidden-step {
+            display: none;
+        }
+        .step-card.visible-step {
+            display: block;
+            animation: fadeSlideIn 0.4s ease forwards;
+        }
+        @keyframes fadeSlideIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .hint-box {
+            border-left: 4px solid #f59e0b;
+            background: #fffbeb;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            margin-top: 0.75rem;
+            font-size: 0.9rem;
+            color: #92400e;
+        }
+        .pill {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+        .visual-stage {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 1rem;
+            padding: 1rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .seat {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+        .seat-boy {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 2px solid #93c5fd;
+        }
+        .seat-girl {
+            background: #fce7f3;
+            color: #9d174d;
+            border: 2px solid #f9a8d4;
+        }
+        .seat-empty {
+            background: #f1f5f9;
+            color: #94a3b8;
+            border: 2px dashed #cbd5e1;
+        }
+        .seat-adjacent {
+            box-shadow: 0 0 0 3px #fbbf24;
+        }
+        .seat-highlight {
+            transform: scale(1.1);
+            box-shadow: 0 0 0 4px #34d399;
+        }
+        .queue-line {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+            margin: 0.75rem 0;
+        }
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+            border-radius: 0.75rem;
+            padding: 0.6rem 1.4rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-primary:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+        }
+        .btn-primary:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #334155;
+            border-radius: 0.75rem;
+            padding: 0.6rem 1.4rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-secondary:hover {
+            background: #cbd5e1;
+        }
+        .formula-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            padding: 1rem 1.25rem;
+            margin: 0.75rem 0;
+            overflow-x: auto;
+        }
+        .formula-box .math {
+            font-size: 1rem;
+        }
+        .step-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #2563eb;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+        .step-number.done {
+            background: #10b981;
+        }
+        .progress-bar {
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 9999px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2563eb, #10b981);
+            border-radius: 9999px;
+            transition: width 0.4s ease;
+            width: 0%;
+        }
+        @media (max-width: 640px) {
+            .seat { width: 30px; height: 30px; font-size: 0.7rem; }
+            .queue-line { gap: 4px; }
+        }
+    </style>
+</head>
+<body class="min-h-screen py-6 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto">
+
+        <!-- ===== HEADER ===== -->
+        <header class="mb-6">
+            <p class="text-sm font-semibold text-blue-600 tracking-wide uppercase mb-1">HKDSE Mathematics — Paper 1</p>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight">2016 Paper 1 Q15</h1>
+            <div class="flex flex-wrap gap-2 mt-3">
+                <span class="pill bg-blue-100 text-blue-700">Probability</span>
+                <span class="pill bg-amber-100 text-amber-700">Arrangements</span>
+                <span class="pill bg-emerald-100 text-emerald-700">No Adjacent</span>
+                <span class="pill bg-purple-100 text-purple-700">Combinatorics</span>
+            </div>
+        </header>
+
+        <!-- ===== QUESTION CARD ===== -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6 mb-6">
+            <div class="flex items-start justify-between mb-3">
+                <h2 class="text-lg font-bold text-slate-700">Question</h2>
+                <span class="text-xs font-semibold text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full">3 marks</span>
+            </div>
+            <p class="text-slate-700 leading-relaxed text-base sm:text-lg">
+                If 4 boys and 5 girls randomly form a queue, find the probability that
+                <span class="font-semibold text-blue-700">no boys are next to each other</span> in the queue.
+            </p>
+            <div class="mt-4 p-3 bg-slate-50 rounded-xl border border-slate-100">
+                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Key Idea</p>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                    First arrange the 5 girls to create 6 "gaps". Then choose 4 of these gaps for the 4 boys.
+                    Count favourable arrangements ÷ total arrangements.
+                </p>
+            </div>
+        </section>
+
+        <!-- ===== PROGRESS BAR ===== -->
+        <div class="mb-4">
+            <div class="flex items-center justify-between mb-1.5">
+                <span class="text-xs font-semibold text-slate-500">Progress</span>
+                <span class="text-xs font-semibold text-blue-600" id="progressText">0 / 5</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <!-- ===== STEP CARDS ===== -->
+        <div id="stepsContainer" class="space-y-4">
+
+            <!-- STEP 1 -->
+            <div class="step-card hidden-step bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6" data-step="1">
+                <div class="flex items-start gap-3">
+                    <div class="step-number">1</div>
+                    <div class="flex-1">
+                        <h3 class="font-bold text-slate-700 text-base mb-1">Understand the total number of arrangements</h3>
+                        <p class="text-sm text-slate-600 leading-relaxed mb-2">
+                            There are \(4 + 5 = 9\) distinct people in total. The total number of possible queues is:
+                        </p>
+                        <div class="formula-box">
+                            \[
+                            \text{Total} = 9! = 362\,880
+                            \]
+                        </div>
+                        <div class="hint-box">
+                            <strong>Hint:</strong> Since all 9 people are distinct, arranging them in a row gives \(9!\) equally likely outcomes.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 2 -->
+            <div class="step-card hidden-step bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6" data-step="2">
+                <div class="flex items-start gap-3">
+                    <div class="step-number">2</div>
+                    <div class="flex-1">
+                        <h3 class="font-bold text-slate-700 text-base mb-1">Arrange the 5 girls first</h3>
+                        <p class="text-sm text-slate-600 leading-relaxed mb-2">
+                            To keep the boys separated, first place the 5 girls in a row. They can be arranged in:
+                        </p>
+                        <div class="formula-box">
+                            \[
+                            5!
+                            \]
+                        </div>
+                        <div class="hint-box">
+                            <strong>Hint:</strong> Arranging the girls first creates "gaps" where boys can be placed later.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 3 -->
+            <div class="step-card hidden-step bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6" data-step="3">
+                <div class="flex items-start gap-3">
+                    <div class="step-number">3</div>
+                    <div class="flex-1">
+                        <h3 class="font-bold text-slate-700 text-base mb-1">Identify the gaps for the boys</h3>
+                        <p class="text-sm text-slate-600 leading-relaxed mb-2">
+                            With 5 girls placed, there are <strong>6 gaps</strong> around and between them:
+                        </p>
+                        <div class="flex justify-center gap-1 my-3 text-slate-500 text-lg font-mono">
+                            <span class="text-xs self-center mr-1">Gaps:</span>
+                            <span class="text-amber-500 text-xl">_</span> G
+                            <span class="text-amber-500 text-xl">_</span> G
+                            <span class="text-amber-500 text-xl">_</span> G
+                            <span class="text-amber-500 text-xl">_</span> G
+                            <span class="text-amber-500 text-xl">_</span> G
+                            <span class="text-amber-500 text-xl">_</span>
+                        </div>
+                        <p class="text-sm text-slate-600">
+                            We need to choose <strong>4</strong> of these 6 gaps to place the 4 boys, ensuring no two boys share a gap.
+                        </p>
+                        <div class="formula-box">
+                            \[
+                            \binom{6}{4}
+                            \]
+                        </div>
+                        <div class="hint-box">
+                            <strong>Hint:</strong> Choosing gaps ensures boys are never adjacent. At most one boy per gap.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 4 -->
+            <div class="step-card hidden-step bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6" data-step="4">
+                <div class="flex items-start gap-3">
+                    <div class="step-number">4</div>
+                    <div class="flex-1">
+                        <h3 class="font-bold text-slate-700 text-base mb-1">Arrange the 4 boys in the chosen gaps</h3>
+                        <p class="text-sm text-slate-600 leading-relaxed mb-2">
+                            The 4 boys can be arranged in the 4 selected gaps in:
+                        </p>
+                        <div class="formula-box">
+                            \[
+                            4!
+                            \]
+                        </div>
+                        <p class="text-sm text-slate-600 leading-relaxed mb-2">
+                            So the number of favourable arrangements is:
+                        </p>
+                        <div class="formula-box">
+                            \[
+                            \binom{6}{4} \cdot 4! \cdot 5!
+                            \]
+                        </div>
+                        <div class="hint-box">
+                            <strong>Hint:</strong> \(\binom{6}{4}\) chooses the gap positions, \(4!\) orders the boys, and \(5!\) orders the girls.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 5 -->
+            <div class="step-card hidden-step bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6" data-step="5">
+                <div class="flex items-start gap-3">
+                    <div class="step-number">5</div>
+                    <div class="flex-1">
+                        <h3 class="font-bold text-slate-700 text-base mb-1">Compute the required probability</h3>
+                        <p class="text-sm text-slate-600 leading-relaxed mb-2">
+                            Divide the favourable arrangements by the total arrangements:
+                        </p>
+                        <div class="formula-box">
+                            \[
+                            \begin{aligned}
+                            \text{Required Probability} &= \frac{\binom{6}{4} \cdot 4! \cdot 5!}{(4+5)!} \\[8pt]
+                            &= \frac{\binom{6}{4} \cdot 4! \cdot 5!}{9!} \\[8pt]
+                            &= \frac{43\,200}{362\,880} \\[8pt]
+                            &= \frac{5}{42}
+                            \end{aligned}
+                            \]
+                        </div>
+                        <div class="hint-box">
+                            <strong>Final answer:</strong> \(\displaystyle \frac{5}{42}\)
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ===== NAVIGATION BUTTONS ===== -->
+        <div class="flex items-center justify-between mt-6 gap-3">
+            <button id="prevBtn" class="btn-secondary" disabled>← Previous</button>
+            <button id="nextBtn" class="btn-primary">Next Step →</button>
+        </div>
+
+        <!-- ===== INTERACTIVE VISUALISATION ===== -->
+        <section class="mt-8 bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6">
+            <div class="flex items-center justify-between mb-3">
+                <h2 class="text-lg font-bold text-slate-700">Interactive Visualisation</h2>
+                <span class="text-xs font-semibold text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full">Explore</span>
+            </div>
+            <p class="text-sm text-slate-500 mb-4">
+                Simulate random queues and check whether no two boys are adjacent. Adjust the number of simulations below.
+            </p>
+
+            <!-- Slider -->
+            <div class="mb-4">
+                <label for="simSlider" class="block text-sm font-semibold text-slate-600 mb-1">
+                    Number of simulations: <span id="simCount" class="text-blue-600 font-bold">200</span>
+                </label>
+                <input type="range" id="simSlider" min="50" max="2000" value="200" step="50"
+                       class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex flex-wrap gap-2 mb-4">
+                <button id="runSimBtn" class="btn-primary text-sm">▶ Run Simulation</button>
+                <button id="resetSimBtn" class="btn-secondary text-sm">Reset</button>
+            </div>
+
+            <!-- Results -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+                <div class="bg-slate-50 rounded-xl p-3 text-center border border-slate-100">
+                    <p class="text-xs font-semibold text-slate-400 uppercase">Simulations</p>
+                    <p class="text-xl font-extrabold text-slate-700" id="statTotal">0</p>
+                </div>
+                <div class="bg-emerald-50 rounded-xl p-3 text-center border border-emerald-100">
+                    <p class="text-xs font-semibold text-emerald-500 uppercase">No Boys Adjacent</p>
+                    <p class="text-xl font-extrabold text-emerald-700" id="statSuccess">0</p>
+                </div>
+                <div class="bg-blue-50 rounded-xl p-3 text-center border border-blue-100">
+                    <p class="text-xs font-semibold text-blue-500 uppercase">Simulated Probability</p>
+                    <p class="text-xl font-extrabold text-blue-700" id="statProb">—</p>
+                </div>
+            </div>
+
+            <!-- Theoretical comparison -->
+            <div class="bg-amber-50 border border-amber-100 rounded-xl p-3 mb-4 text-center">
+                <p class="text-xs font-semibold text-amber-600 uppercase tracking-wide">Theoretical Probability</p>
+                <p class="text-lg font-extrabold text-amber-700">\( \frac{5}{42} \approx 0.11905 \)</p>
+            </div>
+
+            <!-- Last queue sample -->
+            <div class="visual-stage">
+                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2 text-center">Last Queue Sample</p>
+                <div id="queueDisplay" class="queue-line">
+                    <span class="text-slate-400 text-sm italic">Press "Run Simulation" to generate a queue.</span>
+                </div>
+                <p id="queueVerdict" class="text-center text-sm font-semibold mt-1"></p>
+            </div>
+        </section>
+
+        <!-- ===== FOOTER ===== -->
+        <footer class="text-center text-xs text-slate-400 mt-8 pb-4">
+            HKDSE Mathematics 2016 Paper 1 Q15 · Interactive Solution
+        </footer>
+
+    </div>
+
+    <script>
+        // ===================== STEP NAVIGATION =====================
+        const totalSteps = 5;
+        let currentStep = 0;
+        const stepCards = document.querySelectorAll('.step-card');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+
+        function updateUI() {
+            // Show/hide cards
+            stepCards.forEach((card, idx) => {
+                if (idx < currentStep) {
+                    card.classList.remove('hidden-step');
+                    card.classList.add('visible-step');
+                } else {
+                    card.classList.add('hidden-step');
+                    card.classList.remove('visible-step');
+                }
+            });
+
+            // Update step numbers
+            stepCards.forEach((card, idx) => {
+                const num = card.querySelector('.step-number');
+                if (idx < currentStep) {
+                    num.classList.add('done');
+                } else {
+                    num.classList.remove('done');
+                }
+            });
+
+            // Buttons
+            prevBtn.disabled = currentStep === 0;
+            nextBtn.disabled = currentStep === totalSteps;
+            nextBtn.textContent = currentStep === totalSteps ? 'All Steps Shown ✓' : 'Next Step →';
+
+            // Progress
+            const pct = (currentStep / totalSteps) * 100;
+            progressFill.style.width = pct + '%';
+            progressText.textContent = `${currentStep} / ${totalSteps}`;
+        }
+
+        nextBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                updateUI();
+            }
+        });
+
+        prevBtn.addEventListener('click', () => {
+            if (currentStep > 0) {
+                currentStep--;
+                updateUI();
+            }
+        });
+
+        // Initial state
+        updateUI();
+
+        // ===================== SIMULATION =====================
+        const simSlider = document.getElementById('simSlider');
+        const simCount = document.getElementById('simCount');
+        const runSimBtn = document.getElementById('runSimBtn');
+        const resetSimBtn = document.getElementById('resetSimBtn');
+        const statTotal = document.getElementById('statTotal');
+        const statSuccess = document.getElementById('statSuccess');
+        const statProb = document.getElementById('statProb');
+        const queueDisplay = document.getElementById('queueDisplay');
+        const queueVerdict = document.getElementById('queueVerdict');
+
+        simSlider.addEventListener('input', () => {
+            simCount.textContent = simSlider.value;
+        });
+
+        // Fisher-Yates shuffle
+        function shuffle(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        // Check if no two boys are adjacent
+        function noAdjacentBoys(queue) {
+            for (let i = 0; i < queue.length - 1; i++) {
+                if (queue[i] === 'B' && queue[i + 1] === 'B') return false;
+            }
+            return true;
+        }
+
+        function renderQueue(queue, isSuccess) {
+            queueDisplay.innerHTML = '';
+            queue.forEach((person, i) => {
+                const seat = document.createElement('div');
+                seat.className = 'seat ' + (person === 'B' ? 'seat-boy' : 'seat-girl');
+                seat.textContent = person;
+                // Highlight adjacency if failure
+                if (!isSuccess && i < queue.length - 1 && queue[i] === 'B' && queue[i + 1] === 'B') {
+                    seat.classList.add('seat-adjacent');
+                }
+                queueDisplay.appendChild(seat);
+            });
+            queueVerdict.textContent = isSuccess
+                ? '✅ No two boys are adjacent!'
+                : '❌ There is at least one adjacent pair of boys.';
+            queueVerdict.className = 'text-center text-sm font-semibold mt-1 ' + (isSuccess ? 'text-emerald-600' : 'text-rose-500');
+        }
+
+        function runSimulation() {
+            const n = parseInt(simSlider.value, 10);
+            let success = 0;
+            let lastQueue = null;
+            let lastSuccess = false;
+
+            const baseQueue = ['B','B','B','B','G','G','G','G','G'];
+
+            for (let i = 0; i < n; i++) {
+                const q = shuffle(baseQueue);
+                const ok = noAdjacentBoys(q);
+                if (ok) success++;
+                if (i === n - 1) {
+                    lastQueue = q;
+                    lastSuccess = ok;
+                }
+            }
+
+            statTotal.textContent = n;
+            statSuccess.textContent = success;
+            const prob = (success / n).toFixed(5);
+            statProb.textContent = prob;
+
+            if (lastQueue) renderQueue(lastQueue, lastSuccess);
+        }
+
+        runSimBtn.addEventListener('click', runSimulation);
+
+        resetSimBtn.addEventListener('click', () => {
+            statTotal.textContent = '0';
+            statSuccess.textContent = '0';
+            statProb.textContent = '—';
+            queueDisplay.innerHTML = '<span class="text-slate-400 text-sm italic">Press "Run Simulation" to generate a queue.</span>';
+            queueVerdict.textContent = '';
+        });
+    </script>
+
+</body>
+</html>

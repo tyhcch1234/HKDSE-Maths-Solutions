@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2017 Paper 2 Q13 — Dots & Sequences</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root{
+    --bg:#f4f7fb;
+    --card:#ffffff;
+    --ink:#1f2937;
+    --muted:#6b7280;
+    --brand:#2563eb;
+    --brand-soft:#e0ebff;
+    --accent:#0d9488;
+    --accent-soft:#d7f5f1;
+    --warn:#b45309;
+    --warn-soft:#fef3c7;
+    --line:#e5e7eb;
+    --radius:18px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+    background:radial-gradient(1200px 600px at 10% -10%, #e6f0ff 0%, rgba(230,240,255,0) 60%), var(--bg);
+    color:var(--ink);
+    line-height:1.55;
+    padding:18px 14px 70px;
+  }
+  .wrap{max-width:920px;margin:0 auto;}
+
+  /* Header */
+  .tag{
+    display:inline-block;
+    background:var(--brand-soft);
+    color:var(--brand);
+    font-size:.76rem;
+    font-weight:700;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    padding:5px 12px;
+    border-radius:999px;
+    margin-bottom:10px;
+  }
+  h1{
+    font-size:clamp(1.25rem,4.4vw,1.75rem);
+    margin:0 0 6px;
+    line-height:1.3;
+  }
+  .sub{color:var(--muted);font-size:.92rem;margin:0 0 16px;}
+
+  /* Cards */
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:18px 16px;
+    margin-bottom:16px;
+    box-shadow:0 6px 20px -14px rgba(31,41,55,.35);
+  }
+  .card h2{
+    font-size:1rem;
+    margin:0 0 10px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .card h2 .num{
+    background:var(--brand);
+    color:#fff;
+    width:24px;height:24px;
+    border-radius:8px;
+    display:inline-flex;align-items:center;justify-content:center;
+    font-size:.8rem;
+    flex:0 0 auto;
+  }
+  .question{
+    font-size:1.02rem;
+  }
+  .question b{color:var(--brand);}
+
+  /* Chips */
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+  .chip{
+    background:var(--accent-soft);
+    color:#0f766e;
+    font-size:.78rem;
+    font-weight:600;
+    padding:5px 11px;
+    border-radius:999px;
+    border:1px solid #b5ece5;
+  }
+
+  /* Pattern visual */
+  .pattern-box{
+    overflow-x:auto;
+    padding:6px 2px 10px;
+    -webkit-overflow-scrolling:touch;
+  }
+  .pattern-row{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:6px 8px;
+    border-radius:12px;
+    background:#f8fafc;
+    border:1px dashed var(--line);
+    margin:6px 0;
+    white-space:nowrap;
+  }
+  .pattern-row.active{
+    border:2px solid var(--brand);
+    background:#eef4ff;
+  }
+  .pattern-label{
+    font-size:.78rem;
+    font-weight:700;
+    color:var(--muted);
+    min-width:34px;
+    display:inline-block;
+  }
+  .dots{display:inline-flex;flex-wrap:wrap;gap:5px;max-width:100%;}
+  .dot{
+    width:11px;height:11px;border-radius:50%;
+    background:var(--brand);
+    display:inline-block;
+    box-shadow:inset 0 -1px 0 rgba(0,0,0,.15);
+  }
+  .dot.new{background:#f97316;}
+  .arrow{font-size:1.1rem;color:var(--brand);font-weight:700;}
+
+  /* Buttons */
+  .btn{
+    appearance:none;border:none;cursor:pointer;
+    font-size:.95rem;font-weight:700;
+    padding:12px 18px;border-radius:12px;
+    transition:transform .12s ease, filter .12s ease;
+    touch-action:manipulation;
+  }
+  .btn:active{transform:scale(.97);}
+  .btn-primary{background:var(--brand);color:#fff;box-shadow:0 8px 18px -10px rgba(37,99,235,.9);}
+  .btn-primary:hover{filter:brightness(1.08);}
+  .btn-ghost{background:#eef2f7;color:var(--ink);}
+  .btn-ghost:hover{background:#e2e8f0;}
+  .btn:disabled{opacity:.45;cursor:not-allowed;}
+  .controls{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px;}
+
+  /* Accordion steps */
+  .step{
+    border:1px solid var(--line);
+    border-radius:14px;
+    margin-bottom:10px;
+    overflow:hidden;
+    background:#fff;
+    transition:border-color .2s ease, box-shadow .2s ease;
+  }
+  .step.open{border-color:#bfd4ff;box-shadow:0 10px 24px -18px rgba(37,99,235,.5);}
+  .step-head{
+    width:100%;
+    display:flex;align-items:center;gap:10px;
+    background:#f9fbfe;
+    border:none;cursor:pointer;
+    padding:13px 14px;
+    font-size:.97rem;font-weight:700;
+    text-align:left;
+    color:var(--ink);
+    font-family:inherit;
+  }
+  .step-head:hover{background:#f1f6ff;}
+  .step-badge{
+    flex:0 0 auto;
+    width:26px;height:26px;border-radius:9px;
+    background:var(--brand-soft);color:var(--brand);
+    display:inline-flex;align-items:center;justify-content:center;
+    font-size:.8rem;font-weight:800;
+  }
+  .step.open .step-badge{background:var(--brand);color:#fff;}
+  .step-title{flex:1 1 auto;}
+  .step-caret{
+    flex:0 0 auto;
+    font-size:.8rem;color:var(--muted);
+    transition:transform .2s ease;
+  }
+  .step.open .step-caret{transform:rotate(180deg);}
+  .step-body{
+    display:none;
+    padding:2px 16px 16px;
+    border-top:1px solid var(--line);
+    font-size:.97rem;
+  }
+  .step.open .step-body{display:block;}
+  .step-body p{margin:8px 0;}
+
+  /* Hint */
+  .hint{
+    background:var(--warn-soft);
+    border-left:5px solid #f59e0b;
+    border-radius:10px;
+    padding:10px 12px;
+    font-size:.9rem;
+    margin-top:10px;
+    color:#78350f;
+  }
+  .hint b{color:#92400e;}
+
+  /* Formula callout */
+  .formula{
+    background:var(--accent-soft);
+    border:1px solid #a7e8e1;
+    border-radius:12px;
+    padding:12px;
+    margin:10px 0;
+    text-align:center;
+    font-size:1.02rem;
+    overflow-x:auto;
+  }
+
+  /* Table */
+  .tbl-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  table{
+    border-collapse:collapse;
+    width:100%;
+    min-width:280px;
+    font-size:.92rem;
+    margin-top:6px;
+  }
+  th,td{
+    border:1px solid var(--line);
+    padding:9px 8px;
+    text-align:center;
+  }
+  th{background:#f1f6ff;color:#1e3a8a;font-weight:700;}
+  td.hi{background:#fff7ed;font-weight:800;color:#c2410c;}
+  tr.in td{background:#eef4ff;}
+
+  /* Slider */
+  .slider-row{
+    display:flex;align-items:center;gap:12px;
+    margin-top:12px;flex-wrap:wrap;
+  }
+  input[type=range]{
+    flex:1 1 180px;
+    -webkit-appearance:none;
+    height:30px;
+    background:transparent;
+  }
+  input[type=range]::-webkit-slider-runnable-track{
+    height:8px;border-radius:999px;
+    background:linear-gradient(90deg,var(--brand),#60a5fa);
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width:26px;height:26px;border-radius:50%;
+    background:#fff;border:3px solid var(--brand);
+    margin-top:-9px;
+    box-shadow:0 2px 6px rgba(0,0,0,.2);
+    cursor:pointer;
+  }
+  input[type=range]::-moz-range-track{
+    height:8px;border-radius:999px;background:#bfd4ff;
+  }
+  input[type=range]::-moz-range-thumb{
+    width:22px;height:22px;border-radius:50%;
+    background:#fff;border:3px solid var(--brand);cursor:pointer;
+  }
+  .readout{
+    background:#0f172a;color:#e2e8f0;
+    border-radius:12px;padding:10px 14px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+    font-size:.9rem;
+    line-height:1.7;
+    overflow-x:auto;
+  }
+  .readout .k{color:#7dd3fc;}
+  .readout .v{color:#fcd34d;font-weight:700;}
+
+  /* Answer */
+  .answer{
+    background:linear-gradient(135deg,#ecfdf5,#d1fae5);
+    border:1px solid #6ee7b7;
+    border-radius:14px;
+    padding:14px 16px;
+    font-size:1.02rem;
+    font-weight:600;
+    color:#065f46;
+  }
+  .answer .big{
+    display:inline-block;
+    background:#065f46;color:#fff;
+    border-radius:10px;
+    padding:2px 12px;
+    font-size:1.15rem;
+    margin-left:4px;
+  }
+  .muted{color:var(--muted);font-size:.87rem;}
+  .hidden{display:none !important;}
+
+  /* Choice pills */
+  .choices{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px;}
+  .choice{
+    border:2px solid var(--line);
+    background:#fff;
+    border-radius:12px;
+    padding:12px;
+    font-weight:700;
+    cursor:pointer;
+    font-family:inherit;
+    font-size:.95rem;
+    transition:all .15s ease;
+  }
+  .choice:hover{border-color:#93c5fd;}
+  .choice.correct{background:#dcfce7;border-color:#22c55e;color:#14532d;}
+  .choice.wrong{background:#fee2e2;border-color:#ef4444;color:#7f1d1d;}
+  @media(max-width:420px){
+    .choices{grid-template-columns:1fr;}
+    .dot{width:10px;height:10px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="tag">HKDSE Math 2017 · Paper 2 · Q13</span>
+  <h1>Number of Dots in the \(7^{\text{th}}\) Pattern</h1>
+  <p class="sub">Topic: Formulas and Sequences — using a recurrence relation to build up a sequence.</p>
+
+  <!-- QUESTION -->
+  <section class="card">
+    <h2><span class="num">Q</span> The Question</h2>
+    <div class="question">
+      <p>In the figure, the <b>1st pattern</b> consists of <b>1 dot</b>. For any positive integer \(n\), the \((n+1)\)th pattern is formed by <b>adding \((2n+2)\) dots</b> to the \(n\)th pattern. Find the number of dots in the <b>7th pattern</b>.</p>
+    </div>
+    <div class="chips">
+      <span class="chip">Sequences</span>
+      <span class="chip">Recurrence Relation</span>
+      <span class="chip">Summation</span>
+      <span class="chip">Arithmetic Series</span>
+    </div>
+    <div class="choices" id="choices">
+      <button class="choice" data-v="A">A. 41</button>
+      <button class="choice" data-v="B">B. 55</button>
+      <button class="choice" data-v="C">C. 71</button>
+      <button class="choice" data-v="D">D. 161</button>
+    </div>
+    <p class="muted" id="choiceMsg" style="margin:10px 0 0;">Try it first — click an answer to check your intuition.</p>
+  </section>
+
+  <!-- VISUAL -->
+  <section class="card">
+    <h2><span class="num">1</span> See the Pattern Grow</h2>
+    <p class="muted" style="margin-top:0;">Each step adds \((2n+2)\) new dots (shown in <span style="color:#f97316;font-weight:700;">orange</span>) to the previous pattern.</p>
+    <div class="pattern-box" id="patternBox"></div>
+
+    <div class="formula">
+      \[ T(1)=1,\qquad T(n+1)=T(n)+(2n+2) \]
+    </div>
+
+    <div class="slider-row">
+      <label for="nSlider" style="font-weight:700;font-size:.9rem;">Pattern \(n\) =</label>
+      <input type="range" id="nSlider" min="1" max="7" step="1" value="1">
+      <span id="nVal" style="font-weight:800;color:var(--brand);min-width:38px;text-align:center;">1</span>
+    </div>
+    <div class="readout" id="readout"></div>
+    <p class="muted" style="margin-bottom:0;">Drag the slider to inspect any pattern from \(n=1\) to \(n=7\).</p>
+  </section>
+
+  <!-- STEP BY STEP -->
+  <section class="card">
+    <h2><span class="num">2</span> Step-by-Step Solution</h2>
+
+    <div class="step" data-step="1">
+      <button class="step-head">
+        <span class="step-badge">1</span>
+        <span class="step-title">Name the quantity and read the rules</span>
+        <span class="step-caret">▼</span>
+      </button>
+      <div class="step-body">
+        <p>Let \(T(n)\) be the number of dots in the \(n\)th pattern. The question gives us two facts:</p>
+        <div class="formula">
+          \[ (1)\;\; T(1) = 1 \]
+          \[ (2)\;\; T(n+1) = T(n) + (2n+2) \quad \text{for any positive integer } n \]
+        </div>
+        <div class="hint">
+          <b>Hint — what the symbols mean:</b><br>
+          \(T(n)\): total dots in the \(n\)th pattern.<br>
+          \((2n+2)\): the number of <b>new</b> dots added when moving from pattern \(n\) to pattern \(n+1\).<br>
+          Rule (2) is a <b>recurrence relation</b>: each term is built from the previous one.
+        </div>
+      </div>
+    </div>
+
+    <div class="step" data-step="2">
+      <button class="step-head">
+        <span class="step-badge">2</span>
+        <span class="step-title">Work backwards from \(T(7)\) to \(T(1)\)</span>
+        <span class="step-caret">▼</span>
+      </button>
+      <div class="step-body">
+        <p>We want \(T(7)\). Apply rule (2) repeatedly, each time reducing the index by 1:</p>
+        <div class="formula">
+          \[ T(7) = T(6) + 14 \qquad (\text{put } n=6) \]
+          \[ T(6) = T(5) + 12 \qquad (\text{put } n=5) \]
+          \[ \vdots \]
+          \[ T(2) = T(1) + 4 \qquad (\text{put } n=1) \]
+        </div>
+        <div class="hint">
+          <b>Hint:</b> Why does \(n=6\) give \(14\)? Because \(2n+2 = 2(6)+2 = 14\).<br>
+          The added amounts for \(n=1,2,\dots,6\) are \(4,6,8,10,12,14\) — an arithmetic sequence with common difference \(2\).
+        </div>
+      </div>
+    </div>
+
+    <div class="step" data-step="3">
+      <button class="step-head">
+        <span class="step-badge">3</span>
+        <span class="step-title">Substitute and form one sum</span>
+        <span class="step-caret">▼</span>
+      </button>
+      <div class="step-body">
+        <p>Substitute each equation into the previous one:</p>
+        <div class="formula">
+          \[ T(7) = T(1) + 4 + 6 + 8 + 10 + 12 + 14 \]
+        </div>
+        <p>Since \(T(1)=1\):</p>
+        <div class="formula">
+          \[ T(7) = 1 + 4 + 6 + 8 + 10 + 12 + 14 \]
+        </div>
+        <div class="hint">
+          <b>Shortcut (optional):</b> The added terms form an arithmetic series with first term \(4\), last term \(14\), \(6\) terms. Its sum is
+          \[ \frac{(4+14)\times 6}{2} = 54. \]
+          Hence \(T(7) = 1 + 54 = 55\).
+        </div>
+      </div>
+    </div>
+
+    <div class="step" data-step="4">
+      <button class="step-head">
+        <span class="step-badge">4</span>
+        <span class="step-title">Compute the final value</span>
+        <span class="step-caret">▼</span>
+      </button>
+      <div class="step-body">
+        <div class="formula">
+          \[ T(7) = 1 + 4 + 6 + 8 + 10 + 12 + 14 = 55 \]
+        </div>
+        <p>Therefore the number of dots in the \(7\)th pattern is <b>55</b>.</p>
+        <div class="hint">
+          <b>Check with the table below:</b> \(T(2)=5,\;T(3)=11,\;T(4)=19,\;T(5)=29,\;T(6)=41,\;T(7)=55\). Each step's increase matches \(4,6,8,10,12,14\).
+        </div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="nextBtn">Next Step ▶</button>
+      <button class="btn btn-ghost" id="expandBtn">Expand All</button>
+      <button class="btn btn-ghost" id="resetBtn">Reset</button>
+    </div>
+  </section>
+
+  <!-- TABLE -->
+  <section class="card">
+    <h2><span class="num">3</span> Build-up Table</h2>
+    <div class="tbl-scroll">
+      <table id="seqTable">
+        <thead>
+          <tr><th>\(n\)</th><th>Dots added, \((2n+2)\)</th><th>Total dots, \(T(n)\)</th></tr>
+        </thead>
+        <tbody id="seqBody"></tbody>
+      </table>
+    </div>
+    <p class="muted">Click any row to highlight the corresponding pattern above.</p>
+  </section>
+
+  <!-- ANSWER -->
+  <section class="card answer">
+    Correct choice: <b>B</b> &nbsp;—&nbsp; the number of dots in the \(7\)th pattern is <span class="big">55</span>
+  </section>
+
+  <p class="muted" style="text-align:center;">HKDSE Mathematics (Compulsory Part) · Paper 2 · 2017 · Q13</p>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- Data ---------- */
+  var MAXN = 7;
+  var T = [];      // T[n] for n = 1..7
+  var ADD = [];    // ADD[n] = dots added going from n to n+1
+  T[1] = 1;
+  for (var n = 1; n < MAXN; n++){
+    ADD[n] = 2*n + 2;
+    T[n+1] = T[n] + ADD[n];
+  }
+
+  /* ---------- Elements ---------- */
+  var patternBox = document.getElementById('patternBox');
+  var nSlider    = document.getElementById('nSlider');
+  var nVal       = document.getElementById('nVal');
+  var readout    = document.getElementById('readout');
+  var seqBody    = document.getElementById('seqBody');
+  var steps      = Array.prototype.slice.call(document.querySelectorAll('.step'));
+  var nextBtn    = document.getElementById('nextBtn');
+  var expandBtn  = document.getElementById('expandBtn');
+  var resetBtn   = document.getElementById('resetBtn');
+  var choices    = document.getElementById('choices');
+  var choiceMsg  = document.getElementById('choiceMsg');
+
+  /* ---------- Render pattern rows ---------- */
+  function renderPatterns(highlight){
+    var html = '';
+    for (var k = 1; k <= MAXN; k++){
+      var active = (k === highlight) ? ' active' : '';
+      html += '<div class="pattern-row' + active + '" data-n="' + k + '">';
+      html += '<span class="pattern-label">n=' + k + '</span>';
+      html += '<span class="dots">';
+      /* dots added during step k (i.e. from k-1 to k) rendered in orange */
+      for (var i = 0; i < T[k]; i++){
+        var isNew = (k > 1) && (i >= T[k-1]);
+        html += '<span class="dot' + (isNew ? ' new' : '') + '"></span>';
+      }
+      html += '</span>';
+      if (k < MAXN){
+        html += '<span class="arrow">→</span>';
+        html += '<span class="muted" style="font-size:.78rem;font-weight:700;">+' + ADD[k] + '</span>';
+      }
+      html += '</div>';
+    }
+    patternBox.innerHTML = html;
+
+    /* let each row be clickable */
+    Array.prototype.forEach.call(patternBox.querySelectorAll('.pattern-row'), function(row){
+      row.style.cursor = 'pointer';
+      row.addEventListener('click', function(){
+        var v = parseInt(row.getAttribute('data-n'), 10);
+        nSlider.value = v;
+        updateAll(v);
+      });
+    });
+  }
+
+  /* ---------- Readout ---------- */
+  function updateReadout(k){
+    var lines = [];
+    lines.push('<span class="k">T(' + k + ') =</span> <span class="v">' + T[k] + '</span>');
+    if (k === 1){
+      lines.push('<span class="k">Start:</span> T(1) = 1');
+      lines.push('<span class="k">Added from n=1 to n=2:</span> 2(1)+2 = 4');
+    } else {
+      lines.push('<span class="k">Dots added (n=' + (k-1) + '):</span> 2(' + (k-1) + ')+2 = <span class="v">' + ADD[k-1] + '</span>');
+      lines.push('<span class="k">T(' + k + ') =</span> T(' + (k-1) + ') + ' + ADD[k-1] + ' = ' + T[k-1] + ' + ' + ADD[k-1] + ' = <span class="v">' + T[k] + '</span>');
+    }
+    readout.innerHTML = lines.join('<br>');
+  }
+
+  /* ---------- Table ---------- */
+  function buildTable(){
+    var html = '';
+    for (var k = 1; k <= MAXN; k++){
+      var hi = (k === MAXN) ? ' class="hi"' : '';
+      var added = (k === 1) ? '—' : String(ADD[k-1]);
+      html += '<tr data-n="' + k + '">' +
+                '<td>' + k + '</td>' +
+                '<td>' + added + '</td>' +
+                '<td' + hi + '>' + T[k] + '</td>' +
+              '</tr>';
+    }
+    seqBody.innerHTML = html;
+    Array.prototype.forEach.call(seqBody.querySelectorAll('tr'), function(tr){
+      tr.style.cursor = 'pointer';
+      tr.addEventListener('click', function(){
+        var v = parseInt(tr.getAttribute('data-n'), 10);
+        nSlider.value = v;
+        updateAll(v);
+      });
+    });
+  }
+
+  function highlightRow(k){
+    Array.prototype.forEach.call(seqBody.querySelectorAll('tr'), function(tr){
+      tr.classList.toggle('in', parseInt(tr.getAttribute('data-n'), 10) === k);
+    });
+  }
+
+  /* ---------- Master update ---------- */
+  function updateAll(k){
+    nVal.textContent = k;
+    renderPatterns(k);
+    updateReadout(k);
+    highlightRow(k);
+  }
+
+  /* ---------- Slider ---------- */
+  nSlider.addEventListener('input', function(){
+    updateAll(parseInt(nSlider.value, 10));
+  });
+
+  /* ---------- Steps / Accordion ---------- */
+  function openStep(index){
+    if (index < 0 || index >= steps.length) return;
+    steps[index].classList.add('open');
+  }
+  function closeAll(){
+    steps.forEach(function(s){ s.classList.remove('open'); });
+  }
+  function cycleStep(){
+    /* find first closed step */
+    var idx = -1;
+    for (var i = 0; i < steps.length; i++){
+      if (!steps[i].classList.contains('open')){ idx = i; break; }
+    }
+    if (idx === -1){
+      /* all open -> collapse all and restart */
+      closeAll();
+      openStep(0);
+    } else {
+      openStep(idx);
+    }
+    updateNextLabel();
+  }
+  function updateNextLabel(){
+    var openCount = steps.filter(function(s){ return s.classList.contains('open'); }).length;
+    if (openCount === steps.length){
+      nextBtn.textContent = 'Start Over ↻';
+    } else {
+      nextBtn.textContent = 'Next Step ▶ (' + openCount + '/' + steps.length + ')';
+    }
+  }
+
+  steps.forEach(function(step){
+    var head = step.querySelector('.step-head');
+    head.addEventListener('click', function(){
+      step.classList.toggle('open');
+      updateNextLabel();
+    });
+  });
+
+  nextBtn.addEventListener('click', cycleStep);
+
+  expandBtn.addEventListener('click', function(){
+    var allOpen = steps.every(function(s){ return s.classList.contains('open'); });
+    steps.forEach(function(s){ s.classList.toggle('open', !allOpen); });
+    expandBtn.textContent = allOpen ? 'Expand All' : 'Collapse All';
+    updateNextLabel();
+  });
+
+  resetBtn.addEventListener('click', function(){
+    closeAll();
+    openStep(0);
+    nSlider.value = 1;
+    updateAll(1);
+    expandBtn.textContent = 'Expand All';
+    updateNextLabel();
+    /* reset choices */
+    Array.prototype.forEach.call(choices.querySelectorAll('.choice'), function(c){
+      c.classList.remove('correct','wrong');
+      c.disabled = false;
+    });
+    choiceMsg.textContent = 'Try it first — click an answer to check your intuition.';
+  });
+
+  /* ---------- MCQ choices ---------- */
+  choices.addEventListener('click', function(e){
+    var btn = e.target.closest('.choice');
+    if (!btn || btn.disabled) return;
+    var val = btn.getAttribute('data-v');
+    if (val === 'B'){
+      btn.classList.add('correct');
+      choiceMsg.textContent = '✔ Correct! T(7) = 1 + 4 + 6 + 8 + 10 + 12 + 14 = 55.';
+    } else {
+      btn.classList.add('wrong');
+      var reason = {
+        'A': '41 is T(6), not T(7). You stopped one step too early.',
+        'C': '71 is too large — check that the added terms end at +14, not +16.',
+        'D': '161 comes from multiplying instead of adding the increments.'
+      }[val] || 'Not quite. Re-read the recurrence relation.';
+      choiceMsg.textContent = '✘ ' + reason;
+    }
+    btn.disabled = true;
+  });
+
+  /* ---------- Init ---------- */
+  buildTable();
+  openStep(0);
+  updateAll(1);
+  updateNextLabel();
+})();
+</script>
+</body>
+</html>

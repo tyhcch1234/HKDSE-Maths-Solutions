@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2022 Paper 2 Q16 · Major Segment Area</title>
+<style>
+  :root{
+    --blue:#2563eb; --blue-dark:#1e40af; --amber:#d97706; --amber-bg:#fffbeb;
+    --emerald:#059669; --emerald-bg:#ecfdf5; --ink:#1e293b; --muted:#64748b;
+    --line:#e2e8f0; --card:#ffffff; --bg:#f1f5f9;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:900px; margin:0 auto; padding:0 16px 60px;}
+
+  /* ---------- Hero ---------- */
+  .hero{
+    background:linear-gradient(135deg,#1e3a8a 0%,#2563eb 45%,#0ea5e9 100%);
+    color:#fff; padding:38px 16px 34px; position:relative; overflow:hidden;
+  }
+  .hero::after{
+    content:""; position:absolute; right:-60px; top:-60px; width:260px; height:260px;
+    border-radius:50%; background:rgba(255,255,255,.09);
+  }
+  .hero-inner{max-width:900px; margin:0 auto; position:relative; z-index:1;}
+  .eyebrow{font-size:.8rem; letter-spacing:.14em; text-transform:uppercase; opacity:.85; font-weight:600;}
+  .qnum{font-size:1.9rem; font-weight:800; margin:6px 0 4px; letter-spacing:.01em;}
+  .subtitle{font-size:1rem; opacity:.92; margin-bottom:16px;}
+  .pills{display:flex; flex-wrap:wrap; gap:8px;}
+  .pill{
+    background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35);
+    padding:5px 13px; border-radius:999px; font-size:.78rem; font-weight:600;
+    backdrop-filter:blur(4px);
+  }
+
+  /* ---------- Cards ---------- */
+  .card{
+    background:var(--card); border-radius:16px; padding:22px 22px 24px; margin-top:22px;
+    box-shadow:0 4px 18px rgba(15,23,42,.07), 0 1px 3px rgba(15,23,42,.05);
+    border:1px solid var(--line);
+  }
+  .card h2{
+    font-size:1.15rem; margin:0 0 14px; color:var(--blue-dark);
+    display:flex; align-items:center; gap:10px;
+  }
+  .card h2 .tag{
+    font-size:.7rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+    background:#dbeafe; color:#1e40af; padding:3px 9px; border-radius:999px;
+  }
+  .qtext{font-size:1.02rem;}
+  .opts{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin-top:14px;}
+  .opt{
+    border:1px solid var(--line); border-radius:10px; padding:10px 14px; font-weight:600;
+    background:#f8fafc;
+  }
+  .opt.correct{background:var(--emerald-bg); border-color:#a7f3d0; color:#065f46;}
+
+  /* ---------- Steps ---------- */
+  .step{
+    display:none; border-left:4px solid var(--blue); background:#f8fafc;
+    border-radius:0 12px 12px 0; padding:14px 16px; margin-top:14px;
+  }
+  .step.show{display:block; animation:fade .35s ease;}
+  @keyframes fade{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
+  .step-head{display:flex; align-items:center; gap:10px; margin-bottom:8px; flex-wrap:wrap;}
+  .badge{
+    background:var(--blue); color:#fff; font-size:.74rem; font-weight:700;
+    padding:3px 10px; border-radius:999px;
+  }
+  .marks{background:#fef3c7; color:#92400e; font-size:.72rem; font-weight:700; padding:3px 9px; border-radius:999px; border:1px solid #fde68a;}
+  .hint{
+    background:var(--amber-bg); border-left:4px solid var(--amber);
+    border-radius:0 8px 8px 0; padding:9px 13px; margin-top:10px; font-size:.92rem;
+  }
+  .hint b{color:#92400e;}
+  .answer{
+    background:var(--emerald-bg); border-left:4px solid var(--emerald);
+    border-radius:0 8px 8px 0; padding:9px 13px; margin-top:10px; font-size:.95rem;
+    font-weight:600; color:#065f46;
+  }
+  .controls{display:flex; align-items:center; gap:14px; margin-top:16px; flex-wrap:wrap;}
+  button.next{
+    background:var(--blue); color:#fff; border:none; border-radius:10px;
+    padding:10px 20px; font-size:.92rem; font-weight:700; cursor:pointer;
+    transition:.2s; box-shadow:0 2px 8px rgba(37,99,235,.3);
+  }
+  button.next:hover:not(:disabled){background:var(--blue-dark); transform:translateY(-1px);}
+  button.next:disabled{background:#cbd5e1; color:#64748b; cursor:not-allowed; box-shadow:none;}
+  .counter{font-size:.85rem; color:var(--muted); font-weight:600;}
+
+  /* ---------- Canvas ---------- */
+  .canvas-box{
+    background:#f8fafc; border:1px solid var(--line); border-radius:14px;
+    padding:12px; margin:12px 0 4px;
+  }
+  canvas{width:100%; height:auto; display:block; border-radius:10px; background:#fff;}
+  .readouts{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+    gap:8px; margin-top:12px;
+  }
+  .ro{
+    background:#fff; border:1px solid var(--line); border-radius:10px; padding:8px 12px;
+    font-size:.82rem;
+  }
+  .ro span{display:block; font-size:.7rem; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; font-weight:700;}
+  .ro b{font-size:1rem; color:var(--blue-dark); font-variant-numeric:tabular-nums;}
+  .slider-row{display:flex; align-items:center; gap:12px; margin-top:12px; flex-wrap:wrap;}
+  .slider-row label{font-size:.85rem; font-weight:700; color:var(--muted);}
+  input[type=range]{flex:1; min-width:150px; accent-color:var(--blue);}
+  .chk{display:flex; align-items:center; gap:7px; font-size:.85rem; font-weight:600; color:var(--muted);}
+  .chk input{accent-color:var(--blue); width:16px; height:16px;}
+
+  /* ---------- Summary ---------- */
+  .summary{
+    background:linear-gradient(135deg,#0f172a,#1e293b); color:#e2e8f0;
+    border-radius:16px; padding:24px; margin-top:24px;
+  }
+  .summary h2{color:#fff; margin:0 0 14px; font-size:1.15rem;}
+  .summary ul{margin:0; padding-left:20px;}
+  .summary li{margin-bottom:10px;}
+  .summary .hl{color:#6ee7b7; font-weight:700;}
+  .final{
+    margin-top:16px; background:rgba(110,231,183,.12); border:1px solid rgba(110,231,183,.35);
+    border-radius:10px; padding:12px 16px; font-weight:800; font-size:1.05rem; color:#6ee7b7;
+  }
+  footer{text-align:center; color:var(--muted); font-size:.82rem; padding:30px 16px 10px;}
+</style>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[','\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+</head>
+<body>
+
+<!-- ============ HERO ============ -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</div>
+    <div class="qnum">2022 Paper 2 · Question 16</div>
+    <div class="subtitle">Mensuration — Area of a major segment formed by a chord</div>
+    <div class="pills">
+      <span class="pill">Circle</span>
+      <span class="pill">Chord</span>
+      <span class="pill">Major Segment</span>
+      <span class="pill">Sector Area</span>
+      <span class="pill">Cosine / Sine</span>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- ============ QUESTION CARD ============ -->
+  <div class="card">
+    <h2>Question <span class="tag">Multiple Choice</span></h2>
+    <div class="qtext">
+      The diameter of a circle is \(10\text{ cm}\). The circle is divided into a major segment
+      and a minor segment by a chord of length \(8\text{ cm}\). Find the area of the major
+      segment correct to the nearest \(\text{cm}^2\).
+    </div>
+    <div class="opts">
+      <div class="opt">A. \(11\text{ cm}^2\)</div>
+      <div class="opt">B. \(23\text{ cm}^2\)</div>
+      <div class="opt">C. \(55\text{ cm}^2\)</div>
+      <div class="opt correct">D. \(67\text{ cm}^2\) ✓</div>
+    </div>
+  </div>
+
+  <!-- ============ PART 1 ============ -->
+  <div class="card">
+    <h2>Step 1 — Locate the distance from the centre to the chord <span class="tag">Geometry</span></h2>
+    <p>
+      Let \(O\) be the centre, \(A,B\) the chord ends, and \(M\) the mid-point of \(AB\).
+      Since \(OA=OB=r\), the radius \(OM\) bisects the chord at right angles.
+    </p>
+
+    <div class="canvas-box">
+      <canvas id="cv1" width="720" height="420"></canvas>
+      <div class="slider-row">
+        <label>Chord length \(AB\): <b id="abLab">8.0</b> cm</label>
+        <input type="range" id="abSlider" min="2" max="9.6" step="0.1" value="8">
+      </div>
+      <div class="chk">
+        <input type="checkbox" id="showBisect" checked>
+        <label for="showBisect" style="margin:0;">Show bisector \(OM\) and lengths</label>
+      </div>
+      <div class="readouts">
+        <div class="ro"><span>Radius \(r\)</span><b id="rOut">5.00 cm</b></div>
+        <div class="ro"><span>Half-chord \(AM\)</span><b id="amOut">4.00 cm</b></div>
+        <div class="ro"><span>Distance \(OM\)</span><b id="omOut">3.00 cm</b></div>
+        <div class="ro"><span>\(\angle AOM\)</span><b id="angOut">53.13°</b></div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="next" data-target="s1">Next step →</button>
+      <span class="counter" id="c1">0 / 2</span>
+    </div>
+
+    <div class="step" id="s1a">
+      <div class="step-head">
+        <span class="badge">Step 1a</span>
+        <span class="marks">1M</span>
+      </div>
+      <p>Radius is half the diameter:</p>
+      \[ r = OA = OB = \frac{10}{2} = 5\text{ cm} \]
+      <p>Since \(OM \perp AB\) and \(M\) is the mid-point of \(AB\):</p>
+      \[ AM = \frac{AB}{2} = \frac{8}{2} = 4\text{ cm} \]
+      <div class="hint"><b>Hint:</b> A perpendicular from the centre to a chord always bisects that chord (property of the circle).</div>
+    </div>
+
+    <div class="step" id="s1b">
+      <div class="step-head">
+        <span class="badge">Step 1b</span>
+        <span class="marks">1A</span>
+      </div>
+      <p>In the right-angled triangle \(AOM\) (right angle at \(M\)):</p>
+      \[ OM = \sqrt{OA^2 - AM^2} = \sqrt{5^2 - 4^2} = \sqrt{9} = 3\text{ cm} \]
+      <p>And for the half-angle:</p>
+      \[ \sin \angle AOM = \frac{AM}{OA} = \frac{4}{5}
+         \quad\Rightarrow\quad \angle AOM = \sin^{-1}\frac{4}{5} \approx 53.13^\circ \]
+      <div class="answer">Answer so far: \(OM = 3\text{ cm}\), \(\angle AOM = \sin^{-1}\frac45 \approx 53.13^\circ\)</div>
+    </div>
+  </div>
+
+  <!-- ============ PART 2 ============ -->
+  <div class="card">
+    <h2>Step 2 — Angle at the centre &amp; the major sector <span class="tag">Angles</span></h2>
+    <p>
+      The full central angle subtended by chord \(AB\) is \(\angle AOB = 2\angle AOM\).
+      The major sector is the sector on the <em>reflex</em> side of \(AB\), with angle
+      \(360^\circ - \angle AOB\).
+    </p>
+
+    <div class="canvas-box">
+      <canvas id="cv2" width="720" height="440"></canvas>
+      <div class="chk" style="margin-top:10px;">
+        <input type="checkbox" id="showSector" checked>
+        <label for="showSector" style="margin:0;">Highlight major sector (reflex angle)</label>
+      </div>
+      <div class="chk" style="margin-top:6px;">
+        <input type="checkbox" id="showTri" checked>
+        <label for="showTri" style="margin:0;">Show triangle \(AOB\) (used in Step 3)</label>
+      </div>
+      <div class="readouts">
+        <div class="ro"><span>\(\angle AOB\)</span><b id="aobOut">106.26°</b></div>
+        <div class="ro"><span>Reflex angle</span><b id="refOut">253.74°</b></div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="next" data-target="s2">Next step →</button>
+      <span class="counter" id="c2">0 / 1</span>
+    </div>
+
+    <div class="step" id="s2a">
+      <div class="step-head">
+        <span class="badge">Step 2</span>
+        <span class="marks">1A</span>
+      </div>
+      <p>Since \(OM\) is the perpendicular bisector of chord \(AB\), it also bisects \(\angle AOB\):</p>
+      \[ \angle AOB = 2\,\angle AOM = 2\sin^{-1}\tfrac{4}{5} \approx 106.26^\circ \]
+      <p>The major segment corresponds to the <b>reflex</b> angle at the centre:</p>
+      \[ \text{Reflex } \angle AOB = 360^\circ - 2\sin^{-1}\tfrac{4}{5} \approx 253.74^\circ \]
+      <div class="hint"><b>Hint:</b> The chord cuts the circle into two arcs. The longer (major) arc subtends the reflex angle, hence the "major segment" uses that reflex angle.</div>
+    </div>
+  </div>
+
+  <!-- ============ PART 3 ============ -->
+  <div class="card">
+    <h2>Step 3 — Area of the major sector + triangle <span class="tag">Area</span></h2>
+    <p>
+      The major segment = (major sector) + (isosceles triangle \(AOB\)).
+      Drag the slider to watch the segment area change with the chord length!
+    </p>
+
+    <div class="canvas-box">
+      <canvas id="cv3" width="720" height="440"></canvas>
+      <div class="slider-row">
+        <label>Chord length \(AB\): <b id="abLab2">8.0</b> cm</label>
+        <input type="range" id="abSlider2" min="2" max="9.6" step="0.1" value="8">
+      </div>
+      <div class="chk" style="margin-top:8px;">
+        <input type="checkbox" id="showSplit" checked>
+        <label for="showSplit" style="margin:0;">Show sector + triangle split</label>
+      </div>
+      <div class="readouts">
+        <div class="ro"><span>Major sector</span><b id="secOut">55.36 cm²</b></div>
+        <div class="ro"><span>Triangle \(AOB\)</span><b id="triOut">12.00 cm²</b></div>
+        <div class="ro"><span>Major segment</span><b id="segOut">67.36 cm²</b></div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="next" data-target="s3">Next step →</button>
+      <span class="counter" id="c3">0 / 1</span>
+    </div>
+
+    <div class="step" id="s3a">
+      <div class="step-head">
+        <span class="badge">Step 3</span>
+        <span class="marks">1M 1A</span>
+      </div>
+      <p><b>Major sector area</b> (using the reflex angle in degrees):</p>
+      \[ A_{\text{sector}} = \pi r^2 \times \frac{360^\circ - 2\sin^{-1}\frac45}{360^\circ}
+         = \pi(5)^2 \times \frac{360^\circ - 2\sin^{-1}\frac45}{360^\circ} \]
+      <p><b>Triangle \(AOB\) area</b>:</p>
+      \[ A_{\triangle} = \frac{1}{2} \times AB \times OM = \frac{1}{2} \times 8 \times 3 = 12\text{ cm}^2 \]
+      <p><b>Combine:</b></p>
+      \[
+        A_{\text{major}} = 25\pi \cdot \frac{360^\circ - 2\sin^{-1}\frac45}{360^\circ} + \frac{1}{2}(8)(3)
+        \approx 55.3574 + 12 = 67.3574
+      \]
+      \[ \boxed{A_{\text{major}} \approx 67\text{ cm}^2} \]
+      <div class="hint"><b>Hint:</b> The major segment is <em>larger</em> than a semicircle. It equals the major sector <em>plus</em> the triangle \(AOB\), because the triangle lies inside the major sector region.</div>
+      <div class="answer">Correct option: <b>D. \(67\text{ cm}^2\)</b></div>
+    </div>
+  </div>
+
+  <!-- ============ SUMMARY ============ -->
+  <div class="summary">
+    <h2>Summary of Results</h2>
+    <ul>
+      <li>Radius: \(r = 5\text{ cm}\), half-chord \(AM = 4\text{ cm}\), so \(OM = \sqrt{5^2-4^2}=3\text{ cm}\).</li>
+      <li>Half-angle: \(\angle AOM = \sin^{-1}\frac{4}{5}\); full angle \(\angle AOB = 2\sin^{-1}\frac45\).</li>
+      <li>Reflex angle of the major sector: \(360^\circ - 2\sin^{-1}\frac45\).</li>
+      <li>Major sector area \(\approx 55.36\text{ cm}^2\); triangle \(AOB\) area \(=12\text{ cm}^2\).</li>
+      <li>Major segment \(= 55.36 + 12 \approx 67.36\text{ cm}^2\).</li>
+    </ul>
+    <div class="final">
+      Answer: \(\;67\text{ cm}^2\;\) — Option D
+    </div>
+  </div>
+
+  <footer>
+    HKDSE 2022 Paper 2 Q16 · Mensuration · Interactive Solution
+  </footer>
+</div>
+
+<script>
+/* ============================================================
+   Step reveal logic
+   ============================================================ */
+document.querySelectorAll('button.next').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const prefix = btn.dataset.target;
+    const cardSteps = [...document.querySelectorAll('.step')].filter(s => s.id.startsWith(prefix));
+    const hidden = cardSteps.filter(s => !s.classList.contains('show'));
+    if (hidden.length) {
+      hidden[0].classList.add('show');
+      if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([hidden[0]]);
+    }
+    const shown = cardSteps.filter(s => s.classList.contains('show')).length;
+    const counter = btn.parentElement.querySelector('.counter');
+    counter.textContent = shown + ' / ' + cardSteps.length;
+    if (shown === cardSteps.length) {
+      btn.disabled = true;
+      btn.textContent = 'All steps revealed ✓';
+    }
+  });
+});
+
+/* ============================================================
+   Geometry helpers
+   ============================================================ */
+const R = 5;                 // radius (cm)
+const CHORD = 8;             // default chord
+// For chord c, half-chord = c/2, OM = sqrt(r^2 - (c/2)^2)
+function geom(c){
+  const half = c/2;
+  const om = Math.sqrt(Math.max(R*R - half*half, 0));
+  const halfAngle = Math.asin(Math.min(half/R,1)); // radians
+  const angleAOB = 2*halfAngle;                     // radians
+  const reflex = 2*Math.PI - angleAOB;              // radians
+  const sectorReflex = 0.5 * R*R * reflex;          // major sector area
+  const triArea = 0.5 * c * om;                     // triangle AOB
+  return {c, half, om, halfAngle, angleAOB, reflex, sectorReflex, triArea,
+          segment: sectorReflex + triArea};
+}
+
+/* ============================================================
+   CANVAS 1 — chord bisector & right triangle
+   ============================================================ */
+const cv1 = document.getElementById('cv1');
+const ctx1 = cv1.getContext('2d');
+function drawDiagram1(c){
+  const g = geom(c);
+  const W = cv1.width, H = cv1.height;
+  const cx = W/2, cy = H/2, scale = Math.min(W,H)/ (2*6.5); // 6.5 cm half-view
+  ctx1.clearRect(0,0,W,H);
+
+  // grid
+  ctx1.strokeStyle = '#eef2f7'; ctx1.lineWidth = 1;
+  for(let x=0;x<W;x+=scale){ ctx1.beginPath(); ctx1.moveTo(x,0); ctx1.lineTo(x,H); ctx1.stroke(); }
+  for(let y=0;y<H;y+=scale){ ctx1.beginPath(); ctx1.moveTo(0,y); ctx1.lineTo(W,y); ctx1.stroke(); }
+
+  // circle
+  ctx1.beginPath(); ctx1.arc(cx,cy,R*scale,0,Math.PI*2);
+  ctx1.fillStyle = 'rgba(37,99,235,0.06)'; ctx1.fill();
+  ctx1.strokeStyle = '#2563eb'; ctx1.lineWidth = 2.5; ctx1.stroke();
+
+  // points: A left, B right, along horizontal line through cy
+  const halfPx = g.half*scale;
+  const Ax = cx - halfPx, Ay = cy;
+  const Bx = cx + halfPx, By = cy;
+  const Mx = cx, My = cy;
+  const Ox = cx, Oy = cy + g.om*scale;  // O below chord (chord above centre)
+  // actually O should be below the chord by OM
+  // Redraw O at (cx, cy + om*scale), so chord at cy above centre
+
+  // chord AB
+  ctx1.strokeStyle = '#dc2626'; ctx1.lineWidth = 3;
+  ctx1.beginPath(); ctx1.moveTo(Ax,Ay); ctx1.lineTo(Bx,By); ctx1.stroke();
+
+  // OM
+  ctx1.strokeStyle = '#7c3aed'; ctx1.lineWidth = 2; ctx1.setLineDash([6,5]);
+  ctx1.beginPath(); ctx1.moveTo(Ox,Oy); ctx1.lineTo(Mx,My); ctx1.stroke();
+  ctx1.setLineDash([]);
+
+  // radii OA, OB
+  ctx1.strokeStyle = '#059669'; ctx1.lineWidth = 2;
+  ctx1.beginPath(); ctx1.moveTo(Ox,Oy); ctx1.lineTo(Ax,Ay); ctx1.stroke();
+  ctx1.beginPath(); ctx1.moveTo(Ox,Oy); ctx1.lineTo(Bx,By); ctx1.stroke();
+
+  // right angle marker at M
+  ctx1.strokeStyle = '#7c3aed'; ctx1.lineWidth = 1.5;
+  const s = 10;
+  ctx1.beginPath(); ctx1.moveTo(Mx-s,My); ctx1.lineTo(Mx-s,My-s); ctx1.lineTo(Mx,My-s); ctx1.stroke();
+
+  // points
+  function dot(x,y,color,label,dx,dy){
+    ctx1.beginPath(); ctx1.arc(x,y,5,0,Math.PI*2);
+    ctx1.fillStyle=color; ctx1.fill();
+    ctx1.fillStyle='#1e293b'; ctx1.font='bold 15px sans-serif';
+    ctx1.fillText(label, x+dx, y+dy);
+  }
+  dot(Ax,Ay,'#dc2626','A',-18,6);
+  dot(Bx,By,'#dc2626','B',8,6);
+  dot(Mx,My,'#7c3aed','M',6,-8);
+  dot(Ox,Oy,'#059669','O',6,20);
+
+  // labels
+  ctx1.fillStyle='#1e293b'; ctx1.font='bold 14px sans-serif';
+  ctx1.fillText('AB = '+c.toFixed(1)+' cm', cx-40, cy-14);
+  ctx1.fillText('OM = '+g.om.toFixed(2)+' cm', cx+8, cy+g.om*scale/2+4);
+  ctx1.fillText('r = 5 cm', (Ax+Ox)/2-30, (Ay+Oy)/2+16);
+
+  // title
+  ctx1.fillStyle='#1e40af'; ctx1.font='bold 15px sans-serif';
+  ctx1.fillText('Perpendicular from centre bisects the chord', 18, 26);
+}
+
+/* ============================================================
+   CANVAS 2 — central angle & sector
+   ============================================================ */
+const cv2 = document.getElementById('cv2');
+const ctx2 = cv2.getContext('2d');
+function drawDiagram2(c, showSector, showTri){
+  const g = geom(c);
+  const W = cv2.width, H = cv2.height;
+  const cx = W/2, cy = H/2 - 10, scale = Math.min(W,H)/(2*6.5);
+  ctx2.clearRect(0,0,W,H);
+
+  // grid
+  ctx2.strokeStyle = '#eef2f7';
+  for(let x=0;x<W;x+=scale){ ctx2.beginPath(); ctx2.moveTo(x,0); ctx2.lineTo(x,H); ctx2.stroke(); }
+  for(let y=0;y<H;y+=scale){ ctx2.beginPath(); ctx2.moveTo(0,y); ctx2.lineTo(W,y); ctx2.stroke(); }
+
+  // circle full
+  ctx2.beginPath(); ctx2.arc(cx,cy,R*scale,0,Math.PI*2);
+  ctx2.fillStyle='rgba(37,99,235,0.05)'; ctx2.fill();
+  ctx2.strokeStyle='#2563eb'; ctx2.lineWidth=2; ctx2.stroke();
+
+  const halfPx = g.half*scale;
+  const Ax = cx - halfPx, Ay = cy;
+  const Bx = cx + halfPx, By = cy;
+  const Ox = cx, Oy = cy + g.om*scale;
+
+  // angles in canvas: A at angle from O
+  // Vector O->A
+  const vAx = Ax-Ox, vAy = Ay-Oy;
+  const vBx = Bx-Ox, vBy = By-Oy;
+  const startAng = Math.atan2(vAy, vAx);
+  const endAng   = Math.atan2(vBy, vBx);
+  // We want sector covering reflex (major)
+  if(showSector){
+    ctx2.beginPath();
+    ctx2.moveTo(Ox,Oy);
+    ctx2.arc(Ox,Oy,R*scale, startAng, endAng, false); // minor arc
+    ctx2.closePath();
+    ctx2.fillStyle='rgba(220,38,38,0.15)'; ctx2.fill();
+    // major sector (reflex) fill
+    ctx2.beginPath();
+    ctx2.moveTo(Ox,Oy);
+    ctx2.arc(Ox,Oy,R*scale, endAng, startAng, false);
+    ctx2.closePath();
+    ctx2.fillStyle='rgba(16,185,129,0.18)'; ctx2.fill();
+  }
+
+  // chord
+  ctx2.strokeStyle='#dc2626'; ctx2.lineWidth=3;
+  ctx2.beginPath(); ctx2.moveTo(Ax,Ay); ctx2.lineTo(Bx,By); ctx2.stroke();
+
+  // radii
+  ctx2.strokeStyle='#059669'; ctx2.lineWidth=2;
+  ctx2.beginPath(); ctx2.moveTo(Ox,Oy); ctx2.lineTo(Ax,Ay); ctx2.stroke();
+  ctx2.beginPath(); ctx2.moveTo(Ox,Oy); ctx2.lineTo(Bx,By); ctx2.stroke();
+
+  // triangle AOB
+  if(showTri){
+    ctx2.beginPath(); ctx2.moveTo(Ax,Ay); ctx2.lineTo(Bx,By); ctx2.lineTo(Ox,Oy); ctx2.closePath();
+    ctx2.fillStyle='rgba(217,119,6,0.20)'; ctx2.fill();
+    ctx2.strokeStyle='#d97706'; ctx2.lineWidth=1.5; ctx2.stroke();
+  }
+
+  // reflex arc highlight
+  ctx2.beginPath();
+  ctx2.arc(Ox,Oy,R*scale-12, endAng, startAng, false);
+  ctx2.strokeStyle='#059669'; ctx2.lineWidth=3; ctx2.stroke();
+
+  // points
+  function dot(x,y,color,label,dx,dy){
+    ctx2.beginPath(); ctx2.arc(x,y,5,0,Math.PI*2);
+    ctx2.fillStyle=color; ctx2.fill();
+    ctx2.fillStyle='#1e293b'; ctx2.font='bold 15px sans-serif';
+    ctx2.fillText(label, x+dx, y+dy);
+  }
+  dot(Ax,Ay,'#dc2626','A',-20,6);
+  dot(Bx,By,'#dc2626','B',10,6);
+  dot(Ox,Oy,'#059669','O',-6,22);
+
+  // angle labels
+  ctx2.fillStyle='#1e293b'; ctx2.font='bold 13px sans-serif';
+  ctx2.fillText('∠AOB = '+(g.angleAOB*180/Math.PI).toFixed(2)+'°', cx-55, cy+40);
+  ctx2.fillStyle='#065f46';
+  ctx2.fillText('reflex = '+(g.reflex*180/Math.PI).toFixed(2)+'°', cx-60, cy-60);
+
+  // title
+  ctx2.fillStyle='#1e40af'; ctx2.font='bold 15px sans-serif';
+  ctx2.fillText('Major sector uses reflex angle at centre', 18, 26);
+}
+
+/* ============================================================
+   CANVAS 3 — area decomposition (sector + triangle)
+   ============================================================ */
+const cv3 = document.getElementById('cv3');
+const ctx3 = cv3.getContext('2d');
+function drawDiagram3(c, showSplit){
+  const g = geom(c);
+  const W = cv3.width, H = cv3.height;
+  const cx = W/2, cy = H/2 - 10, scale = Math.min(W,H)/(2*6.5);
+  ctx3.clearRect(0,0,W,H);
+
+  // grid
+  ctx3.strokeStyle='#eef2f7';
+  for(let x=0;x<W;x+=scale){ ctx3.beginPath(); ctx3.moveTo(x,0); ctx3.lineTo(x,H); ctx3.stroke(); }
+  for(let y=0;y<H;y+=scale){ ctx3.beginPath(); ctx3.moveTo(0,y); ctx3.lineTo(W,y); ctx3.stroke(); }
+
+  const halfPx = g.half*scale;
+  const Ax = cx-halfPx, Ay = cy;
+  const Bx = cx+halfPx, By = cy;
+  const Ox = cx, Oy = cy + g.om*scale;
+
+  // full circle
+  ctx3.beginPath(); ctx3.arc(cx,cy,R*scale,0,Math.PI*2);
+  ctx3.strokeStyle='#cbd5e1'; ctx3.lineWidth=1.5; ctx3.stroke();
+
+  const vAx=Ax-Ox, vAy=Ay-Oy, vBx=Bx-Ox, vBy=By-Oy;
+  const startAng=Math.atan2(vAy,vAx), endAng=Math.atan2(vBy,vBx);
+
+  if(showSplit){
+    // major sector
+    ctx3.beginPath();
+    ctx3.moveTo(Ox,Oy);
+    ctx3.arc(Ox,Oy,R*scale, endAng, startAng, false);
+    ctx3.closePath();
+    ctx3.fillStyle='rgba(37,99,235,0.20)'; ctx3.fill();
+    ctx3.strokeStyle='#2563eb'; ctx3.lineWidth=1.5; ctx3.stroke();
+
+    // triangle AOB
+    ctx3.beginPath(); ctx3.moveTo(Ax,Ay); ctx3.lineTo(Bx,By); ctx3.lineTo(Ox,Oy); ctx3.closePath();
+    ctx3.fillStyle='rgba(217,119,6,0.35)'; ctx3.fill();
+    ctx3.strokeStyle='#d97706'; ctx3.lineWidth=1.8; ctx3.stroke();
+  } else {
+    // just major segment
+    ctx3.beginPath();
+    ctx3.moveTo(Ax,Ay);
+    ctx3.arc(Ox,Oy,R*scale, startAng, endAng, true);
+    ctx3.closePath();
+    ctx3.fillStyle='rgba(16,185,129,0.35)'; ctx3.fill();
+    ctx3.strokeStyle='#059669'; ctx3.lineWidth=2; ctx3.stroke();
+  }
+
+  // chord
+  ctx3.strokeStyle='#dc2626'; ctx3.lineWidth=3;
+  ctx3.beginPath(); ctx3.moveTo(Ax,Ay); ctx3.lineTo(Bx,By); ctx3.stroke();
+
+  // radii (only when showing split)
+  if(showSplit){
+    ctx3.strokeStyle='#059669'; ctx3.lineWidth=1.5;
+    ctx3.beginPath(); ctx3.moveTo(Ox,Oy); ctx3.lineTo(Ax,Ay); ctx3.stroke();
+    ctx3.beginPath(); ctx3.moveTo(Ox,Oy); ctx3.lineTo(Bx,By); ctx3.stroke();
+  }
+
+  // points
+  function dot(x,y,color,label,dx,dy){
+    ctx3.beginPath(); ctx3.arc(x,y,5,0,Math.PI*2);
+    ctx3.fillStyle=color; ctx3.fill();
+    ctx3.fillStyle='#1e293b'; ctx3.font='bold 15px sans-serif';
+    ctx3.fillText(label, x+dx, y+dy);
+  }
+  dot(Ax,Ay,'#dc2626','A',-20,6);
+  dot(Bx,By,'#dc2626','B',10,6);
+  dot(Ox,Oy,'#059669','O',-6,22);
+
+  // labels
+  ctx3.fillStyle='#1e40af'; ctx3.font='bold 14px sans-serif';
+  if(showSplit){
+    ctx3.fillText('Sector (blue) + Triangle (amber)', 18, 26);
+    ctx3.fillStyle='#065f46';
+    ctx3.fillText('Major segment = both parts', 18, 46);
+  } else {
+    ctx3.fillText('Major segment (green)', 18, 26);
+  }
+
+  // readout on canvas
+  ctx3.fillStyle='#334155'; ctx3.font='bold 13px sans-serif';
+  ctx3.fillText('Segment area ≈ '+g.segment.toFixed(2)+' cm²', W-230, H-18);
+}
+
+/* ============================================================
+   Shared state / event wiring
+   ============================================================ */
+const state = { c1: 8, c2: 8, c3: 8 };
+
+// Canvas 1
+const abSlider = document.getElementById('abSlider');
+abSlider.addEventListener('input', () => {
+  state.c1 = parseFloat(abSlider.value);
+  document.getElementById('abLab').textContent = state.c1.toFixed(1);
+  const g = geom(state.c1);
+  document.getElementById('rOut').textContent = '5.00 cm';
+  document.getElementById('amOut').textContent = g.half.toFixed(2)+' cm';
+  document.getElementById('omOut').textContent = g.om.toFixed(2)+' cm';
+  document.getElementById('angOut').textContent = (g.halfAngle*180/Math.PI).toFixed(2)+'°';
+  drawDiagram1(state.c1);
+});
+document.getElementById('showBisect').addEventListener('change', () => drawDiagram1(state.c1));
+
+// Canvas 2
+const showSector = document.getElementById('showSector');
+const showTri = document.getElementById('showTri');
+function update2(){
+  const g = geom(state.c2);
+  document.getElementById('aobOut').textContent = (g.angleAOB*180/Math.PI).toFixed(2)+'°';
+  document.getElementById('refOut').textContent = (g.reflex*180/Math.PI).toFixed(2)+'°';
+  drawDiagram2(state.c2, showSector.checked, showTri.checked);
+}
+showSector.addEventListener('change', update2);
+showTri.addEventListener('change', update2);
+
+// Canvas 3
+const abSlider2 = document.getElementById('abSlider2');
+abSlider2.addEventListener('input', () => {
+  state.c3 = parseFloat(abSlider2.value);
+  document.getElementById('abLab2').textContent = state.c3.toFixed(1);
+  const g = geom(state.c3);
+  document.getElementById('secOut').textContent = g.sectorReflex.toFixed(2)+' cm²';
+  document.getElementById('triOut').textContent = g.triArea.toFixed(2)+' cm²';
+  document.getElementById('segOut').textContent = g.segment.toFixed(2)+' cm²';
+  drawDiagram3(state.c3, document.getElementById('showSplit').checked);
+});
+document.getElementById('showSplit').addEventListener('change', () => {
+  drawDiagram3(state.c3, document.getElementById('showSplit').checked);
+});
+
+/* ============================================================
+   Initial draw
+   ============================================================ */
+(function init(){
+  // Canvas 1
+  document.getElementById('abLab').textContent = state.c1.toFixed(1);
+  let g = geom(state.c1);
+  document.getElementById('amOut').textContent = g.half.toFixed(2)+' cm';
+  document.getElementById('omOut').textContent = g.om.toFixed(2)+' cm';
+  document.getElementById('angOut').textContent = (g.halfAngle*180/Math.PI).toFixed(2)+'°';
+  drawDiagram1(state.c1);
+
+  // Canvas 2
+  update2();
+
+  // Canvas 3
+  document.getElementById('abLab2').textContent = state.c3.toFixed(1);
+  g = geom(state.c3);
+  document.getElementById('secOut').textContent = g.sectorReflex.toFixed(2)+' cm²';
+  document.getElementById('triOut').textContent = g.triArea.toFixed(2)+' cm²';
+  document.getElementById('segOut').textContent = g.segment.toFixed(2)+' cm²';
+  drawDiagram3(state.c3, true);
+})();
+</script>
+</body>
+</html>

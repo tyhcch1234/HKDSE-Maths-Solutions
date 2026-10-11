@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2020 Paper 2 Q19 — Geometry</title>
+<script>
+  MathJax = {
+    tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<style>
+  :root{
+    --blue:#1e50a2;
+    --blue-l:#3b74d1;
+    --amber:#f59e0b;
+    --amber-l:#fde68a;
+    --emerald:#059669;
+    --emerald-l:#d1fae5;
+    --ink:#0f172a;
+    --muted:#5b6b82;
+    --card:#ffffff;
+    --bg:#eef2f9;
+    --line:#dbe3ef;
+    --radius:16px;
+    --shadow:0 8px 26px rgba(20,40,80,.10);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:960px;margin:0 auto;padding:0 16px 40px}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    background:linear-gradient(135deg,#12305f 0%,#1e50a2 45%,#3b74d1 100%);
+    color:#fff;
+    padding:38px 16px 46px;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero::after{
+    content:"";
+    position:absolute;
+    right:-120px;top:-120px;
+    width:340px;height:340px;border-radius:50%;
+    background:radial-gradient(circle,rgba(245,158,11,.35),transparent 65%);
+  }
+  .hero-inner{max-width:960px;margin:0 auto;position:relative;z-index:2}
+  .eyebrow{
+    font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;
+    color:#c7dbff;font-weight:600;margin-bottom:8px;
+  }
+  .hero h1{
+    margin:0 0 6px;
+    font-size:clamp(1.5rem,4.4vw,2.25rem);
+    font-weight:800;letter-spacing:-.4px;line-height:1.25;
+  }
+  .hero .sub{color:#dbe8ff;font-size:clamp(.9rem,2.4vw,1.02rem);margin:0 0 16px}
+  .pills{display:flex;flex-wrap:wrap;gap:8px}
+  .pill{
+    background:rgba(255,255,255,.14);
+    border:1px solid rgba(255,255,255,.30);
+    color:#fff;
+    padding:5px 13px;border-radius:999px;
+    font-size:.78rem;font-weight:600;backdrop-filter:blur(4px);
+  }
+
+  /* ---------- CARDS ---------- */
+  .card{
+    background:var(--card);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:24px 22px;
+    margin-top:22px;
+    border:1px solid var(--line);
+  }
+  .card h2{
+    margin:0 0 14px;
+    font-size:1.18rem;
+    color:var(--blue);
+    display:flex;align-items:center;gap:10px;
+    font-weight:800;letter-spacing:-.2px;
+  }
+  .card h2 .num{
+    background:var(--blue);color:#fff;
+    width:30px;height:30px;min-width:30px;border-radius:9px;
+    display:inline-flex;align-items:center;justify-content:center;
+    font-size:.92rem;font-weight:800;
+  }
+  .qtext{font-size:1rem}
+  .qtext ol{padding-left:22px}
+  .qtext li{margin:6px 0}
+
+  .qbox{
+    background:linear-gradient(180deg,#f7faff,#eff5ff);
+    border-left:5px solid var(--blue);
+    border-radius:10px;
+    padding:14px 16px;
+    margin:10px 0 4px;
+  }
+  .marks{
+    display:inline-block;
+    background:var(--amber);color:#3b2a00;
+    font-size:.72rem;font-weight:800;
+    padding:2px 9px;border-radius:999px;
+    vertical-align:middle;margin-left:6px;
+  }
+
+  /* ---------- CANVAS ---------- */
+  .canvas-shell{
+    background:#0c1a30;
+    border-radius:14px;
+    padding:10px;
+    margin:8px 0 14px;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.07);
+  }
+  canvas{display:block;width:100%;height:auto;border-radius:8px;background:#0c1a30;touch-action:none}
+  .readout{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+    gap:8px;margin:10px 0 6px;
+  }
+  .ro{
+    background:#f4f7fd;border:1px solid var(--line);border-radius:10px;
+    padding:8px 10px;text-align:center;
+  }
+  .ro .k{font-size:.72rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+  .ro .v{font-size:1.05rem;font-weight:800;color:var(--blue)}
+  .ro.good .v{color:var(--emerald)}
+  .ro.bad .v{color:#c2410c}
+
+  /* ---------- CONTROLS ---------- */
+  .controls{
+    display:grid;grid-template-columns:1fr;gap:12px;
+    background:#f7faff;border:1px dashed #c9d9f2;border-radius:12px;
+    padding:14px;margin:8px 0 4px;
+  }
+  .ctl label{font-size:.85rem;font-weight:700;color:#23406e;display:flex;justify-content:space-between;gap:10px}
+  .ctl label span{color:var(--amber);font-weight:800}
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:99px;
+    background:linear-gradient(90deg,var(--blue-l),#9dc0f2);outline:none;margin-top:8px;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;width:20px;height:20px;border-radius:50%;
+    background:#fff;border:4px solid var(--blue);cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.25)
+  }
+  input[type=range]::-moz-range-thumb{
+    width:20px;height:20px;border-radius:50%;background:#fff;border:4px solid var(--blue);cursor:pointer
+  }
+  .checks{display:flex;flex-wrap:wrap;gap:14px}
+  .chk{display:flex;align-items:center;gap:7px;font-size:.85rem;font-weight:600;color:#23406e;cursor:pointer}
+  .chk input{width:17px;height:17px;accent-color:var(--blue);cursor:pointer}
+
+  /* ---------- STEPS ---------- */
+  .step{
+    display:none;
+    border-left:4px solid var(--blue-l);
+    background:#f7faff;
+    border-radius:10px;
+    padding:14px 16px;
+    margin:12px 0;
+    animation:pop .32s ease;
+  }
+  .step.show{display:block}
+  @keyframes pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .step-head{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+  .badge{
+    background:var(--blue);color:#fff;font-weight:800;font-size:.76rem;
+    padding:3px 11px;border-radius:999px;
+  }
+  .mk{
+    background:var(--emerald-l);color:#065f46;font-weight:800;font-size:.72rem;
+    padding:3px 10px;border-radius:999px;border:1px solid #86e0c4;
+  }
+  .mk.m{background:var(--amber-l);color:#7c4a03;border-color:#f3cf7c}
+  .step p{margin:6px 0}
+  .hint{
+    background:#fffbea;border:1px solid #f3d68a;border-left:4px solid var(--amber);
+    border-radius:8px;padding:9px 12px;font-size:.87rem;margin-top:10px;color:#5c4207;
+  }
+  .hint b{color:#8a5a00}
+  .ans{
+    background:var(--emerald-l);border:1px solid #86e0c4;border-left:4px solid var(--emerald);
+    border-radius:8px;padding:10px 13px;margin-top:10px;font-weight:700;color:#054d38;
+  }
+  .ans .lab{font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:#047857;display:block;margin-bottom:2px;font-weight:800}
+
+  /* ---------- BUTTON ---------- */
+  .stepbtn{
+    display:inline-flex;align-items:center;gap:9px;
+    background:linear-gradient(135deg,var(--blue),var(--blue-l));
+    color:#fff;border:none;border-radius:999px;
+    padding:11px 22px;font-size:.92rem;font-weight:800;cursor:pointer;
+    box-shadow:0 6px 16px rgba(30,80,162,.32);
+    transition:transform .15s, box-shadow .15s, opacity .2s;
+  }
+  .stepbtn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 10px 22px rgba(30,80,162,.4)}
+  .stepbtn:disabled{
+    background:#c3cddd;box-shadow:none;cursor:default;opacity:.9;
+  }
+  .stepbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:14px}
+  .counter{font-size:.82rem;font-weight:800;color:var(--muted)}
+
+  /* ---------- SUMMARY ---------- */
+  .summary{
+    background:linear-gradient(140deg,#101c33,#1b3160);
+    color:#eaf1ff;
+    border-radius:var(--radius);
+    padding:26px 24px;
+    margin-top:24px;
+    box-shadow:var(--shadow);
+    border:1px solid #24437a;
+  }
+  .summary h2{color:#fff;margin:0 0 14px;font-size:1.2rem;display:flex;align-items:center;gap:10px}
+  .summary h2 .num{background:var(--amber);color:#3b2a00}
+  .summary ul{list-style:none;padding:0;margin:0}
+  .summary li{
+    padding:11px 0 11px 30px;position:relative;
+    border-bottom:1px dashed rgba(255,255,255,.14);
+    font-size:.97rem;
+  }
+  .summary li:last-child{border-bottom:none}
+  .summary li::before{
+    content:"✔";position:absolute;left:2px;top:11px;
+    color:var(--amber);font-weight:900;
+  }
+  .summary .hl{color:var(--amber-l);font-weight:700}
+
+  footer{
+    text-align:center;color:var(--muted);font-size:.82rem;
+    padding:28px 10px 10px;
+  }
+
+  @media (max-width:600px){
+    .card{padding:19px 15px;border-radius:14px}
+    .hero{padding:30px 14px 36px}
+    .step{padding:12px 12px}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</div>
+    <h1>2020 Paper 2 · Question 19</h1>
+    <p class="sub">Angles in a Transversal Figure — Deciding Which Statements Must Be True</p>
+    <div class="pills">
+      <span class="pill">Angles &amp; Parallel Lines</span>
+      <span class="pill">Interior Angles of a Triangle</span>
+      <span class="pill">"Must be true" Reasoning</span>
+      <span class="pill">Reflex Angle</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ============ QUESTION ============ -->
+  <section class="card">
+    <h2><span class="num">Q</span>Question</h2>
+    <div class="qtext">
+      <p>According to the figure (two parallel lines \(ABF\) and \(ED\), with a broken line \(B\to C\to D\), forming angles \(u\) at \(B\), reflex angle \(v\) at \(C\) and angle \(w\) at \(D\)), which of the following <b>must be true</b>?</p>
+      <div class="qbox">
+        <ol type="I">
+          <li>\(u-v+w=0^\circ\)</li>
+          <li>\(u+v-w=180^\circ\)</li>
+          <li>\(u+v+w=450^\circ\)</li>
+        </ol>
+      </div>
+      <p><b>A.</b> I only &nbsp;&nbsp;&nbsp; <b>B.</b> II only &nbsp;&nbsp;&nbsp; <b>C.</b> I and III only &nbsp;&nbsp;&nbsp; <b>D.</b> II and III only</p>
+    </div>
+    <div class="hint" style="margin-top:14px">
+      <b>Key idea:</b> "must be true" means the equation has to hold for <em>every possible shape</em> of the figure. So we test each statement by <b>distorting the figure</b> and seeing whether the equation still survives. Only statement <b>II</b> survives all distortions.
+    </div>
+  </section>
+
+  <!-- ============ PART I ============ -->
+  <section class="card">
+    <h2><span class="num">I</span>Statement I: &nbsp; \(u-v+w=0^\circ\)</h2>
+    <p style="margin-top:-4px;color:var(--muted);font-size:.9rem">
+      Drag the slider to slide \(A\) (and hence move the ray \(BA\) relative to \(BC\)) while keeping \(BC\), \(CD\) and \(DE\) fixed. Watch what happens to \(u\), \(v\), \(w\) and to the left-hand side of I.
+    </p>
+
+    <div class="canvas-shell"><canvas id="cv1" width="860" height="430"></canvas></div>
+
+    <div class="controls">
+      <div class="ctl">
+        <label for="s1">Rotate ray \(BA\) about the transversal at \(B\) <span id="s1v">0°</span></label>
+        <input type="range" id="s1" min="-70" max="80" value="0" step="1">
+      </div>
+      <div class="checks">
+        <label class="chk"><input type="checkbox" id="c1" checked> Show angle labels \(u,v,w\)</label>
+        <label class="chk"><input type="checkbox" id="c1b"> Show extension of \(BC\)</label>
+      </div>
+    </div>
+
+    <div class="readout">
+      <div class="ro"><div class="k">\(u\)</div><div class="v" id="r1u">42°</div></div>
+      <div class="ro"><div class="k">\(v\) (reflex)</div><div class="v" id="r1v">222°</div></div>
+      <div class="ro"><div class="k">\(w\)</div><div class="v" id="r1w">138°</div></div>
+      <div class="ro bad"><div class="k">\(u-v+w\)</div><div class="v" id="r1s">-42°</div></div>
+    </div>
+
+    <div class="stepbar">
+      <button class="stepbtn" data-target="p1" data-total="3">
+        Next step → <span style="opacity:.85">1 / 3</span>
+      </button>
+      <span class="counter" id="p1c">0 / 3 revealed</span>
+    </div>
+
+    <div id="p1">
+      <div class="step">
+        <div class="step-head"><span class="badge">Step 1</span><span class="mk m">1M</span> Set up the parallel lines</div>
+        <p>Draw a line through \(C\) parallel to \(AB\) (and \(DE\)), and call the direction it points on the right \(F\). So \(AB \parallel CF \parallel DE\), with \(B\hat{A}F\) … actually the horizontal direction from \(B\) to the right is parallel to the direction from \(D\) to \(E\).</p>
+        <p>Then the angle \(u\) at \(B\) is the angle between \(BA\) and the parallel direction, and \(w\) at \(D\) is the angle between the parallel direction and \(DC\)'s extension.</p>
+        <div class="hint"><b>Hint:</b> Once the two parallel directions are fixed, \(u\) and \(w\) are each controlled by <em>one</em> ray only — so they cannot be forced into a fixed linear relation by themselves.</div>
+      </div>
+
+      <div class="step">
+        <div class="step-head"><span class="badge">Step 2</span><span class="mk">1M</span> Distort \(AB\) only</div>
+        <p>Fix the polyline \(B\to C\to D\to E\). Now move \(B\) along the line so that the ray \(BA\) swings up. Then:</p>
+        <ul>
+          <li>\(u\) <b>decreases</b> (the ray tilts closer to the transversal),</li>
+          <li>\(w\) is <b>unchanged</b> (it depends only on \(DE\) and \(CD\)),</li>
+          <li>so the sum \(u-v+w\) changes even though the right-hand side \(0^\circ\) is fixed.</li>
+        </ul>
+        <div class="hint"><b>Hint:</b> The slider above shows exactly this — sweep it and watch the \(u-v+w\) readout leave \(0^\circ\).</div>
+      </div>
+
+      <div class="step">
+        <div class="step-head"><span class="badge">Step 3</span><span class="mk m">1A</span> Conclusion for I</div>
+        <p>Since a value of \(u\) can be found for which \(u-v+w\neq 0^\circ\), statement I is <b>not always true</b>. In the slider's starting position, \(u-v+w\) is clearly non-zero, so it fails immediately.</p>
+        <div class="ans"><span class="lab">Result</span>Statement I is <b>FALSE</b> — it does not have to be true.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PART II ============ -->
+  <section class="card">
+    <h2><span class="num">II</span>Statement II: &nbsp; \(u+v-w=180^\circ\)</h2>
+    <p style="margin-top:-4px;color:var(--muted);font-size:.9rem">
+      Now drag the slider to change the shape of the broken line (move \(C\) and the kink) — the parallel conditions \(AB\parallel DE\) are kept. The readout \(u+v-w\) stays locked at \(180^\circ\).
+    </p>
+
+    <div class="canvas-shell"><canvas id="cv2" width="860" height="430"></canvas></div>
+
+    <div class="controls">
+      <div class="ctl">
+        <label for="s2">Swing the middle segment \(BC\) <span id="s2v">0°</span></label>
+        <input type="range" id="s2" min="-40" max="45" value="0" step="1">
+      </div>
+      <div class="checks">
+        <label class="chk"><input type="checkbox" id="c2" checked> Draw auxiliary line \(CF\parallel AB\) through \(C\)</label>
+        <label class="chk"><input type="checkbox" id="c2b"> Draw auxiliary line \(GC\) (produce \(BA\) to meet a parallel)</label>
+      </div>
+    </div>
+
+    <div class="readout">
+      <div class="ro"><div class="k">\(u\)</div><div class="v" id="r2u">—</div></div>
+      <div class="ro"><div class="k">\(v\) (reflex)</div><div class="v" id="r2v">—</div></div>
+      <div class="ro"><div class="k">\(w\)</div><div class="v" id="r2w">—</div></div>
+      <div class="ro good"><div class="k">\(u+v-w\)</div><div class="v" id="r2s">180°</div></div>
+    </div>
+
+    <div class="stepbar">
+      <button class="stepbtn" data-target="p2" data-total="4">
+        Next step → <span style="opacity:.85">1 / 4</span>
+      </button>
+      <span class="counter" id="p2c">0 / 4 revealed</span>
+    </div>
+
+    <div id="p2">
+      <div class="step">
+        <div class="step-head"><span class="badge">Step 1</span><span class="mk m">1M</span> Draw the parallel through \(C\) (Method 1)</div>
+        <p>Through \(C\) draw \(F\) so that \(AB\parallel CF\parallel DE\), with \(F\) on the same side as the interior of the figure. Then use interior angles on the same side of a transversal:</p>
+        <p>\[ \angle BCF = 180^\circ - \angle ABC = 180^\circ - u \quad (\text{int. } \angle s,\; CF\parallel AB) \]</p>
+        <div class="hint"><b>Hint:</b> \(BCF\) and \(ABC\) are interior angles between the parallels \(AB\) and \(CF\), so they add to \(180^\circ\).</div>
+      </div>
+
+      <div class="step">
+        <div class="step-head"><span class="badge">Step 2</span><span class="mk">1M</span> Alternate angles give \(\angle DCF\)</div>
+        <p>\[ \angle DCF = \angle CDE = w \quad (\text{alt. } \angle s,\; CF\parallel DE) \]</p>
+        <p>Hence the reflex angle at \(C\) is \[ v = \operatorname{reflex}\angle BCD = \angle BCF + \angle DCF = (180^\circ - u) + w. \]</p>
+        <div class="hint"><b>Hint:</b> The reflex angle at \(C\) opens to the outside of the polyline, exactly the sum of the two angles we just found.</div>
+      </div>
+
+      <div class="step">
+        <div class="step-head"><span class="badge">Step 3</span><span class="mk">1M</span> Rearrange</div>
+        <p>From \(v = (180^\circ - u) + w\), rearrange: \[ v = 180^\circ - u + w \;\Longrightarrow\; u + v - w = 180^\circ. \]</p>
+        <div class="hint"><b>Hint:</b> This is an identity forced by the parallel lines — it holds for every shape, so it must be true.</div>
+      </div>
+
+      <div class="step">
+        <div class="step-head"><span class="badge">Step 4</span><span class="mk m">1A</span> Alternative check by triangle (Method 2)</div>
+        <p>Produce \(BA\) to a point \(G\) so that \(GCD\) is a straight line. Then \(GB\parallel DE\), and interior angles give \(\angle BGD = 180^\circ - w\).</p>
+        <p>Also \(\angle BCG = \operatorname{reflex}\angle BCD - 180^\circ = v - 180^\circ\). In \(\triangle GBC\):</p>
+        <p>\[ (180^\circ - w) + u + (v - 180^\circ) = 180^\circ \;\Longrightarrow\; u + v - w = 180^\circ. \]</p>
+        <div class="ans"><span class="lab">Result</span>Statement II is <b>TRUE</b> — it must always hold.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PART III ============ -->
+  <section class="card">
+    <h2><span class="num">III</span>Statement III: &nbsp; \(u+v+w=450^\circ\)</h2>
+    <p style="margin-top:-4px;color:var(--muted);font-size:.9rem">
+      Drag the slider to move \(D\) and change the angle \(w\), while keeping the other rays fixed. The left-hand side \(u+v+w\) moves away from \(450^\circ\).
+    </p>
+
+    <div class="canvas-shell"><canvas id="cv3" width="860" height="430"></canvas></div>
+
+    <div class="controls">
+      <div class="ctl">
+        <label for="s3">Move \(D\) to change \(w\) <span id="s3v">0°</span></label>
+        <input type="range" id="s3" min="-35" max="50" value="0" step="1">
+      </div>
+      <div class="checks">
+        <label class="chk"><input type="checkbox" id="c3" checked> Show angle labels</label>
+      </div>
+    </div>
+
+    <div class="readout">
+      <div class="ro"><div class="k">\(u\)</div><div class="v" id="r3u">—</div></div>
+      <div class="ro"><div class="k">\(v\) (reflex)</div><div class="v" id="r3v">—</div></div>
+      <div class="ro"><div class="k">\(w\)</div><div class="v" id="r3w">—</div></div>
+      <div class="ro bad"><div class="k">\(u+v+w\)</div><div class="v" id="r3s">—</div></div>
+    </div>
+
+    <div class="stepbar">
+      <button class="stepbtn" data-target="p3" data-total="3">
+        Next step → <span style="opacity:.85">1 / 3</span>
+      </button>
+      <span class="counter" id="p3c">0 / 3 revealed</span>
+    </div>
+
+    <div id="p3">
+      <div class="step">
+        <div class="step-head"><span class="badge">Step 1</span><span class="mk m">1M</span> Increase \(DE\) by moving \(D\) only</div>
+        <p>Keep the direction of \(DE\) fixed and move \(D\) further along so that the segment \(DE\) lengthens. This changes the angle \(w\) only — \(u\) stays fixed, and the reflex angle \(v\) at \(C\) also changes (since \(\angle BCD\) changes as the ray \(DC\) swings).</p>
+        <div class="hint"><b>Hint:</b> Use the slider above: as you move \(D\), watch \(w\) change while \(u\) is untouched.</div>
+      </div>
+
+      <div class="step">
+        <div class="step-head"><span class="badge">Step 2</span><span class="mk">1M</span> Compare the two sides</div>
+        <p>Since \(u\) is fixed, \(w\) changes and \(v\) changes, the sum \(u+v+w\) is not pinned to a constant. For example, from the starting configuration one can check that \(u+v+w \neq 450^\circ\) in general.</p>
+        <p>In fact, using the identity from II, \(u+v-w=180^\circ\), we get \(u+v+w = 180^\circ + 2w\), which depends on \(w\) — not a constant.</p>
+        <div class="hint"><b>Hint:</b> \(180^\circ+2w=450^\circ\) would force \(w=135^\circ\), which is not required by the figure.</div>
+      </div>
+
+      <div class="step">
+        <div class="step-head"><span class="badge">Step 3</span><span class="mk m">1A</span> Conclusion for III</div>
+        <p>Since \(w\) can take values other than \(135^\circ\), statement III is <b>not always true</b>.</p>
+        <div class="ans"><span class="lab">Result</span>Statement III is <b>FALSE</b> — it does not have to be true.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SUMMARY ============ -->
+  <section class="summary">
+    <h2><span class="num">✓</span>Answers at a Glance</h2>
+    <ul>
+      <li>Statement <b>I</b>: \(u-v+w=0^\circ\) — <span class="hl">NOT always true</span> (moving \(B\) keeps \(w\) fixed but changes \(u\) and \(v\)).</li>
+      <li>Statement <b>II</b>: \(u+v-w=180^\circ\) — <span class="hl">TRUE</span>. Shown by \(CF\parallel AB\): \(\angle BCF=180^\circ-u\), \(\angle DCF=w\), so \(v=(180^\circ-u)+w\).</li>
+      <li>Statement <b>III</b>: \(u+v+w=450^\circ\) — <span class="hl">NOT always true</span> (varies with \(w\); equivalently \(u+v+w=180^\circ+2w\)).</li>
+      <li>Only statement II must be true, so the correct option is <b>B (II only)</b>.</li>
+    </ul>
+  </section>
+
+  <footer>
+    HKDSE Mathematics (Compulsory Part) · Paper 2 · 2020 Q19 &nbsp;·&nbsp; Interactive reasoning tool — drag the sliders to test each statement.
+  </footer>
+</div>
+
+<script>
+/* ============================================================
+   Shared geometry helpers
+   The figure: two parallel horizontal reference lines.
+   Top ray: AB on the upper parallel, pointing right.
+   Bottom ray: DE on the lower parallel, pointing right (from D).
+   Broken line: B -> C -> D.
+   Angles:  u = angle ABC (between BA and BC)
+            w = angle CDE (between DC and DE)
+            v = reflex angle BCD
+   Convention used: rays AB and DE point to the RIGHT (east).
+   ============================================================ */
+const DEG = Math.PI/180;
+
+function norm(a){ // to [0,360)
+  a = a % 360; if(a < 0) a += 360; return a;
+}
+function dirDeg(dx, dy){ // angle measured CCW from +x axis (screen coords: y down)
+  return norm(Math.atan2(-dy, dx)/DEG);
+}
+/* angle between ray P->from and ray P->to, measured as the "interior" angle
+   going from direction of (from) CCW to direction of (to), in [0,360) */
+function sweep(fromDir, toDir){
+  return norm(toDir - fromDir);
+}
+
+/* ---------- drawing helpers ---------- */
+function arrow(ctx, x1,y1,x2,y2, color, w, head){
+  ctx.strokeStyle=color; ctx.lineWidth=w; ctx.lineCap='round';
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  const a=Math.atan2(y2-y1,x2-x1), h=head||11;
+  ctx.beginPath();
+  ctx.moveTo(x2,y2);
+  ctx.lineTo(x2-h*Math.cos(a-0.4), y2-h*Math.sin(a-0.4));
+  ctx.lineTo(x2-h*Math.cos(a+0.4), y2-h*Math.sin(a+0.4));
+  ctx.closePath(); ctx.fillStyle=color; ctx.fill();
+}
+function dot(ctx,x,y,c,r){
+  ctx.beginPath(); ctx.arc(x,y,r||5,0,7); ctx.fillStyle=c; ctx.fill();
+}
+function label(ctx,txt,x,y,color,size,bold){
+  ctx.font=(bold?'bold ':'')+(size||15)+'px "Segoe UI",Arial';
+  ctx.fillStyle=color||'#fff';
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(txt,x,y);
+}
+/* draw arc between two directions (screen) about point, radius r */
+function arcBetween(ctx, px,py, d1, d2, r, color, w, ccwFlag){
+  const a1 = -d1*DEG, a2 = -d2*DEG;
+  ctx.beginPath();
+  ctx.arc(px,py,r,a1,a2, ccwFlag!==undefined?ccwFlag:false);
+  ctx.strokeStyle=color; ctx.lineWidth=w||2.5; ctx.stroke();
+}
+/* draw the MARKED angle (smaller sweep) between two screen directions, CCW from d1 to d2 */
+function angleArc(ctx, px,py, dFrom, dTo, r, color, w){
+  let s = norm(dTo - dFrom);       // CCW sweep in screen-angle degrees (using dir convention)
+  let ccw=true;
+  if(s > 180){ // take the other (smaller) sweep => clockwise
+    ccw=false;
+  }
+  ctx.beginPath();
+  ctx.arc(px,py, r, -dFrom*DEG, -dTo*DEG, !ccw);
+  ctx.strokeStyle=color; ctx.lineWidth=w||2.5; ctx.stroke();
+}
+function reflexArc(ctx, px,py, dFrom, dTo, r, color, w){
+  // draw the reflex (>180) arc from dFrom CCW to dTo
+  ctx.beginPath();
+  ctx.arc(px,py, r, -dFrom*DEG, -dTo*DEG, true);
+  ctx.strokeStyle=color; ctx.lineWidth=w||2.5; ctx.stroke();
+}
+
+/* ---------- base figure ---------- */
+const BASE = {
+  by: 110,       // y of upper parallel
+  dy: 320,       // y of lower parallel
+  Bx: 170,       // B x
+  Dx: 560,       // D x
+  Cx: 470, Cy: 215   // C
+};
+/* in the figure, ray DE points right: D at (Dx,dy), E to the right of D
+   ray BA points left-ish? In the original, AB points to the right with arrow at A.
+   The angle u is at B between BA (to the left/up) and BC.
+   We'll model: at B, the reference ray points LEFT (west), 180deg,
+   the transversal ray goes to C.
+   u = angle between B->A (west) and B->C.
+   At D, D->E points east (0deg);  w = angle between D->C and D->E.
+*/
+function computeFigure(p){
+  // p.s1 = rotation of BA about B (degrees, positive = tilt up/CCW)
+  const bA = norm(180 + (p.s1||0));   // direction B->A
+  const bC = dirDeg(BASE.Cx-BASE.Bx, BASE.Cy-BASE.by);
+  const dC = dirDeg(BASE.Cx-BASE.Dx, BASE.Cy-BASE.dy); // D->C (points up-left)
+  const dE = 0; // D->E east (screen right)
+  const u = norm(bA - bC) > 180 ? 360-norm(bA-bC) : norm(bA-bC);
+  // u = smaller angle between BA and BC
+  const uAngle = (function(){
+    let s = Math.abs(norm(bA - bC));
+    if(s>180) s = 360-s;
+    return s;
+  })();
+  // w = smaller angle between D->E (east) and D->C
+  const wAngle = (function(){
+    let s = Math.abs(norm(dE - dC));
+    if(s>180) s = 360-s;
+    return s;
+  })();
+  // v = reflex angle at C between C->B and C->D
+  const cB = norm(bC+180), cD = norm(dC+180);
+  let vRef = (function(){
+    let s = norm(cD - cB);
+    return s > 180 ? s : 360 - s;  // the larger (reflex) sweep
+  })();
+  // ensure v is the reflex: if not >180, take 360 - (smaller)
+  return { bA, bC, dC, dE, u:uAngle, w:wAngle, v:vRef,
+           Bx:BASE.Bx, By:BASE.by, Cx:BASE.Cx, Cy:BASE.Cy,
+           Dx:BASE.Dx, Dy:BASE.dy };
+}
+
+function drawTriangleFill(ctx, x1,y1,x2,y2,x3,y3, color){
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.lineTo(x3,y3);
+  ctx.closePath(); ctx.fillStyle=color; ctx.fill();
+}
+
+/* ============================================================
+   CANVAS 1 — Statement I
+   ============================================================ */
+const cv1 = document.getElementById('cv1');
+const ctx1 = cv1.getContext('2d');
+const s1 = document.getElementById('s1');
+const s1v = document.getElementById('s1v');
+const c1 = document.getElementById('c1');
+const c1b = document.getElementById('c1b');
+
+function draw1(){
+  const p = computeFigure({s1: +s1.value});
+  s1v.textContent = (+s1.value > 0 ? '+' : '') + s1.value + '°';
+  const W=860,H=430;
+  ctx1.clearRect(0,0,W,H);
+
+  // background grid
+  ctx1.strokeStyle='rgba(120,160,220,.09)'; ctx1.lineWidth=1;
+  for(let x=0;x<W;x+=40){ctx1.beginPath();ctx1.moveTo(x,0);ctx1.lineTo(x,H);ctx1.stroke();}
+  for(let y=0;y<H;y+=40){ctx1.beginPath();ctx1.moveTo(0,y);ctx1.lineTo(W,y);ctx1.stroke();}
+
+  // parallel reference lines
+  ctx1.setLineDash([7,7]); ctx1.lineWidth=1.6;
+  ctx1.strokeStyle='rgba(110,200,255,.45)';
+  ctx1.beginPath(); ctx1.moveTo(30, BASE.by); ctx1.lineTo(W-30, BASE.by); ctx1.stroke();
+  ctx1.beginPath(); ctx1.moveTo(30, BASE.dy); ctx1.lineTo(W-30, BASE.dy); ctx1.stroke();
+  ctx1.setLineDash([]);
+  label(ctx1,'upper parallel (AB direction)', W-30, BASE.by-16, 'rgba(150,215,255,.9)', 12);
+  label(ctx1,'lower parallel (DE direction)', W-30, BASE.dy+18, 'rgba(150,215,255,.9)', 12);
+
+  const B={x:p.Bx,y:p.By}, C={x:p.Cx,y:p.Cy}, D={x:p.Dx,y:p.Dy};
+
+  // ray B->A
+  const ax = B.x + 240*Math.cos(p.bA*DEG), ay = B.y - 240*Math.sin(p.bA*DEG);
+  // ray D->E
+  const ex = D.x + 190, ey = D.y;
+  // ray B->A faint original baseline (west)
+  ctx1.setLineDash([4,6]); ctx1.strokeStyle='rgba(255,255,255,.18)'; ctx1.lineWidth=1.5;
+  ctx1.beginPath(); ctx1.moveTo(B.x,B.y); ctx1.lineTo(B.x-240,B.y); ctx1.stroke();
+  ctx1.setLineDash([]);
+
+  // filled interior (for emphasis)
+  drawTriangleFill(ctx1, B.x,B.y, C.x,C.y, D.x,D.y, 'rgba(60,120,220,.10)');
+
+  // broken line B-C-D
+  arrow(ctx1, B.x,B.y, C.x,C.y, '#facc15', 4);
+  arrow(ctx1, C.x,C.y, D.x,D.y, '#facc15', 4);
+  // rays
+  arrow(ctx1, B.x,B.y, ax,ay, '#60a5fa', 3.5);       // BA
+  arrow(ctx1, D.x,D.y, ex,ey, '#60a5fa', 3.5);       // DE
+
+  // extension of BC beyond C (toggle)
+  if(c1b.checked){
+    const ux = C.x + (C.x-B.x)*1.4, uy = C.y + (C.y-B.y)*1.4;
+    ctx1.setLineDash([6,6]); ctx1.strokeStyle='rgba(255,160,120,.85)'; ctx1.lineWidth=2;
+    ctx1.beginPath(); ctx1.moveTo(C.x,C.y); ctx1.lineTo(ux,uy); ctx1.stroke();
+    ctx1.setLineDash([]);
+    label(ctx1,'extension of BC', ux+4, uy-12, 'rgba(255,180,140,.95)', 12);
+  }
+
+  // angle u at B
+  if(c1.checked){
+    angleArc(ctx1, B.x,B.y, p.bC, p.bA, 46, '#f59e0b', 3);
+    // label position: halfway between directions
+    const mid = (p.bC + p.bA)/2;
+    const lx = B.x + 66*Math.cos(mid*DEG), ly = B.y - 66*Math.sin(mid*DEG);
+    label(ctx1,'u = '+p.u.toFixed(1)+'°', lx, ly, '#fbbf24', 14, true);
+    // angle w at D (between D->C and D->E)
+    angleArc(ctx1, D.x,D.y, p.dE, p.dC, 52, '#34d399', 3);
+    const mw = (p.dE + p.dC)/2;
+    const wx = D.x + 74*Math.cos(mw*DEG), wy = D.y - 74*Math.sin(mw*DEG);
+    label(ctx1,'w = '+p.w.toFixed(1)+'°', wx, wy+16, '#6ee7b7', 14, true);
+    // reflex v at C: draw a big arc
+    const cB = p.bC+180, cD = p.dC+180;
+    reflexArc(ctx1, C.x,C.y, cB, cD, 60, '#f472b6', 3);
+    // label v at a spot on the outside
+    let mid2 = norm((cB + (norm(cD-cB)))/2);
+    // determine a point in the reflex region
+    const vx = C.x + 92*Math.cos(mid2*DEG), vy = C.y - 92*Math.sin(mid2*DEG);
+    label(ctx1,'v = '+p.v.toFixed(1)+'°', vx, vy, '#fbcfe8', 14, true);
+  }
+
+  // points
+  dot(ctx1,B.x,B.y,'#fff'); dot(ctx1,C.x,C.y,'#fff'); dot(ctx1,D.x,D.y,'#fff');
+  label(ctx1,'B', B.x-16, B.y-16, '#fff', 16, true);
+  label(ctx1,'C', C.x-4, C.y-18, '#fff', 16, true);
+  label(ctx1,'D', D.x+12, D.y+18, '#fff', 16, true);
+  label(ctx1,'A', ax+10, ay, '#93c5fd', 15, true);
+  label(ctx1,'E', ex-8, ey+18, '#93c5fd', 15, true);
+
+  // live readout update
+  document.getElementById('r1u').textContent = p.u.toFixed(1)+'°';
+  document.getElementById('r1v').textContent = p.v.toFixed(1)+'°';
+  document.getElementById('r1w').textContent = p.w.toFixed(1)+'°';
+  const sum = p.u - p.v + p.w;
+  const el = document.getElementById('r1s');
+  el.textContent = sum.toFixed(1)+'°';
+  el.parentElement.className = 'ro ' + (Math.abs(sum) < 0.6 ? 'good':'bad');
+}
+s1.addEventListener('input', draw1);
+c1.addEventListener('change', draw1);
+c1b.addEventListener('change', draw1);
+
+/* ============================================================
+   CANVAS 2 — Statement II
+   ============================================================ */
+const cv2 = document.getElementById('cv2');
+const ctx2 = cv2.getContext('2d');
+const s2 = document.getElementById('s2');
+const s2v = document.getElementById('s2v');
+const c2 = document.getElementById('c2');
+const c2b = document.getElementById('c2b');
+
+function computeFig2(offset){
+  // move C horizontally & vertically a bit -> changes BC and CD
+  const Cx = BASE.Cx + offset;
+  const Cy = BASE.Cy - offset*0.45;
+  const bC = dirDeg(Cx-BASE.Bx, Cy-BASE.by);
+  const dC = dirDeg(Cx-BASE.Dx, Cy-BASE.dy);
+  const bA = 180;  // BA points west (fixed)
+  const dE = 0;    // DE points east
+  const u = (function(){ let s=Math.abs(norm(bA-bC)); if(s>180)s=360-s; return s;})();
+  const w = (function(){ let s=Math.abs(norm(dE-dC)); if(s>180)s=360-s; return s;})();
+  const cB = norm(bC+180), cD = norm(dC+180);
+  let v = norm(cD-cB); if(v<=180) v = 360-v;
+  return {Bx:BASE.Bx,By:BASE.by,Cx,Cy,Dx:BASE.Dx,Dy:BASE.dy,bA,bC,dC,dE,u,w,v};
+}
+
+function draw2(){
+  const p = computeFig2(+s2.value);
+  s2v.textContent = (+s2.value>0?'+':'')+s2.value+'°';
+  const W=860,H=430;
+  ctx2.clearRect(0,0,W,H);
+
+  ctx2.strokeStyle='rgba(120,160,220,.09)'; ctx2.lineWidth=1;
+  for(let x=0;x<W;x+=40){ctx2.beginPath();ctx2.moveTo(x,0);ctx2.lineTo(x,H);ctx2.stroke();}
+  for(let y=0;y<H;y+=40){ctx2.beginPath();ctx2.moveTo(0,y);ctx2.lineTo(W,y);ctx2.stroke();}
+
+  // parallels
+  ctx2.setLineDash([7,7]); ctx2.lineWidth=1.6; ctx2.strokeStyle='rgba(110,200,255,.45)';
+  ctx2.beginPath(); ctx2.moveTo(30,BASE.by); ctx2.lineTo(W-30,BASE.by); ctx2.stroke();
+  ctx2.beginPath(); ctx2.moveTo(30,BASE.dy); ctx2.lineTo(W-30,BASE.dy); ctx2.stroke();
+  ctx2.setLineDash([]);
+
+  const B={x:p.Bx,y:p.By}, C={x:p.Cx,y:p.Cy}, D={x:p.Dx,y:p.Dy};
+
+  const ax = B.x - 250, ay = B.y;
+  const ex = D.x + 190, ey = D.y;
+
+  drawTriangleFill(ctx2, B.x,B.y, C.x,C.y, D.x,D.y, 'rgba(60,120,220,.10)');
+
+  // broken line
+  arrow(ctx2, B.x,B.y, C.x,C.y, '#facc15', 4);
+  arrow(ctx2, C.x,C.y, D.x,D.y, '#facc15', 4);
+  arrow(ctx2, B.x,B.y, ax,ay, '#60a5fa', 3.5);
+  arrow(ctx2, D.x,D.y, ex,ey, '#60a5fa', 3.5);
+
+  // ---- auxiliary line CF through C parallel to AB/DE ----
+  if(c2.checked){
+    const Fx = C.x + 240, Fy = C.y;
+    ctx2.setLineDash([8,6]); ctx2.strokeStyle='#34d399'; ctx2.lineWidth=2.4;
+    ctx2.beginPath(); ctx2.moveTo(C.x,C.y); ctx2.lineTo(Fx,Fy); ctx2.stroke();
+    ctx2.setLineDash([]);
+    label(ctx2,'F', Fx+4, Fy, '#6ee7b7', 15, true);
+
+    /* put angle markers: (180-u) between C->B and C->F ; w between C->F and C->D */
+    const cB = p.bC+180, cF = 0, cD = p.dC+180;
+    angleArc(ctx2, C.x,C.y, cB, cF, 44, '#f59e0b', 3);
+    const mid1 = (cB + norm(cF-cB)+ (cB))/2;
+    // label position roughly between C->B and C->F
+    let m1 = norm(cB + (norm(cF-cB))/2);
+    label(ctx2, '180°−u', C.x+58*Math.cos(m1*DEG), C.y-58*Math.sin(m1*DEG)-10, '#fbbf24', 13, true);
+
+    angleArc(ctx2, C.x,C.y, cF, cD, 60, '#34d399', 3);
+    let m2 = norm(cF + (norm(cD-cF))/2);
+    label(ctx2, 'w', C.x+76*Math.cos(m2*DEG), C.y-76*Math.sin(m2*DEG)-8, '#6ee7b7', 14, true);
+  }
+
+  if(c2b.checked){
+    // produce BA to G so that G, C, D collinear
+    const gx = C.x + (C.x-B.x)*1.55, gy = C.y + (C.y-B.y)*1.55;
+    ctx2.setLineDash([6,6]); ctx2.strokeStyle='#fb923c'; ctx2.lineWidth=2.2;
+    ctx2.beginPath(); ctx2.moveTo(B.x,B.y); ctx2.lineTo(gx,gy); ctx2.stroke();
+    ctx2.beginPath(); ctx2.moveTo(C.x,C.y); ctx2.lineTo(D.x,D.y); ctx2.stroke();
+    ctx2.setLineDash([]);
+    label(ctx2,'G', gx+12, gy, '#fdba74', 15, true);
+  }
+
+  // u at B
+  angleArc(ctx2, B.x,B.y, p.bC, p.bA, 46, '#f59e0b', 3);
+  let mu = norm(p.bC + (norm(p.bA-p.bC))/2);
+  label(ctx2,'u', B.x+64*Math.cos(mu*DEG), B.y-64*Math.sin(mu*DEG), '#fbbf24', 15, true);
+
+  // w at D
+  angleArc(ctx2, D.x,D.y, p.dE, p.dC, 50, '#34d399', 3);
+  let mw = norm(p.dE + (norm(p.dC-p.dE))/2);
+  label(ctx2,'w', D.x+70*Math.cos(mw*DEG), D.y-70*Math.sin(mw*DEG)+16, '#6ee7b7', 15, true);
+
+  // reflex v at C
+  const cB2 = p.bC+180, cD2 = p.dC+180;
+  reflexArc(ctx2, C.x,C.y, cB2, cD2, 60, '#f472b6', 3);
+  let mv = norm(cB2 + (norm(cD2-cB2))/2);
+  label(ctx2,'v (reflex)', C.x+94*Math.cos(mv*DEG), C.y-94*Math.sin(mv*DEG), '#fbcfe8', 14, true);
+
+  // points
+  dot(ctx2,B.x,B.y,'#fff'); dot(ctx2,C.x,C.y,'#fff'); dot(ctx2,D.x,D.y,'#fff');
+  label(ctx2,'B', B.x-16, B.y-16, '#fff', 16, true);
+  label(ctx2,'C', C.x-2, C.y-20, '#fff', 16, true);
+  label(ctx2,'D', D.x+14, D.y+18, '#fff', 16, true);
+  label(ctx2,'A', ax+12, ay, '#93c5fd', 15, true);
+  label(ctx2,'E', ex-8, ey+18, '#93c5fd', 15, true);
+
+  // readouts
+  document.getElementById('r2u').textContent = p.u.toFixed(1)+'°';
+  document.getElementById('r2v').textContent = p.v.toFixed(1)+'°';
+  document.getElementById('r2w').textContent = p.w.toFixed(1)+'°';
+  const s = p.u + p.v - p.w;
+  const el=document.getElementById('r2s');
+  el.textContent = s.toFixed(1)+'°';
+  el.parentElement.className = 'ro ' + (Math.abs(s-180)<0.9 ? 'good':'bad');
+}
+s2.addEventListener('input', draw2);
+c2.addEventListener('change', draw2);
+c2b.addEventListener('change', draw2);
+
+/* ============================================================
+   CANVAS 3 — Statement III
+   ============================================================ */
+const cv3 = document.getElementById('cv3');
+const ctx3 = cv3.getContext('2d');
+const s3 = document.getElementById('s3');
+const s3v = document.getElementById('s3v');
+const c3 = document.getElementById('c3');
+
+function computeFig3(offset){
+  // move D horizontally (and slightly vertically) -> changes w (and v)
+  const Dx = BASE.Dx + offset*2.2;
+  const Dy = BASE.dy;
+  const bC = dirDeg(BASE.Cx-BASE.Bx, BASE.Cy-BASE.by);
+  const dC = dirDeg(BASE.Cx-Dx, BASE.Cy-Dy);
+  const bA = 180, dE = 0;
+  const u = (function(){ let s=Math.abs(norm(bA-bC)); if(s>180)s=360-s; return s;})();
+  const w = (function(){ let s=Math.abs(norm(dE-dC)); if(s>180)s=360-s; return s;})();
+  const cB = norm(bC+180), cD = norm(dC+180);
+  let v = norm(cD-cB); if(v<=180) v = 360-v;
+  return {Bx:BASE.Bx,By:BASE.by,Cx:BASE.Cx,Cy:BASE.Cy,Dx,Dy,bA,bC,dC,dE,u,w,v};
+}
+
+function draw3(){
+  const p = computeFig3(+s3.value);
+  s3v.textContent = (+s3.value>0?'+':'')+s3.value+'°';
+  const W=860,H=430;
+  ctx3.clearRect(0,0,W,H);
+
+  ctx3.strokeStyle='rgba(120,160,220,.09)'; ctx3.lineWidth=1;
+  for(let x=0;x<W;x+=40){ctx3.beginPath();ctx3.moveTo(x,0);ctx3.lineTo(x,H);ctx3.stroke();}
+  for(let y=0;y<H;y+=40){ctx3.beginPath();ctx3.moveTo(0,y);ctx3.lineTo(W,y);ctx3.stroke();}
+
+  ctx3.setLineDash([7,7]); ctx3.lineWidth=1.6; ctx3.strokeStyle='rgba(110,200,255,.45)';
+  ctx3.beginPath(); ctx3.moveTo(30,BASE.by); ctx3.lineTo(W-30,BASE.by); ctx3.stroke();
+  ctx3.beginPath(); ctx3.moveTo(30,BASE.dy); ctx3.lineTo(W-30,BASE.dy); ctx3.stroke();
+  ctx3.setLineDash([]);
+
+  const B={x:p.Bx,y:p.By}, C={x:p.Cx,y:p.Cy}, D={x:p.Dx,y:p.Dy};
+
+  const ax = B.x - 250, ay = B.y;
+  const ex = D.x + 170, ey = D.y;
+
+  drawTriangleFill(ctx3, B.x,B.y, C.x,C.y, D.x,D.y, 'rgba(60,120,220,.10)');
+
+  arrow(ctx3, B.x,B.y, C.x,C.y, '#facc15', 4);
+  arrow(ctx3, C.x,C.y, D.x,D.y, '#facc15', 4);
+  arrow(ctx3, B.x,B.y, ax,ay, '#60a5fa', 3.5);
+  arrow(ctx3, D.x,D.y, ex,ey, '#60a5fa', 3.5);
+
+  // ghost original DE
+  ctx3.setLineDash([4,7]); ctx3.strokeStyle='rgba(255,255,255,.22)'; ctx3.lineWidth=1.6;
+  ctx3.beginPath(); ctx3.moveTo(BASE.Dx, BASE.dy); ctx3.lineTo(BASE.Dx+170, BASE.dy); ctx3.stroke();
+  ctx3.setLineDash([]);
+
+  if(c3.checked){
+    angleArc(ctx3, B.x,B.y, p.bC, p.bA, 46, '#f59e0b', 3);
+    let mu = norm(p.bC + (norm(p.bA-p.bC))/2);
+    label(ctx3,'u', B.x+64*Math.cos(mu*DEG), B.y-64*Math.sin(mu*DEG), '#fbbf24', 15, true);
+
+    angleArc(ctx3, D.x,D.y, p.dE, p.dC, 46, '#34d399', 3);
+    let mw = norm(p.dE + (norm(p.dC-p.dE))/2);
+    label(ctx3,'w', D.x+62*Math.cos(mw*DEG), D.y-62*Math.sin(mw*DEG)-14, '#6ee7b7', 15, true);
+
+    const cB2=p.bC+180, cD2=p.dC+180;
+    reflexArc(ctx3, C.x,C.y, cB2, cD2, 60, '#f472b6', 3);
+    let mv = norm(cB2 + (norm(cD2-cB2))/2);
+    label(ctx3,'v (reflex)', C.x+94*Math.cos(mv*DEG), C.y-94*Math.sin(mv*DEG), '#fbcfe8', 14, true);
+  }
+
+  dot(ctx3,B.x,B.y,'#fff'); dot(ctx3,C.x,C.y,'#fff'); dot(ctx3,D.x,D.y,'#fff');
+  label(ctx3,'B', B.x-16, B.y-16, '#fff', 16, true);
+  label(ctx3,'C', C.x-2, C.y-20, '#fff', 16, true);
+  label(ctx3,'D', D.x+16, D.y+18, '#fff', 16, true);
+  label(ctx3,'A', ax+12, ay, '#93c5fd', 15, true);
+  label(ctx3,'E', ex-8, ey+18, '#93c5fd', 15, true);
+
+  document.getElementById('r3u').textContent = p.u.toFixed(1)+'°';
+  document.getElementById('r3v').textContent = p.v.toFixed(1)+'°';
+  document.getElementById('r3w').textContent = p.w.toFixed(1)+'°';
+  const s = p.u+p.v+p.w;
+  const el=document.getElementById('r3s');
+  el.textContent = s.toFixed(1)+'°';
+  el.parentElement.className='ro ' + (Math.abs(s-450)<0.9 ? 'good':'bad');
+}
+s3.addEventListener('input', draw3);
+c3.addEventListener('change', draw3);
+
+/* ============================================================
+   STEP-BY-STEP REVEAL
+   ============================================================ */
+function initSteps(btnSel, targetId, counterId){
+  const btn = document.querySelector(btnSel);
+  const steps = document.querySelectorAll('#'+targetId+' .step');
+  const counter = document.getElementById(counterId);
+  let idx = 0;
+  const total = steps.length;
+  btn.addEventListener('click', ()=>{
+    if(idx < total){
+      steps[idx].classList.add('show');
+      idx++;
+    }
+    counter.textContent = idx + ' / ' + total + ' revealed';
+    if(idx >= total){
+      btn.disabled = true;
+      btn.innerHTML = 'All steps revealed ✓';
+    } else {
+      btn.innerHTML = 'Next step → <span style="opacity:.85">' + (idx+1) + ' / ' + total + '</span>';
+    }
+  });
+  counter.textContent = '0 / ' + total + ' revealed';
+}
+initSteps('[data-target="p1"]','p1','p1c');
+initSteps('[data-target="p2"]','p2','p2c');
+initSteps('[data-target="p3"]','p3','p3c');
+
+/* initial render */
+draw1(); draw2(); draw3();
+window.addEventListener('resize', ()=>{draw1();draw2();draw3();});
+</script>
+</body>
+</html>

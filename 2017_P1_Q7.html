@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2017 Paper 1 Q7 — Statistics</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[', '\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<style>
+  :root{
+    --blue:#2563eb; --blue-d:#1e40af; --amber:#f59e0b; --amber-l:#fef3c7;
+    --emerald:#059669; --emerald-l:#d1fae5; --slate:#0f172a; --gray:#64748b;
+    --bg:#f1f5f9; --card:#ffffff; --line:#e2e8f0;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg); color:var(--slate); line-height:1.55; -webkit-font-smoothing:antialiased;
+  }
+  /* ---------- Hero ---------- */
+  .hero{
+    background:linear-gradient(135deg,#1e3a8a 0%,#2563eb 45%,#0ea5e9 100%);
+    color:#fff; padding:38px 22px 46px; position:relative; overflow:hidden;
+  }
+  .hero::after{
+    content:""; position:absolute; width:340px; height:340px; border-radius:50%;
+    background:rgba(255,255,255,.08); top:-140px; right:-90px;
+  }
+  .hero::before{
+    content:""; position:absolute; width:200px; height:200px; border-radius:50%;
+    background:rgba(255,255,255,.06); bottom:-110px; left:-50px;
+  }
+  .hero-inner{max-width:900px; margin:0 auto; position:relative; z-index:2;}
+  .eyebrow{font-size:.8rem; letter-spacing:.14em; text-transform:uppercase; opacity:.85; font-weight:600;}
+  .hero h1{margin:.35rem 0 .2rem; font-size:clamp(1.5rem,4.5vw,2.3rem); font-weight:800; letter-spacing:-.02em;}
+  .hero .topic{font-size:1.02rem; opacity:.95; margin-bottom:16px;}
+  .pills{display:flex; flex-wrap:wrap; gap:8px;}
+  .pill{
+    background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35);
+    padding:5px 13px; border-radius:999px; font-size:.76rem; font-weight:600; backdrop-filter:blur(4px);
+  }
+  /* ---------- Layout ---------- */
+  .wrap{max-width:900px; margin:0 auto; padding:0 18px 60px;}
+  .card{
+    background:var(--card); border-radius:18px; padding:22px 22px 20px; margin-top:22px;
+    box-shadow:0 4px 18px rgba(15,23,42,.07); border:1px solid var(--line);
+  }
+  .card h2{
+    margin:0 0 10px; font-size:1.18rem; font-weight:800; color:var(--blue-d);
+    display:flex; align-items:center; gap:9px;
+  }
+  .card h2 .badge-num{
+    background:linear-gradient(135deg,var(--blue),#0ea5e9); color:#fff; font-size:.8rem;
+    width:28px; height:28px; border-radius:9px; display:grid; place-items:center; flex:0 0 auto; font-weight:800;
+  }
+  .qtext{font-size:1.02rem;}
+  .qtext ol{padding-left:1.4rem;}
+  .marks-total{display:inline-block; margin-top:6px; background:var(--amber-l); color:#92400e;
+    border:1px solid #fcd34d; border-radius:8px; padding:3px 11px; font-weight:700; font-size:.85rem;}
+  /* ---------- Canvas ---------- */
+  .canvas-holder{
+    background:linear-gradient(180deg,#f8fafc,#eef2f7); border:1px solid var(--line);
+    border-radius:14px; padding:10px; margin:14px 0; display:flex; justify-content:center;
+  }
+  canvas{width:100%; max-width:420px; height:auto; display:block; border-radius:10px; touch-action:none;}
+  .readout{
+    display:flex; flex-wrap:wrap; gap:9px; margin-top:4px;
+  }
+  .ro{
+    background:#fff; border:1px solid var(--line); border-radius:10px; padding:7px 12px;
+    font-size:.83rem; font-weight:600; box-shadow:0 1px 3px rgba(15,23,42,.05);
+  }
+  .ro b{color:var(--blue-d); font-weight:800;}
+  .ro.am b{color:#b45309;}
+  .ro.em b{color:var(--emerald);}
+  /* ---------- Controls ---------- */
+  .controls{
+    background:#f8fafc; border:1px dashed #cbd5e1; border-radius:12px; padding:12px 14px; margin:12px 0 4px;
+  }
+  .ctrl-row{display:flex; align-items:center; gap:12px; flex-wrap:wrap; font-size:.86rem; font-weight:600; color:#334155;}
+  .ctrl-row + .ctrl-row{margin-top:10px;}
+  input[type=range]{flex:1 1 180px; accent-color:var(--blue); height:22px;}
+  .val{font-variant-numeric:tabular-nums; background:#fff; border:1px solid var(--line);
+    border-radius:7px; padding:2px 9px; min-width:62px; text-align:center; color:var(--blue-d);}
+  .chk{display:inline-flex; align-items:center; gap:6px; cursor:pointer; select-index:0;}
+  .chk input{accent-color:var(--emerald); width:16px; height:16px;}
+  /* ---------- Steps ---------- */
+  .steps{margin-top:14px;}
+  .step{
+    display:none; background:#fbfdff; border-left:4px solid var(--blue); border-radius:0 12px 12px 0;
+    padding:13px 15px; margin-bottom:12px; animation:slideIn .35s ease;
+  }
+  .step.shown{display:block;}
+  @keyframes slideIn{from{opacity:0; transform:translateY(9px);} to{opacity:1; transform:translateY(0);}}
+  .step-head{display:flex; align-items:center; gap:9px; margin-bottom:7px; flex-wrap:wrap;}
+  .step-badge{
+    background:var(--blue); color:#fff; font-weight:800; font-size:.72rem; padding:3px 9px; border-radius:6px;
+  }
+  .mark-badge{
+    background:#fff7ed; color:#b45309; border:1px solid #fdba74; font-weight:800; font-size:.72rem;
+    padding:2px 8px; border-radius:6px;
+  }
+  .step-work{font-size:.98rem;}
+  .hint{
+    background:var(--amber-l); border-left:4px solid var(--amber); border-radius:9px;
+    padding:9px 13px; margin-top:10px; font-size:.88rem; color:#78350f;
+  }
+  .hint b{color:#92400e;}
+  .answer{
+    background:var(--emerald-l); border-left:4px solid var(--emerald); border-radius:9px;
+    padding:10px 13px; margin-top:10px; font-size:.94rem; color:#064e3b; font-weight:600;
+  }
+  /* ---------- Buttons ---------- */
+  .btn-row{display:flex; align-items:center; gap:12px; margin-top:6px; flex-wrap:wrap;}
+  button.next{
+    background:linear-gradient(135deg,var(--blue),#0ea5e9); color:#fff; border:none; cursor:pointer;
+    font-weight:700; font-size:.9rem; padding:10px 20px; border-radius:11px;
+    box-shadow:0 4px 12px rgba(37,99,235,.32); transition:transform .12s, box-shadow .12s;
+    font-family:inherit;
+  }
+  button.next:hover:not(:disabled){transform:translateY(-1px); box-shadow:0 6px 16px rgba(37,99,235,.42);}
+  button.next:disabled{background:#cbd5e1; box-shadow:none; cursor:default; color:#64748b;}
+  .counter{font-size:.82rem; font-weight:700; color:var(--gray); font-variant-numeric:tabular-nums;}
+  /* ---------- Summary ---------- */
+  .summary{background:linear-gradient(135deg,#0f172a,#1e293b); color:#e2e8f0; border:none;}
+  .summary h2{color:#7dd3fc;}
+  .summary h2 .badge-num{background:linear-gradient(135deg,#0ea5e9,#22d3ee);}
+  .summary ul{list-style:none; padding:0; margin:8px 0 0;}
+  .summary li{
+    padding:10px 0 10px 30px; position:relative; border-bottom:1px solid rgba(148,163,184,.2); font-size:.97rem;
+  }
+  .summary li:last-child{border-bottom:none;}
+  .summary li::before{
+    content:"✓"; position:absolute; left:4px; top:10px; color:#34d399; font-weight:900;
+  }
+  footer{
+    text-align:center; padding:26px 18px 40px; color:var(--gray); font-size:.82rem;
+  }
+  .mjx-container{overflow-x:auto; overflow-y:hidden; max-width:100%;}
+  @media(max-width:520px){
+    .card{padding:17px 14px;}
+    .hero{padding:28px 16px 34px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= HERO ================= -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 1</div>
+    <h1>2017 Paper 1 · Question 7</h1>
+    <div class="topic">Statistics — Pie Chart, Percentage &amp; Probability of a Sector</div>
+    <div class="pills">
+      <span class="pill">Pie Chart</span>
+      <span class="pill">Angles of a Sector</span>
+      <span class="pill">Probability</span>
+      <span class="pill">Proportion</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ================= QUESTION ================= -->
+  <section class="card">
+    <h2><span class="badge-num">Q</span> The Question</h2>
+    <div class="qtext">
+      <p>The pie chart below shows the distribution of the seasons of birth of the students in a school.</p>
+      <p style="background:#f8fafc;border:1px dashed #cbd5e1;border-radius:10px;padding:9px 13px;font-size:.9rem;">
+        <b>Pie chart:</b> Autumn (upper-left quadrant), Summer (top-right, labelled \(158^\circ\)),
+        Spring (bottom-right, labelled \(x\)), Winter (bottom-left). A right-angle mark (\(90^\circ\)) is shown at the centre
+        between Autumn and Winter.
+      </p>
+      <p>If a student is randomly selected from the school, then the probability that the selected student was born in Spring is \(\dfrac{1}{9}\).</p>
+      <ol type="a">
+        <li>Find \(x\).</li>
+        <li>In the school, there are \(180\) students born in winter. Find the number of students in the school.</li>
+      </ol>
+      <span class="marks-total">[4 marks]</span>
+    </div>
+  </section>
+
+  <!-- ================= PART (a) ================= -->
+  <section class="card">
+    <h2><span class="badge-num">a</span> Part (a) — Finding \(x\)</h2>
+
+    <div class="canvas-holder">
+      <canvas id="cvA" width="420" height="420"></canvas>
+    </div>
+
+    <div class="controls">
+      <div class="ctrl-row">
+        <label for="sldA" style="min-width:120px;">Spring angle \(x\):</label>
+        <input type="range" id="sldA" min="5" max="180" step="1" value="80">
+        <span class="val" id="valA">80°</span>
+      </div>
+      <div class="ctrl-row">
+        <label class="chk"><input type="checkbox" id="chkA1" checked> Show right-angle at centre (Winter–Autumn)</label>
+        <label class="chk"><input type="checkbox" id="chkA2" checked> Show sector labels &amp; angles</label>
+        <label class="chk"><input type="checkbox" id="chkA3" checked> Show target: Spring sector drags to 1/9 of circle</label>
+      </div>
+    </div>
+
+    <div class="readout">
+      <span class="ro am">Autumn–Winter angle = <b>90°</b></span>
+      <span class="ro">Summer = <b>158°</b></span>
+      <span class="ro">Spring \(x\) = <b id="roX">80°</b></span>
+      <span class="ro">Winter = <b id="roW">32°</b></span>
+      <span class="ro em">Sum = <b id="roSum">360°</b></span>
+    </div>
+
+    <div class="steps" id="stepsA">
+
+      <div class="step">
+        <div class="step-head"><span class="step-badge">Step 1</span><span class="mark-badge">1M</span></div>
+        <div class="step-work">
+          The probability that a randomly chosen student was born in Spring equals the fraction of the circle occupied by the Spring sector:
+          \[ P(\text{Spring})=\frac{x}{360}. \]
+        </div>
+        <div class="hint"><b>Hint:</b> In a pie chart the angle of a sector is directly proportional to the frequency it represents — so the sector fraction \(\frac{\text{angle}}{360^\circ}\) <em>is</em> the probability.</div>
+      </div>
+
+      <div class="step">
+        <div class="step-head"><span class="step-badge">Step 2</span><span class="mark-badge">1M</span></div>
+        <div class="step-work">
+          Given \(P(\text{Spring})=\dfrac{1}{9}\), set up the equation:
+          \[ \frac{x}{360}=\frac{1}{9}. \]
+        </div>
+        <div class="hint"><b>Hint:</b> Always state the probability as a fraction of \(360^\circ\) first; then the algebra is a simple one-step equation.</div>
+      </div>
+
+      <div class="step">
+        <div class="step-head"><span class="step-badge">Step 3</span><span class="mark-badge">1A</span></div>
+        <div class="step-work">
+          Solve for \(x\):
+          \[ x=\frac{360}{9}=40. \]
+        </div>
+        <div class="answer">∴ \(x=40^\circ\)</div>
+        <div class="hint"><b>Hint:</b> Check: \(40^\circ\) is \(\frac{1}{9}\) of \(360^\circ\). ✓ The remaining Winter sector is \(360-90-158-40=72^\circ\), which is exactly the angle we use in part (b).</div>
+      </div>
+
+    </div>
+
+    <div class="btn-row">
+      <button class="next" id="btnA" data-target="stepsA">Next step →</button>
+      <span class="counter" id="cntA">0 / 3</span>
+    </div>
+  </section>
+
+  <!-- ================= PART (b) ================= -->
+  <section class="card">
+    <h2><span class="badge-num">b</span> Part (b) — Total number of students</h2>
+
+    <div class="canvas-holder">
+      <canvas id="cvB" width="420" height="420"></canvas>
+    </div>
+
+    <div class="controls">
+      <div class="ctrl-row">
+        <label for="sldB" style="min-width:150px;">Number born in Winter:</label>
+        <input type="range" id="sldB" min="30" max="360" step="10" value="180">
+        <span class="val" id="valB">180</span>
+      </div>
+      <div class="ctrl-row">
+        <label class="chk"><input type="checkbox" id="chkB1" checked> Show angle labels</label>
+        <label class="chk"><input type="checkbox" id="chkB2" checked> Show student counts per sector</label>
+      </div>
+    </div>
+
+    <div class="readout">
+      <span class="ro">Winter angle = <b id="roBW">72°</b></span>
+      <span class="ro">Fraction of Winter = <b id="roBF">72/360 = 1/5</b></span>
+      <span class="ro em">Total students \(n\) = <b id="roBN">900</b></span>
+    </div>
+
+    <div class="steps" id="stepsB">
+
+      <div class="step">
+        <div class="step-head"><span class="step-badge">Step 1</span><span class="mark-badge">1M</span></div>
+        <div class="step-work">
+          Find the Winter sector angle using the \(x=40^\circ\) from part (a):
+          \[ \text{Winter}=360-90-158-40=72^\circ. \]
+        </div>
+        <div class="hint"><b>Hint:</b> All four sector angles must add up to \(360^\circ\). Subtract the three known angles from \(360^\circ\).</div>
+      </div>
+
+      <div class="step">
+        <div class="step-head"><span class="step-badge">Step 2</span><span class="mark-badge">1M</span></div>
+        <div class="step-work">
+          Let \(n\) be the number of students in the school. The Winter sector is a fraction \(\frac{72}{360}\) of the whole, so:
+          \[ \frac{n}{360}=\frac{180}{72}. \]
+          &nbsp;(Equivalently, \(\dfrac{n}{180}=\dfrac{360}{72}\).)
+        </div>
+        <div class="hint"><b>Hint:</b> The ratio of "students : students" must equal the ratio of "angles : angles": \(\dfrac{\text{total students}}{180}=\dfrac{360^\circ}{72^\circ}\).</div>
+      </div>
+
+      <div class="step">
+        <div class="step-head"><span class="step-badge">Step 3</span><span class="mark-badge">1A</span></div>
+        <div class="step-work">
+          Simplify the fraction \(\dfrac{180}{72}=\dfrac{5}{2}\) and solve:
+          \[ \frac{n}{360}=\frac{5}{2}\;\Longrightarrow\; n=\frac{5}{2}\times 360 = 180\times 5 = 900. \]
+          Alternatively, \(\dfrac{n}{180}=\dfrac{360}{72}=5\), so \(n=180\times 5=900\).
+        </div>
+        <div class="answer">∴ The number of students in the school is \(900\).</div>
+        <div class="hint"><b>Hint:</b> A common mistake is to write \(\frac{72}{360}=\frac{180}{n}\) upside-down. Check: \(72^\circ\) is a small sector, so \(180\) students must be a <em>small</em> fraction of \(n\) — and \(180/900=1/5=72/360\). ✓</div>
+      </div>
+
+    </div>
+
+    <div class="btn-row">
+      <button class="next" id="btnB" data-target="stepsB">Next step →</button>
+      <span class="counter" id="cntB">0 / 3</span>
+    </div>
+  </section>
+
+  <!-- ================= SUMMARY ================= -->
+  <section class="card summary">
+    <h2><span class="badge-num">Σ</span> Summary of Answers</h2>
+    <ul>
+      <li>(a) \(x = 40^\circ\) &nbsp;(the Spring sector angle)</li>
+      <li>(b) The number of students in the school is \(900\).</li>
+      <li>Key relation used: \(\dfrac{\text{sector angle}}{360^\circ} = \dfrac{\text{frequency}}{\text{total}}\) &nbsp;(equivalently the sector's probability).</li>
+    </ul>
+  </section>
+
+  <footer>
+    HKDSE Mathematics (Compulsory Part) · 2017 Paper 1 Question 7 · Interactive Solution
+  </footer>
+</div>
+
+<script>
+/* ============================================================
+   Shared helpers
+   ============================================================ */
+function drawArcLabel(ctx, cx, cy, rMid, a0, a1, text, color){
+  const mid = (a0 + a1) / 2;
+  const x = cx + Math.cos(mid) * rMid;
+  const y = cy + Math.sin(mid) * rMid;
+  ctx.fillStyle = color;
+  ctx.font = "bold 15px -apple-system, Segoe UI, sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(text, x, y);
+}
+
+function sector(ctx, cx, cy, r, a0, a1, fill, stroke){
+  ctx.beginPath();
+  ctx.moveTo(cx, cy);
+  ctx.arc(cx, cy, r, a0, a1);
+  ctx.closePath();
+  ctx.fillStyle = fill;
+  ctx.fill();
+  ctx.lineWidth = 1.5;
+  ctx.strokeStyle = stroke;
+  ctx.stroke();
+}
+
+/* ============================================================
+   PART (a) canvas
+   Sector layout (angles measured clockwise from the positive y-axis,
+   i.e. screen angles where 12 o'clock = -90°):
+     Summer : 158°
+     Spring : x
+     Winter : remaining
+     Autumn : 90°  (top-left quadrant)
+   We simply place 12 o'clock as the split between Autumn and Summer.
+   ============================================================ */
+(function(){
+  const cv = document.getElementById('cvA');
+  const ctx = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+  const cx = W/2, cy = H/2, R = 145;
+
+  const sld = document.getElementById('sldA');
+  const valA = document.getElementById('valA');
+  const chk1 = document.getElementById('chkA1');
+  const chk2 = document.getElementById('chkA2');
+  const chk3 = document.getElementById('chkA3');
+  const roX = document.getElementById('roX');
+  const roW = document.getElementById('roW');
+  const roSum = document.getElementById('roSum');
+
+  // Canvas angles: standard math angles but y-down.
+  // Start Summer at the top (-90°) heading clockwise (increasing angle in y-down coords).
+  function draw(){
+    const xSpring = parseFloat(sld.value);
+    const winter = 360 - 90 - 158 - xSpring;
+    valA.textContent = xSpring + '°';
+    roX.textContent = xSpring + '°';
+    roW.textContent = winter + '°';
+    roSum.textContent = '360°';
+
+    ctx.clearRect(0,0,W,H);
+
+    // background
+    ctx.fillStyle = '#f8fafc';
+    ctx.fillRect(0,0,W,H);
+
+    // pale guide circle
+    ctx.beginPath();
+    ctx.arc(cx, cy, R, 0, Math.PI*2);
+    ctx.strokeStyle = '#e2e8f0';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    const D = Math.PI/180;
+    // Sector spans (degrees, clockwise from top)
+    const summerA0 = -90,   summerA1 = -90 + 158;       // 158°
+    const springA0 = summerA1, springA1 = springA0 + xSpring;
+    const winterA0 = 0,     winterA1 = winter;          // measured from +x axis (right) clockwise
+    // Actually place Winter just after Spring, and Autumn in the top-left.
+
+    // Summer : top-right, clockwise from top
+    sector(ctx, cx, cy, R, summerA0*D, summerA1*D, '#fde68a', '#d97706');
+    // Spring : next clockwise
+    sector(ctx, cx, cy, R, springA0*D, springA1*D, '#bbf7d0', '#16a34a');
+    // Winter : next clockwise (from Spring end up to 90° position i.e. to the left)
+    sector(ctx, cx, cy, R, springA1*D, (springA1 + winter)*D, '#bae6fd', '#0284c7');
+    // Autumn : remaining, back to top
+    sector(ctx, cx, cy, R, (springA1 + winter)*D, (springA1 + winter + 90)*D, '#e9d5ff', '#7c3aed');
+
+    // outline of the circle
+    ctx.beginPath();
+    ctx.arc(cx, cy, R, 0, Math.PI*2);
+    ctx.strokeStyle = '#334155';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // right angle marker (between Autumn and Winter) — only if toggled
+    if (chk1.checked){
+      const ra = (springA1 + winter) * D;  // angle where Autumn meets Winter
+      const s = 22;
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(ra);
+      ctx.beginPath();
+      ctx.rect(0, -s, s, s);
+      ctx.strokeStyle = '#7c3aed';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // labels
+    if (chk2.checked){
+      drawArcLabel(ctx, cx, cy, R*0.66, summerA0*D, summerA1*D, 'Summer', '#92400e');
+      drawArcLabel(ctx, cx, cy, R*0.66, springA0*D, springA1*D, 'Spring', '#166534');
+      drawArcLabel(ctx, cx, cy, R*0.66, springA1*D, (springA1+winter)*D, 'Winter', '#075985');
+      drawArcLabel(ctx, cx, cy, R*0.66, (springA1+winter)*D, (springA1+winter+90)*D, 'Autumn', '#6b21a8');
+
+      // angle numbers
+      ctx.fillStyle = '#92400e';
+      ctx.font = 'bold 13px -apple-system, Segoe UI, sans-serif';
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      let mS = (summerA0 + summerA1)/2 * D;
+      ctx.fillText('158°', cx + Math.cos(mS)*R*0.88, cy + Math.sin(mS)*R*0.88);
+
+      ctx.fillStyle = '#166534';
+      let mSp = (springA0 + springA1)/2 * D;
+      ctx.fillText(xSpring + '°', cx + Math.cos(mSp)*R*0.88, cy + Math.sin(mSp)*R*0.88);
+
+      ctx.fillStyle = '#075985';
+      let mW = (springA1 + springA1+winter)/2 * D;
+      ctx.fillText(winter + '°', cx + Math.cos(mW)*R*0.88, cy + Math.sin(mW)*R*0.88);
+    }
+
+    // target marker: highlight when x is 1/9 of the circle
+    if (chk3.checked && xSpring === 40){
+      // pulsing ring
+      const t = (Date.now()%1200)/1200;
+      ctx.beginPath();
+      ctx.arc(cx, cy, R*0.5, 0, Math.PI*2);
+      ctx.strokeStyle = 'rgba(22,163,74,' + (0.6 - 0.6*t).toFixed(2) + ')';
+      ctx.lineWidth = 5;
+      ctx.stroke();
+    }
+  }
+
+  sld.addEventListener('input', draw);
+  chk1.addEventListener('change', draw);
+  chk2.addEventListener('change', draw);
+  chk3.addEventListener('change', draw);
+  draw();
+  setInterval(()=>{ if (chk3.checked) draw(); }, 60);
+})();
+
+/* ============================================================
+   PART (b) canvas
+   Pie chart with the fixed angles 90/158/40/72, and the number
+   of winter students controlled by a slider; total scales with it.
+   ============================================================ */
+(function(){
+  const cv = document.getElementById('cvB');
+  const ctx = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+  const cx = W/2, cy = H/2, R = 145;
+
+  const sld = document.getElementById('sldB');
+  const valB = document.getElementById('valB');
+  const chk1 = document.getElementById('chkB1');
+  const chk2 = document.getElementById('chkB2');
+  const roBW = document.getElementById('roBW');
+  const roBF = document.getElementById('roBF');
+  const roBN = document.getElementById('roBN');
+
+  const A_SUMMER = 158, A_SPRING = 40, A_WINTER = 72, A_AUTUMN = 90;
+  const D = Math.PI/180;
+
+  function draw(){
+    const winterStudents = parseFloat(sld.value);
+    const n = Math.round(winterStudents * 360 / A_WINTER);
+    valB.textContent = winterStudents;
+    roBW.textContent = A_WINTER + '°';
+    roBF.textContent = '72/360 = 1/5';
+    roBN.textContent = n;
+
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle = '#f8fafc';
+    ctx.fillRect(0,0,W,H);
+
+    // fixed sector layout
+    const summerA0 = -90, summerA1 = summerA0 + A_SUMMER;
+    const springA0 = summerA1, springA1 = springA0 + A_SPRING;
+    const winterA0 = springA1, winterA1 = winterA0 + A_WINTER;
+    const autumnA0 = winterA1, autumnA1 = autumnA0 + A_AUTUMN;
+
+    sector(ctx, cx, cy, R, summerA0*D, summerA1*D, '#fde68a', '#d97706');
+    sector(ctx, cx, cy, R, springA0*D, springA1*D, '#bbf7d0', '#16a34a');
+    sector(ctx, cx, cy, R, winterA0*D, winterA1*D, '#bae6fd', '#0284c7');
+    sector(ctx, cx, cy, R, autumnA0*D, autumnA1*D, '#e9d5ff', '#7c3aed');
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, R, 0, Math.PI*2);
+    ctx.strokeStyle = '#334155';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // right-angle mark between Winter and Autumn
+    const ra = winterA0 * D;
+    const s = 22;
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(ra);
+    ctx.beginPath();
+    ctx.rect(0, -s, s, s);
+    ctx.strokeStyle = '#7c3aed';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.restore();
+
+    // labels — season and (optionally) count
+    function label(a0,a1,text,color,count){
+      const mid = (a0+a1)/2 * D;
+      const rr = R*0.68;
+      ctx.fillStyle = color;
+      ctx.font = 'bold 14px -apple-system, Segoe UI, sans-serif';
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText(text, cx + Math.cos(mid)*rr, cy + Math.sin(mid)*rr);
+      if (chk2.checked && count !== undefined){
+        ctx.font = 'bold 12px -apple-system, Segoe UI, sans-serif';
+        ctx.fillText(count, cx + Math.cos(mid)*rr, cy + Math.sin(mid)*rr + 16);
+      }
+    }
+
+    const cSummer = Math.round(n * A_SUMMER/360);
+    const cSpring = Math.round(n * A_SPRING/360);
+    const cWinter = winterStudents;
+    const cAutumn = Math.round(n * A_AUTUMN/360);
+
+    label(summerA0, summerA1, 'Summer', '#92400e', cSummer);
+    label(springA0, springA1, 'Spring', '#166534', cSpring);
+    label(winterA0, winterA1, 'Winter', '#075985', cWinter);
+    label(autumnA0, autumnA1, 'Autumn', '#6b21a8', cAutumn);
+
+    // angle labels
+    if (chk1.checked){
+      ctx.fillStyle = '#475569';
+      ctx.font = 'bold 12px -apple-system, Segoe UI, sans-serif';
+      const angleLabels = [
+        [(summerA0+summerA1)/2, '158°'],
+        [(springA0+springA1)/2, '40°'],
+        [(winterA0+winterA1)/2, '72°'],
+        [(autumnA0+autumnA1)/2, '90°']
+      ];
+      angleLabels.forEach(([a, txt])=>{
+        const ang = a*D, rr = R*0.88;
+        ctx.fillText(txt, cx + Math.cos(ang)*rr, cy + Math.sin(ang)*rr);
+      });
+    }
+
+    // highlight Winter sector if 180 students
+    if (Math.abs(winterStudents - 180) < 0.1){
+      ctx.beginPath();
+      ctx.arc(cx, cy, R+8, winterA0*D, winterA1*D);
+      ctx.strokeStyle = 'rgba(2,132,199,.75)';
+      ctx.lineWidth = 4;
+      ctx.stroke();
+    }
+  }
+
+  sld.addEventListener('input', draw);
+  chk1.addEventListener('change', draw);
+  chk2.addEventListener('change', draw);
+  draw();
+})();
+
+/* ============================================================
+   Step reveal logic
+   ============================================================ */
+function setupReveal(btnId, stepsId, cntId){
+  const btn = document.getElementById(btnId);
+  const container = document.getElementById(stepsId);
+  const steps = Array.from(container.querySelectorAll('.step'));
+  const counter = document.getElementById(cntId);
+  let idx = 0;
+
+  function update(){
+    counter.textContent = idx + ' / ' + steps.length;
+    if (idx >= steps.length){
+      btn.disabled = true;
+      btn.textContent = 'All steps revealed ✓';
+    }
+  }
+
+  btn.addEventListener('click', ()=>{
+    if (idx < steps.length){
+      steps[idx].classList.add('shown');
+      idx++;
+      if (window.MathJax && MathJax.typesetPromise){
+        MathJax.typesetPromise([steps[idx-1]]).catch(()=>{});
+      }
+      update();
+    }
+  });
+
+  update();
+}
+
+setupReveal('btnA', 'stepsA', 'cntA');
+setupReveal('btnB', 'stepsB', 'cntB');
+
+/* typeset once on load */
+window.addEventListener('load', ()=>{
+  if (window.MathJax && MathJax.typesetPromise){
+    MathJax.typesetPromise().catch(()=>{});
+  }
+});
+</script>
+</body>
+</html>

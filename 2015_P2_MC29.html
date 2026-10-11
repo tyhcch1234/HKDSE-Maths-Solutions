@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2015 Paper 2 Q29 — Box-and-Whisker Diagram</title>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<style>
+  :root{
+    --blue:#1d4ed8; --blue-dark:#1e3a8a; --blue-light:#dbeafe;
+    --amber:#f59e0b; --amber-light:#fef3c7;
+    --emerald:#059669; --emerald-light:#d1fae5;
+    --slate:#0f172a; --grey:#64748b; --bg:#f1f5f9;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg); color:#1e293b; line-height:1.6;
+  }
+  /* ---------- Hero ---------- */
+  .hero{
+    background:linear-gradient(135deg,#1e3a8a 0%,#1d4ed8 45%,#3b82f6 100%);
+    color:#fff; padding:38px 22px 30px; position:relative; overflow:hidden;
+  }
+  .hero::after{
+    content:""; position:absolute; right:-60px; top:-60px;
+    width:240px; height:240px; border-radius:50%;
+    background:rgba(255,255,255,.08);
+  }
+  .hero-inner{max-width:920px; margin:0 auto; position:relative; z-index:2;}
+  .eyebrow{font-size:.78rem; letter-spacing:.16em; text-transform:uppercase; opacity:.85; margin:0 0 6px;}
+  .hero h1{margin:0; font-size:1.85rem; font-weight:800; letter-spacing:-.02em;}
+  .hero .subtitle{margin:8px 0 16px; font-size:1rem; opacity:.92;}
+  .pills{display:flex; flex-wrap:wrap; gap:8px;}
+  .pill{
+    background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.30);
+    padding:4px 13px; border-radius:999px; font-size:.78rem; font-weight:600;
+  }
+  /* ---------- Layout ---------- */
+  main{max-width:920px; margin:0 auto; padding:26px 16px 50px;}
+  .card{
+    background:#fff; border-radius:16px; padding:22px 24px;
+    box-shadow:0 4px 18px rgba(15,23,42,.07); margin-bottom:24px;
+    border:1px solid #e2e8f0;
+  }
+  .card h2{
+    margin:0 0 14px; font-size:1.18rem; color:var(--blue-dark);
+    border-left:5px solid var(--blue); padding-left:12px;
+  }
+  .qtext{font-size:1.02rem;}
+  .qtext ol{margin:10px 0 0 0; padding-left:22px;}
+  .qtext li{margin:4px 0;}
+  .marks{
+    display:inline-block; background:var(--amber-light); color:#92400e;
+    font-size:.72rem; font-weight:700; border-radius:6px; padding:1px 7px;
+    margin-left:6px; border:1px solid #fcd34d;
+  }
+  /* ---------- Canvas ---------- */
+  .canvas-wrap{
+    background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px;
+    padding:10px; margin:14px 0; text-align:center;
+  }
+  canvas{max-width:100%; height:auto; display:block; margin:0 auto; touch-action:manipulation;}
+  .readouts{
+    display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:10px;
+  }
+  .readout{
+    background:#fff; border:1px solid #cbd5e1; border-radius:10px;
+    padding:6px 13px; font-size:.83rem; font-weight:600; color:#334155;
+    min-width:110px; text-align:center;
+  }
+  .readout b{color:var(--blue);}
+  .controls{display:flex; flex-wrap:wrap; gap:14px; align-items:center; justify-content:center; margin-top:10px;}
+  .control-group{
+    display:flex; align-items:center; gap:9px; background:#fff;
+    border:1px solid #cbd5e1; border-radius:10px; padding:6px 14px; font-size:.83rem; font-weight:600;
+  }
+  input[type=range]{accent-color:var(--blue); width:130px;}
+  /* ---------- Steps ---------- */
+  .step{
+    display:none; border-left:4px solid var(--blue-light);
+    background:#f8fafc; border-radius:0 10px 10px 0; padding:13px 16px; margin:12px 0;
+    animation:fade .35s ease;
+  }
+  .step.show{display:block;}
+  @keyframes fade{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
+  .step-head{display:flex; align-items:center; gap:10px; margin-bottom:7px;}
+  .badge{
+    background:var(--blue); color:#fff; font-size:.74rem; font-weight:800;
+    border-radius:999px; padding:2px 10px; letter-spacing:.03em;
+  }
+  .m-badge{
+    background:var(--amber-light); color:#92400e; font-size:.72rem; font-weight:700;
+    border:1px solid #fcd34d; border-radius:6px; padding:1px 7px;
+  }
+  .hint{
+    background:var(--amber-light); border-left:4px solid var(--amber);
+    border-radius:0 8px 8px 0; padding:9px 13px; font-size:.88rem; margin-top:9px;
+  }
+  .hint b{color:#92400e;}
+  .answerbox{
+    background:var(--emerald-light); border-left:4px solid var(--emerald);
+    border-radius:0 8px 8px 0; padding:9px 13px; font-size:.92rem; margin-top:9px;
+    font-weight:600; color:#065f46;
+  }
+  .step-btn{
+    background:var(--blue); color:#fff; border:none; border-radius:10px;
+    padding:10px 20px; font-size:.9rem; font-weight:700; cursor:pointer;
+    transition:.2s; box-shadow:0 3px 10px rgba(29,78,216,.28); margin-top:6px;
+  }
+  .step-btn:hover:not(:disabled){background:var(--blue-dark); transform:translateY(-1px);}
+  .step-btn:disabled{background:#94a3b8; cursor:not-allowed; box-shadow:none;}
+  .counter{font-size:.8rem; color:var(--grey); font-weight:700; margin-left:12px;}
+  /* ---------- Summary ---------- */
+  .summary{
+    background:linear-gradient(135deg,#0f172a,#1e293b); color:#e2e8f0;
+    border-radius:16px; padding:24px 26px; margin-bottom:24px;
+    box-shadow:0 6px 22px rgba(15,23,42,.25);
+  }
+  .summary h2{color:#93c5fd; border-left-color:#3b82f6; margin-bottom:14px;}
+  .summary ul{margin:0; padding-left:20px;}
+  .summary li{margin:7px 0; font-size:1rem;}
+  .summary .hl{color:#6ee7b7; font-weight:700;}
+  footer{text-align:center; color:var(--grey); font-size:.8rem; padding:14px 0 34px;}
+  @media(max-width:560px){
+    .hero h1{font-size:1.4rem;}
+    .card{padding:17px 15px;}
+    .readout{min-width:88px; font-size:.76rem;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= HERO ================= -->
+<header class="hero">
+  <div class="hero-inner">
+    <p class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</p>
+    <h1>2015 Paper 2 · Question 29</h1>
+    <p class="subtitle">Statistics — Reading a Box-and-Whisker Diagram</p>
+    <div class="pills">
+      <span class="pill">Box-and-Whisker Diagram</span>
+      <span class="pill">Quartiles</span>
+      <span class="pill">Inter-quartile Range</span>
+      <span class="pill">Five-Number Summary</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ================= QUESTION ================= -->
+  <section class="card">
+    <h2>Question</h2>
+    <div class="qtext">
+      <p>The box-and-whisker diagram below shows the distribution of the numbers of books read by some teachers in a term. Find the inter-quartile range of the distribution. <span class="marks">2 marks</span></p>
+      <ol type="A">
+        <li>20</li>
+        <li>35</li>
+        <li>40</li>
+        <li>45</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ================= PART (a) ================= -->
+  <section class="card">
+    <h2>Part (a) — Read the quartiles from the diagram</h2>
+
+    <div class="canvas-wrap">
+      <canvas id="cv1" width="820" height="260"></canvas>
+      <div class="controls">
+        <div class="control-group">
+          <label for="q1s">\(Q_1 =\) <b id="q1val">25</b></label>
+          <input type="range" id="q1s" min="15" max="35" step="1" value="25">
+        </div>
+        <div class="control-group">
+          <label for="q3s">\(Q_3 =\) <b id="q3val">45</b></label>
+          <input type="range" id="q3s" min="38" max="60" step="1" value="45">
+        </div>
+      </div>
+      <div class="readouts">
+        <div class="readout">\(Q_1\) = <b id="ro-q1">25</b></div>
+        <div class="readout">\(Q_3\) = <b id="ro-q3">45</b></div>
+        <div class="readout">IQR = <b id="ro-iqr">20</b></div>
+      </div>
+    </div>
+
+    <button class="step-btn" id="btn1">Next step →</button>
+    <span class="counter" id="cnt1">0 / 3</span>
+
+    <div class="step" data-p="1">
+      <div class="step-head"><span class="badge">Step 1</span><span class="m-badge">1M</span></div>
+      <p>In a box-and-whisker diagram the box is bounded by the <b>lower quartile</b> \(Q_1\) on the left and the <b>upper quartile</b> \(Q_3\) on the right. Locate the left and right edges of the box and read off their values on the horizontal axis.</p>
+      <div class="hint"><b>Hint:</b> The whiskers reach the minimum and maximum; the <em>line inside</em> the box is the median \(Q_2\).</div>
+    </div>
+
+    <div class="step" data-p="1">
+      <div class="step-head"><span class="badge">Step 2</span><span class="m-badge">1A</span></div>
+      <p>From the diagram:</p>
+      \[ Q_1 = 25 \qquad Q_3 = 45 \]
+      <div class="hint"><b>Hint:</b> Check the scale — each small division on the axis is 5 units, and the 4th and 8th vertical guide lines sit at 25 and 45.</div>
+      <div class="answerbox">\(Q_1 = 25,\quad Q_3 = 45\)</div>
+    </div>
+
+    <div class="step" data-p="1">
+      <div class="step-head"><span class="badge">Step 3</span><span class="m-badge">1A</span></div>
+      <p>Compute the inter-quartile range:</p>
+      \[ \text{IQR} = Q_3 - Q_1 = 45 - 25 = 20 \]
+      <div class="hint"><b>Hint:</b> IQR measures the spread of the middle 50% of the data. It is never negative, so always take \(Q_3 - Q_1\).</div>
+      <div class="answerbox">IQR \(= 20\) → Answer: <b>A</b></div>
+    </div>
+  </section>
+
+  <!-- ================= PART (b) ================= -->
+  <section class="card">
+    <h2>Part (b) — Why the other options are wrong</h2>
+
+    <div class="canvas-wrap">
+      <canvas id="cv2" width="820" height="300"></canvas>
+      <div class="controls">
+        <div class="control-group">
+          <label><input type="checkbox" id="chk-med"> Show median \(Q_2\)</label>
+        </div>
+        <div class="control-group">
+          <label><input type="checkbox" id="chk-range" checked> Show full range</label>
+        </div>
+        <div class="control-group">
+          <label><input type="checkbox" id="chk-iqr" checked> Highlight IQR</label>
+        </div>
+      </div>
+      <div class="readouts">
+        <div class="readout">Range = <b id="ro-range">50</b></div>
+        <div class="readout">IQR = <b>20</b></div>
+        <div class="readout">Median \(Q_2\) = <b id="ro-med">40</b></div>
+      </div>
+    </div>
+
+    <button class="step-btn" id="btn2">Next step →</button>
+    <span class="counter" id="cnt2">0 / 3</span>
+
+    <div class="step" data-p="2">
+      <div class="step-head"><span class="badge">Step 1</span><span class="m-badge">1M</span></div>
+      <p><b>Option A (20) — correct.</b> This is exactly \(Q_3 - Q_1\). Toggle the “Highlight IQR” box to see the shaded region which spans from 25 to 45.</p>
+      <div class="hint"><b>Hint:</b> The IQR is the <em>width of the box</em>, not the length of the whole diagram.</div>
+    </div>
+
+    <div class="step" data-p="2">
+      <div class="step-head"><span class="badge">Step 2</span><span class="m-badge">1M</span></div>
+      <p><b>Option B (35) — wrong.</b> This is \(60 - 25\) or another mis-read; it mixes a whisker end with a quartile. The whisker ends are the minimum and maximum, not quartiles.</p>
+      <div class="hint"><b>Hint:</b> Don’t confuse the ends of the whiskers (min / max) with the edges of the box (\(Q_1\) / \(Q_3\)).</div>
+    </div>
+
+    <div class="step" data-p="2">
+      <div class="step-head"><span class="badge">Step 3</span><span class="m-badge">1M</span></div>
+      <p><b>Options C (40) and D (45) — wrong.</b> \(40\) is the median \(Q_2\); \(45\) is simply \(Q_3\). Neither is a <em>difference</em> of two quartiles.</p>
+      <div class="hint"><b>Hint:</b> IQR is always a subtraction. Tick “Show median” to see the vertical line at 40 — that is the median, not the IQR.</div>
+      <div class="answerbox">Correct option: <b>A (20)</b></div>
+    </div>
+  </section>
+
+  <!-- ================= SUMMARY ================= -->
+  <section class="summary">
+    <h2>Summary of Answers</h2>
+    <ul>
+      <li>Lower quartile: \(Q_1 = 25\)</li>
+      <li>Upper quartile: \(Q_3 = 45\)</li>
+      <li>Inter-quartile range: \(\text{IQR} = Q_3 - Q_1 = 45 - 25 = <span class="hl">20</span>\)</li>
+      <li>Correct option: <span class="hl">A</span></li>
+      <li>Reminder: IQR \(=\) width of the box \(=\) spread of the middle 50% of the data.</li>
+    </ul>
+  </section>
+
+</main>
+
+<footer>HKDSE Mathematics (Compulsory Part) · Paper 2 · Interactive Solution</footer>
+
+<script>
+/* =====================================================
+   Diagram 1 : Interactive box-and-whisker plot
+   ===================================================== */
+(function(){
+  const cv = document.getElementById('cv1');
+  const ctx = cv.getContext('2d');
+  const q1s = document.getElementById('q1s');
+  const q3s = document.getElementById('q3s');
+
+  // fixed summary values
+  const MIN = 10, MAX = 60, MED = 40;
+
+  // axis mapping
+  const X0 = 70, X1 = 780;      // pixel positions for value 0 and 70
+  const MINV = 0, MAXV = 70;
+  const yAxis = 175;            // baseline y
+  const boxTop = 110, boxBot = 150;
+
+  function x(v){ return X0 + (v - MINV) / (MAXV - MINV) * (X1 - X0); }
+
+  function draw(){
+    const q1 = +q1s.value, q3 = +q3s.value;
+
+    ctx.clearRect(0,0,cv.width,cv.height);
+
+    // --- grid / guide lines every 5 units ---
+    ctx.strokeStyle = '#cbd5e1';
+    ctx.lineWidth = 1;
+    for(let v = 10; v <= 70; v += 5){
+      const px = x(v);
+      ctx.beginPath();
+      ctx.moveTo(px, 80);
+      ctx.lineTo(px, yAxis);
+      ctx.stroke();
+    }
+
+    // --- axis ---
+    ctx.strokeStyle = '#334155';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(X0-30, yAxis);
+    ctx.lineTo(X1+10, yAxis);
+    ctx.stroke();
+
+    // axis label
+    ctx.fillStyle = '#334155';
+    ctx.font = 'bold 14px Segoe UI, Arial';
+    ctx.textAlign = 'left';
+    ctx.fillText('Number of books read', X1-140, yAxis+34);
+
+    // ticks every 10
+    ctx.font = 'bold 13px Segoe UI, Arial';
+    ctx.textAlign = 'center';
+    for(let v = 10; v <= 70; v += 10){
+      const px = x(v);
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(px, yAxis);
+      ctx.lineTo(px, yAxis+7);
+      ctx.stroke();
+      ctx.fillStyle = '#475569';
+      ctx.fillText(v, px, yAxis+24);
+    }
+
+    // --- IQR shaded region ---
+    ctx.fillStyle = 'rgba(16,185,129,.16)';
+    ctx.fillRect(x(q1), 88, x(q3)-x(q1), yAxis-88);
+
+    // --- whiskers ---
+    ctx.strokeStyle = '#1e3a8a';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(x(MIN), yAxis-30);
+    ctx.lineTo(x(q1), yAxis-30);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x(q3), yAxis-30);
+    ctx.lineTo(x(MAX), yAxis-30);
+    ctx.stroke();
+
+    // whisker end caps
+    ctx.beginPath();
+    ctx.moveTo(x(MIN), yAxis-45);
+    ctx.lineTo(x(MIN), yAxis-15);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x(MAX), yAxis-45);
+    ctx.lineTo(x(MAX), yAxis-15);
+    ctx.stroke();
+
+    // --- box ---
+    ctx.fillStyle = 'rgba(59,130,246,.20)';
+    ctx.fillRect(x(q1), boxTop, x(q3)-x(q1), boxBot-boxTop);
+    ctx.strokeStyle = '#1d4ed8';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(x(q1), boxTop, x(q3)-x(q1), boxBot-boxTop);
+
+    // --- median line ---
+    ctx.strokeStyle = '#dc2626';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(x(MED), boxTop);
+    ctx.lineTo(x(MED), boxBot);
+    ctx.stroke();
+
+    // --- labels ---
+    ctx.font = 'bold 13px Segoe UI, Arial';
+    ctx.textAlign = 'center';
+
+    // Q1 label
+    ctx.fillStyle = '#1d4ed8';
+    ctx.fillText('Q₁ = ' + q1, x(q1), boxTop-14);
+    // Q3 label
+    ctx.fillText('Q₃ = ' + q3, x(q3), boxTop-14);
+
+    // median label
+    ctx.fillStyle = '#dc2626';
+    ctx.fillText('Q₂ = ' + MED, x(MED), boxBot+20);
+
+    // min / max labels
+    ctx.fillStyle = '#1e3a8a';
+    ctx.fillText('min = ' + MIN, x(MIN), yAxis-56);
+    ctx.fillText('max = ' + MAX, x(MAX), yAxis-56);
+
+    // --- IQR double arrow ---
+    const yArrow = 228;
+    ctx.strokeStyle = '#059669';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(x(q1), yArrow);
+    ctx.lineTo(x(q3), yArrow);
+    ctx.stroke();
+    // arrow heads
+    ctx.beginPath();
+    ctx.moveTo(x(q1), yArrow); ctx.lineTo(x(q1)+8, yArrow-5); ctx.lineTo(x(q1)+8, yArrow+5); ctx.closePath();
+    ctx.fillStyle='#059669'; ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(x(q3), yArrow); ctx.lineTo(x(q3)-8, yArrow-5); ctx.lineTo(x(q3)-8, yArrow+5); ctx.closePath();
+    ctx.fill();
+
+    // vertical dashed guides at Q1, Q3 to the arrow
+    ctx.setLineDash([4,4]);
+    ctx.strokeStyle = '#059669';
+    ctx.beginPath(); ctx.moveTo(x(q1), boxBot); ctx.lineTo(x(q1), yArrow); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x(q3), boxBot); ctx.lineTo(x(q3), yArrow); ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.fillStyle = '#059669';
+    ctx.font = 'bold 14px Segoe UI, Arial';
+    ctx.fillText('IQR = ' + (q3-q1), (x(q1)+x(q3))/2, yArrow+24);
+
+    // --- title ---
+    ctx.fillStyle = '#0f172a';
+    ctx.font = 'bold 15px Segoe UI, Arial';
+    ctx.textAlign = 'left';
+    ctx.fillText('Box-and-Whisker Diagram (drag the sliders)', 60, 34);
+
+    // --- readouts ---
+    document.getElementById('q1val').textContent = q1;
+    document.getElementById('q3val').textContent = q3;
+    document.getElementById('ro-q1').textContent = q1;
+    document.getElementById('ro-q3').textContent = q3;
+    document.getElementById('ro-iqr').textContent = q3 - q1;
+  }
+
+  q1s.addEventListener('input', ()=>{
+    if(+q1s.value >= +q3s.value) q1s.value = +q3s.value - 1;
+    draw();
+  });
+  q3s.addEventListener('input', ()=>{
+    if(+q3s.value <= +q1s.value) q3s.value = +q1s.value + 1;
+    draw();
+  });
+
+  draw();
+})();
+
+/* =====================================================
+   Diagram 2 : Toggle layers — median / range / IQR
+   ===================================================== */
+(function(){
+  const cv = document.getElementById('cv2');
+  const ctx = cv.getContext('2d');
+
+  const chkMed   = document.getElementById('chk-med');
+  const chkRange = document.getElementById('chk-range');
+  const chkIQR   = document.getElementById('chk-iqr');
+
+  const MIN = 10, Q1 = 25, MED = 40, Q3 = 45, MAX = 60;
+  const MINV = 0, MAXV = 70;
+  const X0 = 70, X1 = 780;
+  const yAxis = 200;
+  const boxTop = 120, boxBot = 165;
+
+  function x(v){ return X0 + (v - MINV) / (MAXV - MINV) * (X1 - X0); }
+
+  function draw(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+
+    // grid
+    ctx.strokeStyle = '#e2e8f0';
+    ctx.lineWidth = 1;
+    for(let v = 10; v <= 70; v += 5){
+      const px = x(v);
+      ctx.beginPath(); ctx.moveTo(px, 70); ctx.lineTo(px, yAxis); ctx.stroke();
+    }
+
+    // axis
+    ctx.strokeStyle = '#334155';
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(X0-30, yAxis); ctx.lineTo(X1+10, yAxis); ctx.stroke();
+
+    ctx.fillStyle = '#334155';
+    ctx.font = 'bold 14px Segoe UI, Arial';
+    ctx.textAlign = 'left';
+    ctx.fillText('Number of books read', X1-140, yAxis+34);
+
+    ctx.font = 'bold 13px Segoe UI, Arial';
+    ctx.textAlign = 'center';
+    for(let v = 10; v <= 70; v += 10){
+      const px = x(v);
+      ctx.strokeStyle = '#334155';
+      ctx.beginPath(); ctx.moveTo(px, yAxis); ctx.lineTo(px, yAxis+7); ctx.stroke();
+      ctx.fillStyle = '#475569';
+      ctx.fillText(v, px, yAxis+24);
+    }
+
+    // ---- IQR highlight ----
+    if(chkIQR.checked){
+      ctx.fillStyle = 'rgba(16,185,129,.18)';
+      ctx.fillRect(x(Q1), 95, x(Q3)-x(Q1), yAxis-95);
+      // label
+      ctx.fillStyle = '#059669';
+      ctx.font = 'bold 14px Segoe UI, Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('IQR = Q₃ − Q₁ = 20', (x(Q1)+x(Q3))/2, yAxis-80);
+    }
+
+    // ---- full range ----
+    if(chkRange.checked){
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([6,4]);
+      ctx.beginPath();
+      ctx.moveTo(x(MIN), 78);
+      ctx.lineTo(x(MAX), 78);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      // arrow heads
+      ctx.fillStyle = '#f59e0b';
+      ctx.beginPath();
+      ctx.moveTo(x(MIN),78); ctx.lineTo(x(MIN)+9,73); ctx.lineTo(x(MIN)+9,83); ctx.closePath(); ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(x(MAX),78); ctx.lineTo(x(MAX)-9,73); ctx.lineTo(x(MAX)-9,83); ctx.closePath(); ctx.fill();
+      ctx.font = 'bold 13px Segoe UI, Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('Range = 60 − 10 = 50', (x(MIN)+x(MAX))/2, 66);
+    }
+
+    // ---- whiskers ----
+    ctx.strokeStyle = '#1e3a8a';
+    ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(x(MIN), yAxis-30); ctx.lineTo(x(Q1), yAxis-30); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x(Q3), yAxis-30); ctx.lineTo(x(MAX), yAxis-30); ctx.stroke();
+    // caps
+    ctx.beginPath(); ctx.moveTo(x(MIN), yAxis-45); ctx.lineTo(x(MIN), yAxis-15); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x(MAX), yAxis-45); ctx.lineTo(x(MAX), yAxis-15); ctx.stroke();
+
+    // ---- box ----
+    ctx.fillStyle = 'rgba(59,130,246,.22)';
+    ctx.fillRect(x(Q1), boxTop, x(Q3)-x(Q1), boxBot-boxTop);
+    ctx.strokeStyle = '#1d4ed8';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(x(Q1), boxTop, x(Q3)-x(Q1), boxBot-boxTop);
+
+    // ---- median ----
+    if(chkMed.checked){
+      ctx.strokeStyle = '#dc2626';
+      ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(x(MED), boxTop); ctx.lineTo(x(MED), boxBot); ctx.stroke();
+      ctx.fillStyle = '#dc2626';
+      ctx.font = 'bold 13px Segoe UI, Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('Q₂ = 40 (median)', x(MED), boxBot+20);
+    }
+
+    // ---- quartile labels ----
+    ctx.fillStyle = '#1d4ed8';
+    ctx.font = 'bold 13px Segoe UI, Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Q₁ = 25', x(Q1), boxTop-14);
+    ctx.fillText('Q₃ = 45', x(Q3), boxTop-14);
+
+    ctx.fillStyle = '#1e3a8a';
+    ctx.fillText('min', x(MIN), yAxis-56);
+    ctx.fillText('max', x(MAX), yAxis-56);
+
+    // readouts
+    document.getElementById('ro-range').textContent = MAX - MIN;
+    document.getElementById('ro-med').textContent = MED;
+  }
+
+  chkMed.addEventListener('change', draw);
+  chkRange.addEventListener('change', draw);
+  chkIQR.addEventListener('change', draw);
+
+  draw();
+})();
+
+/* =====================================================
+   Step-by-step reveal engine
+   ===================================================== */
+function setupReveal(btnId, cntId, part){
+  const btn = document.getElementById(btnId);
+  const cnt = document.getElementById(cntId);
+  const steps = document.querySelectorAll('.step[data-p="'+part+'"]');
+  let i = 0;
+
+  function update(){
+    cnt.textContent = i + ' / ' + steps.length;
+    if(i >= steps.length){
+      btn.disabled = true;
+      btn.textContent = 'All steps revealed ✓';
+    } else {
+      btn.textContent = 'Next step →';
+    }
+  }
+
+  btn.addEventListener('click', ()=>{
+    if(i < steps.length){
+      steps[i].classList.add('show');
+      i++;
+      update();
+    }
+  });
+
+  update();
+}
+
+setupReveal('btn1','cnt1','1');
+setupReveal('btn2','cnt2','2');
+</script>
+</body>
+</html>

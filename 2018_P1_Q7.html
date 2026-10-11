@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>HKDSE 2018 Paper 1 Q7 — Interactive Solution</title>
+  <!-- Tailwind & KaTeX -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, { delimiters: [{left: '$$', right: '$$', display: true},{left: '\[', right: '\]', display: true},{left: '$', right: '$', display: false},{left: '\(', right: '\)', display: false}] });"></script>
+
+  <style>
+    /* Smooth transitions & custom scrollbar */
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', sans-serif;
+      background: #f1f5f9;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .card {
+      background: white;
+      border-radius: 1.25rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      transition: box-shadow 0.3s ease;
+    }
+    .card:hover { box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08); }
+
+    /* Step cards */
+    .step-card {
+      background: white;
+      border-radius: 1rem;
+      border-left: 6px solid #3b82f6;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+      transition: all 0.3s ease;
+      overflow: hidden;
+    }
+    .step-card .step-header {
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.25rem;
+      background: #f8fafc;
+      transition: background 0.2s;
+    }
+    .step-card .step-header:hover { background: #f1f5f9; }
+    .step-card .step-body {
+      padding: 0 1.25rem 1.25rem 1.25rem;
+      display: none;
+      animation: fadeIn 0.35s ease;
+    }
+    .step-card.open .step-body { display: block; }
+    .step-card .chevron {
+      transition: transform 0.3s ease;
+    }
+    .step-card.open .chevron { transform: rotate(180deg); }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Hint chip */
+    .hint-chip {
+      display: inline-block;
+      background: #fef3c7;
+      color: #92400e;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.2rem 0.7rem;
+      border-radius: 9999px;
+      border: 1px solid #fcd34d;
+    }
+
+    /* Progress bar */
+    .progress-track {
+      height: 6px;
+      background: #e2e8f0;
+      border-radius: 9999px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+      border-radius: 9999px;
+      transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      width: 0%;
+    }
+
+    /* Interactive slider */
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 8px;
+      border-radius: 9999px;
+      background: linear-gradient(90deg, #93c5fd, #c4b5fd);
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #fff;
+      border: 3px solid #3b82f6;
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+    input[type="range"]::-moz-range-thumb {
+      width: 26px; height: 26px; border-radius: 50%;
+      background: #fff; border: 3px solid #3b82f6;
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+      cursor: pointer;
+    }
+
+    /* Value display box */
+    .value-box {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 0.75rem;
+      padding: 0.75rem 1rem;
+      text-align: center;
+    }
+    .value-box .label { font-size: 0.75rem; color: #1e40af; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+    .value-box .num { font-size: 1.35rem; font-weight: 700; color: #1e3a8a; }
+
+    /* Responsive tweaks */
+    @media (max-width: 640px) {
+      .step-card .step-header { padding: 0.85rem 1rem; }
+      .step-card .step-body { padding: 0 1rem 1rem 1rem; }
+    }
+  </style>
+</head>
+<body class="min-h-screen py-6 px-4 sm:px-6 lg:px-8">
+
+  <main class="max-w-3xl mx-auto space-y-6">
+
+    <!-- ===== HEADER ===== -->
+    <header class="text-center sm:text-left">
+      <h1 class="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight">
+        HKDSE Math 2018 Paper 1 Q7
+      </h1>
+      <div class="flex flex-wrap gap-2 mt-3 justify-center sm:justify-start">
+        <span class="bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1 rounded-full">Percentages</span>
+        <span class="bg-emerald-100 text-emerald-700 text-xs font-semibold px-3 py-1 rounded-full">Cost &amp; Selling Price</span>
+        <span class="bg-violet-100 text-violet-700 text-xs font-semibold px-3 py-1 rounded-full">Discount</span>
+      </div>
+    </header>
+
+    <!-- ===== QUESTION CARD ===== -->
+    <section class="card p-5 sm:p-6">
+      <div class="flex items-start gap-3">
+        <span class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-bold">Q</span>
+        <div class="text-slate-700 leading-relaxed text-base sm:text-lg">
+          The marked price of a vase is <strong>30% above its cost</strong>. A loss of&nbsp;<strong>\$88</strong> is made by selling the vase at a discount of <strong>40% on its marked price</strong>. Find the marked price of the vase.
+          <span class="inline-block bg-amber-100 text-amber-800 text-xs font-bold px-2 py-0.5 rounded ml-1">[5 marks]</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== PROGRESS BAR ===== -->
+    <div class="flex items-center gap-3 px-1">
+      <span class="text-xs font-semibold text-slate-500 whitespace-nowrap">Progress</span>
+      <div class="progress-track flex-1">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <span class="text-xs font-semibold text-slate-500" id="progressText">0%</span>
+    </div>
+
+    <!-- ===== STEP CARDS ===== -->
+    <section id="stepsContainer" class="space-y-3">
+
+      <!-- Step 1: Let x be marked price -->
+      <div class="step-card open" data-step="1">
+        <div class="step-header" onclick="toggleStep(this)">
+          <div class="flex items-center gap-3">
+            <span class="flex-shrink-0 w-7 h-7 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-bold">1</span>
+            <span class="font-semibold text-slate-800 text-sm sm:text-base">Define the variable</span>
+          </div>
+          <svg class="chevron w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </div>
+        <div class="step-body">
+          <div class="text-slate-600 text-sm sm:text-base leading-relaxed">
+            Let <span class="font-semibold text-blue-700">$x$</span> be the <strong>marked price</strong> of the vase (in dollars).
+          </div>
+          <div class="mt-3">
+            <span class="hint-chip">💡 Hint: Start with the unknown you need to find.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Cost in terms of x -->
+      <div class="step-card" data-step="2">
+        <div class="step-header" onclick="toggleStep(this)">
+          <div class="flex items-center gap-3">
+            <span class="flex-shrink-0 w-7 h-7 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-bold">2</span>
+            <span class="font-semibold text-slate-800 text-sm sm:text-base">Express the cost in terms of $x$</span>
+          </div>
+          <svg class="chevron w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </div>
+        <div class="step-body">
+          <div class="text-slate-600 text-sm sm:text-base leading-relaxed">
+            Marked price is <strong>30% above cost</strong>, so:
+            \[
+            x = \text{cost} \times (1 + 30\%)
+            \]
+            \[
+            \text{cost} = \frac{x}{1 + 30\%} = \frac{x}{1.3} = \frac{10x}{13}
+            \]
+          </div>
+          <div class="mt-3 bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-800">
+            <span class="font-semibold">📐 Remember:</span> If marked price is 30% above cost, then
+            \(\text{Marked Price} = \text{Cost} \times 1.3\).
+            Rearranging: \(\text{Cost} = \dfrac{\text{Marked Price}}{1.3}\).
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Selling price in terms of x -->
+      <div class="step-card" data-step="3">
+        <div class="step-header" onclick="toggleStep(this)">
+          <div class="flex items-center gap-3">
+            <span class="flex-shrink-0 w-7 h-7 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-bold">3</span>
+            <span class="font-semibold text-slate-800 text-sm sm:text-base">Express the selling price in terms of $x$</span>
+          </div>
+          <svg class="chevron w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </div>
+        <div class="step-body">
+          <div class="text-slate-600 text-sm sm:text-base leading-relaxed">
+            A 40% discount on marked price means the selling price is 60% of the marked price:
+            \[
+            \text{Selling Price} = (1 - 40\%)x = 0.6x = \frac{3x}{5}
+            \]
+          </div>
+          <div class="mt-3">
+            <span class="hint-chip">💡 Hint: Discount is always calculated on the marked price.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4: Equation for loss -->
+      <div class="step-card" data-step="4">
+        <div class="step-header" onclick="toggleStep(this)">
+          <div class="flex items-center gap-3">
+            <span class="flex-shrink-0 w-7 h-7 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-bold">4</span>
+            <span class="font-semibold text-slate-800 text-sm sm:text-base">Set up the loss equation</span>
+          </div>
+          <svg class="chevron w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </div>
+        <div class="step-body">
+          <div class="text-slate-600 text-sm sm:text-base leading-relaxed">
+            Loss = Cost − Selling Price. The loss is \$88:
+            \[
+            \frac{10x}{13} - \frac{3x}{5} = 88
+            \]
+          </div>
+          <div class="mt-3 bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-800">
+            <span class="font-semibold">📐 Remember:</span> Loss occurs when Cost &gt; Selling Price.
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 5: Solve -->
+      <div class="step-card" data-step="5">
+        <div class="step-header" onclick="toggleStep(this)">
+          <div class="flex items-center gap-3">
+            <span class="flex-shrink-0 w-7 h-7 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold">5</span>
+            <span class="font-semibold text-slate-800 text-sm sm:text-base">Solve for $x$</span>
+          </div>
+          <svg class="chevron w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </div>
+        <div class="step-body">
+          <div class="text-slate-600 text-sm sm:text-base leading-relaxed space-y-2">
+            <p>Combine the fractions:</p>
+            \[
+            \frac{10x}{13} - \frac{3x}{5} = \frac{50x - 39x}{65} = \frac{11x}{65}
+            \]
+            <p>So:</p>
+            \[
+            \frac{11x}{65} = 88
+            \]
+            \[
+            x = 88 \times \frac{65}{11} = 8 \times 65 = 520
+            \]
+          </div>
+          <div class="mt-4 bg-emerald-50 border border-emerald-300 rounded-xl p-4 text-center">
+            <p class="text-sm text-emerald-700 font-semibold">Marked price of the vase</p>
+            <p class="text-3xl font-bold text-emerald-800 mt-1">\$520</p>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ===== VISUAL INTERACTIVE DEMO ===== -->
+    <section class="card p-5 sm:p-6 space-y-4">
+      <h2 class="text-lg sm:text-xl font-bold text-slate-800 flex items-center gap-2">
+        <span class="text-xl">🔍</span> Explore the Relationship
+      </h2>
+      <p class="text-sm text-slate-500 leading-relaxed">
+        Drag the slider to change the <strong>marked price</strong>. See how the cost, selling price, and loss change in real time. Notice the loss is always \$88 when the marked price is <strong>\$520</strong>.
+      </p>
+
+      <!-- Slider -->
+      <div class="space-y-2">
+        <div class="flex justify-between items-center">
+          <label class="text-sm font-semibold text-slate-600">Marked Price ($x$)</label>
+          <span class="text-sm font-bold text-blue-700" id="sliderValue">$520</span>
+        </div>
+        <input type="range" id="priceSlider" min="100" max="1000" value="520" step="10">
+      </div>
+
+      <!-- Dynamic Values -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div class="value-box">
+          <div class="label">Cost</div>
+          <div class="num" id="displayCost">$400</div>
+        </div>
+        <div class="value-box">
+          <div class="label">Selling Price</div>
+          <div class="num" id="displaySP">$312</div>
+        </div>
+        <div class="value-box" id="lossBox">
+          <div class="label">Loss</div>
+          <div class="num" id="displayLoss">$88</div>
+        </div>
+        <div class="value-box">
+          <div class="label">Profit / Loss</div>
+          <div class="num" id="displayPL" style="color:#059669;">−$88</div>
+        </div>
+      </div>
+
+      <!-- Visual bar chart -->
+      <div class="mt-2">
+        <div class="flex items-end gap-3 h-32 sm:h-40">
+          <div class="flex-1 flex flex-col items-center justify-end h-full">
+            <div class="w-full bg-blue-400 rounded-t-lg transition-all duration-500" id="barCost" style="height:80%"></div>
+            <span class="text-xs font-semibold text-slate-500 mt-1">Cost</span>
+          </div>
+          <div class="flex-1 flex flex-col items-center justify-end h-full">
+            <div class="w-full bg-violet-400 rounded-t-lg transition-all duration-500" id="barSP" style="height:62%"></div>
+            <span class="text-xs font-semibold text-slate-500 mt-1">Selling</span>
+          </div>
+          <div class="flex-1 flex flex-col items-center justify-end h-full">
+            <div class="w-full bg-rose-400 rounded-t-lg transition-all duration-500" id="barLoss" style="height:18%"></div>
+            <span class="text-xs font-semibold text-slate-500 mt-1">Loss</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-xs text-slate-400 text-center border-t border-slate-100 pt-3">
+        When $x = 520$: Cost = 520/1.3 = 400, Selling = 0.6 × 520 = 312, Loss = 400 − 312 = <strong>88</strong> ✓
+      </div>
+    </section>
+
+    <!-- ===== KEY TAKEAWAYS ===== -->
+    <section class="card p-5 sm:p-6">
+      <h2 class="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2">
+        <span>📌</span> Key Takeaways
+      </h2>
+      <ul class="space-y-2 text-sm sm:text-base text-slate-600">
+        <li class="flex items-start gap-2">
+          <span class="text-blue-500 mt-0.5">•</span>
+          <span><strong>Cost</strong> = Marked Price ÷ (1 + markup %)</span>
+        </li>
+        <li class="flex items-start gap-2">
+          <span class="text-blue-500 mt-0.5">•</span>
+          <span><strong>Selling Price</strong> = Marked Price × (1 − discount %)</span>
+        </li>
+        <li class="flex items-start gap-2">
+          <span class="text-blue-500 mt-0.5">•</span>
+          <span><strong>Loss</strong> = Cost − Selling Price &nbsp;(if positive)</span>
+        </li>
+        <li class="flex items-start gap-2">
+          <span class="text-blue-500 mt-0.5">•</span>
+          <span>Always define a variable for the unknown and express everything in terms of it.</span>
+        </li>
+      </ul>
+    </section>
+
+  </main>
+
+  <script>
+    // ---------- Accordion Step Cards ----------
+    function toggleStep(header) {
+      const card = header.closest('.step-card');
+      card.classList.toggle('open');
+      updateProgress();
+    }
+
+    function updateProgress() {
+      const cards = document.querySelectorAll('.step-card');
+      const openCount = document.querySelectorAll('.step-card.open').length;
+      const pct = Math.round((openCount / cards.length) * 100);
+      document.getElementById('progressFill').style.width = pct + '%';
+      document.getElementById('progressText').textContent = pct + '%';
+    }
+
+    // Initialize progress
+    document.addEventListener('DOMContentLoaded', () => {
+      updateProgress();
+
+      // ---------- Interactive Slider ----------
+      const slider = document.getElementById('priceSlider');
+      const sliderVal = document.getElementById('sliderValue');
+      const displayCost = document.getElementById('displayCost');
+      const displaySP = document.getElementById('displaySP');
+      const displayLoss = document.getElementById('displayLoss');
+      const displayPL = document.getElementById('displayPL');
+      const barCost = document.getElementById('barCost');
+      const barSP = document.getElementById('barSP');
+      const barLoss = document.getElementById('barLoss');
+
+      function updateVisual(x) {
+        // cost = x / 1.3
+        const cost = x / 1.3;
+        const sp = 0.6 * x;
+        const loss = cost - sp;
+
+        // Update text
+        sliderVal.textContent = '$' + x;
+        displayCost.textContent = '$' + cost.toFixed(0);
+        displaySP.textContent = '$' + sp.toFixed(0);
+        displayLoss.textContent = '$' + Math.abs(loss).toFixed(0);
+
+        if (loss >= 0) {
+          displayPL.textContent = '−$' + loss.toFixed(0);
+          displayPL.style.color = '#059669';
+        } else {
+          displayPL.textContent = '+$' + Math.abs(loss).toFixed(0);
+          displayPL.style.color = '#dc2626';
+        }
+
+        // Update bars (relative to cost for scaling)
+        const maxVal = Math.max(cost, sp, Math.abs(loss), 1);
+        barCost.style.height = Math.max((cost / maxVal) * 100, 5) + '%';
+        barSP.style.height = Math.max((sp / maxVal) * 100, 5) + '%';
+        barLoss.style.height = Math.max((Math.abs(loss) / maxVal) * 100, 5) + '%';
+
+        // Highlight when loss is exactly 88 (near x=520)
+        const lossBox = document.getElementById('lossBox');
+        if (Math.abs(loss - 88) < 1.5) {
+          lossBox.style.border = '2px solid #059669';
+          lossBox.style.boxShadow = '0 0 12px rgba(5,150,105,0.3)';
+        } else {
+          lossBox.style.border = '1px solid #bfdbfe';
+          lossBox.style.boxShadow = 'none';
+        }
+      }
+
+      slider.addEventListener('input', (e) => {
+        updateVisual(Number(e.target.value));
+      });
+
+      // Initialize display
+      updateVisual(520);
+
+      // Re-render KaTeX after dynamic changes (text only changes, not math)
+      // No action needed since math is static
+    });
+  </script>
+
+</body>
+</html>

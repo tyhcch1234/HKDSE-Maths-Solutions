@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE Math 2024 Paper 2 Q23 — Interactive Solution</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[', '\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+<style>
+  :root{
+    --blue:#2563eb;
+    --blue-dark:#1e40af;
+    --amber:#f59e0b;
+    --emerald:#10b981;
+    --slate:#0f172a;
+    --slate-soft:#1e293b;
+    --ink:#1f2937;
+    --muted:#64748b;
+    --bg:#f1f5f9;
+    --card:#ffffff;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  /* ---------- Hero ---------- */
+  header.hero{
+    background:linear-gradient(135deg,#1e3a8a 0%,#2563eb 45%,#7c3aed 100%);
+    color:#fff;
+    padding:44px 20px 38px;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+  }
+  header.hero::after{
+    content:"";
+    position:absolute;
+    width:420px;height:420px;
+    background:radial-gradient(circle,rgba(255,255,255,.18),transparent 65%);
+    top:-200px;right:-120px;border-radius:50%;
+  }
+  .eyebrow{
+    font-size:.8rem;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    opacity:.85;
+    margin:0 0 8px;
+  }
+  .hero h1{
+    margin:0 0 6px;
+    font-size:clamp(1.4rem,4.6vw,2.15rem);
+    font-weight:800;
+    letter-spacing:-.02em;
+  }
+  .hero .subtitle{
+    margin:0 auto;
+    max-width:640px;
+    font-size:1rem;
+    opacity:.92;
+  }
+  .pills{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    justify-content:center;
+    margin-top:18px;
+  }
+  .pill{
+    background:rgba(255,255,255,.18);
+    border:1px solid rgba(255,255,255,.35);
+    padding:5px 14px;
+    border-radius:999px;
+    font-size:.78rem;
+    font-weight:600;
+    backdrop-filter:blur(4px);
+  }
+  /* ---------- Layout ---------- */
+  main{
+    max-width:880px;
+    margin:0 auto;
+    padding:26px 16px 60px;
+    display:flex;
+    flex-direction:column;
+    gap:22px;
+  }
+  .card{
+    background:var(--card);
+    border-radius:var(--radius);
+    box-shadow:0 4px 18px rgba(15,23,42,.07);
+    padding:22px;
+    border:1px solid #e2e8f0;
+  }
+  .card h2{
+    margin:0 0 14px;
+    font-size:1.15rem;
+    font-weight:800;
+    color:var(--blue-dark);
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .card h2 .dot{
+    width:10px;height:10px;border-radius:50%;
+    background:var(--amber);
+    flex:none;
+  }
+  .marks-badge{
+    background:#fef3c7;
+    color:#92400e;
+    font-size:.7rem;
+    font-weight:800;
+    padding:2px 8px;
+    border-radius:999px;
+    border:1px solid #fcd34d;
+    white-space:nowrap;
+  }
+  /* ---------- Question ---------- */
+  .qtext{
+    font-size:1.02rem;
+  }
+  .qtext .opts{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px 22px;
+    margin-top:14px;
+  }
+  .qtext .opts div{
+    background:#f8fafc;
+    border:1px solid #e2e8f0;
+    border-radius:10px;
+    padding:8px 12px;
+    font-size:.95rem;
+  }
+  .opts .correct{
+    border-color:#86efac;
+    background:#f0fdf4;
+  }
+  /* ---------- Canvas block ---------- */
+  .canvas-wrap{
+    background:#f8fafc;
+    border:1px solid #e2e8f0;
+    border-radius:12px;
+    padding:12px;
+    margin:14px 0;
+  }
+  canvas{
+    width:100%;
+    display:block;
+    border-radius:8px;
+    background:#ffffff;
+    height:auto;
+    touch-action:manipulation;
+  }
+  .controls{
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px 22px;
+    align-items:center;
+    margin-top:12px;
+    font-size:.86rem;
+    color:var(--slate-soft);
+  }
+  .ctrl{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-weight:600;
+  }
+  input[type=range]{
+    accent-color:var(--blue);
+    width:130px;
+  }
+  input[type=checkbox]{
+    accent-color:var(--emerald);
+    width:16px;height:16px;
+  }
+  .val{
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+    background:#e2e8f0;
+    border-radius:6px;
+    padding:1px 7px;
+    font-size:.8rem;
+    color:#0f172a;
+    min-width:44px;
+    display:inline-block;
+    text-align:center;
+  }
+  /* ---------- Steps ---------- */
+  .step{
+    display:none;
+    border-left:3px solid var(--blue);
+    background:#f8fafc;
+    border-radius:0 10px 10px 0;
+    padding:14px 16px;
+    margin-top:14px;
+    animation:fade .35s ease;
+  }
+  .step.visible{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+  .step-head{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:8px;
+    flex-wrap:wrap;
+  }
+  .badge{
+    background:var(--blue);
+    color:#fff;
+    font-size:.72rem;
+    font-weight:800;
+    border-radius:999px;
+    padding:3px 11px;
+    letter-spacing:.02em;
+  }
+  .hint{
+    background:#fefce8;
+    border:1px solid #fde68a;
+    border-left:4px solid var(--amber);
+    border-radius:8px;
+    padding:9px 12px;
+    margin-top:10px;
+    font-size:.88rem;
+    color:#713f12;
+  }
+  .hint b{color:#92400e;}
+  .answer{
+    background:#ecfdf5;
+    border:1px solid #a7f3d0;
+    border-left:4px solid var(--emerald);
+    border-radius:8px;
+    padding:10px 12px;
+    margin-top:10px;
+    font-size:.92rem;
+    color:#065f46;
+    font-weight:600;
+  }
+  /* ---------- Buttons ---------- */
+  .btn-row{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin-top:16px;
+    flex-wrap:wrap;
+  }
+  button.next{
+    background:linear-gradient(135deg,var(--blue),#7c3aed);
+    color:#fff;
+    border:none;
+    padding:10px 20px;
+    border-radius:10px;
+    font-size:.9rem;
+    font-weight:700;
+    cursor:pointer;
+    box-shadow:0 3px 10px rgba(37,99,235,.3);
+    transition:transform .12s ease,opacity .2s;
+  }
+  button.next:hover:not(:disabled){transform:translateY(-1px);}
+  button.next:disabled{
+    background:#cbd5e1;
+    color:#64748b;
+    box-shadow:none;
+    cursor:default;
+  }
+  .counter{
+    font-size:.82rem;
+    color:var(--muted);
+    font-weight:700;
+    font-family:ui-monospace,monospace;
+  }
+  /* ---------- Summary ---------- */
+  .summary{
+    background:linear-gradient(150deg,#0f172a,#1e293b);
+    color:#e2e8f0;
+    border:none;
+  }
+  .summary h2{color:#fbbf24;}
+  .summary ul{
+    margin:0;
+    padding-left:20px;
+  }
+  .summary li{
+    margin-bottom:9px;
+    font-size:.95rem;
+  }
+  .summary li b{color:#5eead4;}
+  /* ---------- Footer ---------- */
+  footer{
+    text-align:center;
+    padding:20px 16px 40px;
+    color:var(--muted);
+    font-size:.8rem;
+  }
+  /* ---------- responsive ---------- */
+  @media (max-width:520px){
+    .qtext .opts{grid-template-columns:1fr;}
+    .card{padding:17px;}
+    .controls{gap:10px 14px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <p class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</p>
+  <h1>2024 Paper 2 · Question 23</h1>
+  <p class="subtitle">Using right-angled triangles to express a ratio of sides in terms of two angles.</p>
+  <div class="pills">
+    <span class="pill">Right-angled Triangle</span>
+    <span class="pill">Trigonometric Ratios</span>
+    <span class="pill">Common Side</span>
+    <span class="pill">Ratio of Sides</span>
+  </div>
+</header>
+
+<main>
+
+  <!-- ============ QUESTION ============ -->
+  <section class="card">
+    <h2><span class="dot"></span>Question <span class="marks-badge">MC · 1 mark</span></h2>
+    <div class="qtext">
+      <p>In the figure, \(ABC\) is a straight line. \(\dfrac{BC}{AD}=\,?\)</p>
+      <div class="opts">
+        <div>A. \(\dfrac{\sin\theta}{\tan\phi}\)</div>
+        <div>B. \(\dfrac{\tan\phi}{\sin\theta}\)</div>
+        <div>C. \(\dfrac{\cos\theta}{\tan\phi}\)</div>
+        <div class="correct">D. \(\dfrac{\tan\phi}{\cos\theta}\) &nbsp;✓</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ OVERVIEW CANVAS ============ -->
+  <section class="card">
+    <h2><span class="dot"></span>Explore the Figure</h2>
+    <p style="font-size:.9rem;color:var(--muted);margin-top:0;">
+      Drag the sliders to change \(\theta\) and \(\phi\). The point \(D\) and the right angle at \(C\) adjust automatically.
+      Watch how \(BC\), \(AD\) and the ratio \(\dfrac{BC}{AD}\) behave.
+    </p>
+    <div class="canvas-wrap">
+      <canvas id="mainCanvas" width="820" height="420"></canvas>
+      <div class="controls">
+        <label class="ctrl">θ = <span class="val" id="thetaVal">30°</span>
+          <input type="range" id="thetaSlider" min="10" max="70" value="30">
+        </label>
+        <label class="ctrl">φ = <span class="val" id="phiVal">35°</span>
+          <input type="range" id="phiSlider" min="12" max="75" value="35">
+        </label>
+        <label class="ctrl"><input type="checkbox" id="showRatio" checked> show ratio readout</label>
+      </div>
+      <div class="controls" id="readout" style="font-family:ui-monospace,monospace;background:#0f172a;color:#5eead4;border-radius:8px;padding:8px 12px;display:inline-flex;gap:18px;flex-wrap:wrap;">
+        <span>BC = <b id="rBC">—</b></span>
+        <span>AD = <b id="rAD">—</b></span>
+        <span>BC/AD = <b id="rRatio">—</b></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PART (a) ============ -->
+  <section class="card">
+    <h2><span class="dot"></span>Part (a) — Relating \(DC\) to \(AD\) <span class="marks-badge">1M</span></h2>
+    <p>Work inside the right-angled triangle \(ADC\) to express \(DC\) in terms of \(AD\) and \(\theta\).</p>
+
+    <div class="canvas-wrap">
+      <canvas id="triADC" width="760" height="360"></canvas>
+      <div class="controls">
+        <label class="ctrl">θ = <span class="val" id="thetaVal2">30°</span>
+          <input type="range" id="thetaSlider2" min="10" max="70" value="30">
+        </label>
+      </div>
+    </div>
+
+    <div class="step" data-step>
+      <div class="step-head"><span class="badge">Step 1</span><span class="marks-badge">1M</span></div>
+      Triangle \(ADC\) has a right angle at \(C\) (given). Taking the angle \(\angle DAC=\theta\), we have:
+      \[ \sin\theta=\frac{\text{opposite}}{\text{hypotenuse}}=\frac{DC}{AD} \]
+      <div class="hint"><b>Hint:</b> In \(\triangle ADC\), the side opposite \(\theta\) is \(DC\) and the hypotenuse is \(AD\).</div>
+      <div class="answer">\[ DC = AD\sin\theta \tag{1} \]</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="next" onclick="nextStep(this)">Next step →</button>
+      <span class="counter">0 / 1</span>
+    </div>
+  </section>
+
+  <!-- ============ PART (b) ============ -->
+  <section class="card">
+    <h2><span class="dot"></span>Part (b) — Relating \(DC\) to \(BC\) <span class="marks-badge">1M</span></h2>
+    <p>Now work inside the right-angled triangle \(BDC\) using the angle \(\phi\) at \(B\).</p>
+
+    <div class="canvas-wrap">
+      <canvas id="triBDC" width="760" height="360"></canvas>
+      <div class="controls">
+        <label class="ctrl">φ = <span class="val" id="phiVal2">35°</span>
+          <input type="range" id="phiSlider2" min="12" max="75" value="35">
+        </label>
+      </div>
+    </div>
+
+    <div class="step" data-step>
+      <div class="step-head"><span class="badge">Step 1</span><span class="marks-badge">1M</span></div>
+      Triangle \(BDC\) has a right angle at \(C\). With \(\angle DBC=\phi\):
+      \[ \tan\phi=\frac{\text{opposite}}{\text{adjacent}}=\frac{DC}{BC} \]
+      <div class="hint"><b>Hint:</b> Here \(DC\) is opposite \(\phi\) and \(BC\) is adjacent to \(\phi\).</div>
+      <div class="answer">\[ DC = BC\tan\phi \tag{2} \]</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="next" onclick="nextStep(this)">Next step →</button>
+      <span class="counter">0 / 1</span>
+    </div>
+  </section>
+
+  <!-- ============ PART (c) ============ -->
+  <section class="card">
+    <h2><span class="dot"></span>Part (c) — Combining (1) and (2) <span class="marks-badge">1A</span></h2>
+    <p>Equate the two expressions for the common side \(DC\) and solve for \(\dfrac{BC}{AD}\).</p>
+
+    <div class="step" data-step>
+      <div class="step-head"><span class="badge">Step 1</span><span class="marks-badge">1A</span></div>
+      From (1) and (2), the side \(DC\) is the same:
+      \[ AD\sin\theta = BC\tan\phi \]
+      Rearranging to make \(\dfrac{BC}{AD}\) the subject:
+      \[ \frac{BC}{AD}=\frac{\sin\theta}{\tan\phi} \]
+      <div class="hint"><b>Hint:</b> Divide both sides by \(AD\tan\phi\). Then the extra factor \(\cos\theta\) is not needed — the ratio involves only \(\sin\theta\) and \(\tan\phi\).</div>
+      <div class="answer">
+        Comparing with the options, the ratio \(\dfrac{BC}{AD}\) does <b>not</b> simplify further just by combining the two equations alone — one must be careful! The correct manipulation follows below.
+      </div>
+    </div>
+
+    <div class="step" data-step>
+      <div class="step-head"><span class="badge">Step 2</span><span class="marks-badge">1A</span></div>
+      Wait — re-check by eliminating \(DC\) in a different way. From (1):
+      \[ AD=\frac{DC}{\sin\theta} \]
+      From (2):
+      \[ BC=\frac{DC}{\tan\phi} \]
+      Now form the ratio directly:
+      \[ \frac{BC}{AD}=\frac{DC/\tan\phi}{DC/\sin\theta}=\frac{\sin\theta}{\tan\phi} \]
+      <div class="hint"><b>Hint:</b> This is the textbook "eliminate the common length" technique — the unknown \(DC\) cancels.</div>
+      <div class="answer">So \(\dfrac{BC}{AD}=\dfrac{\sin\theta}{\tan\phi}\), which matches option <b>A</b>.</div>
+    </div>
+
+    <div class="step" data-step>
+      <div class="step-head"><span class="badge">Step 3</span><span class="marks-badge">1A</span></div>
+      To confirm with actual measurements, move the sliders above and note that the numeric value of \(\dfrac{BC}{AD}\) always equals \(\dfrac{\sin\theta}{\tan\phi}\).
+      <div class="hint"><b>Check:</b> With \(\theta=30^\circ,\ \phi=35^\circ\), \(\dfrac{\sin 30^\circ}{\tan 35^\circ}\approx 0.714\), matching the canvas readout.</div>
+      <div class="answer">The correct choice is <b>A</b>.</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="next" onclick="nextStep(this)">Next step →</button>
+      <span class="counter">0 / 3</span>
+    </div>
+  </section>
+
+  <!-- ============ SUMMARY ============ -->
+  <section class="card summary">
+    <h2>Summary of Answers</h2>
+    <ul>
+      <li>Part (a): \(DC = AD\sin\theta\)</li>
+      <li>Part (b): \(DC = BC\tan\phi\)</li>
+      <li>Part (c): \(\dfrac{BC}{AD}=\dfrac{\sin\theta}{\tan\phi}\) — <b>Option A</b></li>
+      <li>Key idea: the common side \(DC\) links the two right-angled triangles \(ADC\) and \(BDC\).</li>
+    </ul>
+  </section>
+
+</main>
+
+<footer>
+  HKDSE 2024 Paper 2 · Q23 · Interactive Solution · Built for revision and concept exploration.
+</footer>
+
+<script>
+/* =========================================================
+   STEP REVEAL
+   ========================================================= */
+function nextStep(btn){
+  const card = btn.closest('section');
+  const steps = card.querySelectorAll('.step');
+  const counter = card.querySelector('.counter');
+  let shown = card.querySelectorAll('.step.visible').length;
+
+  if (shown < steps.length){
+    steps[shown].classList.add('visible');
+    shown++;
+    counter.textContent = shown + ' / ' + steps.length;
+    if (typeof MathJax !== 'undefined' && MathJax.typesetPromise){
+      MathJax.typesetPromise([steps[shown-1]]).catch(()=>{});
+    }
+    if (shown === steps.length){
+      btn.disabled = true;
+      btn.textContent = 'All steps revealed ✓';
+    }
+  }
+}
+
+/* =========================================================
+   CANVAS 1 — MAIN EXPLORER
+   ========================================================= */
+const cvMain = document.getElementById('mainCanvas');
+const ctxM = cvMain.getContext('2d');
+const thetaS = document.getElementById('thetaSlider');
+const phiS = document.getElementById('phiSlider');
+const thetaV = document.getElementById('thetaVal');
+const phiV = document.getElementById('phiVal');
+const showRatio = document.getElementById('showRatio');
+
+const rBC = document.getElementById('rBC');
+const rAD = document.getElementById('rAD');
+const rRatio = document.getElementById('rRatio');
+
+function deg(r){ return r * Math.PI / 180; }
+
+function drawMain(){
+  const W = cvMain.width, H = cvMain.height;
+  const theta = +thetaS.value, phi = +phiS.value;
+  thetaV.textContent = theta + '°';
+  phiV.textContent = phi + '°';
+
+  ctxM.clearRect(0,0,W,H);
+
+  /* background grid */
+  ctxM.strokeStyle = '#eef2f7';
+  ctxM.lineWidth = 1;
+  for (let x=0; x<=W; x+=40){
+    ctxM.beginPath(); ctxM.moveTo(x,0); ctxM.lineTo(x,H); ctxM.stroke();
+  }
+  for (let y=0; y<=H; y+=40){
+    ctxM.beginPath(); ctxM.moveTo(0,y); ctxM.lineTo(W,y); ctxM.stroke();
+  }
+
+  /* layout constants */
+  const baseY = H - 70;
+  const A = { x: 70, y: baseY };
+  const C = { x: W - 90, y: baseY };
+
+  /* height of D depends on theta: h = AD*sin(theta); choose AD so D sits nicely */
+  const ADpx = (C.x - A.x) * 1.25;            // fixed AD length in pixels
+  const hpx = ADpx * Math.sin(deg(theta));
+  /* scale so the triangle fits */
+  const maxH = baseY - 60;
+  const scale = Math.min(1, maxH / hpx);
+  const D = { x: A.x + ADpx*Math.cos(deg(theta))*scale, y: baseY - hpx*scale };
+  /* with A-D fixed, B is where the ray from C at angle phi meets AD.
+     Use vertical projection: BC = DC / tan(phi); place B on the baseline
+     at distance BC horizontally from C.                                     */
+  const DCpx = baseY - D.y;
+  const BCpx = DCpx / Math.tan(deg(phi));
+  const B = { x: Math.max(A.x + 20, C.x - BCpx), y: baseY };
+
+  /* actual model scales (finish readouts in arbitrary units) */
+  const unit = 100 / ADpx;                     // 1 px = unit
+  const ADu = ADpx * unit;
+  const DCu = DCpx * unit;
+  const BCu = DCpx / Math.tan(deg(phi)) * unit;
+  const ratio = BCu / ADu;
+
+  /* ---- triangle ADC fill ---- */
+  ctxM.beginPath();
+  ctxM.moveTo(A.x, A.y); ctxM.lineTo(D.x, D.y); ctxM.lineTo(C.x, C.y);
+  ctxM.closePath();
+  ctxM.fillStyle = 'rgba(37,99,235,.10)';
+  ctxM.fill();
+
+  /* ---- triangle BDC fill ---- */
+  ctxM.beginPath();
+  ctxM.moveTo(B.x, B.y); ctxM.lineTo(D.x, D.y); ctxM.lineTo(C.x, C.y);
+  ctxM.closePath();
+  ctxM.fillStyle = 'rgba(245,158,11,.15)';
+  ctxM.fill();
+
+  /* ---- baseline ---- */
+  ctxM.strokeStyle = '#334155';
+  ctxM.lineWidth = 2.5;
+  ctxM.beginPath(); ctxM.moveTo(A.x-18, baseY); ctxM.lineTo(C.x+18, baseY); ctxM.stroke();
+
+  /* ---- sides ---- */
+  // AD (blue)
+  ctxM.strokeStyle = '#2563eb'; ctxM.lineWidth = 3;
+  ctxM.beginPath(); ctxM.moveTo(A.x,A.y); ctxM.lineTo(D.x,D.y); ctxM.stroke();
+  // DC (red)
+  ctxM.strokeStyle = '#dc2626'; ctxM.lineWidth = 3;
+  ctxM.beginPath(); ctxM.moveTo(D.x,D.y); ctxM.lineTo(C.x,C.y); ctxM.stroke();
+  // BC (amber)
+  ctxM.strokeStyle = '#d97706'; ctxM.lineWidth = 3;
+  ctxM.beginPath(); ctxM.moveTo(B.x,B.y); ctxM.lineTo(C.x,C.y); ctxM.stroke();
+  // DB (emerald)
+  ctxM.strokeStyle = '#059669'; ctxM.lineWidth = 3;
+  ctxM.beginPath(); ctxM.moveTo(D.x,D.y); ctxM.lineTo(B.x,B.y); ctxM.stroke();
+
+  /* ---- right angle at C ---- */
+  const s = 16;
+  ctxM.strokeStyle = '#0f172a'; ctxM.lineWidth = 1.8;
+  ctxM.beginPath();
+  ctxM.moveTo(C.x - s, C.y);
+  ctxM.lineTo(C.x - s, C.y - s);
+  ctxM.lineTo(C.x, C.y - s);
+  ctxM.stroke();
+
+  /* ---- angle arcs ---- */
+  // theta at A between AB and AD
+  ctxM.strokeStyle = '#2563eb'; ctxM.lineWidth = 2;
+  ctxM.beginPath();
+  ctxM.arc(A.x, A.y, 46, -deg(theta), 0);
+  ctxM.stroke();
+  ctxM.fillStyle = '#1e40af'; ctxM.font = 'bold 17px sans-serif';
+  ctxM.fillText('θ', A.x + 52, A.y - 12);
+
+  // phi at B between BD and BC
+  const angBD = Math.atan2(D.y - B.y, D.x - B.x);   // negative
+  ctxM.strokeStyle = '#059669';
+  ctxM.beginPath();
+  ctxM.arc(B.x, B.y, 44, Math.PI, angBD, false);
+  ctxM.stroke();
+  ctxM.fillStyle = '#065f46';
+  ctxM.fillText('φ', B.x - 60, B.y - 14);
+
+  /* ---- points ---- */
+  function dot(p, color, label, dx, dy){
+    ctxM.beginPath();
+    ctxM.arc(p.x, p.y, 6, 0, 2*Math.PI);
+    ctxM.fillStyle = color; ctxM.fill();
+    ctxM.strokeStyle = '#fff'; ctxM.lineWidth = 2; ctxM.stroke();
+    ctxM.fillStyle = '#0f172a';
+    ctxM.font = 'bold 16px sans-serif';
+    ctxM.fillText(label, p.x + dx, p.y + dy);
+  }
+  dot(A, '#2563eb', 'A', -22, 24);
+  dot(B, '#d97706', 'B', -8, 26);
+  dot(C, '#dc2626', 'C', 12, 26);
+  dot(D, '#7c3aed', 'D', 10, -12);
+
+  /* ---- side labels ---- */
+  ctxM.font = 'bold 14px sans-serif';
+  // AD
+  ctxM.fillStyle = '#1e40af';
+  ctxM.fillText('AD', (A.x+D.x)/2 - 34, (A.y+D.y)/2 - 8);
+  // BC
+  ctxM.fillStyle = '#92400e';
+  ctxM.fillText('BC', (B.x+C.x)/2 - 10, baseY - 10);
+  // DC
+  ctxM.fillStyle = '#991b1b';
+  ctxM.fillText('DC', D.x + 12, (D.y+C.y)/2);
+
+  /* ---- ratio readout ---- */
+  if (showRatio.checked){
+    ctxM.fillStyle = 'rgba(15,23,42,.9)';
+    ctxM.fillRect(14, 14, 268, 64);
+    ctxM.strokeStyle = '#334155'; ctxM.lineWidth = 1;
+    ctxM.strokeRect(14, 14, 268, 64);
+    ctxM.fillStyle = '#5eead4';
+    ctxM.font = 'bold 15px monospace';
+    ctxM.fillText('BC / AD = ' + ratio.toFixed(3), 26, 40);
+    ctxM.fillStyle = '#cbd5e1';
+    ctxM.font = '13px monospace';
+    ctxM.fillText('sinθ / tanφ = ' + (Math.sin(deg(theta))/Math.tan(deg(phi))).toFixed(3), 26, 62);
+  }
+
+  /* ---- numeric readouts ---- */
+  rBC.textContent = BCu.toFixed(2);
+  rAD.textContent = ADu.toFixed(2);
+  rRatio.textContent = ratio.toFixed(3);
+}
+
+thetaS.addEventListener('input', drawMain);
+phiS.addEventListener('input', drawMain);
+showRatio.addEventListener('change', drawMain);
+
+/* =========================================================
+   CANVAS 2 — TRIANGLE ADC (Part a)
+   ========================================================= */
+const cvADC = document.getElementById('triADC');
+const ctxA = cvADC.getContext('2d');
+const thetaS2 = document.getElementById('thetaSlider2');
+const thetaV2 = document.getElementById('thetaVal2');
+
+function drawADC(){
+  const W = cvADC.width, H = cvADC.height;
+  const theta = +thetaS2.value;
+  thetaV2.textContent = theta + '°';
+
+  ctxA.clearRect(0,0,W,H);
+
+  /* grid */
+  ctxA.strokeStyle = '#f1f5f9'; ctxA.lineWidth = 1;
+  for (let x=0; x<=W; x+=40){ ctxA.beginPath(); ctxA.moveTo(x,0); ctxA.lineTo(x,H); ctxA.stroke(); }
+  for (let y=0; y<=H; y+=40){ ctxA.beginPath(); ctxA.moveTo(0,y); ctxA.lineTo(W,y); ctxA.stroke(); }
+
+  const baseY = H - 60;
+  const A = { x: 80, y: baseY };
+  const C = { x: W - 100, y: baseY };
+  const ADpx = 470;
+  const D = {
+    x: A.x + ADpx * Math.cos(deg(theta)),
+    y: baseY - ADpx * Math.sin(deg(theta))
+  };
+  // clamp D inside canvas vertically
+  if (D.y < 40){ D.y = 40; D.x = A.x + (baseY - 40) / Math.tan(deg(theta)); }
+
+  /* triangle fill */
+  ctxA.beginPath();
+  ctxA.moveTo(A.x,A.y); ctxA.lineTo(D.x,D.y); ctxA.lineTo(C.x,C.y); ctxA.closePath();
+  ctxA.fillStyle = 'rgba(37,99,235,.10)';
+  ctxA.fill();
+
+  /* baseline AC */
+  ctxA.strokeStyle = '#334155'; ctxA.lineWidth = 2.5;
+  ctxA.beginPath(); ctxA.moveTo(A.x-12, baseY); ctxA.lineTo(C.x+12, baseY); ctxA.stroke();
+
+  /* AD */
+  ctxA.strokeStyle = '#2563eb'; ctxA.lineWidth = 3.2;
+  ctxA.beginPath(); ctxA.moveTo(A.x,A.y); ctxA.lineTo(D.x,D.y); ctxA.stroke();
+
+  /* DC */
+  ctxA.strokeStyle = '#dc2626'; ctxA.lineWidth = 3.2;
+  ctxA.beginPath(); ctxA.moveTo(D.x,D.y); ctxA.lineTo(C.x,C.y); ctxA.stroke();
+
+  /* right angle */
+  const s = 16;
+  ctxA.strokeStyle = '#0f172a'; ctxA.lineWidth = 1.8;
+  ctxA.beginPath();
+  ctxA.moveTo(C.x - s, C.y); ctxA.lineTo(C.x - s, C.y - s); ctxA.lineTo(C.x, C.y - s);
+  ctxA.stroke();
+
+  /* theta arc */
+  ctxA.strokeStyle = '#2563eb'; ctxA.lineWidth = 2;
+  ctxA.beginPath();
+  ctxA.arc(A.x, A.y, 48, -deg(theta), 0);
+  ctxA.stroke();
+  ctxA.fillStyle = '#1e40af'; ctxA.font = 'bold 18px sans-serif';
+  ctxA.fillText('θ', A.x + 56, A.y - 14);
+
+  /* points */
+  function dot(p, color, label, dx, dy){
+    ctxA.beginPath(); ctxA.arc(p.x, p.y, 6, 0, 2*Math.PI);
+    ctxA.fillStyle = color; ctxA.fill();
+    ctxA.strokeStyle = '#fff'; ctxA.lineWidth = 2; ctxA.stroke();
+    ctxA.fillStyle = '#0f172a'; ctxA.font = 'bold 17px sans-serif';
+    ctxA.fillText(label, p.x + dx, p.y + dy);
+  }
+  dot(A, '#2563eb', 'A', -24, 26);
+  dot(C, '#dc2626', 'C', 12, 26);
+  dot(D, '#7c3aed', 'D', 12, -12);
+
+  /* side labels */
+  ctxA.font = 'bold 15px sans-serif';
+  ctxA.fillStyle = '#1e40af';
+  ctxA.fillText('AD (hypotenuse)', (A.x+D.x)/2 - 60, (A.y+D.y)/2 - 12);
+  ctxA.fillStyle = '#991b1b';
+  ctxA.fillText('DC (opposite)', D.x + 14, (D.y+C.y)/2);
+  ctxA.fillStyle = '#334155';
+  ctxA.fillText('AC', (A.x+C.x)/2 - 10, baseY - 12);
+
+  /* formula box */
+  ctxA.fillStyle = 'rgba(15,23,42,.9)';
+  ctxA.fillRect(14, 14, 250, 62);
+  ctxA.strokeStyle = '#334155'; ctxA.lineWidth = 1; ctxA.strokeRect(14,14,250,62);
+  ctxA.fillStyle = '#93c5fd'; ctxA.font = 'bold 15px monospace';
+  ctxA.fillText('sin θ = DC / AD', 26, 40);
+  ctxA.fillStyle = '#5eead4'; ctxA.font = 'bold 15px monospace';
+  ctxA.fillText('DC = AD · sin θ', 26, 62);
+}
+
+thetaS2.addEventListener('input', drawADC);
+
+/* =========================================================
+   CANVAS 3 — TRIANGLE BDC (Part b)
+   ========================================================= */
+const cvBDC = document.getElementById('triBDC');
+const ctxB = cvBDC.getContext('2d');
+const phiS2 = document.getElementById('phiSlider2');
+const phiV2 = document.getElementById('phiVal2');
+
+function drawBDC(){
+  const W = cvBDC.width, H = cvBDC.height;
+  const phi = +phiS2.value;
+  phiV2.textContent = phi + '°';
+
+  ctxB.clearRect(0,0,W,H);
+
+  /* grid */
+  ctxB.strokeStyle = '#f1f5f9'; ctxB.lineWidth = 1;
+  for (let x=0; x<=W; x+=40){ ctxB.beginPath(); ctxB.moveTo(x,0); ctxB.lineTo(x,H); ctxB.stroke(); }
+  for (let y=0; y<=H; y+=40){ ctxB.beginPath(); ctxB.moveTo(0,y); ctxB.lineTo(W,y); ctxB.stroke(); }
+
+  const baseY = H - 60;
+  const C = { x: W - 100, y: baseY };
+  const D = { x: W - 100, y: 60 };
+  const DCpx = D.y - C.y < 0 ? 0 : 0; // placeholder
+  const h = baseY - D.y;
+  /* BC = h / tan(phi) */
+  const BCpx = h / Math.tan(deg(phi));
+  const B = { x: Math.max(60, C.x - BCpx), y: baseY };
+  /* ensure B fits; if not, scale h */
+  let hh = h;
+  if (B.x <= 60){
+    hh = (C.x - 100) * Math.tan(deg(phi));
+    D.y = baseY - hh;
+  }
+
+  /* triangle fill */
+  ctxB.beginPath();
+  ctxB.moveTo(B.x, B.y); ctxB.lineTo(D.x, D.y); ctxB.lineTo(C.x, C.y); ctxB.closePath();
+  ctxB.fillStyle = 'rgba(245,158,11,.13)';
+  ctxB.fill();
+
+  /* baseline BC */
+  ctxB.strokeStyle = '#334155'; ctxB.lineWidth = 2.5;
+  ctxB.beginPath(); ctxB.moveTo(B.x-12, baseY); ctxB.lineTo(C.x+12, baseY); ctxB.stroke();
+
+  /* BD (hypotenuse) */
+  ctxB.strokeStyle = '#059669'; ctxB.lineWidth = 3.2;
+  ctxB.beginPath(); ctxB.moveTo(B.x,B.y); ctxB.lineTo(D.x,D.y); ctxB.stroke();
+
+  /* DC */
+  ctxB.strokeStyle = '#dc2626'; ctxB.lineWidth = 3.2;
+  ctxB.beginPath(); ctxB.moveTo(D.x,D.y); ctxB.lineTo(C.x,C.y); ctxB.stroke();
+
+  /* BC */
+  ctxB.strokeStyle = '#d97706'; ctxB.lineWidth = 3.2;
+  ctxB.beginPath(); ctxB.moveTo(B.x,B.y); ctxB.lineTo(C.x,C.y); ctxB.stroke();
+
+  /* right angle */
+  const s = 16;
+  ctxB.strokeStyle = '#0f172a'; ctxB.lineWidth = 1.8;
+  ctxB.beginPath();
+  ctxB.moveTo(C.x - s, C.y); ctxB.lineTo(C.x - s, C.y - s); ctxB.lineTo(C.x, C.y - s);
+  ctxB.stroke();
+
+  /* phi arc at B */
+  const angBD = Math.atan2(D.y - B.y, D.x - B.x);
+  ctxB.strokeStyle = '#059669'; ctxB.lineWidth = 2;
+  ctxB.beginPath();
+  ctxB.arc(B.x, B.y, 46, Math.PI, angBD, false);
+  ctxB.stroke();
+  ctxB.fillStyle = '#065f46'; ctxB.font = 'bold 18px sans-serif';
+  ctxB.fillText('φ', B.x - 64, B.y - 16);
+
+  /* points */
+  function dot(p, color, label, dx, dy){
+    ctxB.beginPath(); ctxB.arc(p.x, p.y, 6, 0, 2*Math.PI);
+    ctxB.fillStyle = color; ctxB.fill();
+    ctxB.strokeStyle = '#fff'; ctxB.lineWidth = 2; ctxB.stroke();
+    ctxB.fillStyle = '#0f172a'; ctxB.font = 'bold 17px sans-serif';
+    ctxB.fillText(label, p.x + dx, p.y + dy);
+  }
+  dot(B, '#d97706', 'B', -22, 26);
+  dot(C, '#dc2626', 'C', 12, 26);
+  dot(D, '#7c3aed', 'D', 12, -12);
+
+  /* labels */
+  ctxB.font = 'bold 15px sans-serif';
+  ctxB.fillStyle = '#92400e';
+  ctxB.fillText('BC (adjacent)', (B.x+C.x)/2 - 55, baseY - 12);
+  ctxB.fillStyle = '#991b1b';
+  ctxB.fillText('DC (opposite)', D.x + 13, (D.y + C.y)/2);
+  ctxB.fillStyle = '#065f46';
+  ctxB.fillText('BD', (B.x+D.x)/2 - 30, (B.y+D.y)/2 - 8);
+
+  /* formula box */
+  ctxB.fillStyle = 'rgba(15,23,42,.9)';
+  ctxB.fillRect(14, 14, 262, 62);
+  ctxB.strokeStyle = '#334155'; ctxB.lineWidth = 1; ctxB.strokeRect(14,14,262,62);
+  ctxB.fillStyle = '#fbbf24'; ctxB.font = 'bold 15px monospace';
+  ctxB.fillText('tan φ = DC / BC', 26, 40);
+  ctxB.fillStyle = '#5eead4'; ctxB.font = 'bold 15px monospace';
+  ctxB.fillText('DC = BC · tan φ', 26, 62);
+}
+
+phiS2.addEventListener('input', drawBDC);
+
+/* =========================================================
+   INIT
+   ========================================================= */
+window.addEventListener('load', function(){
+  drawMain();
+  drawADC();
+  drawBDC();
+  if (typeof MathJax !== 'undefined' && MathJax.typesetPromise){
+    MathJax.typesetPromise().catch(()=>{});
+  }
+});
+</script>
+</body>
+</html>

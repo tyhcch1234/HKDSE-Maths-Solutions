@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2023 Paper 2 · Q19 · Rhombus Geometry</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[', '\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root{
+    --blue:#2563eb; --blue-dark:#1e3a8a; --amber:#f59e0b; --amber-light:#fef3c7;
+    --emerald:#059669; --emerald-light:#d1fae5; --slate:#334155; --slate-light:#f1f5f9;
+    --purple:#7c3aed; --rose:#e11d48;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:'Segoe UI',system-ui,-apple-system,Helvetica,Arial,sans-serif;
+    background:#f8fafc; color:var(--slate); line-height:1.6;
+  }
+  .wrap{max-width:960px; margin:0 auto; padding:0 16px 48px;}
+
+  /* ---------- Hero ---------- */
+  header.hero{
+    background:linear-gradient(135deg,#1e3a8a 0%,#2563eb 45%,#7c3aed 100%);
+    color:#fff; padding:38px 18px 44px; text-align:center;
+    border-radius:0 0 26px 26px; box-shadow:0 10px 30px rgba(30,58,138,.35);
+    position:relative; overflow:hidden;
+  }
+  header.hero::after{
+    content:""; position:absolute; inset:0;
+    background:radial-gradient(circle at 12% 18%, rgba(255,255,255,.20), transparent 42%),
+               radial-gradient(circle at 88% 82%, rgba(255,255,255,.14), transparent 40%);
+    pointer-events:none;
+  }
+  .eyebrow{font-size:.82rem; letter-spacing:.16em; text-transform:uppercase; opacity:.85; margin:0 0 8px;}
+  .hero h1{margin:0 0 4px; font-size:clamp(1.5rem,4.6vw,2.35rem); font-weight:800; letter-spacing:.5px;}
+  .hero h2{margin:0 0 16px; font-size:clamp(.95rem,2.5vw,1.15rem); font-weight:500; opacity:.92;}
+  .pills{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; position:relative; z-index:1;}
+  .pill{
+    background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.4);
+    padding:5px 13px; border-radius:999px; font-size:.78rem; font-weight:600;
+    backdrop-filter:blur(3px);
+  }
+
+  /* ---------- Cards ---------- */
+  .card{
+    background:#fff; border-radius:18px; padding:22px 20px; margin-top:26px;
+    box-shadow:0 4px 18px rgba(15,23,42,.08); border:1px solid #e2e8f0;
+  }
+  .card h3{
+    margin:0 0 14px; font-size:1.18rem; color:var(--blue-dark);
+    display:flex; align-items:center; gap:9px; flex-wrap:wrap;
+  }
+  .card h3 .num{
+    background:var(--blue); color:#fff; width:30px; height:30px; border-radius:9px;
+    display:inline-flex; align-items:center; justify-content:center; font-size:.95rem; flex:0 0 auto;
+  }
+  .marks-badge{
+    background:var(--amber-light); color:#92400e; border:1px solid #fcd34d;
+    font-size:.72rem; font-weight:700; padding:2px 9px; border-radius:999px; margin-left:auto;
+  }
+
+  .qbox{background:var(--slate-light); border-left:5px solid var(--blue); border-radius:10px; padding:16px 18px;}
+  .qbox p{margin:0 0 10px;}
+  .qbox ol{margin:8px 0 0 4px; padding-left:20px;}
+  .qbox li{margin-bottom:7px;}
+
+  /* ---------- Canvas panels ---------- */
+  .panel{
+    background:#fbfdff; border:1px solid #dbeafe; border-radius:14px; padding:14px;
+    margin:14px 0 20px;
+  }
+  .panel canvas{
+    width:100%; height:auto; display:block; border-radius:10px; background:#fff;
+    border:1px solid #e2e8f0; touch-action:none;
+  }
+  .panel-title{font-size:.83rem; font-weight:700; color:var(--blue-dark); letter-spacing:.04em; margin:0 0 10px; text-transform:uppercase;}
+  .controls{display:flex; flex-wrap:wrap; gap:16px; align-items:center; margin-top:12px;}
+  .ctrl{display:flex; align-items:center; gap:9px; font-size:.82rem; font-weight:600; color:var(--slate); flex:1 1 220px;}
+  input[type=range]{flex:1; accent-color:var(--blue); min-width:110px;}
+  .val{font-family:ui-monospace,Consolas,monospace; background:#eff6ff; border:1px solid #bfdbfe; border-radius:6px; padding:1px 7px; color:var(--blue-dark); font-size:.8rem; min-width:58px; text-align:center;}
+  label.chk{display:flex; align-items:center; gap:7px; font-size:.82rem; font-weight:600; cursor:pointer; user-select:none;}
+  input[type=checkbox]{width:16px; height:16px; accent-color:var(--emerald); cursor:pointer;}
+
+  .readouts{display:flex; flex-wrap:wrap; gap:10px; margin-top:12px;}
+  .readout{
+    background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:7px 12px;
+    font-size:.8rem; font-weight:600; color:var(--slate); box-shadow:0 1px 4px rgba(15,23,42,.05);
+  }
+  .readout b{color:var(--blue-dark); font-family:ui-monospace,Consolas,monospace;}
+
+  /* ---------- Steps ---------- */
+  .step{
+    display:none; background:#f8fafc; border:1px solid #e2e8f0; border-left:4px solid var(--amber);
+    border-radius:12px; padding:14px 16px; margin-top:14px; animation:fade .35s ease;
+  }
+  .step.show{display:block;}
+  @keyframes fade{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);}}
+  .step-head{display:flex; align-items:center; gap:9px; margin-bottom:8px; flex-wrap:wrap;}
+  .step-num{background:var(--amber); color:#fff; font-size:.72rem; font-weight:800; padding:2px 10px; border-radius:999px;}
+  .step-mark{background:var(--purple); color:#fff; font-size:.7rem; font-weight:700; padding:2px 9px; border-radius:999px;}
+  .step-body{font-size:.94rem;}
+  .hint{
+    background:var(--amber-light); border-left:4px solid var(--amber); border-radius:8px;
+    padding:9px 12px; margin-top:11px; font-size:.85rem; color:#78350f;
+  }
+  .hint b{color:#92400e;}
+  .answer{
+    background:var(--emerald-light); border-left:4px solid var(--emerald); border-radius:8px;
+    padding:10px 12px; margin-top:11px; font-size:.9rem; color:#065f46; font-weight:600;
+  }
+  .answer b{color:#047857;}
+
+  .btnrow{display:flex; align-items:center; gap:14px; margin-top:16px; flex-wrap:wrap;}
+  button.next{
+    background:linear-gradient(135deg,var(--blue),var(--purple)); color:#fff; border:none;
+    padding:11px 22px; border-radius:11px; font-size:.9rem; font-weight:700; cursor:pointer;
+    box-shadow:0 4px 12px rgba(37,99,235,.35); transition:transform .15s, box-shadow .15s;
+  }
+  button.next:hover:not(:disabled){transform:translateY(-2px); box-shadow:0 7px 18px rgba(37,99,235,.45);}
+  button.next:disabled{background:#cbd5e1; box-shadow:none; cursor:not-allowed; color:#64748b;}
+  .counter{font-size:.82rem; font-weight:700; color:#64748b; font-family:ui-monospace,Consolas,monospace;}
+
+  /* ---------- Summary ---------- */
+  .summary{
+    background:linear-gradient(150deg,#0f172a,#1e293b); color:#e2e8f0; border:none;
+  }
+  .summary h3{color:#93c5fd;}
+  .summary h3 .num{background:#3b82f6;}
+  .summary ul{margin:0; padding-left:20px;}
+  .summary li{margin-bottom:9px;}
+  .summary li b{color:#fbbf24;}
+  .final-tag{
+    display:inline-block; background:#fbbf24; color:#0f172a; font-weight:800;
+    padding:3px 12px; border-radius:999px; font-size:.8rem; margin-top:8px;
+  }
+
+  footer{
+    text-align:center; font-size:.78rem; color:#94a3b8; padding:26px 16px 8px;
+  }
+  .disclaimer{font-size:.72rem; color:#cbd5e1; margin-top:4px;}
+
+  @media(max-width:560px){
+    .card{padding:18px 15px;}
+    .hero{padding:28px 14px 34px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <p class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</p>
+  <h1>2023 Paper 2 · Question 19</h1>
+  <h2>Properties of a Rhombus — Diagonals, Right Angles &amp; Pythagoras</h2>
+  <div class="pills">
+    <span class="pill">Rhombus</span>
+    <span class="pill">Diagonals</span>
+    <span class="pill">Perpendicular Bisectors</span>
+    <span class="pill">Pythagoras' Theorem</span>
+    <span class="pill">Multiple Choice</span>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ================= QUESTION CARD ================= -->
+  <section class="card">
+    <h3><span class="num">?</span> The Question <span class="marks-badge">2 marks</span></h3>
+    <div class="qbox">
+      <p>It is given that \(ABCD\) is a rhombus. Denote the point of intersection of \(AC\) and \(BD\) by \(E\). Which of the following must be true?</p>
+      <ol type="I">
+        <li>\(AE = BE\)</li>
+        <li>\(AE^2 + BE^2 = CD^2\)</li>
+        <li>\(\angle AEB = 90^\circ\)</li>
+      </ol>
+      <p style="margin-bottom:0;">
+        <b>A.</b> I and II only &nbsp;&nbsp;
+        <b>B.</b> I and III only &nbsp;&nbsp;
+        <b>C.</b> II and III only &nbsp;&nbsp;
+        <b>D.</b> I, II and III
+      </p>
+    </div>
+  </section>
+
+  <!-- ================= KEY FACT CARD ================= -->
+  <section class="card">
+    <h3><span class="num">★</span> Key Rhombus Facts</h3>
+    <p>Before testing each statement, recall the defining properties of a <b>rhombus</b>:</p>
+    <ul>
+      <li>All four sides are equal: \(AB = BC = CD = DA\).</li>
+      <li>A rhombus is a parallelogram, so its diagonals <b>bisect each other</b>: \(AE = CE\) and \(BE = DE\).</li>
+      <li>The diagonals of a rhombus are <b>perpendicular</b>: \(AC \perp BD\).</li>
+      <li>Each diagonal <b>bisects a pair of opposite angles</b>.</li>
+    </ul>
+    <div class="hint">
+      <b>Hint:</b> Only the perpendicularity of the diagonals gives a right-angled triangle at \(E\) — that is the bridge to Pythagoras.
+    </div>
+  </section>
+
+  <!-- ================= PART (I) ================= -->
+  <section class="card">
+    <h3><span class="num">I</span> Statement I — Is \(AE = BE\)? <span class="marks-badge">Check</span></h3>
+
+    <div class="panel">
+      <p class="panel-title">Interactive Rhombus — drag the slider to change the shape</p>
+      <canvas id="cv1" width="820" height="440"></canvas>
+      <div class="controls">
+        <div class="ctrl">
+          <span>Diagonal ratio</span>
+          <input type="range" id="sld1" min="30" max="150" value="80">
+          <span class="val" id="v1">1.60</span>
+        </div>
+        <label class="chk"><input type="checkbox" id="chk1a" checked> Show \(AE\) &amp; \(BE\)</label>
+        <label class="chk"><input type="checkbox" id="chk1b" checked> Show equal-side marks</label>
+      </div>
+      <div class="readouts">
+        <div class="readout">\(AE\) = <b id="ro-ae">—</b></div>
+        <div class="readout">\(BE\) = <b id="ro-be">—</b></div>
+        <div class="readout">\(AE - BE\) = <b id="ro-diff">—</b></div>
+      </div>
+    </div>
+
+    <div class="step" id="s1-1">
+      <div class="step-head"><span class="step-num">Step 1</span><span class="step-mark">Reasoning</span></div>
+      <div class="step-body">
+        In a rhombus, the diagonals bisect each other, so
+        \[ AE = \tfrac{1}{2}AC, \qquad BE = \tfrac{1}{2}BD. \]
+        For \(AE = BE\) we would need \(AC = BD\), i.e. the diagonals equal.
+      </div>
+      <div class="hint"><b>Hint:</b> Equal diagonals happen only for a <i>rectangle</i> (or a square), not for every rhombus. A long, thin rhombus has very unequal diagonals.</div>
+    </div>
+
+    <div class="step" id="s1-2">
+      <div class="step-head"><span class="step-num">Step 2</span><span class="step-mark">Counter-example</span></div>
+      <div class="step-body">
+        Take a rhombus with diagonals \(AC = 16\), \(BD = 12\). Then
+        \[ AE = 8, \quad BE = 6 \quad\Rightarrow\quad AE \neq BE. \]
+        The slider above shows \(AE \neq BE\) for almost every shape — only the degenerate square gives equality.
+      </div>
+      <div class="answer"><b>Conclusion:</b> Statement I is <b>NOT always true</b>. ✗</div>
+    </div>
+
+    <div class="btnrow">
+      <button class="next" data-target="part1">Next step →</button>
+      <span class="counter" id="c-part1">0 / 2</span>
+    </div>
+  </section>
+
+  <!-- ================= PART (III) ================= -->
+  <section class="card">
+    <h3><span class="num">III</span> Statement III — Is \(\angle AEB = 90^\circ\)? <span class="marks-badge">Check</span></h3>
+
+    <div class="panel">
+      <p class="panel-title">Diagonals of a rhombus are always perpendicular</p>
+      <canvas id="cv2" width="820" height="440"></canvas>
+      <div class="controls">
+        <div class="ctrl">
+          <span>Shape of rhombus</span>
+          <input type="range" id="sld2" min="30" max="150" value="60">
+          <span class="val" id="v2">1.20</span>
+        </div>
+        <label class="chk"><input type="checkbox" id="chk2" checked> Highlight \(\angle AEB\)</label>
+      </div>
+      <div class="readouts">
+        <div class="readout">\(\angle AEB\) = <b id="ro-ang">90.0°</b></div>
+        <div class="readout">\(\angle AED\) = <b id="ro-ang2">90.0°</b></div>
+      </div>
+    </div>
+
+    <div class="step" id="s3-1">
+      <div class="step-head"><span class="step-num">Step 1</span><span class="step-mark">Proof</span></div>
+      <div class="step-body">
+        In \(\triangle ABD\), since \(AB = AD\) (rhombus), the triangle is isosceles with apex \(A\).
+        <br>
+        Since \(BE = DE\) (diagonals bisect), the median from \(A\) to \(BD\) is also the <b>altitude</b>:
+        \[ AE \perp BD \quad\Rightarrow\quad \angle AEB = 90^\circ. \]
+      </div>
+      <div class="hint"><b>Hint:</b> Move the slider — no matter how "flat" or "thin" the rhombus looks, the angle readout stays at exactly \(90^\circ\).</div>
+    </div>
+
+    <div class="step" id="s3-2">
+      <div class="step-head"><span class="step-num">Step 2</span><span class="step-mark">Check</span></div>
+      <div class="step-body">
+        \[ \angle AEB = 90^\circ \quad\checkmark \]
+      </div>
+      <div class="answer"><b>Conclusion:</b> Statement III is <b>always true</b>. ✓</div>
+    </div>
+
+    <div class="btnrow">
+      <button class="next" data-target="part3">Next step →</button>
+      <span class="counter" id="c-part3">0 / 2</span>
+    </div>
+  </section>
+
+  <!-- ================= PART (II) ================= -->
+  <section class="card">
+    <h3><span class="num">II</span> Statement II — Is \(AE^2 + BE^2 = CD^2\)? <span class="marks-badge">Check</span></h3>
+
+    <div class="panel">
+      <p class="panel-title">Right-angled triangle \(AEB\) and side \(CD\)</p>
+      <canvas id="cv3" width="820" height="440"></canvas>
+      <div class="controls">
+        <div class="ctrl">
+          <span>Half-diagonal \(AE\)</span>
+          <input type="range" id="sld3a" min="3" max="15" value="8" step="0.5">
+          <span class="val" id="v3a">8.0</span>
+        </div>
+        <div class="ctrl">
+          <span>Half-diagonal \(BE\)</span>
+          <input type="range" id="sld3b" min="2" max="12" value="6" step="0.5">
+          <span class="val" id="v3b">6.0</span>
+        </div>
+      </div>
+      <div class="readouts">
+        <div class="readout">\(AE^2 + BE^2\) = <b id="ro-lhs">—</b></div>
+        <div class="readout">\(AB = \sqrt{AE^2+BE^2}\) = <b id="ro-ab">—</b></div>
+        <div class="readout">\(CD^2\) = <b id="ro-cd">—</b></div>
+      </div>
+    </div>
+
+    <div class="step" id="s2-1">
+      <div class="step-head"><span class="step-num">Step 1</span><span class="step-mark">1M</span></div>
+      <div class="step-body">
+        By Statement III, \(\angle AEB = 90^\circ\), so \(\triangle AEB\) is right-angled at \(E\). Applying Pythagoras' theorem:
+        \[ AE^2 + BE^2 = AB^2. \]
+      </div>
+      <div class="hint"><b>Hint:</b> This is the classic "perpendicular diagonals ⇒ Pythagoras" step. Look at the blue right triangle in the diagram.</div>
+    </div>
+
+    <div class="step" id="s2-2">
+      <div class="step-head"><span class="step-num">Step 2</span><span class="step-mark">1A</span></div>
+      <div class="step-body">
+        Since \(ABCD\) is a rhombus, \(AB = CD\). Therefore
+        \[ AB^2 = CD^2 \quad\Rightarrow\quad AE^2 + BE^2 = CD^2. \]
+      </div>
+      <div class="answer"><b>Conclusion:</b> Statement II is <b>always true</b>. ✓</div>
+    </div>
+
+    <div class="btnrow">
+      <button class="next" data-target="part2">Next step →</button>
+      <span class="counter" id="c-part2">0 / 2</span>
+    </div>
+  </section>
+
+  <!-- ================= SUMMARY ================= -->
+  <section class="card summary">
+    <h3><span class="num">✓</span> Summary of the Answer</h3>
+    <ul>
+      <li><b>Statement I</b> \((AE = BE)\): <b>Not always true</b> — only if \(AC = BD\). ✗</li>
+      <li><b>Statement II</b> \((AE^2 + BE^2 = CD^2)\): <b>Always true</b> — Pythagoras in \(\triangle AEB\) with \(AB = CD\). ✓</li>
+      <li><b>Statement III</b> \((\angle AEB = 90^\circ)\): <b>Always true</b> — diagonals of a rhombus are perpendicular. ✓</li>
+    </ul>
+    <p style="margin-top:14px;">Therefore the correct choice is <b>II and III only</b>.</p>
+    <span class="final-tag">Answer: C</span>
+  </section>
+
+  <footer>
+    HKDSE Mathematics (Compulsory Part) · Paper 2 · 2023 Q19
+    <div class="disclaimer">Interactive solution · Drawn with HTML5 Canvas · Rendered with MathJax</div>
+  </footer>
+
+</div>
+
+<script>
+/* ============================================================
+   SHARED CANVAS HELPERS
+   ============================================================ */
+function arrow(ctx, x1, y1, x2, y2, color, size){
+  size = size || 9;
+  ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  var a = Math.atan2(y2-y1, x2-x1);
+  ctx.beginPath();
+  ctx.moveTo(x2,y2);
+  ctx.lineTo(x2 - size*Math.cos(a-0.4), y2 - size*Math.sin(a-0.4));
+  ctx.lineTo(x2 - size*Math.cos(a+0.4), y2 - size*Math.sin(a+0.4));
+  ctx.closePath(); ctx.fill();
+}
+function dot(ctx, x, y, color, r){
+  r = r || 5;
+  ctx.fillStyle = color; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle = "#fff"; ctx.lineWidth = 1.6; ctx.stroke();
+}
+function label(ctx, text, x, y, color, size, align, baseline){
+  ctx.fillStyle = color; ctx.font = (size||13) + "px 'Segoe UI', Arial, sans-serif";
+  ctx.textAlign = align || "left"; ctx.textBaseline = baseline || "middle";
+  ctx.fillText(text, x, y);
+}
+function grid(ctx, W, H, ox, oy, step, color){
+  ctx.strokeStyle = color || "#eef2f7"; ctx.lineWidth = 1;
+  for (var x = ox % step; x < W; x += step){
+    ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke();
+  }
+  for (var y = oy % step; y < H; y += step){
+    ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();
+  }
+}
+function axes(ctx, W, H, ox, oy){
+  ctx.strokeStyle = "#cbd5e1"; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(0,oy); ctx.lineTo(W,oy); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(ox,0); ctx.lineTo(ox,H); ctx.stroke();
+  arrow(ctx, ox, oy, W-6, oy, "#94a3b8", 8);
+  arrow(ctx, ox, oy, ox, 8, "#94a3b8", 8);
+  label(ctx, "x", W-16, oy+16, "#94a3b8", 12);
+  label(ctx, "y", ox+10, 14, "#94a3b8", 12);
+}
+/* right-angle marker at vertex V between rays to P and Q */
+function rightAngle(ctx, Vx, Vy, Px, Py, Qx, Qy, color){
+  var u1 = norm(Px-Vx, Py-Vy), u2 = norm(Qx-Vx, Qy-Vy);
+  var s = 14;
+  var a1x = Vx + u1.x*s, a1y = Vy + u1.y*s;
+  var a2x = Vx + u2.x*s, a2y = Vy + u2.y*s;
+  var cx = a1x + u2.x*s, cy = a1y + u2.y*s;
+  ctx.strokeStyle = color; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(a1x,a1y); ctx.lineTo(cx,cy); ctx.lineTo(a2x,a2y); ctx.stroke();
+}
+function norm(dx, dy){ var L = Math.hypot(dx,dy)||1; return {x:dx/L, y:dy/L}; }
+
+/* ============================================================
+   DIAGRAM 1 — Rhombus, AE vs BE
+   ============================================================ */
+(function(){
+  var cv = document.getElementById("cv1");
+  var ctx = cv.getContext("2d");
+  var W = cv.width, H = cv.height;
+  var ox = W/2, oy = H/2;
+  var scale = 12;
+
+  function draw(){
+    var ratio = parseFloat(document.getElementById("sld1").value)/50; // 0.6 .. 3.0
+    document.getElementById("v1").textContent = ratio.toFixed(2);
+
+    var hx = 6;              // half of BD (horizontal)
+    var hy = hx*ratio;       // half of AC (vertical)
+
+    var A = {x:0,  y: hy};
+    var B = {x:-hx, y:0};
+    var C = {x:0,  y:-hy};
+    var D = {x: hx, y:0};
+    var E = {x:0,  y:0};
+
+    function X(p){ return ox + p.x*scale; }
+    function Y(p){ return oy - p.y*scale; }
+
+    ctx.clearRect(0,0,W,H);
+    grid(ctx, W, H, ox, oy, 40, "#f1f5f9");
+    axes(ctx, W, H, ox, oy);
+
+    // quadrilateral fill
+    ctx.beginPath();
+    ctx.moveTo(X(A),Y(A)); ctx.lineTo(X(B),Y(B));
+    ctx.lineTo(X(C),Y(C)); ctx.lineTo(X(D),Y(D));
+    ctx.closePath();
+    ctx.fillStyle = "rgba(37,99,235,0.08)";
+    ctx.fill();
+    ctx.strokeStyle = "#2563eb"; ctx.lineWidth = 2.5; ctx.stroke();
+
+    // diagonals
+    ctx.setLineDash([7,6]);
+    ctx.strokeStyle = "#7c3aed"; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(X(A),Y(A)); ctx.lineTo(X(C),Y(C)); ctx.stroke();
+    ctx.strokeStyle = "#e11d48";
+    ctx.beginPath(); ctx.moveTo(X(B),Y(B)); ctx.lineTo(X(D),Y(D)); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // highlight AE and BE
+    if (document.getElementById("chk1a").checked){
+      ctx.strokeStyle = "#f59e0b"; ctx.lineWidth = 5; ctx.lineCap="round";
+      ctx.beginPath(); ctx.moveTo(X(E),Y(E)); ctx.lineTo(X(A),Y(A)); ctx.stroke();
+      ctx.strokeStyle = "#059669";
+      ctx.beginPath(); ctx.moveTo(X(E),Y(E)); ctx.lineTo(X(B),Y(B)); ctx.stroke();
+      ctx.lineCap="butt";
+      // marks on AE (single tick) and BE (double tick)
+      drawTick(ctx, X(E),Y(E), X(A),Y(A), 1, "#f59e0b");
+      drawTick(ctx, X(E),Y(E), X(B),Y(B), 2, "#059669");
+    }
+
+    // equal side marks
+    if (document.getElementById("chk1b").checked){
+      drawTick(ctx, X(A),Y(A), X(B),Y(B), 1, "#2563eb");
+      drawTick(ctx, X(B),Y(B), X(C),Y(C), 1, "#2563eb");
+      drawTick(ctx, X(C),Y(C), X(D),Y(D), 1, "#2563eb");
+      drawTick(ctx, X(D),Y(D), X(A),Y(A), 1, "#2563eb");
+    }
+
+    // right angle at E
+    rightAngle(ctx, X(E),Y(E), X(A),Y(A), X(B),Y(B), "#94a3b8");
+
+    // points
+    dot(ctx, X(A),Y(A), "#2563eb"); label(ctx,"A", X(A)+10, Y(A)-10, "#1e3a8a", 14, "left");
+    dot(ctx, X(B),Y(B), "#2563eb"); label(ctx,"B", X(B)-12, Y(B)+2, "#1e3a8a", 14, "right");
+    dot(ctx, X(C),Y(C), "#2563eb"); label(ctx,"C", X(C)+10, Y(C)+10, "#1e3a8a", 14, "left");
+    dot(ctx, X(D),Y(D), "#2563eb"); label(ctx,"D", X(D)+12, Y(D)+2, "#1e3a8a", 14, "left");
+    dot(ctx, X(E),Y(E), "#0f172a", 5); label(ctx,"E", X(E)+10, Y(E)+14, "#0f172a", 14, "left");
+
+    // readouts
+    var AE = hy, BE = hx;
+    document.getElementById("ro-ae").textContent = (AE*2).toFixed(1);
+    document.getElementById("ro-be").textContent = (BE*2).toFixed(1);
+    document.getElementById("ro-diff").textContent = ((AE-BE)*2).toFixed(1);
+
+    // caption
+    label(ctx, "AE = " + (AE*2).toFixed(1) + "  (α)", 18, 24, "#b45309", 13, "left");
+    label(ctx, "BE = " + (BE*2).toFixed(1) + "  (β)", 18, 44, "#047857", 13, "left");
+    label(ctx, (Math.abs(AE-BE) < 1e-6) ? "AE = BE (square case)" : "AE ≠ BE → Statement I fails", 18, 64,
+          (Math.abs(AE-BE) < 1e-6) ? "#065f46" : "#be123c", 13, "left");
+  }
+
+  function drawTick(ctx, x1,y1, x2,y2, n, color){
+    var mx = (x1+x2)/2, my = (y1+y2)/2;
+    var u = norm(x2-x1, y2-y1);
+    var p = {x:-u.y, y:u.x};
+    ctx.strokeStyle = color; ctx.lineWidth = 3;
+    var gap = 6;
+    for (var i=0;i<n;i++){
+      var off = (n===1)?0:(-(n-1)/2 + i)*gap;
+      var bx = mx + u.x*off, by = my + u.y*off;
+      ctx.beginPath();
+      ctx.moveTo(bx - p.x*7, by - p.y*7);
+      ctx.lineTo(bx + p.x*7, by + p.y*7);
+      ctx.stroke();
+    }
+  }
+
+  cv.addEventListener("input", draw);
+  document.getElementById("sld1").addEventListener("input", draw);
+  document.getElementById("chk1a").addEventListener("change", draw);
+  document.getElementById("chk1b").addEventListener("change", draw);
+  draw();
+})();
+
+/* ============================================================
+   DIAGRAM 2 — Perpendicular diagonals (angle always 90°)
+   ============================================================ */
+(function(){
+  var cv = document.getElementById("cv2");
+  var ctx = cv.getContext("2d");
+  var W = cv.width, H = cv.height;
+  var ox = W/2, oy = H/2;
+  var scale = 12;
+
+  function draw(){
+    var ratio = parseFloat(document.getElementById("sld2").value)/50;
+    document.getElementById("v2").textContent = ratio.toFixed(2);
+
+    var hx = 6, hy = hx*ratio;
+    var A = {x:0, y: hy};
+    var B = {x:-hx, y:0};
+    var C = {x:0, y:-hy};
+    var D = {x: hx, y:0};
+    var E = {x:0, y:0};
+    function X(p){ return ox + p.x*scale; }
+    function Y(p){ return oy - p.y*scale; }
+
+    ctx.clearRect(0,0,W,H);
+    grid(ctx, W, H, ox, oy, 40, "#f1f5f9");
+    axes(ctx, W, H, ox, oy);
+
+    // rhombus
+    ctx.beginPath();
+    ctx.moveTo(X(A),Y(A)); ctx.lineTo(X(B),Y(B));
+    ctx.lineTo(X(C),Y(C)); ctx.lineTo(X(D),Y(D));
+    ctx.closePath();
+    ctx.fillStyle = "rgba(37,99,235,0.08)"; ctx.fill();
+    ctx.strokeStyle = "#2563eb"; ctx.lineWidth = 2.5; ctx.stroke();
+
+    // diagonals
+    ctx.strokeStyle = "#7c3aed"; ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.moveTo(X(A),Y(A)); ctx.lineTo(X(C),Y(C)); ctx.stroke();
+    ctx.strokeStyle = "#e11d48"; ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.moveTo(X(B),Y(B)); ctx.lineTo(X(D),Y(D)); ctx.stroke();
+
+    // right angle highlight
+    if (document.getElementById("chk2").checked){
+      ctx.save();
+      ctx.fillStyle = "rgba(245,158,11,0.22)";
+      ctx.beginPath();
+      ctx.moveTo(X(E),Y(E));
+      ctx.lineTo(X(A),Y(A));
+      ctx.lineTo(X(B),Y(B));
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+      rightAngle(ctx, X(E),Y(E), X(A),Y(A), X(B),Y(B), "#f59e0b");
+      rightAngle(ctx, X(E),Y(E), X(A),Y(A), X(D),Y(D), "#f59e0b");
+      label(ctx, "90°", ((X(E)+X(A))/2)+14, ((Y(E)+Y(A))/2)-2, "#b45309", 13, "left");
+      label(ctx, "90°", ((X(E)+X(D))/2)+14, ((Y(E)+Y(D))/2)+16, "#b45309", 13, "left");
+    }
+
+    // points & labels
+    dot(ctx, X(A),Y(A), "#2563eb"); label(ctx,"A", X(A)+10, Y(A)-10, "#1e3a8a", 14, "left");
+    dot(ctx, X(B),Y(B), "#2563eb"); label(ctx,"B", X(B)-12, Y(B)+2, "#1e3a8a", 14, "right");
+    dot(ctx, X(C),Y(C), "#2563eb"); label(ctx,"C", X(C)+10, Y(C)+10, "#1e3a8a", 14, "left");
+    dot(ctx, X(D),Y(D), "#2563eb"); label(ctx,"D", X(D)+12, Y(D)+2, "#1e3a8a", 14, "left");
+    dot(ctx, X(E),Y(E), "#0f172a", 5); label(ctx,"E", X(E)+10, Y(E)+14, "#0f172a", 14, "left");
+
+    // readouts — cosine rule confirms 90 degrees
+    var AE = hy, BE = hx, AB = Math.hypot(hx,hy);
+    var cos = (AE*AE + BE*BE - AB*AB)/(2*AE*BE);
+    var ang = Math.acos(Math.max(-1,Math.min(1,cos)))*180/Math.PI;
+    document.getElementById("ro-ang").textContent = ang.toFixed(1) + "°";
+    document.getElementById("ro-ang2").textContent = ang.toFixed(1) + "°";
+
+    label(ctx, "∠AEB = " + ang.toFixed(1) + "°  (always 90°)", 18, 24, "#b45309", 13, "left");
+    label(ctx, "Diagonals bisect each other:  AE = CE,  BE = DE", 18, 44, "#475569", 12.5, "left");
+  }
+
+  document.getElementById("sld2").addEventListener("input", draw);
+  document.getElementById("chk2").addEventListener("change", draw);
+  draw();
+})();
+
+/* ============================================================
+   DIAGRAM 3 — Pythagoras: AE² + BE² = AB² = CD²
+   ============================================================ */
+(function(){
+  var cv = document.getElementById("cv3");
+  var ctx = cv.getContext("2d");
+  var W = cv.width, H = cv.height;
+
+  function draw(){
+    var AE = parseFloat(document.getElementById("sld3a").value);
+    var BE = parseFloat(document.getElementById("sld3b").value);
+    document.getElementById("v3a").textContent = AE.toFixed(1);
+    document.getElementById("v3b").textContent = BE.toFixed(1);
+
+    var AB = Math.hypot(AE, BE);
+    var scale = Math.min(W, H) / Math.max(AE*2 + 3, BE*2 + 3) * 0.85;
+
+    var ox = W/2, oy = H/2;
+
+    var E = {x:0, y:0};
+    var A = {x:0, y: AE};
+    var B = {x:-BE, y:0};
+    var C = {x:0, y:-AE};
+    var D = {x:BE, y:0};
+
+    function X(p){ return ox + p.x*scale; }
+    function Y(p){ return oy - p.y*scale; }
+
+    ctx.clearRect(0,0,W,H);
+    grid(ctx, W, H, ox, oy, 40, "#f1f5f9");
+    axes(ctx, W, H, ox, oy);
+
+    // rhombus
+    ctx.beginPath();
+    ctx.moveTo(X(A),Y(A)); ctx.lineTo(X(B),Y(B));
+    ctx.lineTo(X(C),Y(C)); ctx.lineTo(X(D),Y(D));
+    ctx.closePath();
+    ctx.fillStyle = "rgba(37,99,235,0.07)"; ctx.fill();
+    ctx.strokeStyle = "#2563eb"; ctx.lineWidth = 2.5; ctx.stroke();
+
+    // right triangle AEB shade
+    ctx.beginPath();
+    ctx.moveTo(X(E),Y(E)); ctx.lineTo(X(A),Y(A)); ctx.lineTo(X(B),Y(B));
+    ctx.closePath();
+    ctx.fillStyle = "rgba(245,158,11,0.18)"; ctx.fill();
+
+    // triangle edges
+    ctx.strokeStyle = "#f59e0b"; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(X(E),Y(E)); ctx.lineTo(X(A),Y(A)); ctx.stroke();
+    ctx.strokeStyle = "#059669";
+    ctx.beginPath(); ctx.moveTo(X(E),Y(E)); ctx.lineTo(X(B),Y(B)); ctx.stroke();
+    ctx.strokeStyle = "#e11d48"; ctx.lineWidth = 3.5;
+    ctx.beginPath(); ctx.moveTo(X(A),Y(A)); ctx.lineTo(X(B),Y(B)); ctx.stroke();
+
+    // CD highlighted (equal to AB)
+    ctx.strokeStyle = "#7c3aed"; ctx.lineWidth = 3.5;
+    ctx.beginPath(); ctx.moveTo(X(C),Y(C)); ctx.lineTo(X(D),Y(D)); ctx.stroke();
+
+    // right angle at E
+    rightAngle(ctx, X(E),Y(E), X(A),Y(A), X(B),Y(B), "#92400e");
+
+    // labels of lengths
+    label(ctx, "AE = " + AE.toFixed(1), (X(E)+X(A))/2 + 12, (Y(E)+Y(A))/2, "#b45309", 13, "left");
+    label(ctx, "BE = " + BE.toFixed(1), (X(E)+X(B))/2 - 8, (Y(E)+Y(B))/2 - 12, "#047857", 13, "right");
+    label(ctx, "AB = " + AB.toFixed(2), (X(A)+X(B))/2 - 8, (Y(A)+Y(B))/2 - 12, "#be123c", 13, "right");
+    label(ctx, "CD = " + AB.toFixed(2), (X(C)+X(D))/2 + 10, (Y(C)+Y(D))/2 + 16, "#6d28d9", 13, "left");
+
+    // points
+    dot(ctx, X(A),Y(A), "#2563eb"); label(ctx,"A", X(A)+11, Y(A)-6, "#1e3a8a", 14, "left");
+    dot(ctx, X(B),Y(B), "#2563eb"); label(ctx,"B", X(B)-12, Y(B)-4, "#1e3a8a", 14, "right");
+    dot(ctx, X(C),Y(C), "#2563eb"); label(ctx,"C", X(C)+11, Y(C)+8, "#1e3a8a", 14, "left");
+    dot(ctx, X(D),Y(D), "#2563eb"); label(ctx,"D", X(D)+12, Y(D)+4, "#1e3a8a", 14, "left");
+    dot(ctx, X(E),Y(E), "#0f172a", 5); label(ctx,"E", X(E)+10, Y(E)+14, "#0f172a", 14, "left");
+
+    // readouts
+    var lhs = AE*AE + BE*BE;
+    document.getElementById("ro-lhs").textContent = lhs.toFixed(2);
+    document.getElementById("ro-ab").textContent = AB.toFixed(3);
+    document.getElementById("ro-cd").textContent = lhs.toFixed(2);
+
+    label(ctx, "AE² + BE² = " + lhs.toFixed(2) + " = AB² = CD²", 18, 24, "#065f46", 14, "left");
+    label(ctx, "→ Statement II is always true ✓", 18, 46, "#065f46", 13, "left");
+  }
+
+  document.getElementById("sld3a").addEventListener("input", draw);
+  document.getElementById("sld3b").addEventListener("input", draw);
+  draw();
+})();
+
+/* ============================================================
+   STEP-BY-STEP REVEAL
+   ============================================================ */
+(function(){
+  var groups = {
+    part1: { steps: ["s1-1","s1-2"], idx: 0, counter: "c-part1" },
+    part2: { steps: ["s2-1","s2-2"], idx: 0, counter: "c-part2" },
+    part3: { steps: ["s3-1","s3-2"], idx: 0, counter: "c-part3" }
+  };
+
+  function update(groupKey, btn){
+    var g = groups[groupKey];
+    var counterEl = document.getElementById(g.counter);
+    counterEl.textContent = g.idx + " / " + g.steps.length;
+    if (g.idx >= g.steps.length){
+      btn.disabled = true;
+      btn.textContent = "All steps revealed ✓";
+    }
+  }
+
+  document.querySelectorAll("button.next").forEach(function(btn){
+    var key = btn.getAttribute("data-target");
+    var g = groups[key];
+    // init
+    update(key, btn);
+
+    btn.addEventListener("click", function(){
+      if (g.idx < g.steps.length){
+        var el = document.getElementById(g.steps[g.idx]);
+        el.classList.add("show");
+        g.idx++;
+      }
+      update(key, btn);
+    });
+  });
+})();
+</script>
+</body>
+</html>

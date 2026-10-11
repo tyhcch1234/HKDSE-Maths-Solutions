@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2012 P1 Q8 — Intersecting Chords & Similar Triangles</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root{
+    --blue:#1e3a8a; --blue2:#2563eb; --amber:#f59e0b; --amber-bg:#fffbeb;
+    --emerald:#059669; --emerald-bg:#ecfdf5; --slate:#0f172a; --muted:#64748b;
+    --card:#ffffff; --line:#e2e8f0;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+    background:#f1f5f9; color:var(--slate); line-height:1.6;
+  }
+  .wrap{max-width:960px; margin:0 auto; padding:0 16px 60px;}
+
+  /* Hero */
+  header.hero{
+    background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 45%,#2563eb 100%);
+    color:#fff; padding:38px 16px 44px; margin-bottom:-24px;
+    border-radius:0 0 28px 28px; box-shadow:0 12px 30px rgba(30,58,138,.35);
+  }
+  .hero-inner{max-width:960px; margin:0 auto;}
+  .eyebrow{font-size:.78rem; letter-spacing:.16em; text-transform:uppercase; opacity:.8; font-weight:600;}
+  .qnum{font-size:1.9rem; font-weight:800; margin:.25rem 0 .1rem; letter-spacing:.01em;}
+  .subtitle{opacity:.92; font-size:1rem; margin-bottom:16px;}
+  .tags{display:flex; flex-wrap:wrap; gap:8px;}
+  .pill{
+    background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.28);
+    padding:5px 13px; border-radius:999px; font-size:.78rem; font-weight:600; backdrop-filter:blur(3px);
+  }
+
+  /* Cards */
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:18px;
+    padding:22px 22px 18px; margin:22px 0; box-shadow:0 6px 18px rgba(15,23,42,.06);
+  }
+  .card h2{
+    font-size:1.18rem; margin:0 0 12px; display:flex; align-items:center; gap:10px;
+    color:var(--blue);
+  }
+  .badge-num{
+    background:var(--blue); color:#fff; font-size:.82rem; font-weight:700;
+    width:30px; height:30px; min-width:30px; border-radius:9px; display:inline-flex;
+    align-items:center; justify-content:center;
+  }
+  .marks-tag{
+    margin-left:auto; background:#e0e7ff; color:#3730a3; font-size:.74rem; font-weight:700;
+    padding:3px 10px; border-radius:999px; white-space:nowrap;
+  }
+  .qtext{font-size:1.02rem;}
+  .qtext p{margin:.5rem 0;}
+
+  /* Steps */
+  .step{
+    display:none; border-left:4px solid var(--blue2); background:#f8fafc;
+    border-radius:0 12px 12px 0; padding:14px 16px; margin:14px 0;
+    animation:fade .35s ease;
+  }
+  .step.show{display:block;}
+  @keyframes fade{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
+  .step-head{display:flex; align-items:center; gap:10px; margin-bottom:8px; flex-wrap:wrap;}
+  .step-badge{
+    background:var(--slate); color:#fff; font-size:.72rem; font-weight:700;
+    padding:2px 9px; border-radius:6px;
+  }
+  .mark-badge{
+    background:var(--amber); color:#3b2600; font-size:.72rem; font-weight:800;
+    padding:2px 9px; border-radius:6px;
+  }
+  .step-body{font-size:.98rem;}
+  .hint{
+    background:var(--amber-bg); border-left:4px solid var(--amber);
+    padding:9px 13px; border-radius:8px; font-size:.9rem; margin:10px 0; color:#78350f;
+  }
+  .hint strong{color:#92400e;}
+  .ans{
+    background:var(--emerald-bg); border-left:4px solid var(--emerald);
+    padding:9px 13px; border-radius:8px; font-size:.95rem; margin:10px 0; color:#064e3b; font-weight:600;
+  }
+
+  /* Controls */
+  .controls{margin-top:14px; display:flex; align-items:center; gap:14px; flex-wrap:wrap;}
+  button.next{
+    background:linear-gradient(135deg,#2563eb,#1e40af); color:#fff; border:none;
+    padding:10px 20px; border-radius:11px; font-size:.92rem; font-weight:700; cursor:pointer;
+    box-shadow:0 4px 12px rgba(37,99,235,.35); transition:.18s;
+  }
+  button.next:hover:not(:disabled){transform:translateY(-1px); box-shadow:0 7px 18px rgba(37,99,235,.45);}
+  button.next:disabled{background:#cbd5e1; color:#64748b; cursor:not-allowed; box-shadow:none;}
+  .counter{font-size:.86rem; color:var(--muted); font-weight:600;}
+
+  /* Canvas */
+  .canvas-wrap{
+    background:linear-gradient(180deg,#ffffff,#f8fafc); border:1px solid var(--line);
+    border-radius:14px; padding:12px; margin:6px 0 14px;
+  }
+  canvas{width:100%; height:auto; display:block; border-radius:10px; touch-action:none;}
+  .slider-row{display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-top:10px;}
+  .slider-row label{font-size:.86rem; font-weight:600; color:#334155;}
+  input[type=range]{flex:1; min-width:140px; accent-color:#2563eb;}
+  .readout{
+    font-family:'Consolas','Monaco',monospace; font-size:.84rem; background:#0f172a; color:#7dd3fc;
+    padding:8px 12px; border-radius:9px; display:inline-block; margin-top:8px;
+  }
+  .readout b{color:#fbbf24;}
+  .toggle-row{display:flex; gap:16px; flex-wrap:wrap; margin-top:10px; font-size:.86rem; font-weight:600; color:#334155;}
+  .toggle-row label{display:flex; align-items:center; gap:6px; cursor:pointer;}
+  input[type=checkbox]{accent-color:#059669; width:16px; height:16px;}
+
+  /* Summary */
+  .card.dark{background:linear-gradient(135deg,#0f172a,#1e293b); color:#e2e8f0; border:none;}
+  .card.dark h2{color:#fff;}
+  .card.dark ul{margin:10px 0 0; padding-left:20px;}
+  .card.dark li{margin:8px 0;}
+  .card.dark .hl{color:#fbbf24; font-weight:700;}
+
+  footer{text-align:center; color:var(--muted); font-size:.82rem; padding:26px 10px 10px;}
+
+  @media(max-width:560px){
+    .qnum{font-size:1.5rem;}
+    .card{padding:17px 15px 14px;}
+    .card h2{font-size:1.05rem;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 1</div>
+    <div class="qnum">2012 Paper 1 · Question 8</div>
+    <div class="subtitle">Intersecting Chords of a Circle · Similar Triangles · Perpendicularity Test</div>
+    <div class="tags">
+      <span class="pill">Similar Triangles</span>
+      <span class="pill">Intersecting Chords</span>
+      <span class="pill">Ratio of Corresponding Sides</span>
+      <span class="pill">Converse of Pythagoras</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- QUESTION CARD -->
+  <section class="card">
+    <h2><span class="badge-num">Q8</span> The Question <span class="marks-tag">5 marks</span></h2>
+    <div class="qtext">
+      <p>In Figure 1, \(AB\), \(BC\), \(CD\) and \(AD\) are chords of the circle. \(AC\) and \(BD\) intersect at \(E\).
+      It is given that \(BE=8\text{ cm}\), \(CE=20\text{ cm}\) and \(DE=15\text{ cm}\).</p>
+      <p><strong>(a)</strong> Write down a pair of similar triangles in Figure 1. Also find \(AE\). <em>(3 marks)</em></p>
+      <p><strong>(b)</strong> Suppose that \(AB=10\text{ cm}\). Are \(AC\) and \(BD\) perpendicular to each other?
+      Explain your answer. <em>(2 marks)</em></p>
+    </div>
+  </section>
+
+  <!-- PART A -->
+  <section class="card">
+    <h2><span class="badge-num">a</span> Part (a) — Similar Triangles &amp; Finding \(AE\) <span class="marks-tag">3 marks</span></h2>
+
+    <div class="canvas-wrap">
+      <canvas id="cvA" width="720" height="480"></canvas>
+      <div class="slider-row">
+        <label for="sliderAE">Drag to change \(AE\):</label>
+        <input type="range" id="sliderAE" min="3" max="14" step="0.1" value="6">
+        <span id="aeLabel" class="counter" style="min-width:66px; text-align:right;">AE = 6.0</span>
+      </div>
+      <div class="readout" id="readoutA"></div>
+      <div class="toggle-row">
+        <label><input type="checkbox" id="showTri" checked> Highlight \(\triangle AEB\) &amp; \(\triangle DEC\)</label>
+        <label><input type="checkbox" id="showLabels" checked> Show side labels</label>
+      </div>
+    </div>
+
+    <div class="step" data-part="a">
+      <div class="step-head"><span class="step-badge">Step 1</span><span class="mark-badge">1A</span></div>
+      <div class="step-body">
+        <p>In the circle, the two triangles \(\triangle AEB\) and \(\triangle DEC\) share the vertex \(E\) where the chords \(AC\) and \(BD\) intersect. Examine their angles:</p>
+        \[ \angle AEB = \angle DEC \quad (\text{vertically opposite angles}) \]
+        \[ \angle ABE = \angle DCE \quad (\angle \text{ in the same segment, subtended by arc } AD) \]
+        <p>Hence two pairs of equal angles are found, so \(\triangle AEB \sim \triangle DEC\).</p>
+        <div class="hint"><strong>Hint:</strong> Chords of the same circle subtend equal angles in the same segment — this is the standard way to spot similar triangles in an "X"-shaped chord crossing.</div>
+      </div>
+    </div>
+
+    <div class="step" data-part="a">
+      <div class="step-head"><span class="step-badge">Step 2</span><span class="mark-badge">1M</span></div>
+      <div class="step-body">
+        <p>Since the triangles are similar, corresponding sides are proportional. Match the sides opposite equal angles:</p>
+        \[ \frac{AE}{DE} = \frac{BE}{CE} \]
+        <p>(Equivalently, \(AE \cdot CE = BE \cdot DE\), the intersecting chords theorem.)</p>
+        <div class="hint"><strong>Hint:</strong> Make sure corresponding vertices are matched: \(A \leftrightarrow D\), \(E \leftrightarrow E\), \(B \leftrightarrow C\).</div>
+      </div>
+    </div>
+
+    <div class="step" data-part="a">
+      <div class="step-head"><span class="step-badge">Step 3</span><span class="mark-badge">1A</span></div>
+      <div class="step-body">
+        <p>Substitute the given lengths \(BE=8\), \(CE=20\), \(DE=15\):</p>
+        \[ \frac{AE}{15} = \frac{8}{20} = \frac{2}{5} \]
+        \[ AE = 15 \times \frac{2}{5} = 6 \text{ cm} \]
+        <div class="ans">Answer: \(AE = 6\text{ cm}\)</div>
+        <p style="font-size:.9rem;color:#475569;">Also accepted: \(\triangle AED \sim \triangle BEC\) with \(\dfrac{AE}{BE}=\dfrac{DE}{CE}\) gives the same result.</p>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="next" data-target="a">Next step →</button>
+      <span class="counter" data-counter="a">0 / 3</span>
+    </div>
+  </section>
+
+  <!-- PART B -->
+  <section class="card">
+    <h2><span class="badge-num">b</span> Part (b) — Are \(AC\) and \(BD\) Perpendicular? <span class="marks-tag">2 marks</span></h2>
+
+    <div class="canvas-wrap">
+      <canvas id="cvB" width="720" height="480"></canvas>
+      <div class="slider-row">
+        <label for="sliderAB">Change \(AB\) (cm):</label>
+        <input type="range" id="sliderAB" min="6" max="14" step="0.1" value="10">
+        <span id="abLabel" class="counter" style="min-width:78px; text-align:right;">AB = 10.0</span>
+      </div>
+      <div class="readout" id="readoutB"></div>
+      <div class="toggle-row">
+        <label><input type="checkbox" id="showRight" checked> Show right-angle mark at \(E\)</label>
+        <label><input type="checkbox" id="showRightTri" checked> Highlight \(\triangle AEB\)</label>
+      </div>
+    </div>
+
+    <div class="step" data-part="b">
+      <div class="step-head"><span class="step-badge">Step 1</span><span class="mark-badge">1M</span></div>
+      <div class="step-body">
+        <p>From part (a), \(AE=6\text{ cm}\), \(BE=8\text{ cm}\), and we are now told \(AB=10\text{ cm}\). Check the converse of the Pythagorean theorem in \(\triangle AEB\):</p>
+        \[ AE^2 + BE^2 = 6^2 + 8^2 = 36 + 64 = 100 \]
+        \[ AB^2 = 10^2 = 100 \]
+        <p>So \(AE^2 + BE^2 = AB^2\).</p>
+        <div class="hint"><strong>Hint:</strong> A \(6\text{-}8\text{-}10\) triangle is a scaled \(3\text{-}4\text{-}5\) right triangle — a classic signal that a right angle is hidden somewhere.</div>
+      </div>
+    </div>
+
+    <div class="step" data-part="b">
+      <div class="step-head"><span class="step-badge">Step 2</span><span class="mark-badge">1A</span></div>
+      <div class="step-body">
+        <p>By the converse of the Pythagorean theorem, \(\angle AEB = 90^\circ\) (right angle). Since \(A\), \(E\), \(C\) are collinear and \(B\), \(E\), \(D\) are collinear, the angle between the lines \(AC\) and \(BD\) is \(90^\circ\).</p>
+        <div class="ans">Answer: Yes — \(AC\) and \(BD\) are perpendicular to each other.</div>
+        <p style="font-size:.9rem;color:#475569;">Note: the fact that \(AB=10\) forces \(\angle AEB=90^\circ\); this is independent of the circle geometry beyond part (a).</p>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="next" data-target="b">Next step →</button>
+      <span class="counter" data-counter="b">0 / 2</span>
+    </div>
+  </section>
+
+  <!-- SUMMARY -->
+  <section class="card dark">
+    <h2><span class="badge-num" style="background:#fbbf24;color:#0f172a;">✓</span> Summary of Answers</h2>
+    <ul>
+      <li><span class="hl">Part (a):</span> \(\triangle AEB \sim \triangle DEC\) (also \(\triangle AED \sim \triangle BEC\)). Therefore \(AE = \mathbf{6\text{ cm}}\).</li>
+      <li><span class="hl">Part (b):</span> \(AE^2+BE^2 = 6^2+8^2 = 100 = 10^2 = AB^2\), so \(\angle AEB = 90^\circ\) by the converse of the Pythagorean theorem. Hence \(AC \perp BD\).</li>
+    </ul>
+    <p style="font-size:.85rem;opacity:.8;margin-top:14px;">Key idea: intersecting chords create similar triangles; the ratio of corresponding sides gives the missing chord segment. The Pythagorean converse then tests perpendicularity.</p>
+  </section>
+
+  <footer>HKDSE Mathematics (Compulsory Part) · Paper 1 · 2012 Question 8 · Interactive Solution</footer>
+</div>
+
+<script>
+/* ================= STEP REVEAL ================= */
+document.querySelectorAll('.next').forEach(btn => {
+  const key = btn.dataset.target;
+  const steps = document.querySelectorAll(`.step[data-part="${key}"]`);
+  const counter = document.querySelector(`[data-counter="${key}"]`);
+  let idx = 0;
+  btn.addEventListener('click', () => {
+    if (idx < steps.length) {
+      steps[idx].classList.add('show');
+      idx++;
+      counter.textContent = `${idx} / ${steps.length}`;
+      if (idx === steps.length) {
+        btn.disabled = true;
+        btn.textContent = 'All steps revealed ✓';
+      }
+    }
+  });
+});
+
+/* ================= CANVAS PART (a) ================= */
+const cvA = document.getElementById('cvA');
+const ctx = cvA.getContext('2d');
+const sliderAE = document.getElementById('sliderAE');
+const aeLabel = document.getElementById('aeLabel');
+const readoutA = document.getElementById('readoutA');
+const showTri = document.getElementById('showTri');
+const showLabels = document.getElementById('showLabels');
+
+/* We draw a fixed circle (so BE=8, CE=20, DE=15 layout is visually sensible),
+   and let the user vary AE. The geometric model: a circle through A,B,C,D with
+   chords AC and BD crossing at E. We choose a coordinate system with E at origin,
+   AC on the x-axis, BD tilted by angle theta. Points: A on negative x, C positive x,
+   B and D on the tilted line. The circle through all four points exists automatically
+   if the intersecting-chords product holds: AE*CE = BE*DE -> AE*20 = 8*15 -> AE=6.
+   To let the slider be meaningful visually while showing the product relation, we draw
+   the circle that fits the current AE under the chosen theta (it always exists for any
+   positive product? Not always -> we adjust theta so that a real circle exists by
+   choosing theta based on the requirement that A,B,C,D are concyclic.)
+
+   Simpler robust approach: fix the circle first. Take circle center O, radius R.
+   Choose E inside. Then pick the chords through E. For any E inside a circle, ANY line
+   through E cuts the circle at two points P,Q with EP*EQ = R^2 - OE^2 (constant, the
+   power of E). So all chords through E give products equal to the same value k.
+   We want CE and DE products to match: BE*DE = 8*15 = 120 = AE*CE = AE*20 -> AE=6.
+   So set k = 120, e.g. R^2 - OE^2 = 120. Choose R and OE accordingly.
+   Then choose the chord AC direction and BD direction. Given a direction, we can place
+   the chord so the distances from E along that direction are the target values only if
+   the direction and E position allow. Actually for a fixed line through E, the two
+   distances are determined and their product equals k. So we can choose direction to
+   achieve BE=8 -> then DE = k/8 = 15 automatically. 
+
+   Let us work it out concretely:
+   Put E at origin. Let k = 120. A line through E in direction u (unit) meets the
+   circle at distances t1>0 and -t2<0 with t1*t2 = k. We want BE = 8 along one side,
+   so DE = 15 on the other. Similarly CE = 20 one side, AE = 6 other side.
+   For a chord through E at angle phi, distances satisfy: 1/t and 1/(-t') from the
+   circle equation. Circle: |x - O|^2 = R^2, with |O|^2 = R^2 - k.
+   Point: x = t*u. |t u - O|^2 = R^2 -> t^2 - 2 t (u·O) + |O|^2 - R^2 = 0
+   -> t^2 - 2 t (u·O) - k = 0.
+   Roots t1, t2 with t1 t2 = -k, so one positive one negative; product of magnitudes = k.
+   Sum t1 + t2 = 2 (u·O). We want along line AC: positive root = 20 (C side), negative
+   root = -6 (A side) => sum = 14 = 2 (u_AC · O). Along BD: positive = 15 (D side), 
+   negative = -8 (B side) => sum = 7 = 2 (u_BD · O).
+   Let O = (p, q) in 2D. Let u_AC = (1,0). Then 2p = 14 -> p = 7.
+   Let u_BD = (cosθ, sinθ). Then 2(7cosθ + q sinθ) = 7.
+   Also |O|^2 = R^2 - k -> R^2 = 49 + q^2 + 120 = 169 + q^2.
+   We have freedom in q and θ. Pick q = -2. Then 14 cosθ - 4 sinθ = 7.
+   Solve: R0 = sqrt(14^2+4^2)=sqrt(212)=14.560; cos(θ+α)=7/14.560=0.4807 where
+   tan α = -4/14 => α = -15.945°. cos(θ-15.945°?) careful: expression 14 cosθ -4 sinθ
+   = sqrt(212) cos(θ + φ) with cos φ = 14/sqrt212, sin φ = 4/sqrt212 -> φ = 15.945°.
+   So cos(θ+15.945°)=0.4807 -> θ+15.945° = ±61.28° -> θ = 45.34° or θ = -77.23°.
+   Choose θ = 45.34° (nice slant).
+   Great — this gives us a concrete consistent picture with k=120, making the slider
+   for AE able to show the "wrong" configurations too: if user changes AE, we keep
+   CE=20, BE=8, DE=15 and re-solve for the circle that passes through A,B,C,D with
+   the new AE. Let's generalize: given AE=a, we need a*20 = 8*15 = 120 for concyclicity.
+   So only a=6 works. To keep the figure valid while sliding, we instead let the slider
+   change AE and *redraw the circle that fits all four points* — for a≠6 such a circle
+   does not exist, so we can show the "best fit" and flag it as not concyclic. 
+   Cleaner: interpret the slider as controlling AE directly, and keep the geometric
+   model as: A,E,C collinear with AE=a, CE=20; B,E,D collinear with BE=8, DE=15,
+   angle between the lines fixed; then draw the circle through A,B,C only and show
+   whether D also lies on it (it does only when a=6). This is pedagogically great!
+*/
+let AE = 6;
+const BE = 8, CE = 20, DE = 15;
+
+function drawA(){
+  const W = cvA.width, H = cvA.height;
+  ctx.clearRect(0,0,W,H);
+
+  // world-to-screen: E at (cx, cy), scale s
+  const cx = W*0.46, cy = H*0.55;
+  const s = 11;
+  const X = x => cx + x*s;
+  const Y = y => cy - y*s;
+
+  // grid
+  ctx.strokeStyle = '#eef2f7'; ctx.lineWidth = 1;
+  for(let x=0;x<W;x+=s){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+  for(let y=0;y<H;y+=s){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+
+  // angle of BD line
+  const theta = 45.34 * Math.PI/180;
+  const ux = Math.cos(theta), uy = Math.sin(theta);
+
+  // Points relative to E at origin
+  const A = {x:-AE, y:0};
+  const C = {x: CE, y:0};
+  const B = {x:-BE*ux, y:-BE*uy};
+  const D = {x: DE*ux, y: DE*uy};
+
+  // Circle through A, B, C  (then check D)
+  const circ = circleFrom3(A,B,C);
+
+  // draw circle if valid
+  if (circ && isFinite(circ.r) && circ.r < 4000){
+    ctx.beginPath();
+    ctx.arc(X(circ.x), Y(circ.y), circ.r*s, 0, Math.PI*2);
+    ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2;
+    ctx.setLineDash([6,5]); ctx.stroke(); ctx.setLineDash([]);
+  }
+
+  // highlight triangles
+  if (showTri.checked){
+    // triangle AEB
+    ctx.beginPath();
+    ctx.moveTo(X(A.x),Y(A.y)); ctx.lineTo(X(0),Y(0)); ctx.lineTo(X(B.x),Y(B.y)); ctx.closePath();
+    ctx.fillStyle = 'rgba(37,99,235,0.16)'; ctx.fill();
+    // triangle DEC
+    ctx.beginPath();
+    ctx.moveTo(X(D.x),Y(D.y)); ctx.lineTo(X(0),Y(0)); ctx.lineTo(X(C.x),Y(C.y)); ctx.closePath();
+    ctx.fillStyle = 'rgba(245,158,11,0.18)'; ctx.fill();
+  }
+
+  // chords
+  ctx.lineWidth = 2.6;
+  ctx.strokeStyle = '#2563eb';
+  ctx.beginPath(); ctx.moveTo(X(A.x),Y(A.y)); ctx.lineTo(X(C.x),Y(C.y)); ctx.stroke();
+  ctx.strokeStyle = '#f59e0b';
+  ctx.beginPath(); ctx.moveTo(X(B.x),Y(B.y)); ctx.lineTo(X(D.x),Y(D.y)); ctx.stroke();
+
+  // points
+  const pts = [['A',A,'#dc2626'],['B',B,'#dc2626'],['C',C,'#dc2626'],['D',D,'#dc2626'],['E',{x:0,y:0},'#0f172a']];
+  pts.forEach(([name,p,col])=>{
+    ctx.beginPath(); ctx.arc(X(p.x),Y(p.y),5.5,0,Math.PI*2);
+    ctx.fillStyle=col; ctx.fill();
+    ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
+    ctx.fillStyle='#0f172a'; ctx.font='bold 16px Segoe UI';
+    ctx.fillText(name, X(p.x)+9, Y(p.y)-9);
+  });
+
+  // labels on sides
+  if (showLabels.checked){
+    ctx.font = 'bold 13px Consolas, monospace';
+    ctx.fillStyle = '#1e40af';
+    ctx.fillText('AE='+AE.toFixed(1), X(-AE/2)-30, Y(0)+18);
+    ctx.fillStyle = '#9a3412';
+    ctx.fillText('CE=20', X(CE/2)-16, Y(0)+18);
+    ctx.fillStyle = '#b45309';
+    ctx.fillText('BE=8', X(B.x/2)-44, Y(B.y/2)-4);
+    ctx.fillText('DE=15', X(D.x/2)+6, Y(D.y/2)+14);
+  }
+
+  // product readout
+  const prodLeft = AE*CE;
+  const prodRight = BE*DE;
+  const ok = Math.abs(prodLeft-prodRight) < 0.05;
+  readoutA.innerHTML = `AE·CE = <b>${prodLeft.toFixed(1)}</b> &nbsp;|&nbsp; BE·DE = <b>${prodRight.toFixed(1)}</b> &nbsp;|&nbsp; ` +
+    (ok ? `<b style="color:#4ade80;">concyclic ✓ (AE = 6)</b>` : `<b style="color:#f87171;">not concyclic</b>`);
+}
+
+function circleFrom3(P,Q,R){
+  const ax=P.x, ay=P.y, bx=Q.x, by=Q.y, cx=R.x, cy=R.y;
+  const d = 2*(ax*(by-cy)+bx*(cy-ay)+cx*(ay-by));
+  if (Math.abs(d) < 1e-9) return null;
+  const ux = ((ax*ax+ay*ay)*(by-cy)+(bx*bx+by*by)*(cy-ay)+(cx*cx+cy*cy)*(ay-by))/d;
+  const uy = ((ax*ax+ay*ay)*(cx-bx)+(bx*bx+by*by)*(ax-cx)+(cx*cx+cy*cy)*(bx-ax))/d;
+  const r = Math.hypot(ax-ux, ay-uy);
+  return {x:ux, y:uy, r:r};
+}
+
+sliderAE.addEventListener('input', ()=>{
+  AE = parseFloat(sliderAE.value);
+  aeLabel.textContent = 'AE = ' + AE.toFixed(1);
+  drawA();
+});
+showTri.addEventListener('change', drawA);
+showLabels.addEventListener('change', drawA);
+drawA();
+
+/* ================= CANVAS PART (b) ================= */
+const cvB = document.getElementById('cvB');
+const ctxB = cvB.getContext('2d');
+const sliderAB = document.getElementById('sliderAB');
+const abLabel = document.getElementById('abLabel');
+const readoutB = document.getElementById('readoutB');
+const showRight = document.getElementById('showRight');
+const showRightTri = document.getElementById('showRightTri');
+
+let ABval = 10;
+
+function drawB(){
+  const W = cvB.width, H = cvB.height;
+  ctxB.clearRect(0,0,W,H);
+
+  const cx = W*0.42, cy = H*0.56;
+  const s = 12;
+  const X = x => cx + x*s;
+  const Y = y => cy - y*s;
+
+  // grid
+  ctxB.strokeStyle = '#eef2f7'; ctxB.lineWidth = 1;
+  for(let x=0;x<W;x+=s){ ctxB.beginPath(); ctxB.moveTo(x,0); ctxB.lineTo(x,H); ctxB.stroke(); }
+  for(let y=0;y<H;y+=s){ ctxB.beginPath(); ctxB.moveTo(0,y); ctxB.lineTo(W,y); ctxB.stroke(); }
+
+  // Place E at origin. A on -x axis at AE=6. B determined by AB and BE=8.
+  const AE = 6, BE = 8;
+  const A = {x:-AE, y:0};
+  // B: distance from E is BE=8, distance from A is ABval. 
+  // Solve: (Bx+6)^2 + By^2 = AB^2 ; Bx^2+By^2 = 64
+  // => 12 Bx + 36 = AB^2 - 64 => Bx = (AB^2 - 100)/12
+  const Bx = (ABval*ABval - 100)/12;
+  const By2 = 64 - Bx*Bx;
+  const By = By2 > 0 ? Math.sqrt(By2) : 0;  // upper side
+  const B = {x:Bx, y:By};
+
+  // Check right angle at E: dot product of (A-E) and (B-E)
+  const dot = (A.x)*(B.x) + (A.y)*(B.y);
+  const isRight = Math.abs(dot) < 0.03;
+
+  // Draw AC as a long line through A and E extended to C (CE=20)
+  const C = {x:20, y:0};
+  // D on the line EB extended past E by DE=15
+  const lenEB = Math.hypot(B.x, B.y);
+  const D = {x: -B.x/lenEB*15, y: -B.y/lenEB*15};
+
+  // Circle through A,B,C,D (may not exist for general AB; draw dashed fit through A,B,C)
+  const circ = circleFrom3(A,B,C);
+  if (circ && isFinite(circ.r) && circ.r < 4000){
+    ctxB.beginPath();
+    ctxB.arc(X(circ.x), Y(circ.y), circ.r*s, 0, Math.PI*2);
+    ctxB.strokeStyle = '#94a3b8'; ctxB.lineWidth = 2;
+    ctxB.setLineDash([6,5]); ctxB.stroke(); ctxB.setLineDash([]);
+  }
+
+  // Highlight triangle AEB
+  if (showRightTri.checked){
+    ctxB.beginPath();
+    ctxB.moveTo(X(A.x),Y(A.y)); ctxB.lineTo(X(0),Y(0)); ctxB.lineTo(X(B.x),Y(B.y)); ctxB.closePath();
+    ctxB.fillStyle = isRight ? 'rgba(16,185,129,0.18)' : 'rgba(37,99,235,0.14)';
+    ctxB.fill();
+  }
+
+  // chords
+  ctxB.lineWidth = 2.6;
+  ctxB.strokeStyle = '#2563eb';
+  ctxB.beginPath(); ctxB.moveTo(X(A.x),Y(A.y)); ctxB.lineTo(X(C.x),Y(C.y)); ctxB.stroke();
+  ctxB.strokeStyle = '#f59e0b';
+  ctxB.beginPath(); ctxB.moveTo(X(D.x),Y(D.y)); ctxB.lineTo(X(B.x),Y(B.y)); ctxB.stroke();
+
+  // right angle marker at E
+  if (showRight.checked && isRight){
+    const r = 0.9;
+    ctxB.strokeStyle = '#dc2626'; ctxB.lineWidth = 2.4;
+    // draw small square between the two lines
+    const u1 = {x:1, y:0}, u2 = {x: B.x/lenEB, y: B.y/lenEB};
+    ctxB.beginPath();
+    ctxB.moveTo(X(u1.x*r), Y(u1.y*r));
+    ctxB.lineTo(X((u1.x+u2.x)*r), Y((u1.y+u2.y)*r));
+    ctxB.lineTo(X(u2.x*r), Y(u2.y*r));
+    ctxB.stroke();
+  }
+
+  // points
+  const pts = [['A',A],['B',B],['C',C],['D',D],['E',{x:0,y:0}]];
+  pts.forEach(([name,p])=>{
+    ctxB.beginPath(); ctxB.arc(X(p.x),Y(p.y),5.5,0,Math.PI*2);
+    ctxB.fillStyle = name==='E' ? '#0f172a' : '#dc2626'; ctxB.fill();
+    ctxB.strokeStyle='#fff'; ctxB.lineWidth=2; ctxB.stroke();
+    ctxB.fillStyle='#0f172a'; ctxB.font='bold 16px Segoe UI';
+    ctxB.fillText(name, X(p.x)+9, Y(p.y)-9);
+  });
+
+  // labels
+  ctxB.font = 'bold 13px Consolas, monospace';
+  ctxB.fillStyle = '#1e40af';
+  ctxB.fillText('AE=6', X(-3)-30, Y(0)+18);
+  ctxB.fillStyle = '#b45309';
+  ctxB.fillText('BE=8', X(B.x/2)-46, Y(B.y/2)+4);
+  ctxB.fillStyle = '#7c3aed';
+  ctxB.fillText('AB='+ABval.toFixed(1), X((A.x+B.x)/2)-24, Y((A.y+B.y)/2)-10);
+  ctxB.fillStyle = '#9a3412';
+  ctxB.fillText('CE=20', X(10)-16, Y(0)+18);
+
+  // readout
+  const lhs = AE*AE + BE*BE;
+  const rhs = ABval*ABval;
+  readoutB.innerHTML = `AE²+BE² = 6²+8² = <b>${lhs}</b> &nbsp;|&nbsp; AB² = <b>${rhs.toFixed(1)}</b> &nbsp;|&nbsp; ` +
+    (isRight ? `<b style="color:#4ade80;">right angle at E ✓</b>` : `<b style="color:#f87171;">not a right angle</b>`);
+}
+
+sliderAB.addEventListener('input', ()=>{
+  ABval = parseFloat(sliderAB.value);
+  abLabel.textContent = 'AB = ' + ABval.toFixed(1);
+  drawB();
+});
+showRight.addEventListener('change', drawB);
+showRightTri.addEventListener('change', drawB);
+drawB();
+
+/* redraw on resize to keep crisp */
+function resizeCanvas(cv){
+  // canvas has fixed pixel size; only CSS scales -> nothing needed
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE Math 2023 Paper 1 Q3 — Regular Cheese Packets</title>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: linear-gradient(135deg, #eef4ff 0%, #f7fbff 100%);
+    color: #1e2a3a;
+    line-height: 1.6;
+    padding: 16px;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; }
+
+  header.card {
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 20px 22px;
+    box-shadow: 0 8px 22px rgba(30, 80, 160, 0.10);
+    border: 1px solid #e2ecfa;
+  }
+  .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+  .tag {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: #e3f0ff;
+    color: #1560c4;
+    letter-spacing: 0.3px;
+  }
+  h1 { font-size: 1.15rem; margin: 0 0 4px 0; color: #0d3f7d; }
+  .qmeta { font-size: 0.8rem; color: #6b7d95; margin-bottom: 14px; }
+  .qtext {
+    background: #f8fbff;
+    border-left: 5px solid #2f80ed;
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 0.98rem;
+  }
+  .qtext strong { color: #0d3f7d; }
+
+  h2.section {
+    font-size: 1rem;
+    color: #0d3f7d;
+    margin: 26px 0 12px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  h2.section::before {
+    content: "";
+    width: 5px; height: 20px; border-radius: 3px;
+    background: linear-gradient(180deg,#2f80ed,#56ccf2);
+    display: inline-block;
+  }
+
+  /* Steps */
+  .step {
+    background: #fff;
+    border: 1px solid #e2ecfa;
+    border-radius: 14px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    box-shadow: 0 3px 10px rgba(30,80,160,0.06);
+    transition: box-shadow 0.25s;
+  }
+  .step.open { box-shadow: 0 8px 22px rgba(30,80,160,0.14); }
+  .step-head {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 16px;
+    cursor: pointer;
+    user-select: none;
+    background: linear-gradient(90deg, #f6faff, #ffffff);
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #17456f;
+  }
+  .step-num {
+    flex: 0 0 30px; height: 30px; width: 30px;
+    border-radius: 50%;
+    background: #2f80ed; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem; font-weight: 700;
+  }
+  .step.locked .step-num { background: #c7d6e8; }
+  .step-arrow {
+    margin-left: auto; color: #7fa2c9; transition: transform .25s; font-size: 0.9rem;
+  }
+  .step.open .step-arrow { transform: rotate(180deg); }
+  .step-body {
+    display: none;
+    padding: 0 16px 16px 58px;
+    font-size: 0.94rem;
+    color: #2c3e50;
+  }
+  .step.open .step-body { display: block; animation: fade .3s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(-4px);} to {opacity:1; transform:none;} }
+
+  .hint {
+    background: #fff9e8;
+    border: 1px dashed #f0c24b;
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin: 10px 0;
+    font-size: 0.88rem;
+    color: #7a5a00;
+  }
+  .hint b { color: #b37700; }
+
+  .math-block { overflow-x: auto; margin: 10px 0; }
+
+  /* Controls */
+  .controls {
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+    margin: 16px 0 24px 0;
+  }
+  button {
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    padding: 11px 20px;
+    cursor: pointer;
+    transition: transform .15s, box-shadow .15s, background .2s;
+  }
+  button:active { transform: scale(0.97); }
+  .btn-next {
+    background: linear-gradient(135deg,#2f80ed,#56ccf2);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(47,128,237,0.35);
+  }
+  .btn-next:disabled { background: #c7d6e8; box-shadow: none; cursor: not-allowed; }
+  .btn-reset {
+    background: #fff; color: #2f80ed; border: 1.5px solid #b6d3f5;
+  }
+
+  /* Visual box */
+  .visual {
+    background: #ffffff;
+    border: 1px solid #e2ecfa;
+    border-radius: 18px;
+    padding: 18px 16px;
+    box-shadow: 0 8px 22px rgba(30,80,160,0.08);
+  }
+  .visual-title { font-weight: 700; color: #17456f; font-size: 0.95rem; margin-bottom: 6px;}
+  .visual-sub { font-size: 0.82rem; color: #6b7d95; margin-bottom: 14px; }
+
+  .range-row { margin: 14px 0; }
+  .range-label {
+    display: flex; justify-content: space-between;
+    font-size: 0.85rem; color: #456; font-weight: 600; margin-bottom: 6px;
+  }
+  input[type=range] {
+    -webkit-appearance: none; appearance: none;
+    width: 100%; height: 8px; border-radius: 999px;
+    background: linear-gradient(90deg,#56ccf2,#2f80ed);
+    outline: none;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 24px; height: 24px; border-radius: 50%;
+    background: #fff; border: 3px solid #2f80ed;
+    cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  }
+  input[type=range]::-moz-range-thumb {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: #fff; border: 3px solid #2f80ed; cursor: pointer;
+  }
+
+  .readout {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 14px;
+  }
+  .readout .cell {
+    background: #f4f9ff;
+    border-radius: 12px;
+    padding: 10px 12px;
+    text-align: center;
+  }
+  .readout .cell .k { font-size: 0.72rem; color: #6b7d95; letter-spacing: .3px; }
+  .readout .cell .v { font-size: 1.05rem; font-weight: 700; color: #1560c4; margin-top: 2px;}
+
+  .verdict {
+    margin-top: 16px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.92rem;
+    transition: background .3s, color .3s;
+  }
+  .verdict.bad { background: #ffe9e9; color: #b32020; border: 1px solid #f5b6b6; }
+  .verdict.good { background: #e5f9ee; color: #10794a; border: 1px solid #a6e3c3; }
+
+  /* number line */
+  .numline { margin-top: 10px; position: relative; height: 70px; }
+  svg { width: 100%; height: 70px; display: block; }
+
+  footer {
+    text-align: center; font-size: 0.75rem; color: #93a5bb;
+    margin: 30px 0 12px;
+  }
+  .answer-band {
+    margin-top: 18px;
+    background: #eafaf1;
+    border: 1px solid #a6e3c3;
+    border-radius: 12px;
+    padding: 14px 16px;
+    color: #0f6b42;
+    font-weight: 600;
+    font-size: 0.92rem;
+  }
+  @media (max-width: 520px) {
+    .step-body { padding-left: 20px; }
+    .readout { grid-template-columns: repeat(2, 1fr); }
+    h1 { font-size: 1.02rem; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- QUESTION OVERVIEW -->
+  <header class="card">
+    <div class="tag-row">
+      <span class="tag">Estimation</span>
+      <span class="tag">Approximation</span>
+      <span class="tag">Error</span>
+      <span class="tag">Rounding</span>
+      <span class="tag">Number Sense</span>
+    </div>
+    <h1>HKDSE Math 2023 Paper 1 Q3</h1>
+    <div class="qmeta">Topic: Estimation, Approximation and Error · [3 marks]</div>
+    <div class="qtext">
+      <p style="margin:0 0 8px;">A packet of cheese is termed <strong>regular</strong> if its weight is measured as <strong>220 g correct to the nearest 10 g</strong>. Someone claims that the total weight of <strong>250 regular packets</strong> of cheese can be measured as <strong>53.6 kg correct to the nearest 0.1 kg</strong>. Is the claim correct? Explain your answer.</p>
+      <p style="margin:0;font-size:0.88rem;color:#4a6d99;">Key idea: rounding intervals — find the smallest and largest possible true value from a rounded measurement.</p>
+    </div>
+  </header>
+
+  <h2 class="section">Step-by-Step Guided Solution</h2>
+
+  <div class="controls">
+    <button class="btn-next" id="nextBtn">Next Step ▶</button>
+    <button class="btn-reset" id="resetBtn">Reset</button>
+    <span style="font-size:0.82rem;color:#6b7d95;" id="progressText">0 / 6 steps revealed</span>
+  </div>
+
+  <!-- Step 1 -->
+  <div class="step" data-step="1">
+    <div class="step-head">
+      <span class="step-num">1</span>
+      <span>Understand what "correct to the nearest 10 g" means</span>
+      <span class="step-arrow">▼</span>
+    </div>
+    <div class="step-body">
+      <p>A measurement of \(220\text{ g}\) correct to the nearest \(10\text{ g}\) means the true weight could be up to <strong>half</strong> of the rounding unit away from 220 g.</p>
+      <div class="hint"><b>Hint (maximum error):</b> Maximum absolute error \(=\dfrac{1}{2}\times(\text{rounding unit})=\dfrac{1}{2}\times 10=5\text{ g}\).</div>
+      <p>So each regular packet's true weight lies in the interval</p>
+      <div class="math-block">\[ 220-5\le w < 220+5 \quad\text{so}\quad 215\text{ g}\le w < 225\text{ g}. \]</div>
+    </div>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="step" data-step="2">
+    <div class="step-head">
+      <span class="step-num">2</span>
+      <span>Find the least possible weight of one packet</span>
+      <span class="step-arrow">▼</span>
+    </div>
+    <div class="step-body">
+      <p>From Step 1, the <strong>least</strong> possible true weight of one regular packet is</p>
+      <div class="math-block">\[ w_{\min}=220-5=215\text{ g}. \]</div>
+      <div class="hint"><b>Hint:</b> The maximum error \(5\text{ g}\) is subtracted from the measured value to get the smallest possible weight. (We don't include 225 g as a possible maximum because the rounding was <em>down</em> at 225 g — but using 215 g is enough for this comparison.)</div>
+    </div>
+  </div>
+
+  <!-- Step 3 -->
+  <div class="step" data-step="3">
+    <div class="step-head">
+      <span class="step-num">3</span>
+      <span>Convert grams to kilograms</span>
+      <span class="step-arrow">▼</span>
+    </div>
+    <div class="step-body">
+      <p>The claim is in kilograms, so convert:</p>
+      <div class="math-block">\[ w_{\min}=215\text{ g}=0.215\text{ kg}. \]</div>
+      <div class="hint"><b>Hint:</b> \(1\text{ kg}=1000\text{ g}\), so divide grams by 1000 to get kg.</div>
+      <p style="color:#b37700;font-size:0.86rem;">Careful: the model answer uses \(0.22-0.005=0.215\text{ kg}\) in step 4. Keep that in mind.</p>
+    </div>
+  </div>
+
+  <!-- Step 4 -->
+  <div class="step" data-step="4">
+    <div class="step-head">
+      <span class="step-num">4</span>
+      <span>Find the least possible total weight of 250 packets</span>
+      <span class="step-arrow">▼</span>
+    </div>
+    <div class="step-body">
+      <p>Multiply the least weight of one packet by the number of packets:</p>
+      <div class="math-block">\[ W_{\min}=0.215\times 250=53.75\text{ kg}. \]</div>
+      <div class="hint"><b>Hint:</b> \(0.22-0.005=0.215\) (in kg), then multiply by \(250\). This is exactly the first line of the official solution: \((0.22-0.005)\times 250=53.75\text{ kg}\).</div>
+    </div>
+  </div>
+
+  <!-- Step 5 -->
+  <div class="step" data-step="5">
+    <div class="step-head">
+      <span class="step-num">5</span>
+      <span>Compare with the claimed measurement</span>
+      <span class="step-arrow">▼</span>
+    </div>
+    <div class="step-body">
+      <p>The claim is that the total weight can be measured as \(53.6\text{ kg}\) correct to the nearest \(0.1\text{ kg}\). That means the true total would be at least</p>
+      <div class="math-block">\[ 53.6-0.05=53.55\text{ kg}. \]</div>
+      <p>But we found the <strong>least possible</strong> total is \(53.75\text{ kg}\). Since</p>
+      <div class="math-block">\[ 53.75\text{ kg} > 53.65\text{ kg}, \]</div>
+      <p>the smallest possible total is <strong>already larger</strong> than the largest value that would round to \(53.6\text{ kg}\).</p>
+      <div class="hint"><b>Hint:</b> Any true total weight rounds to \(53.6\text{ kg}\) only if it lies in \([53.55,\,53.65)\text{ kg}\). But our minimum is \(53.75\text{ kg}\) — outside that interval.</div>
+    </div>
+  </div>
+
+  <!-- Step 6 -->
+  <div class="step" data-step="6">
+    <div class="step-head">
+      <span class="step-num">6</span>
+      <span>Conclusion</span>
+      <span class="step-arrow">▼</span>
+    </div>
+    <div class="step-body">
+      <p>The total weight of \(250\) regular packets is always at least \(53.75\text{ kg}\), which is greater than \(53.65\text{ kg}\). Therefore the total cannot be measured as \(53.6\text{ kg}\) correct to the nearest \(0.1\text{ kg}\).</p>
+      <p><strong>The claim is not correct.</strong></p>
+    </div>
+  </div>
+
+  <div class="answer-band">
+    ✔ Final Answer: The claim is <strong>not correct</strong>.<br>
+    Reason: The least possible total weight is \((0.22-0.005)\times 250=53.75\text{ kg} > 53.65\text{ kg}\).
+  </div>
+
+  <!-- VISUAL DEMO -->
+  <h2 class="section">Interactive Demonstration</h2>
+  <div class="visual">
+    <div class="visual-title">Explore: How small can the total weight be?</div>
+    <div class="visual-sub">Drag the slider to change the assumed true weight of one regular packet (in grams). See how the total for 250 packets changes.</div>
+
+    <div class="range-row">
+      <div class="range-label"><span>True weight of one packet</span><span id="wVal">215 g</span></div>
+      <input type="range" id="wSlider" min="215" max="225" step="0.5" value="215">
+    </div>
+
+    <div class="readout">
+      <div class="cell"><div class="k">True weight / packet</div><div class="v" id="rW">0.215 kg</div></div>
+      <div class="cell"><div class="k">Total for 250 packets</div><div class="v" id="rT">53.75 kg</div></div>
+    </div>
+
+    <div class="numline">
+      <svg viewBox="0 0 600 90" preserveAspectRatio="none" id="numSvg">
+        <!-- axis -->
+        <line x1="40" y1="55" x2="560" y2="55" stroke="#c7d6e8" stroke-width="3" stroke-linecap="round"/>
+        <!-- allowed band 53.55 - 53.65 -->
+        <rect x="0" y="45" width="0" height="20" fill="#bfe6d2" rx="4" id="band53"/>
+        <!-- marker for min -->
+        <line x1="0" y1="20" x2="0" y2="70" stroke="#2f80ed" stroke-width="3" id="markerMin"/>
+        <text x="0" y="15" font-size="12" fill="#1560c4" font-weight="700" id="labelMin" text-anchor="middle">53.75</text>
+        <text x="0" y="82" font-size="11" fill="#6b7d95" id="axisMin" text-anchor="middle">53.75 kg</text>
+      </svg>
+    </div>
+
+    <div class="verdict bad" id="verdict">
+      Total ≥ 53.75 kg → cannot round to 53.6 kg. Claim is NOT correct.
+    </div>
+  </div>
+
+  <footer>HKDSE Math 2023 Paper 1 Q3 · Interactive Solution</footer>
+</div>
+
+<script>
+  // MathJax typesetting (auto)
+  if (window.MathJax) {
+    MathJax.typesetPromise && MathJax.typesetPromise();
+  }
+
+  /* ---------- Step-by-step accordion ---------- */
+  const steps = Array.from(document.querySelectorAll('.step'));
+  let revealed = 0;
+
+  const nextBtn = document.getElementById('nextBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const progressText = document.getElementById('progressText');
+
+  function renderSteps() {
+    steps.forEach((s, i) => {
+      if (i < revealed) {
+        s.classList.remove('locked');
+      } else {
+        s.classList.add('locked');
+      }
+    });
+    progressText.textContent = revealed + ' / ' + steps.length + ' steps revealed';
+    nextBtn.disabled = revealed >= steps.length;
+    if (nextBtn.disabled) {
+      nextBtn.textContent = 'All steps shown ✔';
+    } else {
+      nextBtn.textContent = 'Next Step ▶';
+    }
+  }
+
+  nextBtn.addEventListener('click', () => {
+    if (revealed < steps.length) {
+      // close others, open newly revealed
+      steps.forEach((s, i) => { if (i !== revealed) s.classList.remove('open'); });
+      steps[revealed].classList.add('open');
+      steps[revealed].scrollIntoView({behavior:'smooth', block:'center'});
+      revealed++;
+      renderSteps();
+    }
+  });
+
+  resetBtn.addEventListener('click', () => {
+    revealed = 0;
+    steps.forEach(s => s.classList.remove('open'));
+    renderSteps();
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+
+  // Allow clicking step head to toggle (only if revealed)
+  steps.forEach((s, i) => {
+    s.querySelector('.step-head').addEventListener('click', () => {
+      if (i < revealed) s.classList.toggle('open');
+    });
+  });
+
+  renderSteps();
+
+  /* ---------- Interactive slider visual ---------- */
+  const slider = document.getElementById('wSlider');
+  const wVal = document.getElementById('wVal');
+  const rW = document.getElementById('rW');
+  const rT = document.getElementById('rT');
+  const verdict = document.getElementById('verdict');
+
+  const band53 = document.getElementById('band53');
+  const markerMin = document.getElementById('markerMin');
+  const labelMin = document.getElementById('labelMin');
+  const axisMin = document.getElementById('axisMin');
+
+  // number-line mapping: value range 53.5 .. 54.0  -> x 40 .. 560
+  const X0 = 40, X1 = 560;
+  const V_MIN = 53.5, V_MAX = 54.0;
+  function xOf(v) {
+    const t = (v - V_MIN) / (V_MAX - V_MIN);
+    return X0 + Math.max(0, Math.min(1, t)) * (X1 - X0);
+  }
+
+  function update() {
+    const w = parseFloat(slider.value);          // grams
+    const wkg = w / 1000;                        // kg
+    const total = wkg * 250;                     // kg
+
+    wVal.textContent = w.toFixed(1) + ' g';
+    rW.textContent = wkg.toFixed(3) + ' kg';
+    rT.textContent = total.toFixed(2) + ' kg';
+
+    // marker for the current total
+    const mx = xOf(total);
+    markerMin.setAttribute('x1', mx);
+    markerMin.setAttribute('x2', mx);
+    labelMin.setAttribute('x', mx);
+    labelMin.textContent = total.toFixed(2);
+    axisMin.setAttribute('x', mx);
+    axisMin.textContent = total.toFixed(2) + ' kg';
+
+    // allowed band for rounding to 53.6 kg nearest 0.1: [53.55, 53.65)
+    const bx = xOf(53.55);
+    const bxe = xOf(53.65);
+    band53.setAttribute('x', bx);
+    band53.setAttribute('width', Math.max(0, bxe - bx));
+
+    // verdict logic
+    // The total cannot be 53.6 (nearest 0.1) if total >= 53.65  (since max
+    // value that rounds to 53.6 is just below 53.65) OR total < 53.55
+    // With min packet weight 215 g, total >= 53.75, so claim must be wrong.
+    if (total >= 53.65) {
+      verdict.className = 'verdict bad';
+      verdict.textContent = 'Total = ' + total.toFixed(2) + ' kg ≥ 53.65 kg → cannot round to 53.6 kg. Claim is NOT correct.';
+    } else if (total < 53.55) {
+      verdict.className = 'verdict bad';
+      verdict.textContent = 'Total = ' + total.toFixed(2) + ' kg < 53.55 kg → would round to 53.5 kg or lower. Claim is NOT correct.';
+    } else {
+      // This range is only reachable in the model if packet weight allowed below 215
+      verdict.className = 'verdict good';
+      verdict.textContent = 'Total = ' + total.toFixed(2) + ' kg lies in [53.55, 53.65) → could round to 53.6 kg.';
+    }
+  }
+
+  slider.addEventListener('input', update);
+  update();
+</script>
+</body>
+</html>
