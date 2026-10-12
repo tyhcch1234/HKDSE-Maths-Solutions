@@ -3,345 +3,82 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HKDSE Math 2014 P1 Q10 · Interactive Solution</title>
-  <!-- MathJax for LaTeX -->
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
-  <!-- Tailwind CSS (lightweight, modern) -->
+  <title>HKDSE 2014 Paper 1 Q10 · Distance–Time Graph</title>
+  <script>
+    MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] } };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
   <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    /* smooth transitions and custom slider styling */
-    body { background: #f8fafc; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
-    .step-card { transition: all 0.2s ease; }
-    .step-card:hover { box-shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.1); }
-    input[type=range] {
-      -webkit-appearance: none;
-      background: transparent;
-      cursor: pointer;
-    }
-    input[type=range]::-webkit-slider-runnable-track {
-      height: 6px;
-      border-radius: 10px;
-      background: #d1d5db;
-    }
-    input[type=range]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      height: 20px;
-      width: 20px;
-      border-radius: 50%;
-      background: #2563eb;
-      margin-top: -7px;
-      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
-      transition: all 0.1s;
-    }
-    input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.15); background: #1d4ed8; }
-    canvas { display: block; width: 100%; height: auto; background: white; border-radius: 16px; }
-    .badge { display: inline-block; padding: 4px 12px; border-radius: 9999px; font-size: 0.8rem; font-weight: 600; }
-  </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4 md:p-6">
-<div class="w-full max-w-4xl mx-auto space-y-6">
+<body class="bg-slate-50 text-slate-800 font-sans antialiased">
+  <main class="max-w-3xl mx-auto px-4 py-8">
 
-  <!-- ===== QUESTION HEADER ===== -->
-  <div class="bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl p-6 md:p-8 border border-slate-100">
-    <div class="flex flex-wrap items-center gap-3 mb-2">
-      <span class="badge bg-blue-100 text-blue-700">HKDSE Math 2014 Paper 1 Q10</span>
-      <span class="badge bg-emerald-100 text-emerald-700">Rate, Ratio &amp; Variations</span>
+    <div class="flex flex-wrap items-center justify-between gap-2 mb-5">
+      <h1 class="text-xl md:text-2xl font-bold text-slate-900">HKDSE Math 2014 Paper 1 <span class="text-blue-600">Q10</span></h1>
+      <span class="bg-emerald-100 text-emerald-800 text-sm font-medium px-3 py-1 rounded-full">Rate, Ratio &amp; Variations</span>
     </div>
-    <h1 class="text-2xl md:text-3xl font-bold text-slate-800 mb-4">Distance–Time Graph of Two Cars</h1>
-    <p class="text-slate-600 leading-relaxed">
-      Town \(X\) and town \(Y\) are 80 km apart. Figure 2 shows the graphs for car \(A\) and car \(B\) travelling on the same straight road between town \(X\) and town \(Y\) during the period 7:30 to 9:30 in a morning. Car \(A\) travels at a constant speed during the period. Car \(B\) comes to rest at 8:15 in the morning.
-    </p>
-    <p class="text-slate-600 leading-relaxed mt-3">
-      (a) Find the distance of car \(A\) from town \(X\) at 8:15 in the morning. [2 marks]<br>
-      (b) At what time after 7:30 in the morning do car \(A\) and car \(B\) first meet? [2 marks]<br>
-      (c) The driver of car \(B\) claims that the average speed of car \(B\) is higher than that of car \(A\) during the period 8:15 to 9:30 in the morning. Do you agree? Explain your answer. [2 marks]
-    </p>
-    <!-- Conceptual keyword tags -->
-    <div class="flex flex-wrap gap-2 mt-4">
-      <span class="bg-slate-100 text-slate-600 text-xs px-3 py-1 rounded-full">Distance–Time Graph</span>
-      <span class="bg-slate-100 text-slate-600 text-xs px-3 py-1 rounded-full">Constant Speed</span>
-      <span class="bg-slate-100 text-slate-600 text-xs px-3 py-1 rounded-full">Average Speed</span>
-      <span class="bg-slate-100 text-slate-600 text-xs px-3 py-1 rounded-full">Linear Interpolation</span>
-    </div>
-  </div>
 
-  <!-- ===== INTERACTIVE CANVAS ===== -->
-  <div class="bg-white rounded-3xl shadow-xl p-4 md:p-6 border border-slate-100">
-    <div class="flex items-center justify-between mb-3">
-      <h2 class="font-semibold text-slate-700 text-lg">📊 Interactive Graph</h2>
-      <span id="sliderLabel" class="text-sm font-mono bg-slate-100 px-3 py-1 rounded-full text-slate-600">t = 0 min (7:30)</span>
-    </div>
-    <canvas id="graphCanvas" width="600" height="360"></canvas>
-    <div class="mt-4 flex items-center gap-4">
-      <span class="text-sm text-slate-500 w-12">7:30</span>
-      <input id="timeSlider" type="range" min="0" max="120" value="0" step="1" class="w-full accent-blue-600">
-      <span class="text-sm text-slate-500 w-12 text-right">9:30</span>
-    </div>
-    <p class="text-xs text-slate-400 text-center mt-2">Drag the slider to move through time. The vertical dashed line shows the current moment.</p>
-  </div>
-
-  <!-- ===== STEP-BY-STEP SOLUTION ===== -->
-  <div class="space-y-4">
-
-    <!-- STEP (a) -->
-    <div class="step-card bg-white rounded-3xl shadow-lg border border-slate-100 overflow-hidden">
-      <button class="w-full text-left px-6 py-4 flex items-center justify-between bg-gradient-to-r from-blue-50 to-white hover:from-blue-100/50 transition" onclick="toggleStep('stepA')">
-        <div class="flex items-center gap-3">
-          <span class="bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm shadow">a</span>
-          <span class="font-semibold text-slate-800 text-lg">Distance of car A at 8:15</span>
-        </div>
-        <svg id="iconA" class="w-5 h-5 text-slate-400 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-      </button>
-      <div id="stepA" class="px-6 pb-6 hidden">
-        <div class="prose prose-slate max-w-none text-slate-700 space-y-3">
-          <p><strong>Hint:</strong> Car A travels at constant speed, so its graph is a straight line from \(t = 0\) (7:30) to \(t = 120\) (9:30). Use similar triangles or the formula:</p>
-          <p class="bg-slate-50 p-3 rounded-xl font-mono text-sm">\(\text{distance} = \text{speed} \times \text{time}\)</p>
-          <p>At 8:15, 45 minutes have passed. Since total time is 120 minutes for 80 km:</p>
-          <p>\[
-            \text{distance from } X = \frac{45}{120} \times 80 = 30 \text{ km}
-          \]</p>
-          <p class="text-emerald-700 font-semibold text-lg">✔ Answer: 30 km</p>
-        </div>
+    <!-- Question -->
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 md:p-6 mb-6">
+      <p class="text-slate-700 leading-relaxed">
+        Town $X$ and town $Y$ are $80$ km apart. Figure 2 shows the graphs for car $A$ and car $B$ travelling on the same
+        straight road between town $X$ and town $Y$ during the period 7:30 to 9:30 in a morning. Car $A$ travels at a constant
+        speed during the period. Car $B$ comes to rest at 8:15 in the morning.
+      </p>
+      <p class="text-slate-500 text-sm mt-3">
+        From the graph: car $A$ moves uniformly from $(7{:}30,\,0)$ to $(9{:}30,\,80)$; car $B$ moves to $44$ km by 8:15, rests
+        at $44$ km, then continues to $80$ km at 9:30.
+      </p>
+      <div class="mt-3 space-y-1 text-slate-700">
+        <p>(a) Find the distance of car $A$ from town $X$ at 8:15 in the morning. <span class="text-slate-400">[2 marks]</span></p>
+        <p>(b) At what time after 7:30 in the morning do car $A$ and car $B$ first meet? <span class="text-slate-400">[2 marks]</span></p>
+        <p>(c) The driver of car $B$ claims that the average speed of car $B$ is higher than that of car $A$ during the period
+          8:15 to 9:30 in the morning. Do you agree? Explain your answer. <span class="text-slate-400">[2 marks]</span></p>
       </div>
-    </div>
+    </section>
 
-    <!-- STEP (b) -->
-    <div class="step-card bg-white rounded-3xl shadow-lg border border-slate-100 overflow-hidden">
-      <button class="w-full text-left px-6 py-4 flex items-center justify-between bg-gradient-to-r from-amber-50 to-white hover:from-amber-100/50 transition" onclick="toggleStep('stepB')">
-        <div class="flex items-center gap-3">
-          <span class="bg-amber-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm shadow">b</span>
-          <span class="font-semibold text-slate-800 text-lg">First meeting time of cars A and B</span>
+    <!-- Solution -->
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 md:p-6">
+      <h2 class="text-lg font-semibold text-slate-800 mb-4">Step-by-step solution</h2>
+
+      <div class="space-y-5 text-slate-700 leading-relaxed">
+
+        <div>
+          <p class="font-semibold text-slate-800">(a) Distance of car $A$ at 8:15</p>
+          <p class="mt-1">Car $A$ travels $80$ km in $2$ hours, so its constant speed is</p>
+          <p class="my-2 text-center">$\dfrac{80\text{ km}}{2\text{ h}}=40\text{ km/h}$</p>
+          <p>From 7:30 to 8:15 is $45$ minutes $=\dfrac{3}{4}$ hour, so</p>
+          <p class="my-2 text-center">$\text{distance}=40\times\dfrac{3}{4}=30\text{ km}$</p>
+          <p class="text-emerald-700 font-semibold">Distance $=30$ km</p>
         </div>
-        <svg id="iconB" class="w-5 h-5 text-slate-400 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-      </button>
-      <div id="stepB" class="px-6 pb-6 hidden">
-        <div class="prose prose-slate max-w-none text-slate-700 space-y-3">
-          <p><strong>Hint:</strong> Car B rests at \(t=45\) (8:15) at distance 44 km. After that, B travels straight to (120, 80). Car A is also heading towards Y. They meet when their distances from X are equal.</p>
-          <p>Let \(t\) be the time in minutes after 7:30 when they meet. For car A: \(d_A = \frac{80}{120}t\). For car B: after 8:15, it moves from 44 km to 80 km in \(120-45=75\) min. Its speed is \((80-44)/75 = 36/75\) km/min. So for \(t \ge 45\), \(d_B = 44 + \frac{36}{75}(t-45)\).</p>
-          <p>Set \(d_A = d_B\):</p>
-          <p>\[
-            \frac{80}{120}t = 44 + \frac{36}{75}(t-45)
-          \]</p>
-          <p>Multiply by 120: \(80t = 5280 + 57.6(t-45)\) … Actually simpler: solve exactly:</p>
-          <p>\[
-            \frac{2}{3}t = 44 + \frac{12}{25}(t-45)
-          \]</p>
-          <p>Multiply by 75: \(50t = 3300 + 36(t-45) = 3300 + 36t - 1620 = 1680 + 36t\)</p>
-          <p>\(14t = 1680 \Rightarrow t = 120\)? That gives 9:30, but they meet earlier. Let's re-check: Car B before 8:15 also moves. Actually car B first part: from (0,0) to (45,44) with speed 44/45 km/min. So for \(0 \le t \le 45\), \(d_B = \frac{44}{45}t\).</p>
-          <p>They meet when \(d_A = d_B\) on the first segment. For \(t \le 45\): \(\frac{80}{120}t = \frac{44}{45}t\). But wait, car B's graph shows a line from (0,0) to (45,44)? Actually the graph shows B goes from 0 to 44 in 45 min, then rests? No — the graph shows B rests at 8:15, meaning from 8:15 to some time? The problem says "Car B comes to rest at 8:15" — meaning it stops at 8:15 and then continues? But the graph shows B's line goes from (0,0) to (45,44) then horizontal? Actually the graph in the image: Car B is the lower line from (0,0) to (45,44), then a horizontal segment? No, it's a line that goes from (0,0) to (45,44) then from (45,44) to (120,80). That's not a rest; it's just a change in slope. The phrase "comes to rest at 8:15" means it stops momentarily? But the graph shows a continuous line — likely it means B's speed changes at 8:15. Actually re-reading: "Car B comes to rest at 8:15 in the morning." That means B stops at 8:15, so its distance stays 44 km until it starts again? But the graph shows B's line continuing from (45,44) to (120,80) without a horizontal segment. Wait, the graph shows two lines: one is car A (straight from (0,0) to (120,80)), the other is car B (from (0,0) to (45,44), then from (45,44) to (120,80)? But that would be the same as car A after 8:15? No, car B's second segment has a different slope. The graph shows a line that goes from (0,0) to (45,44), then from (45,44) to (120,80)? But then car B would have the same total time, but the slopes differ. Actually the image shows car B's graph as two segments: from (0,0) to (45,44) and then from (45,44) to (120,80). That means car B travels at one speed until 8:15, then at another speed. The phrase "comes to rest" might be a misprint? In standard HKDSE, this question typically has car B resting (horizontal line) after 8:15. But the graph in the image shows B's line going up after 8:15? Let's check the image carefully: The graph shows car A as a straight line from (0,0) to (120,80). Car B is labelled with a line that goes from (0,0) to (45,44), then there is a horizontal segment? Actually looking at the image, car B's line goes from (0,0) to (45,44), then it appears to be horizontal until some point, then continues? But the standard HKDSE 2014 Q10 has car B resting from 8:15 to some time, then moving again? Let me recall: The official solution says: "During the period 8:15 to 9:30, car B travels 36 km while car A travels more than 36 km." So car B travels 36 km from 8:15 to 9:30. That means at 8:15, B is at 44 km, and at 9:30 B is at 80 km. So B travels 36 km after 8:15. So B is NOT resting; it just changes speed at 8:15. The phrase "comes to rest" might mean it stops momentarily? Actually the standard interpretation: Car B comes to rest at 8:15 means it stops for some time, but then the graph would show a horizontal line. The image shows no horizontal line for B after 8:15; it shows a line going up. So the phrase "comes to rest" might be a translation issue: it means "comes to a stop" only momentarily? But the graph shows continuous motion. I'll stick with the official solution: B travels 36 km from 8:15 to 9:30. So B's second segment is from (45,44) to (120,80). That is consistent with the graph shown. So they meet when d_A = d_B. For t between 0 and 45, both are straight lines from origin. Their speeds: A: 80/120 = 2/3 km/min. B: 44/45 km/min. Since 44/45 ≈ 0.978 > 0.667, B is faster initially, so they don't meet before 45 except at t=0. After 45, B's speed is (80-44)/(120-45) = 36/75 = 0.48 km/min, which is slower than A's 0.667. So they must meet after 45. Solve: d_A = d_B => (80/120)t = 44 + (36/75)(t-45). Multiply by 600: 400t = 26400 + 288(t-45) = 26400 + 288t - 12960 = 13440 + 288t => 112t = 13440 => t = 120. That gives 9:30, not 8:36. But the official answer is 8:36 (t=66). So my d_B is wrong. Let's re-read: Official solution (b): "Suppose that car A and car B first meet at the time t minutes after 7:30". Then they set up t/120 = 44/80? That is strange. Actually the official solution in the image says: (a) 45/120 * 80 = 30 km. (b) They set t/120 = 44/80 => t = 66. That means they used the ratio t/120 = 44/80, i.e., distance 44 corresponds to time t? That would mean car B is at 44 km at time t? But car B is at 44 km at 8:15 (t=45). So they are equating car A's distance fraction to car B's distance fraction? That seems odd. Actually the official solution: "Suppose that car A and car B first meet at the time t minutes after 7:30. t/120 = 44/80, t = 66." This implies that at the meeting point, both cars are at the same distance, and that distance is 44 km? But 44 is the distance of car B at 8:15. But if they meet, the distance could be different. This official solution seems to assume that they meet at the point where car B is at 44 km? That would be at t=45 for car B, but car A at t=45 is at 30 km, not 44. So they don't meet there. So the official solution might be incorrect? Or perhaps the graph shows car B resting at 44 km from 8:15 to some time, and car A catches up at that distance. Yes! That is the standard interpretation: Car B comes to rest at 8:15, so it stays at 44 km for a while. Then car A reaches 44 km at some time t. The official solution: t/120 = 44/80 => t = 66 minutes. That means car A travels 44 km in 66 minutes. At that time, car B is at rest at 44 km, so they meet. That makes perfect sense. So the graph in the image likely has a horizontal segment for car B from (45,44) to some point, then perhaps continues? But the image shows a line going up after (45,44). Let me look again: The image shows car B's graph as a line from (0,0) to (45,44), then a line from (45,44) to (120,80). That is not a rest. However, the text says "Car B comes to rest at 8:15". That contradicts the graph. Possibly the graph is misdrawn or the text means car B comes to rest after 8:15? Or the graph shows car B's path as a broken line? I'll go with the official solution: they meet at t=66 minutes, i.e., 8:36, at distance 44 km. So the meeting point is (66, 44). That means car B is at rest at 44 km from 8:15 until at least 8:36. So the graph should show a horizontal line for car B from t=45 to t=66, then maybe it moves again. But the image does not show that clearly. Given the complexity, I'll follow the official standard answer for HKDSE 2014 Q10. The official answer for (b) is 8:36 am. So I'll present that as the correct solution, using the ratio method: since car A is at 44 km when it meets car B (which is resting at 44 km), we have t/120 = 44/80 => t = 66.</p>
-          <p class="bg-slate-50 p-3 rounded-xl font-mono text-sm mt-2">\[
-            \frac{t}{120} = \frac{44}{80} \quad \Rightarrow \quad t = 66 \text{ min}
-          \]</p>
-          <p>66 minutes after 7:30 is 8:36.</p>
-          <p class="text-emerald-700 font-semibold text-lg">✔ Answer: 8:36 am</p>
+
+        <div>
+          <p class="font-semibold text-slate-800">(b) First meeting time</p>
+          <p class="mt-1">Car $B$ comes to rest at 8:15 at a distance of $44$ km from town $X$. Car $A$ reaches the same
+            distance when</p>
+          <p class="my-2 text-center">$40t=44\Rightarrow t=\dfrac{44}{40}=1.1\text{ h}=1\text{ h }6\text{ min}$</p>
+          <p>measured from 7:30, i.e. at <strong>8:36</strong>. Since car $B$ is still resting at $44$ km at that moment,
+            this is where they first meet.</p>
+          <p class="text-emerald-700 font-semibold">They first meet at 8:36 a.m.</p>
         </div>
+
+        <div>
+          <p class="font-semibold text-slate-800">(c) Comparing average speeds from 8:15 to 9:30</p>
+          <p class="mt-1">From 8:15 to 9:30 is $75$ minutes $=1.25$ hours.</p>
+          <ul class="list-disc pl-5 mt-2 space-y-1">
+            <li>Car $A$: travels from $30$ km to $80$ km, i.e. $50$ km.
+              Average speed $=\dfrac{50}{1.25}=40$ km/h.</li>
+            <li>Car $B$: travels from $44$ km to $80$ km, i.e. $36$ km.
+              Average speed $=\dfrac{36}{1.25}=28.8$ km/h.</li>
+          </ul>
+          <p class="mt-2">Since $40&gt;28.8$, car $A$'s average speed is higher.</p>
+          <p class="text-emerald-700 font-semibold">Disagree — car $A$'s average speed is higher.</p>
+        </div>
+
       </div>
-    </div>
+    </section>
 
-    <!-- STEP (c) -->
-    <div class="step-card bg-white rounded-3xl shadow-lg border border-slate-100 overflow-hidden">
-      <button class="w-full text-left px-6 py-4 flex items-center justify-between bg-gradient-to-r from-emerald-50 to-white hover:from-emerald-100/50 transition" onclick="toggleStep('stepC')">
-        <div class="flex items-center gap-3">
-          <span class="bg-emerald-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm shadow">c</span>
-          <span class="font-semibold text-slate-800 text-lg">Comparing average speeds 8:15–9:30</span>
-        </div>
-        <svg id="iconC" class="w-5 h-5 text-slate-400 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-      </button>
-      <div id="stepC" class="px-6 pb-6 hidden">
-        <div class="prose prose-slate max-w-none text-slate-700 space-y-3">
-          <p><strong>Hint:</strong> Average speed = total distance / total time (75 min = 1.25 h).</p>
-          <p>From 8:15 to 9:30:<br>
-          Car B: travels from 44 km to 80 km → distance = 36 km.<br>
-          Car A: at 8:15, distance = 30 km; at 9:30, distance = 80 km → distance = 50 km.</p>
-          <p>Average speed of B = \(36 / 1.25 = 28.8\) km/h.<br>
-          Average speed of A = \(50 / 1.25 = 40\) km/h.</p>
-          <p>40 > 28.8, so car A's average speed is higher. The driver's claim is <strong>disagreed</strong>.</p>
-          <p class="text-emerald-700 font-semibold text-lg">✔ Answer: Disagree — car A's average speed is higher.</p>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- footer -->
-  <p class="text-center text-xs text-slate-400 pb-6">Interactive solution · HKDSE Math 2014 Paper 1 Q10</p>
-</div>
-
-<script>
-  // ----- toggle steps -----
-  function toggleStep(id) {
-    const el = document.getElementById(id);
-    const icon = document.getElementById('icon' + id.charAt(4)); // stepA -> iconA
-    el.classList.toggle('hidden');
-    if (icon) icon.classList.toggle('rotate-180');
-  }
-
-  // ----- canvas drawing -----
-  const canvas = document.getElementById('graphCanvas');
-  const ctx = canvas.getContext('2d');
-  const slider = document.getElementById('timeSlider');
-  const sliderLabel = document.getElementById('sliderLabel');
-
-  // logical graph dimensions
-  const PAD_LEFT = 60, PAD_RIGHT = 30, PAD_TOP = 30, PAD_BOTTOM = 50;
-  const W = 600, H = 360;
-  const plotW = W - PAD_LEFT - PAD_RIGHT;
-  const plotH = H - PAD_TOP - PAD_BOTTOM;
-
-  // data mapping
-  const tMax = 120; // minutes
-  const dMax = 80;  // km
-
-  function toX(t) { return PAD_LEFT + (t / tMax) * plotW; }
-  function toY(d) { return PAD_TOP + plotH - (d / dMax) * plotH; }
-
-  // draw static graph
-  function drawGraph(currentT = 0) {
-    ctx.clearRect(0, 0, W, H);
-
-    // background grid
-    ctx.strokeStyle = '#e2e8f0';
-    ctx.lineWidth = 0.8;
-    for (let d = 0; d <= 80; d += 20) {
-      const y = toY(d);
-      ctx.beginPath();
-      ctx.moveTo(PAD_LEFT, y);
-      ctx.lineTo(W - PAD_RIGHT, y);
-      ctx.stroke();
-    }
-    for (let t = 0; t <= 120; t += 15) {
-      const x = toX(t);
-      ctx.beginPath();
-      ctx.moveTo(x, PAD_TOP);
-      ctx.lineTo(x, H - PAD_BOTTOM);
-      ctx.stroke();
-    }
-
-    // axes lines
-    ctx.strokeStyle = '#94a3b8';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.moveTo(PAD_LEFT, PAD_TOP);
-    ctx.lineTo(PAD_LEFT, H - PAD_BOTTOM);
-    ctx.lineTo(W - PAD_RIGHT, H - PAD_BOTTOM);
-    ctx.stroke();
-
-    // axis labels
-    ctx.fillStyle = '#475569';
-    ctx.font = '14px Inter, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('Time', W / 2, H - 15);
-    ctx.save();
-    ctx.translate(15, H / 2);
-    ctx.rotate(-Math.PI / 2);
-    ctx.fillText('Distance (km)', 0, 0);
-    ctx.restore();
-
-    // tick labels
-    ctx.font = '12px monospace';
-    ctx.fillStyle = '#64748b';
-    // x-axis
-    ctx.fillText('7:30', toX(0), H - PAD_BOTTOM + 20);
-    ctx.fillText('8:15', toX(45), H - PAD_BOTTOM + 20);
-    ctx.fillText('9:30', toX(120), H - PAD_BOTTOM + 20);
-    // y-axis
-    ctx.textAlign = 'right';
-    ctx.fillText('0', PAD_LEFT - 8, toY(0) + 4);
-    ctx.fillText('44', PAD_LEFT - 8, toY(44) + 4);
-    ctx.fillText('80', PAD_LEFT - 8, toY(80) + 4);
-
-    // car A line (0,0) to (120,80)
-    ctx.beginPath();
-    ctx.strokeStyle = '#2563eb';
-    ctx.lineWidth = 3;
-    ctx.moveTo(toX(0), toY(0));
-    ctx.lineTo(toX(120), toY(80));
-    ctx.stroke();
-
-    // car B line: (0,0) -> (45,44) -> (120,80)  (rest at 8:15 means horizontal? actually official solution has B resting at 44 from 8:15 to some time, then moving? but we follow official which says B travels 36 km from 8:15 to 9:30, so B goes from (45,44) to (120,80) with a different slope. However the meeting at t=66 requires B to be at 44 then. So B rests at 44 until t=66, then moves. That is the correct interpretation from official solution. Let's draw: B horizontal from (45,44) to (66,44), then line to (120,80).)
-    ctx.beginPath();
-    ctx.strokeStyle = '#dc2626';
-    ctx.lineWidth = 3;
-    ctx.moveTo(toX(0), toY(0));
-    ctx.lineTo(toX(45), toY(44));
-    // horizontal rest until meeting time (66)
-    ctx.lineTo(toX(66), toY(44));
-    // then to (120,80)
-    ctx.lineTo(toX(120), toY(80));
-    ctx.stroke();
-
-    // labels
-    ctx.font = 'bold 16px Inter, sans-serif';
-    ctx.fillStyle = '#2563eb';
-    ctx.fillText('Car A', toX(85), toY(60));
-    ctx.fillStyle = '#dc2626';
-    ctx.fillText('Car B', toX(15), toY(30));
-
-    // meeting point marker (66,44)
-    if (currentT >= 0) {
-      const mx = toX(66);
-      const my = toY(44);
-      ctx.beginPath();
-      ctx.fillStyle = '#10b981';
-      ctx.arc(mx, my, 6, 0, 2 * Math.PI);
-      ctx.fill();
-      ctx.fillStyle = '#065f46';
-      ctx.font = '12px Inter, sans-serif';
-      ctx.fillText('Meeting (8:36, 44 km)', mx, my - 15);
-    }
-
-    // current time vertical line
-    const cx = toX(currentT);
-    ctx.beginPath();
-    ctx.strokeStyle = '#f59e0b';
-    ctx.lineWidth = 2;
-    ctx.setLineDash([6, 4]);
-    ctx.moveTo(cx, PAD_TOP);
-    ctx.lineTo(cx, H - PAD_BOTTOM);
-    ctx.stroke();
-    ctx.setLineDash([]);
-
-    // moving dots: car A and car B
-    // car A: distance = (80/120)*t
-    const dA = (80 / 120) * currentT;
-    const xA = toX(currentT);
-    const yA = toY(dA);
-    ctx.beginPath();
-    ctx.fillStyle = '#2563eb';
-    ctx.arc(xA, yA, 6, 0, 2 * Math.PI);
-    ctx.fill();
-
-    // car B: piecewise
-    let dB;
-    if (currentT <= 45) {
-      dB = (44 / 45) * currentT;
-    } else if (currentT <= 66) {
-      dB = 44;
-    } else {
-      dB = 44 + (36 / 54) * (currentT - 66); // 80-44=36 over 120-66=54 min
-    }
-    const xB = toX(currentT);
-    const yB = toY(dB);
-    ctx.beginPath();
-    ctx.fillStyle = '#dc2626';
-    ctx.arc(xB, yB, 6, 0, 2 * Math.PI);
-    ctx.fill();
-
-    // update label
-    const totalMin = currentT;
-    const hh = 7 + Math.floor((30 + totalMin) / 60);
-    const mm = (30 + totalMin) % 60;
-    sliderLabel.textContent = `t = ${totalMin} min (${hh}:${String(mm).padStart(2, '0')})`;
-  }
-
-  // slider event
-  slider.addEventListener('input', (e) => {
-    const t = parseFloat(e.target.value);
-    drawGraph(t);
-  });
-
-  // initial draw
-  drawGraph(0);
-</script>
+    <footer class="mt-8 text-center text-xs text-slate-400">HKDSE 2014 Paper 1 Q10 · Distance–Time Graph</footer>
+  </main>
 </body>
 </html>
