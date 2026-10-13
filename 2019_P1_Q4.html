@@ -1,472 +1,409 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HKDSE 2019 P1 Q4 · Factorization · Interactive Solution</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2019 Paper 1 Q04 — Polynomials</title>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+/* ==========================================================================
+   HKDSE Mathematics (Compulsory Part) — Unified Design System
+   Canonical source of truth. This exact block is inlined into every
+   question page, index.html and DSE_Maths_By_Topic.html so that all
+   deliverables share one visual identity.
+   ========================================================================== */
 
-  <!-- Tailwind CSS (via CDN) -->
-  <script src="https://cdn.tailwindcss.com"></script>
+:root {
+  /* Palette */
+  --slate-900: #1e293b;   /* Primary / header surface */
+  --slate-800: #334155;
+  --slate-600: #475569;
+  --slate-400: #94a3b8;
+  --slate-200: #e2e8f0;
+  --slate-100: #f1f5f9;
+  --slate-50:  #f8fafc;
+  --indigo:    #3b82f6;   /* Primary accent */
+  --indigo-600:#2563eb;
+  --amber-bg:  #fef3c7;   /* Hints / concepts */
+  --amber-bd:  #f59e0b;
+  --emerald-bg:#d1fae5;   /* Final answers */
+  --emerald-bd:#10b981;
+  --badge-bg:  #dbeafe;   /* Badges / marks */
+  --badge-fg:  #1e40af;
 
-  <!-- KaTeX for math rendering -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  /* Shape & depth */
+  --radius: 12px;
+  --radius-sm: 8px;
+  --pad-card: 1.5rem;
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, .06), 0 1px 3px rgba(15, 23, 42, .08);
+  --shadow-md: 0 4px 12px rgba(15, 23, 42, .08), 0 2px 4px rgba(15, 23, 42, .04);
 
-  <style>
-    body {
-      font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
-      background: #f6f9fc;
-      margin: 0;
-      padding: 0;
-    }
+  /* Type */
+  --font-body: "Source Serif 4", "Noto Serif TC", Georgia, "Times New Roman", serif;
+  --font-ui: "Inter Tight", "Noto Sans TC", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+  --lh-tight: 1.25;
+  --lh-body: 1.7;
+}
 
-    .card {
-      background: white;
-      border-radius: 1.5rem;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
-      transition: all 0.2s ease;
-    }
+* { box-sizing: border-box; }
 
-    .step-card {
-      border-left: 6px solid #3b82f6;
-      border-radius: 0 1rem 1rem 0;
-      background: #ffffff;
-      margin-bottom: 1rem;
-      overflow: hidden;
-      transition: all 0.3s ease;
-    }
+html { -webkit-text-size-adjust: 100%; }
 
-    .step-card.completed {
-      border-left-color: #10b981;
-    }
+body {
+  margin: 0;
+  background: var(--slate-50);
+  background-image:
+    radial-gradient(circle at 12% -10%, rgba(59, 130, 246, .10), transparent 45%),
+    radial-gradient(circle at 95% 0%, rgba(30, 41, 59, .08), transparent 40%);
+  background-attachment: fixed;
+  color: var(--slate-900);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: var(--lh-body);
+}
 
-    .step-header {
-      cursor: pointer;
-      user-select: none;
-      padding: 1rem 1.25rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: #f8fafc;
-      transition: background 0.2s;
-    }
+/* ---------- Layout shells ------------------------------------------------ */
 
-    .step-header:hover {
-      background: #eef2f6;
-    }
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 3rem;
+}
 
-    .step-body {
-      padding: 0 1.25rem 1.25rem 1.25rem;
-      display: none;
-    }
+.split {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 3rem;
+  display: grid;
+  grid-template-columns: minmax(0, 42%) minmax(0, 58%);
+  gap: 1.5rem;
+  align-items: start;
+}
 
-    .step-body.active {
-      display: block;
-      animation: fadeSlide 0.3s ease;
-    }
+.split__aside {
+  position: sticky;
+  top: 1rem;
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
 
-    @keyframes fadeSlide {
-      from { opacity: 0; transform: translateY(-6px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+.split__main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
 
-    .hint-box {
-      background: #fffbeb;
-      border-left: 4px solid #f59e0b;
-      padding: 0.75rem 1rem;
-      border-radius: 0.75rem;
-      font-size: 0.95rem;
-      color: #78350f;
-    }
+/* ---------- Hero header -------------------------------------------------- */
 
-    .final-answer {
-      background: #ecfdf5;
-      border-left: 4px solid #10b981;
-      padding: 0.75rem 1rem;
-      border-radius: 0.75rem;
-      font-weight: 600;
-      color: #065f46;
-    }
+.hero {
+  background: linear-gradient(135deg, var(--slate-900) 0%, #27364f 55%, #1d4ed8 160%);
+  color: #fff;
+  border-radius: var(--radius);
+  padding: 2rem var(--pad-card);
+  box-shadow: var(--shadow-md);
+  margin-bottom: 1.5rem;
+}
 
-    .tag {
-      background: #e0e7ff;
-      color: #4338ca;
-      padding: 0.25rem 0.75rem;
-      border-radius: 9999px;
-      font-size: 0.8rem;
-      font-weight: 500;
-    }
+.hero__eyebrow {
+  font-family: var(--font-ui);
+  font-size: .75rem;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: #93c5fd;
+  margin: 0 0 .5rem;
+}
 
-    .highlight {
-      background: #fef08a;
-      padding: 0.1rem 0.3rem;
-      border-radius: 0.25rem;
-    }
+.hero__title {
+  font-family: var(--font-ui);
+  font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.1rem);
+  line-height: var(--lh-tight);
+  font-weight: 700;
+  margin: 0 0 .5rem;
+}
 
-    .interactive-panel {
-      background: #f1f5f9;
-      border-radius: 1.25rem;
-      padding: 1.25rem;
-    }
+.hero__subtitle {
+  margin: 0;
+  color: #cbd5e1;
+  font-size: .95rem;
+}
 
-    .slider-label {
-      font-size: 0.85rem;
-      color: #475569;
-      font-weight: 500;
-    }
+.hero__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  margin-top: 1rem;
+}
 
-    input[type="range"] {
-      width: 100%;
-      accent-color: #3b82f6;
-    }
+/* ---------- Cards -------------------------------------------------------- */
 
-    .toggle-btn {
-      background: #3b82f6;
-      color: white;
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 9999px;
-      font-weight: 600;
-      font-size: 0.9rem;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
+.card {
+  background: #fff;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius);
+  padding: var(--pad-card);
+  box-shadow: var(--shadow-sm);
+}
 
-    .toggle-btn:hover {
-      background: #2563eb;
-    }
+.card + .card { margin-top: 0; }
 
-    /* KaTeX formula display */
-    .katex {
-      font-size: 1.15rem;
-    }
+.card__title {
+  font-family: var(--font-ui);
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 1rem;
+  padding-bottom: .6rem;
+  border-bottom: 2px solid var(--slate-100);
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  flex-wrap: wrap;
+}
 
-    /* Mobile adjustments */
-    @media (max-width: 640px) {
-      .step-header {
-        padding: 0.85rem 1rem;
-      }
-      .step-body {
-        padding: 0 1rem 1rem 1rem;
-      }
-      .katex {
-        font-size: 1rem;
-      }
-    }
-  </style>
+/* ---------- Step cards --------------------------------------------------- */
+
+.step {
+  border-left: 4px solid var(--indigo);
+  background: #fff;
+  border-radius: var(--radius);
+  padding: var(--pad-card);
+  box-shadow: var(--shadow-sm);
+}
+
+.step__head {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  flex-wrap: wrap;
+  margin-bottom: .85rem;
+  font-family: var(--font-ui);
+  font-weight: 600;
+}
+
+/* ---------- Callouts ----------------------------------------------------- */
+
+.hint,
+.answer,
+.note {
+  border-radius: var(--radius-sm);
+  padding: 1rem 1.15rem;
+  margin: 1rem 0;
+}
+
+.hint {
+  background: var(--amber-bg);
+  border-left: 4px solid var(--amber-bd);
+}
+
+.answer {
+  background: var(--emerald-bg);
+  border-left: 4px solid var(--emerald-bd);
+}
+
+.note {
+  background: var(--slate-100);
+  border-left: 4px solid var(--slate-400);
+}
+
+.hint__label,
+.answer__label {
+  font-family: var(--font-ui);
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: .35rem;
+}
+
+.hint__label   { color: #92400e; }
+.answer__label { color: #065f46; }
+
+/* ---------- Badges ------------------------------------------------------- */
+
+.badge {
+  display: inline-block;
+  font-family: var(--font-ui);
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  padding: .2rem .55rem;
+  border-radius: 999px;
+  background: var(--badge-bg);
+  color: var(--badge-fg);
+  white-space: nowrap;
+}
+
+.badge--mark  { background: var(--badge-bg); color: var(--badge-fg); }
+.badge--topic { background: var(--slate-100); color: var(--slate-600); }
+.badge--hard  { background: #fee2e2; color: #991b1b; }
+.badge--rate  { background: #ecfdf5; color: #047857; }
+
+/* ---------- Option list (Paper 2) --------------------------------------- */
+
+.options {
+  list-style: none;
+  margin: .5rem 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: .5rem;
+}
+
+.options li {
+  background: var(--slate-100);
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-sm);
+  padding: .6rem .85rem;
+}
+
+.option-key {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  color: var(--slate-600);
+  margin-right: .35rem;
+}
+
+/* ---------- Figures ----------------------------------------------------- */
+
+.figure {
+  background: #fff;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius);
+  padding: .75rem;
+  text-align: center;
+}
+
+.figure img,
+.question-img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-sm);
+  display: block;
+  margin: 0 auto;
+}
+
+.figure figcaption {
+  font-family: var(--font-ui);
+  font-size: .78rem;
+  color: var(--slate-600);
+  margin-top: .5rem;
+}
+
+.figure svg { max-width: 100%; height: auto; }
+
+/* ---------- Tables ------------------------------------------------------- */
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .95rem;
+}
+
+.table th,
+.table td {
+  border: 1px solid var(--slate-200);
+  padding: .5rem .65rem;
+  text-align: left;
+}
+
+.table th {
+  background: var(--slate-100);
+  font-family: var(--font-ui);
+  font-weight: 600;
+}
+
+/* ---------- Index pages -------------------------------------------------- */
+
+.index-section { margin-bottom: 1.5rem; }
+
+.index-table td:first-child { white-space: nowrap; }
+
+a { color: var(--indigo-600); }
+
+a.qlink {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+
+a.qlink:hover { border-bottom-color: currentColor; }
+
+/* ---------- Footer ------------------------------------------------------- */
+
+.footer {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 2.5rem;
+  text-align: center;
+  font-family: var(--font-ui);
+  font-size: .8rem;
+  color: var(--slate-600);
+}
+
+/* ---------- MathJax tweaks ---------------------------------------------- */
+
+mjx-container[display="true"] { margin: .75rem 0 !important; }
+
+/* ---------- Responsive -------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .split { grid-template-columns: minmax(0, 1fr); }
+  .split__aside {
+    position: static;
+    max-height: none;
+    overflow-y: visible;
+  }
+}
+
+@media (max-width: 480px) {
+  body { font-size: 16px; }
+  :root { --pad-card: 1.15rem; }
+  .hero { padding: 1.5rem 1.15rem; }
+}
+
+
+/* ---- solution page extras ---- */
+.hero__title .qstar { color:#fbbf24; }
+.qcard__body { font-size: 1.02rem; }
+.qcard__body .part { border-left: 4px solid var(--indigo); background: var(--slate-50);
+  padding: .7rem 1rem; margin: .7rem 0; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+.qcard__body .part b { color: var(--indigo-600); font-family: var(--font-ui); }
+.marks-inline { font-family: var(--font-ui); font-size: .75rem; font-weight: 700;
+  color: var(--badge-fg); background: var(--badge-bg); padding: .1rem .5rem; border-radius: 999px; margin-left: .4rem; }
+.options { list-style:none; margin:.75rem 0 0; padding:0; display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:.55rem; }
+.options li { background:var(--slate-50); border:1px solid var(--slate-200);
+  border-radius:var(--radius-sm); padding:.6rem .9rem; }
+.opt-key { font-family:var(--font-ui); font-weight:700; color:var(--slate-600); margin-right:.4rem; }
+.step { border:1px solid var(--slate-200); border-left:4px solid var(--indigo);
+  border-radius:var(--radius); padding:var(--pad-card); box-shadow:var(--shadow-sm); }
+.step + .step { margin-top:1rem; }
+.step__head { display:flex; align-items:center; gap:.6rem; flex-wrap:wrap; margin-bottom:.75rem;
+  font-family:var(--font-ui); font-weight:700; }
+.step__num { background:var(--indigo); color:#fff; border-radius:8px; min-width:1.9rem;
+  text-align:center; padding:.15rem .4rem; font-size:.85rem; }
+.math { margin:.65rem 0; overflow-x:auto; overflow-y:hidden; padding-bottom:2px; }
+.distractor { background:#fff; border:1px solid var(--slate-200); border-radius:var(--radius-sm);
+  padding:.75rem .95rem; margin:.5rem 0; }
+.distractor .opt-tag { font-family:var(--font-ui); font-weight:800; display:inline-block;
+  min-width:1.6rem; color:var(--slate-600); }
+.distractor.correct { background:var(--emerald-bg); border-color:var(--emerald-bd); }
+.distractor.correct .opt-tag { color:#065f46; }
+.distractor.wrong .opt-tag { color:#991b1b; }
+.distractor.wrong { background:#fef2f2; border-color:#fecaca; }
+.figure svg { max-width:100%; height:auto; }
+.step p { margin:.55em 0; }
+
+</style>
 </head>
-
-<body class="min-h-screen p-4 md:p-8 flex justify-center">
-  <div class="w-full max-w-3xl">
-
-    <!-- HEADER / QUESTION OVERVIEW -->
-    <header class="card p-6 md:p-8 mb-6">
-      <div class="flex flex-wrap items-center gap-3 mb-3">
-        <span class="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">HKDSE 2019</span>
-        <span class="bg-gray-200 text-gray-700 text-xs font-bold px-3 py-1 rounded-full">Paper 1 · Q4</span>
-        <span class="tag">Polynomials</span>
-        <span class="tag">Factorization</span>
-        <span class="tag">Difference of Squares</span>
-      </div>
-      <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-2">Factorization Challenge</h1>
-      <p class="text-gray-600 mb-4">Factorize each of the following expressions.</p>
-
-      <!-- QUESTION PARTS -->
-      <div class="grid gap-4 md:grid-cols-3">
-        <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
-          <span class="text-sm font-semibold text-blue-700">(a)</span>
-          <div class="mt-1 text-lg">\(4m^2 - 9\)</div>
-        </div>
-        <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
-          <span class="text-sm font-semibold text-blue-700">(b)</span>
-          <div class="mt-1 text-lg">\(2m^2n + 7mn - 15n\)</div>
-        </div>
-        <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
-          <span class="text-sm font-semibold text-blue-700">(c)</span>
-          <div class="mt-1 text-lg">\(4m^2 - 9 - 2m^2n - 7mn + 15n\)</div>
-        </div>
-      </div>
-      <p class="text-sm text-gray-500 mt-4">[4 marks]</p>
-    </header>
-
-    <!-- INTERACTIVE DEMO: VISUAL FACTORISATION -->
-    <section class="card p-6 md:p-8 mb-6">
-      <h2 class="text-xl font-bold text-gray-800 mb-2 flex items-center gap-2">
-        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
-        Visual Demo — Difference of Squares
-      </h2>
-      <p class="text-gray-600 text-sm mb-4">
-        Part (a) uses the identity <span class="font-mono bg-yellow-100 px-1 rounded">\(a^2 - b^2 = (a+b)(a-b)\)</span>.
-        Adjust <span class="font-semibold">\(m\)</span> to see how the area of a square minus a smaller square rearranges into a rectangle.
-      </p>
-
-      <div class="interactive-panel flex flex-col md:flex-row items-center gap-6">
-        <div class="flex-1 w-full">
-          <svg id="geoViz" viewBox="0 0 240 180" class="w-full h-auto bg-white rounded-lg shadow-inner border border-gray-200">
-            <!-- Dynamic shapes will be drawn here -->
-          </svg>
-        </div>
-        <div class="flex-1 w-full">
-          <label class="slider-label flex justify-between mb-1">
-            <span>Value of \(m\)</span>
-            <span id="mValue" class="font-bold text-blue-600">1.5</span>
-          </label>
-          <input type="range" id="mSlider" min="1.0" max="3.0" step="0.1" value="1.5">
-          <div class="mt-4 text-sm text-gray-600 space-y-1">
-            <p>\(4m^2 - 9 = (2m)^2 - 3^2\)</p>
-            <p id="areaEquation" class="font-mono bg-gray-100 p-2 rounded-md text-center"></p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- STEP-BY-STEP GUIDED SOLUTION -->
-    <section class="card p-6 md:p-8">
-      <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
-        Step-by-Step Solution
-      </h2>
-      <p class="text-sm text-gray-500 mb-4">Click on each step to reveal the working. Try to solve it yourself first!</p>
-
-      <!-- STEP 1: Part (a) -->
-      <div class="step-card" id="step1">
-        <div class="step-header" onclick="toggleStep('step1')">
-          <span class="font-semibold text-gray-800">Part (a) — Factorize \(4m^2 - 9\)</span>
-          <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-        </div>
-        <div class="step-body" id="step1-body">
-          <div class="hint-box mb-3">
-            <strong>💡 Hint:</strong> This is a difference of two squares: \(a^2 - b^2 = (a+b)(a-b)\).<br>
-            Identify \(a\) and \(b\): \(4m^2 = (2m)^2\) and \(9 = 3^2\).
-          </div>
-          <div class="bg-gray-50 p-3 rounded-lg text-center text-lg mb-2">
-            \(4m^2 - 9 = (2m)^2 - 3^2 = (2m + 3)(2m - 3)\)
-          </div>
-          <div class="final-answer">Answer: \((2m + 3)(2m - 3)\) &nbsp; [1A]</div>
-          <button class="toggle-btn mt-3" onclick="markComplete('step1')">Mark as understood ✓</button>
-        </div>
-      </div>
-
-      <!-- STEP 2: Part (b) intro -->
-      <div class="step-card" id="step2">
-        <div class="step-header" onclick="toggleStep('step2')">
-          <span class="font-semibold text-gray-800">Part (b) — Start factorizing \(2m^2n + 7mn - 15n\)</span>
-          <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-        </div>
-        <div class="step-body" id="step2-body">
-          <div class="hint-box mb-3">
-            <strong>💡 Hint:</strong> First take out the common factor \(n\) (since every term contains \(n\)).
-          </div>
-          <div class="bg-gray-50 p-3 rounded-lg text-center text-lg mb-2">
-            \(2m^2n + 7mn - 15n = n(2m^2 + 7m - 15)\)
-          </div>
-          <p class="text-sm text-gray-500">Now we need to factorize the quadratic \(2m^2 + 7m - 15\).</p>
-          <button class="toggle-btn mt-3" onclick="markComplete('step2')">Mark as understood ✓</button>
-        </div>
-      </div>
-
-      <!-- STEP 3: Factorize quadratic -->
-      <div class="step-card" id="step3">
-        <div class="step-header" onclick="toggleStep('step3')">
-          <span class="font-semibold text-gray-800">Part (b) — Factorize \(2m^2 + 7m - 15\)</span>
-          <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-        </div>
-        <div class="step-body" id="step3-body">
-          <div class="hint-box mb-3">
-            <strong>💡 Hint:</strong> Look for two numbers that multiply to \(2 \times (-15) = -30\) and add to \(7\).<br>
-            Those numbers are \(10\) and \(-3\).
-          </div>
-          <div class="bg-gray-50 p-3 rounded-lg text-center text-lg mb-2">
-            \(2m^2 + 10m - 3m - 15\)<br>
-            \(= 2m(m + 5) - 3(m + 5)\)<br>
-            \(= (2m - 3)(m + 5)\)
-          </div>
-          <p class="text-sm text-gray-500">So \(2m^2n + 7mn - 15n = n(2m - 3)(m + 5)\).</p>
-          <div class="final-answer">Answer: \(n(2m - 3)(m + 5)\) &nbsp; [1A]</div>
-          <button class="toggle-btn mt-3" onclick="markComplete('step3')">Mark as understood ✓</button>
-        </div>
-      </div>
-
-      <!-- STEP 4: Part (c) strategy -->
-      <div class="step-card" id="step4">
-        <div class="step-header" onclick="toggleStep('step4')">
-          <span class="font-semibold text-gray-800">Part (c) — Recognize the structure</span>
-          <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-        </div>
-        <div class="step-body" id="step4-body">
-          <div class="hint-box mb-3">
-            <strong>💡 Hint:</strong> Notice that part (c) is \(4m^2 - 9\) minus \(2m^2n + 7mn - 15n\).<br>
-            Use the results from (a) and (b) to factorize!
-          </div>
-          <div class="bg-gray-50 p-3 rounded-lg text-center text-lg mb-2">
-            \(4m^2 - 9 - 2m^2n - 7mn + 15n\)<br>
-            \(= 4m^2 - 9 - (2m^2n + 7mn - 15n)\)
-          </div>
-          <p class="text-sm text-gray-500">Substitute the factorized forms from (a) and (b).</p>
-          <button class="toggle-btn mt-3" onclick="markComplete('step4')">Mark as understood ✓</button>
-        </div>
-      </div>
-
-      <!-- STEP 5: Part (c) final -->
-      <div class="step-card" id="step5">
-        <div class="step-header" onclick="toggleStep('step5')">
-          <span class="font-semibold text-gray-800">Part (c) — Final factorization</span>
-          <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-        </div>
-        <div class="step-body" id="step5-body">
-          <div class="bg-gray-50 p-3 rounded-lg text-center text-lg mb-2">
-            \(= (2m + 3)(2m - 3) - n(2m - 3)(m + 5)\)<br>
-            <span class="highlight">Common factor: \((2m - 3)\)</span><br>
-            \(= (2m - 3)\big[(2m + 3) - n(m + 5)\big]\)<br>
-            \(= (2m - 3)(2m + 3 - mn - 5n)\)<br>
-            \(= (2m - 3)(2m - mn - 5n + 3)\)
-          </div>
-          <div class="final-answer">Answer: \((2m - 3)(2m - mn - 5n + 3)\) &nbsp; [1M, 1A]</div>
-          <button class="toggle-btn mt-3" onclick="markComplete('step5')">Mark as understood ✓</button>
-        </div>
-      </div>
-
-      <!-- ALL STEPS COMPLETE MESSAGE -->
-      <div id="allDone" class="hidden mt-6 p-4 bg-green-50 border border-green-200 rounded-xl text-center text-green-800 font-medium">
-        🎉 Excellent! You have gone through all the steps. Review the key ideas below.
-      </div>
-    </section>
-
-    <!-- KEY TAKEAWAYS -->
-    <section class="card p-6 md:p-8 mt-6">
-      <h2 class="text-xl font-bold text-gray-800 mb-3">Key Takeaways</h2>
-      <ul class="list-disc list-inside text-gray-700 space-y-2">
-        <li><strong>Difference of squares:</strong> \(a^2 - b^2 = (a + b)(a - b)\)</li>
-        <li><strong>Common factor:</strong> Always look for a common factor across all terms first.</li>
-        <li><strong>Grouping:</strong> For four terms, group them into pairs and factorize each pair, then take out the common binomial factor.</li>
-        <li><strong>Link parts:</strong> In DSE, part (c) often builds on (a) and (b). Use previous answers to save time!</li>
-      </ul>
-    </section>
-
-    <!-- FOOTER -->
-    <footer class="text-center text-xs text-gray-400 mt-8 mb-4">
-      HKDSE Math 2019 Paper 1 Q4 · Interactive Solution · Designed for learning
-    </footer>
-
-  </div>
-
-  <script>
-    // ====== KATEX AUTO-RENDER ======
-    document.addEventListener("DOMContentLoaded", function () {
-      renderMathInElement(document.body, {
-        delimiters: [
-          { left: "\\(", right: "\\)", display: false },
-          { left: "\\[", right: "\\]", display: true }
-        ]
-      });
-
-      // Initialize visual demo
-      drawGeoViz(1.5);
-      updateEquation(1.5);
-    });
-
-    // ====== STEP ACCORDION ======
-    function toggleStep(stepId) {
-      const body = document.getElementById(stepId + '-body');
-      const card = document.getElementById(stepId);
-
-      if (body.classList.contains('active')) {
-        body.classList.remove('active');
-      } else {
-        // Close other step bodies (optional for focus)
-        document.querySelectorAll('.step-body').forEach(el => el.classList.remove('active'));
-        body.classList.add('active');
-        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }
-
-    function markComplete(stepId) {
-      const card = document.getElementById(stepId);
-      card.classList.add('completed');
-      const body = document.getElementById(stepId + '-body');
-      body.classList.remove('active');
-
-      // Check if all steps are completed
-      const steps = ['step1', 'step2', 'step3', 'step4', 'step5'];
-      const allDone = steps.every(id => document.getElementById(id).classList.contains('completed'));
-      if (allDone) {
-        document.getElementById('allDone').classList.remove('hidden');
-      }
-    }
-
-    // ====== VISUAL DEMO: DIFFERENCE OF SQUARES ======
-    const svg = document.getElementById('geoViz');
-    const mSlider = document.getElementById('mSlider');
-    const mValue = document.getElementById('mValue');
-    const areaEquation = document.getElementById('areaEquation');
-
-    mSlider.addEventListener('input', function () {
-      const m = parseFloat(this.value);
-      mValue.textContent = m.toFixed(1);
-      drawGeoViz(m);
-      updateEquation(m);
-    });
-
-    function drawGeoViz(m) {
-      // We'll draw a large square of side 2m and a small square of side 3 inside it.
-      // The remaining area is (2m)^2 - 3^2 = (2m+3)(2m-3)
-      const bigSide = 2 * m;         // side of big square
-      const smallSide = 3;            // side of small square
-
-      // Scale to fit in viewBox 240x180 with margin
-      const margin = 30;
-      const maxDim = Math.max(bigSide, 6); // ensure at least 6 for scale
-      const scale = (Math.min(200, 150) / maxDim) * 0.9;
-
-      const bigPx = bigSide * scale;
-      const smallPx = smallSide * scale;
-
-      const startX = (240 - bigPx) / 2;
-      const startY = (180 - bigPx) / 2;
-
-      // Build SVG content
-      let svgContent = '';
-
-      // Big square outline
-      svgContent += `<rect x="${startX}" y="${startY}" width="${bigPx}" height="${bigPx}" fill="#bfdbfe" stroke="#2563eb" stroke-width="2" rx="2" />`;
-
-      // Small square (top-right corner inside big square) - representing subtracted area
-      const smallX = startX + bigPx - smallPx;
-      const smallY = startY;
-      svgContent += `<rect x="${smallX}" y="${smallY}" width="${smallPx}" height="${smallPx}" fill="#fca5a5" stroke="#dc2626" stroke-width="2" rx="2" />`;
-
-      // Labels
-      svgContent += `<text x="${startX + bigPx/2}" y="${startY + bigPx + 20}" text-anchor="middle" font-size="12" fill="#1e40af">2m = ${bigSide.toFixed(1)}</text>`;
-      svgContent += `<text x="${smallX + smallPx/2}" y="${smallY - 8}" text-anchor="middle" font-size="11" fill="#991b1b">3</text>`;
-
-      // Legend
-      svgContent += `<rect x="10" y="10" width="12" height="12" fill="#bfdbfe" stroke="#2563eb" stroke-width="1" />`;
-      svgContent += `<text x="26" y="20" font-size="10" fill="#374151">4m²</text>`;
-      svgContent += `<rect x="70" y="10" width="12" height="12" fill="#fca5a5" stroke="#dc2626" stroke-width="1" />`;
-      svgContent += `<text x="86" y="20" font-size="10" fill="#374151">9</text>`;
-
-      svg.innerHTML = svgContent;
-    }
-
-    function updateEquation(m) {
-      const area1 = (2*m)*(2*m);
-      const area2 = 9;
-      const result = area1 - area2;
-      const factored1 = (2*m + 3);
-      const factored2 = (2*m - 3);
-      
-      areaEquation.innerHTML = 
-        `\\( (2 \\times ${m.toFixed(1)})^2 - 3^2 = ${area1.toFixed(1)} - 9 = ${result.toFixed(1)} \\)<br>` +
-        `\\( = (${factored1.toFixed(1)})(${factored2.toFixed(1)}) = ${(factored1 * factored2).toFixed(1)} \\)`;
-      
-      // Re-render KaTeX in the equation area
-      renderMathInElement(areaEquation, {
-        delimiters: [
-          { left: "\\(", right: "\\)", display: false }
-        ]
-      });
-    }
-  </script>
+<body>
+<div class="container"><header class="hero"><p class="hero__eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 1</p><h1 class="hero__title">2019 Paper 1 · Question 4<span class="qstar"></span></h1><p class="hero__subtitle">Polynomials</p><div class="hero__meta"><span class="badge badge--topic">Polynomials</span><span class="badge badge--rate">Passing rate 68%</span><span class="badge badge--mark">4 marks</span></div></header><section class="card"><h2 class="card__title">Question</h2><div class="qcard__body"><p>Factorize:</p><p class="part"><b>(a)</b> \(4m^2-9\)</p><p class="part"><b>(b)</b> \(2m^2n+7mn-15n\)</p><p class="part"><b>(c)</b> \(4m^2-9-2m^2n-7mn+15n\). <span class="marks-inline">4 marks</span></p></div></section><section class="card"><h2 class="card__title">Solution</h2><div class="qcard__body"><div class="step"><div class="step__head"><span class="step__num">a</span>(a) Difference of squares</div><div class="math">\[4m^2-9=(2m+3)(2m-3)\]</div><p><span class="badge badge--mark">1A</span> correct.</p></div><div class="step"><div class="step__head"><span class="step__num">b</span>(b) Common factor + quadratic</div><div class="math">\[2m^2n+7mn-15n=n(2m^2+7m-15)=n(2m-3)(m+5)\]</div><p><span class="badge badge--mark">1A</span> correct.</p></div><div class="step"><div class="step__head"><span class="step__num">c</span>(c) Group and factorise</div><div class="math">\[=(2m+3)(2m-3)-n(2m-3)(m+5)\]</div><p><span class="badge badge--mark">1M</span> grouping using (a) and (b).</p><div class="math">\[=(2m-3)(2m+3-mn-5n)\]</div><p><span class="badge badge--mark">1A</span> correct factorisation.</p></div></div></section><section class="card"><h2 class="card__title">Answer</h2><div class="qcard__body"><div class="answer"><span class="answer__label">Answer</span>(a) \((2m+3)(2m-3)\) · (b) \(n(2m-3)(m+5)\) · (c) \((2m-3)(2m+3-mn-5n)\)</div></div></section></div><footer class="footer">HKDSE Mathematics (Compulsory Part) · 2019 Paper 1 Q04 · <a href="index.html">Index by year</a> · <a href="DSE_Maths_By_Topic.html">Index by topic</a></footer>
 </body>
 </html>

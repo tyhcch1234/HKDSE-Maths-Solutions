@@ -1,326 +1,409 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>HKDSE 2017 Paper 1 Q5 – Inequalities</title>
-    <!-- MathJax for LaTeX rendering -->
-    <script>
-        MathJax = {
-            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
-            svg: { fontCache: 'global' }
-        };
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
-    <!-- Tailwind CSS via CDN (lightweight utility classes) -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Custom smooth transitions & monospace for numbers */
-        body { font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif; background: #f8fafc; }
-        .step-card { transition: all 0.25s ease; }
-        .step-card.active { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); border-left: 6px solid #3b82f6; }
-        .step-card:not(.active) { border-left: 6px solid #e2e8f0; opacity: 0.7; }
-        .number-line { width: 100%; height: auto; max-height: 120px; }
-        .badge { background: #dbeafe; color: #1e40af; border-radius: 9999px; padding: 0.15rem 0.75rem; font-size: 0.75rem; font-weight: 600; }
-        .interactive-btn { transition: transform 0.1s; }
-        .interactive-btn:active { transform: scale(0.96); }
-        .glow-on-hover:hover { box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); }
-        /* Responsive typography */
-        @media (max-width: 640px) {
-            .step-content { font-size: 0.95rem; }
-            .math-display { font-size: 0.95rem; overflow-x: auto; }
-        }
-        .math-display { font-size: 1.1rem; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2017 Paper 1 Q05 — Inequalities and Linear Programming</title>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+/* ==========================================================================
+   HKDSE Mathematics (Compulsory Part) — Unified Design System
+   Canonical source of truth. This exact block is inlined into every
+   question page, index.html and DSE_Maths_By_Topic.html so that all
+   deliverables share one visual identity.
+   ========================================================================== */
+
+:root {
+  /* Palette */
+  --slate-900: #1e293b;   /* Primary / header surface */
+  --slate-800: #334155;
+  --slate-600: #475569;
+  --slate-400: #94a3b8;
+  --slate-200: #e2e8f0;
+  --slate-100: #f1f5f9;
+  --slate-50:  #f8fafc;
+  --indigo:    #3b82f6;   /* Primary accent */
+  --indigo-600:#2563eb;
+  --amber-bg:  #fef3c7;   /* Hints / concepts */
+  --amber-bd:  #f59e0b;
+  --emerald-bg:#d1fae5;   /* Final answers */
+  --emerald-bd:#10b981;
+  --badge-bg:  #dbeafe;   /* Badges / marks */
+  --badge-fg:  #1e40af;
+
+  /* Shape & depth */
+  --radius: 12px;
+  --radius-sm: 8px;
+  --pad-card: 1.5rem;
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, .06), 0 1px 3px rgba(15, 23, 42, .08);
+  --shadow-md: 0 4px 12px rgba(15, 23, 42, .08), 0 2px 4px rgba(15, 23, 42, .04);
+
+  /* Type */
+  --font-body: "Source Serif 4", "Noto Serif TC", Georgia, "Times New Roman", serif;
+  --font-ui: "Inter Tight", "Noto Sans TC", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+  --lh-tight: 1.25;
+  --lh-body: 1.7;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--slate-50);
+  background-image:
+    radial-gradient(circle at 12% -10%, rgba(59, 130, 246, .10), transparent 45%),
+    radial-gradient(circle at 95% 0%, rgba(30, 41, 59, .08), transparent 40%);
+  background-attachment: fixed;
+  color: var(--slate-900);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: var(--lh-body);
+}
+
+/* ---------- Layout shells ------------------------------------------------ */
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 3rem;
+}
+
+.split {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 3rem;
+  display: grid;
+  grid-template-columns: minmax(0, 42%) minmax(0, 58%);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.split__aside {
+  position: sticky;
+  top: 1rem;
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.split__main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* ---------- Hero header -------------------------------------------------- */
+
+.hero {
+  background: linear-gradient(135deg, var(--slate-900) 0%, #27364f 55%, #1d4ed8 160%);
+  color: #fff;
+  border-radius: var(--radius);
+  padding: 2rem var(--pad-card);
+  box-shadow: var(--shadow-md);
+  margin-bottom: 1.5rem;
+}
+
+.hero__eyebrow {
+  font-family: var(--font-ui);
+  font-size: .75rem;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: #93c5fd;
+  margin: 0 0 .5rem;
+}
+
+.hero__title {
+  font-family: var(--font-ui);
+  font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.1rem);
+  line-height: var(--lh-tight);
+  font-weight: 700;
+  margin: 0 0 .5rem;
+}
+
+.hero__subtitle {
+  margin: 0;
+  color: #cbd5e1;
+  font-size: .95rem;
+}
+
+.hero__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  margin-top: 1rem;
+}
+
+/* ---------- Cards -------------------------------------------------------- */
+
+.card {
+  background: #fff;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius);
+  padding: var(--pad-card);
+  box-shadow: var(--shadow-sm);
+}
+
+.card + .card { margin-top: 0; }
+
+.card__title {
+  font-family: var(--font-ui);
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 1rem;
+  padding-bottom: .6rem;
+  border-bottom: 2px solid var(--slate-100);
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  flex-wrap: wrap;
+}
+
+/* ---------- Step cards --------------------------------------------------- */
+
+.step {
+  border-left: 4px solid var(--indigo);
+  background: #fff;
+  border-radius: var(--radius);
+  padding: var(--pad-card);
+  box-shadow: var(--shadow-sm);
+}
+
+.step__head {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  flex-wrap: wrap;
+  margin-bottom: .85rem;
+  font-family: var(--font-ui);
+  font-weight: 600;
+}
+
+/* ---------- Callouts ----------------------------------------------------- */
+
+.hint,
+.answer,
+.note {
+  border-radius: var(--radius-sm);
+  padding: 1rem 1.15rem;
+  margin: 1rem 0;
+}
+
+.hint {
+  background: var(--amber-bg);
+  border-left: 4px solid var(--amber-bd);
+}
+
+.answer {
+  background: var(--emerald-bg);
+  border-left: 4px solid var(--emerald-bd);
+}
+
+.note {
+  background: var(--slate-100);
+  border-left: 4px solid var(--slate-400);
+}
+
+.hint__label,
+.answer__label {
+  font-family: var(--font-ui);
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: .35rem;
+}
+
+.hint__label   { color: #92400e; }
+.answer__label { color: #065f46; }
+
+/* ---------- Badges ------------------------------------------------------- */
+
+.badge {
+  display: inline-block;
+  font-family: var(--font-ui);
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  padding: .2rem .55rem;
+  border-radius: 999px;
+  background: var(--badge-bg);
+  color: var(--badge-fg);
+  white-space: nowrap;
+}
+
+.badge--mark  { background: var(--badge-bg); color: var(--badge-fg); }
+.badge--topic { background: var(--slate-100); color: var(--slate-600); }
+.badge--hard  { background: #fee2e2; color: #991b1b; }
+.badge--rate  { background: #ecfdf5; color: #047857; }
+
+/* ---------- Option list (Paper 2) --------------------------------------- */
+
+.options {
+  list-style: none;
+  margin: .5rem 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: .5rem;
+}
+
+.options li {
+  background: var(--slate-100);
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-sm);
+  padding: .6rem .85rem;
+}
+
+.option-key {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  color: var(--slate-600);
+  margin-right: .35rem;
+}
+
+/* ---------- Figures ----------------------------------------------------- */
+
+.figure {
+  background: #fff;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius);
+  padding: .75rem;
+  text-align: center;
+}
+
+.figure img,
+.question-img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-sm);
+  display: block;
+  margin: 0 auto;
+}
+
+.figure figcaption {
+  font-family: var(--font-ui);
+  font-size: .78rem;
+  color: var(--slate-600);
+  margin-top: .5rem;
+}
+
+.figure svg { max-width: 100%; height: auto; }
+
+/* ---------- Tables ------------------------------------------------------- */
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .95rem;
+}
+
+.table th,
+.table td {
+  border: 1px solid var(--slate-200);
+  padding: .5rem .65rem;
+  text-align: left;
+}
+
+.table th {
+  background: var(--slate-100);
+  font-family: var(--font-ui);
+  font-weight: 600;
+}
+
+/* ---------- Index pages -------------------------------------------------- */
+
+.index-section { margin-bottom: 1.5rem; }
+
+.index-table td:first-child { white-space: nowrap; }
+
+a { color: var(--indigo-600); }
+
+a.qlink {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+
+a.qlink:hover { border-bottom-color: currentColor; }
+
+/* ---------- Footer ------------------------------------------------------- */
+
+.footer {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 2.5rem;
+  text-align: center;
+  font-family: var(--font-ui);
+  font-size: .8rem;
+  color: var(--slate-600);
+}
+
+/* ---------- MathJax tweaks ---------------------------------------------- */
+
+mjx-container[display="true"] { margin: .75rem 0 !important; }
+
+/* ---------- Responsive -------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .split { grid-template-columns: minmax(0, 1fr); }
+  .split__aside {
+    position: static;
+    max-height: none;
+    overflow-y: visible;
+  }
+}
+
+@media (max-width: 480px) {
+  body { font-size: 16px; }
+  :root { --pad-card: 1.15rem; }
+  .hero { padding: 1.5rem 1.15rem; }
+}
+
+
+/* ---- solution page extras ---- */
+.hero__title .qstar { color:#fbbf24; }
+.qcard__body { font-size: 1.02rem; }
+.qcard__body .part { border-left: 4px solid var(--indigo); background: var(--slate-50);
+  padding: .7rem 1rem; margin: .7rem 0; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+.qcard__body .part b { color: var(--indigo-600); font-family: var(--font-ui); }
+.marks-inline { font-family: var(--font-ui); font-size: .75rem; font-weight: 700;
+  color: var(--badge-fg); background: var(--badge-bg); padding: .1rem .5rem; border-radius: 999px; margin-left: .4rem; }
+.options { list-style:none; margin:.75rem 0 0; padding:0; display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:.55rem; }
+.options li { background:var(--slate-50); border:1px solid var(--slate-200);
+  border-radius:var(--radius-sm); padding:.6rem .9rem; }
+.opt-key { font-family:var(--font-ui); font-weight:700; color:var(--slate-600); margin-right:.4rem; }
+.step { border:1px solid var(--slate-200); border-left:4px solid var(--indigo);
+  border-radius:var(--radius); padding:var(--pad-card); box-shadow:var(--shadow-sm); }
+.step + .step { margin-top:1rem; }
+.step__head { display:flex; align-items:center; gap:.6rem; flex-wrap:wrap; margin-bottom:.75rem;
+  font-family:var(--font-ui); font-weight:700; }
+.step__num { background:var(--indigo); color:#fff; border-radius:8px; min-width:1.9rem;
+  text-align:center; padding:.15rem .4rem; font-size:.85rem; }
+.math { margin:.65rem 0; overflow-x:auto; overflow-y:hidden; padding-bottom:2px; }
+.distractor { background:#fff; border:1px solid var(--slate-200); border-radius:var(--radius-sm);
+  padding:.75rem .95rem; margin:.5rem 0; }
+.distractor .opt-tag { font-family:var(--font-ui); font-weight:800; display:inline-block;
+  min-width:1.6rem; color:var(--slate-600); }
+.distractor.correct { background:var(--emerald-bg); border-color:var(--emerald-bd); }
+.distractor.correct .opt-tag { color:#065f46; }
+.distractor.wrong .opt-tag { color:#991b1b; }
+.distractor.wrong { background:#fef2f2; border-color:#fecaca; }
+.figure svg { max-width:100%; height:auto; }
+.step p { margin:.55em 0; }
+
+</style>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4 md:p-8">
-
-    <div class="max-w-4xl mx-auto">
-
-        <!-- Header -->
-        <div class="bg-white rounded-2xl shadow-sm p-5 md:p-6 mb-6 border border-slate-200">
-            <div class="flex flex-wrap items-center gap-3 mb-2">
-                <span class="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">HKDSE 2017 Paper 1 Q5</span>
-                <span class="badge">Inequalities</span>
-                <span class="badge">Linear Programming</span>
-                <span class="badge">Integer Solutions</span>
-            </div>
-            <h1 class="text-2xl md:text-3xl font-bold text-slate-800 mb-3">Solving Compound Inequalities</h1>
-            <p class="text-slate-600 text-sm md:text-base leading-relaxed">
-                This question tests your ability to solve <strong>linear inequalities</strong>, find the <strong>intersection</strong> of solution sets, and count <strong>integer values</strong> that satisfy both conditions.
-            </p>
-        </div>
-
-        <!-- Question Display -->
-        <div class="bg-white rounded-2xl shadow-sm p-5 md:p-6 mb-6 border border-slate-200">
-            <h2 class="text-lg font-semibold text-slate-800 mb-3 flex items-center gap-2">
-                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                Question
-            </h2>
-            <div class="math-display bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
-                <p class="font-medium text-slate-700">(a) Find the range of values of \(x\) which satisfy both</p>
-                <div class="flex flex-wrap items-center gap-2 text-slate-800">
-                    <span class="text-lg">\(7(x - 2) \le \dfrac{11x + 8}{3}\)</span>
-                    <span class="text-slate-400 font-bold">and</span>
-                    <span class="text-lg">\(6 - x < 5\)</span>
-                </div>
-                <p class="font-medium text-slate-700 mt-4">(b) How many integers satisfy both inequalities in (a)?</p>
-            </div>
-            <div class="mt-3 text-xs text-slate-400 text-right">[4 marks]</div>
-        </div>
-
-        <!-- Interactive Number Line (Visual Aid) -->
-        <div class="bg-white rounded-2xl shadow-sm p-5 md:p-6 mb-6 border border-slate-200">
-            <h2 class="text-lg font-semibold text-slate-800 mb-3 flex items-center gap-2">
-                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"/></svg>
-                Visualizing the Solution Range
-            </h2>
-            <p class="text-sm text-slate-500 mb-4">The shaded region represents values of \(x\) that satisfy <strong>both</strong> inequalities.</p>
-            
-            <!-- SVG Number Line -->
-            <svg viewBox="0 0 600 80" class="number-line w-full" role="img" aria-label="Number line showing x between 1 and 5">
-                <!-- Base line -->
-                <line x1="20" y1="40" x2="580" y2="40" stroke="#94a3b8" stroke-width="2"/>
-                
-                <!-- Ticks and labels -->
-                <!-- -1 -->
-                <line x1="70" y1="35" x2="70" y2="45" stroke="#94a3b8" stroke-width="2"/>
-                <text x="70" y="65" text-anchor="middle" font-size="14" fill="#64748b">-1</text>
-                <!-- 0 -->
-                <line x1="130" y1="35" x2="130" y2="45" stroke="#94a3b8" stroke-width="2"/>
-                <text x="130" y="65" text-anchor="middle" font-size="14" fill="#64748b">0</text>
-                <!-- 1 -->
-                <line x1="190" y1="35" x2="190" y2="45" stroke="#94a3b8" stroke-width="2"/>
-                <text x="190" y="65" text-anchor="middle" font-size="14" fill="#64748b">1</text>
-                <!-- 2 -->
-                <line x1="250" y1="35" x2="250" y2="45" stroke="#94a3b8" stroke-width="2"/>
-                <text x="250" y="65" text-anchor="middle" font-size="14" fill="#64748b">2</text>
-                <!-- 3 -->
-                <line x1="310" y1="35" x2="310" y2="45" stroke="#94a3b8" stroke-width="2"/>
-                <text x="310" y="65" text-anchor="middle" font-size="14" fill="#64748b">3</text>
-                <!-- 4 -->
-                <line x1="370" y1="35" x2="370" y2="45" stroke="#94a3b8" stroke-width="2"/>
-                <text x="370" y="65" text-anchor="middle" font-size="14" fill="#64748b">4</text>
-                <!-- 5 -->
-                <line x1="430" y1="35" x2="430" y2="45" stroke="#94a3b8" stroke-width="2"/>
-                <text x="430" y="65" text-anchor="middle" font-size="14" fill="#64748b">5</text>
-                <!-- 6 -->
-                <line x1="490" y1="35" x2="490" y2="45" stroke="#94a3b8" stroke-width="2"/>
-                <text x="490" y="65" text-anchor="middle" font-size="14" fill="#64748b">6</text>
-                <!-- 7 -->
-                <line x1="550" y1="35" x2="550" y2="45" stroke="#94a3b8" stroke-width="2"/>
-                <text x="550" y="65" text-anchor="middle" font-size="14" fill="#64748b">7</text>
-
-                <!-- Highlighted region: 1 < x <= 5  (between 190 and 430) -->
-                <!-- Transparent overlay -->
-                <rect x="190" y="25" width="240" height="30" fill="#3b82f6" fill-opacity="0.15" rx="4"/>
-                
-                <!-- Open circle at 1 -->
-                <circle cx="190" cy="40" r="6" fill="white" stroke="#3b82f6" stroke-width="3"/>
-                <!-- Closed circle at 5 -->
-                <circle cx="430" cy="40" r="6" fill="#3b82f6" stroke="#3b82f6" stroke-width="3"/>
-                
-                <!-- Labels for endpoints -->
-                <text x="190" y="25" text-anchor="middle" font-size="12" fill="#3b82f6" font-weight="bold">1</text>
-                <text x="430" y="25" text-anchor="middle" font-size="12" fill="#3b82f6" font-weight="bold">5</text>
-                
-                <!-- Arrow indicators for inequality direction -->
-                <polygon points="190,40 210,33 210,47" fill="#3b82f6" opacity="0.7"/>
-                <polygon points="430,40 410,33 410,47" fill="#3b82f6" opacity="0.7"/>
-            </svg>
-
-            <div class="flex justify-between text-xs text-slate-500 mt-1 px-2">
-                <span>\(-\infty\)</span>
-                <span>\(+\infty\)</span>
-            </div>
-            <p class="text-center text-sm font-medium text-blue-700 mt-2">Solution: \(1 < x \le 5\)</p>
-        </div>
-
-        <!-- Step-by-Step Solution Accordion -->
-        <div class="bg-white rounded-2xl shadow-sm p-5 md:p-6 mb-6 border border-slate-200">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-lg font-semibold text-slate-800 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                    Step-by-Step Solution
-                </h2>
-                <button id="expandAllBtn" class="text-sm text-blue-600 hover:text-blue-800 font-medium px-3 py-1 rounded-lg hover:bg-blue-50 transition">Expand All</button>
-            </div>
-
-            <!-- Step 1 -->
-            <div class="step-card active bg-white rounded-xl p-4 mb-3 border border-slate-200 cursor-pointer" onclick="toggleStep(this)">
-                <div class="flex items-start gap-3">
-                    <span class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center text-sm">1</span>
-                    <div class="flex-1">
-                        <h3 class="font-semibold text-slate-800">Solve the first inequality</h3>
-                        <div class="step-content mt-2 hidden">
-                            <div class="math-display bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-2">
-                                <p>\(7(x - 2) \le \dfrac{11x + 8}{3}\)</p>
-                                <p class="text-slate-500 text-sm">Multiply both sides by 3 to eliminate the fraction:</p>
-                                <p>\(21(x - 2) \le 11x + 8\)</p>
-                                <p class="text-slate-500 text-sm">Expand the left side:</p>
-                                <p>\(21x - 42 \le 11x + 8\)</p>
-                                <p class="text-slate-500 text-sm">Subtract \(11x\) from both sides and add 42:</p>
-                                <p>\(10x \le 50\)</p>
-                                <p>\(\therefore x \le 5\)</p>
-                            </div>
-                            <div class="mt-2 bg-amber-50 border border-amber-200 rounded-lg p-2 text-xs text-amber-800">
-                                <strong>💡 Hint:</strong> When multiplying or dividing by a <strong>negative</strong> number, reverse the inequality sign. Here we divide by 10 (positive), so the sign stays the same.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Step 2 -->
-            <div class="step-card bg-white rounded-xl p-4 mb-3 border border-slate-200 cursor-pointer" onclick="toggleStep(this)">
-                <div class="flex items-start gap-3">
-                    <span class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center text-sm">2</span>
-                    <div class="flex-1">
-                        <h3 class="font-semibold text-slate-800">Solve the second inequality</h3>
-                        <div class="step-content mt-2 hidden">
-                            <div class="math-display bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-2">
-                                <p>\(6 - x < 5\)</p>
-                                <p class="text-slate-500 text-sm">Subtract 6 from both sides:</p>
-                                <p>\(-x < -1\)</p>
-                                <p class="text-slate-500 text-sm">Multiply both sides by -1. <strong>Reverse the inequality sign!</strong></p>
-                                <p>\(x > 1\)</p>
-                            </div>
-                            <div class="mt-2 bg-amber-50 border border-amber-200 rounded-lg p-2 text-xs text-amber-800">
-                                <strong>💡 Hint:</strong> When we multiply or divide by a negative number, the direction of the inequality changes. For example: \(-2 < 3\) becomes \(2 > -3\) when multiplied by -1.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Step 3 -->
-            <div class="step-card bg-white rounded-xl p-4 mb-3 border border-slate-200 cursor-pointer" onclick="toggleStep(this)">
-                <div class="flex items-start gap-3">
-                    <span class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center text-sm">3</span>
-                    <div class="flex-1">
-                        <h3 class="font-semibold text-slate-800">Combine the two inequalities</h3>
-                        <div class="step-content mt-2 hidden">
-                            <div class="math-display bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-2">
-                                <p>From Step 1: \(x \le 5\)</p>
-                                <p>From Step 2: \(x > 1\)</p>
-                                <p class="text-slate-500 text-sm">The solution must satisfy <strong>both</strong> conditions. This means \(x\) is between 1 and 5, with 1 <em>not included</em> and 5 <em>included</em>.</p>
-                                <p class="font-semibold text-blue-700">\(\therefore 1 < x \le 5\)</p>
-                            </div>
-                            <div class="mt-2 bg-amber-50 border border-amber-200 rounded-lg p-2 text-xs text-amber-800">
-                                <strong>💡 Hint:</strong> The intersection of \(x > 1\) and \(x \le 5\) is written as a compound inequality. On the number line, this is the region between open circle at 1 and closed circle at 5.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Step 4 -->
-            <div class="step-card bg-white rounded-xl p-4 mb-3 border border-slate-200 cursor-pointer" onclick="toggleStep(this)">
-                <div class="flex items-start gap-3">
-                    <span class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center text-sm">4</span>
-                    <div class="flex-1">
-                        <h3 class="font-semibold text-slate-800">Count the integers (Part b)</h3>
-                        <div class="step-content mt-2 hidden">
-                            <div class="math-display bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-2">
-                                <p>The integers satisfying \(1 < x \le 5\) are:</p>
-                                <p class="font-medium text-slate-700 text-lg">\(2, 3, 4, 5\)</p>
-                                <p class="text-slate-500 text-sm">Note: 1 is not included (strict inequality), 5 is included (non-strict).</p>
-                                <p>There are <strong>4</strong> integers in total.</p>
-                                <p class="font-semibold text-green-700">Answer: 4</p>
-                            </div>
-                            <div class="mt-2 bg-amber-50 border border-amber-200 rounded-lg p-2 text-xs text-amber-800">
-                                <strong>💡 Hint:</strong> Always double-check which endpoints are included. Here \(x > 1\) means 1 is <em>not</em> included, while \(x \le 5\) means 5 <em>is</em> included.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Final Answer Summary -->
-        <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl shadow-md p-5 md:p-6 text-white mb-8">
-            <h2 class="text-lg font-semibold mb-2 flex items-center gap-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                Final Answers
-            </h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-3">
-                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-3 border border-white/20">
-                    <p class="text-blue-100 text-xs uppercase tracking-wider">Part (a)</p>
-                    <p class="text-xl font-bold mt-1">\(1 < x \le 5\)</p>
-                </div>
-                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-3 border border-white/20">
-                    <p class="text-blue-100 text-xs uppercase tracking-wider">Part (b)</p>
-                    <p class="text-xl font-bold mt-1">4 integers</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <div class="text-center text-xs text-slate-400 pb-6">
-            HKDSE Mathematics 2017 Paper 1 Q5 · Interactive Solution Guide
-        </div>
-
-    </div>
-
-    <!-- JavaScript for Accordion Toggle -->
-    <script>
-        // Toggle individual step
-        function toggleStep(card) {
-            const content = card.querySelector('.step-content');
-            const isActive = card.classList.contains('active');
-            
-            // If the card is already active, collapse it (remove active)
-            // But we want to allow only one open at a time? Let's keep it simple: toggle independently.
-            // Actually better UX: clicking opens it and stays open.
-            
-            if (isActive) {
-                card.classList.remove('active');
-                if (content) content.classList.add('hidden');
-            } else {
-                card.classList.add('active');
-                if (content) content.classList.remove('hidden');
-            }
-        }
-
-        // Expand all steps
-        document.getElementById('expandAllBtn').addEventListener('click', function() {
-            const allCards = document.querySelectorAll('.step-card');
-            const anyHidden = Array.from(allCards).some(card => {
-                const content = card.querySelector('.step-content');
-                return content && content.classList.contains('hidden');
-            });
-
-            allCards.forEach(card => {
-                const content = card.querySelector('.step-content');
-                if (anyHidden) {
-                    // Open all
-                    card.classList.add('active');
-                    if (content) content.classList.remove('hidden');
-                } else {
-                    // Close all
-                    card.classList.remove('active');
-                    if (content) content.classList.add('hidden');
-                }
-            });
-
-            // Update button text
-            this.textContent = anyHidden ? 'Collapse All' : 'Expand All';
-        });
-
-        // Initialize: ensure first step is open, others closed
-        window.addEventListener('DOMContentLoaded', () => {
-            const cards = document.querySelectorAll('.step-card');
-            cards.forEach((card, index) => {
-                const content = card.querySelector('.step-content');
-                if (index === 0) {
-                    card.classList.add('active');
-                    if (content) content.classList.remove('hidden');
-                } else {
-                    card.classList.remove('active');
-                    if (content) content.classList.add('hidden');
-                }
-            });
-        });
-    </script>
+<body>
+<div class="container"><header class="hero"><p class="hero__eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 1</p><h1 class="hero__title">2017 Paper 1 · Question 5<span class="qstar"></span></h1><p class="hero__subtitle">Inequalities and Linear Programming</p><div class="hero__meta"><span class="badge badge--topic">Inequalities and Linear Programming</span><span class="badge badge--rate">Passing rate 85%</span><span class="badge badge--mark">4 marks</span></div></header><section class="card"><h2 class="card__title">Question</h2><div class="qcard__body"><p class="part"><b>(a)</b> Find the range of values of \(x\) which satisfy both \(7(x-2)\le\dfrac{11x+8}{3}\) and \(6-x&lt;5\).</p><p class="part"><b>(b)</b> How many integers satisfy both inequalities in (a)? <span class="marks-inline">4 marks</span></p></div></section><section class="card"><h2 class="card__title">Solution</h2><div class="qcard__body"><div class="step"><div class="step__head"><span class="step__num">a</span>(a) Solve both</div><div class="math">\[21x-42\le11x+8\ \Rightarrow\ x\le5;\quad 6-x&lt;5\ \Rightarrow\ x&gt;1\]</div><p><span class="badge badge--mark">1A</span> first.<span class="badge badge--mark">1A</span> second.</p><div class="math">\[1&lt;x\le5\]</div><p><span class="badge badge--mark">1M</span> overlap.</p></div><div class="step"><div class="step__head"><span class="step__num">b</span>(b) Count</div><p>2, 3, 4, 5 → <b>4</b> integers.</p><p><span class="badge badge--mark">1A</span> correct.</p></div></div></section><section class="card"><h2 class="card__title">Answer</h2><div class="qcard__body"><div class="answer"><span class="answer__label">Answer</span>(a) \(1&lt;x\le5\) · (b) 4</div></div></section></div><footer class="footer">HKDSE Mathematics (Compulsory Part) · 2017 Paper 1 Q05 · <a href="index.html">Index by year</a> · <a href="DSE_Maths_By_Topic.html">Index by topic</a></footer>
 </body>
 </html>

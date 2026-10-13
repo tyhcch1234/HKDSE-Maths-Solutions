@@ -1,620 +1,409 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HKDSE Math 2014 Paper 1 Q18 – Interactive Solution</title>
-    <!-- MathJax for LaTeX rendering -->
-    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
-    <!-- Tailwind CSS via CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Custom minor styling for smooth accordion and canvas */
-        .step-content {
-            transition: max-height 0.3s ease-out, opacity 0.2s ease-out;
-            overflow: hidden;
-        }
-        .step-content.collapsed {
-            max-height: 0;
-            opacity: 0;
-            padding: 0 1rem;
-        }
-        .step-content.expanded {
-            max-height: 2000px;
-            opacity: 1;
-            padding: 1rem;
-        }
-        canvas {
-            background-color: #f8fafc;
-            border-radius: 0.75rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-        .badge {
-            display: inline-block;
-            background-color: #dbeafe;
-            color: #1e40af;
-            border-radius: 9999px;
-            padding: 0.25rem 0.75rem;
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin-right: 0.5rem;
-            margin-bottom: 0.25rem;
-        }
-        .hint-box {
-            background-color: #fef9c3;
-            border-left: 4px solid #eab308;
-            padding: 0.75rem 1rem;
-            border-radius: 0.5rem;
-            margin-top: 0.75rem;
-            font-size: 0.9rem;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2014 Paper 1 Q18* — Inequalities and Linear Programming</title>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+/* ==========================================================================
+   HKDSE Mathematics (Compulsory Part) — Unified Design System
+   Canonical source of truth. This exact block is inlined into every
+   question page, index.html and DSE_Maths_By_Topic.html so that all
+   deliverables share one visual identity.
+   ========================================================================== */
+
+:root {
+  /* Palette */
+  --slate-900: #1e293b;   /* Primary / header surface */
+  --slate-800: #334155;
+  --slate-600: #475569;
+  --slate-400: #94a3b8;
+  --slate-200: #e2e8f0;
+  --slate-100: #f1f5f9;
+  --slate-50:  #f8fafc;
+  --indigo:    #3b82f6;   /* Primary accent */
+  --indigo-600:#2563eb;
+  --amber-bg:  #fef3c7;   /* Hints / concepts */
+  --amber-bd:  #f59e0b;
+  --emerald-bg:#d1fae5;   /* Final answers */
+  --emerald-bd:#10b981;
+  --badge-bg:  #dbeafe;   /* Badges / marks */
+  --badge-fg:  #1e40af;
+
+  /* Shape & depth */
+  --radius: 12px;
+  --radius-sm: 8px;
+  --pad-card: 1.5rem;
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, .06), 0 1px 3px rgba(15, 23, 42, .08);
+  --shadow-md: 0 4px 12px rgba(15, 23, 42, .08), 0 2px 4px rgba(15, 23, 42, .04);
+
+  /* Type */
+  --font-body: "Source Serif 4", "Noto Serif TC", Georgia, "Times New Roman", serif;
+  --font-ui: "Inter Tight", "Noto Sans TC", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+  --lh-tight: 1.25;
+  --lh-body: 1.7;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--slate-50);
+  background-image:
+    radial-gradient(circle at 12% -10%, rgba(59, 130, 246, .10), transparent 45%),
+    radial-gradient(circle at 95% 0%, rgba(30, 41, 59, .08), transparent 40%);
+  background-attachment: fixed;
+  color: var(--slate-900);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: var(--lh-body);
+}
+
+/* ---------- Layout shells ------------------------------------------------ */
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 3rem;
+}
+
+.split {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 3rem;
+  display: grid;
+  grid-template-columns: minmax(0, 42%) minmax(0, 58%);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.split__aside {
+  position: sticky;
+  top: 1rem;
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.split__main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* ---------- Hero header -------------------------------------------------- */
+
+.hero {
+  background: linear-gradient(135deg, var(--slate-900) 0%, #27364f 55%, #1d4ed8 160%);
+  color: #fff;
+  border-radius: var(--radius);
+  padding: 2rem var(--pad-card);
+  box-shadow: var(--shadow-md);
+  margin-bottom: 1.5rem;
+}
+
+.hero__eyebrow {
+  font-family: var(--font-ui);
+  font-size: .75rem;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: #93c5fd;
+  margin: 0 0 .5rem;
+}
+
+.hero__title {
+  font-family: var(--font-ui);
+  font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.1rem);
+  line-height: var(--lh-tight);
+  font-weight: 700;
+  margin: 0 0 .5rem;
+}
+
+.hero__subtitle {
+  margin: 0;
+  color: #cbd5e1;
+  font-size: .95rem;
+}
+
+.hero__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  margin-top: 1rem;
+}
+
+/* ---------- Cards -------------------------------------------------------- */
+
+.card {
+  background: #fff;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius);
+  padding: var(--pad-card);
+  box-shadow: var(--shadow-sm);
+}
+
+.card + .card { margin-top: 0; }
+
+.card__title {
+  font-family: var(--font-ui);
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 1rem;
+  padding-bottom: .6rem;
+  border-bottom: 2px solid var(--slate-100);
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  flex-wrap: wrap;
+}
+
+/* ---------- Step cards --------------------------------------------------- */
+
+.step {
+  border-left: 4px solid var(--indigo);
+  background: #fff;
+  border-radius: var(--radius);
+  padding: var(--pad-card);
+  box-shadow: var(--shadow-sm);
+}
+
+.step__head {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  flex-wrap: wrap;
+  margin-bottom: .85rem;
+  font-family: var(--font-ui);
+  font-weight: 600;
+}
+
+/* ---------- Callouts ----------------------------------------------------- */
+
+.hint,
+.answer,
+.note {
+  border-radius: var(--radius-sm);
+  padding: 1rem 1.15rem;
+  margin: 1rem 0;
+}
+
+.hint {
+  background: var(--amber-bg);
+  border-left: 4px solid var(--amber-bd);
+}
+
+.answer {
+  background: var(--emerald-bg);
+  border-left: 4px solid var(--emerald-bd);
+}
+
+.note {
+  background: var(--slate-100);
+  border-left: 4px solid var(--slate-400);
+}
+
+.hint__label,
+.answer__label {
+  font-family: var(--font-ui);
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: .35rem;
+}
+
+.hint__label   { color: #92400e; }
+.answer__label { color: #065f46; }
+
+/* ---------- Badges ------------------------------------------------------- */
+
+.badge {
+  display: inline-block;
+  font-family: var(--font-ui);
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  padding: .2rem .55rem;
+  border-radius: 999px;
+  background: var(--badge-bg);
+  color: var(--badge-fg);
+  white-space: nowrap;
+}
+
+.badge--mark  { background: var(--badge-bg); color: var(--badge-fg); }
+.badge--topic { background: var(--slate-100); color: var(--slate-600); }
+.badge--hard  { background: #fee2e2; color: #991b1b; }
+.badge--rate  { background: #ecfdf5; color: #047857; }
+
+/* ---------- Option list (Paper 2) --------------------------------------- */
+
+.options {
+  list-style: none;
+  margin: .5rem 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: .5rem;
+}
+
+.options li {
+  background: var(--slate-100);
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-sm);
+  padding: .6rem .85rem;
+}
+
+.option-key {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  color: var(--slate-600);
+  margin-right: .35rem;
+}
+
+/* ---------- Figures ----------------------------------------------------- */
+
+.figure {
+  background: #fff;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius);
+  padding: .75rem;
+  text-align: center;
+}
+
+.figure img,
+.question-img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-sm);
+  display: block;
+  margin: 0 auto;
+}
+
+.figure figcaption {
+  font-family: var(--font-ui);
+  font-size: .78rem;
+  color: var(--slate-600);
+  margin-top: .5rem;
+}
+
+.figure svg { max-width: 100%; height: auto; }
+
+/* ---------- Tables ------------------------------------------------------- */
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .95rem;
+}
+
+.table th,
+.table td {
+  border: 1px solid var(--slate-200);
+  padding: .5rem .65rem;
+  text-align: left;
+}
+
+.table th {
+  background: var(--slate-100);
+  font-family: var(--font-ui);
+  font-weight: 600;
+}
+
+/* ---------- Index pages -------------------------------------------------- */
+
+.index-section { margin-bottom: 1.5rem; }
+
+.index-table td:first-child { white-space: nowrap; }
+
+a { color: var(--indigo-600); }
+
+a.qlink {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+
+a.qlink:hover { border-bottom-color: currentColor; }
+
+/* ---------- Footer ------------------------------------------------------- */
+
+.footer {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 2.5rem;
+  text-align: center;
+  font-family: var(--font-ui);
+  font-size: .8rem;
+  color: var(--slate-600);
+}
+
+/* ---------- MathJax tweaks ---------------------------------------------- */
+
+mjx-container[display="true"] { margin: .75rem 0 !important; }
+
+/* ---------- Responsive -------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .split { grid-template-columns: minmax(0, 1fr); }
+  .split__aside {
+    position: static;
+    max-height: none;
+    overflow-y: visible;
+  }
+}
+
+@media (max-width: 480px) {
+  body { font-size: 16px; }
+  :root { --pad-card: 1.15rem; }
+  .hero { padding: 1.5rem 1.15rem; }
+}
+
+
+/* ---- solution page extras ---- */
+.hero__title .qstar { color:#fbbf24; }
+.qcard__body { font-size: 1.02rem; }
+.qcard__body .part { border-left: 4px solid var(--indigo); background: var(--slate-50);
+  padding: .7rem 1rem; margin: .7rem 0; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+.qcard__body .part b { color: var(--indigo-600); font-family: var(--font-ui); }
+.marks-inline { font-family: var(--font-ui); font-size: .75rem; font-weight: 700;
+  color: var(--badge-fg); background: var(--badge-bg); padding: .1rem .5rem; border-radius: 999px; margin-left: .4rem; }
+.options { list-style:none; margin:.75rem 0 0; padding:0; display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:.55rem; }
+.options li { background:var(--slate-50); border:1px solid var(--slate-200);
+  border-radius:var(--radius-sm); padding:.6rem .9rem; }
+.opt-key { font-family:var(--font-ui); font-weight:700; color:var(--slate-600); margin-right:.4rem; }
+.step { border:1px solid var(--slate-200); border-left:4px solid var(--indigo);
+  border-radius:var(--radius); padding:var(--pad-card); box-shadow:var(--shadow-sm); }
+.step + .step { margin-top:1rem; }
+.step__head { display:flex; align-items:center; gap:.6rem; flex-wrap:wrap; margin-bottom:.75rem;
+  font-family:var(--font-ui); font-weight:700; }
+.step__num { background:var(--indigo); color:#fff; border-radius:8px; min-width:1.9rem;
+  text-align:center; padding:.15rem .4rem; font-size:.85rem; }
+.math { margin:.65rem 0; overflow-x:auto; overflow-y:hidden; padding-bottom:2px; }
+.distractor { background:#fff; border:1px solid var(--slate-200); border-radius:var(--radius-sm);
+  padding:.75rem .95rem; margin:.5rem 0; }
+.distractor .opt-tag { font-family:var(--font-ui); font-weight:800; display:inline-block;
+  min-width:1.6rem; color:var(--slate-600); }
+.distractor.correct { background:var(--emerald-bg); border-color:var(--emerald-bd); }
+.distractor.correct .opt-tag { color:#065f46; }
+.distractor.wrong .opt-tag { color:#991b1b; }
+.distractor.wrong { background:#fef2f2; border-color:#fecaca; }
+.figure svg { max-width:100%; height:auto; }
+.step p { margin:.55em 0; }
+
+</style>
 </head>
-<body class="bg-slate-50 font-sans text-gray-800 antialiased">
-
-    <div class="max-w-4xl mx-auto px-4 py-6 md:py-10">
-
-        <!-- HEADER -->
-        <header class="mb-8">
-            <div class="flex flex-wrap items-center gap-2 mb-2">
-                <span class="bg-indigo-600 text-white text-sm font-bold px-3 py-1 rounded-full">HKDSE Math 2014 Paper 1 Q18</span>
-                <span class="badge">Inequalities</span>
-                <span class="badge">Linear Programming</span>
-                <span class="badge">Graphical Method</span>
-            </div>
-            <h1 class="text-2xl md:text-3xl font-extrabold text-slate-800 tracking-tight">Inequalities & Linear Programming</h1>
-            <p class="text-slate-500 mt-1">Step-by-step guided solution with interactive graph</p>
-        </header>
-
-        <!-- QUESTION OVERVIEW -->
-        <section class="bg-white rounded-2xl shadow-md p-6 mb-8 border border-slate-100">
-            <h2 class="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
-                <span class="text-indigo-600">📋</span> Question Overview
-            </h2>
-            <div class="space-y-4 text-slate-700 leading-relaxed">
-                <p><strong>(a)</strong> In Figure 7, the equation of the straight line \(L_1\) is \(6x + 7y = 900\) and the \(x\)-intercept of the straight line \(L_2\) is \(180\). \(L_1\) and \(L_2\) intersect at the point \((45, 90)\). The shaded region (including the boundary) represents the solution of a system of inequalities. Find the system of inequalities. <span class="text-indigo-600 font-semibold">[4 marks]</span></p>
-                <p><strong>(b)</strong> A factory produces two types of wardrobes, \(X\) and \(Y\). Each wardrobe \(X\) requires 6 man-hours for assembly and 2 man-hours for packing while each wardrobe \(Y\) requires 7 man-hours for assembly and 3 man-hours for packing. In a certain month, the factory has 900 man-hours available for assembly and 360 man-hours available for packing. The profits for producing a wardrobe \(X\) and a wardrobe \(Y\) are \(\$440\) and \(\$665\) respectively. A worker claims that the total profit can exceed \(\$80\,000\) that month. Do you agree? Explain your answer. <span class="text-indigo-600 font-semibold">[4 marks]</span></p>
-            </div>
-        </section>
-
-        <!-- INTERACTIVE GRAPH AREA -->
-        <section class="bg-white rounded-2xl shadow-md p-6 mb-8 border border-slate-100">
-            <h2 class="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
-                <span class="text-indigo-600">📈</span> Interactive Feasible Region
-            </h2>
-            <p class="text-sm text-slate-500 mb-4">Drag the sliders to see how the lines and feasible region change. The shaded region represents the solution to the system of inequalities.</p>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Canvas -->
-                <div class="order-2 md:order-1">
-                    <canvas id="graphCanvas" width="500" height="500" class="w-full max-w-[500px] mx-auto"></canvas>
-                </div>
-                <!-- Controls -->
-                <div class="order-1 md:order-2 flex flex-col justify-center space-y-6">
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1">Line \(L_1\): \(6x + 7y = 900\)</label>
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs text-slate-400 w-12">x-int:</span>
-                            <input type="range" id="l1xSlider" min="0" max="250" value="150" class="w-full h-2 bg-indigo-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
-                            <span id="l1xVal" class="text-sm font-mono bg-slate-100 px-2 py-0.5 rounded">150</span>
-                        </div>
-                        <div class="flex items-center gap-2 mt-2">
-                            <span class="text-xs text-slate-400 w-12">y-int:</span>
-                            <input type="range" id="l1ySlider" min="0" max="250" value="128.6" class="w-full h-2 bg-indigo-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
-                            <span id="l1yVal" class="text-sm font-mono bg-slate-100 px-2 py-0.5 rounded">128.6</span>
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1">Line \(L_2\): \(2x + 3y = 360\)</label>
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs text-slate-400 w-12">x-int:</span>
-                            <input type="range" id="l2xSlider" min="0" max="250" value="180" class="w-full h-2 bg-emerald-200 rounded-lg appearance-none cursor-pointer accent-emerald-600">
-                            <span id="l2xVal" class="text-sm font-mono bg-slate-100 px-2 py-0.5 rounded">180</span>
-                        </div>
-                        <div class="flex items-center gap-2 mt-2">
-                            <span class="text-xs text-slate-400 w-12">y-int:</span>
-                            <input type="range" id="l2ySlider" min="0" max="250" value="120" class="w-full h-2 bg-emerald-200 rounded-lg appearance-none cursor-pointer accent-emerald-600">
-                            <span id="l2yVal" class="text-sm font-mono bg-slate-100 px-2 py-0.5 rounded">120</span>
-                        </div>
-                    </div>
-                    <div class="hint-box">
-                        <p class="text-xs font-semibold text-amber-800">💡 Interactive Tip</p>
-                        <p class="text-xs text-amber-700">The feasible region is the intersection of the half-planes satisfying all constraints. Adjust the intercepts to see how the vertices shift.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- STEP-BY-STEP SOLUTION (ACCORDION) -->
-        <section class="space-y-4">
-            <h2 class="text-xl font-bold text-slate-800 mb-2 flex items-center gap-2">
-                <span class="text-indigo-600">📝</span> Step-by-Step Solution
-            </h2>
-
-            <!-- Step 1 -->
-            <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
-                <button class="step-header w-full text-left px-5 py-4 flex justify-between items-center hover:bg-slate-50 transition-colors" data-step="1">
-                    <span class="font-semibold text-slate-800 flex items-center gap-2"><span class="bg-indigo-100 text-indigo-700 text-xs font-bold px-2.5 py-1 rounded-full">1</span> Part (a): Find the equation of \(L_2\)</span>
-                    <span class="text-slate-400 transform transition-transform duration-200" id="icon1">▼</span>
-                </button>
-                <div id="step1" class="step-content collapsed border-t border-slate-100 bg-slate-50/50">
-                    <div class="space-y-3 text-slate-700">
-                        <p>We are given two points on \(L_2\): the \(x\)-intercept \((180, 0)\) and the intersection point \((45, 90)\).</p>
-                        <p><strong>Slope of \(L_2\):</strong></p>
-                        <p class="text-center text-lg">\[ m = \frac{90 - 0}{45 - 180} = \frac{90}{-135} = -\frac{2}{3} \]</p>
-                        <p><strong>Equation of \(L_2\) (using point-slope form):</strong></p>
-                        <p class="text-center text-lg">\[ y - 90 = -\frac{2}{3}(x - 45) \]</p>
-                        <p>Multiply both sides by 3:</p>
-                        <p class="text-center text-lg">\[ 3y - 270 = -2x + 90 \]</p>
-                        <p class="text-center text-lg">\[ 2x + 3y = 360 \]</p>
-                        <div class="hint-box">
-                            <p class="text-sm"><strong>Hint:</strong> The slope formula is \(m = \frac{y_2 - y_1}{x_2 - x_1}\). Here, substituting the coordinates gives \(-\frac{2}{3}\). This slope means for every 2 units down, we move 3 units right.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Step 2 -->
-            <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
-                <button class="step-header w-full text-left px-5 py-4 flex justify-between items-center hover:bg-slate-50 transition-colors" data-step="2">
-                    <span class="font-semibold text-slate-800 flex items-center gap-2"><span class="bg-indigo-100 text-indigo-700 text-xs font-bold px-2.5 py-1 rounded-full">2</span> Part (a): Determine the system of inequalities</span>
-                    <span class="text-slate-400 transform transition-transform duration-200" id="icon2">▼</span>
-                </button>
-                <div id="step2" class="step-content collapsed border-t border-slate-100 bg-slate-50/50">
-                    <div class="space-y-3 text-slate-700">
-                        <p>The shaded region is below both lines and in the first quadrant. We identify each boundary:</p>
-                        <ul class="list-disc list-inside space-y-1 ml-2">
-                            <li>Boundary \(L_1\): \(6x + 7y = 900\) \(\Rightarrow\) Shaded region: \(6x + 7y \leq 900\)</li>
-                            <li>Boundary \(L_2\): \(2x + 3y = 360\) \(\Rightarrow\) Shaded region: \(2x + 3y \leq 360\)</li>
-                            <li>\(x\)-axis boundary: \(y = 0\) \(\Rightarrow\) \(y \geq 0\)</li>
-                            <li>\(y\)-axis boundary: \(x = 0\) \(\Rightarrow\) \(x \geq 0\)</li>
-                        </ul>
-                        <p class="font-semibold">Thus, the system of inequalities is:</p>
-                        <div class="bg-indigo-50 p-4 rounded-lg text-center text-lg font-semibold text-indigo-900">
-                            \[
-                            \begin{cases}
-                            6x + 7y \leq 900 \\
-                            2x + 3y \leq 360 \\
-                            x \geq 0 \\
-                            y \geq 0
-                            \end{cases}
-                            \]
-                        </div>
-                        <div class="hint-box">
-                            <p class="text-sm"><strong>Hint:</strong> To determine the inequality sign, pick a test point inside the shaded region, e.g., \((0,0)\). Substitute into \(6x + 7y\): \(0 \leq 900\) is true, so the inequality is \(\leq\).</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Step 3 -->
-            <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
-                <button class="step-header w-full text-left px-5 py-4 flex justify-between items-center hover:bg-slate-50 transition-colors" data-step="3">
-                    <span class="font-semibold text-slate-800 flex items-center gap-2"><span class="bg-indigo-100 text-indigo-700 text-xs font-bold px-2.5 py-1 rounded-full">3</span> Part (b): Formulate the profit function</span>
-                    <span class="text-slate-400 transform transition-transform duration-200" id="icon3">▼</span>
-                </button>
-                <div id="step3" class="step-content collapsed border-t border-slate-100 bg-slate-50/50">
-                    <div class="space-y-3 text-slate-700">
-                        <p>Let \(x\) and \(y\) be the number of wardrobes \(X\) and \(Y\) produced respectively.</p>
-                        <p><strong>Constraints:</strong></p>
-                        <ul class="list-disc list-inside space-y-1 ml-2">
-                            <li>Assembly: \(6x + 7y \leq 900\)</li>
-                            <li>Packing: \(2x + 3y \leq 360\)</li>
-                            <li>Non-negativity: \(x \geq 0, y \geq 0\) and \(x, y\) are integers.</li>
-                        </ul>
-                        <p><strong>Profit function:</strong></p>
-                        <p class="text-center text-lg">\[ P = 440x + 665y \]</p>
-                        <div class="hint-box">
-                            <p class="text-sm"><strong>Hint:</strong> The profit per wardrobe \(X\) is \$440 and per wardrobe \(Y\) is \$665. The total profit is a linear combination of the quantities produced.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Step 4 -->
-            <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
-                <button class="step-header w-full text-left px-5 py-4 flex justify-between items-center hover:bg-slate-50 transition-colors" data-step="4">
-                    <span class="font-semibold text-slate-800 flex items-center gap-2"><span class="bg-indigo-100 text-indigo-700 text-xs font-bold px-2.5 py-1 rounded-full">4</span> Part (b): Evaluate profit at vertices</span>
-                    <span class="text-slate-400 transform transition-transform duration-200" id="icon4">▼</span>
-                </button>
-                <div id="step4" class="step-content collapsed border-t border-slate-100 bg-slate-50/50">
-                    <div class="space-y-3 text-slate-700">
-                        <p>The vertices of the shaded feasible region (from Figure 7) are:</p>
-                        <p class="text-center font-mono bg-slate-100 py-2 rounded">\((0, 0),\ (0, 120),\ (45, 90),\ (150, 0)\)</p>
-                        <p>We evaluate the profit function \(P = 440x + 665y\) at each vertex:</p>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-sm text-left border-collapse">
-                                <thead>
-                                    <tr class="bg-slate-100 text-slate-600">
-                                        <th class="p-2 border border-slate-200">Vertex</th>
-                                        <th class="p-2 border border-slate-200">Calculation</th>
-                                        <th class="p-2 border border-slate-200">Profit \(P\)</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="p-2 border border-slate-200">\((0,0)\)</td>
-                                        <td class="p-2 border border-slate-200">\(440(0) + 665(0)\)</td>
-                                        <td class="p-2 border border-slate-200 font-semibold">\$0</td>
-                                    </tr>
-                                    <tr class="bg-slate-50">
-                                        <td class="p-2 border border-slate-200">\((0,120)\)</td>
-                                        <td class="p-2 border border-slate-200">\(440(0) + 665(120)\)</td>
-                                        <td class="p-2 border border-slate-200 font-semibold">\$79\,800</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="p-2 border border-slate-200">\((45,90)\)</td>
-                                        <td class="p-2 border border-slate-200">\(440(45) + 665(90)\)</td>
-                                        <td class="p-2 border border-slate-200 font-semibold">\$79\,650</td>
-                                    </tr>
-                                    <tr class="bg-slate-50">
-                                        <td class="p-2 border border-slate-200">\((150,0)\)</td>
-                                        <td class="p-2 border border-slate-200">\(440(150) + 665(0)\)</td>
-                                        <td class="p-2 border border-slate-200 font-semibold">\$66\,000</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="hint-box">
-                            <p class="text-sm"><strong>Hint:</strong> For a linear programming problem, the maximum or minimum value of a linear objective function occurs at one of the vertices of the feasible region.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Step 5 -->
-            <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
-                <button class="step-header w-full text-left px-5 py-4 flex justify-between items-center hover:bg-slate-50 transition-colors" data-step="5">
-                    <span class="font-semibold text-slate-800 flex items-center gap-2"><span class="bg-indigo-100 text-indigo-700 text-xs font-bold px-2.5 py-1 rounded-full">5</span> Part (b): Conclusion</span>
-                    <span class="text-slate-400 transform transition-transform duration-200" id="icon5">▼</span>
-                </button>
-                <div id="step5" class="step-content collapsed border-t border-slate-100 bg-slate-50/50">
-                    <div class="space-y-3 text-slate-700">
-                        <p>The greatest possible profit is \(\$79\,800\) (attained when \(x = 0\) and \(y = 120\)).</p>
-                        <p>Since \(\$79\,800 < \$80\,000\), the worker's claim that the total profit can exceed \(\$80\,000\) is <strong>not</strong> valid.</p>
-                        <p class="text-center text-lg font-semibold text-red-600">Therefore, the claim is disagreed.</p>
-                        <div class="hint-box">
-                            <p class="text-sm"><strong>Hint:</strong> The maximum profit is obtained at the vertex \((0, 120)\). This means the factory should produce 0 wardrobes of type \(X\) and 120 of type \(Y\) to maximise profit.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- FOOTER -->
-        <footer class="mt-10 text-center text-sm text-slate-400 border-t border-slate-200 pt-6">
-            <p>HKDSE Mathematics 2014 Paper 1 Q18 – Interactive Solution</p>
-            <p class="mt-1">Designed for effective learning • Step-by-step breakdown</p>
-        </footer>
-    </div>
-
-    <script>
-        // ---------- Accordion functionality ----------
-        const stepHeaders = document.querySelectorAll('.step-header');
-        const stepContents = document.querySelectorAll('.step-content');
-        const icons = document.querySelectorAll('[id^="icon"]');
-
-        // Initially open first step
-        document.getElementById('step1').classList.remove('collapsed');
-        document.getElementById('step1').classList.add('expanded');
-        document.getElementById('icon1').style.transform = 'rotate(180deg)';
-
-        stepHeaders.forEach((header, index) => {
-            header.addEventListener('click', () => {
-                const stepNumber = index + 1;
-                const content = document.getElementById(`step${stepNumber}`);
-                const icon = document.getElementById(`icon${stepNumber}`);
-
-                // Close all others (optional: only one open at a time). Let's allow multiple open for flexibility.
-                // But we can toggle individually.
-                if (content.classList.contains('collapsed')) {
-                    content.classList.remove('collapsed');
-                    content.classList.add('expanded');
-                    icon.style.transform = 'rotate(180deg)';
-                } else {
-                    content.classList.remove('expanded');
-                    content.classList.add('collapsed');
-                    icon.style.transform = 'rotate(0deg)');
-                }
-            });
-        });
-
-        // ---------- Interactive Graph with Canvas ----------
-        const canvas = document.getElementById('graphCanvas');
-        const ctx = canvas.getContext('2d');
-
-        // Sliders
-        const l1xSlider = document.getElementById('l1xSlider');
-        const l1ySlider = document.getElementById('l1ySlider');
-        const l2xSlider = document.getElementById('l2xSlider');
-        const l2ySlider = document.getElementById('l2ySlider');
-        const l1xVal = document.getElementById('l1xVal');
-        const l1yVal = document.getElementById('l1yVal');
-        const l2xVal = document.getElementById('l2xVal');
-        const l2yVal = document.getElementById('l2yVal');
-
-        // Function to draw the graph
-        function drawGraph() {
-            // Canvas dimensions
-            const W = canvas.width;
-            const H = canvas.height;
-            const padding = 50; // space for axes
-
-            // Clear canvas
-            ctx.clearRect(0, 0, W, H);
-
-            // Axis scaling: we want x from 0 to 200, y from 0 to 200 for visual
-            const maxX = 200;
-            const maxY = 200;
-
-            // Helper to map data coordinates to canvas coordinates
-            const toCanvasX = (x) => padding + (x / maxX) * (W - 2 * padding);
-            const toCanvasY = (y) => H - padding - (y / maxY) * (H - 2 * padding);
-
-            // Draw axes
-            ctx.beginPath();
-            ctx.strokeStyle = '#94a3b8';
-            ctx.lineWidth = 1.5;
-            // X-axis
-            ctx.moveTo(padding, H - padding);
-            ctx.lineTo(W - padding, H - padding);
-            // Y-axis
-            ctx.moveTo(padding, H - padding);
-            ctx.lineTo(padding, padding);
-            ctx.stroke();
-
-            // Axis labels
-            ctx.font = '12px sans-serif';
-            ctx.fillStyle = '#475569';
-            ctx.fillText('x', W - padding + 10, H - padding + 5);
-            ctx.fillText('y', padding - 15, padding - 5);
-            ctx.fillText('O', padding - 12, H - padding + 15);
-
-            // Draw grid lines (every 20 units)
-            ctx.strokeStyle = '#e2e8f0';
-            ctx.lineWidth = 0.5;
-            for (let i = 0; i <= maxX; i += 20) {
-                const cx = toCanvasX(i);
-                ctx.beginPath();
-                ctx.moveTo(cx, padding);
-                ctx.lineTo(cx, H - padding);
-                ctx.stroke();
-                if (i % 40 === 0) {
-                    ctx.fillStyle = '#94a3b8';
-                    ctx.font = '10px sans-serif';
-                    ctx.fillText(i, cx - 6, H - padding + 15);
-                }
-            }
-            for (let i = 0; i <= maxY; i += 20) {
-                const cy = toCanvasY(i);
-                ctx.beginPath();
-                ctx.moveTo(padding, cy);
-                ctx.lineTo(W - padding, cy);
-                ctx.stroke();
-                if (i % 40 === 0) {
-                    ctx.fillStyle = '#94a3b8';
-                    ctx.font = '10px sans-serif';
-                    ctx.fillText(i, padding - 25, cy + 4);
-                }
-            }
-
-            // Get current slider values
-            const l1x = parseFloat(l1xSlider.value);
-            const l1y = parseFloat(l1ySlider.value);
-            const l2x = parseFloat(l2xSlider.value);
-            const l2y = parseFloat(l2ySlider.value);
-
-            // Update displayed values
-            l1xVal.textContent = l1x.toFixed(1);
-            l1yVal.textContent = l1y.toFixed(1);
-            l2xVal.textContent = l2x.toFixed(1);
-            l2yVal.textContent = l2y.toFixed(1);
-
-            // Draw lines: Line is defined by intercepts (x-intercept, y-intercept)
-            // Equation: x/a + y/b = 1  =>  y = b(1 - x/a)
-            // But we need to draw lines extending from 0 to the intercepts.
-
-            // Function to draw a line segment between intercepts
-            function drawLine(xInt, yInt, color, label) {
-                if (xInt <= 0 || yInt <= 0) return; // ignore invalid
-                ctx.beginPath();
-                ctx.strokeStyle = color;
-                ctx.lineWidth = 2.5;
-                ctx.moveTo(toCanvasX(0), toCanvasY(yInt));
-                ctx.lineTo(toCanvasX(xInt), toCanvasY(0));
-                ctx.stroke();
-
-                // Label
-                ctx.fillStyle = color;
-                ctx.font = 'bold 14px sans-serif';
-                ctx.fillText(label, toCanvasX(xInt * 0.6), toCanvasY(yInt * 0.4));
-            }
-
-            // Draw L1 and L2
-            drawLine(l1x, l1y, '#4f46e5', 'L₁');
-            drawLine(l2x, l2y, '#059669', 'L₂');
-
-            // Draw feasible region (shaded) - The region bounded by x>=0, y>=0, and below both lines.
-            // The feasible region is the intersection of half-planes: x >= 0, y >= 0, x/l1x + y/l1y <= 1, x/l2x + y/l2y <= 1
-            // The vertices are (0,0), (0, min(l1y, l2y)), (intersection point), (min(l1x, l2x), 0)
-            // But the intersection point may not be simply calculated. Let's compute it.
-            // Line1: x/l1x + y/l1y = 1
-            // Line2: x/l2x + y/l2y = 1
-            // Solve:
-            // (1/l1x - 1/l2x) x = 1/l2y - 1/l1y
-            // x = (1/l2y - 1/l1y) / (1/l1x - 1/l2x)
-            // Let's use standard line equations from the original: 6x+7y=900 and 2x+3y=360, but with sliders we have intercepts.
-            // Instead of solving, we can compute the feasible region by polygon clipping.
-            // Simpler: Use canvas clipping with paths. But need to shade the region.
-            // Let's draw the shaded polygon with vertices:
-            // v0 = (0,0)
-            // v1 = (0, min(l1y, l2y)) - but only if that point is below the other line? Actually the region is below both lines.
-            // The feasible region is bounded by the x-axis, y-axis, and the two lines.
-            // The vertices are: (0,0), (0, y_int1) if y_int1 <= y_int2? Actually the intersection of x=0 with the lower line.
-            // The feasible region is the set of points satisfying:
-            // x >= 0, y >= 0, y <= l1y(1 - x/l1x), y <= l2y(1 - x/l2x)
-            // The upper boundary is the minimum of the two lines.
-            // So the feasible region is bounded above by the lower of the two lines for each x.
-            // The vertices are:
-            // (0,0)
-            // (0, min(l1y, l2y))
-            // (intersection_x, intersection_y) - if it lies within [0, min(l1x, l2x)]
-            // (min(l1x, l2x), 0)
-            // Actually if the lines intersect within the first quadrant, the feasible region is a polygon with 4 vertices.
-            // Let's compute the intersection.
-            // l1: x/a1 + y/b1 = 1, l2: x/a2 + y/b2 = 1
-            const a1 = l1x, b1 = l1y, a2 = l2x, b2 = l2y;
-            let vertices = [];
-            vertices.push({x:0, y:0});
-            // Find intersection of the two lines
-            // Solve: x/a1 + y/b1 = 1 ; x/a2 + y/b2 = 1
-            // => x = (1/b2 - 1/b1) / (1/a1 - 1/a2)
-            const denom = (1/a1 - 1/a2);
-            if (Math.abs(denom) > 1e-9) {
-                const xInt = (1/b2 - 1/b1) / denom;
-                const yInt = b1 * (1 - xInt/a1);
-                // Check if intersection is within the first quadrant and below both intercepts
-                if (xInt > 0 && yInt > 0 && xInt <= a1 && yInt <= b1 && xInt <= a2 && yInt <= b2) {
-                    vertices.push({x:0, y: Math.min(b1, b2)}); // Actually the y-intercept of the lower line might not be the vertex.
-                    // Better approach: construct the feasible region by considering the upper boundary.
-                    // Let's compute the feasible region vertices manually.
-                    // The upper boundary is min(line1, line2).
-                    // For x in [0, min(a1, a2)], y_max = min( b1*(1 - x/a1), b2*(1 - x/a2) ).
-                    // The feasible region is bounded by y=0, x=0, and y=y_max(x).
-                    // The vertices occur at x=0, x=a_boundary, and the intersection point.
-                    // Let's find the x-coordinate where the two lines intersect. We already have xInt.
-                    // If the intersection is within the first quadrant, the feasible region is a quadrilateral with vertices:
-                    // (0,0), (0, min(b1,b2)), (xInt, yInt), (min(a1,a2), 0) -- but note that if intersection x > min(a1,a2), then the region is a triangle.
-                    // Let's just compute the polygon by clipping.
-                    // For simplicity, let's just shade the region defined by the two lines and axes using canvas clipping with paths.
-                    // We'll create a path that traces the boundary: start at (0,0), go up to (0, b_min), then follow the lower line to the intersection, then follow the other line to the x-axis, then back to (0,0).
-                    // But easier: Use canvas to fill the intersection of the half-planes.
-                    // Draw the shaded region using a path that covers the entire canvas, then clip to the inequalities.
-                    // Actually, simplest: Draw polygon with vertices (0,0), (0, b1'), (xInt, yInt), (a2', 0) where b1' is the y-intercept of the lower line at x=0, etc.
-                    // Let's compute the upper boundary carefully.
-                    // The feasible region is the set of (x,y) such that x>=0, y>=0, y <= f1(x) = b1 - (b1/a1)x, and y <= f2(x) = b2 - (b2/a2)x.
-                    // The boundary y = min(f1, f2). The vertices are at x=0, x=intersection, x=where min(f1,f2)=0.
-                    // Let's compute the polygon vertices.
-                    // Vertex 1: (0,0)
-                    // Vertex 2: (0, f1(0)) or (0, f2(0)) depending on which is lower. Actually at x=0, the feasible y is up to min(b1, b2).
-                    // So Vertex 2: (0, min(b1, b2))
-                    // Vertex 3: intersection point (if within boundaries)
-                    // Vertex 4: (x-intercept of the lower line at y=0) => (min(a1, a2), 0)
-                    // However, if the intersection point is outside the range, the region is a triangle.
-                    // Let's find intersection x: xInt = (b2 - b1) / (b2/a2 - b1/a1) ... Actually derived earlier.
-                    // Let's use a robust method: polygon clipping.
-                    // We'll clip the rectangle [0, maxX]x[0, maxY] by the half-planes.
-                    // But for the purpose of this visual, we can just draw the shaded region as a polygon with vertices:
-                    // (0,0), (0, min(b1,b2)), (xInt, yInt), (min(a1,a2), 0) if intersection exists and is valid.
-                    // Let's compute xInt and yInt properly.
-                    // Equations: x/a1 + y/b1 = 1, x/a2 + y/b2 = 1
-                    // Solve for x: (1/a1 - 1/a2)x = 1 - y/b1 - (1 - y/b2) ... wait.
-                    // Cramer's rule:
-                    // [1/a1, 1/b1; 1/a2, 1/b2] [x; y] = [1; 1]
-                    // Determinant D = (1/a1)(1/b2) - (1/b1)(1/a2) = (b1*a2 - b2*a1) / (a1*b1*a2*b2)
-                    // x = (1/b2 - 1/b1) / D = (b1 - b2) / (b1*a2 - b2*a1) * (a1*a2)?? Let's use a simpler approach.
-                    // Use standard line equation: A1 x + B1 y = C1, where A1 = 1/a1, B1 = 1/b1, C1 = 1.
-                    // A2 x + B2 y = C2, A2 = 1/a2, B2 = 1/b2, C2 = 1.
-                    // x = (C1*B2 - C2*B1) / (A1*B2 - A2*B1)
-                    // y = (A1*C2 - A2*C1) / (A1*B2 - A2*B1)
-                    const A1 = 1/a1, B1 = 1/b1, C1 = 1;
-                    const A2 = 1/a2, B2 = 1/b2, C2 = 1;
-                    const det = A1*B2 - A2*B1;
-                    let xIntersect = null, yIntersect = null;
-                    if (Math.abs(det) > 1e-9) {
-                        xIntersect = (C1*B2 - C2*B1) / det;
-                        yIntersect = (A1*C2 - A2*C1) / det;
-                    }
-
-                    // Determine polygon vertices
-                    let poly = [];
-                    poly.push({x:0, y:0}); // origin
-                    // y-intercept at x=0: the lower of the two y-intercepts (but only if both positive and within canvas)
-                    // Actually the upper boundary at x=0 is min(b1, b2). But if one line has negative intercept, ignore.
-                    const y0 = Math.min(b1, b2);
-                    if (y0 > 0) poly.push({x:0, y:y0});
-                    // If intersection exists and is within the first quadrant and below both lines, it's a vertex.
-                    if (xIntersect !== null && yIntersect !== null && xIntersect > 0 && yIntersect > 0 && xIntersect <= a1 && yIntersect <= b1 && xIntersect <= a2 && yIntersect <= b2) {
-                        // But ensure the intersection point is actually the upper boundary corner. It is.
-                        poly.push({x:xIntersect, y:yIntersect});
-                    }
-                    // x-intercept at y=0: the minimum of the two x-intercepts.
-                    const x0 = Math.min(a1, a2);
-                    if (x0 > 0) poly.push({x:x0, y:0});
-                    // Sort polygon vertices by angle around centroid to ensure correct order? They are already in order: origin -> y-intercept -> intersection -> x-intercept -> back to origin.
-                    // But if intersection doesn't exist, we just have (0,0), (0, y0), (x0,0) which is a triangle.
-
-                    // Draw polygon
-                    ctx.beginPath();
-                    ctx.moveTo(toCanvasX(poly[0].x), toCanvasY(poly[0].y));
-                    for (let i = 1; i < poly.length; i++) {
-                        ctx.lineTo(toCanvasX(poly[i].x), toCanvasY(poly[i].y));
-                    }
-                    ctx.closePath();
-                    ctx.fillStyle = 'rgba(99, 102, 241, 0.2)'; // semi-transparent indigo
-                    ctx.fill();
-                    ctx.strokeStyle = '#6366f1';
-                    ctx.lineWidth = 1;
-                    ctx.stroke();
-
-                    // Draw vertices as small circles
-                    poly.forEach(p => {
-                        ctx.beginPath();
-                        ctx.arc(toCanvasX(p.x), toCanvasY(p.y), 4, 0, 2 * Math.PI);
-                        ctx.fillStyle = '#4338ca';
-                        ctx.fill();
-                    });
-
-                } else {
-                    // Lines are parallel or intersection not in first quadrant. Just shade below the lower line.
-                    // Simplify: shade below the lower line.
-                    // We'll just shade the region under the minimum of the two lines for x in [0, min(a1,a2)].
-                    const x0 = Math.min(a1, a2);
-                    ctx.beginPath();
-                    ctx.moveTo(toCanvasX(0), toCanvasY(Math.min(b1, b2)));
-                    for (let x = 0; x <= x0; x += 1) {
-                        const y1 = b1 * (1 - x/a1);
-                        const y2 = b2 * (1 - x/a2);
-                        const y = Math.min(y1, y2);
-                        if (y >= 0) {
-                            ctx.lineTo(toCanvasX(x), toCanvasY(y));
-                        }
-                    }
-                    ctx.lineTo(toCanvasX(x0), toCanvasY(0));
-                    ctx.lineTo(toCanvasX(0), toCanvasY(0));
-                    ctx.closePath();
-                    ctx.fillStyle = 'rgba(99, 102, 241, 0.2)';
-                    ctx.fill();
-                    ctx.strokeStyle = '#6366f1';
-                    ctx.lineWidth = 1;
-                    ctx.stroke();
-                }
-            }
-        }
-
-        // Add event listeners to sliders
-        l1xSlider.addEventListener('input', drawGraph);
-        l1ySlider.addEventListener('input', drawGraph);
-        l2xSlider.addEventListener('input', drawGraph);
-        l2ySlider.addEventListener('input', drawGraph);
-
-        // Initial draw
-        drawGraph();
-
-        // Redraw on window resize for responsiveness (canvas size is fixed but we can adjust)
-        window.addEventListener('resize', () => {
-            // Canvas size is set by width/height attributes, but CSS controls display size.
-            // No need to redraw on resize for this simple setup.
-        });
-
-        // Initialize MathJax to render all LaTeX after page load
-        window.addEventListener('load', () => {
-            if (window.MathJax) {
-                MathJax.typesetPromise();
-            }
-        });
-    </script>
+<body>
+<div class="split"><aside class="split__aside"><figure class="figure"><svg viewBox="0 0 360 260" xmlns="http://www.w3.org/2000/svg"><rect width="360" height="260" fill="#fff"/><line x1="40" y1="230" x2="340" y2="230" stroke="#333" stroke-width="1.5"/><line x1="40" y1="230" x2="40" y2="20" stroke="#333" stroke-width="1.5"/><text x="340" y="250" font-size="12" fill="#333">x</text><text x="20" y="25" font-size="12" fill="#333">y</text><text x="34" y="245" font-size="12" fill="#333">O</text><polygon points="40,230 40,110 115,60 190,230" fill="#bfdbfe" stroke="none"/><line x1="40" y1="110" x2="190" y2="230" stroke="#0ea5e9" stroke-width="2"/><line x1="40" y1="110" x2="115" y2="60" stroke="#e8590c" stroke-width="2"/><text x="150" y="120" font-size="12" fill="#0ea5e9">L₁: 6x+7y=900</text><text x="130" y="70" font-size="12" fill="#e8590c">L₂: 2x+3y=360</text><circle cx="40" cy="110" r="3" fill="#333"/><circle cx="115" cy="60" r="3" fill="#333"/><circle cx="190" cy="230" r="3" fill="#333"/><text x="30" y="120" font-size="11" fill="#333">(0,120)</text><text x="120" y="55" font-size="11" fill="#333">(45,90)</text><text x="185" y="245" font-size="11" fill="#333">(150,0)</text></svg><figcaption>Figure 7 (feasible region, not to scale)</figcaption></figure></aside><main class="split__main"><header class="hero"><p class="hero__eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 1</p><h1 class="hero__title">2014 Paper 1 · Question 18<span class="qstar">*</span></h1><p class="hero__subtitle">Inequalities and Linear Programming</p><div class="hero__meta"><span class="badge badge--topic">Inequalities and Linear Programming</span><span class="badge badge--rate">Passing rate 31%</span><span class="badge badge--hard">Difficulty · &lt;50%</span><span class="badge badge--mark">8 marks</span></div></header><section class="card"><h2 class="card__title">Question</h2><div class="qcard__body"><p class="part"><b>(a)</b> In Figure 7, the equation of the straight line \(L_1\) is \(6x+7y=900\) and the \(x\)-intercept of \(L_2\) is 180. \(L_1\) and \(L_2\) intersect at \((45,90)\). The shaded region (including the boundary) represents the solution of a system of inequalities. Find the system of inequalities. <span class="marks-inline">4 marks</span></p><p class="part"><b>(b)</b> A factory produces two types of wardrobes, \(X\) and \(Y\). Each \(X\) requires 6 man-hours assembly and 2 man-hours packing; each \(Y\) requires 7 man-hours assembly and 3 man-hours packing. In a month, the factory has 900 man-hours for assembly and 360 for packing. Profits for \(X\) and \(Y\) are \(\$440\) and \(\$665\). A worker claims the total profit can exceed \(\$80\,000\) that month. Do you agree? Explain. <span class="marks-inline">4 marks</span></p></div></section><section class="card"><h2 class="card__title">Solution</h2><div class="qcard__body"><div class="step"><div class="step__head"><span class="step__num">a</span>(a) System of inequalities</div><div class="math">\[m_{L_2}=\frac{90}{45-180}=-\frac23\ \Rightarrow\ L_2:2x+3y=360\]</div><p><span class="badge badge--mark">1M</span> finding the equation of \(L_2\).<span class="badge badge--mark">1A</span> correct equation.</p><div class="math">\[\begin{cases}6x+7y\le900\ 2x+3y\le360\ x\ge0\ y\ge0\end{cases}\]</div><p><span class="badge badge--mark">1M</span> writing the inequalities.<span class="badge badge--mark">1A</span> correct system.</p></div><div class="step"><div class="step__head"><span class="step__num">b</span>(b) Maximum profit</div><div class="math">\[P=440x+665y\]</div><p><span class="badge badge--mark">1A</span> correct profit function.</p><div class="math">\[\text{vertices: }(0,0),(0,120),(45,90),(150,0)\]</div><p><span class="badge badge--mark">1M</span> identifying vertices.<span class="badge badge--mark">1M</span> testing vertices.</p><div class="math">\[P(0,120)=79\,800,\ P(45,90)=79\,650\ \Rightarrow\ \text{max}=\$79\,800&lt;\$80\,000\]</div><p>Hence <b>disagree</b>.</p><p><span class="badge badge--mark">1A</span> correct conclusion.</p></div></div></section><section class="card"><h2 class="card__title">Answer</h2><div class="qcard__body"><div class="answer"><span class="answer__label">Answer</span>(a) \(6x+7y\le900,\ 2x+3y\le360,\ x,y\ge0\) · (b) disagree</div></div></section></main></div><footer class="footer">HKDSE Mathematics (Compulsory Part) · 2014 Paper 1 Q18* · <a href="index.html">Index by year</a> · <a href="DSE_Maths_By_Topic.html">Index by topic</a></footer>
 </body>
 </html>

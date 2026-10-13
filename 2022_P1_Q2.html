@@ -1,450 +1,409 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HKDSE Math 2022 Paper 1 Q2 – Interactive Solution</title>
-    <!-- KaTeX for math rendering -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
-            onload="renderMathInElement(document.body, { delimiters: [{left: '$$', right: '$$', display: true},{left: '\\[', right: '\\]', display: true}, {left: '$', right: '$', display: false},{left: '\\(', right: '\\)', display: false}] });"></script>
-    <!-- Tailwind via CDN (lightweight) -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background: #f8fafc;
-            display: flex;
-            justify-content: center;
-            padding: 16px;
-        }
-        .card {
-            background: white;
-            border-radius: 24px;
-            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.02);
-            max-width: 900px;
-            width: 100%;
-            padding: 24px;
-            margin-bottom: 24px;
-            transition: all 0.2s;
-        }
-        .step-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.4s ease-out, opacity 0.3s ease-in;
-            opacity: 0;
-        }
-        .step-content.open {
-            max-height: 800px;
-            opacity: 1;
-        }
-        .step-header {
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        .step-header:last-child {
-            border-bottom: none;
-        }
-        .badge {
-            background: #e0f2fe;
-            color: #0369a1;
-            border-radius: 9999px;
-            padding: 4px 12px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            display: inline-block;
-            margin-right: 6px;
-            margin-bottom: 6px;
-        }
-        .math-block {
-            font-size: 1.15rem;
-        }
-        .hint-box {
-            background: #fffbeb;
-            border-left: 4px solid #f59e0b;
-            padding: 12px 16px;
-            border-radius: 0 12px 12px 0;
-            margin: 12px 0;
-            font-size: 0.95rem;
-        }
-        canvas {
-            max-width: 100%;
-            height: auto;
-            background: #f1f5f9;
-            border-radius: 16px;
-            touch-action: none;
-        }
-        .btn-primary {
-            background: #4f46e5;
-            color: white;
-            border-radius: 9999px;
-            padding: 10px 24px;
-            font-weight: 600;
-            transition: background 0.2s;
-        }
-        .btn-primary:hover {
-            background: #4338ca;
-        }
-        .btn-primary:disabled {
-            background: #a5b4fc;
-            cursor: not-allowed;
-        }
-        .toggle-icon {
-            transition: transform 0.3s;
-        }
-        .toggle-icon.rotate {
-            transform: rotate(180deg);
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2022 Paper 1 Q02 — Equations</title>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+/* ==========================================================================
+   HKDSE Mathematics (Compulsory Part) — Unified Design System
+   Canonical source of truth. This exact block is inlined into every
+   question page, index.html and DSE_Maths_By_Topic.html so that all
+   deliverables share one visual identity.
+   ========================================================================== */
+
+:root {
+  /* Palette */
+  --slate-900: #1e293b;   /* Primary / header surface */
+  --slate-800: #334155;
+  --slate-600: #475569;
+  --slate-400: #94a3b8;
+  --slate-200: #e2e8f0;
+  --slate-100: #f1f5f9;
+  --slate-50:  #f8fafc;
+  --indigo:    #3b82f6;   /* Primary accent */
+  --indigo-600:#2563eb;
+  --amber-bg:  #fef3c7;   /* Hints / concepts */
+  --amber-bd:  #f59e0b;
+  --emerald-bg:#d1fae5;   /* Final answers */
+  --emerald-bd:#10b981;
+  --badge-bg:  #dbeafe;   /* Badges / marks */
+  --badge-fg:  #1e40af;
+
+  /* Shape & depth */
+  --radius: 12px;
+  --radius-sm: 8px;
+  --pad-card: 1.5rem;
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, .06), 0 1px 3px rgba(15, 23, 42, .08);
+  --shadow-md: 0 4px 12px rgba(15, 23, 42, .08), 0 2px 4px rgba(15, 23, 42, .04);
+
+  /* Type */
+  --font-body: "Source Serif 4", "Noto Serif TC", Georgia, "Times New Roman", serif;
+  --font-ui: "Inter Tight", "Noto Sans TC", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+  --lh-tight: 1.25;
+  --lh-body: 1.7;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--slate-50);
+  background-image:
+    radial-gradient(circle at 12% -10%, rgba(59, 130, 246, .10), transparent 45%),
+    radial-gradient(circle at 95% 0%, rgba(30, 41, 59, .08), transparent 40%);
+  background-attachment: fixed;
+  color: var(--slate-900);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: var(--lh-body);
+}
+
+/* ---------- Layout shells ------------------------------------------------ */
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 3rem;
+}
+
+.split {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 3rem;
+  display: grid;
+  grid-template-columns: minmax(0, 42%) minmax(0, 58%);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.split__aside {
+  position: sticky;
+  top: 1rem;
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.split__main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* ---------- Hero header -------------------------------------------------- */
+
+.hero {
+  background: linear-gradient(135deg, var(--slate-900) 0%, #27364f 55%, #1d4ed8 160%);
+  color: #fff;
+  border-radius: var(--radius);
+  padding: 2rem var(--pad-card);
+  box-shadow: var(--shadow-md);
+  margin-bottom: 1.5rem;
+}
+
+.hero__eyebrow {
+  font-family: var(--font-ui);
+  font-size: .75rem;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: #93c5fd;
+  margin: 0 0 .5rem;
+}
+
+.hero__title {
+  font-family: var(--font-ui);
+  font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.1rem);
+  line-height: var(--lh-tight);
+  font-weight: 700;
+  margin: 0 0 .5rem;
+}
+
+.hero__subtitle {
+  margin: 0;
+  color: #cbd5e1;
+  font-size: .95rem;
+}
+
+.hero__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  margin-top: 1rem;
+}
+
+/* ---------- Cards -------------------------------------------------------- */
+
+.card {
+  background: #fff;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius);
+  padding: var(--pad-card);
+  box-shadow: var(--shadow-sm);
+}
+
+.card + .card { margin-top: 0; }
+
+.card__title {
+  font-family: var(--font-ui);
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 1rem;
+  padding-bottom: .6rem;
+  border-bottom: 2px solid var(--slate-100);
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  flex-wrap: wrap;
+}
+
+/* ---------- Step cards --------------------------------------------------- */
+
+.step {
+  border-left: 4px solid var(--indigo);
+  background: #fff;
+  border-radius: var(--radius);
+  padding: var(--pad-card);
+  box-shadow: var(--shadow-sm);
+}
+
+.step__head {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  flex-wrap: wrap;
+  margin-bottom: .85rem;
+  font-family: var(--font-ui);
+  font-weight: 600;
+}
+
+/* ---------- Callouts ----------------------------------------------------- */
+
+.hint,
+.answer,
+.note {
+  border-radius: var(--radius-sm);
+  padding: 1rem 1.15rem;
+  margin: 1rem 0;
+}
+
+.hint {
+  background: var(--amber-bg);
+  border-left: 4px solid var(--amber-bd);
+}
+
+.answer {
+  background: var(--emerald-bg);
+  border-left: 4px solid var(--emerald-bd);
+}
+
+.note {
+  background: var(--slate-100);
+  border-left: 4px solid var(--slate-400);
+}
+
+.hint__label,
+.answer__label {
+  font-family: var(--font-ui);
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: .35rem;
+}
+
+.hint__label   { color: #92400e; }
+.answer__label { color: #065f46; }
+
+/* ---------- Badges ------------------------------------------------------- */
+
+.badge {
+  display: inline-block;
+  font-family: var(--font-ui);
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  padding: .2rem .55rem;
+  border-radius: 999px;
+  background: var(--badge-bg);
+  color: var(--badge-fg);
+  white-space: nowrap;
+}
+
+.badge--mark  { background: var(--badge-bg); color: var(--badge-fg); }
+.badge--topic { background: var(--slate-100); color: var(--slate-600); }
+.badge--hard  { background: #fee2e2; color: #991b1b; }
+.badge--rate  { background: #ecfdf5; color: #047857; }
+
+/* ---------- Option list (Paper 2) --------------------------------------- */
+
+.options {
+  list-style: none;
+  margin: .5rem 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: .5rem;
+}
+
+.options li {
+  background: var(--slate-100);
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-sm);
+  padding: .6rem .85rem;
+}
+
+.option-key {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  color: var(--slate-600);
+  margin-right: .35rem;
+}
+
+/* ---------- Figures ----------------------------------------------------- */
+
+.figure {
+  background: #fff;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius);
+  padding: .75rem;
+  text-align: center;
+}
+
+.figure img,
+.question-img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-sm);
+  display: block;
+  margin: 0 auto;
+}
+
+.figure figcaption {
+  font-family: var(--font-ui);
+  font-size: .78rem;
+  color: var(--slate-600);
+  margin-top: .5rem;
+}
+
+.figure svg { max-width: 100%; height: auto; }
+
+/* ---------- Tables ------------------------------------------------------- */
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .95rem;
+}
+
+.table th,
+.table td {
+  border: 1px solid var(--slate-200);
+  padding: .5rem .65rem;
+  text-align: left;
+}
+
+.table th {
+  background: var(--slate-100);
+  font-family: var(--font-ui);
+  font-weight: 600;
+}
+
+/* ---------- Index pages -------------------------------------------------- */
+
+.index-section { margin-bottom: 1.5rem; }
+
+.index-table td:first-child { white-space: nowrap; }
+
+a { color: var(--indigo-600); }
+
+a.qlink {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+
+a.qlink:hover { border-bottom-color: currentColor; }
+
+/* ---------- Footer ------------------------------------------------------- */
+
+.footer {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 2.5rem;
+  text-align: center;
+  font-family: var(--font-ui);
+  font-size: .8rem;
+  color: var(--slate-600);
+}
+
+/* ---------- MathJax tweaks ---------------------------------------------- */
+
+mjx-container[display="true"] { margin: .75rem 0 !important; }
+
+/* ---------- Responsive -------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .split { grid-template-columns: minmax(0, 1fr); }
+  .split__aside {
+    position: static;
+    max-height: none;
+    overflow-y: visible;
+  }
+}
+
+@media (max-width: 480px) {
+  body { font-size: 16px; }
+  :root { --pad-card: 1.15rem; }
+  .hero { padding: 1.5rem 1.15rem; }
+}
+
+
+/* ---- solution page extras ---- */
+.hero__title .qstar { color:#fbbf24; }
+.qcard__body { font-size: 1.02rem; }
+.qcard__body .part { border-left: 4px solid var(--indigo); background: var(--slate-50);
+  padding: .7rem 1rem; margin: .7rem 0; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+.qcard__body .part b { color: var(--indigo-600); font-family: var(--font-ui); }
+.marks-inline { font-family: var(--font-ui); font-size: .75rem; font-weight: 700;
+  color: var(--badge-fg); background: var(--badge-bg); padding: .1rem .5rem; border-radius: 999px; margin-left: .4rem; }
+.options { list-style:none; margin:.75rem 0 0; padding:0; display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:.55rem; }
+.options li { background:var(--slate-50); border:1px solid var(--slate-200);
+  border-radius:var(--radius-sm); padding:.6rem .9rem; }
+.opt-key { font-family:var(--font-ui); font-weight:700; color:var(--slate-600); margin-right:.4rem; }
+.step { border:1px solid var(--slate-200); border-left:4px solid var(--indigo);
+  border-radius:var(--radius); padding:var(--pad-card); box-shadow:var(--shadow-sm); }
+.step + .step { margin-top:1rem; }
+.step__head { display:flex; align-items:center; gap:.6rem; flex-wrap:wrap; margin-bottom:.75rem;
+  font-family:var(--font-ui); font-weight:700; }
+.step__num { background:var(--indigo); color:#fff; border-radius:8px; min-width:1.9rem;
+  text-align:center; padding:.15rem .4rem; font-size:.85rem; }
+.math { margin:.65rem 0; overflow-x:auto; overflow-y:hidden; padding-bottom:2px; }
+.distractor { background:#fff; border:1px solid var(--slate-200); border-radius:var(--radius-sm);
+  padding:.75rem .95rem; margin:.5rem 0; }
+.distractor .opt-tag { font-family:var(--font-ui); font-weight:800; display:inline-block;
+  min-width:1.6rem; color:var(--slate-600); }
+.distractor.correct { background:var(--emerald-bg); border-color:var(--emerald-bd); }
+.distractor.correct .opt-tag { color:#065f46; }
+.distractor.wrong .opt-tag { color:#991b1b; }
+.distractor.wrong { background:#fef2f2; border-color:#fecaca; }
+.figure svg { max-width:100%; height:auto; }
+.step p { margin:.55em 0; }
+
+</style>
 </head>
 <body>
-<div class="card space-y-6">
-    <!-- Question heading -->
-    <div class="flex flex-wrap items-center justify-between gap-4">
-        <h1 class="text-2xl md:text-3xl font-bold text-gray-800">HKDSE Math 2022 Paper 1 <span class="text-indigo-600">Q2</span></h1>
-        <div class="badge">Simultaneous Equations</div>
-        <div class="badge">Substitution</div>
-        <div class="badge">Algebra</div>
-    </div>
-
-    <!-- Question statement -->
-    <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200">
-        <p class="text-gray-700 text-lg leading-relaxed">
-            Let \(x\) and \(y\) be two numbers. The sum of \(x\) and \(y\) is 456 while the product of 7 and \(x\) is \(y\). Find \(x\). <span class="text-sm font-semibold text-indigo-500 ml-2">[3 marks]</span>
-        </p>
-    </div>
-
-    <!-- Key concepts hint (always visible) -->
-    <div class="flex flex-wrap gap-2">
-        <span class="badge">Forming equations from words</span>
-        <span class="badge">Substitution method</span>
-        <span class="badge">Solving linear equations</span>
-    </div>
-
-    <!-- Step-by-step guided solution -->
-    <h2 class="text-xl font-bold text-gray-800 mt-4">Step-by-step Solution</h2>
-    <div id="stepsContainer" class="space-y-2">
-        <!-- Step 1 -->
-        <div class="bg-white rounded-xl border border-gray-100 shadow-sm">
-            <div class="step-header" data-step="1">
-                <div class="flex items-center gap-3">
-                    <span class="w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-sm font-bold">1</span>
-                    <span class="font-semibold text-gray-800">Translate the word problem into equations</span>
-                </div>
-                <svg class="toggle-icon w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-            </div>
-            <div id="content1" class="step-content px-4 pb-4">
-                <div class="hint-box">
-                    <strong>💡 Hint:</strong> The sum of \(x\) and \(y\) is 456 → \(x + y = 456\).<br>
-                    The product of 7 and \(x\) is \(y\) → \(7x = y\).
-                </div>
-                <div class="space-y-2 mt-3">
-                    <p><span class="font-medium">Equation (1):</span> \(x + y = 456\)</p>
-                    <p><span class="font-medium">Equation (2):</span> \(7x = y\)</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Step 2 -->
-        <div class="bg-white rounded-xl border border-gray-100 shadow-sm">
-            <div class="step-header" data-step="2">
-                <div class="flex items-center gap-3">
-                    <span class="w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-sm font-bold">2</span>
-                    <span class="font-semibold text-gray-800">Substitute equation (2) into equation (1)</span>
-                </div>
-                <svg class="toggle-icon w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-            </div>
-            <div id="content2" class="step-content px-4 pb-4">
-                <div class="hint-box">
-                    <strong>💡 Hint:</strong> Since \(y = 7x\), replace \(y\) in \(x + y = 456\) with \(7x\).
-                </div>
-                <div class="math-block mt-3">
-                    \[
-                    \begin{aligned}
-                    x + \color{red}{y} &= 456 \\
-                    x + \color{red}{7x} &= 456
-                    \end{aligned}
-                    \]
-                </div>
-            </div>
-        </div>
-
-        <!-- Step 3 -->
-        <div class="bg-white rounded-xl border border-gray-100 shadow-sm">
-            <div class="step-header" data-step="3">
-                <div class="flex items-center gap-3">
-                    <span class="w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-sm font-bold">3</span>
-                    <span class="font-semibold text-gray-800">Simplify and solve for \(x\)</span>
-                </div>
-                <svg class="toggle-icon w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-            </div>
-            <div id="content3" class="step-content px-4 pb-4">
-                <div class="hint-box">
-                    <strong>💡 Hint:</strong> Combine like terms: \(x + 7x = 8x\). Then divide both sides by 8.
-                </div>
-                <div class="math-block mt-3 space-y-2">
-                    <p>\[ x + 7x = 456 \]</p>
-                    <p>\[ 8x = 456 \]</p>
-                    <p>\[ x = \frac{456}{8} \]</p>
-                    <p class="text-2xl font-bold text-indigo-700 mt-3">\[ x = 57 \]</p>
-                </div>
-                <div class="hint-box mt-4">
-                    <strong>✅ Final answer:</strong> \(x = 57\)
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Interactive Visualisation -->
-    <h2 class="text-xl font-bold text-gray-800 mt-6">Interactive Visualisation</h2>
-    <p class="text-gray-600 text-sm mb-3">Move the slider to change the value of \(x\) and see how \(y = 7x\) and the sum \(x + y\) compare to 456.</p>
-    <div class="bg-slate-50 p-4 rounded-2xl">
-        <div class="flex flex-col md:flex-row items-center gap-6">
-            <canvas id="balanceCanvas" width="400" height="220" class="w-full max-w-[400px] rounded-xl bg-white border border-slate-200"></canvas>
-            <div class="flex-1 space-y-4 w-full">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Value of \(x\):</label>
-                    <input type="range" id="xSlider" min="0" max="100" value="0" step="1" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
-                </div>
-                <div class="grid grid-cols-2 gap-3 text-center">
-                    <div class="bg-white p-3 rounded-xl shadow-sm border border-slate-100">
-                        <span class="text-xs text-gray-500">\(x\)</span>
-                        <p id="displayX" class="text-lg font-bold text-indigo-700">0</p>
-                    </div>
-                    <div class="bg-white p-3 rounded-xl shadow-sm border border-slate-100">
-                        <span class="text-xs text-gray-500">\(y = 7x\)</span>
-                        <p id="displayY" class="text-lg font-bold text-indigo-700">0</p>
-                    </div>
-                    <div class="bg-white p-3 rounded-xl shadow-sm border border-slate-100 col-span-2">
-                        <span class="text-xs text-gray-500">\(x + y\)</span>
-                        <p id="displaySum" class="text-lg font-bold text-indigo-700">0</p>
-                    </div>
-                </div>
-                <div id="feedbackMessage" class="text-center text-sm font-semibold text-gray-500 min-h-[24px]"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Marking scheme summary (optional, discreet) -->
-    <details class="text-sm text-gray-500 mt-4">
-        <summary class="cursor-pointer hover:text-indigo-600 font-medium">📝 Marking Scheme Reference</summary>
-        <div class="mt-2 p-3 bg-slate-50 rounded-xl">
-            <p>1A: \(x+y=456\) and \(7x=y\)</p>
-            <p>1M: \(x+7x=456\)</p>
-            <p>1A: \(x=57\)</p>
-        </div>
-    </details>
-
-    <!-- Next button to reveal all steps sequentially -->
-    <div class="flex justify-end mt-4">
-        <button id="nextStepBtn" class="btn-primary text-sm shadow-md">Reveal Next Step</button>
-    </div>
-</div>
-
-<script>
-    // ---------- Accordion + Next Step Logic ----------
-    const stepHeaders = document.querySelectorAll('.step-header');
-    const stepContents = document.querySelectorAll('.step-content');
-    const nextBtn = document.getElementById('nextStepBtn');
-    const totalSteps = stepHeaders.length;
-    let currentStep = 0; // 0 means none open
-
-    // Toggle individual step on header click
-    stepHeaders.forEach((header, index) => {
-        header.addEventListener('click', () => {
-            const contentId = 'content' + (index + 1);
-            const content = document.getElementById(contentId);
-            const icon = header.querySelector('.toggle-icon');
-            const isOpen = content.classList.contains('open');
-            // Close all others (accordion style: only one open at a time)
-            stepContents.forEach((c, i) => {
-                if (i !== index) {
-                    c.classList.remove('open');
-                    const otherIcon = stepHeaders[i].querySelector('.toggle-icon');
-                    if (otherIcon) otherIcon.classList.remove('rotate');
-                }
-            });
-            // Toggle current
-            if (isOpen) {
-                content.classList.remove('open');
-                icon.classList.remove('rotate');
-                currentStep = 0;
-            } else {
-                content.classList.add('open');
-                icon.classList.add('rotate');
-                currentStep = index + 1;
-            }
-            updateButtonState();
-        });
-    });
-
-    // Next step button: open the next closed step sequentially
-    nextBtn.addEventListener('click', () => {
-        // Find first closed step
-        let nextIndex = -1;
-        for (let i = 0; i < totalSteps; i++) {
-            const content = stepContents[i];
-            if (!content.classList.contains('open')) {
-                nextIndex = i;
-                break;
-            }
-        }
-        if (nextIndex !== -1) {
-            // Close all first (accordion)
-            stepContents.forEach((c, i) => {
-                c.classList.remove('open');
-                const icon = stepHeaders[i].querySelector('.toggle-icon');
-                if (icon) icon.classList.remove('rotate');
-            });
-            // Open the found step
-            const content = stepContents[nextIndex];
-            content.classList.add('open');
-            const icon = stepHeaders[nextIndex].querySelector('.toggle-icon');
-            if (icon) icon.classList.add('rotate');
-            // Scroll into view
-            stepHeaders[nextIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
-            currentStep = nextIndex + 1;
-        }
-        updateButtonState();
-    });
-
-    function updateButtonState() {
-        const anyClosed = Array.from(stepContents).some(c => !c.classList.contains('open'));
-        nextBtn.disabled = !anyClosed;
-        nextBtn.textContent = anyClosed ? 'Reveal Next Step' : 'All Steps Revealed';
-    }
-    updateButtonState(); // Initial state: all closed, button enabled
-
-    // ---------- Interactive Canvas + Slider ----------
-    const canvas = document.getElementById('balanceCanvas');
-    const ctx = canvas.getContext('2d');
-    const xSlider = document.getElementById('xSlider');
-    const displayX = document.getElementById('displayX');
-    const displayY = document.getElementById('displayY');
-    const displaySum = document.getElementById('displaySum');
-    const feedback = document.getElementById('feedbackMessage');
-
-    // Fixed target sum
-    const TARGET_SUM = 456;
-
-    function drawScene(xVal) {
-        const w = canvas.width;
-        const h = canvas.height;
-        ctx.clearRect(0, 0, w, h);
-
-        // Draw a simple bar visualisation: x (blue), y (teal), sum as total length vs target
-        const totalLength = xVal + 7 * xVal; // x + y = 8x
-        const maxVal = Math.max(456, totalLength, 1);
-        const scale = (w - 80) / maxVal;
-
-        const barY = 70;
-        const barHeight = 30;
-
-        // Background target bar
-        ctx.fillStyle = '#e2e8f0';
-        ctx.beginPath();
-        ctx.roundRect(40, barY, TARGET_SUM * scale, barHeight, 8);
-        ctx.fill();
-
-        // Actual x+y bar
-        ctx.fillStyle = totalLength === TARGET_SUM ? '#22c55e' : '#f59e0b';
-        ctx.beginPath();
-        ctx.roundRect(40, barY, totalLength * scale, barHeight, 8);
-        ctx.fill();
-
-        // Draw x part
-        ctx.fillStyle = '#6366f1';
-        ctx.beginPath();
-        ctx.roundRect(40, barY + barHeight + 8, xVal * scale, barHeight, 8);
-        ctx.fill();
-
-        // Draw y part
-        ctx.fillStyle = '#14b8a6';
-        ctx.beginPath();
-        ctx.roundRect(40 + xVal * scale, barY + barHeight + 8, 7 * xVal * scale, barHeight, 8);
-        ctx.fill();
-
-        // Labels
-        ctx.font = '12px Inter, sans-serif';
-        ctx.fillStyle = '#334155';
-        // Target label
-        ctx.fillText('Target sum = 456', 40, barY - 8);
-        // Sum label
-        ctx.fillText('x + y = ' + totalLength, 40, barY + barHeight + 60);
-        // x label
-        ctx.fillStyle = '#6366f1';
-        ctx.fillText('x = ' + xVal, 40, barY + barHeight + 100);
-        ctx.fillStyle = '#14b8a6';
-        ctx.fillText('y = 7x = ' + (7 * xVal), 40 + xVal * scale, barY + barHeight + 100);
-
-        // Draw tick / indicator when exactly matches
-        if (totalLength === TARGET_SUM) {
-            ctx.fillStyle = '#22c55e';
-            ctx.font = 'bold 14px Inter, sans-serif';
-            ctx.fillText('✓ Matches!', w - 120, barY + barHeight/2 + 5);
-        }
-    }
-
-    // Helper for rounded rect
-    CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
-        if (w < 2 * r) r = w / 2;
-        if (h < 2 * r) r = h / 2;
-        this.moveTo(x + r, y);
-        this.lineTo(x + w - r, y);
-        this.quadraticCurveTo(x + w, y, x + w, y + r);
-        this.lineTo(x + w, y + h - r);
-        this.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-        this.lineTo(x + r, y + h);
-        this.quadraticCurveTo(x, y + h, x, y + h - r);
-        this.lineTo(x, y + r);
-        this.quadraticCurveTo(x, y, x + r, y);
-        return this;
-    };
-
-    function updateFromSlider() {
-        const xVal = parseFloat(xSlider.value);
-        const yVal = 7 * xVal;
-        const sum = xVal + yVal;
-
-        displayX.textContent = xVal;
-        displayY.textContent = yVal;
-        displaySum.textContent = sum;
-
-        if (sum === TARGET_SUM) {
-            feedback.textContent = '🎉 Correct! x + 7x = 456, so x = 57.';
-            feedback.className = 'text-center text-sm font-semibold text-green-600 min-h-[24px]';
-        } else {
-            feedback.textContent = sum < TARGET_SUM ? 'Sum is too small. Increase x.' : 'Sum is too large. Decrease x.';
-            feedback.className = 'text-center text-sm font-semibold text-amber-600 min-h-[24px]';
-        }
-
-        drawScene(xVal);
-    }
-
-    // Initialize
-    xSlider.value = 0;
-    updateFromSlider();
-
-    // Slider event
-    xSlider.addEventListener('input', updateFromSlider);
-
-    // Initial draw
-    window.addEventListener('load', () => {
-        drawScene(parseFloat(xSlider.value));
-        if (window.renderMathInElement) {
-            renderMathInElement(document.body, { delimiters: [{left: '$$', right: '$$', display: true},{left: '\\[', right: '\\]', display: true}, {left: '$', right: '$', display: false},{left: '\\(', right: '\\)', display: false}] });
-        }
-    });
-
-    // Also draw on resize for crispness (though canvas size fixed)
-    window.addEventListener('resize', () => {
-        drawScene(parseFloat(xSlider.value));
-    });
-</script>
+<div class="container"><header class="hero"><p class="hero__eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 1</p><h1 class="hero__title">2022 Paper 1 · Question 2<span class="qstar"></span></h1><p class="hero__subtitle">Equations</p><div class="hero__meta"><span class="badge badge--topic">Equations</span><span class="badge badge--rate">Passing rate 92%</span><span class="badge badge--mark">3 marks</span></div></header><section class="card"><h2 class="card__title">Question</h2><div class="qcard__body"><p>Let \(x\) and \(y\) be two numbers. The sum of \(x\) and \(y\) is 456 while the product of 7 and \(x\) is \(y\). Find \(x\). <span class="marks-inline">3 marks</span></p></div></section><section class="card"><h2 class="card__title">Solution</h2><div class="qcard__body"><div class="step"><div class="step__head"><span class="step__num">1</span>Set up</div><div class="math">\[x+y=456,\quad 7x=y\]</div><p><span class="badge badge--mark">1A</span> correct equations.</p><div class="math">\[x+7x=456\ \Rightarrow\ x=57\]</div><p><span class="badge badge--mark">1M</span> substituting.<span class="badge badge--mark">1A</span> correct \(x\).</p></div></div></section><section class="card"><h2 class="card__title">Answer</h2><div class="qcard__body"><div class="answer"><span class="answer__label">Answer</span>\(x=57\)</div></div></section></div><footer class="footer">HKDSE Mathematics (Compulsory Part) · 2022 Paper 1 Q02 · <a href="index.html">Index by year</a> · <a href="DSE_Maths_By_Topic.html">Index by topic</a></footer>
 </body>
 </html>
