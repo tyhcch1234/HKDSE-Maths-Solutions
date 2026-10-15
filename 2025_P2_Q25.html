@@ -3,582 +3,322 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HKDSE 2025 Paper 2 Q25 · Locus of P</title>
-<script>
-  MathJax = {
-    tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['\\[', '\\]']] },
-    svg: { fontCache: 'global' }
-  };
-</script>
+<title>HKDSE 2025 P2 Q25 — Locus of P</title>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
-  :root{
-    --blue:#1d4ed8; --blue-l:#3b82f6; --amber:#f59e0b; --amber-l:#fbbf24;
-    --emerald:#059669; --emerald-l:#10b981; --ink:#0f172a; --slate:#475569;
-    --bg:#f1f5f9; --card:#ffffff; --line:#e2e8f0;
-  }
   *{box-sizing:border-box;}
   body{
-    margin:0; font-family:'Segoe UI',system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
-    background:var(--bg); color:var(--ink); line-height:1.6;
-    -webkit-font-smoothing:antialiased;
+    margin:0;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+    background:linear-gradient(135deg,#eef4ff 0%,#f7fbff 60%,#eefaf5 100%);
+    color:#1e293b;padding:14px;
   }
-  .wrap{max-width:960px; margin:0 auto; padding:0 16px 48px;}
-  /* HERO */
-  header.hero{
-    background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 45%,#2563eb 100%);
-    color:#fff; padding:38px 16px 42px; position:relative; overflow:hidden;
+  h1{font-size:1.05rem;margin:0 0 12px;color:#1d4ed8;letter-spacing:.3px;}
+  h1 span{font-size:.8rem;color:#64748b;font-weight:500;}
+
+  .split{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    gap:12px;align-items:start;
   }
-  header.hero::after{
-    content:""; position:absolute; right:-90px; top:-90px; width:320px; height:320px;
-    border-radius:50%; background:radial-gradient(circle,rgba(251,191,36,.28),transparent 68%);
+  @media(min-width:900px){
+    .split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}
   }
-  .hero-inner{max-width:960px; margin:0 auto; position:relative; z-index:2;}
-  .eyebrow{font-size:.78rem; letter-spacing:.16em; text-transform:uppercase; color:#93c5fd; font-weight:600;}
-  .qnum{font-size:1.9rem; font-weight:800; margin:6px 0 2px; letter-spacing:-.01em;}
-  .subtitle{font-size:1.02rem; color:#e0e7ff; margin-bottom:16px;}
-  .pills{display:flex; flex-wrap:wrap; gap:8px;}
-  .pill{
-    background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.28);
-    padding:4px 12px; border-radius:999px; font-size:.76rem; font-weight:600; color:#fff;
-    backdrop-filter:blur(4px);
+
+  .panel{
+    background:#ffffff;border-radius:16px;padding:14px;
+    box-shadow:0 6px 22px rgba(30,64,175,.10);
+    border:1px solid #e2e8f0;
   }
-  /* CARDS */
-  .card{
-    background:var(--card); border-radius:16px; padding:22px 22px 26px; margin-top:22px;
-    box-shadow:0 4px 18px rgba(15,23,42,.07); border:1px solid var(--line);
+  .diagram{
+    position:sticky;top:16px;
+    max-height:calc(100vh - 2rem);
+    overflow-y:auto;
   }
-  .card h2{
-    margin:0 0 14px; font-size:1.16rem; font-weight:800; color:var(--blue);
-    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
-  }
-  .card h2 .tag{
-    font-size:.68rem; background:#dbeafe; color:#1e40af; padding:3px 9px;
-    border-radius:999px; font-weight:700; letter-spacing:.03em;
-  }
-  .qtext{font-size:1.02rem; color:#1e293b;}
-  .options{list-style:none; padding:0; margin:14px 0 0; display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:8px;}
-  .options li{
-    background:#f8fafc; border:1px solid var(--line); border-radius:10px;
-    padding:9px 14px; font-weight:600; color:#334155;
-  }
-  /* MARK BADGE */
-  .marks{
-    display:inline-block; background:#fef3c7; color:#92400e; font-size:.72rem;
-    font-weight:800; padding:2px 8px; border-radius:6px; border:1px solid #fde68a;
-  }
-  /* CANVAS */
-  .canvas-box{
-    margin:16px 0 6px; background:#fbfcfe; border:1px solid var(--line);
-    border-radius:14px; padding:10px; display:flex; justify-content:center;
-  }
-  canvas{width:100%; max-width:560px; height:auto; display:block; border-radius:8px; touch-action:none;}
-  .controls{
-    display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
-    gap:12px 20px; margin:12px 4px 4px;
-  }
-  .ctrl label{font-size:.82rem; font-weight:700; color:var(--slate); display:block; margin-bottom:2px;}
-  .ctrl input[type=range]{width:100%; accent-color:var(--blue-l);}
-  .ctrl .val{float:right; font-variant-numeric:tabular-nums; color:var(--blue); font-weight:800;}
-  .chk{display:flex; align-items:center; gap:8px; font-size:.84rem; font-weight:600; color:var(--slate);}
-  .chk input{width:17px; height:17px; accent-color:var(--emerald);}
-  .readout{
-    font-size:.82rem; font-weight:700; color:#0f172a; background:#eef2ff;
-    border:1px dashed #c7d2fe; border-radius:10px; padding:8px 12px; margin-top:10px;
-    font-variant-numeric:tabular-nums;
-  }
-  /* STEPS */
+
+  canvas{width:100%;height:auto;display:block;border-radius:12px;background:#fbfdff;}
+
+  .legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;font-size:.72rem;color:#475569;}
+  .legend div{display:flex;align-items:center;gap:5px;}
+  .swatch{width:12px;height:12px;border-radius:3px;display:inline-block;}
+
+  .qtext{font-size:.86rem;line-height:1.55;}
+  .qtext b{color:#1d4ed8;}
+  .options{margin:10px 0 0;padding-left:4px;font-size:.84rem;line-height:1.75;}
+  .options span{display:block;}
+  .options span b{color:#0f766e;}
+
   .step{
-    display:none; border-left:4px solid var(--blue-l); background:#f8fafc;
-    border-radius:0 12px 12px 0; padding:14px 16px; margin-top:14px;
-    animation:fade .35s ease;
+    border-left:4px solid #cbd5e1;background:#f8fafc;border-radius:10px;
+    padding:10px 12px;margin:12px 0;transition:.25s;font-size:.84rem;line-height:1.6;
   }
-  .step.show{display:block;}
-  @keyframes fade{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
-  .step-head{display:flex; align-items:center; gap:10px; margin-bottom:8px; flex-wrap:wrap;}
-  .badge{
-    background:var(--blue); color:#fff; font-size:.72rem; font-weight:800;
-    padding:3px 10px; border-radius:999px; letter-spacing:.03em;
+  .step.active{
+    border-left-color:#2563eb;
+    background:linear-gradient(90deg,#eff6ff 0%,#ffffff 100%);
+    box-shadow:0 4px 16px rgba(37,99,235,.13);
+    transform:translateX(2px);
   }
+  .tag{
+    display:inline-block;background:#2563eb;color:#fff;font-size:.68rem;font-weight:700;
+    padding:3px 9px;border-radius:20px;letter-spacing:.5px;margin-bottom:6px;
+  }
+  .step.active .tag{background:#1d4ed8;}
+
+  .ansbox{
+    margin-top:14px;background:linear-gradient(135deg,#ecfdf5,#f0fdfa);
+    border:2px dashed #10b981;border-radius:12px;padding:12px;
+    text-align:center;font-size:.95rem;font-weight:700;color:#047857;
+  }
+  .ansbox small{display:block;font-weight:500;color:#64748b;font-size:.7rem;margin-top:4px;}
+
   .hint{
-    background:#fffbeb; border-left:4px solid var(--amber-l); color:#78350f;
-    border-radius:0 8px 8px 0; padding:9px 13px; margin-top:11px; font-size:.9rem;
+    font-size:.75rem;color:#7c3aed;background:#f5f3ff;border-radius:8px;
+    padding:8px 10px;margin-top:10px;border:1px solid #ddd6fe;
   }
-  .hint b{color:#b45309;}
-  .answer{
-    background:#ecfdf5; border-left:4px solid var(--emerald-l); color:#065f46;
-    border-radius:0 8px 8px 0; padding:9px 13px; margin-top:11px; font-weight:700; font-size:.94rem;
-  }
-  .btnrow{display:flex; align-items:center; gap:14px; margin-top:16px; flex-wrap:wrap;}
-  button.next{
-    background:var(--blue); color:#fff; border:none; padding:10px 22px; border-radius:10px;
-    font-size:.92rem; font-weight:700; cursor:pointer; transition:.2s;
-    box-shadow:0 3px 10px rgba(29,78,216,.28);
-  }
-  button.next:hover:not(:disabled){background:#1e40af; transform:translateY(-1px);}
-  button.next:disabled{background:#cbd5e1; color:#64748b; cursor:not-allowed; box-shadow:none;}
-  .counter{font-size:.84rem; font-weight:800; color:var(--slate); font-variant-numeric:tabular-nums;}
-  /* SUMMARY */
-  .card.dark{background:linear-gradient(140deg,#0f172a,#1e293b); color:#e2e8f0; border:none;}
-  .card.dark h2{color:#fbbf24;}
-  .card.dark ul{margin:8px 0 0; padding-left:20px;}
-  .card.dark li{margin-bottom:9px;}
-  .card.dark .em{color:#34d399; font-weight:800;}
-  footer{text-align:center; font-size:.78rem; color:#94a3b8; padding:26px 0 8px;}
-  .legend{display:flex; gap:16px; flex-wrap:wrap; font-size:.78rem; font-weight:600; color:var(--slate); margin-top:8px; justify-content:center;}
-  .legend span{display:flex; align-items:center; gap:6px;}
-  .sw{width:14px; height:4px; border-radius:2px; display:inline-block;}
+  .figbox{margin:10px 0;padding:8px;border:1px dashed #94a3b8;border-radius:10px;background:#f8fafc;font-size:.7rem;color:#64748b;text-align:center;}
 </style>
 </head>
 <body>
 
-<header class="hero">
-  <div class="hero-inner">
-    <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</div>
-    <div class="qnum">2025 Paper 2 · Question 25</div>
-    <div class="subtitle">Coordinate Geometry — Locus of a Moving Point · Multiple Choice</div>
-    <div class="pills">
-      <span class="pill">Distance Formula</span>
-      <span class="pill">Locus</span>
-      <span class="pill">Circle Equation</span>
-      <span class="pill">Coordinate Geometry</span>
-    </div>
-  </div>
-</header>
+<h1>HKDSE 2025 · Paper 2 · Q25 <span>— Coordinate Geometry / Locus</span></h1>
 
-<div class="wrap">
+<div class="split">
 
-  <!-- QUESTION CARD -->
-  <div class="card">
-    <h2>Question <span class="tag">1 mark</span></h2>
-    <div class="qtext">
-      <p>Denote the origin by \(O\). The coordinates of the point \(A\) are \((a,\,2a)\), where \(a&gt;0\). Let \(P\) be a moving point in the rectangular coordinate plane such that \(AP=OA\). The locus of \(P\) is a</p>
-      <ul class="options">
-        <li>A. point.</li>
-        <li>B. circle.</li>
-        <li>C. rhombus.</li>
-        <li>D. straight line.</li>
-      </ul>
-      <p style="margin-top:14px; color:#64748b; font-size:.9rem;">
-        (Answer: <strong>B. circle</strong>)
-      </p>
-    </div>
-  </div>
-
-  <!-- PART (a) -->
-  <div class="card">
-    <h2>Part (a) — Translate the condition into an equation <span class="tag">Setup</span></h2>
-    <p>Let \(P=(x,y)\). The condition \(AP=OA\) says: the distance from \(P\) to \(A\) equals the distance from \(O\) to \(A\).</p>
-
-    <div class="canvas-box">
-      <canvas id="cv1" width="560" height="420"></canvas>
-    </div>
+  <!-- LEFT: DIAGRAM -->
+  <section class="panel diagram">
+    <canvas id="cv" width="640" height="640"></canvas>
     <div class="legend">
-      <span><i class="sw" style="background:#1d4ed8"></i>OA (radius)</span>
-      <span><i class="sw" style="background:#059669"></i>AP (equal length)</span>
-      <span><i class="sw" style="background:#f59e0b"></i>Locus circle</span>
+      <div><span class="swatch" style="background:#ef4444"></span>Point A(a, 2a)</div>
+      <div><span class="swatch" style="background:#10b981"></span>Origin O</div>
+      <div><span class="swatch" style="background:#2563eb"></span>Locus circle</div>
+      <div><span class="swatch" style="background:#f59e0b"></span>Centre of locus (a,2a)</div>
+      <div><span class="swatch" style="background:#8b5cf6"></span>Radius √5·a</div>
     </div>
-    <div class="controls">
-      <div class="ctrl">
-        <label>Parameter \(a\) <span class="val" id="valA">1.0</span></label>
-        <input type="range" id="slA" min="0.5" max="2.5" step="0.1" value="1">
+  </section>
+
+  <!-- RIGHT: QUESTION + SOLUTION -->
+  <section class="panel">
+    <div class="qtext">
+      <p>Denote the origin by $O$. The coordinates of the point $A$ are $(a,\,2a)$, where $a>0$. Let $P$ be a moving point in the rectangular coordinate plane such that $AP = OA$. The locus of $P$ is a</p>
+      <div class="options">
+        <span><b>A.</b> point.</span>
+        <span><b>B.</b> circle.</span>
+        <span><b>C.</b> rhombus.</span>
+        <span><b>D.</b> straight line.</span>
       </div>
-      <div class="ctrl">
-        <label>Move \(P\) around the circle <span class="val" id="valT">0°</span></label>
-        <input type="range" id="slT" min="0" max="360" step="1" value="40">
-      </div>
-      <div class="chk"><input type="checkbox" id="ckOA" checked><label for="ckOA" style="display:inline">Show OA</label></div>
-      <div class="chk"><input type="checkbox" id="ckAP" checked><label for="ckAP" style="display:inline">Show AP</label></div>
-    </div>
-    <div class="readout" id="ro1"></div>
-
-    <div class="step" id="s1-1">
-      <div class="step-head"><span class="badge">Step 1</span></div>
-      <p>Compute \(OA\), the distance from \(O(0,0)\) to \(A(a,2a)\):</p>
-      \[ OA=\sqrt{a^2+(2a)^2}=\sqrt{a^2+4a^2}=\sqrt{5a^2}=\sqrt{5}\,a \]
-      <div class="hint"><b>Hint:</b> Since \(a&gt;0\), \(\sqrt{5a^2}=\sqrt{5}\,a\). The quantity \(OA\) is a fixed positive constant once \(a\) is fixed.</div>
+      <div class="figbox">Figure: origin O, point A(a, 2a) with OA drawn.</div>
     </div>
 
-    <div class="step" id="s1-2">
-      <div class="step-head"><span class="badge">Step 2</span></div>
-      <p>Write the distance \(AP\) using the distance formula:</p>
-      \[ AP=\sqrt{(x-a)^2+(y-2a)^2} \]
-      <div class="hint"><b>Hint:</b> Apply \(\sqrt{(x_1-x_2)^2+(y_1-y_2)^2}\) directly. Square both sides next to remove the radicals.</div>
+    <!-- FIGURE_HERE -->
+
+    <div class="step" data-step="1">
+      <span class="tag">STEP 1 · SET UP</span>
+      <p>Let the moving point be $P=(x,\,y)$. Also $O=(0,0)$ and $A=(a,\,2a)$ with $a>0$.</p>
+      <p>The condition is</p>
+      $$AP = OA.$$
+      <div class="hint">Hint: "locus" = set of ALL points satisfying a distance condition — so we write the condition algebraically and identify the shape.</div>
     </div>
 
-    <div class="step" id="s1-3">
-      <div class="step-head"><span class="badge">Step 3</span></div>
-      <p>Set \(AP=OA\) and square both sides:</p>
-      \[ \sqrt{(x-a)^2+(y-2a)^2}=\sqrt{5}\,a \]
-      \[ \Rightarrow\ (x-a)^2+(y-2a)^2=5a^2 \]
-      <div class="answer">✓ Equation of the locus: \((x-a)^2+(y-2a)^2=5a^2\)</div>
-      <div class="hint"><b>Hint:</b> This is the standard form \((x-h)^2+(y-k)^2=r^2\) of a circle.</div>
+    <div class="step" data-step="2">
+      <span class="tag">STEP 2 · COMPUTE OA</span>
+      <p>Distance $OA$ (from origin to $A$):</p>
+      $$OA=\sqrt{(a-0)^2+(2a-0)^2}=\sqrt{a^2+4a^2}=\sqrt{5a^2}=\sqrt{5}\,a.$$
     </div>
 
-    <div class="btnrow">
-      <button class="next" data-target="1" data-total="3">Next step →</button>
-      <span class="counter" id="c1">0 / 3</span>
-    </div>
-  </div>
-
-  <!-- PART (b) -->
-  <div class="card">
-    <h2>Part (b) — Identify the locus <span class="tag">Conclusion</span></h2>
-    <p>Compare the squared equation with the general circle equation \((x-h)^2+(y-k)^2=r^2\).</p>
-
-    <div class="canvas-box">
-      <canvas id="cv2" width="560" height="420"></canvas>
-    </div>
-    <div class="controls">
-      <div class="ctrl">
-        <label>Centre parameter \(a\) <span class="val" id="valA2">1.0</span></label>
-        <input type="range" id="slA2" min="0.5" max="2.5" step="0.1" value="1">
-      </div>
-      <div class="chk"><input type="checkbox" id="ckRad" checked><label for="ckRad" style="display:inline">Show radius \(r=\sqrt5 a\)</label></div>
-      <div class="chk"><input type="checkbox" id="ckPass" checked><label for="ckPass" style="display:inline">Show \(P\) with \(AP=OA\)</label></div>
-    </div>
-    <div class="readout" id="ro2"></div>
-
-    <div class="step" id="s2-1">
-      <div class="step-head"><span class="badge">Step 1</span></div>
-      <p>Read off the centre and the radius from \((x-a)^2+(y-2a)^2=5a^2\):</p>
-      \[ \text{centre}=(a,\,2a)=A,\qquad r=\sqrt{5a^2}=\sqrt{5}\,a \]
-      <div class="hint"><b>Hint:</b> The centre of this circle is exactly the fixed point \(A\). The radius equals \(OA\), which is fixed.</div>
+    <div class="step" data-step="3">
+      <span class="tag">STEP 3 · WRITE AP = OA</span>
+      <p>Distance $AP$ (from $A$ to $P$):</p>
+      $$\sqrt{(x-a)^2+(y-2a)^2}=\sqrt{a^2+(2a)^2}$$
+      $$\sqrt{(x-a)^2+(y-2a)^2}=\sqrt{5a^2}$$
     </div>
 
-    <div class="step" id="s2-2">
-      <div class="step-head"><span class="badge">Step 2</span></div>
-      <p>The locus of \(P\) consists of all points at the fixed distance \(\sqrt5 a\) from the fixed point \(A\). This is by definition a circle:</p>
-      \[ \text{Locus of }P:\ \text{circle centred at }(a,2a)\text{ with radius }\sqrt5\,a \]
-      <div class="hint"><b>Hint:</b> A "point" would require \(OA=0\) (impossible since \(a&gt;0\)). A "straight line" requires a perpendicular-distance condition, not a fixed distance from a fixed point.</div>
+    <div class="step" data-step="4">
+      <span class="tag">STEP 4 · SQUARE & SIMPLIFY</span>
+      <p>Squaring both sides:</p>
+      $$(x-a)^2+(y-2a)^2=5a^2.$$
+      <p>This is the equation of a circle with centre $(a,\,2a)$ and radius $\sqrt{5}\,a$.</p>
     </div>
 
-    <div class="step" id="s2-3">
-      <div class="step-head"><span class="badge">Step 3</span></div>
-      <p>Therefore the locus of \(P\) is a <strong>circle</strong>, so the correct option is <strong>B</strong>.</p>
-      <div class="answer">✓ The locus of \(P\) is a circle (Option B).</div>
-      <div class="hint"><b>Hint:</b> Key idea — <em>a locus defined by a constant distance from a fixed point is a circle.</em></div>
+    <div class="step" data-step="5">
+      <span class="tag">STEP 5 · INTERPRET</span>
+      <p>The locus of $P$ is a <b>circle</b> centred at $A(a,2a)$ with radius $\sqrt{5}\,a$.</p>
+      <p>Note: the locus passes through $O$ (since $OA=\sqrt5 a$), and $OA$ itself is a radius of that circle — visually the red segment $OA$ has the same length as the purple radius.</p>
     </div>
 
-    <div class="btnrow">
-      <button class="next" data-target="2" data-total="3">Next step →</button>
-      <span class="counter" id="c2">0 / 3</span>
+    <div class="ansbox">
+      Answer: B. circle
+      <small>Locus: $(x-a)^2+(y-2a)^2=5a^2$</small>
     </div>
-  </div>
+  </section>
 
-  <!-- SUMMARY -->
-  <div class="card dark">
-    <h2>Summary of Answers</h2>
-    <ul>
-      <li>\(OA=\sqrt{a^2+(2a)^2}=\sqrt5\,a\) — a <span class="em">fixed radius</span>.</li>
-      <li>\(AP=\sqrt{(x-a)^2+(y-2a)^2}\) — distance from \(P\) to the fixed point \(A\).</li>
-      <li>Condition \(AP=OA\) gives \((x-a)^2+(y-2a)^2=5a^2\).</li>
-      <li>Centre \(=(a,2a)=A\), radius \(=\sqrt5\,a\).</li>
-      <li>The locus of \(P\) is a <span class="em">circle</span> → <span class="em">Option B</span>.</li>
-    </ul>
-  </div>
-
-  <footer>HKDSE Mathematics · Coordinate Geometry · Interactive Solution</footer>
 </div>
 
 <script>
-/* ================= MATHJAX RE-RENDER ================= */
-function typeset(){
-  if(window.MathJax && MathJax.typesetPromise){
-    MathJax.typesetPromise().catch(()=>{});
-  }
-}
+(function(){
+  const cv=document.getElementById('cv');
+  const ctx=cv.getContext('2d');
+  let mode=1;
 
-/* ================= STEP REVEAL ================= */
-document.querySelectorAll('.next').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    const id = btn.dataset.target;
-    const total = parseInt(btn.dataset.total,10);
-    let shown = 0;
-    for(let i=1;i<=total;i++){
-      const el = document.getElementById('s'+id+'-'+i);
-      if(el && !el.classList.contains('show')){
-        el.classList.add('show');
-        break;
+  // ---- geometry (world units) ----
+  const a=1;               // a = 1
+  const A={x:a, y:2*a};    // A(1,2)
+  const O={x:0, y:0};
+  const centre={x:a, y:2*a};
+  const R=Math.sqrt(5)*a;  // radius = √5 a
+
+  // world extents
+  const xmin=-4.2, xmax=5.2, ymin=-2.6, ymax=6.2;
+
+  const W=cv.width, H=cv.height;
+  const pad=8;
+  const sx=(W-2*pad)/(xmax-xmin);
+  const sy=(H-2*pad)/(ymax-ymin);
+  const s=Math.min(sx,sy);
+
+  function X(x){ return pad+(x-xmin)*s; }
+  function Y(y){ return H-pad-(y-ymin)*s; }
+
+  function drawGrid(){
+    // background
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#fbfdff';ctx.fillRect(0,0,W,H);
+
+    // axes
+    ctx.strokeStyle='#94a3b8';ctx.lineWidth=1.2;
+    ctx.beginPath();
+    ctx.moveTo(X(xmin),Y(0));ctx.lineTo(X(xmax),Y(0));
+    ctx.moveTo(X(0),Y(ymin));ctx.lineTo(X(0),Y(ymax));
+    ctx.stroke();
+
+    // ticks
+    ctx.fillStyle='#94a3b8';ctx.font='11px sans-serif';ctx.textAlign='center';
+    for(let i=-4;i<=5;i++){
+      if(i===0)continue;
+      ctx.beginPath();ctx.moveTo(X(i),Y(0)-3);ctx.lineTo(X(i),Y(0)+3);ctx.stroke();
+      ctx.fillText(i, X(i), Y(0)+15);
+    }
+    ctx.textAlign='right';
+    for(let j=-2;j<=6;j++){
+      if(j===0)continue;
+      ctx.beginPath();ctx.moveTo(X(0)-3,Y(j));ctx.lineTo(X(0)+3,Y(j));ctx.stroke();
+      ctx.fillText(j, X(0)-7, Y(j)+4);
+    }
+    ctx.fillStyle='#64748b';ctx.font='bold 12px sans-serif';
+    ctx.fillText('O', X(0)-7, Y(0)+15);
+    ctx.textAlign='left';ctx.fillText('x', X(xmax)-14, Y(0)-6);
+    ctx.fillText('y', X(0)+6, Y(ymax)+4);
+  }
+
+  function circle(cx,cy,r,color,width,dash){
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(X(cx),Y(cy),r*s,0,Math.PI*2);
+    ctx.strokeStyle=color;ctx.lineWidth=width;
+    if(dash)ctx.setLineDash(dash);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function point(p,color,label,dx,dy,r){
+    r=r||6;
+    ctx.beginPath();
+    ctx.arc(X(p.x),Y(p.y),r,0,Math.PI*2);
+    ctx.fillStyle=color;ctx.fill();
+    ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
+    if(label){
+      ctx.fillStyle=color;ctx.font='bold 14px sans-serif';
+      ctx.textAlign='left';
+      ctx.fillText(label, X(p.x)+(dx||10), Y(p.y)+(dy||-8));
+    }
+  }
+
+  function line(p1,p2,color,width,dash){
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(X(p1.x),Y(p1.y));
+    ctx.lineTo(X(p2.x),Y(p2.y));
+    ctx.strokeStyle=color;ctx.lineWidth=width;
+    if(dash)ctx.setLineDash(dash);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function draw(){
+    drawGrid();
+
+    const showCircle = mode>=2;
+    const showCentre = mode>=2;
+    const showRadius = mode>=3;
+    const showOA     = mode>=2;
+
+    // Locus circle
+    if(showCircle){
+      circle(centre.x,centre.y,R,'#2563eb',2.5, mode===2?[7,5]:null);
+      // soft fill
+      ctx.save();
+      ctx.beginPath();ctx.arc(X(centre.x),Y(centre.y),R*s,0,Math.PI*2);
+      ctx.fillStyle='rgba(37,99,235,0.06)';ctx.fill();
+      ctx.restore();
+    }
+
+    // radius line (purple)
+    if(showRadius){
+      // draw a radius from centre at an angle (pointing to locus)
+      const ang=-Math.PI/5;
+      const px=centre.x+R*Math.cos(ang);
+      const py=centre.y+R*Math.sin(ang);
+      line(centre,{x:px,y:py},'#8b5cf6',3);
+      point({x:px,y:py},'#8b5cf6',null);
+      ctx.fillStyle='#8b5cf6';ctx.font='bold 12px sans-serif';
+      ctx.fillText('√5·a', X((centre.x+px)/2)+6, Y((centre.y+py)/2)-6);
+    }
+
+    // OA segment (red)
+    if(showOA){
+      line(O,A,'#ef4444',3);
+    }
+
+    // OA label
+    ctx.fillStyle='#ef4444';ctx.font='bold 12px sans-serif';
+    ctx.fillText('OA', X(a/2)+8, Y(a)+8);
+
+    // Centre marker
+    if(showCentre){
+      point(centre,'#f59e0b',null,0,0,5);
+      ctx.fillStyle='#b45309';ctx.font='bold 12px sans-serif';
+      ctx.fillText('(a, 2a)', X(centre.x)+10, Y(centre.y)-10);
+    }
+
+    // Points
+    point(O,'#10b981','O',10,20);
+    point(A,'#ef4444','A(a,2a)',12,-10);
+
+    // radius arc annotation on circle for step5
+    if(mode>=5){
+      ctx.fillStyle='#2563eb';ctx.font='bold 13px sans-serif';
+      ctx.fillText('locus = circle', X(-3.5), Y(5.5));
+    }
+  }
+
+  // ------- scroll sync -------
+  const steps=Array.from(document.querySelectorAll('.step'));
+  const obs=new IntersectionObserver((es)=>{
+    es.forEach(e=>{
+      if(e.isIntersecting){
+        const m=+e.target.dataset.step;
+        mode=m;
+        steps.forEach(st=>st.classList.toggle('active',st===e.target));
+        draw();
       }
-    }
-    // count
-    for(let i=1;i<=total;i++){
-      const el = document.getElementById('s'+id+'-'+i);
-      if(el && el.classList.contains('show')) shown++;
-    }
-    document.getElementById('c'+id).textContent = shown + ' / ' + total;
-    if(shown>=total){
-      btn.disabled = true;
-      btn.textContent = 'All steps revealed ✓';
-    }
-    typeset();
-  });
-});
+    });
+  },{rootMargin:'-15% 0px -55% 0px',threshold:0});
+  steps.forEach(st=>obs.observe(st));
 
-/* ================= SHARED DRAW HELPERS ================= */
-function gridAxes(ctx, W, H, cx, cy, unit){
-  // grid
-  ctx.save();
-  ctx.strokeStyle='#eef2f7'; ctx.lineWidth=1;
-  for(let gx=cx%unit; gx<W; gx+=unit){ ctx.beginPath(); ctx.moveTo(gx,0); ctx.lineTo(gx,H); ctx.stroke(); }
-  for(let gy=cy%unit; gy<H; gy+=unit){ ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(W,gy); ctx.stroke(); }
-  // axes
-  ctx.strokeStyle='#94a3b8'; ctx.lineWidth=1.5;
-  ctx.beginPath(); ctx.moveTo(0,cy); ctx.lineTo(W,cy); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(cx,0); ctx.lineTo(cx,H); ctx.stroke();
-  // ticks
-  ctx.fillStyle='#64748b'; ctx.font='10px system-ui';
-  for(let i=-10;i<=10;i++){
-    if(i===0) continue;
-    ctx.beginPath(); ctx.moveTo(cx+i*unit,cy-3); ctx.lineTo(cx+i*unit,cy+3); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(cx-3,cy-i*unit); ctx.lineTo(cx+3,cy-i*unit); ctx.stroke();
-  }
-  // arrows
-  ctx.fillStyle='#64748b';
-  ctx.beginPath(); ctx.moveTo(W-2,cy); ctx.lineTo(W-12,cy-5); ctx.lineTo(W-12,cy+5); ctx.closePath(); ctx.fill();
-  ctx.beginPath(); ctx.moveTo(cx,2); ctx.lineTo(cx-5,12); ctx.lineTo(cx+5,12); ctx.closePath(); ctx.fill();
-  ctx.font='bold 12px system-ui'; ctx.fillStyle='#475569';
-  ctx.fillText('x', W-18, cy-9);
-  ctx.fillText('y', cx+9, 14);
-  ctx.fillText('O', cx-13, cy+13);
-  ctx.restore();
-}
+  // initial active state for step 1
+  if(steps.length){ steps[0].classList.add('active'); }
 
-function dot(ctx,x,y,label,color,dx,dy){
-  ctx.save();
-  ctx.fillStyle=color;
-  ctx.beginPath(); ctx.arc(x,y,4.5,0,Math.PI*2); ctx.fill();
-  ctx.strokeStyle='#fff'; ctx.lineWidth=1.6; ctx.stroke();
-  if(label){
-    ctx.font='bold 12px system-ui';
-    ctx.fillStyle=color;
-    ctx.fillText(label, x+(dx||8), y+(dy||-9));
-  }
-  ctx.restore();
-}
-
-/* ================= DIAGRAM 1 ================= */
-(function(){
-  const cv = document.getElementById('cv1');
-  const ctx = cv.getContext('2d');
-  const W = cv.width, H = cv.height;
-  const slA = document.getElementById('slA');
-  const slT = document.getElementById('slT');
-  const ckOA = document.getElementById('ckOA');
-  const ckAP = document.getElementById('ckAP');
-  const valA = document.getElementById('valA');
-  const valT = document.getElementById('valT');
-  const ro = document.getElementById('ro1');
-
-  function draw(){
-    const a = parseFloat(slA.value);
-    const deg = parseFloat(slT.value);
-    const unit = 65;
-    const cx = 165, cy = 275;   // origin on canvas
-
-    valA.textContent = a.toFixed(1);
-    valT.textContent = deg.toFixed(0)+'°';
-
-    ctx.clearRect(0,0,W,H);
-    ctx.fillStyle='#fbfcfe'; ctx.fillRect(0,0,W,H);
-    gridAxes(ctx, W, H, cx, cy, unit);
-
-    // canvas -> world helpers
-    const X = wx => cx + wx*unit;
-    const Y = wy => cy - wy*unit;
-
-    const Ax = X(a), Ay = Y(2*a);
-    const rWorld = Math.sqrt(5)*a;
-    const rPix = rWorld*unit;
-
-    // locus circle
-    ctx.save();
-    ctx.strokeStyle='#f59e0b'; ctx.lineWidth=2.6;
-    ctx.setLineDash([]);
-    ctx.beginPath(); ctx.arc(Ax,Ay,rPix,0,Math.PI*2); ctx.stroke();
-    ctx.fillStyle='rgba(245,158,11,.07)'; ctx.fill();
-    ctx.restore();
-
-    // radius line A -> P
-    const th = deg*Math.PI/180;
-    const Px = Ax + rPix*Math.cos(th);
-    const Py = Ay - rPix*Math.sin(th);
-
-    if(ckAP.checked){
-      ctx.save();
-      ctx.strokeStyle='#059669'; ctx.lineWidth=2.4;
-      ctx.beginPath(); ctx.moveTo(Ax,Ay); ctx.lineTo(Px,Py); ctx.stroke();
-      // length label
-      const mx=(Ax+Px)/2, my=(Ay+Py)/2;
-      ctx.fillStyle='#059669'; ctx.font='bold 12px system-ui';
-      ctx.fillText('AP = √5 a', mx+7, my-6);
-      ctx.restore();
-    }
-
-    if(ckOA.checked){
-      ctx.save();
-      ctx.strokeStyle='#1d4ed8'; ctx.lineWidth=2.4;
-      ctx.beginPath(); ctx.moveTo(X(0),Y(0)); ctx.lineTo(Ax,Ay); ctx.stroke();
-      const mx=(X(0)+Ax)/2, my=(Y(0)+Ay)/2;
-      ctx.fillStyle='#1d4ed8'; ctx.font='bold 12px system-ui';
-      ctx.fillText('OA = √5 a', mx-72, my+16);
-      ctx.restore();
-    }
-
-    // centre = A
-    dot(ctx, Ax, Ay, 'A(a, 2a)', '#0f172a', 9, -10);
-    dot(ctx, X(0), Y(0), 'O', '#0f172a', -16, 16);
-    dot(ctx, Px, Py, 'P', '#b45309', 9, -10);
-
-    // origin distance visual (dashed equal-length marker)
-    ctx.save();
-    ctx.setLineDash([5,5]); ctx.strokeStyle='#94a3b8'; ctx.lineWidth=1.3;
-    ctx.beginPath(); ctx.moveTo(Ax,Ay); ctx.lineTo(Ax, Py); ctx.stroke();
-    ctx.restore();
-
-    // caption
-    ctx.fillStyle='#475569'; ctx.font='bold 12px system-ui';
-    ctx.fillText('Locus: circle, centre A(a, 2a), radius √5 a', 14, 20);
-    ctx.font='11px system-ui';
-    ctx.fillStyle='#64748b';
-    ctx.fillText('Drag "a" to rescale, or move P around the circle.', 14, 38);
-
-    // readout
-    ro.textContent =
-      'OA = √5 a = ' + rWorld.toFixed(3) +
-      '   |   AP = ' + rWorld.toFixed(3) +
-      '   |   centre A = (' + a.toFixed(2) + ', ' + (2*a).toFixed(2) + ')' +
-      '   |   radius = ' + rWorld.toFixed(3);
-  }
-
-  [slA, slT, ckOA, ckAP].forEach(el=>{
-    el.addEventListener('input', draw);
-    el.addEventListener('change', draw);
-  });
   draw();
+  window.addEventListener('resize',draw);
 })();
-
-/* ================= DIAGRAM 2 ================= */
-(function(){
-  const cv = document.getElementById('cv2');
-  const ctx = cv.getContext('2d');
-  const W = cv.width, H = cv.height;
-  const slA = document.getElementById('slA2');
-  const ckRad = document.getElementById('ckRad');
-  const ckPass = document.getElementById('ckPass');
-  const valA = document.getElementById('valA2');
-  const ro = document.getElementById('ro2');
-
-  function draw(){
-    const a = parseFloat(slA.value);
-    const unit = 65;
-    const cx = 185, cy = 285;
-
-    valA.textContent = a.toFixed(1);
-
-    ctx.clearRect(0,0,W,H);
-    ctx.fillStyle='#fbfcfe'; ctx.fillRect(0,0,W,H);
-    gridAxes(ctx, W, H, cx, cy, unit);
-
-    const X = wx => cx + wx*unit;
-    const Y = wy => cy - wy*unit;
-
-    const Ax = X(a), Ay = Y(2*a);
-    const rWorld = Math.sqrt(5)*a;
-    const rPix = rWorld*unit;
-
-    // shaded interior of locus circle
-    ctx.save();
-    ctx.beginPath(); ctx.arc(Ax,Ay,rPix,0,Math.PI*2);
-    ctx.fillStyle='rgba(29,78,216,.06)'; ctx.fill();
-    ctx.strokeStyle='#1d4ed8'; ctx.lineWidth=2.6; ctx.stroke();
-    ctx.restore();
-
-    // centre dot A
-    dot(ctx, Ax, Ay, 'A(a, 2a)', '#0f172a', 10, -10);
-    dot(ctx, X(0), Y(0), 'O', '#0f172a', -16, 16);
-
-    // radius line
-    if(ckRad.checked){
-      ctx.save();
-      ctx.strokeStyle='#f59e0b'; ctx.lineWidth=2.2;
-      ctx.setLineDash([6,4]);
-      ctx.beginPath(); ctx.moveTo(Ax,Ay); ctx.lineTo(Ax+rPix, Ay); ctx.stroke();
-      ctx.restore();
-      ctx.fillStyle='#b45309'; ctx.font='bold 12px system-ui';
-      ctx.fillText('r = √5 a', Ax+rPix*0.32, Ay-8);
-    }
-
-    // point P satisfying AP = OA
-    if(ckPass.checked){
-      const th = 55*Math.PI/180;
-      const Px = Ax + rPix*Math.cos(th);
-      const Py = Ay - rPix*Math.sin(th);
-      ctx.save();
-      ctx.strokeStyle='#059669'; ctx.lineWidth=2.2;
-      ctx.beginPath(); ctx.moveTo(Ax,Ay); ctx.lineTo(Px,Py); ctx.stroke();
-      ctx.restore();
-      dot(ctx, Px, Py, 'P', '#047857', 9, -10);
-      // OA segment
-      ctx.save();
-      ctx.strokeStyle='#059669'; ctx.lineWidth=1.8; ctx.setLineDash([4,4]);
-      ctx.beginPath(); ctx.moveTo(X(0),Y(0)); ctx.lineTo(Ax,Ay); ctx.stroke();
-      ctx.restore();
-      ctx.fillStyle='#047857'; ctx.font='bold 11px system-ui';
-      ctx.fillText('AP = OA', (Ax+Px)/2+6, (Ay+Py)/2-6);
-    }
-
-    ctx.fillStyle='#475569'; ctx.font='bold 12px system-ui';
-    ctx.fillText('Circle centre A, radius √5 a — every P with AP = OA lies on it', 14, 20);
-
-    ro.textContent =
-      'centre = (' + a.toFixed(2) + ', ' + (2*a).toFixed(2) + ')   |   ' +
-      'radius = √5 a = ' + rWorld.toFixed(3) + '   |   ' +
-      'OA = ' + rWorld.toFixed(3);
-  }
-
-  [slA, ckRad, ckPass].forEach(el=>{
-    el.addEventListener('input', draw);
-    el.addEventListener('change', draw);
-  });
-  draw();
-})();
-
-/* initial typeset */
-typeset();
 </script>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
-
 </body>
 </html>

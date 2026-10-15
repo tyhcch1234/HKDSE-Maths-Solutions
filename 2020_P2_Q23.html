@@ -1,857 +1,309 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>HKDSE 2020 Paper 2 Q23 · Shortest Distance to Lighthouse</title>
-<script>
-  window.MathJax = {
-    tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['\\[', '\\]']] },
-    svg: { fontCache: 'global' }
-  };
-</script>
-<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE Math 2020 Paper 2 Q23 — Trigonometry</title>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
-  :root {
-    --blue-900: #0f2a4a;
-    --blue-700: #1d4e89;
-    --blue-500: #2b7bd6;
-    --amber-500: #f59e0b;
-    --amber-50: #fff8e6;
-    --emerald-600: #059669;
-    --emerald-50: #ecfdf5;
-    --slate-900: #0b1220;
-    --slate-700: #334155;
-    --slate-500: #64748b;
-    --slate-200: #e2e8f0;
-    --slate-100: #f1f5f9;
-    --card-r: 18px;
-    --shadow: 0 10px 25px -12px rgba(15, 42, 74, 0.35);
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+    background:linear-gradient(135deg,#eef4ff 0%,#f7f0ff 100%);
+    color:#1e293b;padding:12px;min-height:100vh;
   }
-  * { box-sizing: border-box; }
-  html, body { margin: 0; padding: 0; }
-  body {
-    font-family: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
-    background: #f6f8fb;
-    color: var(--slate-900);
-    line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start;}
+  @media(min-width:900px){.split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}}
+  .panel{
+    background:#fff;border-radius:16px;padding:14px;
+    box-shadow:0 6px 24px rgba(80,100,180,0.13);
+    border:1px solid #e2e8f5;
   }
-  .wrap { max-width: 960px; margin: 0 auto; padding: 0 16px 60px; }
-
-  /* ---------- Hero ---------- */
-  header.hero {
-    background: linear-gradient(125deg, #0b2a4a 0%, #1d4e89 45%, #2b7bd6 100%);
-    color: #fff;
-    padding: 42px 20px 54px;
-    position: relative;
-    overflow: hidden;
+  .diagram{position:sticky;top:16px;max-height:calc(100vh - 2rem);overflow-y:auto;}
+  h1{font-size:1.05rem;color:#3730a3;margin-bottom:6px;letter-spacing:.2px;}
+  .sub{font-size:.72rem;color:#64748b;margin-bottom:10px;}
+  canvas{width:100%;height:auto;display:block;border-radius:10px;background:#fbfcff;}
+  .legend{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:10px;font-size:.72rem;color:#475569;}
+  .legend span{display:flex;align-items:center;gap:5px;}
+  .dot{width:11px;height:11px;border-radius:3px;display:inline-block;}
+  .qbox{background:#f4f7ff;border-left:5px solid #4f46e5;border-radius:10px;padding:12px 14px;margin-bottom:14px;}
+  .qbox p{font-size:.92rem;line-height:1.55;}
+  .qtag{font-size:.7rem;font-weight:700;color:#4f46e5;letter-spacing:.5px;margin-bottom:5px;}
+  .opts{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px;}
+  .opt{background:#fff;border:1.5px solid #dbe3f8;border-radius:8px;padding:6px 10px;font-size:.85rem;font-weight:600;color:#334155;}
+  .opt.correct{border-color:#16a34a;background:#f0fdf4;color:#15803d;}
+  .step{
+    background:#fbfcff;border:1.5px solid #e4e9f7;border-left:5px solid #c7d2fe;
+    border-radius:12px;padding:12px 14px;margin-bottom:12px;
+    transition:all .3s ease;opacity:.72;
   }
-  header.hero::after {
-    content: "";
-    position: absolute;
-    right: -80px; top: -80px;
-    width: 320px; height: 320px;
-    background: radial-gradient(circle, rgba(245,158,11,.35), rgba(245,158,11,0) 65%);
-    border-radius: 50%;
+  .step.active{
+    border-left-color:#4f46e5;background:#f5f7ff;
+    box-shadow:0 6px 18px rgba(79,70,229,0.16);opacity:1;transform:translateX(2px);
   }
-  .hero-inner { max-width: 960px; margin: 0 auto; position: relative; z-index: 2; }
-  .eyebrow {
-    font-size: .78rem; letter-spacing: .18em; text-transform: uppercase;
-    color: #a9ccf5; font-weight: 700; margin-bottom: 10px;
+  .stag{font-size:.7rem;font-weight:800;color:#4f46e5;letter-spacing:.6px;margin-bottom:6px;text-transform:uppercase;}
+  .step p{font-size:.86rem;line-height:1.6;margin-bottom:5px;}
+  .hint{background:#fffbeb;border:1px dashed #f59e0b;border-radius:8px;padding:7px 10px;font-size:.78rem;color:#92400e;margin-top:7px;}
+  .ans{
+    background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff;
+    border-radius:12px;padding:12px 16px;text-align:center;font-weight:700;font-size:.95rem;
+    box-shadow:0 6px 18px rgba(34,197,94,.32);margin-top:4px;
   }
-  h1.qtitle { margin: 0 0 8px; font-size: clamp(1.5rem, 4vw, 2.2rem); font-weight: 800; letter-spacing: -0.5px; }
-  .subtitle { color: #cfe2f8; font-size: 1rem; margin: 0 0 18px; }
-  .pills { display: flex; flex-wrap: wrap; gap: 8px; }
-  .pill {
-    background: rgba(255,255,255,.16);
-    border: 1px solid rgba(255,255,255,.32);
-    color: #fff;
-    padding: 5px 13px;
-    border-radius: 999px;
-    font-size: .78rem;
-    font-weight: 600;
-    backdrop-filter: blur(4px);
-  }
-
-  /* ---------- Cards ---------- */
-  .card {
-    background: #fff;
-    border-radius: var(--card-r);
-    box-shadow: var(--shadow);
-    padding: 24px;
-    margin-top: 26px;
-    border: 1px solid var(--slate-200);
-  }
-  .card h2 {
-    margin: 0 0 6px;
-    font-size: 1.18rem;
-    color: var(--blue-900);
-    display: flex; align-items: center; gap: 10px;
-  }
-  .card h2 .dot {
-    width: 11px; height: 11px; border-radius: 50%;
-    background: var(--blue-500); flex: 0 0 auto;
-    box-shadow: 0 0 0 4px rgba(43,123,214,.16);
-  }
-  .qcard { border-left: 6px solid var(--blue-700); }
-  .qtext { font-size: 1rem; }
-  .marks {
-    display: inline-block;
-    background: var(--amber-50);
-    color: #92590b;
-    border: 1px solid #f7d488;
-    border-radius: 8px;
-    font-size: .74rem;
-    font-weight: 700;
-    padding: 2px 8px;
-    margin-left: 6px;
-    white-space: nowrap;
-  }
-  .choices { margin: 12px 0 0; padding-left: 0; list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 6px 18px; }
-  .choices li { font-size: .98rem; }
-  .choices li span.k { display: inline-block; width: 1.4em; font-weight: 700; color: var(--blue-700); }
-
-  /* ---------- Canvas ---------- */
-  .canvas-wrap {
-    background: linear-gradient(180deg, #fbfdff, #f0f5fb);
-    border: 1px solid var(--slate-200);
-    border-radius: 14px;
-    padding: 12px;
-    margin: 14px 0 6px;
-  }
-  canvas { width: 100%; height: auto; display: block; border-radius: 10px; background: #fff; }
-  .ctrls {
-    display: flex; flex-wrap: wrap; gap: 14px 26px;
-    align-items: center; margin-top: 12px;
-  }
-  .ctrl { display: flex; align-items: center; gap: 10px; font-size: .86rem; color: var(--slate-700); font-weight: 600; }
-  input[type=range] { width: 150px; accent-color: var(--blue-500); }
-  input[type=checkbox] { width: 17px; height: 17px; accent-color: var(--blue-500); }
-  .val { font-variant-numeric: tabular-nums; color: var(--blue-700); font-weight: 800; min-width: 3.4em; }
-
-  /* ---------- Steps ---------- */
-  .step {
-    border-left: 4px solid var(--blue-500);
-    background: #f8fbff;
-    border-radius: 0 12px 12px 0;
-    padding: 14px 16px;
-    margin-top: 14px;
-    display: none;
-    animation: fade .35s ease;
-  }
-  .step.show { display: block; }
-  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-  .step-head { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; flex-wrap: wrap; }
-  .badge-num {
-    background: var(--blue-700); color: #fff;
-    border-radius: 8px; padding: 2px 9px;
-    font-size: .74rem; font-weight: 800; letter-spacing: .04em;
-  }
-  .badge-mark {
-    background: var(--amber-500); color: #3d2600;
-    border-radius: 8px; padding: 2px 9px;
-    font-size: .72rem; font-weight: 800;
-  }
-  .hint {
-    background: var(--amber-50);
-    border-left: 4px solid var(--amber-500);
-    border-radius: 0 10px 10px 0;
-    padding: 8px 12px;
-    margin-top: 10px;
-    font-size: .9rem;
-    color: #6b4508;
-  }
-  .hint b { color: #92590b; }
-  .answer {
-    background: var(--emerald-50);
-    border: 1px solid #a7e3c8;
-    border-radius: 10px;
-    padding: 10px 14px;
-    margin-top: 10px;
-    color: #065f46;
-    font-weight: 600;
-    font-size: .95rem;
-  }
-  .stepbtn {
-    margin-top: 16px;
-    background: linear-gradient(135deg, var(--blue-700), var(--blue-500));
-    color: #fff; border: none; border-radius: 12px;
-    padding: 11px 20px; font-size: .92rem; font-weight: 700;
-    cursor: pointer; box-shadow: 0 6px 16px -8px rgba(29,78,137,.9);
-    transition: transform .15s, box-shadow .15s, opacity .15s;
-  }
-  .stepbtn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 10px 20px -8px rgba(29,78,137,.9); }
-  .stepbtn:disabled { opacity: .55; cursor: not-allowed; }
-  .counter {
-    font-size: .82rem; color: var(--slate-500); font-weight: 700;
-    margin-left: 12px;
-  }
-  .row { display: flex; align-items: center; flex-wrap: wrap; }
-
-  /* ---------- Summary ---------- */
-  .summary {
-    background: linear-gradient(135deg, #0b1220, #17324f);
-    color: #e8eef7;
-    border-radius: var(--card-r);
-    padding: 26px;
-    margin-top: 26px;
-    box-shadow: var(--shadow);
-  }
-  .summary h2 { color: #fff; margin: 0 0 14px; font-size: 1.18rem; display: flex; align-items: center; gap: 10px;}
-  .summary ul { margin: 0; padding-left: 20px; }
-  .summary li { margin-bottom: 10px; }
-  .summary .hl { color: #fbbf24; font-weight: 800; }
-
-  footer {
-    text-align: center; color: var(--slate-500);
-    font-size: .82rem; padding: 30px 16px 10px;
-  }
-  @media (max-width: 560px){
-    .card { padding: 18px; }
-    .choices { grid-template-columns: 1fr; }
-    input[type=range]{ width: 110px; }
+  @media(max-width:640px){
+    body{padding:6px;}
+    .panel{padding:9px;border-radius:12px;}
+    h1{font-size:.85rem;}
+    .qbox p{font-size:.8rem;}
+    .step p{font-size:.76rem;}
+    .stag{font-size:.62rem;}
+    .opt{font-size:.75rem;}
+    .legend{font-size:.62rem;}
   }
 </style>
 </head>
 <body>
-
-<header class="hero">
-  <div class="hero-inner">
-    <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</div>
-    <h1 class="qtitle">2020 Paper 2 · Question 23</h1>
-    <p class="subtitle">Shortest distance from a ship to a lighthouse — bearings &amp; right-angled trigonometry</p>
-    <div class="pills">
-      <span class="pill">Bearings</span>
-      <span class="pill">S 60° E</span>
-      <span class="pill">Right-angled Triangle</span>
-      <span class="pill">Perpendicular Distance</span>
-      <span class="pill">sin ratio</span>
-    </div>
-  </div>
-</header>
-
-<div class="wrap">
-
-  <!-- QUESTION CARD -->
-  <section class="card qcard">
-    <h2><span class="dot"></span>Question</h2>
-    <p class="qtext">
-      A ship is \(50\text{ km}\) due west of a lighthouse. If the ship moves in the direction
-      \(\text{S }60^\circ\text{E}\), find the shortest distance between the ship and the lighthouse.
-    </p>
-    <ul class="choices">
-      <li><span class="k">A.</span> \(20\text{ km}\)</li>
-      <li><span class="k">B.</span> \(25\text{ km}\)</li>
-      <li><span class="k">C.</span> \(43\text{ km}\)</li>
-      <li><span class="k">D.</span> \(87\text{ km}\)</li>
-    </ul>
-    <p class="marks"></p><figure style="margin:12px 0;text-align:center;"><img src="figures/2020_P2_Q23.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
-  </section>
-
-  <!-- PART A -->
-  <section class="card">
-    <h2><span class="dot"></span>Part (a) — Set up the diagram &amp; find \(\angle BAC\)</h2>
-    <p>Place the lighthouse at \(A\) and the ship's initial position at \(B\), \(50\text{ km}\) due east of \(A\). The ship then travels in the direction \(\text{S }60^\circ\text{E}\).</p>
-
-    <div class="canvas-wrap">
-      <canvas id="cvA" width="880" height="470"></canvas>
-    </div>
-    <div class="ctrls">
-      <label class="ctrl">Travel direction from south (°E):
-        <input type="range" id="angA" min="10" max="80" value="60" step="1" />
-        <span class="val" id="angAVal">60°</span>
-      </label>
-      <label class="ctrl"><input type="checkbox" id="showPerpA" checked /> Show perpendicular \(BC\)</label>
-      <label class="ctrl"><input type="checkbox" id="showAngleA" checked /> Show right angle at \(C\)</label>
-    </div>
-
-    <div class="step">
-      <div class="step-head"><span class="badge-num">STEP 1</span></div>
-      <p>Let \(A\) be the lighthouse and \(B\) the ship's starting point. Then \(AB = 50\text{ km}\) and \(AB\) runs east&ndash;west.</p>
-      <div class="hint"><b>Hint:</b> "Due west of the lighthouse" means the ship is on the same horizontal line, to the west of \(A\) if we let \(A\) be at the origin and the ship at \(B\).</div>
-    </div>
-
-    <div class="step">
-      <div class="step-head"><span class="badge-num">STEP 2</span></div>
-      <p>The direction of travel is \(\text{S }60^\circ\text{E}\), i.e. it makes \(60^\circ\) with the south direction. In the diagram, the north line through \(B\) is vertical, so the south direction is the downward vertical.</p>
-      \[
-        \angle ABC \text{ (between the south direction and } BA) = 90^\circ.
-      \]
-      <p>At \(A\), the line \(AB\) points due east, so the angle between \(AB\) and the travel line \(BC\) at \(A\) is:</p>
-      \[
-        \angle BAC = 90^\circ - 60^\circ = 30^\circ.
-      \]
-      <div class="hint"><b>Hint:</b> The angle between due east and \(\text{S }60^\circ\text{E}\) is the complement of \(60^\circ\), i.e. \(90^\circ - 60^\circ = 30^\circ\).</div>
-      <div class="answer">\(\angle BAC = 30^\circ\)</div>
-    </div>
-
-    <div class="row">
-      <button class="stepbtn" data-target="cardA">Next step →</button>
-      <span class="counter" id="cnt-cardA">0 / 2</span>
+<div class="split">
+  <!-- LEFT DIAGRAM -->
+  <section class="panel diagram">
+    <h1>Interactive Diagram</h1>
+    <div class="sub">Ship &amp; Lighthouse · Shortest Distance</div>
+    <canvas id="cv" width="520" height="470"></canvas>
+    <div class="legend">
+      <span><i class="dot" style="background:#4f46e5"></i>Lighthouse A</span>
+      <span><i class="dot" style="background:#f59e0b"></i>Ship B</span>
+      <span><i class="dot" style="background:#e11d48"></i>Route (S 60° E)</span>
+      <span><i class="dot" style="background:#16a34a"></i>Shortest dist BC</span>
+      <span><i class="dot" style="background:#0891b2"></i>North lines</span>
     </div>
   </section>
 
-  <!-- PART B -->
-  <section class="card">
-    <h2><span class="dot"></span>Part (b) — Find the shortest distance \(BC\)</h2>
-    <p>The shortest distance from a point to a line is the perpendicular distance. Let \(C\) be the foot of the perpendicular from \(A\) to the ship's path \(BC\).</p>
-
-    <div class="canvas-wrap">
-      <canvas id="cvB" width="880" height="470"></canvas>
+  <!-- RIGHT SOLUTION -->
+  <section class="panel">
+    <div class="qbox">
+      <div class="qtag">[2020 MC #23]</div>
+      <p>A ship is 50 km due west of a lighthouse. If the ship moves in the direction <strong>S 60° E</strong>, find the shortest distance between the ship and the lighthouse.</p>
+      <div class="opts">
+        <div class="opt">A. 20 km</div>
+        <div class="opt correct">B. 25 km ✓</div>
+        <div class="opt">C. 43 km</div>
+        <div class="opt">D. 87 km</div>
+      </div>
     </div>
-    <div class="ctrls">
-      <label class="ctrl">Angle \(\angle BAC\) (°):
-        <input type="range" id="angB" min="10" max="80" value="30" step="1" />
-        <span class="val" id="angBVal">30°</span>
-      </label>
-      <label class="ctrl"><input type="checkbox" id="showRightB" checked /> Show right angle at \(C\)</label>
-      <label class="ctrl"><input type="checkbox" id="showLabelB" checked /> Show lengths along path</label>
-    </div>
+    <figure style="margin:12px 0;text-align:center;"><img src="figures/2020_P2_Q23.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
 
-    <div class="step">
-      <div class="step-head"><span class="badge-num">STEP 1</span></div>
-      <p>In \(\triangle ABC\), \(C\) is the foot of the perpendicular from \(A\) to the line of travel, so \(\angle ACB = 90^\circ\). The shortest distance is therefore \(BC\).</p>
-      <div class="hint"><b>Hint:</b> The perpendicular from a point to a line gives the shortest distance from the point to the line.</div>
-    </div>
-
-    <div class="step">
-      <div class="step-head"><span class="badge-num">STEP 2</span></div>
-      <p>Using the right-angled triangle \(\triangle ABC\):</p>
-      \[
-        \sin\angle BAC = \frac{BC}{AB}.
-      \]
-      \[
-        BC = AB \cdot \sin\angle BAC = 50 \sin 30^\circ = 50 \times \frac{1}{2} = 25\text{ km}.
-      \]
-      <div class="hint"><b>Hint:</b> Here \(AB\) is the hypotenuse and \(BC\) is the side opposite to \(\angle BAC = 30^\circ\). So use \(\sin\).</div>
-      <div class="answer">Shortest distance \(= 25\text{ km}\) — answer <b>B</b></div>
+    <div class="step" data-step="1">
+      <div class="stag">Step 1 · Set up the positions</div>
+      <p>Denote the position of the ship by $B$ and the position of the lighthouse by $A$.</p>
+      <p>Since the ship is <strong>50 km due west</strong> of the lighthouse, we have:</p>
+      <p style="text-align:center">$AB = 50$ km</p>
+      <div class="hint">💡 Draw a North line at each point. "Due west" means $AB$ is horizontal and points west ($A$ is on the right, $B$ on the left).</div>
     </div>
 
-    <div class="row">
-      <button class="stepbtn" data-target="cardB">Next step →</button>
-      <span class="counter" id="cnt-cardB">0 / 2</span>
+    <div class="step" data-step="2">
+      <div class="stag">Step 2 · Interpret the bearing S 60° E</div>
+      <p>From $B$, the direction <strong>S 60° E</strong> means: start facing South, then turn 60° towards the East.</p>
+      <p>So the route $BC$ makes an angle of $60^\circ$ with the southward direction of the North–South line at $B$.</p>
+      <div class="hint">💡 At point $B$, the South direction is vertically downward. S 60° E lies 60° from South towards East.</div>
+    </div>
+
+    <div class="step" data-step="3">
+      <div class="stag">Step 3 · Drop the perpendicular</div>
+      <p>Let $C$ be the foot of the perpendicular from $A$ (lighthouse) to the route of the ship.</p>
+      <p>Then $BC$ is the <strong>shortest distance</strong> between the ship and the lighthouse — because the perpendicular from a point to a line gives the shortest distance.</p>
+    </div>
+
+    <div class="step" data-step="4">
+      <div class="stag">Step 4 · Find ∠BAC</div>
+      <p>The route runs at 60° from the South direction, so $BC$ makes $60^\circ$ with the North–South line at $B$.</p>
+      <p>The line $AB$ is horizontal (East–West) and meets the North line at $B$ at $90^\circ$.</p>
+      <p>Therefore in $\triangle ABC$:</p>
+      <p style="text-align:center">$\angle BAC = 90^\circ - 60^\circ = 30^\circ$</p>
+      <div class="hint">💡 $AC \perp BC$, and $\angle B = 60^\circ$, so $\angle A = 180^\circ - 90^\circ - 60^\circ = 30^\circ$.</div>
+    </div>
+
+    <div class="step" data-step="5">
+      <div class="stag">Step 5 · Use right-angled trigonometry</div>
+      <p>In $\triangle ABC$ (right angle at $C$):</p>
+      <p style="text-align:center">$BC = AB \sin \angle BAC$</p>
+      <p style="text-align:center">$BC = 50 \sin 30^\circ$</p>
+    </div>
+
+    <div class="step" data-step="6">
+      <div class="stag">Step 6 · Compute the answer</div>
+      <p style="text-align:center">$BC = 50 \times 0.5 = 25$ km</p>
+      <div class="ans">Shortest distance = 25 km → Answer B</div>
     </div>
   </section>
-
-  <!-- SUMMARY -->
-  <section class="summary">
-    <h2>📌 Summary of Answers</h2>
-    <ul>
-      <li>Let \(A\) = lighthouse, \(B\) = ship's starting point, \(C\) = foot of perpendicular from \(A\) to the ship's route.</li>
-      <li>\(AB = 50\text{ km}\) (due east&ndash;west).</li>
-      <li>\(\angle BAC = 90^\circ - 60^\circ = 30^\circ\).</li>
-      <li>\(\angle ACB = 90^\circ\) (perpendicular distance).</li>
-      <li>Shortest distance: \(BC = 50\sin 30^\circ = 25\text{ km}\).</li>
-      <li>Correct option: <span class="hl">B (25 km)</span>.</li>
-    </ul>
-  </section>
-
-  <footer>
-    HKDSE Mathematics (Compulsory Part) · Paper 2 · 2020 Q23 — Interactive Solution
-  </footer>
 </div>
 
 <script>
-/* =========================================================
-   Shared drawing helpers
-   ========================================================= */
-function arrowHead(ctx, x, y, angle, size, color) {
-  ctx.save();
-  ctx.translate(x, y);
-  ctx.rotate(angle);
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+let mode = 1;
+
+/* ---- Geometry in world units (km), then scaled ---- */
+// A = lighthouse at origin (0,0)
+// B = ship 50 km west => (-50, 0)
+// Route direction S60E from B: south is (0,-1), east is (1,0)
+// dir = cos60 * east + sin60 * south = (0.5, -0.866)
+const A = {x:0, y:0};
+const B = {x:-50, y:0};
+const d = {x:Math.cos(Math.PI/3), y:-Math.sin(Math.PI/3)}; // south-east
+// C = projection of A onto ray B + t*d
+const tBC = ((A.x-B.x)*d.x + (A.y-B.y)*d.y); // = 25 in world units
+const C = {x:B.x + tBC*d.x, y:B.y + tBC*d.y};
+
+const W = cv.width, H = cv.height;
+// determine bounds
+const allX = [A.x,B.x,C.x], allY = [A.y,B.y,C.y];
+const pad = 55;
+const minX = Math.min(...allX), maxX = Math.max(...allX);
+const minY = Math.min(...allY), maxY = Math.max(...allY);
+const spanX = (maxX-minX)||1, spanY=(maxY-minY)||1;
+const scale = Math.min((W-2*pad)/spanX, (H-2*pad)/spanY);
+const cx = (minX+maxX)/2, cy=(minY+maxY)/2;
+function sx(x){ return W/2 + (x-cx)*scale; }
+function sy(y){ return H/2 - (y-cy)*scale; } // flip y
+
+function line(x1,y1,x2,y2,col,w,dash){
+  ctx.save();ctx.strokeStyle=col;ctx.lineWidth=w;ctx.setLineDash(dash||[]);
+  ctx.beginPath();ctx.moveTo(sx(x1),sy(y1));ctx.lineTo(sx(x2),sy(y2));ctx.stroke();ctx.restore();
+}
+function pt(p,col,r,label,dx,dy){
+  ctx.save();ctx.fillStyle=col;ctx.beginPath();ctx.arc(sx(p.x),sy(p.y),r,0,7);ctx.fill();
+  ctx.font='bold 14px Segoe UI';ctx.fillStyle=col;ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(label,sx(p.x)+(dx||0),sy(p.y)+(dy||0));ctx.restore();
+}
+function drawRightAngle(p, u1, u2, size){
+  // draws small right-angle square at p between unit vectors u1,u2
+  const px=sx(p.x), py=sy(p.y);
+  const s1x=(u1.x)*scale*size, s1y=-(u1.y)*scale*size;
+  const s2x=(u2.x)*scale*size, s2y=-(u2.y)*scale*size;
+  ctx.save();ctx.strokeStyle='#94a3b8';ctx.lineWidth=1.6;
   ctx.beginPath();
-  ctx.moveTo(0, 0);
-  ctx.lineTo(-size, size * 0.5);
-  ctx.lineTo(-size, -size * 0.5);
-  ctx.closePath();
-  ctx.fillStyle = color;
-  ctx.fill();
+  ctx.moveTo(px+s1x,py+s1y);ctx.lineTo(px+s1x+s2x,py+s1y+s2y);ctx.lineTo(px+s2x,py+s2y);
+  ctx.stroke();ctx.restore();
+}
+function arrowHead(x,y,ang,col){
+  ctx.save();ctx.translate(x,y);ctx.rotate(ang);ctx.fillStyle=col;
+  ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(-10,-4);ctx.lineTo(-10,4);ctx.closePath();ctx.fill();ctx.restore();
+}
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  // subtle grid
+  ctx.save();ctx.strokeStyle='#eef2fb';ctx.lineWidth=1;
+  for(let x=0;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
   ctx.restore();
-}
 
-function drawNorthArrow(ctx, x, y, size, color) {
-  ctx.save();
-  ctx.strokeStyle = color;
-  ctx.fillStyle = color;
-  ctx.lineWidth = 2;
-  // shaft
-  ctx.beginPath();
-  ctx.moveTo(x, y + size);
-  ctx.lineTo(x, y - size);
-  ctx.stroke();
-  // head
-  ctx.beginPath();
-  ctx.moveTo(x, y - size - 6);
-  ctx.lineTo(x - 6, y - size + 6);
-  ctx.lineTo(x + 6, y - size + 6);
-  ctx.closePath();
-  ctx.fill();
-  // "N"
-  ctx.font = "bold 15px 'Segoe UI', sans-serif";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "bottom";
-  ctx.fillText("N", x, y - size - 10);
+  // highlight colours depending on mode
+  const focusPerp = (mode>=3);
+  const focusAngle = (mode===4);
+  const focusRoute = (mode>=2);
+
+  // --- North lines (vertical dashed) at A and B ---
+  const nlen = 90;
+  line(A.x, A.y, A.x, A.y+nlen, '#0891b2', 1.6, [6,5]);
+  line(B.x, B.y, B.x, B.y+nlen, '#0891b2', 1.6, [6,5]);
+  // "N" labels
+  ctx.save();ctx.fillStyle='#0891b2';ctx.font='bold 13px Segoe UI';ctx.textAlign='center';
+  ctx.fillText('N',sx(A.x),sy(A.y+nlen)-6);
+  ctx.fillText('N',sx(B.x),sy(B.y+nlen)-6);
   ctx.restore();
+  // north arrows
+  arrowHead(sx(A.x),sy(A.y+nlen)+2,-Math.PI/2,'#0891b2');
+  arrowHead(sx(B.x),sy(B.y+nlen)+2,-Math.PI/2,'#0891b2');
+
+  // --- route ray from B (long) ---
+  const rayLen = 60;
+  const rEnd = {x:B.x+d.x*rayLen, y:B.y+d.y*rayLen};
+  line(B.x,B.y,rEnd.x,rEnd.y, focusRoute?'#e11d48':'#f3a6b8', focusRoute?2.6:2.0, []);
+  // arrow along route
+  const ang = Math.atan2(-d.y, d.x);
+  arrowHead(sx(rEnd.x),sy(rEnd.y),ang, focusRoute?'#e11d48':'#f3a6b8');
+
+  // --- AB segment ---
+  line(A.x,A.y,B.x,B.y,'#4f46e5',2.6,[]);
+  // 50 km label
+  ctx.save();ctx.font='bold 14px Segoe UI';ctx.fillStyle='#4f46e5';ctx.textAlign='center';
+  ctx.fillText('50 km',(sx(A.x)+sx(B.x))/2, sy(A.y)-12);
+  ctx.restore();
+
+  // --- perpendicular AC (shortest distance) and BC segment ---
+  if(focusPerp){
+    // AC dotted line
+    line(A.x,A.y,C.x,C.y,'#16a34a',2.2,[7,5]);
+    // BC highlighted segment
+    line(B.x,B.y,C.x,C.y,'#16a34a',3.4,[]);
+    // right angle at C
+    // unit vector C->A and C->B
+    const ca = {x:A.x-C.x, y:A.y-C.y};
+    const nca = Math.hypot(ca.x,ca.y); const ua={x:ca.x/nca,y:ca.y/nca};
+    const cb = {x:B.x-C.x, y:B.y-C.y};
+    const ncb = Math.hypot(cb.x,cb.y); const ub={x:cb.x/ncb,y:cb.y/ncb};
+    drawRightAngle(C, ua, ub, 7);
+    // BC length label
+    ctx.save();ctx.font='bold 13px Segoe UI';ctx.fillStyle='#16a34a';ctx.textAlign='left';
+    const mx=(sx(B.x)+sx(C.x))/2, my=(sy(B.y)+sy(C.y))/2;
+    ctx.fillText('shortest', mx+8, my+16);
+    ctx.fillText('distance', mx+8, my+30);
+    ctx.restore();
+  }
+
+  // --- Angle at B (60 between south line and route) ---
+  if(mode>=2){
+    ctx.save();
+    ctx.strokeStyle='#f59e0b';ctx.lineWidth=2;ctx.beginPath();
+    const bx=sx(B.x),by=sy(B.y);
+    const r=34;
+    // south direction angle = +90deg in canvas (downward)
+    const aSouth = Math.PI/2;
+    const aRoute = Math.atan2(sy(B.y+d.y*10)-by, sx(B.x+d.x*10)-bx);
+    ctx.arc(bx,by,r,Math.min(aSouth,aRoute),Math.max(aSouth,aRoute));
+    ctx.stroke();
+    ctx.font='bold 13px Segoe UI';ctx.fillStyle='#d97706';
+    ctx.fillText('60°', bx+16, by+38);
+    ctx.restore();
+  }
+
+  // --- Angle at A (30) ---
+  if(focusAngle){
+    ctx.save();
+    const ax=sx(A.x),ay=sy(A.y);
+    const r=40;
+    const aAB = Math.atan2(0, -1); // pointing left = PI
+    const aAC = Math.atan2(sy(C.y)-ay, sx(C.x)-ax);
+    ctx.strokeStyle='#7c3aed';ctx.lineWidth=2;ctx.beginPath();
+    ctx.arc(ax,ay,r,Math.min(aAB,aAC),Math.max(aAB,aAC));
+    ctx.stroke();
+    ctx.font='bold 14px Segoe UI';ctx.fillStyle='#7c3aed';
+    ctx.fillText('30°', ax-56, ay+28);
+    ctx.restore();
+  }
+
+  // --- Points ---
+  pt(A,'#4f46e5',7,'A',-16,-14);
+  pt(B,'#f59e0b',7,'B',-14,-14);
+  if(mode>=3) pt(C,'#16a34a',7,'C',16,14);
+
+  // highlight overlay for perpendicular (mode 3)
+  if(mode===3){
+    ctx.save();ctx.strokeStyle='rgba(22,163,74,.9)';ctx.lineWidth=2;ctx.setLineDash([4,4]);
+    ctx.beginPath();ctx.arc(sx(C.x),sy(C.y),20,0,7);ctx.stroke();ctx.restore();
+  }
 }
 
-function drawPt(ctx, x, y, r, fill, stroke) {
-  ctx.beginPath();
-  ctx.arc(x, y, r, 0, Math.PI * 2);
-  ctx.fillStyle = fill;
-  ctx.fill();
-  ctx.strokeStyle = stroke;
-  ctx.lineWidth = 2;
-  ctx.stroke();
-}
+/* ---- Scroll sync ---- */
+const steps=Array.from(document.querySelectorAll('.step'));
+const obs=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){
+  const m=+e.target.dataset.step; mode=m;
+  steps.forEach(st=>st.classList.toggle('active',st===e.target)); draw();}});},
+  {rootMargin:'-15% 0px -55% 0px',threshold:0});
+steps.forEach(st=>obs.observe(st));
 
-/* =========================================================
-   Diagram A — setup & angle BAC
-   ========================================================= */
-(function () {
-  const cv = document.getElementById('cvA');
-  const ctx = cv.getContext('2d');
-  const W = cv.width, H = cv.height;
-
-  const angSlider = document.getElementById('angA');
-  const angVal = document.getElementById('angAVal');
-  const showPerp = document.getElementById('showPerpA');
-  const showAngle = document.getElementById('showAngleA');
-
-  // world: A at origin, B at (50, 0)  [units = km]
-  // screen mapping
-  const pad = 70;
-  function mapX(x) { return pad + (x / 62) * (W - 2 * pad); }
-  function mapY(y) { return H - pad - (y / 45) * (H - 2 * pad); }
-
-  function draw() {
-    const theta = parseFloat(angSlider.value); // degrees from south towards east
-    const angBAC = 90 - theta;                  // angle at A between AB and path
-    const rad = angBAC * Math.PI / 180;
-
-    // Path direction from B: S θ E -> vector (sin θ, -cos θ)
-    const dirx = Math.sin(theta * Math.PI / 180);
-    const diry = -Math.cos(theta * Math.PI / 180);
-
-    // Foot of perpendicular from A (origin) to path line through B (50,0)
-    const bx = 50, by = 0;
-    const t = -(bx * dirx + by * diry) / (dirx * dirx + diry * diry); // projection param (A onto line)
-    const cxw = bx + t * dirx;
-    const cyw = by + t * diry;
-    const dist = Math.hypot(cxw - 0, cyw - 0);
-
-    // clear
-    ctx.clearRect(0, 0, W, H);
-
-    // grid
-    ctx.strokeStyle = "#e8eef6";
-    ctx.lineWidth = 1;
-    for (let gx = 0; gx <= 60; gx += 10) {
-      ctx.beginPath(); ctx.moveTo(mapX(gx), mapY(-20)); ctx.lineTo(mapX(gx), mapY(40)); ctx.stroke();
-    }
-    for (let gy = -20; gy <= 40; gy += 10) {
-      ctx.beginPath(); ctx.moveTo(mapX(-5), mapY(gy)); ctx.lineTo(mapX(62), mapY(gy)); ctx.stroke();
-    }
-
-    // East-West horizontal through A,B
-    ctx.strokeStyle = "#b9c7d8";
-    ctx.lineWidth = 1.5;
-    ctx.setLineDash([6, 5]);
-    ctx.beginPath(); ctx.moveTo(mapX(-8), mapY(0)); ctx.lineTo(mapX(60), mapY(0)); ctx.stroke();
-    ctx.setLineDash([]);
-
-    // Path line from B (extend far)
-    ctx.strokeStyle = "#2b7bd6";
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(mapX(bx), mapY(by));
-    ctx.lineTo(mapX(bx + 45 * dirx), mapY(by + 45 * diry));
-    ctx.stroke();
-    // arrow on path
-    arrowHead(ctx, mapX(bx + 45 * dirx), mapY(by + 45 * diry),
-      Math.atan2(-(diry) * -1, dirx) * 0, 0, "transparent"); // placeholder (arrow below)
-    (function(){
-      const px = mapX(bx + 45 * dirx), py = mapY(by + 45 * diry);
-      const ang = Math.atan2(mapY(by + 46 * diry) - mapY(by + 45 * diry), mapX(bx + 46 * dirx) - mapX(bx + 45 * dirx));
-      arrowHead(ctx, px, py, ang, 12, "#2b7bd6");
-    })();
-
-    // Segment AB
-    ctx.strokeStyle = "#0f2a4a";
-    ctx.lineWidth = 3.5;
-    ctx.beginPath();
-    ctx.moveTo(mapX(0), mapY(0));
-    ctx.lineTo(mapX(bx), mapY(by));
-    ctx.stroke();
-
-    // Perpendicular BC (the foot C)
-    if (showPerp.checked) {
-      ctx.strokeStyle = "#059669";
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(mapX(0), mapY(0));
-      ctx.lineTo(mapX(cxw), mapY(cyw));
-      ctx.stroke();
-    }
-
-    // Right-angle marker at C
-    if (showAngle.checked && showPerp.checked) {
-      const s = 14;
-      const ux = (cxw - 0) / dist, uy = (cyw - 0) / dist; // C->A direction
-      const vx = dirx, vy = diry;                         // C-> along path (towards +)
-      // draw small square at C: from C + u*s to C + (u+v)*s to C + v*s
-      const p1x = mapX(cxw), p1y = mapY(cyw);
-      const p2x = mapX(cxw + ux * 6), p2y = mapY(cyw + uy * 6);
-      const p3x = mapX(cxw + ux * 6 + vx * 6), p3y = mapY(cyw + uy * 6 + vy * 6);
-      const p4x = mapX(cxw + vx * 6), p4y = mapY(cyw + vy * 6);
-      ctx.strokeStyle = "#059669";
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(p1x, p1y); ctx.lineTo(p2x, p2y); ctx.lineTo(p3x, p3y); ctx.lineTo(p4x, p4y);
-      ctx.stroke();
-    }
-
-    // North arrow at B
-    drawNorthArrow(ctx, mapX(bx), mapY(by), 34, "#64748b");
-
-    // Angle arc at A between AB (east) and AC
-    ctx.strokeStyle = "#f59e0b";
-    ctx.lineWidth = 2.5;
-    ctx.beginPath();
-    const angA = Math.atan2(-(cyw - 0), cxw - 0); // screen angle from A to C
-    ctx.arc(mapX(0), mapY(0), 52, 0, angA, angA < 0);
-    ctx.stroke();
-    // Label angle BAC
-    const mid = angA / 2;
-    ctx.fillStyle = "#92590b";
-    ctx.font = "bold 16px 'Segoe UI', sans-serif";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText("30°", mapX(0) + 72 * Math.cos(mid), mapY(0) + 72 * Math.sin(mid));
-
-    // angle at B between south and BA (right angle)
-    ctx.strokeStyle = "#94a3b8";
-    ctx.lineWidth = 2;
-    // small right angle marker between south and BA
-    const bs = 22;
-    ctx.beginPath();
-    ctx.moveTo(mapX(bx), mapY(by) + bs);
-    ctx.lineTo(mapX(bx) - bs, mapY(by) + bs);
-    ctx.stroke();
-
-    // points & labels
-    drawPt(ctx, mapX(0), mapY(0), 6, "#f59e0b", "#92590b");
-    drawPt(ctx, mapX(bx), mapY(by), 6, "#0f2a4a", "#0f2a4a");
-    if (showPerp.checked) drawPt(ctx, mapX(cxw), mapY(cyw), 6, "#059669", "#065f46");
-
-    ctx.font = "bold 17px 'Segoe UI', sans-serif";
-    ctx.fillStyle = "#0f2a4a";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "bottom";
-    ctx.fillText("A (lighthouse)", mapX(0), mapY(0) - 14);
-    ctx.textBaseline = "top";
-    ctx.fillText("B", mapX(bx) - 4, mapY(by) + 12);
-    if (showPerp.checked) {
-      ctx.fillStyle = "#065f46";
-      ctx.fillText("C", mapX(cxw) + 6, mapY(cyw) + 10);
-    }
-
-    // Labels: AB = 50 km
-    ctx.fillStyle = "#0f2a4a";
-    ctx.font = "bold 15px 'Segoe UI', sans-serif";
-    ctx.textAlign = "center";
-    ctx.fillText("50 km", (mapX(0) + mapX(bx)) / 2, mapY(0) - 18);
-
-    // Direction label S 60 E
-    ctx.fillStyle = "#2b7bd6";
-    ctx.font = "bold 14px 'Segoe UI', sans-serif";
-    ctx.textAlign = "left";
-    ctx.fillText("S " + theta + "° E", mapX(bx + 18 * dirx) + 8, mapY(by + 18 * diry));
-
-    // Readout box
-    ctx.fillStyle = "rgba(255,255,255,0.94)";
-    ctx.strokeStyle = "#cbd5e1";
-    ctx.lineWidth = 1.5;
-    roundRect(ctx, W - 240, 16, 224, 78, 12);
-    ctx.fill(); ctx.stroke();
-    ctx.fillStyle = "#0b1220";
-    ctx.font = "bold 14px 'Segoe UI', sans-serif";
-    ctx.textAlign = "left";
-    ctx.fillText("AB = 50 km", W - 222, 40);
-    ctx.fillStyle = "#92590b";
-    ctx.fillText("∠BAC = " + angBAC + "°", W - 222, 62);
-    ctx.textAlign = "left";
-    ctx.fillStyle = "#2b7bd6";
-    ctx.fillText("θ (from South) = " + theta + "°", W - 222, 84);
-  }
-
-  function roundRect(c, x, y, w, h, r) {
-    c.beginPath();
-    c.moveTo(x + r, y);
-    c.arcTo(x + w, y, x + w, y + h, r);
-    c.arcTo(x + w, y + h, x, y + h, r);
-    c.arcTo(x, y + h, x, y, r);
-    c.arcTo(x, y, x + w, y, r);
-    c.closePath();
-  }
-
-  angSlider.addEventListener('input', () => {
-    angVal.textContent = angSlider.value + "°";
-    draw();
-  });
-  showPerp.addEventListener('change', draw);
-  showAngle.addEventListener('change', draw);
-  draw();
-})();
-
-/* =========================================================
-   Diagram B — shortest distance BC
-   ========================================================= */
-(function () {
-  const cv = document.getElementById('cvB');
-  const ctx = cv.getContext('2d');
-  const W = cv.width, H = cv.height;
-
-  const angSlider = document.getElementById('angB');
-  const angVal = document.getElementById('angBVal');
-  const showRight = document.getElementById('showRightB');
-  const showLabel = document.getElementById('showLabelB');
-
-  const pad = 70;
-  function mapX(x) { return pad + (x / 62) * (W - 2 * pad); }
-  function mapY(y) { return H - pad - (y / 45) * (H - 2 * pad); }
-
-  function draw() {
-    const angBAC = parseFloat(angSlider.value); // between AB and path at A
-    const theta = 90 - angBAC;                  // from South
-    const rad = angBAC * Math.PI / 180;
-
-    // B at (50, 0), path direction from B: S theta E -> (sin theta, -cos theta)
-    const dirx = Math.sin(theta * Math.PI / 180);
-    const diry = -Math.cos(theta * Math.PI / 180);
-
-    // C = perpendicular projection of origin onto line through B
-    const bx = 50, by = 0;
-    const t = -(bx * dirx + by * diry) / (dirx * dirx + diry * diry);
-    const cxw = bx + t * dirx;
-    const cyw = by + t * diry;
-    const dist = Math.hypot(cxw, cyw); // shortest distance
-
-    ctx.clearRect(0, 0, W, H);
-
-    // grid
-    ctx.strokeStyle = "#e8eef6";
-    ctx.lineWidth = 1;
-    for (let gx = 0; gx <= 60; gx += 10) {
-      ctx.beginPath(); ctx.moveTo(mapX(gx), mapY(-20)); ctx.lineTo(mapX(gx), mapY(40)); ctx.stroke();
-    }
-    for (let gy = -20; gy <= 40; gy += 10) {
-      ctx.beginPath(); ctx.moveTo(mapX(-5), mapY(gy)); ctx.lineTo(mapX(62), mapY(gy)); ctx.stroke();
-    }
-
-    // Path line (extend)
-    ctx.strokeStyle = "#2b7bd6";
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(mapX(bx - 5 * dirx), mapY(by - 5 * diry)); // slightly before B
-    ctx.lineTo(mapX(bx + 50 * dirx), mapY(by + 50 * diry));
-    ctx.stroke();
-
-    // Path arrow
-    (function(){
-      const px = mapX(bx + 48 * dirx), py = mapY(by + 48 * diry);
-      const ang = Math.atan2(mapY(by + 49 * diry) - py, mapX(bx + 49 * dirx) - px);
-      arrowHead(ctx, px, py, ang, 12, "#2b7bd6");
-    })();
-
-    // Triangle ABC
-    ctx.fillStyle = "rgba(251, 191, 36, 0.12)";
-    ctx.beginPath();
-    ctx.moveTo(mapX(0), mapY(0));
-    ctx.lineTo(mapX(bx), mapY(by));
-    ctx.lineTo(mapX(cxw), mapY(cyw));
-    ctx.closePath();
-    ctx.fill();
-
-    // AB
-    ctx.strokeStyle = "#0f2a4a";
-    ctx.lineWidth = 3.5;
-    ctx.beginPath(); ctx.moveTo(mapX(0), mapY(0)); ctx.lineTo(mapX(bx), mapY(by)); ctx.stroke();
-
-    // AC
-    ctx.strokeStyle = "#059669";
-    ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.moveTo(mapX(0), mapY(0)); ctx.lineTo(mapX(cxw), mapY(cyw)); ctx.stroke();
-
-    // BC
-    ctx.strokeStyle = "#f59e0b";
-    ctx.lineWidth = 3.5;
-    ctx.beginPath(); ctx.moveTo(mapX(bx), mapY(by)); ctx.lineTo(mapX(cxw), mapY(cyw)); ctx.stroke();
-
-    // Right angle marker at C
-    if (showRight.checked) {
-      const ux = (0 - cxw) / dist, uy = (0 - cyw) / dist;         // C->A
-      const vx = (bx - cxw), vy = (by - cyw);
-      const vlen = Math.hypot(vx, vy) || 1;
-      const nvx = vx / vlen, nvy = vy / vlen;                      // C->B
-      const s = 6;
-      const p1 = [cxw + ux * s, cyw + uy * s];
-      const p2 = [cxw + ux * s + nvx * s, cyw + uy * s + nvy * s];
-      const p3 = [cxw + nvx * s, cyw + nvy * s];
-      ctx.strokeStyle = "#059669";
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(mapX(p1[0]), mapY(p1[1]));
-      ctx.lineTo(mapX(p2[0]), mapY(p2[1]));
-      ctx.lineTo(mapX(p3[0]), mapY(p3[1]));
-      ctx.stroke();
-    }
-
-    // Points
-    drawPt(ctx, mapX(0), mapY(0), 6, "#f59e0b", "#92590b");
-    drawPt(ctx, mapX(bx), mapY(by), 6, "#0f2a4a", "#0f2a4a");
-    drawPt(ctx, mapX(cxw), mapY(cyw), 6, "#059669", "#065f46");
-
-    // Labels
-    ctx.font = "bold 17px 'Segoe UI', sans-serif";
-    ctx.fillStyle = "#0f2a4a";
-    ctx.textAlign = "center"; ctx.textBaseline = "bottom";
-    ctx.fillText("A", mapX(0), mapY(0) - 14);
-    ctx.textBaseline = "top";
-    ctx.fillText("B", mapX(bx) - 4, mapY(by) + 12);
-    ctx.fillStyle = "#065f46";
-    ctx.fillText("C", mapX(cxw) + 6, mapY(cyw) + 10);
-
-    // Lengths
-    ctx.font = "bold 15px 'Segoe UI', sans-serif";
-    ctx.fillStyle = "#0f2a4a";
-    ctx.textAlign = "center";
-    ctx.fillText("50 km", (mapX(0) + mapX(bx)) / 2, mapY(0) - 30);
-
-    if (showLabel.checked) {
-      ctx.fillStyle = "#92590b";
-      ctx.fillText("BC = " + dist.toFixed(1) + " km",
-        (mapX(bx) + mapX(cxw)) / 2 + 8, (mapY(by) + mapY(cyw)) / 2 + 20);
-      ctx.fillStyle = "#059669";
-      ctx.fillText("AC = " + dist.toFixed(1) + " km",
-        (mapX(0) + mapX(cxw)) / 2 - 40, (mapY(0) + mapY(cyw)) / 2);
-    }
-
-    // Angle arc at A
-    ctx.strokeStyle = "#f59e0b";
-    ctx.lineWidth = 2.5;
-    const a1 = Math.atan2(-(by - 0), bx - 0);
-    const a2 = Math.atan2(-(cyw - 0), cxw - 0);
-    ctx.beginPath();
-    ctx.arc(mapX(0), mapY(0), 54, Math.min(a1, a2), Math.max(a1, a2));
-    ctx.stroke();
-    const mid = (a1 + a2) / 2;
-    ctx.fillStyle = "#92590b";
-    ctx.font = "bold 15px 'Segoe UI', sans-serif";
-    ctx.textAlign = "center"; ctx.textBaseline = "middle";
-    ctx.fillText(angBAC + "°", mapX(0) + 74 * Math.cos(mid), mapY(0) + 74 * Math.sin(mid));
-
-    // North arrow at B
-    drawNorthArrow(ctx, mapX(bx), mapY(by), 30, "#64748b");
-
-    // Readout panel
-    ctx.fillStyle = "rgba(255,255,255,0.95)";
-    ctx.strokeStyle = "#cbd5e1";
-    ctx.lineWidth = 1.5;
-    roundRect(ctx, W - 280, 16, 264, 104, 12);
-    ctx.fill(); ctx.stroke();
-    ctx.fillStyle = "#0b1220";
-    ctx.font = "bold 14px 'Segoe UI', sans-serif";
-    ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
-    ctx.fillText("AB = 50 km", W - 262, 40);
-    ctx.fillStyle = "#92590b";
-    ctx.fillText("∠BAC = " + angBAC + "°", W - 262, 62);
-    ctx.fillStyle = "#059669";
-    ctx.font = "bold 15px 'Segoe UI', sans-serif";
-    ctx.fillText("Shortest dist = " + dist.toFixed(2) + " km", W - 262, 88);
-    ctx.fillStyle = "#2b7bd6";
-    ctx.font = "bold 13px 'Segoe UI', sans-serif";
-    ctx.fillText("BC = AB·sin∠BAC", W - 262, 108);
-  }
-
-  function roundRect(c, x, y, w, h, r) {
-    c.beginPath();
-    c.moveTo(x + r, y);
-    c.arcTo(x + w, y, x + w, y + h, r);
-    c.arcTo(x + w, y + h, x, y + h, r);
-    c.arcTo(x, y + h, x, y, r);
-    c.arcTo(x, y, x + w, y, r);
-    c.closePath();
-  }
-
-  angSlider.addEventListener('input', () => {
-    angVal.textContent = angSlider.value + "°";
-    draw();
-  });
-  showRight.addEventListener('change', draw);
-  showLabel.addEventListener('change', draw);
-  draw();
-})();
-
-/* =========================================================
-   Step-by-step reveal
-   ========================================================= */
-document.querySelectorAll('.stepbtn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const card = btn.closest('.card');
-    const steps = card.querySelectorAll('.step');
-    const counter = document.getElementById('cnt-' + btn.dataset.target);
-    let shown = 0;
-    for (let i = 0; i < steps.length; i++) {
-      if (steps[i].classList.contains('show')) shown++;
-    }
-    if (shown < steps.length) {
-      steps[shown].classList.add('show');
-      shown++;
-    }
-    counter.textContent = shown + " / " + steps.length;
-    if (shown >= steps.length) {
-      btn.disabled = true;
-      btn.textContent = "All steps revealed ✓";
-    }
-    // Re-render MathJax for newly shown content
-    if (window.MathJax && MathJax.typesetPromise) {
-      MathJax.typesetPromise([card]);
-    }
-  });
-});
+draw();
+window.addEventListener('resize',draw);
 </script>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
-
 </body>
 </html>

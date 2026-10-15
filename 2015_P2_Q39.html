@@ -2,862 +2,622 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HKDSE 2015 Paper 2 · Q39 — Trigonometry</title>
-<script>
-MathJax = {
-  tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['\\[','\\]']] },
-  svg: { fontCache: 'global' }
-};
-</script>
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HKDSE 2015 Paper 2 Q39 — Trigonometry</title>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
   :root{
-    --blue:#1e3a8a;
-    --blue-mid:#2563eb;
-    --blue-light:#dbeafe;
-    --amber:#f59e0b;
-    --amber-light:#fffbeb;
-    --emerald:#059669;
-    --emerald-light:#ecfdf5;
-    --ink:#0f172a;
-    --muted:#64748b;
-    --paper:#f1f5f9;
+    --bg:#f3f6fc;
     --card:#ffffff;
-    --shadow:0 4px 18px rgba(15,23,42,.08);
+    --blue:#2563eb;
+    --blue-soft:#dbeafe;
+    --red:#dc2626;
+    --green:#059669;
+    --amber:#f59e0b;
+    --purple:#7c3aed;
+    --ink:#1e293b;
+    --muted:#64748b;
+    --border:#e2e8f0;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{
-    font-family:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
-    background:var(--paper);
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    background:linear-gradient(180deg,#eef3fb 0%,#f7fafc 100%);
     color:var(--ink);
-    line-height:1.65;
-    -webkit-font-smoothing:antialiased;
+    padding:12px;
+    line-height:1.5;
   }
-  .wrap{max-width:980px;margin:0 auto;padding:0 16px 60px;}
+  .wrap{
+    max-width:1400px;
+    margin:0 auto;
+  }
+  h1.title{
+    font-size:clamp(14px,1.5vw,19px);
+    margin:4px 0 12px;
+    color:var(--muted);
+    font-weight:600;
+    letter-spacing:.3px;
+  }
+  h1.title b{color:var(--blue);}
+  .split{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    gap:12px;
+    align-items:start;
+  }
+  @media(min-width:900px){
+    .split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}
+  }
+  .panel{
+    background:var(--card);
+    border-radius:16px;
+    box-shadow:0 6px 22px rgba(30,58,138,.08),0 1px 3px rgba(30,58,138,.06);
+    border:1px solid var(--border);
+    padding:14px;
+  }
+  .diagram{
+    position:sticky;
+    top:16px;
+    max-height:calc(100vh - 2rem);
+    overflow-y:auto;
+  }
+  .diagram h2, .qpanel h2{
+    font-size:clamp(12px,1.1vw,14px);
+    margin:0 0 8px;
+    text-transform:uppercase;
+    letter-spacing:.8px;
+    color:var(--muted);
+  }
+  canvas{
+    width:100%;
+    height:auto;
+    display:block;
+    border-radius:12px;
+    background:#fbfdff;
+  }
+  .legend{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 14px;
+    margin-top:10px;
+    font-size:clamp(10px,1vw,12px);
+    color:#334155;
+  }
+  .legend span{display:inline-flex;align-items:center;gap:5px;}
+  .dot{width:11px;height:11px;border-radius:50%;display:inline-block;}
+  .legend .line{width:16px;height:3px;border-radius:2px;display:inline-block;}
 
-  /* ---------- HERO ---------- */
-  .hero{
-    background:linear-gradient(135deg,#1e3a8a 0%,#2563eb 55%,#3b82f6 100%);
-    color:#fff;
-    padding:40px 16px 48px;
-    position:relative;
-    overflow:hidden;
-  }
-  .hero:before{
-    content:"";position:absolute;inset:-40% -10% auto auto;
-    width:420px;height:420px;border-radius:50%;
-    background:radial-gradient(circle,rgba(255,255,255,.18),transparent 68%);
-  }
-  .hero:after{
-    content:"";position:absolute;bottom:-120px;left:-60px;
-    width:300px;height:300px;border-radius:50%;
-    background:radial-gradient(circle,rgba(245,158,11,.25),transparent 70%);
-  }
-  .hero-inner{max-width:980px;margin:0 auto;position:relative;z-index:2;}
-  .eyebrow{
-    font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;
-    color:#bfdbfe;font-weight:700;margin-bottom:8px;
-  }
-  .hero h1{margin:0 0 6px;font-size:1.95rem;line-height:1.25;font-weight:800;}
-  .hero h2{margin:0 0 18px;font-size:1rem;font-weight:500;color:#dbeafe;}
-  .pills{display:flex;flex-wrap:wrap;gap:8px;}
-  .pill{
-    background:rgba(255,255,255,.15);
-    border:1px solid rgba(255,255,255,.35);
-    padding:5px 13px;border-radius:999px;
-    font-size:.78rem;font-weight:600;letter-spacing:.02em;
-    backdrop-filter:blur(4px);
-  }
-  .pill.gold{background:rgba(245,158,11,.28);border-color:rgba(245,158,11,.6);}
-
-  /* ---------- CARDS ---------- */
-  .card{
-    background:var(--card);border-radius:18px;box-shadow:var(--shadow);
-    padding:24px 22px;margin-top:22px;border:1px solid #e2e8f0;
-  }
-  .card h3{
-    margin:0 0 14px;font-size:1.12rem;font-weight:800;color:var(--blue);
-    display:flex;align-items:center;gap:10px;
-  }
-  .card h3 .chip{
-    background:var(--blue-light);color:var(--blue);
-    font-size:.72rem;font-weight:800;padding:3px 10px;border-radius:999px;
-    letter-spacing:.04em;flex:none;
-  }
-  .card h3 .chip.amber{background:#fef3c7;color:#92400e;}
-  .marks{font-size:.8rem;color:var(--muted);font-weight:700;margin-left:auto;flex:none;}
-  .qtext{font-size:1.02rem;}
   .qbox{
-    background:#f8fafc;border-left:4px solid var(--blue-mid);
-    border-radius:0 12px 12px 0;padding:14px 16px;margin:12px 0;
+    background:var(--blue-soft);
+    border-left:4px solid var(--blue);
+    padding:10px 12px;
+    border-radius:10px;
+    font-size:clamp(12px,1.15vw,15px);
+    margin-bottom:12px;
+  }
+  .qbox b{color:#1d4ed8;}
+  .opts{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:6px 12px;
+    margin-top:8px;
+    font-size:clamp(11px,1.05vw,14px);
+  }
+  .opts div{
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:5px 9px;
+  }
+  .opts .correct{
+    border-color:var(--green);
+    background:#ecfdf5;
+    box-shadow:0 0 0 2px rgba(5,150,105,.15);
   }
 
-  /* ---------- STEP REVEAL ---------- */
   .step{
-    display:none;
-    border:1px solid #e2e8f0;border-radius:14px;
-    padding:16px;margin-top:14px;background:#fcfdff;
-    animation:fade .35s ease;
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:10px 12px;
+    margin-bottom:10px;
+    background:#ffffff;
+    transition:all .25s ease;
+    font-size:clamp(12px,1.1vw,14.5px);
   }
-  .step.show{display:block;}
-  @keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
-  .step-head{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;}
-  .badge-num{
-    background:var(--blue);color:#fff;font-weight:800;font-size:.78rem;
-    width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none;
+  .step.active{
+    border-color:var(--blue);
+    box-shadow:0 0 0 3px rgba(37,99,235,.13);
+    background:#f8fbff;
+    transform:translateX(2px);
   }
-  .badge-mk{
-    background:#fef3c7;color:#92400e;font-weight:800;font-size:.72rem;
-    padding:2px 9px;border-radius:999px;border:1px solid #fcd34d;
+  .tag{
+    display:inline-block;
+    font-size:clamp(10px,.95vw,11.5px);
+    font-weight:700;
+    letter-spacing:.6px;
+    text-transform:uppercase;
+    color:#fff;
+    background:var(--blue);
+    padding:3px 9px;
+    border-radius:999px;
+    margin-bottom:7px;
   }
+  .step:nth-child(4) .tag{background:var(--purple);}
   .hint{
-    background:var(--amber-light);border:1px solid #fde68a;border-left:4px solid var(--amber);
-    border-radius:0 10px 10px 0;padding:10px 14px;margin-top:12px;
-    font-size:.92rem;color:#78350f;
+    background:#fffbeb;
+    border-left:4px solid var(--amber);
+    border-radius:8px;
+    padding:7px 10px;
+    font-size:clamp(11px,1.02vw,13px);
+    margin-top:8px;
+    color:#92400e;
   }
-  .hint b{color:#92400e;}
   .answer{
-    background:var(--emerald-light);border:1px solid #a7f3d0;border-left:4px solid var(--emerald);
-    border-radius:0 10px 10px 0;padding:10px 14px;margin-top:12px;
-    font-size:.95rem;color:#064e3b;font-weight:600;
+    background:linear-gradient(135deg,#ecfdf5,#d1fae5);
+    border:1.5px solid var(--green);
+    border-radius:12px;
+    padding:10px 13px;
+    margin-top:6px;
+    font-weight:700;
+    color:#065f46;
+    font-size:clamp(13px,1.2vw,16px);
+    text-align:center;
   }
-
-  /* ---------- STEP CONTROLS ---------- */
-  .controls{display:flex;align-items:center;gap:14px;margin-top:18px;flex-wrap:wrap;}
-  button.next{
-    background:linear-gradient(135deg,#2563eb,#1d4ed8);
-    color:#fff;border:none;border-radius:999px;
-    padding:11px 24px;font-size:.92rem;font-weight:700;cursor:pointer;
-    box-shadow:0 4px 14px rgba(37,99,235,.32);
-    transition:transform .15s,box-shadow .15s,opacity .2s;
+  .answer small{
+    display:block;
+    font-weight:600;
+    color:#059669;
+    font-size:.72em;
+    letter-spacing:.5px;
+    margin-bottom:3px;
   }
-  button.next:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 7px 20px rgba(37,99,235,.4);}
-  button.next:disabled{
-    background:#cbd5e1;color:#64748b;cursor:default;box-shadow:none;opacity:.9;
+  .step b{color:#1e40af;}
+  .note{
+    font-size:clamp(10.5px,.98vw,12.5px);
+    color:var(--muted);
+    margin-top:6px;
   }
-  button.reset{
-    background:#fff;color:var(--blue);border:2px solid var(--blue-light);
-    border-radius:999px;padding:9px 20px;font-size:.88rem;font-weight:700;cursor:pointer;
-  }
-  button.reset:hover{background:var(--blue-light);}
-  .counter{font-size:.85rem;font-weight:700;color:var(--muted);}
-
-  /* ---------- CANVAS ---------- */
-  .cvwrap{
-    background:#fbfdff;border:1px solid #e2e8f0;border-radius:14px;
-    padding:12px;margin:14px 0;
-  }
-  canvas{width:100%;height:auto;display:block;border-radius:10px;background:#fff;touch-action:none;}
-  .readouts{
-    display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;
-  }
-  .ro{
-    background:#eff6ff;border:1px solid #bfdbfe;border-radius:9px;
-    padding:5px 11px;font-size:.82rem;font-weight:700;color:#1e40af;
-    font-variant-numeric:tabular-nums;
-  }
-  .ro.g{background:#ecfdf5;border-color:#a7f3d0;color:#065f46;}
-  .ro.a{background:#fffbeb;border-color:#fde68a;color:#92400e;}
-  .sliders{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:14px;}
-  .sl label{display:block;font-size:.82rem;font-weight:700;color:#334155;margin-bottom:4px;}
-  .sl input[type=range]{width:100%;accent-color:#2563eb;}
-  .curves{display:flex;flex-wrap:wrap;gap:18px;margin-top:10px;}
-  .curves label{font-size:.83rem;font-weight:700;color:#334155;display:flex;align-items:center;gap:6px;cursor:pointer;}
-  .curves input{accent-color:#2563eb;}
-
-  /* ---------- SUMMARY ---------- */
-  .summary{
-    background:linear-gradient(135deg,#0f172a,#1e293b);
-    color:#e2e8f0;border-radius:18px;padding:26px 24px;margin-top:24px;
-    box-shadow:0 10px 30px rgba(15,23,42,.28);
-  }
-  .summary h3{color:#fff;margin:0 0 16px;font-size:1.12rem;font-weight:800;
-    display:flex;align-items:center;gap:10px;}
-  .summary ul{margin:0;padding-left:0;list-style:none;}
-  .summary li{
-    padding:11px 0 11px 30px;position:relative;border-bottom:1px dashed rgba(148,163,184,.28);
-    font-size:.98rem;
-  }
-  .summary li:last-child{border-bottom:none;}
-  .summary li:before{
-    content:"▸";position:absolute;left:6px;color:#38bdf8;font-weight:900;font-size:1rem;
-  }
-  .summary b{color:#fbbf24;}
-
-  footer{
-    text-align:center;color:#94a3b8;font-size:.82rem;padding:34px 16px 10px;
-  }
-  .katex-display{margin:.55em 0 !important;overflow-x:auto;overflow-y:hidden;}
-  @media(max-width:520px){
-    .hero h1{font-size:1.45rem;}
-    .card{padding:18px 15px;}
-    .card h3{font-size:1rem;}
-  }
+  mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
 </style>
 </head>
 <body>
-
-<!-- ============ HERO ============ -->
-<header class="hero">
-  <div class="hero-inner">
-    <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2 · Multiple Choice</div>
-    <h1>2015 Paper 2 · Question 39</h1>
-    <figure style="margin:12px 0;text-align:center;"><img src="figures/2015_P2_Q39.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure><h2>Trigonometry — Amplitude, period and phase shift of \(y=\sin(kx^\circ+\theta)\)</h2>
-    <div class="pills">
-      <span class="pill">Sine Graph</span>
-      <span class="pill">Period &amp; Frequency \(k\)</span>
-      <span class="pill gold">Phase Shift \(\theta\)</span>
-      <span class="pill">Horizontal Scaling</span>
-    </div>
-  </div>
-</header>
-
 <div class="wrap">
+  <h1 class="title"><b>HKDSE 2015 · Paper 2 · Q39</b> — Topic 13: Trigonometry</h1>
 
-  <!-- ============ QUESTION CARD ============ -->
-  <section class="card">
-    <h3><span class="chip">QUESTION</span> The Problem </h3>
-    <div class="qtext">
-      Let \(k\) be a positive constant and \(-180^\circ < \theta < 180^\circ\). If the figure shows the graph of \(y=\sin(kx^\circ+\theta)\), then
-    </div>
-
-    <div class="cvwrap" style="margin-top:16px;">
-      <canvas id="cvQ" width="820" height="300" aria-label="Graph of y equals sine of k x plus theta"></canvas>
-    </div>
-
-    <div class="qbox">
-      <div style="margin:6px 0;"><b>A.</b> \(\;k=\dfrac{1}{2}\) and \(\theta=-30^\circ\)</div>
-      <div style="margin:6px 0;"><b>B.</b> \(\;k=\dfrac{1}{2}\) and \(\theta=30^\circ\)</div>
-      <div style="margin:6px 0;"><b>C.</b> \(\;k=2\) and \(\theta=-30^\circ\)</div>
-      <div style="margin:6px 0;"><b>D.</b> \(\;k=2\) and \(\theta=30^\circ\)</div>
-    </div>
-
-    <div class="hint">
-      <b>Read the figure:</b> The curve crosses the \(x\)-axis at \(x=75\) going <i>downward</i> (it had been rising),
-      and rises again through the \(x\)-axis at \(x=165\). Two consecutive "rising" axis-crossings are one full period apart.
-    </div>
-  </section>
-
-  <!-- ============ PART 1: FIND k ============ -->
-  <section class="card">
-    <h3><span class="chip">STEP GROUP 1</span> Finding the frequency \(k\) from the period </h3>
-
-    <div class="cvwrap">
-      <canvas id="cvK" width="820" height="300" aria-label="Interactive diagram: period of the sine graph"></canvas>
-      <div class="readouts">
-        <span class="ro" id="roPeriod">Period = 180°</span>
-        <span class="ro g" id="roK">k = 2</span>
-        <span class="ro a" id="roCross">x-intercepts: 75°, 165°</span>
+  <div class="split">
+    <!-- ============ LEFT : DIAGRAM ============ -->
+    <section class="panel diagram">
+      <h2>Interactive Diagram</h2>
+      <canvas id="cv" width="760" height="620"></canvas>
+      <div class="legend">
+        <span><i class="line" style="background:#dc2626"></i> Curve $y=\sin(kx^\circ+\theta)$</span>
+        <span><i class="dot" style="background:#7c3aed"></i> Axis / origin</span>
+        <span><i class="dot" style="background:#059669"></i> $x$-intercept at 75</span>
+        <span><i class="dot" style="background:#f59e0b"></i> $x$-intercept at 165</span>
+        <span><i class="dot" style="background:#2563eb"></i> $y$-intercept / turning points</span>
       </div>
-      <div class="curves">
-        <label><input type="checkbox" id="ckGrid" checked> Show grid</label>
-        <label><input type="checkbox" id="ckPer" checked> Highlight one period</label>
-        <label><input type="checkbox" id="ckRef"> Show reference \(y=\sin 2x^\circ\)</label>
+      <p class="note" id="modeText">Drag your eye down the solution — the diagram highlights each step.</p>
+    </section>
+
+    <!-- ============ RIGHT : QUESTION + SOLUTION ============ -->
+    <section class="panel qpanel">
+      <h2>Question</h2>
+      <div class="qbox">
+        Let $k$ be a positive constant and $-180^\circ<\theta<180^\circ$. If the figure shows the graph of
+        $y=\sin(kx^\circ+\theta)$, then
+        <div class="opts">
+          <div>A. $k=\dfrac{1}{2}$ and $\theta=-30^\circ$</div>
+          <div>B. $k=\dfrac{1}{2}$ and $\theta=30^\circ$</div>
+          <div>C. $k=2$ and $\theta=-30^\circ$</div>
+          <div class="correct">D. $k=2$ and $\theta=30^\circ$ ✓</div>
+        </div>
       </div>
-      <div class="sl">
-        <label for="sk">Try a value of \(k\) : <span id="skVal">2.0</span></label>
-        <input type="range" id="sk" min="0.5" max="3" step="0.1" value="2">
+      <figure style="margin:12px 0;text-align:center;"><img src="figures/2015_P2_Q39.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
+
+      <h2>Step-by-step Solution</h2>
+
+      <div class="step" data-step="1">
+        <span class="tag">Step 1 · Read the period from the graph</span>
+        <p>The curve is a sine wave. From the figure, the wave has been drawn so that it crosses the $x$-axis
+        at $75$ and again at $165$, and the curve <b>finishes one full period at $x=165$</b> (returning to the
+        $x$-axis with the same downward-to-upward structure after the trough).</p>
+        <p>So the period is the horizontal distance between two consecutive $x$-intercepts of <i>the same kind</i>:
+        one period starts at $x=75$ and ends at $x=165$.</p>
+        <div class="hint">On the figure, the trough sits halfway between the $75$ and $165$ marks, confirming
+        $75 \to 165$ is exactly one full period.</div>
+        <p>$$\text{Period}=\frac{360^\circ}{k}=165-75=90^\circ$$</p>
       </div>
-    </div>
 
-    <div class="controls">
-      <button class="next" data-target="g1">Next step →</button>
-      <span class="counter" id="c-g1">0 / 3</span>
-      <button class="reset" data-target="g1">Reset</button>
-    </div>
-
-    <div class="step" data-group="g1">
-      <div class="step-head"><span class="badge-num">1</span><b>Identify one complete period from the graph</b></div>
-      The curve descends through \((75,0)\) and rises again through \((165,0)\).
-      Between two successive crossings where the graph goes the <i>same way</i> is exactly one period.
-      \[ T = 165^\circ - 75^\circ = 90^\circ \]
-      <div class="hint"><b>Hint:</b> The points \(x=75\) and \(x=165\) are both "rising" (negative→positive) axis-crossings, so they are exactly one period apart. (Equivalently, the maximum at \(x=120\) and the minimum at \(x=30\) are half a period apart: \(120-30=90\).)</div>
-    </div>
-
-    <div class="step" data-group="g1">
-      <div class="step-head"><span class="badge-num">2</span><b>Relate the period to \(k\)</b></div>
-      For \(y=\sin(kx^\circ+\theta)\) the period is
-      \[ T = \frac{360^\circ}{k}. \]
-      Substituting \(T=90^\circ\):
-      \[ \frac{360^\circ}{k}=90^\circ \quad\Longrightarrow\quad k=\frac{360}{90}=4. \]
-      But wait — check the scaling direction. Here the graph reaches a full cycle in \(90^\circ\), which is <i>shorter</i> than the standard \(360^\circ\), so the graph is compressed, meaning \(k>1\). Let us re-verify with the reference curve.
-      <div class="hint"><b>Hint:</b> \(k\) is the number of complete cycles fitted into \(360^\circ\). A period of \(90^\circ\) means 4 cycles in \(360^\circ\)… so we must be careful — the figure's labelled crossings are \(75\) and \(165\), but is the distance between them a <i>full</i> period? Two <b>identical-type</b> crossings (both descending) are one period apart. Use the descending crossings at \(x=75\) and the next descending crossing.</div>
-    </div>
-
-    <div class="step" data-group="g1">
-      <div class="step-head"><span class="badge-num">3</span><b>Correct reading of the period</b></div>
-      The labelled crossings are \(x=75\) (descending) and \(x=165\) (ascending) — that is only <b>half</b> a period, because the graph goes from "crossing down" to "crossing up".
-      \[ \frac{T}{2}=165^\circ-75^\circ=90^\circ \quad\Longrightarrow\quad T=180^\circ. \]
-      Hence
-      \[ k=\frac{360^\circ}{180^\circ}=2. \]
-      <div class="answer">✔ \(\;k=2\)</div>
-      <div class="hint"><b>Hint:</b> A quick sanity check — the peak is at \(x=120^\circ\) and the trough at \(x=30^\circ\) (reading the figure). Peak-to-trough is half a period: \(120-30=90=\tfrac{T}{2}\), so \(T=180^\circ\).</div>
-    </div>
-  </section>
-
-  <!-- ============ PART 2: FIND theta ============ -->
-  <section class="card">
-    <h3><span class="chip">STEP GROUP 2</span> Finding the phase shift \(\theta\) </h3>
-
-    <div class="cvwrap">
-      <canvas id="cvT" width="820" height="320" aria-label="Interactive diagram: phase shift theta"></canvas>
-      <div class="readouts">
-        <span class="ro" id="roThetaV">θ = 30°</span>
-        <span class="ro a" id="roZero">sin(kx+θ)=0 at x = 75°</span>
-        <span class="ro g" id="roCheck">k=2, θ=30°</span>
+      <div class="step" data-step="2">
+        <span class="tag">Step 2 · Solve for $k$</span>
+        <p>From $\dfrac{360^\circ}{k}=90^\circ$:</p>
+        <p>$$360 = 90k \quad\Rightarrow\quad k=\frac{360}{90}=4\ ?$$</p>
+        <div class="hint">Careful — that would need a period of $90^\circ$ only if the two marks were consecutive
+        <i>half</i>-period apart. Check the shape again.</div>
       </div>
-      <div class="curves">
-        <label><input type="checkbox" id="ctShow" checked> Show \(y=\sin(kx+\theta)\)</label>
-        <label><input type="checkbox" id="ctRef"> Show \(y=\sin 2x^\circ\)</label>
-        <label><input type="checkbox" id="ctShift" checked> Show phase-shift arrow</label>
+
+      <div class="step" data-step="3">
+        <span class="tag">Step 3 · Correct reading of the period</span>
+        <p>Looking closely at the figure: the curve starts at the origin with a <b>positive</b> slope, reaches a
+        maximum, then crosses the axis at $75$ going <b>down</b>, hits a minimum, and comes back to the axis at
+        $165$.</p>
+        <p>Between the $x$-intercept at $75$ and the $x$-intercept at $165$ the curve goes <b>down then up</b> —
+        that is a <i>half</i> period, not a full period.</p>
+        <p>$$\text{Half period}=165-75=90^\circ \;\Rightarrow\; \text{Period}=180^\circ$$</p>
+        <p>$$\frac{360^\circ}{k}=180^\circ \quad\Rightarrow\quad \boxed{k=2}$$</p>
       </div>
-      <div class="sl">
-        <label for="st">Try a value of \(\theta\) : <span id="stVal">30°</span></label>
-        <input type="range" id="st" min="-180" max="180" step="5" value="30">
+
+      <div class="step" data-step="4">
+        <span class="tag">Step 4 · Find $\theta$ from the $x$-intercept at 75</span>
+        <p>With $k=2$, the curve is $y=\sin(2x^\circ+\theta)$. An $x$-intercept at $x=75$ means
+        $\sin(2\cdot75^\circ+\theta)=0$, i.e.</p>
+        <p>$$150^\circ+\theta = n\cdot 180^\circ \quad (n\in\mathbb{Z})$$</p>
+        <p>$$\theta = n\cdot180^\circ-150^\circ$$</p>
+        <p>Testing the allowed range $-180^\circ<\theta<180^\circ$:</p>
+        <ul>
+          <li>$n=1:\ \theta=180-150=30^\circ$ ✔</li>
+          <li>$n=0:\ \theta=-150^\circ$ (possible numerically, but check the shape)</li>
+        </ul>
+        <div class="hint">At $x=75$ the curve crosses from <b>above</b> to <b>below</b> the $x$-axis — a
+        descending zero of the sine function. That fixes which solution is correct.</div>
       </div>
-    </div>
 
-    <div class="controls">
-      <button class="next" data-target="g2">Next step →</button>
-      <span class="counter" id="c-g2">0 / 3</span>
-      <button class="reset" data-target="g2">Reset</button>
-    </div>
-
-    <div class="step" data-group="g2">
-      <div class="step-head"><span class="badge-num">1</span><b>Use a known point on the curve</b></div>
-      We already found \(k=2\), so \(y=\sin(2x^\circ+\theta)\).
-      The point \((75,0)\) lies on the graph:
-      \[ \sin(2(75)^\circ+\theta)=0 \]
-      \[ \sin(150^\circ+\theta)=0. \]
-      <div class="hint"><b>Hint:</b> The zeros of \(\sin u\) occur at \(u=0^\circ,180^\circ,-180^\circ,\dots\) So \(150^\circ+\theta\) must be a multiple of \(180^\circ\).</div>
-    </div>
-
-    <div class="step" data-group="g2">
-      <div class="step-head"><span class="badge-num">2</span><b>Solve for the possible values of \(\theta\)</b></div>
-      \[ 150^\circ+\theta = 0^\circ \;\Rightarrow\; \theta=-150^\circ \]
-      \[ 150^\circ+\theta = 180^\circ \;\Rightarrow\; \theta=30^\circ \]
-      Both satisfy \(-180^\circ<\theta<180^\circ\). Use the second crossing or the gradient to decide which one is correct.
-      <div class="hint"><b>Hint:</b> We must also match the <b>terminal direction</b>: at \(x=75\) the curve is going <i>downward</i> (slope negative). Compute \(\tfrac{dy}{dx}=2\cos(2x+\theta)\cdot\tfrac{\pi}{180}\) and test each candidate.</div>
-    </div>
-
-    <div class="step" data-group="g2">
-      <div class="step-head"><span class="badge-num">3</span><b>Test the slope at \(x=75^\circ\)</b></div>
-      Try \(\theta=30^\circ\): \(\;2(75)+30=180^\circ\), and \(\cos 180^\circ = -1 <0\) — descending. ✓<br>
-      Try \(\theta=-150^\circ\): \(\;2(75)-150=0^\circ\), and \(\cos 0^\circ = +1 >0\) — ascending. ✗<br>
-      So we must have
-      \[ \theta = 30^\circ. \]
-      <div class="answer">✔ \(\;k=2\) and \(\theta=30^\circ\) — Answer D</div>
-      <div class="hint"><b>Hint (elegant check):</b> \(y=\sin(2x^\circ+30^\circ)=\sin(2(x+15)^\circ)\). So the graph of \(y=\sin(2x^\circ)\) is shifted <b>left</b> by \(15^\circ\). Its first zeros after the shift move from \(0^\circ,90^\circ,\ldots\) to \(-15^\circ,75^\circ,165^\circ,\ldots\) — exactly matching the figure.</div>
-    </div>
-  </section>
-
-  <!-- ============ PART 3: TRANSFORMATION VISUALISER ============ -->
-  <section class="card">
-    <h3><span class="chip amber">DEEP DIVE</span> How \(y=\sin x^\circ\) becomes \(y=\sin(2x^\circ+30^\circ)\) <span class="marks">concept</span></h3>
-
-    <div class="cvwrap">
-      <canvas id="cvT2" width="820" height="330" aria-label="Transformation explorer canvas"></canvas>
-      <div class="readouts">
-        <span class="ro" id="t2A">A: y = sin x</span>
-        <span class="ro g" id="t2B">B: y = sin 2x</span>
-        <span class="ro a" id="t2C">C: y = sin(2x + 30°)</span>
+      <div class="step" data-step="5">
+        <span class="tag">Step 5 · Check with the $y$-intercept</span>
+        <p>At $x=0$ the graph cuts the positive $y$-axis (a positive value), so</p>
+        <p>$$y(0)=\sin(0+\theta)=\sin\theta > 0$$</p>
+        <p>With $\theta=30^\circ$, $\sin 30^\circ=\tfrac12>0$ ✔ &nbsp;(with $\theta=-150^\circ$,
+        $\sin(-150^\circ)=-\tfrac12<0$ ✘, which contradicts the figure).</p>
+        <p>Also at $x=75$: $\sin(150^\circ+30^\circ)=\sin180^\circ=0$ ✔ and the curve goes downward there ✔.</p>
+        <p>At $x=165$: $\sin(330^\circ+30^\circ)=\sin360^\circ=0$ ✔</p>
       </div>
-      <div class="curves">
-        <label><input type="checkbox" id="t2a" checked> <span style="color:#0ea5e9">■</span> \(y=\sin x^\circ\)</label>
-        <label><input type="checkbox" id="t2b" checked> <span style="color:#059669">■</span> \(y=\sin 2x^\circ\) (reduce along \(x\)-axis by \(\tfrac12\))</label>
-        <label><input type="checkbox" id="t2c" checked> <span style="color:#f59e0b">■</span> \(y=\sin(2x^\circ+30^\circ)\) (translate left by 15 units)</label>
+
+      <div class="step" data-step="6">
+        <span class="tag">Step 6 · Conclusion</span>
+        <p>Therefore</p>
+        <p>$$k=2,\qquad \theta=30^\circ$$</p>
+        <div class="answer"><small>FINAL ANSWER</small>$k=2$ and $\theta=30^\circ$ &nbsp;(Option D)</div>
+        <p class="note">Check: $y=\sin(2x^\circ+30^\circ)$ has period $180^\circ$, cuts the $y$-axis at
+        $\sin30^\circ=0.5$, and has $x$-intercepts at $x=75$ and $x=165$ — matching the given figure.</p>
       </div>
-      <div class="sl">
-        <label for="t2x">Hover / drag the cursor line at \(x=\) <span id="t2xv">75°</span></label>
-        <input type="range" id="t2x" min="0" max="360" step="1" value="75">
-      </div>
-    </div>
-
-    <div class="hint">
-      <b>Read this diagram:</b> First the period is halved (\(k=2\)), giving \(y=\sin 2x^\circ\) with zeros at \(0^\circ, 90^\circ, 180^\circ,\ldots\)
-      Then the whole curve is translated <b>left</b> by \(15^\circ\), moving those zeros to \(-15^\circ, 75^\circ, 165^\circ,\ldots\) — precisely the two labelled crossings in the question.
-    </div>
-  </section>
-
-  <!-- ============ SUMMARY ============ -->
-  <section class="summary">
-    <h3>📋&nbsp; Final Answer at a Glance</h3>
-    <ul>
-      <li>Period of the graph: \(\;\dfrac{T}{2}=165^\circ-75^\circ=90^\circ \;\Rightarrow\; T=180^\circ\)</li>
-      <li>Frequency: \(\;k=\dfrac{360^\circ}{T}=\dfrac{360^\circ}{180^\circ}=\mathbf{2}\)</li>
-      <li>Substitute \((75,0)\): \(\;\sin(150^\circ+\theta)=0 \;\Rightarrow\; \theta=-150^\circ\) or \(\theta=30^\circ\)</li>
-      <li>Slope test at \(x=75^\circ\) (descending) rules out \(\theta=-150^\circ\)</li>
-      <li>Final: \(\;\boxed{\,k=2,\quad \theta=30^\circ\,}\)</li>
-      <li>Correct option: <b>D</b></li>
-      <li>Equivalently: \(\;y=\sin(2x^\circ+30^\circ)=\sin\!\big(2(x+15)^\circ\big)\) — shift left by \(15^\circ\)</li>
-    </ul>
-  </section>
-
-  <footer>HKDSE Mathematics (Compulsory Part) · 2015 Paper 2 · Q39 · Interactive Solution</footer>
+    </section>
+  </div>
 </div>
 
 <script>
-/* ============================================================
-   Shared drawing helpers
-   ============================================================ */
-const DEG = Math.PI/180;
-
-function arrow(ctx,x1,y1,x2,y2,color,w){
-  ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineWidth=w||1.6;
-  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
-  const a=Math.atan2(y2-y1,x2-x1), s=7;
-  ctx.beginPath();
-  ctx.moveTo(x2,y2);
-  ctx.lineTo(x2-s*Math.cos(a-0.4), y2-s*Math.sin(a-0.4));
-  ctx.lineTo(x2-s*Math.cos(a+0.4), y2-s*Math.sin(a+0.4));
-  ctx.closePath(); ctx.fill();
-}
-
-function label(ctx,txt,x,y,color,size,align,bold){
-  ctx.fillStyle=color||'#0f172a';
-  ctx.font=(bold?'700 ':'')+(size||12)+'px Segoe UI, sans-serif';
-  ctx.textAlign=align||'center'; ctx.textBaseline='middle';
-  ctx.fillText(txt,x,y);
-}
-
-function dot(ctx,x,y,r,color,stroke){
-  ctx.beginPath(); ctx.arc(x,y,r,0,2*Math.PI);
-  ctx.fillStyle=color; ctx.fill();
-  if(stroke){ctx.strokeStyle=stroke; ctx.lineWidth=2; ctx.stroke();}
-}
-
-/* ============================================================
-   CANVAS 1 — the question figure (static styled)
-   ============================================================ */
 (function(){
-  const cv=document.getElementById('cvQ'); if(!cv) return;
-  const ctx=cv.getContext('2d');
-  const W=cv.width,H=cv.height;
-  const x0=70, x1=W-40, yMid=H/2+10;
-  const amp=78;
-  // map x-degree 0..360 to px
-  const X = d => x0 + (d/360)*(x1-x0);
-  const Y = v => yMid - v*amp;
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+  let mode = 1;
 
-  ctx.clearRect(0,0,W,H);
+  // -------- coordinate mapping (math units: degrees in x, sine value in y) --------
+  // visible x range: -60 .. 210 ; y range: -1.6 .. 1.6
+  const xMin = -60, xMax = 220, yMin = -1.7, yMax = 1.7;
+  const padL = 70, padR = 45, padT = 55, padB = 65;
+  const plotW = W - padL - padR;
+  const plotH = H - padT - padB;
 
-  // faint grid every 30 degrees
-  ctx.strokeStyle='#eef2f7'; ctx.lineWidth=1;
-  for(let d=0; d<=360; d+=30){
-    ctx.beginPath(); ctx.moveTo(X(d), yMid-amp-26); ctx.lineTo(X(d), yMid+amp+26); ctx.stroke();
+  function X(x){ return padL + (x - xMin)/(xMax - xMin)*plotW; }
+  function Y(y){ return padT + (yMax - y)/(yMax - yMin)*plotH; }
+
+  // parameters of the actual curve (answer D)
+  const k = 2, theta = 30; // y = sin(2x + 30) in degrees
+
+  function curve(xdeg){
+    return Math.sin((k*xdeg + theta)*Math.PI/180);
   }
 
-  // axes
-  arrow(ctx,x0-14,yMid,x1+18,yMid,'#334155',1.8);
-  arrow(ctx,X(0),yMid+amp+26,X(0),yMid-amp-40,'#334155',1.8);
-
-  // axis ticks & labels
-  [75,165].forEach(d=>{
-    ctx.strokeStyle='#334155'; ctx.lineWidth=1.4;
-    ctx.beginPath(); ctx.moveTo(X(d),yMid-5); ctx.lineTo(X(d),yMid+5); ctx.stroke();
-    label(ctx,d+'',X(d),yMid+20,'#0f172a',13,'center',true);
-  });
-  label(ctx,'O',X(0)-14,yMid+16,'#0f172a',13,'center',true);
-  label(ctx,'x',x1+16,yMid+18,'#334155',13,'center',true);
-  label(ctx,'y',X(0)-18,yMid-amp-30,'#334155',13,'center',true);
-
-  // the curve y = sin(2x+30)
-  ctx.beginPath(); ctx.strokeStyle='#2563eb'; ctx.lineWidth=3.2;
-  let started=false;
-  for(let d=-30; d<=360; d+=0.5){
-    const v=Math.sin((2*d+30)*DEG);
-    const px=X(d), py=Y(v);
-    if(!started){ctx.moveTo(px,py); started=true;} else ctx.lineTo(px,py);
+  function clearBg(){
+    ctx.fillStyle = '#fbfdff';
+    ctx.fillRect(0,0,W,H);
   }
-  ctx.stroke();
 
-  // golden crossing dots
-  [[75,'#dc2626'],[165,'#dc2626']].forEach(([d,c])=>{
-    dot(ctx,X(d),yMid,5.5,c,'#fff');
-  });
-  label(ctx,'(75, 0)',X(75),yMid-20,'#dc2626',12,'center',true);
-  label(ctx,'(165, 0)',X(165),yMid-20,'#dc2626',12,'center',true);
-
-  // dashed guide for period
-  ctx.setLineDash([6,5]); ctx.strokeStyle='#94a3b8'; ctx.lineWidth=1.4;
-  ctx.beginPath(); ctx.moveTo(X(75),yMid); ctx.lineTo(X(75),yMid+amp+22); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(X(165),yMid); ctx.lineTo(X(165),yMid+amp+22); ctx.stroke();
-  ctx.setLineDash([]);
-
-  // period bracket
-  const by=yMid+amp+18;
-  ctx.strokeStyle='#7c3aed'; ctx.lineWidth=2;
-  ctx.beginPath(); ctx.moveTo(X(75),by); ctx.lineTo(X(165),by); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(X(75),by-6); ctx.lineTo(X(75),by+6); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(X(165),by-6); ctx.lineTo(X(165),by+6); ctx.stroke();
-  label(ctx,'90°  ( = T/2 )',(X(75)+X(165))/2, by+18,'#7c3aed',12,'center',true);
-
-  // curve label
-  label(ctx,'y = sin(kx° + θ)',W-150,H/2-amp+6,'#2563eb',14,'left',true);
-})();
-
-/* ============================================================
-   CANVAS 2 — interactive period explorer (k slider)
-   ============================================================ */
-(function(){
-  const cv=document.getElementById('cvK'); if(!cv) return;
-  const ctx=cv.getContext('2d');
-  const W=cv.width,H=cv.height;
-  const x0=70, x1=W-40, yMid=H/2+6;
-  const amp=76;
-  const X = d => x0 + (d/360)*(x1-x0);
-  const Y = v => yMid - v*amp;
-
-  const sk=document.getElementById('sk');
-  const ckGrid=document.getElementById('ckGrid');
-  const ckPer=document.getElementById('ckPer');
-  const ckRef=document.getElementById('ckRef');
-  const skVal=document.getElementById('skVal');
-  const roPeriod=document.getElementById('roPeriod');
-  const roK=document.getElementById('roK');
-
-  function draw(){
-    const k=parseFloat(sk.value);
-    ctx.clearRect(0,0,W,H);
-
-    if(ckGrid.checked){
-      ctx.strokeStyle='#eef2f7'; ctx.lineWidth=1;
-      for(let d=0; d<=360; d+=30){
-        ctx.beginPath(); ctx.moveTo(X(d),yMid-amp-30); ctx.lineTo(X(d),yMid+amp+30); ctx.stroke();
-      }
-      for(let g=-1.5; g<=1.5; g+=0.5){
-        ctx.beginPath(); ctx.moveTo(x0-10,Y(g)); ctx.lineTo(x1+10,Y(g)); ctx.stroke();
-      }
+  function grid(){
+    ctx.lineWidth = 1;
+    // vertical gridlines every 30 degrees
+    for(let gx = -60; gx <= 210; gx += 30){
+      ctx.strokeStyle = (gx % 90 === 0) ? '#dbeafe' : '#eef3fb';
+      ctx.beginPath();
+      ctx.moveTo(X(gx), Y(yMin));
+      ctx.lineTo(X(gx), Y(yMax));
+      ctx.stroke();
     }
-
-    // axes
-    arrow(ctx,x0-14,yMid,x1+18,yMid,'#334155',1.8);
-    arrow(ctx,X(0),yMid+amp+30,X(0),yMid-amp-42,'#334155',1.8);
-    label(ctx,'O',X(0)-14,yMid+15,'#0f172a',12,'center',true);
-    label(ctx,'x',x1+16,yMid+16,'#334155',12,'center',true);
-    label(ctx,'y',X(0)-18,yMid-amp-32,'#334155',12,'center',true);
-    for(let d=0; d<=360; d+=90){
-      ctx.strokeStyle='#94a3b8'; ctx.lineWidth=1.2;
-      ctx.beginPath(); ctx.moveTo(X(d),yMid-4); ctx.lineTo(X(d),yMid+4); ctx.stroke();
-      label(ctx,d+'',X(d),yMid+18,'#475569',11);
+    // horizontal gridlines every 0.5
+    for(let gy = -1.5; gy <= 1.5; gy += 0.5){
+      ctx.strokeStyle = '#eef3fb';
+      ctx.beginPath();
+      ctx.moveTo(X(xMin), Y(gy));
+      ctx.lineTo(X(xMax), Y(gy));
+      ctx.stroke();
     }
+  }
 
-    // reference y = sin 2x
-    if(ckRef.checked){
-      ctx.beginPath(); ctx.strokeStyle='#cbd5e1'; ctx.lineWidth=2; ctx.setLineDash([5,4]);
-      let st=false;
-      for(let d=0; d<=360; d+=1){ const v=Math.sin(2*d*DEG); if(!st){ctx.moveTo(X(d),Y(v));st=true;}else ctx.lineTo(X(d),Y(v)); }
-      ctx.stroke(); ctx.setLineDash([]);
-      label(ctx,'y = sin 2x°',x1-8,Y(1)-14,'#94a3b8',12,'right',true);
-    }
+  function axes(){
+    // x-axis
+    ctx.strokeStyle = '#7c3aed';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(X(xMin)+8, Y(0));
+    ctx.lineTo(X(xMax)-6, Y(0));
+    ctx.stroke();
+    // arrow head x
+    ctx.fillStyle = '#7c3aed';
+    ctx.beginPath();
+    ctx.moveTo(X(xMax)-6, Y(0));
+    ctx.lineTo(X(xMax)-18, Y(0)-6);
+    ctx.lineTo(X(xMax)-18, Y(0)+6);
+    ctx.closePath(); ctx.fill();
 
-    // period highlight
-    const T = 360/k;
-    if(ckPer.checked){
-      // shade one period from a zero crossing
-      let startD=0;
-      for(let d=-360; d<=360; d+=0.25){
-        const v=Math.sin(k*d*DEG);
-        if(Math.abs(v)<0.004 && d>=0){ startD=d; break; }
-      }
-      // choose the two "rising" crossings
-      const c1 = 0, c2 = T;
-      ctx.fillStyle='rgba(37,99,235,0.08)';
-      ctx.fillRect(X(c1), yMid-amp-30, X(c2)-X(c1), 2*amp+60);
-      // bracket
-      const by=yMid+amp+24;
-      ctx.strokeStyle='#7c3aed'; ctx.lineWidth=2;
-      ctx.beginPath(); ctx.moveTo(X(c1),by); ctx.lineTo(X(c2),by); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(X(c1),by-6); ctx.lineTo(X(c1),by+6); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(X(c2),by-6); ctx.lineTo(X(c2),by+6); ctx.stroke();
-      label(ctx,'T = '+T.toFixed(0)+'°',(X(c1)+X(c2))/2, by+17,'#7c3aed',12,'center',true);
-    }
+    // y-axis
+    ctx.beginPath();
+    ctx.moveTo(X(0), Y(yMin)+10);
+    ctx.lineTo(X(0), Y(yMax)-2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(X(0), Y(yMax)-2);
+    ctx.lineTo(X(0)-6, Y(yMax)+10);
+    ctx.lineTo(X(0)+6, Y(yMax)+10);
+    ctx.closePath(); ctx.fill();
 
-    // the curve
-    ctx.beginPath(); ctx.strokeStyle='#2563eb'; ctx.lineWidth=3.2;
-    let st=false;
-    for(let d=0; d<=360; d+=0.5){
-      const v=Math.sin(k*d*DEG);
-      if(!st){ctx.moveTo(X(d),Y(v)); st=true;} else ctx.lineTo(X(d),Y(v));
+    // labels
+    ctx.fillStyle = '#7c3aed';
+    ctx.font = 'bold 18px Segoe UI, sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText('x', X(xMax)-8, Y(0)+26);
+    ctx.textAlign = 'left';
+    ctx.fillText('y', X(0)+12, Y(yMax)+4);
+    ctx.font = 'bold 16px Segoe UI, sans-serif';
+    ctx.fillStyle = '#334155';
+    ctx.fillText('O', X(0)-20, Y(0)+22);
+    // 1 and -1 ticks
+    ctx.font = '13px Segoe UI, sans-serif';
+    ctx.fillStyle = '#94a3b8';
+    ctx.textAlign='right';
+    ctx.fillText('1', X(0)-8, Y(1)+5);
+    ctx.fillText('-1', X(0)-8, Y(-1)+5);
+    ctx.textAlign='center';
+    ctx.fillText('0.5', X(0)-4, Y(0.5)+5);
+  }
+
+  function drawCurve(){
+    ctx.strokeStyle = '#dc2626';
+    ctx.lineWidth = 3.4;
+    ctx.lineJoin='round';
+    ctx.beginPath();
+    let started = false;
+    for(let px = 0; px <= W; px++){
+      const xv = xMin + (px - padL)/plotW*(xMax-xMin);
+      if(xv < xMin || xv > xMax) continue;
+      const yv = curve(xv);
+      const sx = X(xv), sy = Y(yv);
+      if(!started){ ctx.moveTo(sx, sy); started = true; }
+      else ctx.lineTo(sx, sy);
     }
     ctx.stroke();
-    label(ctx,'y = sin '+k.toFixed(1)+'x°', x1-8, yMid-amp-14,'#2563eb',13,'right',true);
-
-    roPeriod.textContent='Period = '+T.toFixed(0)+'°';
-    roK.textContent='k = '+k.toFixed(1);
-    skVal.textContent=k.toFixed(1);
   }
 
-  [sk,ckGrid,ckPer,ckRef].forEach(el=>el.addEventListener('input',draw));
-  draw();
-})();
-
-/* ============================================================
-   CANVAS 3 — interactive phase-shift explorer (theta slider)
-   ============================================================ */
-(function(){
-  const cv=document.getElementById('cvT'); if(!cv) return;
-  const ctx=cv.getContext('2d');
-  const W=cv.width,H=cv.height;
-  const x0=70, x1=W-40, yMid=H/2+6;
-  const amp=80;
-  const X = d => x0 + ((d+60)/480)*(x1-x0);   // show -60..420
-  const Y = v => yMid - v*amp;
-
-  const st=document.getElementById('st');
-  const ctShow=document.getElementById('ctShow');
-  const ctRef=document.getElementById('ctRef');
-  const ctShift=document.getElementById('ctShift');
-  const stVal=document.getElementById('stVal');
-  const roThetaV=document.getElementById('roThetaV');
-  const roZero=document.getElementById('roZero');
-  const roCheck=document.getElementById('roCheck');
-
-  function draw(){
-    const th=parseFloat(st.value);
-    const k=2;
-    ctx.clearRect(0,0,W,H);
-
-    // grid
-    ctx.strokeStyle='#eef2f7'; ctx.lineWidth=1;
-    for(let d=-60; d<=420; d+=30){ ctx.beginPath(); ctx.moveTo(X(d),yMid-amp-30); ctx.lineTo(X(d),yMid+amp+30); ctx.stroke(); }
-
-    // axes
-    arrow(ctx,x0-14,yMid,x1+18,yMid,'#334155',1.8);
-    arrow(ctx,X(0),yMid+amp+30,X(0),yMid-amp-42,'#334155',1.8);
-    label(ctx,'O',X(0)-15,yMid+15,'#0f172a',12,'center',true);
-    label(ctx,'x',x1+16,yMid+16,'#334155',12,'center',true);
-    label(ctx,'y',X(0)-18,yMid-amp-32,'#334155',12,'center',true);
-    [75,165].forEach(d=>{
-      ctx.strokeStyle='#94a3b8'; ctx.lineWidth=1.2;
-      ctx.beginPath(); ctx.moveTo(X(d),yMid-4); ctx.lineTo(X(d),yMid+4); ctx.stroke();
-      label(ctx,d+'',X(d),yMid+18,'#475569',11,'center',true);
-    });
-
-    // reference sin 2x
-    if(ctRef.checked){
-      ctx.beginPath(); ctx.strokeStyle='#cbd5e1'; ctx.lineWidth=2; ctx.setLineDash([5,4]);
-      let s=false;
-      for(let d=-60; d<=420; d+=1){ const v=Math.sin(2*d*DEG); if(!s){ctx.moveTo(X(d),Y(v));s=true;}else ctx.lineTo(X(d),Y(v)); }
-      ctx.stroke(); ctx.setLineDash([]);
-      label(ctx,'y = sin 2x°',x1-8,Y(1)-14,'#94a3b8',12,'right',true);
-    }
-
-    // phase shift arrow
-    if(ctShift.checked){
-      const shift=-th/2; // x-shift of the curve relative to sin(kx)
-      const yA=yMid-amp-18;
-      ctx.strokeStyle='#f59e0b'; ctx.lineWidth=2;
-      ctx.beginPath(); ctx.moveTo(X(0),yA); ctx.lineTo(X(shift),yA); ctx.stroke();
-      const a=Math.atan2(0,X(shift)-X(0));
-      ctx.beginPath(); ctx.moveTo(X(shift),yA);
-      ctx.lineTo(X(shift)-7*Math.cos(a-0.4), yA-7*Math.sin(a-0.4));
-      ctx.lineTo(X(shift)-7*Math.cos(a+0.4), yA-7*Math.sin(a+0.4));
-      ctx.closePath(); ctx.fillStyle='#f59e0b'; ctx.fill();
-      label(ctx,'shift = '+shift.toFixed(1)+'°', (X(0)+X(shift))/2, yA-13,'#b45309',12,'center',true);
-    }
-
-    // main curve
-    if(ctShow.checked){
-      ctx.beginPath(); ctx.strokeStyle='#f59e0b'; ctx.lineWidth=3.4;
-      let s=false;
-      for(let d=-60; d<=420; d+=0.5){
-        const v=Math.sin((k*d+th)*DEG);
-        if(!s){ctx.moveTo(X(d),Y(v)); s=true;} else ctx.lineTo(X(d),Y(v));
-      }
+  // ---------- markers ----------
+  function intercept(xv, color, label, offX, offY, showVert){
+    const sx = X(xv), sy = Y(0);
+    if(showVert){
+      ctx.strokeStyle = color;
+      ctx.setLineDash([4,4]);
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      ctx.moveTo(sx, sy);
+      ctx.lineTo(sx, Y(curve(xv)) - 0); // not meaningful; instead vertical from x-axis
       ctx.stroke();
-      label(ctx,'y = sin(2x° + '+th.toFixed(0)+'°)', x1-8, yMid+amp+22,'#b45309',13,'right',true);
+      ctx.setLineDash([]);
     }
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(sx, sy, 6.5, 0, Math.PI*2);
+    ctx.fill();
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
 
-    // mark x = 75 crossing
-    dot(ctx,X(75),yMid,6,'#dc2626','#fff');
-    label(ctx,'(75, 0)',X(75),yMid-18,'#dc2626',12,'center',true);
-
-    // readouts
-    roThetaV.textContent='θ = '+th.toFixed(0)+'°';
-    const val=Math.sin((2*75+th)*DEG);
-    roZero.textContent='sin(2·75°+θ) = '+val.toFixed(3);
-    if(Math.abs(th-30)<2.6){
-      roCheck.textContent='✓ Matches figure (θ=30°)';
-      roCheck.style.background='#a7f3d0';
-    } else {
-      roCheck.textContent='Does not match figure';
-      roCheck.style.background='#fee2e2';
-      roCheck.style.borderColor='#fca5a5';
-      roCheck.style.color='#7f1d1d';
-    }
-    stVal.textContent=th.toFixed(0)+'°';
+    ctx.fillStyle = color;
+    ctx.font = 'bold 18px Segoe UI, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(label, sx + (offX||0), sy + (offY||28));
   }
 
-  [st,ctShow,ctRef,ctShift].forEach(el=>el.addEventListener('input',draw));
-  draw();
-})();
+  function pointOnCurve(xv, color, r){
+    const sx = X(xv), sy = Y(curve(xv));
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(sx, sy, r||6, 0, Math.PI*2);
+    ctx.fill();
+  }
 
-/* ============================================================
-   CANVAS 4 — transformation explorer
-   ============================================================ */
-(function(){
-  const cv=document.getElementById('cvT2'); if(!cv) return;
-  const ctx=cv.getContext('2d');
-  const W=cv.width,H=cv.height;
-  const x0=60, x1=W-40, yMid=H/2+10;
-  const amp=88;
-  const X = d => x0 + (d/360)*(x1-x0);
-  const Y = v => yMid - v*amp;
+  function labelPoint(xv, color, txt, offX, offY){
+    const sx = X(xv), sy = Y(curve(xv));
+    ctx.fillStyle = color;
+    ctx.font = 'bold 15px Segoe UI, sans-serif';
+    ctx.textAlign='left';
+    ctx.fillText(txt, sx+offX, sy+offY);
+  }
 
-  const t2a=document.getElementById('t2a');
-  const t2b=document.getElementById('t2b');
-  const t2c=document.getElementById('t2c');
-  const t2x=document.getElementById('t2x');
-  const t2xv=document.getElementById('t2xv');
+  // dashed guide from a point to the x-axis
+  function guideDown(xv, color){
+    const sx = X(xv);
+    ctx.strokeStyle = color;
+    ctx.setLineDash([5,5]);
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    ctx.moveTo(sx, Y(curve(xv)));
+    ctx.lineTo(sx, Y(0));
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  function highlightPeriod(){
+    const y0 = Y(0);
+    const yb = y0 + 42;
+    ctx.strokeStyle = '#2563eb';
+    ctx.lineWidth = 2.4;
+    ctx.beginPath();
+    ctx.moveTo(X(75), yb); ctx.lineTo(X(165), yb);
+    ctx.stroke();
+    // ticks
+    ctx.beginPath(); ctx.moveTo(X(75), yb-7); ctx.lineTo(X(75), yb+7); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(X(165), yb-7); ctx.lineTo(X(165), yb+7); ctx.stroke();
+    ctx.fillStyle = '#2563eb';
+    ctx.font = 'bold 15px Segoe UI, sans-serif';
+    ctx.textAlign='center';
+    ctx.fillText('half period = 90°', (X(75)+X(165))/2, yb+24);
+    // arrows
+    ctx.fillStyle = '#2563eb';
+  }
+
+  function highlightFullPeriod(){
+    const y0 = Y(0);
+    const yb = y0 + 74;
+    ctx.strokeStyle = '#7c3aed';
+    ctx.lineWidth = 2.4;
+    ctx.beginPath();
+    ctx.moveTo(X(0), yb); ctx.lineTo(X(180), yb);
+    ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(X(0), yb-7); ctx.lineTo(X(0), yb+7); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(X(180), yb-7); ctx.lineTo(X(180), yb+7); ctx.stroke();
+    ctx.fillStyle = '#7c3aed';
+    ctx.font = 'bold 15px Segoe UI, sans-serif';
+    ctx.textAlign='center';
+    ctx.fillText('one period = 180°  ⇒  k = 2', (X(0)+X(180))/2, yb+24);
+  }
+
+  function equationBox(txt, color){
+    ctx.fillStyle = 'rgba(255,255,255,0.94)';
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    const bw = 330, bh = 52;
+    const bx = padL + 8, by = padT - 6;
+    roundRect(bx, by, bw, bh, 12);
+    ctx.fill(); ctx.stroke();
+    ctx.fillStyle = color;
+    ctx.font = 'bold 20px Segoe UI, sans-serif';
+    ctx.textAlign='left';
+    ctx.fillText(txt, bx+16, by+34);
+  }
+
+  function roundRect(x,y,w,h,r){
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);
+    ctx.arcTo(x+w,y,x+w,y+h,r);
+    ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r);
+    ctx.arcTo(x,y,x+w,y,r);
+    ctx.closePath();
+  }
 
   function draw(){
-    const xd=parseFloat(t2x.value);
-    ctx.clearRect(0,0,W,H);
+    clearBg();
+    grid();
+    axes();
 
-    // grid
-    ctx.strokeStyle='#eef2f7'; ctx.lineWidth=1;
-    for(let d=0; d<=360; d+=30){ ctx.beginPath(); ctx.moveTo(X(d),yMid-amp-30); ctx.lineTo(X(d),yMid+amp+30); ctx.stroke(); }
-    for(let g=-1; g<=1; g+=0.5){ ctx.beginPath(); ctx.moveTo(x0-10,Y(g)); ctx.lineTo(x1+10,Y(g)); ctx.stroke(); }
-
-    // axes
-    arrow(ctx,x0-14,yMid,x1+18,yMid,'#334155',1.8);
-    arrow(ctx,X(0),yMid+amp+30,X(0),yMid-amp-42,'#334155',1.8);
-    label(ctx,'O',X(0)-14,yMid+16,'#0f172a',12,'center',true);
-    label(ctx,'x',x1+16,yMid+16,'#334155',12,'center',true);
-    label(ctx,'y',X(0)-18,yMid-amp-32,'#334155',12,'center',true);
-    for(let d=0; d<=360; d+=90){
-      ctx.strokeStyle='#94a3b8'; ctx.lineWidth=1.2;
-      ctx.beginPath(); ctx.moveTo(X(d),yMid-4); ctx.lineTo(X(d),yMid+4); ctx.stroke();
-      label(ctx,d+'',X(d),yMid+18,'#475569',11);
+    if(mode === 1){
+      drawCurve();
+      intercept(75, '#059669', '75', 0, 30, false);
+      intercept(165, '#f59e0b', '165', 0, 30, false);
+      equationBox('y = sin(kx° + θ)', '#2563eb');
+      // subtle highlight of the two intercepts region
+      ctx.fillStyle = 'rgba(5,150,105,0.07)';
+      ctx.fillRect(X(75), Y(0), X(165)-X(75), 0);
     }
 
-    function curve(fn,color,w,dash){
-      ctx.beginPath(); ctx.strokeStyle=color; ctx.lineWidth=w;
-      if(dash) ctx.setLineDash(dash);
-      let s=false;
-      for(let d=0; d<=360; d+=1){
-        const v=fn(d);
-        if(v===null) continue;
-        const xp=X(d); if(isNaN(xp)) continue;
-        if(!s){ctx.moveTo(xp,Y(v)); s=true;} else ctx.lineTo(xp,Y(v));
-      }
-      ctx.stroke(); if(dash) ctx.setLineDash([]);
+    if(mode === 2){
+      drawCurve();
+      intercept(75, '#059669', '75', 0, 30, false);
+      intercept(165, '#f59e0b', '165', 0, 30, false);
+      highlightPeriod();
+      // mark min point
+      pointOnCurve(120, '#2563eb', 7);
+      labelPoint(120, '#2563eb', 'min', 10, -8);
+      equationBox('Period = 360°/k', '#dc2626');
     }
 
-    if(t2a.checked) curve(d=>Math.sin(d*DEG),'#0ea5e9',2.4,null);
-    if(t2b.checked) curve(d=>Math.sin(2*d*DEG),'#059669',2.6,null);
-    if(t2c.checked) curve(d=>Math.sin((2*d+30)*DEG),'#f59e0b',3.2,null);
-
-    // moving cursor line
-    ctx.strokeStyle='#ef4444'; ctx.lineWidth=1.6; ctx.setLineDash([5,4]);
-    ctx.beginPath(); ctx.moveTo(X(xd),yMid-amp-30); ctx.lineTo(X(xd),yMid+amp+30); ctx.stroke();
-    ctx.setLineDash([]);
-    label(ctx,'x = '+xd+'°',X(xd),yMid-amp-38,'#ef4444',12,'center',true);
-
-    // dots at values
-    if(t2a.checked) dot(ctx,X(xd),Y(Math.sin(xd*DEG)),4.5,'#0ea5e9','#fff');
-    if(t2b.checked) dot(ctx,X(xd),Y(Math.sin(2*xd*DEG)),4.5,'#059669','#fff');
-    if(t2c.checked){
-      const v=Math.sin((2*xd+30)*DEG);
-      dot(ctx,X(xd),Y(v),5.5,'#f59e0b','#fff');
-      label(ctx,v.toFixed(2),X(xd)+22,Y(v),'#b45309',11,'left',true);
+    if(mode === 3){
+      drawCurve();
+      intercept(75, '#059669', '75', 0, 30, false);
+      intercept(165, '#f59e0b', '165', 0, 30, false);
+      highlightPeriod();
+      highlightFullPeriod();
+      equationBox('180° = 360°/k  ⇒  k = 2', '#7c3aed');
     }
 
-    // legend
-    label(ctx,'y = sin x°',x1-8,Y(1)-12,'#0ea5e9',12,'right',true);
-    label(ctx,'y = sin 2x°',x1-8,Y(-1)+22,'#059669',12,'right',true);
-    label(ctx,'y = sin(2x°+30°)',x1-8,Y(-0.6)+40,'#b45309',12,'right',true);
+    if(mode === 4){
+      drawCurve();
+      pointOnCurve(75, '#059669', 8);
+      guideDown(75, '#059669');
+      intercept(75, '#059669', '75', 0, 30, false);
+      // tangent-like small arrow showing downward crossing
+      const sx = X(75), sy = Y(0);
+      ctx.strokeStyle = '#059669'; ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(sx-16, sy-20); ctx.lineTo(sx+16, sy+20);
+      ctx.stroke();
+      equationBox('sin(150° + θ) = 0', '#059669');
+      ctx.fillStyle='#065f46'; ctx.font='bold 15px Segoe UI, sans-serif'; ctx.textAlign='left';
+      ctx.fillText('crossing downward', sx+26, sy+40);
+    }
 
-    t2xv.textContent=xd+'°';
+    if(mode === 5){
+      drawCurve();
+      // y-intercept
+      pointOnCurve(0, '#2563eb', 8.5);
+      intercept(75, '#059669', '75', 0, 30, false);
+      intercept(165, '#f59e0b', '165', 0, 30, false);
+      // dashed 0.5 level
+      ctx.strokeStyle = '#2563eb'; ctx.setLineDash([5,5]); ctx.lineWidth=1.6;
+      ctx.beginPath();
+      ctx.moveTo(X(0), Y(0.5)); ctx.lineTo(X(0)+70, Y(0.5));
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle='#2563eb'; ctx.font='bold 15px Segoe UI, sans-serif'; ctx.textAlign='left';
+      ctx.fillText('y = 0.5 at x = 0', X(0)+16, Y(0.5)-12);
+      equationBox('sin θ = +0.5  ⇒  θ = 30°', '#2563eb');
+    }
+
+    if(mode === 6){
+      drawCurve();
+      pointOnCurve(0, '#2563eb', 7);
+      intercept(75, '#059669', '75', 0, 30, false);
+      intercept(165, '#f59e0b', '165', 0, 30, false);
+      highlightFullPeriod();
+      equationBox('y = sin(2x° + 30°)', '#dc2626');
+    }
+
+    // always (except mode 6) show a base faint curve if not drawn
+    if(mode < 1 || mode > 6){ drawCurve(); }
+    if(mode === 1){ /* curve already drawn */ }
   }
 
-  [t2a,t2b,t2c,t2x].forEach(el=>el.addEventListener('input',draw));
+  // ---------- scroll sync ----------
+  const steps = Array.from(document.querySelectorAll('.step'));
+  const modeText = document.getElementById('modeText');
+
+  const obs = new IntersectionObserver((es)=>{
+    es.forEach(e=>{
+      if(e.isIntersecting){
+        const m = +e.target.dataset.step;
+        mode = m;
+        steps.forEach(st=>st.classList.toggle('active', st===e.target));
+        modeText.textContent = 'Highlighting step ' + m + '.';
+        draw();
+      }
+    });
+  }, {rootMargin:'-15% 0px -55% 0px', threshold:0});
+
+  steps.forEach(st=>obs.observe(st));
+
+  // initial
+  steps.forEach(st=>st.classList.toggle('active', +st.dataset.step === 1));
   draw();
-})();
 
-/* ============================================================
-   Step-by-step reveal logic
-   ============================================================ */
-(function(){
-  const buttons=document.querySelectorAll('button.next[data-target]');
-  const counters={};
-
-  function refresh(group){
-    const steps=document.querySelectorAll('.step[data-group="'+group+'"]');
-    let shown=0;
-    steps.forEach(s=>{ if(s.classList.contains('show')) shown++; });
-    const btn=document.querySelector('button.next[data-target="'+group+'"]');
-    const ctr=document.getElementById('c-'+group);
-    if(ctr) ctr.textContent=shown+' / '+steps.length;
-    if(btn) btn.disabled=(shown>=steps.length);
-    if(btn && shown>=steps.length) btn.textContent='All steps revealed ✓';
-    else if(btn && shown<steps.length) btn.textContent='Next step →';
-  }
-
-  buttons.forEach(btn=>{
-    const g=btn.getAttribute('data-target');
-    counters[g]=0;
-    btn.addEventListener('click',()=>{
-      const steps=document.querySelectorAll('.step[data-group="'+g+'"]');
-      let shown=0;
-      steps.forEach(s=>{ if(s.classList.contains('show')) shown++; });
-      if(shown<steps.length){
-        steps[shown].classList.add('show');
-        if(window.MathJax && MathJax.typesetPromise){
-          MathJax.typesetPromise([steps[shown]]).catch(()=>{});
-        }
-        refresh(g);
-      }
-    });
-  });
-
-  document.querySelectorAll('button.reset[data-target]').forEach(btn=>{
-    btn.addEventListener('click',()=>{
-      const g=btn.getAttribute('data-target');
-      document.querySelectorAll('.step[data-group="'+g+'"]').forEach(s=>s.classList.remove('show'));
-      const nextBtn=document.querySelector('button.next[data-target="'+g+'"]');
-      if(nextBtn) nextBtn.disabled=false;
-      refresh(g);
-    });
-  });
-
-  ['g1','g2'].forEach(refresh);
+  // redraw on resize for crispness
+  window.addEventListener('resize', ()=>draw());
 })();
 </script>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
-
 </body>
 </html>

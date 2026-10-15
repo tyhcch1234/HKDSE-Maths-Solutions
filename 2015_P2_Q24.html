@@ -3,975 +3,367 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HKDSE 2015 Paper 2 Q24 — Locus of Equidistant Point</title>
-<script>
-window.MathJax = {
-  tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['\\[', '\\]']] },
-  svg: { fontCache: 'global' }
-};
-</script>
+<title>HKDSE 2015 P2 Q24 · Coordinate Geometry</title>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
-  :root{
-    --blue:#2563eb;
-    --blue-dark:#1e3a8a;
-    --amber:#f59e0b;
-    --amber-light:#fef3c7;
-    --emerald:#059669;
-    --emerald-light:#d1fae5;
-    --slate:#0f172a;
-    --slate-soft:#334155;
-    --muted:#64748b;
-    --bg:#f1f5f9;
-    --card:#ffffff;
-    --purple:#7c3aed;
-    --rose:#e11d48;
-  }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    background:var(--bg);
-    color:var(--slate);
-    line-height:1.6;
-    -webkit-font-smoothing:antialiased;
+    font-family:'Segoe UI',system-ui,-apple-system,Arial,sans-serif;
+    background:linear-gradient(135deg,#eef4ff 0%,#f7fbff 40%,#fdf4ff 100%);
+    color:#1f2937;
+    padding:14px;
+    line-height:1.5;
   }
-  .wrap{max-width:960px;margin:0 auto;padding:0 16px 60px;}
+  h1{font-size:1.05rem;margin:0 0 10px;color:#1e3a8a;letter-spacing:.2px;}
+  h1 .badge{background:#4f46e5;color:#fff;border-radius:8px;padding:2px 8px;font-size:.75rem;margin-right:6px;vertical-align:middle;}
 
-  /* ---------- HERO ---------- */
-  .hero{
-    background:linear-gradient(135deg,#1e3a8a 0%,#2563eb 45%,#7c3aed 100%);
-    color:#fff;
-    padding:38px 16px 34px;
-    border-radius:0 0 26px 26px;
-    box-shadow:0 10px 30px rgba(30,58,138,.28);
-    position:relative;
-    overflow:hidden;
-  }
-  .hero::after{
-    content:"";
-    position:absolute;
-    width:340px;height:340px;
-    border-radius:50%;
-    background:rgba(255,255,255,.07);
-    top:-140px;right:-90px;
-  }
-  .hero-inner{max-width:960px;margin:0 auto;position:relative;z-index:1;}
-  .eyebrow{
-    font-size:.78rem;
-    letter-spacing:.14em;
-    text-transform:uppercase;
-    font-weight:700;
-    color:#bfdbfe;
-    margin-bottom:8px;
-  }
-  .hero h1{
-    margin:0 0 6px;
-    font-size:clamp(1.5rem,4.2vw,2.15rem);
-    font-weight:800;
-    letter-spacing:-.02em;
-  }
-  .hero .sub{
-    font-size:1rem;
-    color:#dbeafe;
-    margin:0 0 16px;
-  }
-  .pills{display:flex;flex-wrap:wrap;gap:8px;}
-  .pill{
-    background:rgba(255,255,255,.16);
-    border:1px solid rgba(255,255,255,.28);
-    color:#fff;
-    font-size:.75rem;
-    font-weight:600;
-    padding:5px 12px;
-    border-radius:999px;
-    backdrop-filter:blur(4px);
-  }
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start;}
+  @media(min-width:900px){.split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}}
 
-  /* ---------- CARDS ---------- */
-  .card{
-    background:var(--card);
-    border-radius:18px;
-    padding:22px 22px 24px;
-    margin-top:22px;
-    box-shadow:0 4px 18px rgba(15,23,42,.07);
-    border:1px solid #e2e8f0;
+  .panel{
+    background:#ffffff;
+    border-radius:16px;
+    box-shadow:0 6px 22px rgba(30,58,138,.10),0 1px 3px rgba(0,0,0,.05);
+    padding:14px;
+    border:1px solid #e5eaf5;
   }
-  .card h2{
-    margin:0 0 14px;
-    font-size:1.18rem;
-    font-weight:800;
-    color:var(--blue-dark);
-    display:flex;
-    align-items:center;
-    gap:10px;
-    flex-wrap:wrap;
-  }
-  .card h2 .marks{
-    font-size:.72rem;
-    font-weight:700;
-    background:var(--amber-light);
-    color:#92400e;
-    border:1px solid #fcd34d;
-    padding:3px 9px;
-    border-radius:999px;
-    white-space:nowrap;
-  }
-  .qtext{font-size:1.02rem;}
-  .qtext ol{margin:8px 0 0;padding-left:22px;}
-  .qtext li{margin-bottom:6px;}
+  .diagram{position:sticky;top:16px;max-height:calc(100vh - 2rem);overflow-y:auto;}
 
-  /* ---------- STEP REVEAL ---------- */
+  canvas{width:100%;height:auto;display:block;border-radius:12px;background:#fbfdff;}
+
+  .legend{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:10px;font-size:.74rem;}
+  .legend span{display:inline-flex;align-items:center;gap:5px;color:#374151;}
+  .swatch{width:13px;height:13px;border-radius:4px;display:inline-block;}
+
+  /* Right panel */
+  .qbox{background:#f8faff;border:1px solid #dbe6ff;border-left:5px solid #4f46e5;border-radius:12px;padding:10px 12px;margin-bottom:12px;font-size:.9rem;}
+  .qbox b{color:#3730a3;}
+  .opts{margin:8px 0 0;padding-left:0;list-style:none;font-size:.86rem;}
+  .opts li{padding:3px 0;color:#374151;}
+  .opts li b{color:#4f46e5;margin-right:4px;}
+
   .step{
-    border-left:4px solid var(--blue);
-    background:#f8fafc;
-    border-radius:0 12px 12px 0;
-    padding:14px 16px;
-    margin:14px 0;
-    display:none;
-    animation:fade .38s ease;
+    background:#ffffff;
+    border:1px solid #e6ebf5;
+    border-left:5px solid #c7d2fe;
+    border-radius:12px;
+    padding:10px 12px;
+    margin-bottom:12px;
+    transition:all .28s ease;
+    font-size:.87rem;
   }
-  .step.show{display:block;}
-  @keyframes fade{
-    from{opacity:0;transform:translateY(8px);}
-    to{opacity:1;transform:translateY(0);}
+  .step.active{
+    border-left-color:#4f46e5;
+    background:linear-gradient(180deg,#f5f8ff 0%,#ffffff 60%);
+    box-shadow:0 6px 18px rgba(79,70,229,.14);
+    transform:translateX(2px);
   }
-  .step-head{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    margin-bottom:8px;
-    flex-wrap:wrap;
-  }
-  .badge{
-    background:var(--blue);
+  .tag{
+    display:inline-block;
+    font-size:.68rem;
+    font-weight:700;
+    letter-spacing:.5px;
     color:#fff;
-    font-size:.72rem;
-    font-weight:800;
-    padding:3px 10px;
+    background:#4f46e5;
     border-radius:999px;
-    letter-spacing:.03em;
-    white-space:nowrap;
+    padding:2px 10px;
+    margin-bottom:7px;
   }
-  .ms{
-    background:#e0e7ff;
-    color:#3730a3;
-    border:1px solid #c7d2fe;
-    font-size:.7rem;
-    font-weight:800;
-    padding:2px 8px;
-    border-radius:999px;
-  }
-  .ms.m{background:#fee2e2;color:#991b1b;border-color:#fecaca;}
-  .ms.a{background:#dcfce7;color:#166534;border-color:#bbf7d0;}
-
+  .step.active .tag{background:#7c3aed;}
+  .step p{margin:5px 0;}
   .hint{
-    background:var(--amber-light);
-    border-left:4px solid var(--amber);
-    border-radius:8px;
-    padding:10px 14px;
-    margin-top:10px;
-    font-size:.93rem;
+    background:#fffbea;border:1px dashed #f5c542;border-radius:9px;
+    padding:7px 10px;font-size:.8rem;color:#7a5900;margin-top:7px;
   }
-  .hint b{color:#92400e;}
   .answer{
-    background:var(--emerald-light);
-    border-left:4px solid var(--emerald);
-    border-radius:8px;
-    padding:10px 14px;
-    margin-top:10px;
-    font-size:.95rem;
-    color:#065f46;
+    background:linear-gradient(135deg,#ecfdf5 0%,#f0fff9 100%);
+    border:2px solid #34d399;border-radius:12px;padding:11px 13px;
+    font-weight:700;color:#065f46;text-align:center;font-size:.95rem;
+    margin-top:4px;
   }
-  .answer b{color:#065f46;}
+  .answer .lbl{display:block;font-size:.68rem;letter-spacing:1px;color:#059669;font-weight:600;margin-bottom:3px;}
 
-  /* ---------- BUTTONS ---------- */
-  .btnbar{
-    display:flex;
-    align-items:center;
-    gap:14px;
-    margin-top:16px;
-    flex-wrap:wrap;
-  }
-  button.next{
-    background:linear-gradient(135deg,var(--blue),var(--purple));
-    color:#fff;
-    border:none;
-    padding:11px 22px;
-    border-radius:12px;
-    font-size:.92rem;
-    font-weight:700;
-    cursor:pointer;
-    box-shadow:0 5px 14px rgba(37,99,235,.32);
-    transition:transform .15s, box-shadow .15s, opacity .2s;
-  }
-  button.next:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 20px rgba(37,99,235,.4);}
-  button.next:disabled{
-    background:#cbd5e1;
-    color:#64748b;
-    box-shadow:none;
-    cursor:not-allowed;
-  }
-  .counter{
-    font-size:.86rem;
-    font-weight:700;
-    color:var(--muted);
-    font-variant-numeric:tabular-nums;
-  }
-
-  /* ---------- CANVAS ---------- */
-  .canvas-box{
-    background:#0b1220;
-    border-radius:14px;
-    padding:10px;
-    margin:12px 0 6px;
-  }
-  canvas{
-    width:100%;
-    height:auto;
-    display:block;
-    border-radius:10px;
-    background:#0b1220;
-    touch-action:none;
-  }
-  .controls{
-    display:flex;
-    flex-wrap:wrap;
-    gap:16px 26px;
-    align-items:center;
-    margin-top:12px;
-    padding:12px 14px;
-    background:#f8fafc;
-    border:1px solid #e2e8f0;
-    border-radius:12px;
-    font-size:.86rem;
-  }
-  .ctrl{
-    display:flex;
-    align-items:center;
-    gap:9px;
-    font-weight:600;
-    color:var(--slate-soft);
-  }
-  input[type=range]{
-    -webkit-appearance:none;
-    appearance:none;
-    width:150px;
-    height:6px;
-    border-radius:999px;
-    background:linear-gradient(90deg,var(--blue),var(--purple));
-    outline:none;
-  }
-  input[type=range]::-webkit-slider-thumb{
-    -webkit-appearance:none;
-    width:18px;height:18px;
-    border-radius:50%;
-    background:#fff;
-    border:3px solid var(--blue);
-    cursor:pointer;
-    box-shadow:0 2px 6px rgba(0,0,0,.25);
-  }
-  input[type=range]::-moz-range-thumb{
-    width:18px;height:18px;border-radius:50%;
-    background:#fff;border:3px solid var(--blue);cursor:pointer;
-  }
-  input[type=checkbox]{
-    width:17px;height:17px;
-    accent-color:var(--blue);
-    cursor:pointer;
-  }
-  .readout{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-    gap:10px;
-    margin-top:12px;
-  }
-  .ro{
-    background:#f1f5f9;
-    border:1px solid #e2e8f0;
-    border-radius:10px;
-    padding:9px 12px;
-    font-size:.82rem;
-    color:var(--muted);
-    font-weight:600;
-  }
-  .ro span{
-    display:block;
-    font-size:1.02rem;
-    font-weight:800;
-    color:var(--slate);
-    font-variant-numeric:tabular-nums;
-    margin-top:2px;
-  }
-  .ro.good span{color:var(--emerald);}
-  .ro.bad span{color:var(--rose);}
-
-  /* ---------- SUMMARY ---------- */
-  .summary{
-    background:linear-gradient(135deg,#0f172a,#1e293b);
-    color:#e2e8f0;
-    border:none;
-  }
-  .summary h2{color:#fff;}
-  .summary ul{margin:0;padding-left:20px;}
-  .summary li{margin-bottom:9px;font-size:.97rem;}
-  .summary li b{color:#93c5fd;}
-  .summary .hl{color:#6ee7b7;font-weight:700;}
-
-  /* ---------- FOOTER ---------- */
-  footer{
-    text-align:center;
-    color:var(--muted);
-    font-size:.82rem;
-    padding:30px 16px 10px;
-    line-height:1.7;
-  }
-  .legend{
-    display:flex;flex-wrap:wrap;gap:14px;
-    font-size:.8rem;font-weight:600;color:var(--muted);
-    margin-top:8px;
-  }
-  .legend i{
-    display:inline-block;width:12px;height:12px;border-radius:3px;
-    margin-right:5px;vertical-align:-1px;
-  }
-  @media(max-width:600px){
-    .card{padding:18px 15px 20px;border-radius:15px;}
-    input[type=range]{width:118px;}
-    .controls{gap:12px 18px;}
+  @media(max-width:520px){
+    body{padding:8px;}
+    .panel{padding:9px;border-radius:12px;}
+    .step,.qbox{font-size:.76rem;padding:8px 9px;}
+    h1{font-size:.9rem;}
+    .legend{font-size:.62rem;}
   }
 </style>
 </head>
 <body>
 
-<!-- ================= HERO ================= -->
-<header class="hero">
-  <div class="hero-inner">
-    <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</div>
-    <h1>Multiple Choice Question 24</h1>
-    <p class="sub">Topic 12 · Coordinate Geometry — Locus of a Point Equidistant from Two Fixed Points</p>
-    <div class="pills">
-      <span class="pill">Locus</span>
-      <span class="pill">Perpendicular Bisector</span>
-      <span class="pill">Distance Formula</span>
-      <span class="pill">Equidistant Condition</span>
-    </div>
-  </div>
-</header>
+<h1><span class="badge">HKDSE 2015 P2</span>Q24 · Coordinate Geometry — Locus of a Point Equidistant from A and B</h1>
 
-<div class="wrap">
+<div class="split">
 
-  <!-- ================= QUESTION ================= -->
-  <section class="card">
-    <h2>Question </h2>
-    <div class="qtext">
-      <p>The coordinates of the points \(A\) and \(B\) are \((2,\,0)\) and \((1,\,5)\) respectively. If \(P\) is a moving point in the rectangular coordinate plane such that \(P\) is equidistant from \(A\) and \(B\), then the locus of \(P\) is</p>
-      <ol type="A">
-        <li>the perpendicular bisector of \(AB\).</li>
-        <li>the circle with \(AB\) as a diameter.</li>
-        <li>the straight line which passes through \(A\) and \(B\).</li>
-        <li>the angle bisector of \(\angle AOB\), where \(O\) is the origin.</li>
-      </ol<figure style="margin:12px 0;text-align:center;"><img src="figures/2015_P2_Q24.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>>
+  <!-- LEFT: DIAGRAM -->
+  <section class="panel diagram">
+    <canvas id="cv" width="620" height="620"></canvas>
+    <div class="legend">
+      <span><i class="swatch" style="background:#4f46e5"></i>A (2, 0)</span>
+      <span><i class="swatch" style="background:#dc2626"></i>B (1, 5)</span>
+      <span><i class="swatch" style="background:#16a34a"></i>Segment AB &amp; midpoint M</span>
+      <span><i class="swatch" style="background:#f59e0b"></i>Moving point P</span>
+      <span><i class="swatch" style="background:#9333ea"></i>Locus (perpendicular bisector)</span>
+      <span><i class="swatch" style="background:#0ea5e9"></i>PA = PB</span>
     </div>
   </section>
 
-  <!-- ================= PART A : THE KEY IDEA ================= -->
-  <section class="card">
-    <h2>Part (a) — Understanding "Equidistant from two fixed points" </h2>
+  <!-- RIGHT: QUESTION + SOLUTION -->
+  <section class="panel">
 
-    <p>Let us first <em>see</em> the condition \(PA = PB\). Drag the slider to move the moving point \(P\) and watch the two distances.</p>
-
-    <div class="canvas-box">
-      <canvas id="c1" width="900" height="620"></canvas>
+    <div class="qbox">
+      <p><b>Question.</b> The coordinates of the points \(A\) and \(B\) are \((2,0)\) and \((1,5)\) respectively. If \(P\) is a moving point in the rectangular coordinate plane such that \(P\) is equidistant from \(A\) and \(B\), then the locus of \(P\) is</p>
+      <ul class="opts">
+        <li><b>A.</b> the perpendicular bisector of \(AB\).</li>
+        <li><b>B.</b> the circle with \(AB\) as a diameter.</li>
+        <li><b>C.</b> the straight line which passes through \(A\) and \(B\).</li>
+        <li><b>D.</b> the angle bisector of \(\angle AOB\), where \(O\) is the origin.</li>
+      </ul>
     </div>
 
-    <div class="controls">
-      <div class="ctrl">
-        <label for="s1">Position of \(P\) along the locus:</label>
-        <input type="range" id="s1" min="-8" max="12" step="0.05" value="0">
-      </div>
-      <div class="ctrl">
-        <label><input type="checkbox" id="k1" checked> Show perpendicular bisector</label>
-      </div>
-      <div class="ctrl">
-        <label><input type="checkbox" id="k2" checked> Show \(PA\) and \(PB\)</label>
-      </div>
-      <div class="ctrl">
-        <label><input type="checkbox" id="k3"> Show option D (angle bisector)</label>
-      </div>
+    <figure style="margin:12px 0;text-align:center;"><img src="figures/2015_P2_Q24.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
+
+    <div class="step" data-step="1">
+      <span class="tag">STEP 1 · Translate the condition</span>
+      <p>\(P\) is <em>equidistant</em> from the two fixed points \(A\) and \(B\) means exactly:</p>
+      <p>$$PA = PB$$</p>
+      <p>So every position of \(P\) must satisfy this single distance equation.</p>
+      <div class="hint">💡 The locus is the set of <b>all</b> points satisfying the given condition — not just one point.</div>
     </div>
 
-    <div class="readout">
-      <div class="ro" id="ro1">Distances
-        <span id="ro1v">—</span>
-      </div>
-      <div class="ro good" id="ro2">Equal?
-        <span id="ro2v">—</span>
-      </div>
-      <div class="ro" id="ro3">Equation of locus
-        <span id="ro3v">\(y = \tfrac{x}{5}+\tfrac{11}{5}\)</span>
-      </div>
+    <div class="step" data-step="2">
+      <span class="tag">STEP 2 · Use the distance formula</span>
+      <p>Let \(P = (x,y)\). With \(A(2,0)\) and \(B(1,5)\):</p>
+      <p>$$\sqrt{(x-2)^2+(y-0)^2}=\sqrt{(x-1)^2+(y-5)^2}$$</p>
+      <p>Squaring both sides (both sides are non-negative):</p>
+      <p>$$(x-2)^2+y^2=(x-1)^2+(y-5)^2$$</p>
     </div>
 
-    <div class="step" id="a1">
-      <div class="step-head">
-        <span class="badge">Step 1</span>
-        
-      </div>
-      <p>Write down the condition "\(P\) is equidistant from \(A\) and \(B\)" using the distance formula. Let \(P=(x,\,y)\).</p>
-      \[PA=PB\]
-      \[\sqrt{(x-2)^2+(y-0)^2}=\sqrt{(x-1)^2+(y-5)^2}\]
-      <div class="hint"><b>Hint:</b> "Equidistant" means the two distances are <em>equal</em>. Squaring both sides will remove the square roots — this is the key algebraic move.</div>
+    <div class="step" data-step="3">
+      <span class="tag">STEP 3 · Expand and simplify</span>
+      <p>$$x^2-4x+4+y^2=x^2-2x+1+y^2-10y+25$$</p>
+      <p>Cancel \(x^2\) and \(y^2\) on both sides:</p>
+      <p>$$-4x+4=-2x-10y+26$$</p>
+      <p>$$\Rightarrow\ 2x-10y+22=0 \quad\Rightarrow\quad x-5y+11=0$$</p>
+      <div class="hint">📐 A linear equation in \(x\) and \(y\) ⟹ the locus is a <b>straight line</b>.</div>
     </div>
 
-    <div class="step" id="a2">
-      <div class="step-head">
-        <span class="badge">Step 2</span>
-        
-      </div>
-      <p>Square both sides and expand.</p>
-      \[(x-2)^2+y^2=(x-1)^2+(y-5)^2\]
-      \[x^2-4x+4+y^2=x^2-2x+1+y^2-10y+25\]
-      <div class="hint"><b>Hint:</b> The \(x^2\) and \(y^2\) terms appear on both sides — they cancel out, which is exactly why the locus is a <em>straight line</em> and not a circle. No \(x^2\) or \(y^2\) should survive!</div>
+    <div class="step" data-step="4">
+      <span class="tag">STEP 4 · Identify the line geometrically</span>
+      <p>Slope of \(AB\):</p>
+      <p>$$m_{AB}=\frac{5-0}{1-2}=\frac{5}{-1}=-5$$</p>
+      <p>Slope of the locus line \(x-5y+11=0\):</p>
+      <p>$$y=\tfrac{1}{5}x+\tfrac{11}{5}\ \Rightarrow\ m=\tfrac{1}{5}$$</p>
+      <p>Since \(m_{AB}\cdot m=-5\times\tfrac{1}{5}=-1\), the locus is <b>perpendicular</b> to \(AB\).</p>
     </div>
 
-    <div class="step" id="a3">
-      <div class="step-head">
-        <span class="badge">Step 3</span>
-        
-      </div>
-      <p>Cancel \(x^2\) and \(y^2\), then simplify.</p>
-      \[-4x+4=-2x+26-10y\]
-      \[10y=2x+22\]
-      \[y=\frac{x}{5}+\frac{11}{5}\]
-      <p>This is the equation of a <b>straight line</b> — the perpendicular bisector of \(AB\).</p>
-      <div class="answer"><b>Answer:</b> The locus is the perpendicular bisector of \(AB\) &nbsp;→&nbsp; <b>Option A</b>.</div>
-      <div class="hint"><b>Hint:</b> A linear equation \(ax+by+c=0\) in the \(xy\)-plane always describes a straight line. To confirm it bisects \(AB\), note it passes through the midpoint \(\left(\tfrac{3}{2},\,\tfrac{5}{2}\right)\) and its slope \(\tfrac{1}{5}\) is the negative reciprocal of the slope of \(AB\).</div>
+    <div class="step" data-step="5">
+      <span class="tag">STEP 5 · Check it passes through the midpoint</span>
+      <p>Midpoint of \(AB\):</p>
+      <p>$$M=\left(\frac{2+1}{2},\frac{0+5}{2}\right)=\left(\tfrac{3}{2},\tfrac{5}{2}\right)$$</p>
+      <p>Substitute into \(x-5y+11\):</p>
+      <p>$$\tfrac{3}{2}-5\left(\tfrac{5}{2}\right)+11=\tfrac{3}{2}-\tfrac{25}{2}+\tfrac{22}{2}=0\ \checkmark$$</p>
+      <p>The locus is the line through \(M\), perpendicular to \(AB\) — the <b>perpendicular bisector of \(AB\)</b>.</p>
     </div>
 
-    <div class="btnbar">
-      <button class="next" id="btnA" onclick="next('A')">Next step →</button>
-      <span class="counter" id="cntA">0 / 3</span>
+    <div class="step" data-step="6">
+      <span class="tag">STEP 6 · Conclusion</span>
+      <p>By the standard locus result: the locus of a point equidistant from two fixed points is the <b>perpendicular bisector</b> of the segment joining them.</p>
+      <p>Option B would require \(P\) on a circle (only some points satisfy it); Option C gives points that are <em>not</em> equidistant (except the midpoint); Option D gives points equidistant from the two <em>lines</em> \(OA\) and \(OB\), not from the points \(A\) and \(B\).</p>
+      <div class="answer"><span class="lbl">ANSWER</span>A · the perpendicular bisector of \(AB\)</div>
     </div>
+
   </section>
-
-  <!-- ================= PART B : WHY NOT THE OTHERS ================= -->
-  <section class="card">
-    <h2>Part (b) — Eliminating the Wrong Options </h2>
-
-    <p>Use the toggles below to overlay each option on the diagram and see why only <b>A</b> satisfies \(PA=PB\) for <em>every</em> point on it.</p>
-
-    <div class="canvas-box">
-      <canvas id="c2" width="900" height="620"></canvas>
-    </div>
-
-    <div class="controls">
-      <div class="ctrl">
-        <label for="s2">Test point position:</label>
-        <input type="range" id="s2" min="0" max="1" step="0.002" value="0.5">
-      </div>
-      <div class="ctrl">
-        <label><input type="checkbox" id="bA" checked> A · Perpendicular bisector</label>
-      </div>
-      <div class="ctrl">
-        <label><input type="checkbox" id="bB"> B · Circle with \(AB\) as diameter</label>
-      </div>
-      <div class="ctrl">
-        <label><input type="checkbox" id="bC"> C · Line \(AB\)</label>
-      </div>
-      <div class="ctrl">
-        <label><input type="checkbox" id="bD"> D · Angle bisector of \(\angle AOB\)</label>
-      </div>
-    </div>
-
-    <div class="readout">
-      <div class="ro" id="roB1">\(PA\)
-        <span id="roB1v">—</span>
-      </div>
-      <div class="ro" id="roB2">\(PB\)
-        <span id="roB2v">—</span>
-      </div>
-      <div class="ro" id="roB3">\(PA-PB\)
-        <span id="roB3v">—</span>
-      </div>
-    </div>
-
-    <div class="step" id="b1">
-      <div class="step-head">
-        <span class="badge">Step 1</span>
-        <span class="ms">Reasoning</span>
-      </div>
-      <p><b>Option A — perpendicular bisector:</b> every point on it is equidistant from \(A\) and \(B\).</p>
-      <p><b>Option C — the line \(AB\) itself:</b> take the midpoint \(\left(\tfrac{3}{2},\,\tfrac{5}{2}\right)\); it is equidistant, but take \(A\) itself: then \(PA=0\) while \(PB=AB\neq 0\). So <em>not every</em> point on line \(AB\) works. ✘</p>
-      <div class="hint"><b>Hint:</b> A locus must satisfy the condition at <em>every</em> point on it — not just at some points. Test the easiest points, like \(A\), \(B\), and the midpoint.</div>
-    </div>
-
-    <div class="step" id="b2">
-      <div class="step-head">
-        <span class="badge">Step 2</span>
-        <span class="ms">Reasoning</span>
-      </div>
-      <p><b>Option B — circle with \(AB\) as diameter:</b> by Thales' theorem, every point on this circle sees \(AB\) at \(90^\circ\), but the distances \(PA\) and \(PB\) are generally <em>unequal</em>. For example, at the point of the circle farthest from \(A\), \(PA\ne PB\). ✘</p>
-      <p><b>Option D — angle bisector of \(\angle AOB\):</b> this line is equidistant from the <em>lines</em> \(OA\) and \(OB\), not from the <em>points</em> \(A\) and \(B\). ✘</p>
-      <div class="hint"><b>Hint:</b> Read the condition carefully: "equidistant from \(A\) and \(B\)" means distance to <b>points</b>, i.e. \(PA=PB\). Option D confuses distance to points with distance to lines.</div>
-      <div class="answer"><b>Conclusion:</b> Only the perpendicular bisector of \(AB\) contains exactly the points equidistant from \(A\) and \(B\).</div>
-    </div>
-
-    <div class="step" id="b3">
-      <div class="step-head">
-        <span class="badge">Step 3</span>
-        
-      </div>
-      <p>The locus is the perpendicular bisector of the line segment joining the two fixed points.</p>
-      <div class="answer"><b>Final answer:</b> <b>Option A</b></div>
-    </div>
-
-    <div class="btnbar">
-      <button class="next" id="btnB" onclick="next('B')">Next step →</button>
-      <span class="counter" id="cntB">0 / 3</span>
-    </div>
-  </section>
-
-  <!-- ================= SUMMARY ================= -->
-  <section class="card summary">
-    <h2>Summary of Answers</h2>
-    <ul>
-      <li><b>Given:</b> \(A=(2,\,0)\), \(B=(1,\,5)\), point \(P\) moves with \(PA=PB\).</li>
-      <li><b>Key equation:</b> \[(x-2)^2+y^2=(x-1)^2+(y-5)^2 \;\Rightarrow\; y=\tfrac{x}{5}+\tfrac{11}{5}\]</li>
-      <li><b>Nature of locus:</b> a <span class="hl">straight line</span> — the <span class="hl">perpendicular bisector of \(AB\)</span>.</li>
-      <li><b>Final answer (MC):</b> <span class="hl">Option A</span> — the perpendicular bisector of \(AB\).</li>
-      <li><b>General principle:</b> The locus of a moving point equidistant from two fixed points is always the perpendicular bisector of the line segment joining the two fixed points.</li>
-    </ul>
-  </section>
-
 </div>
 
-<footer>
-  HKDSE Mathematics (Compulsory Part) · Paper 2 · 2015 · Question 24<br>
-  Interactive solution — Coordinate Geometry &amp; Locus. Built with HTML5 Canvas &amp; MathJax.
-</footer>
-
 <script>
-/* ============================================================
-   GEOMETRY DATA
-   ============================================================ */
-const A = {x: 2, y: 0};
-const B = {x: 1, y: 5};
-const M = {x: (A.x + B.x)/2, y: (A.y + B.y)/2};   // midpoint = (1.5, 2.5)
-const slopeAB = (B.y - A.y)/(B.x - A.x);           // -5
-const slopePB = -1/slopeAB;                        // 1/5  (perpendicular bisector)
+/* ---------- Canvas setup ---------- */
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+let mode = 1;
 
-/* Axis / world mapping for canvas 1 and 2 (shared) */
-function makeMapper(W, H, xmin, xmax, ymin, ymax){
-  const sx = W/(xmax-xmin), sy = H/(ymax-ymin);
-  return {
-    X: x => (x - xmin)*sx,
-    Y: y => H - (y - ymin)*sy,
-    sx, sy, xmin, xmax, ymin, ymax, W, H
-  };
-}
+/* world coords -> canvas coords (uniform scale, y flipped) */
+const W = 620, H = 620;
+const SCALE = 78;              // pixels per unit
+const OX = 170, OY = 470;      // canvas position of world origin (0,0)
 
-/* generic grid + axes drawer */
-function drawGrid(ctx, m, opts={}){
-  const {xmin,xmax,ymin,ymax,W,H} = m;
+function X(x){ return OX + x*SCALE; }
+function Y(y){ return OY - y*SCALE; }
+
+function drawAxes(){
   ctx.clearRect(0,0,W,H);
-
   // background
-  ctx.fillStyle = "#0b1220";
+  ctx.fillStyle = '#fbfdff';
   ctx.fillRect(0,0,W,H);
 
-  // minor grid
-  ctx.strokeStyle = "rgba(148,163,184,0.14)";
+  // grid
+  ctx.strokeStyle = '#eef2fa';
   ctx.lineWidth = 1;
-  for(let x = Math.ceil(xmin); x <= xmax; x++){
-    ctx.beginPath();
-    ctx.moveTo(m.X(x), 0);
-    ctx.lineTo(m.X(x), H);
-    ctx.stroke();
+  for(let gx=-1; gx<=7; gx++){
+    ctx.beginPath(); ctx.moveTo(X(gx),0); ctx.lineTo(X(gx),H); ctx.stroke();
   }
-  for(let y = Math.ceil(ymin); y <= ymax; y++){
-    ctx.beginPath();
-    ctx.moveTo(0, m.Y(y));
-    ctx.lineTo(W, m.Y(y));
-    ctx.stroke();
+  for(let gy=-1; gy<=8; gy++){
+    ctx.beginPath(); ctx.moveTo(0,Y(gy)); ctx.lineTo(W,Y(gy)); ctx.stroke();
   }
 
   // axes
-  ctx.strokeStyle = "rgba(226,232,240,0.85)";
+  ctx.strokeStyle = '#94a3b8';
   ctx.lineWidth = 2;
-  ctx.beginPath(); ctx.moveTo(0, m.Y(0)); ctx.lineTo(W, m.Y(0)); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(m.X(0), 0); ctx.lineTo(m.X(0), H); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(0,Y(0)); ctx.lineTo(W,Y(0)); ctx.stroke();   // x-axis
+  ctx.beginPath(); ctx.moveTo(X(0),H); ctx.lineTo(X(0),0); ctx.stroke();   // y-axis
 
-  // axis ticks and labels
-  ctx.fillStyle = "rgba(148,163,184,0.9)";
-  ctx.font = "13px -apple-system, Segoe UI, sans-serif";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "top";
-  for(let x = Math.ceil(xmin); x <= xmax; x++){
-    if(x === 0) continue;
-    ctx.fillText(x, m.X(x), m.Y(0)+6);
+  // axis ticks & labels
+  ctx.fillStyle = '#64748b';
+  ctx.font = '12px Segoe UI, Arial';
+  ctx.textAlign = 'center';
+  for(let gx=1; gx<=7; gx++){
+    ctx.beginPath(); ctx.moveTo(X(gx),Y(0)-4); ctx.lineTo(X(gx),Y(0)+4);
+    ctx.strokeStyle='#94a3b8'; ctx.lineWidth=1.5; ctx.stroke();
+    ctx.fillText(gx, X(gx), Y(0)+18);
   }
-  ctx.textAlign = "right";
-  ctx.textBaseline = "middle";
-  for(let y = Math.ceil(ymin); y <= ymax; y++){
-    if(y === 0) continue;
-    ctx.fillText(y, m.X(0)-7, m.Y(y));
+  ctx.textAlign='right';
+  for(let gy=1; gy<=8; gy++){
+    ctx.beginPath(); ctx.moveTo(X(0)-4,Y(gy)); ctx.lineTo(X(0)+4,Y(gy));
+    ctx.strokeStyle='#94a3b8'; ctx.lineWidth=1.5; ctx.stroke();
+    ctx.fillText(gy, X(0)-8, Y(gy)+4);
   }
-  // origin
-  ctx.textAlign = "right"; ctx.textBaseline = "top";
-  ctx.fillText("O", m.X(0)-6, m.Y(0)+6);
+  ctx.textAlign='left';
+  ctx.fillStyle='#475569';
+  ctx.font='italic 13px Segoe UI, Arial';
+  ctx.fillText('x', W-18, Y(0)+18);
+  ctx.fillText('y', X(0)+8, 16);
+  ctx.fillText('O', X(0)-14, Y(0)+16);
 }
 
-function drawDot(ctx, m, p, color, r=7, label=null){
+function dot(x,y,color,label,dx,dy,radius){
+  const px=X(x), py=Y(y);
   ctx.beginPath();
-  ctx.arc(m.X(p.x), m.Y(p.y), r, 0, Math.PI*2);
-  ctx.fillStyle = color;
+  ctx.arc(px,py,radius||6,0,Math.PI*2);
+  ctx.fillStyle=color;
   ctx.fill();
-  ctx.strokeStyle = "#fff";
-  ctx.lineWidth = 2;
+  ctx.strokeStyle='#ffffff';
+  ctx.lineWidth=2;
   ctx.stroke();
   if(label){
-    ctx.fillStyle = "#fff";
-    ctx.font = "bold 16px -apple-system, Segoe UI, sans-serif";
-    ctx.textAlign = "left";
-    ctx.textBaseline = "bottom";
-    ctx.fillText(label, m.X(p.x)+12, m.Y(p.y)-10);
+    ctx.fillStyle=color;
+    ctx.font='bold 14px Segoe UI, Arial';
+    ctx.textAlign='left';
+    ctx.fillText(label, px+(dx||10), py+(dy||-10));
   }
 }
 
-function drawLineSeg(ctx, m, p, q, color, width=3, dash=null){
+function segLine(p1,p2,color,width,dash){
   ctx.save();
-  ctx.setLineDash(dash || []);
-  ctx.strokeStyle = color;
-  ctx.lineWidth = width;
   ctx.beginPath();
-  ctx.moveTo(m.X(p.x), m.Y(p.y));
-  ctx.lineTo(m.X(q.x), m.Y(q.y));
+  ctx.moveTo(X(p1[0]),Y(p1[1]));
+  ctx.lineTo(X(p2[0]),Y(p2[1]));
+  ctx.strokeStyle=color;
+  ctx.lineWidth=width;
+  if(dash) ctx.setLineDash(dash);
+  ctx.lineCap='round';
   ctx.stroke();
   ctx.restore();
 }
 
-function labelText(ctx, x, y, text, color, font="bold 15px -apple-system, Segoe UI, sans-serif", align="left", baseline="middle", bg=null){
-  ctx.font = font;
-  ctx.textAlign = align;
-  ctx.textBaseline = baseline;
-  if(bg){
-    const w = ctx.measureText(text).width;
-    let bx = x;
-    if(align === "center") bx = x - w/2;
-    if(align === "right") bx = x - w;
-    ctx.fillStyle = bg;
-    ctx.fillRect(bx-6, y-12, w+12, 24);
+function draw(){
+  drawAxes();
+
+  const A=[2,0], B=[1,5];
+  const M=[1.5,2.5];
+
+  /* Locus line: x - 5y + 11 = 0  =>  y = (x+11)/5 */
+  // draw a long chunk of the perpendicular bisector
+  const lx1=-1.2, lx2=6.5;
+  const L1=[lx1,(lx1+11)/5];
+  const L2=[lx2,(lx2+11)/5];
+
+  if(mode>=1){
+    // locus (purple) — draw faint in later steps too
+    segLine(L1,L2,'#9333ea', mode===4||mode===5 ? 3.5 : 2.6, [9,7]);
   }
-  ctx.fillStyle = color;
-  ctx.fillText(text, x, y);
+
+  // segment AB (green) — always shown, highlighted in step 2
+  segLine(A,B, mode===2 ? '#15803d' : '#22c55e', mode===2 ? 4 : 3);
+
+  // midpoint M (green dot) highlighted in step 5
+  if(mode>=2){
+    dot(M[0],M[1], mode===5 ? '#15803d' : '#22c55e','M', 10, -12, mode===5?7:5);
+  }
+
+  // right angle marker at M between AB and locus
+  if(mode===4 || mode===5){
+    const uL=[1, (1/5)];              // direction of locus  (1, 1/5)
+    const uB=[B[0]-A[0], B[1]-A[1]];  // direction of AB
+    const nL=Math.hypot(uL[0],uL[1]), nB=Math.hypot(uB[0],uB[1]);
+    const v1=[uL[0]/nL*0.42, uL[1]/nL*0.42];
+    const v2=[uB[0]/nB*0.42, uB[1]/nB*0.42];
+    ctx.save();
+    ctx.strokeStyle='#ef4444';
+    ctx.lineWidth=2;
+    ctx.beginPath();
+    ctx.moveTo(X(M[0]+v1[0]), Y(M[1]+v1[1]));
+    ctx.lineTo(X(M[0]+v1[0]+v2[0]), Y(M[1]+v1[1]+v2[1]));
+    ctx.lineTo(X(M[0]+v2[0]), Y(M[1]+v2[1]));
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // Moving point P on the locus (amber) — shown from step 1 (and step 3)
+  if(mode===1 || mode===3){
+    const px = mode===1 ? 3.4 : 4.6;
+    const P=[px,(px+11)/5];
+    // PA and PB in sky-blue to show equality
+    segLine(P,A,'#0ea5e9',2.4);
+    segLine(P,B,'#0ea5e9',2.4);
+    dot(P[0],P[1],'#f59e0b','P',12,-8,7);
+    // small equality ticks labels
+    ctx.fillStyle='#0369a1';
+    ctx.font='bold 12px Segoe UI, Arial';
+    // label PA / PB near midpoints
+    ctx.fillText('PA', (X(P[0])+X(A[0]))/2+6, (Y(P[1])+Y(A[1]))/2+4);
+    ctx.fillText('PB', (X(P[0])+X(B[0]))/2-24, (Y(P[1])+Y(B[1]))/2-6);
+  }
+
+  // A and B always visible
+  dot(A[0],A[1],'#4f46e5','A (2, 0)', 12, 20);
+  dot(B[0],B[1],'#dc2626','B (1, 5)', 12, -12);
+
+  // Origin label handled in axes
+  // Step 6: emphasise the whole perpendicular bisector
+  if(mode===6){
+    segLine(L1,L2,'#9333ea',3.8,[9,7]);
+    // fade in the AB / M for clarity
+    segLine(A,B,'#22c55e',3);
+    dot(M[0],M[1],'#22c55e','M',10,-12,6);
+    dot(A[0],A[1],'#4f46e5','A (2, 0)', 12, 20);
+    dot(B[0],B[1],'#dc2626','B (1, 5)', 12, -12);
+  }
 }
 
-/* equation of perpendicular bisector : y = x/5 + 11/5 */
-function locusY(x){ return x/5 + 11/5; }
-
-/* ============================================================
-   CANVAS 1 : main interactive locus explorer
-   ============================================================ */
-(function(){
-  const cv = document.getElementById('c1');
-  const ctx = cv.getContext('2d');
-  const W = cv.width, H = cv.height;
-  const m = makeMapper(W, H, -9, 13, -4, 10);
-
-  const s1 = document.getElementById('s1');
-  const k1 = document.getElementById('k1');
-  const k2 = document.getElementById('k2');
-  const k3 = document.getElementById('k3');
-
-  const ro1v = document.getElementById('ro1v');
-  const ro2v = document.getElementById('ro2v');
-
-  function P_from_t(t){
-    // parametrise perpendicular bisector by x = t
-    return {x: t, y: locusY(t)};
-  }
-
-  function draw(){
-    drawGrid(ctx, m);
-
-    // --- Option D angle bisector of angle AOB (faint) ---
-    if(k3.checked){
-      // direction of OA = (2,0), OB = (1,5)
-      const nA = Math.hypot(2,0), nB = Math.hypot(1,5);
-      const uA = {x: 2/nA, y: 0};
-      const uB = {x: 1/nB, y: 5/nB};
-      const dir = {x: uA.x + uB.x, y: uA.y + uB.y};
-      const L = 14;
-      const p1 = {x: -0.3*dir.x, y: -0.3*dir.y};
-      const p2 = {x: L*dir.x, y: L*dir.y};
-      drawLineSeg(ctx, m, p1, p2, "rgba(251,113,133,0.55)", 2, [8,7]);
-      labelText(ctx, m.X(3.4), m.Y(3.4*dir.y/dir.x), "D: angle bisector of ∠AOB",
-                "rgba(251,113,133,0.95)", "bold 13px -apple-system, Segoe UI, sans-serif");
+/* ---------- Scroll sync ---------- */
+const steps = Array.from(document.querySelectorAll('.step'));
+const obs = new IntersectionObserver((es)=>{
+  es.forEach(e=>{
+    if(e.isIntersecting){
+      const m = +e.target.dataset.step;
+      mode = m;
+      steps.forEach(st=>st.classList.toggle('active', st===e.target));
+      draw();
     }
+  });
+},{rootMargin:'-15% 0px -55% 0px',threshold:0});
+steps.forEach(st=>obs.observe(st));
 
-    // --- Perpendicular bisector of AB ---
-    if(k1.checked){
-      const pL = P_from_t(-9), pR = P_from_t(13);
-      drawLineSeg(ctx, m, pL, pR, "#34d399", 3.5);
-      // label
-      labelText(ctx, m.X(11.2), m.Y(locusY(11.2))-14,
-        "perp. bisector:  y = x/5 + 11/5",
-        "#34d399", "bold 14px -apple-system, Segoe UI, sans-serif", "right");
-    }
-
-    // --- AB segment & midpoint ---
-    drawLineSeg(ctx, m, A, B, "#60a5fa", 3);
-    // midpoint
-    drawDot(ctx, m, M, "#fbbf24", 6, "M");
-    // right angle marker at M
-    (function(){
-      const s = 0.42;
-      const u = {x: (B.x-A.x)/Math.hypot(B.x-A.x,B.y-A.y), y:(B.y-A.y)/Math.hypot(B.x-A.x,B.y-A.y)};
-      const v = {x: -u.y, y: u.x};
-      const p1 = {x: M.x + s*u.x, y: M.y + s*u.y};
-      const p2 = {x: M.x + s*u.x + s*v.x, y: M.y + s*u.y + s*v.y};
-      const p3 = {x: M.x + s*v.x, y: M.y + s*v.y};
-      ctx.strokeStyle = "#fbbf24";
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(m.X(p1.x), m.Y(p1.y));
-      ctx.lineTo(m.X(p2.x), m.Y(p2.y));
-      ctx.lineTo(m.X(p3.x), m.Y(p3.y));
-      ctx.stroke();
-    })();
-
-    // --- fixed points ---
-    drawDot(ctx, m, A, "#f87171", 8, "A(2, 0)");
-    drawDot(ctx, m, B, "#c084fc", 8, "B(1, 5)");
-
-    // --- moving point P ---
-    const t = parseFloat(s1.value);
-    const P = P_from_t(t);
-
-    if(k2.checked){
-      drawLineSeg(ctx, m, P, A, "#f87171", 2, [7,6]);
-      drawLineSeg(ctx, m, P, B, "#c084fc", 2, [7,6]);
-
-      // distance labels
-      const dA = Math.hypot(P.x-A.x, P.y-A.y);
-      const dB = Math.hypot(P.x-B.x, P.y-B.y);
-      const midPA = {x:(P.x+A.x)/2, y:(P.y+A.y)/2};
-      const midPB = {x:(P.x+B.x)/2, y:(P.y+B.y)/2};
-      labelText(ctx, m.X(midPA.x), m.Y(midPA.y), dA.toFixed(2),
-                "#fca5a5", "bold 13px -apple-system, Segoe UI, sans-serif", "center",
-                "middle", "rgba(11,18,32,0.75)");
-      labelText(ctx, m.X(midPB.x), m.Y(midPB.y), dB.toFixed(2),
-                "#d8b4fe", "bold 13px -apple-system, Segoe UI, sans-serif", "center",
-                "middle", "rgba(11,18,32,0.75)");
-    }
-
-    drawDot(ctx, m, P, "#facc15", 8, "P(" + P.x.toFixed(2) + ", " + P.y.toFixed(2) + ")");
-
-    // glow ring
-    ctx.beginPath();
-    ctx.arc(m.X(P.x), m.Y(P.y), 15, 0, Math.PI*2);
-    ctx.strokeStyle = "rgba(250,204,21,0.35)";
-    ctx.lineWidth = 3;
-    ctx.stroke();
-
-    // readouts
-    const dA = Math.hypot(P.x-A.x, P.y-A.y);
-    const dB = Math.hypot(P.x-B.x, P.y-B.y);
-    ro1v.textContent = "PA = " + dA.toFixed(4) + "  |  PB = " + dB.toFixed(4);
-    const eq = Math.abs(dA-dB) < 1e-6;
-    ro2v.textContent = eq ? "PA = PB  ✔  (" + Math.abs(dA-dB).toExponential(1) + ")" : "unequal ✘";
-    document.getElementById('ro2').className = "ro " + (eq ? "good" : "bad");
-  }
-
-  [s1, k1, k2, k3].forEach(el => el.addEventListener('input', draw));
+/* initial */
+window.addEventListener('load', ()=>{
   draw();
-})();
-
-/* ============================================================
-   CANVAS 2 : option checker
-   ============================================================ */
-(function(){
-  const cv = document.getElementById('c2');
-  const ctx = cv.getContext('2d');
-  const W = cv.width, H = cv.height;
-  const m = makeMapper(W, H, -9, 13, -5, 10);
-
-  const s2 = document.getElementById('s2');
-  const bA = document.getElementById('bA');
-  const bB = document.getElementById('bB');
-  const bC = document.getElementById('bC');
-  const bD = document.getElementById('bD');
-
-  const roB1v = document.getElementById('roB1v');
-  const roB2v = document.getElementById('roB2v');
-  const roB3v = document.getElementById('roB3v');
-
-  /* option B: circle with AB as diameter -> centre M, radius |AB|/2 */
-  const rad = Math.hypot(B.x-A.x, B.y-A.y)/2;
-
-  function draw(){
-    drawGrid(ctx, m);
-
-    // Option C : line AB (extended)
-    if(bC.checked){
-      const u = {x: (B.x-A.x), y:(B.y-A.y)};
-      const n = Math.hypot(u.x,u.y);
-      const dir = {x: u.x/n, y: u.y/n};
-      const p1 = {x: A.x - 6*dir.x, y: A.y - 6*dir.y};
-      const p2 = {x: A.x + 9*dir.x, y: A.y + 9*dir.y};
-      drawLineSeg(ctx, m, p1, p2, "rgba(96,165,250,0.75)", 2.5, [9,7]);
-      labelText(ctx, m.X(5.5*dir.x+0.5), m.Y(5.5*dir.y+0.2), "C: line AB",
-                "rgba(147,197,253,0.95)", "bold 13px -apple-system, Segoe UI, sans-serif");
-    }
-
-    // Option B : circle with AB as diameter
-    if(bB.checked){
-      ctx.beginPath();
-      ctx.arc(m.X(M.x), m.Y(M.y), rad*m.sx, 0, Math.PI*2);
-      ctx.strokeStyle = "rgba(192,132,252,0.8)";
-      ctx.lineWidth = 2.5;
-      ctx.setLineDash([9,7]);
-      ctx.stroke();
-      ctx.setLineDash([]);
-      labelText(ctx, m.X(M.x + rad + 0.3), m.Y(M.y + rad*0.7), "B: circle, AB diameter",
-                "rgba(216,180,254,0.95)", "bold 13px -apple-system, Segoe UI, sans-serif");
-    }
-
-    // Option D : angle bisector of ∠AOB
-    if(bD.checked){
-      const nA = 2, nB = Math.hypot(1,5);
-      const dir = {x: 2/nA + 1/nB, y: 0 + 5/nB};
-      const L = 13;
-      const p1 = {x: -0.3*dir.x, y: -0.3*dir.y};
-      const p2 = {x: L*dir.x, y: L*dir.y};
-      drawLineSeg(ctx, m, p1, p2, "rgba(251,113,133,0.8)", 2.5, [9,7]);
-      labelText(ctx, m.X(4.2), m.Y(4.2*dir.y/dir.x), "D: angle bisector",
-                "rgba(251,113,133,0.95)", "bold 13px -apple-system, Segoe UI, sans-serif");
-    }
-
-    // Option A : perpendicular bisector (always available as reference)
-    if(bA.checked){
-      const pL = {x:-9, y:locusY(-9)};
-      const pR = {x:13, y:locusY(13)};
-      drawLineSeg(ctx, m, pL, pR, "#34d399", 3.5);
-      labelText(ctx, m.X(12.6), m.Y(locusY(12.6))-16, "A: perp. bisector",
-                "#34d399", "bold 14px -apple-system, Segoe UI, sans-serif", "right");
-    }
-
-    // AB segment
-    drawLineSeg(ctx, m, A, B, "#60a5fa", 3);
-    drawDot(ctx, m, M, "#fbbf24", 6, "M(1.5, 2.5)");
-
-    // fixed points
-    drawDot(ctx, m, A, "#f87171", 8, "A(2, 0)");
-    drawDot(ctx, m, B, "#c084fc", 8, "B(1, 5)");
-
-    /* -------- moving test point Q --------
-       slide along the currently *selected* curve.
-       priority: if A checked -> A ; else B -> B ; else C -> C ; else D -> D
-       t in [0,1]
-    */
-    const t = parseFloat(s2.value);
-    let Q;
-    if(bA.checked){
-      const xq = -9 + t*22;
-      Q = {x: xq, y: locusY(xq)};
-    } else if(bB.checked){
-      const th = t*Math.PI*2;
-      Q = {x: M.x + rad*Math.cos(th), y: M.y + rad*Math.sin(th)};
-    } else if(bC.checked){
-      const dir = {x:(B.x-A.x)/Math.hypot(B.x-A.x,B.y-A.y), y:(B.y-A.y)/Math.hypot(B.x-A.x,B.y-A.y)};
-      const s = -6 + t*15;
-      Q = {x: A.x + s*dir.x, y: A.y + s*dir.y};
-    } else if(bD.checked){
-      const nB = Math.hypot(1,5);
-      const dir0 = {x: 2/2 + 1/nB, y: 0 + 5/nB};
-      const nd = Math.hypot(dir0.x, dir0.y);
-      const dir = {x: dir0.x/nd, y: dir0.y/nd};
-      const s = -0.3 + t*13.3;
-      Q = {x: s*dir.x, y: s*dir.y};
-    } else {
-      const xq = -9 + t*22;
-      Q = {x: xq, y: locusY(xq)};
-    }
-
-    // dashed QA, QB
-    drawLineSeg(ctx, m, Q, A, "#f87171", 2, [7,6]);
-    drawLineSeg(ctx, m, Q, B, "#c084fc", 2, [7,6]);
-
-    drawDot(ctx, m, Q, "#facc15", 8, "Q(" + Q.x.toFixed(2) + ", " + Q.y.toFixed(2) + ")");
-    ctx.beginPath();
-    ctx.arc(m.X(Q.x), m.Y(Q.y), 15, 0, Math.PI*2);
-    ctx.strokeStyle = "rgba(250,204,21,0.35)";
-    ctx.lineWidth = 3;
-    ctx.stroke();
-
-    // readouts
-    const dA = Math.hypot(Q.x-A.x, Q.y-A.y);
-    const dB = Math.hypot(Q.x-B.x, Q.y-B.y);
-    roB1v.textContent = dA.toFixed(4);
-    roB2v.textContent = dB.toFixed(4);
-    const diff = dA - dB;
-    roB3v.textContent = diff.toFixed(4);
-    document.getElementById('roB3').className = "ro " + (Math.abs(diff)<1e-6 ? "good" : "bad");
-  }
-
-  [s2,bA,bB,bC,bD].forEach(el => el.addEventListener('input', draw));
-  draw();
-})();
-
-/* ============================================================
-   STEP REVEAL LOGIC
-   ============================================================ */
-const stepState = {A: {total: 3, shown: 0}, B: {total: 3, shown: 0}};
-
-function next(part){
-  const st = stepState[part];
-  if(st.shown < st.total){
-    st.shown++;
-    const el = document.getElementById(part.toLowerCase() + st.shown);
-    if(el) el.classList.add('show');
-    document.getElementById('cnt'+part).textContent = st.shown + ' / ' + st.total;
-    if(st.shown === st.total){
-      const btn = document.getElementById('btn'+part);
-      btn.disabled = true;
-      btn.textContent = 'All steps revealed ✓';
-    }
-  }
-}
-</script>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
+  if(steps.length) { steps[0].classList.add('active'); }
 });
+draw();
 </script>
-
 </body>
 </html>

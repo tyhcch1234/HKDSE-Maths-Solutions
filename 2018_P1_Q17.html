@@ -1,875 +1,577 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>HKDSE 2018 Paper 1 Q17 · Trigonometry</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2018 P1 Q17 · Trigonometry</title>
 <script>
-  MathJax = {
-    tex: { inlineMath: [['\\(', '\\)'], ['$', '$']], displayMath: [['\\[', '\\]'], ['$$', '$$']] },
-    svg: { fontCache: 'global' }
-  };
+window.MathJax = {
+  tex: {
+    inlineMath: [['$','$'],['\\(','\\)']],
+    displayMath: [['$$','$$'],['\\[','\\]']]
+  },
+  svg: { fontCache: 'global' }
+};
 </script>
-<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
-  :root {
-    --blue: #1d4ed8;
-    --blue-dark: #1e3a8a;
-    --blue-light: #dbeafe;
-    --amber: #b45309;
-    --amber-light: #fef3c7;
-    --emerald: #047857;
-    --emerald-light: #d1fae5;
-    --ink: #0f172a;
-    --muted: #475569;
-    --line: #cbd5e1;
-    --card-radius: 18px;
-    --shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  :root{
+    --bg:#eef3fb;
+    --panel:#ffffff;
+    --ink:#1f2b3a;
+    --muted:#5b6b80;
+    --blue:#2563eb;
+    --red:#e11d48;
+    --green:#059669;
+    --amber:#d97706;
+    --purple:#7c3aed;
+    --cyan:#0891b2;
+    --card-shadow:0 6px 22px rgba(31,43,58,.10);
   }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-    color: var(--ink);
-    background: #f1f5f9;
-    line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:radial-gradient(1200px 600px at 10% -10%, #dbe8ff 0%, transparent 60%),
+               radial-gradient(900px 500px at 110% 10%, #ffe7ef 0%, transparent 55%),
+               var(--bg);
+    color:var(--ink);
+    font-family:"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    line-height:1.55;
+    padding:14px;
   }
-  .wrap { max-width: 980px; margin: 0 auto; padding: 0 14px 60px; }
+  header.top{
+    max-width:1400px;margin:0 auto 14px;
+    background:linear-gradient(100deg,#1e3a8a,#2563eb 55%,#7c3aed);
+    color:#fff;border-radius:18px;padding:14px 20px;
+    box-shadow:var(--card-shadow);
+    display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;
+  }
+  header.top h1{font-size:1.15rem;margin:0;font-weight:700;letter-spacing:.2px;}
+  header.top .pill{
+    background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);
+    padding:3px 10px;border-radius:999px;font-size:.78rem;font-weight:600;
+  }
+  .split{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    gap:12px;
+    align-items:start;
+    max-width:1400px;margin:0 auto;
+  }
+  @media(min-width:900px){
+    .split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}
+  }
+  .panel{
+    background:var(--panel);
+    border-radius:18px;
+    box-shadow:var(--card-shadow);
+    padding:14px;
+    border:1px solid rgba(37,99,235,.08);
+  }
+  .diagram{
+    position:sticky;top:16px;
+    max-height:calc(100vh - 2rem);
+    overflow-y:auto;
+  }
+  .diagram h2, .panel h2{
+    margin:0 0 8px;font-size:1rem;letter-spacing:.3px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .diagram h2::before, .panel h2::before{
+    content:"";width:10px;height:10px;border-radius:3px;
+    background:linear-gradient(135deg,var(--blue),var(--purple));
+    display:inline-block;
+  }
+  canvas{width:100%;height:auto;display:block;border-radius:14px;background:#fbfdff;touch-action:manipulation;}
+  .legend{
+    display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:10px;font-size:.74rem;color:var(--muted);
+  }
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .swatch{width:14px;height:4px;border-radius:2px;display:inline-block;}
+  .dot{width:10px;height:10px;border-radius:50%;display:inline-block;}
+  .controls{
+    display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;
+  }
+  .controls button{
+    border:1px solid rgba(37,99,235,.25);
+    background:#f2f7ff;color:#1e3a8a;font-weight:600;font-size:.76rem;
+    padding:6px 10px;border-radius:10px;cursor:pointer;transition:.15s;
+  }
+  .controls button:hover{background:#e0edff;}
+  .controls button.on{background:linear-gradient(120deg,#2563eb,#7c3aed);color:#fff;border-color:transparent;}
 
-  /* ---------- HERO ---------- */
-  header.hero {
-    background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 45%, #0ea5e9 100%);
-    color: #fff;
-    padding: 36px 18px 42px;
-    border-bottom-left-radius: 28px;
-    border-bottom-right-radius: 28px;
-    box-shadow: 0 12px 30px rgba(29, 78, 216, 0.28);
+  /* Right panel */
+  .qhead{
+    background:linear-gradient(120deg,#f0f6ff,#faf0ff);
+    border:1px dashed rgba(124,58,237,.3);
+    border-radius:14px;padding:12px 14px;margin-bottom:12px;
   }
-  .hero-inner { max-width: 980px; margin: 0 auto; }
-  .eyebrow {
-    font-size: 0.78rem; letter-spacing: 0.14em; text-transform: uppercase;
-    opacity: 0.85; font-weight: 600;
+  .qhead .tag{
+    display:inline-block;font-size:.7rem;font-weight:800;letter-spacing:.6px;
+    background:#1e3a8a;color:#fff;padding:2px 9px;border-radius:999px;margin-bottom:6px;
   }
-  .hero h1 { margin: 6px 0 4px; font-size: clamp(1.35rem, 4.2vw, 2.1rem); font-weight: 800; }
-  .hero h2 { margin: 0; font-size: clamp(0.95rem, 2.6vw, 1.15rem); font-weight: 500; opacity: 0.94; }
-  .pills { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px; }
-  .pill {
-    background: rgba(255,255,255,0.16);
-    border: 1px solid rgba(255,255,255,0.35);
-    padding: 5px 13px; border-radius: 999px;
-    font-size: 0.78rem; font-weight: 600; backdrop-filter: blur(3px);
+  .qhead p{margin:7px 0;}
+  .figph{
+    margin:10px 0 4px;padding:10px;border:2px dashed rgba(37,99,235,.35);
+    border-radius:12px;background:#f8fbff;text-align:center;font-size:.76rem;color:var(--muted);
   }
-
-  /* ---------- CARDS ---------- */
-  .card {
-    background: #fff; border-radius: var(--card-radius); box-shadow: var(--shadow);
-    padding: 22px 20px; margin-top: 22px; border: 1px solid #eef2f7;
+  .step{
+    border:1px solid rgba(37,99,235,.14);
+    border-left:6px solid #cbd5e1;
+    background:#fff;border-radius:14px;
+    padding:11px 13px;margin:11px 0;
+    transition:transform .2s, box-shadow .2s, border-left-color .2s, background .2s;
+    opacity:.72;
   }
-  .card h3 {
-    margin: 0 0 4px; font-size: 1.12rem; color: var(--blue-dark);
-    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  .step.active{
+    opacity:1;
+    border-left-color:var(--blue);
+    background:linear-gradient(100deg,#f5f9ff,#ffffff);
+    box-shadow:0 8px 26px rgba(37,99,235,.16);
+    transform:translateX(2px);
   }
-  .card h3 .tag {
-    font-size: 0.7rem; background: var(--blue-light); color: var(--blue-dark);
-    padding: 3px 10px; border-radius: 999px; font-weight: 700; letter-spacing: 0.03em;
+  .steptag{
+    display:inline-block;font-size:.7rem;font-weight:800;letter-spacing:.5px;
+    color:#fff;background:linear-gradient(120deg,#2563eb,#7c3aed);
+    padding:2px 9px;border-radius:999px;margin-bottom:6px;
   }
-  .sub { color: var(--muted); font-size: 0.9rem; margin: 2px 0 14px; }
-
-  .qtext { font-size: 1rem; }
-  .qtext ol { padding-left: 22px; }
-  .qtext li { margin-bottom: 8px; }
-  .marks {
-    display: inline-block; background: var(--amber-light); color: var(--amber);
-    font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 6px;
-    margin-left: 6px; white-space: nowrap;
+  .step p{margin:6px 0;}
+  .answer{
+    margin-top:12px;border-radius:14px;padding:12px 14px;
+    background:linear-gradient(110deg,#ecfdf5,#f0fdfa);
+    border:1px solid rgba(5,150,105,.3);
   }
-
-  /* ---------- CANVAS ---------- */
-  .canvas-box {
-    background: #fbfdff; border: 1px solid #e2e8f0; border-radius: 14px;
-    padding: 10px; margin: 12px 0 6px;
+  .answer h3{margin:0 0 6px;font-size:.86rem;color:#065f46;letter-spacing:.4px;}
+  .answer .big{font-size:1.05rem;font-weight:800;color:#065f46;}
+  .hint{
+    font-size:.8rem;color:var(--muted);background:#fffbeb;
+    border:1px dashed rgba(217,119,6,.4);border-radius:12px;padding:8px 11px;margin:10px 0;
   }
-  canvas { width: 100%; height: auto; display: block; border-radius: 10px; background: #ffffff; }
-  .controls {
-    display: flex; flex-wrap: wrap; gap: 14px 24px; align-items: center;
-    margin-top: 12px; padding: 12px 14px; background: #f8fafc;
-    border: 1px dashed var(--line); border-radius: 12px;
+  .hint b{color:#b45309;}
+  table.mini{border-collapse:collapse;font-size:.82rem;margin:6px 0;}
+  table.mini td,table.mini th{border:1px solid #dbe4f0;padding:4px 8px;}
+  table.mini th{background:#f2f7ff;}
+  @media(max-width:900px){
+    body{padding:8px;}
+    .panel{padding:10px;border-radius:14px;}
+    .step{padding:9px 10px;margin:9px 0;}
+    header.top{padding:11px 13px;border-radius:14px;}
+    header.top h1{font-size:.98rem;}
+    .legend{font-size:.66rem;gap:5px 9px;}
+    .qhead{padding:9px 10px;}
   }
-  .ctrl { display: flex; flex-direction: column; gap: 4px; min-width: 190px; flex: 1 1 190px; }
-  .ctrl label { font-size: 0.8rem; font-weight: 700; color: var(--blue-dark); }
-  input[type=range] { width: 100%; accent-color: var(--blue); }
-  .checkline { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: 600; color: var(--muted); }
-  input[type=checkbox] { width: 17px; height: 17px; accent-color: var(--emerald); }
-  .readout {
-    font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.82rem;
-    background: #0f172a; color: #a5f3fc; padding: 8px 12px; border-radius: 10px;
-    margin-top: 10px; display: flex; flex-wrap: wrap; gap: 4px 18px;
-  }
-  .readout b { color: #fde68a; font-weight: 700; }
-
-  /* ---------- STEPS ---------- */
-  .step {
-    display: none; border-left: 4px solid var(--blue);
-    background: #f8fbff; border-radius: 0 12px 12px 0;
-    padding: 14px 16px; margin-top: 14px; animation: fade 0.35s ease;
-  }
-  .step.show { display: block; }
-  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-  .step-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
-  .badge {
-    background: var(--blue); color: #fff; font-size: 0.72rem; font-weight: 800;
-    padding: 3px 10px; border-radius: 999px; letter-spacing: 0.04em;
-  }
-  .mfbadge {
-    background: #fff; color: var(--amber); border: 1.5px solid var(--amber);
-    font-size: 0.7rem; font-weight: 800; padding: 2px 8px; border-radius: 6px;
-  }
-  .hint {
-    background: var(--amber-light); border-left: 4px solid #f59e0b;
-    border-radius: 8px; padding: 8px 12px; margin-top: 10px; font-size: 0.88rem;
-  }
-  .hint b { color: #92400e; }
-  .answer {
-    background: var(--emerald-light); border-left: 4px solid var(--emerald);
-    border-radius: 8px; padding: 9px 13px; margin-top: 10px; font-weight: 600;
-    color: #065f46; font-size: 0.95rem;
-  }
-  .step-actions { display: flex; align-items: center; gap: 14px; margin-top: 16px; flex-wrap: wrap; }
-  button.next {
-    background: linear-gradient(135deg, var(--blue), #2563eb); color: #fff; border: none;
-    padding: 10px 22px; border-radius: 10px; font-size: 0.9rem; font-weight: 700;
-    cursor: pointer; box-shadow: 0 4px 12px rgba(29,78,216,0.3); transition: transform .12s;
-  }
-  button.next:hover:not(:disabled) { transform: translateY(-1px); }
-  button.next:disabled { background: #cbd5e1; color: #64748b; box-shadow: none; cursor: not-allowed; }
-  .counter { font-size: 0.84rem; font-weight: 700; color: var(--muted); }
-
-  /* ---------- SUMMARY ---------- */
-  .summary {
-    background: linear-gradient(135deg, #0f172a, #1e293b);
-    color: #e2e8f0; border-radius: var(--card-radius); padding: 24px 22px;
-    margin-top: 26px; box-shadow: 0 10px 30px rgba(15,23,42,0.35);
-  }
-  .summary h3 { color: #7dd3fc; margin-top: 0; }
-  .summary ul { padding-left: 20px; margin: 10px 0 0; }
-  .summary li { margin-bottom: 9px; }
-  .summary .hl { color: #fcd34d; font-weight: 700; }
-
-  footer { text-align: center; color: #64748b; font-size: 0.8rem; padding: 26px 10px 10px; }
 </style>
 </head>
 <body>
 
-<!-- ===================== HERO ===================== -->
-<header class="hero">
-  <div class="hero-inner">
-    <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 1</div>
-    <h1>2018 Paper 1 · Question 17</h1>
-    <h2>3-D Trigonometry in a Folded Parallelogram Card</h2>
-    <div class="pills">
-      <span class="pill">Sine Formula</span>
-      <span class="pill">Cosine Formula</span>
-      <span class="pill">Parallelogram</span>
-      <span class="pill">Angle between Two Planes</span>
-      <span class="pill">Perpendicular Foot</span>
-    </div>
-  </div>
+<header class="top">
+  <h1>HKDSE Mathematics (Compulsory Part) · Paper 1</h1>
+  <span class="pill">2018 · Q17 · Trigonometry</span>
+  <span class="pill">Marks: (a) 2 &nbsp; (b)(i) 2 &nbsp; (b)(ii) 5</span>
 </header>
 
-<div class="wrap">
+<div class="split">
 
-  <!-- ===================== QUESTION ===================== -->
-  <section class="card">
-    <h3>Question</h3>
-    <p class="sub">Read the whole question carefully before unfolding the steps.</p>
-    <div class="qtext">
-      <p><strong>(a)</strong> In Figure 3(a), \(ABCD\) is a paper card in the shape of a parallelogram. It is given that \(AB = 60\) cm, \(\angle ABD = 20^\circ\) and \(\angle BAD = 120^\circ\).
-      <br>Find the length of \(AD\). <span class="marks">2 marks</span></p>
-
-      <p><strong>(b)</strong> The paper card in Figure 3(a) is folded along \(BD\) such that the distance between \(A\) and \(C\) is \(40\) cm. (see Figure 3(b)).</p>
-      <ol type="i">
-        <li>Find \(\angle ABC\). <span class="marks">5 marks</span></li>
-        <li>Find the angle between the plane \(ABD\) and the plane \(BCD\). <span class="marks">included in (b)(ii)</span></li>
-      </ol>
-    </div>
-  </section>
-<section style="margin:16px 0;padding:16px;background:var(--bg,#fff);border:1px solid #e2e8f0;border-radius:10px;">
-  <h2 style="font-size:1rem;font-weight:600;margin:0 0 10px;color:var(--fg,#1a1a1a);">Original Figure</h2>
-  <div style="text-align:center;">
-    <img src="figures/2018_P1_17.png" alt="Original figure" style="max-width:100%;height:auto;border-radius:6px;">
-  </div>
-</section>
-
-
-  <!-- ===================== PART (a) ===================== -->
-  <section class="card">
-    <h3>Part (a) — Find \(AD\) <span class="tag">Sine Formula</span></h3>
-    <p class="sub">Use the triangle \(ABD\) and the sine formula.</p>
-
-    <div class="canvas-box">
-      <canvas id="cvA" width="820" height="470"></canvas>
+  <!-- ============== LEFT : DIAGRAM ============== -->
+  <section class="panel diagram">
+    <h2>Interactive Figure</h2>
+    <canvas id="cv" width="760" height="620" aria-label="Figure 3(a) and 3(b)"></canvas>
+    <div class="legend">
+      <span><i class="swatch" style="background:#2563eb"></i>AB / BC (given)</span>
+      <span><i class="swatch" style="background:#e11d48"></i>AD / DC (unknown)</span>
+      <span><i class="swatch" style="background:#059669"></i>Diagonal BD (fold line)</span>
+      <span><i class="swatch" style="background:#0891b2"></i>AC after folding</span>
+      <span><i class="swatch" style="background:#d97706"></i>AP, PQ, right angles</span>
+      <span><i class="dot" style="background:#7c3aed"></i>Vertices / foot P</span>
     </div>
     <div class="controls">
-      <div class="ctrl">
-        <label>Angle \(\angle ABD = 20^\circ\) fixed &nbsp;|&nbsp; Drag to explore \(AB\)</label>
-        <input type="range" id="abSlider" min="30" max="90" value="60" step="1">
-      </div>
-      <div class="ctrl">
-        <label>Angle \(\angle BAD\) (slider)</label>
-        <input type="range" id="badSlider" min="90" max="140" value="120" step="1">
-      </div>
-      <label class="checkline"><input type="checkbox" id="showAltA" checked> Show parallelogram \(ABCD\)</label>
-    </div>
-    <div class="readout" id="readA"></div>
-
-    <div class="step" data-step>
-      <div class="step-head"><span class="badge">Step 1</span><span class="mfbadge">1M</span></div>
-      <p>In \(\triangle ABD\), the third angle is</p>
-      \[ \angle ADB = 180^\circ - 120^\circ - 20^\circ = 40^\circ. \]
-      <div class="hint"><b>Hint:</b> Angles in a triangle add up to \(180^\circ\).</div>
-    </div>
-
-    <div class="step" data-step>
-      <div class="step-head"><span class="badge">Step 2</span><span class="mfbadge">1M</span></div>
-      <p>Apply the sine formula to \(\triangle ABD\):</p>
-      \[ \frac{AD}{\sin \angle ABD} = \frac{AB}{\sin \angle ADB} \]
-      \[ \frac{AD}{\sin 20^\circ} = \frac{60}{\sin 40^\circ} \]
-      <div class="hint"><b>Hint:</b> Pair each side with the angle <em>opposite</em> it. \(AD\) is opposite \(\angle ABD = 20^\circ\), \(AB\) is opposite \(\angle ADB = 40^\circ\).</div>
-    </div>
-
-    <div class="step" data-step>
-      <div class="step-head"><span class="badge">Step 3</span><span class="mfbadge">1A</span></div>
-      <p>Solve for \(AD\):</p>
-      \[ AD = \frac{60 \sin 20^\circ}{\sin 40^\circ} \approx 31.92533317 \text{ cm} \]
-      <div class="answer">\(AD \approx 31.9\) cm (correct to 3 s.f.)</div>
-      <div class="hint"><b>Hint:</b> Keep the full calculator value — it will be reused in part (b)(i).</div>
-    </div>
-
-    <div class="step-actions">
-      <button class="next" data-next>Next step →</button>
-      <span class="counter">0 / 3</span>
+      <button id="btnA" class="on">Fig 3(a) — Paper card</button>
+      <button id="btnB">Fig 3(b) — Folded</button>
+      <button id="btnReset">Reset view</button>
     </div>
   </section>
 
-  <!-- ===================== PART (b)(i) ===================== -->
-  <section class="card">
-    <h3>Part (b)(i) — Find \(\angle ABC\) <span class="tag">Cosine Formula</span></h3>
-    <p class="sub">After folding, \(AC = 40\) cm. Use \(\triangle ABC\).</p>
+  <!-- ============== RIGHT : TEXT + SOLUTION ============== -->
+  <section class="panel">
 
-    <div class="canvas-box">
-      <canvas id="cvB1" width="820" height="470"></canvas>
-    </div>
-    <div class="controls">
-      <div class="ctrl">
-        <label>Folded distance \(AC\) (cm)</label>
-        <input type="range" id="acSlider" min="10" max="70" value="40" step="1">
-      </div>
-      <div class="ctrl">
-        <label>\(AB\) (cm)</label>
-        <input type="range" id="abSlider2" min="40" max="80" value="60" step="1">
-      </div>
-      <label class="checkline"><input type="checkbox" id="showAngle" checked> Highlight \(\angle ABC\)</label>
-    </div>
-    <div class="readout" id="readB1"></div>
-
-    <div class="step" data-step>
-      <div class="step-head"><span class="badge">Step 1</span><span class="mfbadge">1M</span></div>
-      <p>Since \(ABCD\) is a parallelogram, opposite sides are equal:</p>
-      \[ AB = CD = 60 \text{ cm}, \qquad BC = AD \approx 31.92533317 \text{ cm}. \]
-      <div class="hint"><b>Hint:</b> The fold does not change any edge length of the card.</div>
+    <div class="qhead">
+      <span class="tag">QUESTION 17</span>
+      <p><b>(a)</b> In Figure 3(a), $ABCD$ is a paper card in the shape of a parallelogram. It is given that $AB = 60$ cm, $\angle ABD = 20^\circ$ and $\angle BAD = 120^\circ$.</p>
+      <p><b>Find the length of $AD$.</b> &nbsp;[2 marks]</p>
+      <p><b>(b)</b> The paper card in Figure 3(a) is folded along $BD$ such that the distance between $A$ and $C$ is $40$ cm. (see Figure 3(b))</p>
+      <p><b>(i)</b> Find $\angle ABC$.</p>
+      <p><b>(ii)</b> Find the angle between the plane $ABD$ and the plane $BCD$. &nbsp;[5 marks]</p>
+      <!-- FIGURE_HERE -->
     </div>
 
-    <div class="step" data-step>
-      <div class="step-head"><span class="badge">Step 2</span><span class="mfbadge">1M</span></div>
-      <p>In \(\triangle ABC\), apply the cosine formula:</p>
-      \[ \cos \angle ABC = \frac{AB^2 + BC^2 - AC^2}{2(AB)(BC)} \]
-      \[ \cos \angle ABC = \frac{60^2 + (31.92533317)^2 - 40^2}{2(60)(31.92533317)} \]
-      <div class="hint"><b>Hint:</b> The angle \(\angle ABC\) is the one <em>between</em> sides \(AB\) and \(BC\), so it appears in the numerator as \(-AC^2\) (opposite side).</div>
+    <div class="hint"><b>Hints.</b> (a) Use the <i>sine formula</i> in $\triangle ABD$ — you know $AB$, the angle at $B$ and the angle at $A$. (b)(i) Use the <i>cosine formula</i> in $\triangle ABC$ after the fold. (b)(ii) The angle between two planes is the angle between two lines, one in each plane, both perpendicular to the common line $BD$; here the needed angle is $\angle APQ$.</div>
+
+    <div class="step" data-step="1">
+      <span class="steptag">STEP 1 · (a) Angle at D in $\triangle ABD$</span>
+      <p>In $\triangle ABD$, the third angle is the supplement of the other two:</p>
+      $$\angle ADB = 180^\circ - 120^\circ - 20^\circ = 40^\circ$$
+      <p>Also, since $ABCD$ is a parallelogram the opposite angles are equal, so $\angle BCD = \angle BAD = 120^\circ$ and $\angle ADC = \angle ABC$.</p>
     </div>
 
-    <div class="step" data-step>
-      <div class="step-head"><span class="badge">Step 3</span><span class="mfbadge">1A</span></div>
-      <p>Evaluate:</p>
-      \[ \cos \angle ABC \approx 0.78705183 \quad\Rightarrow\quad \angle ABC \approx 37.99207534^\circ \]
-      <div class="answer">\(\angle ABC \approx 38.0^\circ\) (correct to 3 s.f.)</div>
-      <div class="hint"><b>Hint:</b> \(AC = 40\) cm is the folded distance, so it is shorter than \(AB + BC\).</div>
+    <div class="step" data-step="2">
+      <span class="steptag">STEP 2 · (a) Sine formula for $AD$</span>
+      <p>By the sine formula in $\triangle ABD$,</p>
+      $$\frac{AD}{\sin \angle ABD}=\frac{AB}{\sin \angle ADB}$$
+      $$\frac{AD}{\sin 20^\circ}=\frac{60}{\sin 40^\circ}$$
+      $$AD=\frac{60\sin 20^\circ}{\sin 40^\circ}\approx 31.9253\ \text{cm}$$
+      <p>$\therefore\; AD \approx 31.9\ \text{cm}$ (correct to 3 sig. fig.)</p>
     </div>
 
-    <div class="step-actions">
-      <button class="next" data-next>Next step →</button>
-      <span class="counter">0 / 3</span>
-    </div>
-  </section>
-
-  <!-- ===================== PART (b)(ii) ===================== -->
-  <section class="card">
-    <h3>Part (b)(ii) — Angle between planes \(ABD\) and \(BCD\) <span class="tag">3-D / Perpendicular Foot</span></h3>
-    <p class="sub">The required angle is the angle between the two triangular halves of the folded card.</p>
-
-    <div class="canvas-box">
-      <canvas id="cvB2" width="820" height="500"></canvas>
-    </div>
-    <div class="controls">
-      <div class="ctrl">
-        <label>Folded distance \(AC\) (cm) — affects the dihedral angle</label>
-        <input type="range" id="acSlider2" min="10" max="70" value="40" step="1">
-      </div>
-      <label class="checkline"><input type="checkbox" id="showFoot" checked> Show foot \(P\) on \(BD\)</label>
-      <label class="checkline"><input type="checkbox" id="showPlanes" checked> Shade planes \(ABD\) / \(BCD\)</label>
-    </div>
-    <div class="readout" id="readB2"></div>
-
-    <div class="step" data-step>
-      <div class="step-head"><span class="badge">Step 1</span><span class="mfbadge">1M</span></div>
-      <p>In Figure 3(a), \(AP\) produced meets \(CD\) at \(Q\), where \(P\) is the foot of the perpendicular from \(A\) to \(BD\). Note that the required angle is \(\angle APQ\) in Figure 3(b).</p>
-      <div class="hint"><b>Hint:</b> A plane angle between two planes is the angle between the two lines drawn in each plane perpendicular to the common edge \(BD\).</div>
+    <div class="step" data-step="3">
+      <span class="steptag">STEP 3 · (b)(i) Set up $\triangle ABC$</span>
+      <p>After folding along $BD$, $A$ moves to a new position while $B$, $C$, $D$ and the diagonal $BD$ stay fixed. The card is folded so that $AC = 40$ cm.</p>
+      <p>In $\triangle ABC$ we know two sides and want the included angle:</p>
+      <table class="mini">
+        <tr><th>$AB$</th><th>$BC = AD$</th><th>$AC$</th></tr>
+        <tr><td>$60$ cm</td><td $\approx 31.9253$ cm</td><td>$40$ cm</td></tr>
+      </table>
+      <p>Since $ABCD$ is a parallelogram, $BC = AD \approx 31.9253$ cm.</p>
     </div>
 
-    <div class="step" data-step>
-      <div class="step-head"><span class="badge">Step 2</span><span class="mfbadge">1M</span></div>
-      <p>In \(\triangle ABD\), compute \(AP\) and \(DP\):</p>
-      \[ AP = AD \sin \angle ADP \approx 31.92533317 \sin(180^\circ - 120^\circ - 20^\circ) \approx 20.5212086 \text{ cm} \]
-      \[ DP^2 = AD^2 - AP^2 \approx (31.92533317)^2 - (20.5212086)^2 \quad\Rightarrow\quad DP \approx 24.45622407 \text{ cm} \]
-      <div class="hint"><b>Hint:</b> \(AP \perp BD\), so \(\triangle APD\) is right-angled at \(P\).</div>
+    <div class="step" data-step="4">
+      <span class="steptag">STEP 4 · (b)(i) Cosine formula</span>
+      <p>By the cosine formula in $\triangle ABC$,</p>
+      $$\cos \angle ABC=\frac{AB^2+BC^2-AC^2}{2(AB)(BC)}$$
+      $$\cos \angle ABC \approx \frac{60^2+(31.9253)^2-40^2}{2(60)(31.9253)}$$
+      $$\angle ABC \approx 37.992^\circ$$
+      <p>$\therefore\; \angle ABC \approx 38.0^\circ$ (correct to 3 sig. fig.)</p>
     </div>
 
-    <div class="step" data-step>
-      <div class="step-head"><span class="badge">Step 3</span><span class="mfbadge">1M</span></div>
-      <p>Compute \(PQ\) and \(DQ\):</p>
-      \[ PQ = DP \tan \angle PDQ \approx 24.45622407 \tan 20^\circ \approx 8.901337605 \text{ cm} \]
-      \[ DQ^2 = DP^2 + PQ^2 \approx (24.45622407)^2 + (8.901337605)^2 \quad\Rightarrow\quad DQ \approx 26.02577006 \text{ cm} \]
-      <div class="hint"><b>Hint:</b> \(\angle PDQ = \angle ADB = 40^\circ\)? Careful — here \(\angle PDQ\) is the angle at \(D\) inside \(\triangle DPQ\), which equals \(20^\circ\) because \(PQ /\!/ AP\) after folding preserves right angles in the base plane.</div>
+    <div class="step" data-step="5">
+      <span class="steptag">STEP 5 · (b)(ii) Locate the plane angle $APQ$</span>
+      <p>Let $AP$ be produced to meet $CD$ at $Q$, where $P$ is the foot of the perpendicular from $A$ to $BD$.</p>
+      <p>Since $AP \perp BD$ and $PQ \perp BD$, the angle between the plane $ABD$ and the plane $BCD$ is the angle $\angle APQ$.</p>
+      <p>In $\triangle ABD$:&nbsp; $AP = AD \sin \angle ADP$</p>
+      $$AP \approx 31.9253\sin(180^\circ-120^\circ-20^\circ)=31.9253\sin 40^\circ \approx 20.521\ \text{cm}$$
+      <p>Then $DP^2 = AD^2 - AP^2$, so $DP \approx 24.456\ \text{cm}$, and in the right-angled triangle $PDQ$ with $\angle PDQ = 20^\circ$:</p>
+      $$PQ = DP\tan 20^\circ \approx 8.901\ \text{cm}$$
     </div>
 
-    <div class="step" data-step>
-      <div class="step-head"><span class="badge">Step 4</span><span class="mfbadge">1M</span></div>
-      <p>Note that \(\angle ADC = \angle ABC = 37.99207534^\circ\). Apply the cosine formula in \(\triangle ADC\):</p>
-      \[ AQ^2 = AD^2 + DQ^2 - 2(AD)(DQ)\cos \angle ADC \]
-      \[ AQ^2 \approx (31.92533317)^2 + (26.02577006)^2 - 2(31.92533317)(26.02577006)\cos 37.99207534^\circ \]
-      \[ AQ \approx 19.67076991 \text{ cm} \]
-      <div class="hint"><b>Hint:</b> The fold preserves the length \(DQ\) and \(AD\), but the angle between them changes to \(\angle ADC\).</div>
+    <div class="step" data-step="6">
+      <span class="steptag">STEP 6 · (b)(ii) Find $AQ$</span>
+      <p>First get $DQ$ from the right-angled triangle $PDQ$:</p>
+      $$DQ^2 = DP^2 + PQ^2 \approx (24.456)^2 + (8.901)^2 \;\Rightarrow\; DQ \approx 26.026\ \text{cm}$$
+      <p>Note that $\angle ADC = \angle ABC \approx 37.992^\circ$. Apply the cosine formula in $\triangle ADQ$:</p>
+      $$AQ^2 = AD^2 + DQ^2 - 2(AD)(DQ)\cos \angle ADC$$
+      $$AQ^2 \approx (31.9253)^2+(26.026)^2-2(31.9253)(26.026)\cos 37.992^\circ$$
+      $$AQ \approx 19.671\ \text{cm}$$
     </div>
 
-    <div class="step" data-step>
-      <div class="step-head"><span class="badge">Step 5</span><span class="mfbadge">1A</span></div>
-      <p>Finally apply the cosine formula in \(\triangle APQ\):</p>
-      \[ \cos \angle APQ = \frac{AP^2 + PQ^2 - AQ^2}{2(AP)(PQ)} \]
-      \[ \cos \angle APQ \approx \frac{(20.5212086)^2 + (8.901337605)^2 - (19.67076991)^2}{2(20.5212086)(8.901337605)} \]
-      \[ \angle APQ \approx 71.91411397^\circ \]
-      <div class="answer">The angle between plane \(ABD\) and plane \(BCD\) is \(\approx 71.9^\circ\) (correct to 3 s.f.).</div>
-      <div class="hint"><b>Hint:</b> This is a 3-D angle. Check your calculator is in <em>degree</em> mode.</div>
+    <div class="step" data-step="7">
+      <span class="steptag">STEP 7 · (b)(ii) Cosine formula in $\triangle APQ$</span>
+      <p>Finally, in $\triangle APQ$ with $AP \approx 20.521$, $PQ \approx 8.901$, $AQ \approx 19.671$:</p>
+      $$\cos \angle APQ=\frac{AP^2+PQ^2-AQ^2}{2(AP)(PQ)}$$
+      $$\cos \angle APQ \approx \frac{(20.521)^2+(8.901)^2-(19.671)^2}{2(20.521)(8.901)}$$
+      $$\angle APQ \approx 71.914^\circ$$
+      <p>$\therefore$ the required angle is $71.9^\circ$ (correct to 3 sig. fig.).</p>
     </div>
 
-    <div class="step-actions">
-      <button class="next" data-next>Next step →</button>
-      <span class="counter">0 / 5</span>
+    <div class="answer">
+      <h3>FINAL ANSWERS</h3>
+      <p><b>(a)</b> &nbsp;$AD \approx \dfrac{60\sin 20^\circ}{\sin 40^\circ} \approx \boxed{31.9\ \text{cm}}$</p>
+      <p><b>(b)(i)</b> &nbsp;$\angle ABC \approx \boxed{38.0^\circ}$</p>
+      <p class="big"><b>(b)(ii)</b> &nbsp;Angle between plane $ABD$ and plane $BCD$ $= \angle APQ \approx \boxed{71.9^\circ}$</p>
     </div>
   </section>
-
-  <!-- ===================== SUMMARY ===================== -->
-  <section class="summary">
-    <h3>Summary of Answers</h3>
-    <ul>
-      <li>(a) \(AD = \dfrac{60\sin 20^\circ}{\sin 40^\circ} \approx \mathbf{31.9\ \text{cm}}\)</li>
-      <li>(b)(i) \(\angle ABC \approx \mathbf{38.0^\circ}\)</li>
-      <li>(b)(ii) Angle between planes \(ABD\) and \(BCD\) \(\approx \mathbf{71.9^\circ}\)</li>
-      <li><span class="hl">Key relations:</span> \(\angle ADB = 40^\circ\), \(BC = AD\), \(AC = 40\) cm, \(AP \perp BD\), \(PQ /\!/ AP\).</li>
-    </ul>
-  </section>
-
-  <footer>HKDSE Mathematics (Compulsory Part) · Paper 1 2018 Q17 · Interactive solution</footer>
 </div>
 
 <script>
-/* ============================================================
-   Shared helpers
-   ============================================================ */
-function deg2rad(d) { return d * Math.PI / 180; }
+(function(){
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  let mode = 1;                 // active step => drawing mode
+  let view = 'a';               // 'a' = Figure 3(a), 'b' = Figure 3(b)
+  let showAux = false;          // show step-5 geometry (AP, Q, AC)
+  let showAC  = false;          // show AC construction
+  let showAQ  = false;          // show AQ construction
 
-/* ============================================================
-   PART (a) CANVAS — triangle ABD + parallelogram
-   ============================================================ */
-const cvA = document.getElementById('cvA');
-const ctxA = cvA.getContext('2d');
-const readA = document.getElementById('readA');
-const abS = document.getElementById('abSlider');
-const badS = document.getElementById('badSlider');
-const altA = document.getElementById('showAltA');
+  // ---------- constants ----------
+  const AB = 60;
+  const AD = 60*Math.sin(20*Math.PI/180)/Math.sin(40*Math.PI/180);  // ≈31.9253
+  const ABC = 37.992*Math.PI/180;   // ∠ABC in the folded figure
+  const AC_FOLD = 40;
+  const AP = AD*Math.sin(40*Math.PI/180);
+  const DP = Math.sqrt(AD*AD-AP*AP);
+  const PQ = DP*Math.tan(20*Math.PI/180);
+  const DQ = Math.sqrt(DP*DP+PQ*PQ);
+  const AQ = Math.sqrt(AD*AD+DQ*DQ-2*AD*DQ*Math.cos(ABC));
 
-function drawA() {
-  const W = cvA.width, H = cvA.height;
-  ctxA.clearRect(0, 0, W, H);
+  const rad = d => d*Math.PI/180;
+  const cosB = Math.cos(rad(20));
+  const sinB = Math.sin(rad(20));
 
-  const AB = parseFloat(abS.value);
-  const BAD = parseFloat(badS.value) * (Math.PI / 180);
-  const ABD = deg2rad(20);
-  const ADB = Math.PI - BAD - ABD;
-
-  /* place B, A, D in a local frame */
-  const scale = 4.4;
-  const bx = 120, by = H - 90;
-  const ax = bx + AB * scale, ay = by;
-  const adLen = AB * Math.sin(ABD) / Math.sin(ADB);
-  const adx = ax + adLen * scale * Math.cos(Math.PI - BAD);
-  const ady = ay - adLen * scale * Math.sin(Math.PI - BAD);
-
-  /* Point C for parallelogram: C = A + D - B */
-  const cx = ax + adx - bx;
-  const cy = ay + ady - by;
-
-  /* grid */
-  ctxA.strokeStyle = '#f1f5f9'; ctxA.lineWidth = 1;
-  for (let x = 0; x < W; x += 30) { ctxA.beginPath(); ctxA.moveTo(x, 0); ctxA.lineTo(x, H); ctxA.stroke(); }
-  for (let y = 0; y < H; y += 30) { ctxA.beginPath(); ctxA.moveTo(0, y); ctxA.lineTo(W, y); ctxA.stroke(); }
-
-  /* parallelogram fill */
-  if (altA.checked) {
-    ctxA.beginPath();
-    ctxA.moveTo(ax, ay); ctxA.lineTo(bx, by); ctxA.lineTo(adx, ady); ctxA.lineTo(cx, cy);
-    ctxA.closePath();
-    ctxA.fillStyle = 'rgba(219,234,254,0.55)';
-    ctxA.fill();
-  }
-
-  /* edges */
-  ctxA.lineWidth = 3;
-  ctxA.strokeStyle = '#1d4ed8'; /* triangle ABD */
-  ctxA.beginPath(); ctxA.moveTo(ax, ay); ctxA.lineTo(bx, by); ctxA.stroke();
-  ctxA.beginPath(); ctxA.moveTo(bx, by); ctxA.lineTo(adx, ady); ctxA.stroke();
-  ctxA.beginPath(); ctxA.moveTo(adx, ady); ctxA.lineTo(ax, ay); ctxA.stroke();
-
-  /* folded/other edges of parallelogram (dashed) */
-  if (altA.checked) {
-    ctxA.strokeStyle = '#94a3b8'; ctxA.lineWidth = 2; ctxA.setLineDash([7, 6]);
-    ctxA.beginPath(); ctxA.moveTo(adx, ady); ctxA.lineTo(cx, cy); ctxA.stroke();
-    ctxA.beginPath(); ctxA.moveTo(cx, cy); ctxA.lineTo(bx, by); ctxA.stroke();
-    ctxA.setLineDash([]);
-  }
-
-  /* angle arc at A */
-  ctxA.strokeStyle = '#dc2626'; ctxA.lineWidth = 2.5;
-  ctxA.beginPath(); ctxA.arc(ax, ay, 42, Math.PI - BAD, Math.PI, false); ctxA.stroke();
-  ctxA.fillStyle = '#dc2626'; ctxA.font = 'bold 15px sans-serif';
-  ctxA.fillText('120°', ax - 78, ay - 12);
-
-  /* angle arc at B */
-  ctxA.strokeStyle = '#7c3aed';
-  ctxA.beginPath(); ctxA.arc(bx, by, 40, Math.PI, Math.PI + (Math.PI - ABD - Math.PI) , false);
-  /* simpler: draw arc between BA and BD */
-  const angBA = Math.atan2(ay - by, ax - bx);
-  const angBD = Math.atan2(ady - by, adx - bx);
-  ctxA.beginPath(); ctxA.arc(bx, by, 40, Math.min(angBA, angBD), Math.max(angBA, angBD), false); ctxA.stroke();
-  ctxA.fillStyle = '#7c3aed'; ctxA.font = 'bold 15px sans-serif';
-  ctxA.fillText('20°', bx - 6, by - 52);
-
-  /* angle at D */
-  ctxA.strokeStyle = '#0891b2';
-  const angDA = Math.atan2(ay - ady, ax - adx);
-  const angDB = Math.atan2(by - ady, bx - adx);
-  ctxA.beginPath(); ctxA.arc(adx, ady, 38, Math.min(angDA, angDB), Math.max(angDA, angDB), false); ctxA.stroke();
-  ctxA.fillStyle = '#0891b2';
-  ctxA.fillText('40°', adx + 18, ady + 34);
-
-  /* point labels */
-  ctxA.font = 'bold 17px sans-serif';
-  ctxA.fillStyle = '#0f172a';
-  ctxA.fillText('A', ax + 12, ay + 20);
-  ctxA.fillText('B', bx - 24, by + 4);
-  ctxA.fillStyle = '#1d4ed8';
-  ctxA.fillText('D', adx - 20, ady - 8);
-  if (altA.checked) { ctxA.fillStyle = '#64748b'; ctxA.fillText('C', cx + 12, cy - 6); }
-
-  /* dots */
-  [[ax,ay,'#0f172a'],[bx,by,'#0f172a'],[adx,ady,'#1d4ed8']].forEach(([x,y,c])=>{
-    ctxA.beginPath(); ctxA.arc(x,y,6,0,Math.PI*2); ctxA.fillStyle=c; ctxA.fill();
-  });
-  if (altA.checked) { ctxA.beginPath(); ctxA.arc(cx,cy,6,0,Math.PI*2); ctxA.fillStyle='#64748b'; ctxA.fill(); }
-
-  /* side length labels */
-  ctxA.font = 'bold 14px monospace';
-  ctxA.fillStyle = '#0f172a';
-  ctxA.fillText('AB = ' + AB + ' cm', (ax + bx) / 2 - 60, ay + 26);
-  ctxA.fillStyle = '#1d4ed8';
-  ctxA.fillText('AD = ' + adLen.toFixed(2) + ' cm', (ax + adx) / 2 + 14, (ay + ady) / 2 - 8);
-
-  /* heading */
-  ctxA.fillStyle = '#1e3a8a'; ctxA.font = 'bold 16px sans-serif';
-  ctxA.fillText('Figure 3(a) — parallelogram ABCD', 18, 28);
-
-  /* readout */
-  readA.innerHTML =
-    '<span>AB = <b>' + AB + '</b> cm</span>' +
-    '<span>∠BAD = <b>' + badS.value + '°</b></span>' +
-    '<span>∠ABD = <b>20°</b></span>' +
-    '<span>∠ADB = <b>' + (180 - parseFloat(badS.value) - 20).toFixed(1) + '°</b></span>' +
-    '<span>AD = <b>' + adLen.toFixed(4) + '</b> cm</span>';
-}
-[abS, badS, altA].forEach(el => el.addEventListener('input', drawA));
-drawA();
-
-/* ============================================================
-   PART (b)(i) CANVAS — triangle ABC
-   ============================================================ */
-const cvB1 = document.getElementById('cvB1');
-const ctxB1 = cvB1.getContext('2d');
-const readB1 = document.getElementById('readB1');
-const acS = document.getElementById('acSlider');
-const abS2 = document.getElementById('abSlider2');
-const showAngleChk = document.getElementById('showAngle');
-
-function drawB1() {
-  const W = cvB1.width, H = cvB1.height;
-  ctxB1.clearRect(0, 0, W, H);
-
-  const AC = parseFloat(acS.value);
-  const AB = parseFloat(abS2.value);
-  const BC = 31.92533317; /* fixed from part (a) */
-
-  /* cosine rule */
-  const cosB = (AB * AB + BC * BC - AC * AC) / (2 * AB * BC);
-  let B = null;
-  if (cosB >= -1 && cosB <= 1) B = Math.acos(cosB);
-
-  /* draw grid */
-  ctxB1.strokeStyle = '#f1f5f9'; ctxB1.lineWidth = 1;
-  for (let x = 0; x < W; x += 30) { ctxB1.beginPath(); ctxB1.moveTo(x, 0); ctxB1.lineTo(x, H); ctxB1.stroke(); }
-  for (let y = 0; y < H; y += 30) { ctxB1.beginPath(); ctxB1.moveTo(0, y); ctxB1.lineTo(W, y); ctxB1.stroke(); }
-
-  if (B === null) {
-    ctxB1.fillStyle = '#dc2626'; ctxB1.font = 'bold 18px sans-serif';
-    ctxB1.fillText('No such triangle: AC is too long for the given AB and BC.', 40, H / 2);
-    readB1.innerHTML = '<span>Invalid combination — increase AC or adjust AB.</span>';
-    return;
-  }
-
-  const scale = 3.6;
-  const bx = 180, by = H - 120;
-  const ax = bx + AB * scale, ay = by;
-  /* C placed so that |AC| = AC and |BC| = BC */
-  const angC_BA = B; // angle ABC
-  const cxx = bx + BC * scale * Math.cos(Math.PI - angC_BA) * -1;
-  /* More robust: solve for C coordinates */
-  const cx0 = bx + BC * scale; // along positive x from B
-  // rotate by angle B (upwards)
-  const Cx = bx + (BC * scale) * Math.cos(Math.PI - B);
-  const Cy = by - (BC * scale) * Math.sin(Math.PI - B);
-
-  /* triangle fill */
-  ctxB1.beginPath();
-  ctxB1.moveTo(ax, ay); ctxB1.lineTo(bx, by); ctxB1.lineTo(Cx, Cy);
-  ctxB1.closePath();
-  ctxB1.fillStyle = 'rgba(254,243,199,0.6)';
-  ctxB1.fill();
-
-  /* edges */
-  ctxB1.lineWidth = 3;
-  ctxB1.strokeStyle = '#1d4ed8';
-  ctxB1.beginPath(); ctxB1.moveTo(ax, ay); ctxB1.lineTo(bx, by); ctxB1.stroke();
-  ctxB1.beginPath(); ctxB1.moveTo(bx, by); ctxB1.lineTo(Cx, Cy); ctxB1.stroke();
-  ctxB1.strokeStyle = '#059669';
-  ctxB1.beginPath(); ctxB1.moveTo(ax, ay); ctxB1.lineTo(Cx, Cy); ctxB1.stroke();
-
-  /* angle highlight at B */
-  if (showAngleChk.checked) {
-    const a1 = Math.atan2(ay - by, ax - bx);
-    const a2 = Math.atan2(Cy - by, Cx - bx);
-    ctxB1.beginPath();
-    ctxB1.moveTo(bx, by);
-    ctxB1.arc(bx, by, 62, Math.min(a1, a2), Math.max(a1, a2), false);
-    ctxB1.closePath();
-    ctxB1.fillStyle = 'rgba(220,38,38,0.18)';
-    ctxB1.fill();
-    ctxB1.strokeStyle = '#dc2626'; ctxB1.lineWidth = 2.5; ctxB1.stroke();
-
-    ctxB1.fillStyle = '#dc2626'; ctxB1.font = 'bold 17px sans-serif';
-    const mid = (a1 + a2) / 2;
-    ctxB1.fillText('∠ABC ≈ ' + (B * 180 / Math.PI).toFixed(1) + '°',
-        bx + 78 * Math.cos(mid) - 60, by + 78 * Math.sin(mid) + 6);
-  }
-
-  /* labels */
-  ctxB1.font = 'bold 17px sans-serif';
-  ctxB1.fillStyle = '#0f172a'; ctxB1.fillText('A', ax + 14, ay + 22);
-  ctxB1.fillText('B', bx - 26, by + 6);
-  ctxB1.fillStyle = '#1d4ed8'; ctxB1.fillText('C', Cx - 8, Cy - 12);
-
-  [[ax,ay,'#0f172a'],[bx,by,'#0f172a'],[Cx,Cy,'#1d4ed8']].forEach(([x,y,c])=>{
-    ctxB1.beginPath(); ctxB1.arc(x,y,6,0,Math.PI*2); ctxB1.fillStyle=c; ctxB1.fill();
-  });
-
-  /* side labels */
-  ctxB1.font = 'bold 13.5px monospace';
-  ctxB1.fillStyle = '#0f172a';
-  ctxB1.fillText('AB = ' + AB + ' cm', (ax + bx) / 2 - 56, ay + 26);
-  ctxB1.fillStyle = '#7c3aed';
-  ctxB1.fillText('BC ≈ ' + BC.toFixed(2) + ' cm', (bx + Cx) / 2 + 8, (by + Cy) / 2 + 4);
-  ctxB1.fillStyle = '#059669';
-  ctxB1.fillText('AC = ' + AC + ' cm', (ax + Cx) / 2 - 120, (ay + Cy) / 2 - 6);
-
-  ctxB1.fillStyle = '#1e3a8a'; ctxB1.font = 'bold 16px sans-serif';
-  ctxB1.fillText('Figure 3(b) — triangle ABC after folding', 18, 28);
-
-  readB1.innerHTML =
-    '<span>AB = <b>' + AB + '</b> cm</span>' +
-    '<span>BC = <b>' + BC.toFixed(4) + '</b> cm</span>' +
-    '<span>AC = <b>' + AC + '</b> cm</span>' +
-    '<span>∠ABC = <b>' + (B * 180 / Math.PI).toFixed(4) + '°</b></span>';
-}
-[acS, abS2, showAngleChk].forEach(el => el.addEventListener('input', drawB1));
-drawB1();
-
-/* ============================================================
-   PART (b)(ii) CANVAS — 3-D view: planes ABD & BCD, foot P
-   ============================================================ */
-const cvB2 = document.getElementById('cvB2');
-const ctxB2 = cvB2.getContext('2d');
-const readB2 = document.getElementById('readB2');
-const acS2 = document.getElementById('acSlider2');
-const showFoot = document.getElementById('showFoot');
-const showPlanes = document.getElementById('showPlanes');
-
-function drawB2() {
-  const W = cvB2.width, H = cvB2.height;
-  ctxB2.clearRect(0, 0, W, H);
-
-  const AC = parseFloat(acS2.value);
-  const AB = 60, AD = 31.92533317;
-  const BC = AD;
-
-  /* Base triangle ABD in the plane z=0 */
-  const BD = Math.sqrt(AB * AB + AD * AD - 2 * AB * AD * Math.cos(deg2rad(120)));
-  /* coordinates in base plane: put B at origin, BD along x-axis */
-  const Bx0 = 0, By0 = 0;
-  const Dx0 = BD, Dy0 = 0;
-  /* A determined by |AB|=60, |AD|=AD */
-  const Ax0 = (AB * AB - AD * AD + BD * BD) / (2 * BD);
-  const Ay0 = Math.sqrt(Math.max(0, AB * AB - Ax0 * Ax0));
-
-  /* fold: find A' and C' in 3D such that |AC|=AC and fold about BD */
-  /* In folded config, A' lies in a plane perpendicular to BD at some x, and C' too.
-     We simulate by rotating the second half by a dihedral angle θ. */
-  const cosABC = (AB*AB + BC*BC - AC*AC)/(2*AB*BC);
-  let ABC = Math.acos(Math.max(-1, Math.min(1, cosABC)));
-  /* base angle ∠ABC in figure 3(a) is fixed (from original paper) ~38°, but folded ABC changes. */
-
-  /* For visualisation: parametric fold angle φ */
-  const baseABC = deg2rad(37.99207534);
-  const phi = Math.max(0, Math.min(Math.PI, ABC));
-
-  /* Simple 3-D projection helpers */
-  const scale3 = 4.0;
-  const cxScreen = W * 0.48, cyScreen = H * 0.60;
-  function proj(x, y, z) {
-    /* isometric-ish */
-    const X = (x - y * 0.65) * scale3 + cxScreen;
-    const Y = (-z * 0.9 - y * 0.45) * scale3 + cyScreen;
-    return [X, Y];
-  }
-
-  /* Base plane: B=(0,0,0), D=(BD,0,0) */
-  const B = proj(0, 0, 0);
-  const D = proj(BD, 0, 0);
-
-  /* A in base plane (z=0) at (Ax0, Ay0, 0) */
-  const A_base = proj(Ax0, Ay0, 0);
-
-  /* Folded A: rotate A_base about BD (x-axis) by -phi (lifting up) */
-  /* In folded figure, triangle ABD and BCD share BD. C is on other side. */
-  /* Let's create a nicer visual: keep ABD horizontal, lift C. */
-
-  /* Actually, for visualisation: put A above the base, C below, both hinged at BD */
-  const dTh = Math.PI; /* not used */
-
-  /* Triangle ABD in plane z = 0 : A is the apex above BD */
-  /* Triangle BCD : C is the apex below BD */
-  /* Fold angle between them = phi */
-
-  /* C in base plane coordinates would be at (Cx0, Cy0, 0), with Cx0 = BC*cos(baseABC), Cy0 = BC*sin(baseABC) */
-  /* But C shares BD line with A. Let's place C after fold: */
-  const Cx0 = Ax0;                       /* projection on BD axis */
-  const Cy0 = -Math.sqrt(Math.max(0, BC*BC - Cx0*Cx0)); /* perpendicular distance, opposite side */
-  /* Fold: rotate C up by phi about BD */
-  const Cz = -Cy0 * Math.sin(phi);
-  const Cy = Cy0 * Math.cos(phi);
-
-  const A = proj(Ax0, Ay0, 0);  /* keep A in base plane */
-  const C = proj(Cx0, Cy, Cz);
-
-  /* Foot P on BD */
-  const P = proj(Ax0, 0, 0); /* projection of A onto BD is at Ax0 along BD */
-  const Q_base_x = Ax0;        /* Q is on CD in base plane */
-  /* For visual, Q is on line from D to C in the plane BCD */
-  const t = (Ax0) / BD;
-  const Qx = Cx0; /* approximate */
-  const Qy = Cy * 0.5;
-  const Qz = Cz * 0.5;
-  const Q = proj(Cx0 * 0.7 + Dx0 * 0.3, Cy * 0.7, Cz * 0.7);
-
-  /* grid floor */
-  ctxB2.strokeStyle = '#f1f5f9'; ctxB2.lineWidth = 1;
-  for (let i = -8; i <= 8; i++) {
-    const p1 = proj(i * 6, -12, 0), p2 = proj(i * 6, 12, 0);
-    ctxB2.beginPath(); ctxB2.moveTo(p1[0], p1[1]); ctxB2.lineTo(p2[0], p2[1]); ctxB2.stroke();
-    const q1 = proj(-12, i * 6, 0), q2 = proj(12, i * 6, 0);
-    ctxB2.beginPath(); ctxB2.moveTo(q1[0], q1[1]); ctxB2.lineTo(q2[0], q2[1]); ctxB2.stroke();
-  }
-
-  /* Plane ABD shading */
-  if (showPlanes.checked) {
-    ctxB2.beginPath();
-    ctxB2.moveTo(A[0], A[1]); ctxB2.lineTo(B[0], B[1]); ctxB2.lineTo(D[0], D[1]);
-    ctxB2.closePath();
-    ctxB2.fillStyle = 'rgba(29,78,216,0.18)';
-    ctxB2.fill();
-
-    /* Plane BCD shading */
-    ctxB2.beginPath();
-    ctxB2.moveTo(B[0], B[1]); ctxB2.lineTo(D[0], D[1]); ctxB2.lineTo(C[0], C[1]);
-    ctxB2.closePath();
-    ctxB2.fillStyle = 'rgba(5,150,105,0.18)';
-    ctxB2.fill();
-  }
-
-  /* Draw edges */
-  ctxB2.lineWidth = 3;
-  ctxB2.strokeStyle = '#1d4ed8';
-  ctxB2.beginPath(); ctxB2.moveTo(A[0], A[1]); ctxB2.lineTo(B[0], B[1]); ctxB2.stroke();
-  ctxB2.beginPath(); ctxB2.moveTo(A[0], A[1]); ctxB2.lineTo(D[0], D[1]); ctxB2.stroke();
-
-  ctxB2.strokeStyle = '#059669';
-  ctxB2.beginPath(); ctxB2.moveTo(B[0], B[1]); ctxB2.lineTo(C[0], C[1]); ctxB2.stroke();
-  ctxB2.beginPath(); ctxB2.moveTo(C[0], C[1]); ctxB2.lineTo(D[0], D[1]); ctxB2.stroke();
-
-  /* Common edge BD */
-  ctxB2.strokeStyle = '#0f172a'; ctxB2.lineWidth = 4;
-  ctxB2.beginPath(); ctxB2.moveTo(B[0], B[1]); ctxB2.lineTo(D[0], D[1]); ctxB2.stroke();
-
-  /* Foot P */
-  if (showFoot.checked) {
-    ctxB2.beginPath(); ctxB2.arc(P[0], P[1], 7, 0, Math.PI * 2);
-    ctxB2.fillStyle = '#f59e0b'; ctxB2.fill();
-    ctxB2.strokeStyle = '#b45309'; ctxB2.lineWidth = 2; ctxB2.stroke();
-    ctxB2.fillStyle = '#b45309'; ctxB2.font = 'bold 15px sans-serif';
-    ctxB2.fillText('P', P[0] - 6, P[1] + 24);
-
-    /* AP and PQ */
-    ctxB2.strokeStyle = '#dc2626'; ctxB2.lineWidth = 2.5; ctxB2.setLineDash([6, 5]);
-    ctxB2.beginPath(); ctxB2.moveTo(A[0], A[1]); ctxB2.lineTo(P[0], P[1]); ctxB2.stroke();
-    ctxB2.beginPath(); ctxB2.moveTo(P[0], P[1]); ctxB2.lineTo(Q[0], Q[1]); ctxB2.stroke();
-    ctxB2.setLineDash([]);
-
-    /* Angle arc at P between PA and PQ */
-    const v1 = [A[0] - P[0], A[1] - P[1]];
-    const v2 = [Q[0] - P[0], Q[1] - P[1]];
-    const a1 = Math.atan2(v1[1], v1[0]);
-    const a2 = Math.atan2(v2[1], v2[0]);
-    ctxB2.beginPath();
-    ctxB2.arc(P[0], P[1], 38, Math.min(a1, a2), Math.max(a1, a2), false);
-    ctxB2.strokeStyle = '#dc2626'; ctxB2.lineWidth = 3; ctxB2.stroke();
-    ctxB2.fillStyle = '#dc2626'; ctxB2.font = 'bold 16px sans-serif';
-    const midAng = (a1 + a2) / 2;
-    ctxB2.fillText('θ', P[0] + 50 * Math.cos(midAng) - 6, P[1] + 50 * Math.sin(midAng) + 6);
-  }
-
-  /* points and labels */
-  [[A[0], A[1], '#1d4ed8', 'A'], [B[0], B[1], '#0f172a', 'B'],
-   [D[0], D[1], '#0f172a', 'D'], [C[0], C[1], '#059669', 'C']].forEach(([x, y, c, lbl]) => {
-    ctxB2.beginPath(); ctxB2.arc(x, y, 6, 0, Math.PI * 2);
-    ctxB2.fillStyle = c; ctxB2.fill();
-    ctxB2.fillStyle = c; ctxB2.font = 'bold 17px sans-serif';
-    ctxB2.fillText(lbl, x + 10, y - 8);
-  });
-
-  /* Heading */
-  ctxB2.fillStyle = '#1e3a8a'; ctxB2.font = 'bold 16px sans-serif';
-  ctxB2.fillText('Figure 3(b) — folded card: planes ABD and BCD', 18, 28);
-
-  /* readout */
-  readB2.innerHTML =
-    '<span>AC = <b>' + AC + '</b> cm</span>' +
-    '<span>BD = <b>' + BD.toFixed(4) + '</b> cm</span>' +
-    '<span>AP = <b>' + (AD * Math.sin(deg2rad(40))).toFixed(4) + '</b> cm</span>' +
-    '<span>DP = <b>' + (AD * Math.cos(deg2rad(40))).toFixed(4) + '</b> cm</span>' +
-    '<span>fold angle θ ≈ <b>' + (phi * 180 / Math.PI).toFixed(2) + '°</b></span>' +
-    '<span>answer ≈ <b>71.91°</b></span>';
-}
-[acS2, showFoot, showPlanes].forEach(el => el.addEventListener('input', drawB2));
-drawB2();
-
-/* ============================================================
-   STEP-BY-STEP REVEAL
-   ============================================================ */
-document.querySelectorAll('.card').forEach(card => {
-  const steps = card.querySelectorAll('.step');
-  const btn = card.querySelector('.next');
-  const counter = card.querySelector('.counter');
-  if (!btn || steps.length === 0) return;
-
-  let shown = 0;
-  const update = () => {
-    counter.textContent = shown + ' / ' + steps.length;
-    if (shown >= steps.length) {
-      btn.disabled = true;
-      btn.textContent = 'All steps revealed ✓';
-    } else {
-      btn.disabled = false;
-      btn.textContent = 'Next step →';
-    }
+  // ---------- world coordinates (cm) ----------
+  // Put B at origin, C on the +x axis, and B->D at 20 degrees above the x axis,
+  // so that BD lies on a common, well-oriented line in both figures.
+  const B = {x:0, y:0};
+  const C = {x:AB, y:0};
+  const D = {x:AD*cosB, y:AD*sinB};          // D: BD at 20° from BC
+  // A in figure (a) : AB = 60, AD parallel to BC  =>  A = D + (AB,0)
+  const A_a = {x:D.x+AB, y:D.y};
+  // A' in figure (b) : triangle ABC with AB=60, BC=AD, AC=40, on the other side of BC
+  const A_b = {
+    x:(AB*AB + AC_FOLD*AC_FOLD - AD*AD)/(2*AB),
+    y:-Math.sqrt(Math.max(0,AC_FOLD*AC_FOLD - Math.pow((AB*AB+AC_FOLD*AC_FOLD-AD*AD)/(2*AB),2)))
   };
 
-  btn.addEventListener('click', () => {
-    if (shown < steps.length) {
-      steps[shown].classList.add('show');
-      shown++;
-      if (window.MathJax && MathJax.typesetPromise) {
-        MathJax.typesetPromise([steps[shown - 1]]).catch(() => {});
-      }
-      update();
-    }
-  });
+  // ---------- layout / transform ----------
+  let S = 4, ox = 60, oy = 60;
 
-  update();
-});
-
-/* initial MathJax typeset */
-window.addEventListener('load', () => {
-  if (window.MathJax && MathJax.typesetPromise) {
-    MathJax.typesetPromise().catch(() => {});
+  function computeTransform(pts){
+    let minx=1e9,maxx=-1e9,miny=1e9,maxy=-1e9;
+    pts.forEach(p=>{
+      minx=Math.min(minx,p.x); maxx=Math.max(maxx,p.x);
+      miny=Math.min(miny,p.y); maxy=Math.max(maxy,p.y);
+    });
+    const pad = 62;
+    const w = cv.width, h = cv.height;
+    const sx = (w-2*pad)/Math.max(1e-6,(maxx-minx));
+    const sy = (h-2*pad)/Math.max(1e-6,(maxy-miny));
+    S = Math.min(sx,sy);
+    const cxw = (minx+maxx)/2, cyw = (miny+maxy)/2;
+    ox = w/2 - S*cxw;
+    oy = h/2 + S*cyw;
   }
-});
-</script>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
+  const X = p => ox + S*p.x;
+  const Y = p => oy - S*p.y;
 
+  function m(x,y){ ctx.beginPath(); ctx.moveTo(X(x),Y(y)); }
+  function l(x,y){ ctx.lineTo(X(x),Y(y)); ctx.stroke(); }
+  function dot(p,c,r){
+    ctx.beginPath(); ctx.arc(X(p.x),Y(p.y),r||5,0,Math.PI*2);
+    ctx.fillStyle=c; ctx.fill();
+    ctx.lineWidth=1.6; ctx.strokeStyle='#fff'; ctx.stroke();
+  }
+  function label(x,y,txt,col,dx,dy,bold,size){
+    ctx.font=(bold?'700 ':'600 ')+(size||15)+'px "Segoe UI",Arial,sans-serif';
+    ctx.fillStyle=col; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.strokeStyle='rgba(255,255,255,.92)'; ctx.lineWidth=3.4;
+    ctx.strokeText(txt, X(x)+dx, Y(y)+dy);
+    ctx.fillText(txt, X(x)+dx, Y(y)+dy);
+  }
+  function txt(cx,cy,txt,col,size,bold,align){
+    ctx.font=(bold?'700 ':'600 ')+(size||13)+'px "Segoe UI",Arial,sans-serif';
+    ctx.fillStyle=col; ctx.textAlign=align||'center'; ctx.textBaseline='middle';
+    ctx.strokeStyle='rgba(255,255,255,.92)'; ctx.lineWidth=3.4;
+    ctx.strokeText(txt,cx,cy);
+    ctx.fillText(txt,cx,cy);
+  }
+  function seg(p,q,col,w,dash){
+    ctx.save();
+    ctx.setLineDash(dash||[]);
+    ctx.lineWidth=w||2.6; ctx.strokeStyle=col; ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(X(p.x),Y(p.y)); ctx.lineTo(X(q.x),Y(q.y)); ctx.stroke();
+    ctx.restore();
+  }
+  function arcAngle(center, p1, p2, r, col, text, off){
+    const a1=Math.atan2(p1.y-center.y,p1.x-center.x);
+    const a2=Math.atan2(p2.y-center.y,p2.x-center.x);
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(X(center.x),Y(center.y),r, -a1, -a2, (a2-a1)>0?false:true);
+    ctx.strokeStyle=col; ctx.lineWidth=2.2; ctx.stroke();
+    ctx.restore();
+    if(text){
+      let am=(a1+a2)/2;
+      // choose the bisector branch that points inward
+      if(Math.abs(a2-a1)>Math.PI) am=am+Math.PI;
+      const rx=X(center.x)+ (r+16)*Math.cos(-am);
+      const ry=Y(center.y)+ (r+16)*Math.sin(-am);
+      txt(rx+(off?off[0]:0), ry+(off?off[1]:0), text, col, 12.5, true);
+    }
+  }
+  function rightAngle(at, p1, p2, size){
+    // small square marking
+    const u1=unit(at,p1), u2=unit(at,p2);
+    const s=size||11;
+    const a={x:X(at.x)+u1.x*s, y:Y(at.y)+u1.y*s};
+    const b={x:X(at.x)+u2.x*s, y:Y(at.y)+u2.y*s};
+    const c={x:a.x+u2.x*s, y:a.y+u2.y*s};
+    ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(c.x,c.y); ctx.lineTo(b.x,b.y);
+    ctx.strokeStyle='#d97706'; ctx.lineWidth=2; ctx.stroke();
+  }
+  function unit(a,b){
+    let dx=X(b.x)-X(a.x), dy=Y(b.y)-Y(a.y);
+    const n=Math.hypot(dx,dy)||1; return {x:dx/n,y:dy/n};
+  }
+  function tickSize(){
+    ctx.lineWidth=2.4; ctx.strokeStyle='#94a3b8';
+    ctx.beginPath(); ctx.moveTo(14, cv.height-16); ctx.lineTo(14+S*10, cv.height-16);
+    ctx.moveTo(14, cv.height-21); ctx.lineTo(14, cv.height-11);
+    ctx.moveTo(14+S*10, cv.height-21); ctx.lineTo(14+S*10, cv.height-11);
+    ctx.stroke();
+    txt(14+S*5, cv.height-34, '10 cm', '#475569', 12, true);
+  }
+
+  // ---------- drawing ----------
+  function draw(){
+    const isB = (view==='b');
+    const A = isB ? A_b : A_a;
+
+    const pts=[B,C,D,A];
+    if(mode>=5){ pts.push({x:0,y:0}); }
+    // include helper points for framing in figure (b)
+    if(isB){
+      pts.push(A_b);
+    }
+    computeTransform(pts);
+
+    ctx.clearRect(0,0,cv.width,cv.height);
+
+    // soft background grid
+    ctx.save();
+    ctx.strokeStyle='rgba(37,99,235,.055)'; ctx.lineWidth=1;
+    for(let gx=0;gx<cv.width;gx+=34){ctx.beginPath();ctx.moveTo(gx,0);ctx.lineTo(gx,cv.height);ctx.stroke();}
+    for(let gy=0;gy<cv.height;gy+=34){ctx.beginPath();ctx.moveTo(0,gy);ctx.lineTo(cv.width,gy);ctx.stroke();}
+    ctx.restore();
+
+    const step = mode;
+
+    // ---------- hidden / folded extra geometry ----------
+    // In figure (b), show the ORIGINAL position of A (dashed) only on step 3
+    if(isB && (step===3 || step===4)){
+      ctx.save(); ctx.setLineDash([7,6]);
+      seg(A_a, D, 'rgba(148,163,184,.85)', 2);
+      seg(A_a, B, 'rgba(148,163,184,.85)', 2);
+      ctx.restore();
+      label(A_a.x,A_a.y,'A (before fold)','#94a3b8',0,-24,true,12);
+    }
+
+    // ---------- the quad ABCD ----------
+    const colAB = (step===1||step===2) ? '#1d4ed8' : '#2563eb';
+    const colAD = (step===1||step===2) ? '#e11d48' : '#f43f5e';
+    const colBD = (step>=3) ? '#047857' : '#059669';
+
+    seg(A, B, colAB, step===3||step===4?3.8:3);
+    seg(B, C, colAB, step===3||step===4?3.8:3);
+    seg(C, D, colAD, step===1||step===2?3.8:3);
+    seg(D, A, colAD, step===1||step===2?3.8:3);
+    // diagonal BD (green, the fold line)
+    seg(B, D, colBD, step>=2?3.8:3, (step>=3?[]:[7,5]));
+
+    // ---------- AC after folding (Fig 3b) ----------
+    if(isB && (showAC || step===3 || step===4 || step>=5)){
+      seg(A, C, '#0891b2', 3.4, step>=5?[8,5]:[]);
+      if(step===3||step===4){
+        const mx=(A.x+C.x)/2, my=(A.y+C.y)/2;
+        label(mx,my,'$AC=40$ cm','#0e7490',0,-16,true,12);
+      }
+    }
+
+    // ---------- step 5-7 auxiliary construction ----------
+    if(isB && (showAux || step>=5)){
+      // P = foot of perpendicular from A to BD  (P is a point on BD)
+      const t = ((A.x-B.x)*(D.x-B.x)+(A.y-B.y)*(D.y-B.y))/((D.x-B.x)**2+(D.y-B.y)**2);
+      const P = {x:B.x+t*(D.x-B.x), y:B.y+t*(D.y-B.y)};
+      // Q = intersection of line AP with line DC
+      // line AP: A + s(P-A) ; line DC: D + u(C-D)
+      const ax=A.x, ay=A.y, px=P.x, py=P.y;
+      const dx=D.x, dy=D.y, cx=C.x, cy=C.y;
+      const r1x=px-ax, r1y=py-ay, r2x=cx-dx, r2y=cy-dy;
+      const den = r1x*r2y - r1y*r2x;
+      const s = ((dx-ax)*r2y - (dy-ay)*r2x)/den;
+      const Q = {x:ax+s*r1x, y:ay+s*r1y};
+
+      seg(A, Q, '#d97706', 3, [8,5]);          // A–P–Q line
+      seg(P, Q, '#d97706', 3.6);               // P–Q in plane BCD
+      seg(P, A, '#f59e0b', 3.6);               // A–P in plane ABD
+      rightAngle(P, A, D, 12);                 // right angle at P
+      dot(P,'#7c3aed',5.5);
+      dot(Q,'#7c3aed',5.5);
+      label(P.x,P.y,'P','#6d28d9',-14,10,true,13);
+      label(Q.x,Q.y,'Q','#6d28d9',16,-12,true,13);
+
+      if(step===6||step===7){ seg(A,Q,'#b45309',3.2); }
+      if(step===7){
+        // angle APQ highlight
+        arcAngle(P, A, Q, 30, '#dc2626', '', [0,0]);
+        const am=(Math.atan2(A.y-P.y,A.x-P.x)+Math.atan2(Q.y-P.y,Q.x-P.x))/2;
+        if(Math.abs(Math.atan2(Q.y-P.y,Q.x-P.x)-Math.atan2(A.y-P.y,A.x-P.x))>Math.PI) {}
+        label(P.x+ (36/S)*Math.cos(am)*0.9, P.y+ (36/S)*Math.sin(am)*0.9, '∠APQ', '#dc2626', 4, -14, true, 13);
+      }
+    }
+
+    // ---------- vertex dots & labels ----------
+    dot(B,'#7c3aed',6); dot(C,'#7c3aed',6); dot(D,'#7c3aed',6); dot(A,'#7c3aed',6);
+    label(B.x,B.y,'B','#4c1d95', -18,16,true,15);
+    label(C.x,C.y,'C','#4c1d95', 18,-14,true,15);
+    label(D.x,D.y,'D','#4c1d95', -6,-20,true,15);
+    label(A.x,A.y, isB?'A':'A','#4c1d95', 6,-22,true,15);
+
+    // ---------- side/angle annotations ----------
+    if(step<=2){
+      // Fig (a) angle at B = 20°, at A = 120°
+      arcAngle(B, C, D, 34, '#2563eb', '20°', [-4,6]);
+      const angA = rad(120);
+      arcAngle(A, D, B, 32, '#e11d48', '120°', [6,4]);
+
+      // AB length
+      const mAB={x:(A.x+B.x)/2, y:(A.y+B.y)/2};
+      label(mAB.x,mAB.y,'AB = 60 cm','#1d4ed8',0,16,true,12.5);
+      const mAD={x:(A.x+D.x)/2, y:(A.y+D.y)/2};
+      label(mAD.x,mAD.y, step===2 ? 'AD = ?' : 'AD','#be123c',0,-16,true,13);
+    } else if (step===3||step===4){
+      // triangle ABC focus
+      label(0,0,'','#000',0,0,true,12);
+      const mAB={x:(A.x+B.x)/2, y:(A.y+B.y)/2};
+      label(mAB.x,mAB.y,'AB = 60','#1d4ed8',-22,0,true,12.5);
+      const mBC={x:(B.x+C.x)/2, y:(B.y+C.y)/2};
+      label(mBC.x,mBC.y,'BC = AD ≈ 31.9','#1d4ed8',0,18,true,12.5);
+      arcAngle(B, A, C, 30, '#059669', '∠ABC = ?', [6,0]);
+    } else {
+      // steps 5-7 : show that the required angle is ∠APQ
+      arcAngle(B, A, D, 30, 'rgba(5,150,105,.9)', '', [0,0]);
+      txt(cv.width-16, 22, 'Folded figure:  BD is the intersection of the two planes', '#475569', 12.5, true, 'right');
+      txt(cv.width-16, 40, 'Plane ABD (A,P,B)  and  Plane BCD (C,P,D)', '#475569', 12, false, 'right');
+    }
+
+    // figure caption
+    txt(16, 22, isB ? 'Figure 3(b)  —  card folded along BD, AC = 40 cm' : 'Figure 3(a)  —  parallelogram paper card',
+        '#1e3a8a', 13, true, 'left');
+
+    tickSize();
+
+    // scale note
+    txt(cv.width-16, cv.height-16, 'Drawn to scale (single uniform scale)', '#94a3b8', 11.5, false, 'right');
+  }
+
+  // ---------- interactions ----------
+  const btnA=document.getElementById('btnA');
+  const btnB=document.getElementById('btnB');
+  const btnR=document.getElementById('btnReset');
+  function refreshButtons(){
+    btnA.classList.toggle('on', view==='a');
+    btnB.classList.toggle('on', view==='b');
+  }
+  btnA.addEventListener('click',()=>{view='a';showAux=false;showAC=false;refreshButtons();draw();});
+  btnB.addEventListener('click',()=>{view='b';showAux=(mode>=5);showAC=(mode>=3);refreshButtons();draw();});
+  btnR.addEventListener('click',()=>{draw();});
+
+  // ---------- step sync ----------
+  const steps=Array.from(document.querySelectorAll('.step'));
+  const obs=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){
+    const m=+e.target.dataset.step; mode=m;
+    if(m>=3) view='b';
+    if(m>=5){ view='b'; }
+    showAux = (m>=5);
+    showAC  = (m>=3);
+    refreshButtons();
+    steps.forEach(st=>st.classList.toggle('active',st===e.target));
+    draw();}});},
+    {rootMargin:'-15% 0px -55% 0px',threshold:0});
+  steps.forEach(st=>obs.observe(st));
+
+  // initial
+  steps[0].classList.add('active');
+  refreshButtons();
+  draw();
+  window.addEventListener('resize',()=>{ draw(); });
+})();
+</script>
 </body>
 </html>

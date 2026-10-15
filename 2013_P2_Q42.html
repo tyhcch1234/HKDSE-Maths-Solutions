@@ -4,782 +4,358 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HKDSE 2013 P2 Q42 — Coordinate Geometry</title>
-<script>
-window.MathJax = {
-  tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['\\[', '\\]']] },
-  svg: { fontCache: 'global' }
-};
-</script>
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
-  :root {
-    --blue: #2563eb;
-    --blue-dark: #1e40af;
-    --amber: #f59e0b;
-    --emerald: #059669;
-    --slate: #0f172a;
-    --slate-soft: #334155;
-    --bg: #f1f5f9;
-    --card: #ffffff;
-    --muted: #64748b;
+  :root{
+    --bg:#eef3fb;
+    --card:#ffffff;
+    --ink:#1c2541;
+    --muted:#5b6b8c;
+    --blue:#2563eb;
+    --red:#e11d48;
+    --green:#059669;
+    --amber:#d97706;
+    --purple:#7c3aed;
+    --line:#dbe4f3;
   }
-  * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-  body {
-    margin: 0;
-    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-    background: var(--bg);
-    color: var(--slate);
-    line-height: 1.65;
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:radial-gradient(1200px 700px at 15% -10%,#dbeafe 0%,transparent 55%),var(--bg);
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    color:var(--ink);
+    padding:14px;
   }
-  /* ---------- Hero ---------- */
-  .hero {
-    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 45%, #0ea5e9 100%);
-    color: #fff;
-    padding: 46px 22px 38px;
-    text-align: center;
-    box-shadow: 0 8px 26px rgba(15, 23, 42, 0.25);
+  h1{font-size:1.05rem;margin:0 0 10px 2px;letter-spacing:.3px;color:#28406b;}
+  h1 span{background:linear-gradient(90deg,#2563eb,#7c3aed);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:800;}
+
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start;}
+  @media(min-width:900px){.split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}}
+
+  .panel{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:16px;
+    box-shadow:0 8px 26px rgba(30,58,138,.10);
+    padding:14px;
   }
-  .hero .eyebrow {
-    font-size: 0.8rem;
-    letter-spacing: 2.4px;
-    text-transform: uppercase;
-    opacity: 0.85;
-    font-weight: 600;
+  .diagram{position:sticky;top:16px;max-height:calc(100vh - 2rem);overflow-y:auto;}
+  canvas{width:100%;height:auto;display:block;border-radius:12px;background:linear-gradient(180deg,#fbfdff,#f2f7ff);}
+
+  .legend{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:10px;font-size:.72rem;color:var(--muted);}
+  .legend i{display:inline-block;width:14px;height:4px;border-radius:2px;margin-right:5px;vertical-align:middle;}
+  .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:middle;}
+
+  .qbox{
+    background:linear-gradient(135deg,#eff6ff,#f5f3ff);
+    border:1px solid #d8e3fb;
+    border-radius:12px;
+    padding:12px 14px;
+    font-size:.95rem;
+    line-height:1.6;
   }
-  .hero h1 {
-    margin: 10px 0 6px;
-    font-size: clamp(1.5rem, 4vw, 2.3rem);
-    font-weight: 800;
-    letter-spacing: 0.5px;
+  .qtag{
+    display:inline-block;font-size:.7rem;font-weight:800;letter-spacing:.6px;
+    background:var(--blue);color:#fff;border-radius:999px;padding:3px 10px;margin-bottom:8px;
   }
-  .hero .subtitle { font-size: 1rem; opacity: 0.92; margin-bottom: 18px; }
-  .pills { display: flex; flex-wrap: wrap; gap: 9px; justify-content: center; }
-  .pill {
-    background: rgba(255, 255, 255, 0.16);
-    border: 1px solid rgba(255, 255, 255, 0.38);
-    backdrop-filter: blur(4px);
-    padding: 5px 15px;
-    border-radius: 999px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    letter-spacing: 0.3px;
+  .choices{margin:10px 0 0;padding-left:4px;font-size:.9rem;line-height:1.7;list-style:none;}
+  .choices li{font-weight:600;}
+  .choices b{color:var(--green);}
+
+  .step{
+    border:1px solid var(--line);
+    border-left:5px solid #c7d2fe;
+    border-radius:12px;
+    padding:10px 13px;
+    margin-top:12px;
+    background:#fff;
+    transition:box-shadow .25s,border-color .25s,transform .25s,background .25s;
+    font-size:.9rem;
+    line-height:1.62;
   }
-  /* ---------- Layout ---------- */
-  .wrap { max-width: 1000px; margin: 0 auto; padding: 26px 16px 60px; }
-  .card {
-    background: var(--card);
-    border-radius: 18px;
-    box-shadow: 0 5px 20px rgba(15, 23, 42, 0.09);
-    padding: 26px 24px;
-    margin-bottom: 26px;
-    border: 1px solid #e2e8f0;
+  .step.active{
+    border-left-color:var(--blue);
+    background:#f8fbff;
+    box-shadow:0 8px 20px rgba(37,99,235,.14);
+    transform:translateX(2px);
   }
-  .card h2 {
-    margin: 0 0 6px;
-    font-size: 1.18rem;
-    color: var(--blue-dark);
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  .step .tag{
+    display:block;font-weight:800;font-size:.75rem;letter-spacing:.7px;
+    color:var(--purple);margin-bottom:6px;text-transform:uppercase;
   }
-  .card h2 .num {
-    background: linear-gradient(135deg, var(--blue), #0ea5e9);
-    color: #fff;
-    width: 30px; height: 30px;
-    border-radius: 9px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.92rem;
-    font-weight: 700;
-    flex: 0 0 auto;
+  .step p{margin:6px 0;}
+  .hint{
+    background:#fffbeb;border:1px dashed #fbbf24;border-radius:10px;
+    padding:8px 11px;font-size:.82rem;color:#92400e;margin-top:10px;
   }
-  .card h3 { color: var(--slate-soft); font-size: 1rem; margin: 18px 0 8px; }
-  .qtext { font-size: 1.02rem; }
-  .marks {
-    display: inline-block;
-    background: #fef3c7;
-    color: #92400e;
-    border: 1px solid #fcd34d;
-    border-radius: 6px;
-    padding: 1px 8px;
-    font-size: 0.78rem;
-    font-weight: 700;
-    margin-left: 6px;
-    vertical-align: middle;
+  .answer{
+    margin-top:14px;border-radius:12px;padding:12px 14px;
+    background:linear-gradient(135deg,#ecfdf5,#d1fae5);
+    border:1px solid #6ee7b7;font-weight:700;color:#065f46;font-size:.95rem;
   }
-  /* ---------- Steps ---------- */
-  .step {
-    display: none;
-    margin-top: 14px;
-    padding: 15px 16px 15px 16px;
-    border-radius: 13px;
-    background: #f8fafc;
-    border-left: 5px solid var(--blue);
-    animation: fade 0.4s ease;
-  }
-  .step.show { display: block; }
-  @keyframes fade { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: none; } }
-  .step-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
-  .badge-num {
-    background: var(--blue);
-    color: #fff;
-    font-size: 0.72rem;
-    font-weight: 700;
-    padding: 3px 10px;
-    border-radius: 999px;
-    letter-spacing: 0.5px;
-  }
-  .badge-m {
-    background: #fee2e2;
-    color: #b91c1c;
-    border: 1px solid #fca5a5;
-    font-size: 0.72rem;
-    font-weight: 700;
-    padding: 3px 9px;
-    border-radius: 999px;
-  }
-  .hint {
-    background: #fffbeb;
-    border: 1px dashed #fcd34d;
-    border-radius: 10px;
-    padding: 9px 13px;
-    font-size: 0.88rem;
-    color: #78350f;
-    margin-top: 10px;
-  }
-  .hint::before { content: "💡 Hint: "; font-weight: 700; }
-  .answer {
-    background: #ecfdf5;
-    border: 1px solid #6ee7b7;
-    border-left: 5px solid var(--emerald);
-    border-radius: 10px;
-    padding: 10px 14px;
-    margin-top: 12px;
-    color: #065f46;
-    font-weight: 600;
-    font-size: 0.95rem;
-  }
-  .answer::before { content: "✅ "; }
-  .btn {
-    background: linear-gradient(135deg, var(--blue), #0ea5e9);
-    color: #fff;
-    border: none;
-    border-radius: 10px;
-    padding: 10px 20px;
-    font-size: 0.92rem;
-    font-weight: 700;
-    cursor: pointer;
-    margin-top: 16px;
-    box-shadow: 0 3px 12px rgba(37, 99, 235, 0.32);
-    transition: 0.2s;
-  }
-  .btn:hover:not(:disabled) { transform: translateY(-1.5px); box-shadow: 0 6px 16px rgba(37, 99, 235, 0.42); }
-  .btn:disabled { background: #cbd5e1; box-shadow: none; cursor: not-allowed; color: #64748b; }
-  .counter { font-size: 0.83rem; color: var(--muted); margin-left: 12px; font-weight: 600; }
-  /* ---------- Canvas ---------- */
-  .canvas-box {
-    background: #fbfdff;
-    border: 1px solid #dbeafe;
-    border-radius: 14px;
-    padding: 12px;
-    margin-top: 14px;
-  }
-  canvas { width: 100%; display: block; border-radius: 10px; touch-action: none; }
-  .controls {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-    align-items: center;
-    margin-top: 12px;
-    font-size: 0.87rem;
-  }
-  .ctrl {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: #f1f5f9;
-    border-radius: 10px;
-    padding: 7px 13px;
-    font-weight: 600;
-    color: var(--slate-soft);
-  }
-  input[type=range] { width: 150px; accent-color: var(--blue); }
-  input[type=checkbox] { accent-color: var(--emerald); width: 16px; height: 16px; }
-  .readout {
-    font-family: "SFMono-Regular", Consolas, monospace;
-    background: #0f172a;
-    color: #7dd3fc;
-    border-radius: 9px;
-    padding: 8px 14px;
-    font-size: 0.85rem;
-    margin-top: 12px;
-    display: inline-block;
-  }
-  .readout b { color: #fbbf24; }
-  /* ---------- Summary ---------- */
-  .summary {
-    background: linear-gradient(135deg, #0f172a, #1e293b);
-    color: #e2e8f0;
-    border-radius: 18px;
-    padding: 26px 24px;
-    box-shadow: 0 8px 26px rgba(15, 23, 42, 0.3);
-    margin-bottom: 26px;
-  }
-  .summary h2 { color: #fbbf24; margin: 0 0 14px; font-size: 1.18rem; }
-  .summary ul { margin: 0; padding-left: 4px; list-style: none; }
-  .summary li {
-    padding: 9px 0 9px 26px;
-    position: relative;
-    border-bottom: 1px solid rgba(148, 163, 184, 0.18);
-  }
-  .summary li:last-child { border-bottom: none; }
-  .summary li::before {
-    content: "▸";
-    position: absolute;
-    left: 4px;
-    color: #38bdf8;
-    font-weight: 700;
-  }
-  .summary li strong { color: #fbbf24; }
-  footer {
-    text-align: center;
-    color: var(--muted);
-    font-size: 0.82rem;
-    padding: 18px 10px 40px;
-  }
-  .options { display: grid; gap: 8px; margin-top: 10px; }
-  .opt {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 10px;
-    padding: 9px 14px;
-    font-size: 0.95rem;
-  }
-  @media (max-width: 560px) {
-    .card { padding: 20px 15px; }
-    .controls { gap: 10px; }
-    input[type=range] { width: 110px; }
+  .answer .lbl{display:block;font-size:.7rem;letter-spacing:1px;color:#047857;margin-bottom:4px;}
+  .note{font-size:.78rem;color:var(--muted);margin-top:10px;}
+  mjx-container{font-size:98% !important;}
+
+  @media(max-width:520px){
+    body{padding:8px;}
+    .panel{padding:9px;border-radius:12px;}
+    .step{font-size:.8rem;padding:8px 10px;}
+    .qbox{font-size:.82rem;}
+    h1{font-size:.88rem;}
   }
 </style>
 </head>
 <body>
 
-<!-- ============ HERO ============ -->
-<header class="hero">
-  <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</div>
-  <h1>2013 Paper 2 · Question 42</h1>
-  <div class="subtitle">Coordinate Geometry — Intersection of a Circle and a Straight Line</div>
-  <div class="pills">
-    <span class="pill">Circle Equation</span>
-    <span class="pill">Straight Line</span>
-    <span class="pill">Quadratic Discriminant</span>
-    <span class="pill">Range of k</span>
-  </div>
-</header>
+<h1>HKDSE Math 2013 · Paper 2 · <span>Q42 — Coordinate Geometry</span></h1>
 
-<div class="wrap">
+<div class="split">
 
-  <!-- ============ QUESTION ============ -->
-  <section class="card">
-    <h2><span class="num">Q</span> Question</h2>
-    <p class="qtext">
-      Find the range of values of \(k\) such that the circle
-      \[ x^2 + y^2 + 2x - 2y - 7 = 0 \]
-      and the straight line
-      \[ 3x - 4y + k = 0 \]
-      intersect.
-    </p><figure style="margin:12px 0;text-align:center;"><img src="figures/2013_P2_Q42.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
-    <div class="options">
-      <div class="opt">A. \(\;-8 < k < 22\)</div>
-      <div class="opt">B. \(\;-8 \le k \le 22\)</div>
-      <div class="opt">C. \(\;k < -22\) or \(k > 8\)</div>
-      <div class="opt">D. \(\;k \le -22\) or \(k \ge 8\)</div>
+  <!-- LEFT : DIAGRAM -->
+  <section class="panel diagram">
+    <canvas id="cv" width="620" height="620"></canvas>
+    <div class="legend">
+      <span><i style="background:#2563eb"></i>Circle $C$ (centre $P$)</span>
+      <span><i style="background:#e11d48"></i>Line $3x-4y+k=0$</span>
+      <span><span class="dot" style="background:#7c3aed"></span>Centre $P(-1,1)$</span>
+      <span><span class="dot" style="background:#d97706"></span>Tangent points (extreme $k$)</span>
+      <span><i style="background:#059669"></i>Radius $r=3$</span>
     </div>
   </section>
 
-  <!-- ============ PART A: THE GEOMETRIC PICTURE ============ -->
-  <section class="card">
-    <h2><span class="num">A</span> Understanding the Setup (Circle &amp; Line)</h2>
-    <p>
-      First rewrite the circle in centre–radius form, and see what varying \(k\) does to the line.
-      The line \(3x - 4y + k = 0\) is a family of <em>parallel</em> lines — changing \(k\) slides the
-      line but never changes its slope \(\tfrac{3}{4}\).
-    </p>
-
-    <div class="canvas-box">
-      <canvas id="cvA" width="820" height="520"></canvas>
-      <div class="controls">
-        <label class="ctrl">
-          k = <span id="kValA" style="color:#2563eb">0</span>
-          <input type="range" id="kSliderA" min="-30" max="30" step="0.5" value="0">
-        </label>
-        <label class="ctrl"><input type="checkbox" id="showCentreA" checked> Show centre &amp; radius</label>
-        <label class="ctrl"><input type="checkbox" id="showIntersectA" checked> Show intersection points</label>
-      </div>
-      <div class="readout" id="readoutA"></div>
+  <!-- RIGHT : QUESTION + SOLUTION -->
+  <section class="panel">
+    <div class="qbox">
+      <span class="qtag">[2013 MC #42]</span>
+      <div>Find the range of values of $k$ such that the circle
+        $$x^{2}+y^{2}+2x-2y-7=0$$
+        and the straight line
+        $$3x-4y+k=0$$
+        intersect.</div>
+      <ul class="choices">
+        <li>A. &nbsp;$-8<k<22$</li>
+        <li>B. &nbsp;$\mathbf{-8\le k\le 22}$</li>
+        <li>C. &nbsp;$k<-22$ or $k>8$</li>
+        <li>D. &nbsp;$k\le-22$ or $k\ge 8$</li>
+      </ul>
     </div>
 
-    <div class="step" id="a1">
-      <div class="step-head"><span class="badge-num">Step 1</span></div>
-      <p>Rewrite the circle by completing the square:</p>
-      \[ x^2 + 2x + y^2 - 2y = 7 \]
-      \[ (x+1)^2 - 1 + (y-1)^2 - 1 = 7 \]
-      \[ (x+1)^2 + (y-1)^2 = 9 \]
-      <div class="hint">The centre is \((-1,\,1)\) and the radius is \(\sqrt{9} = 3\).</div>
-      <div class="answer">Circle: centre \((-1,\,1)\), radius \(3\)</div>
+    <figure style="margin:12px 0;text-align:center;"><img src="figures/2013_P2_Q42.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
+
+    <!-- STEP 1 -->
+    <div class="step" data-step="1">
+      <span class="tag">Step 1 · Find the centre and radius of the circle</span>
+      <p>Complete the square:</p>
+      <p>$$x^{2}+y^{2}+2x-2y-7=0$$</p>
+      <p>$$(x+1)^{2}-1+(y-1)^{2}-1-7=0$$</p>
+      <p>$$(x+1)^{2}+(y-1)^{2}=9$$</p>
+      <p>So the centre is $P(-1,\,1)$ and the radius is $r=3$.</p>
+      <div class="hint">💡 The line can be drawn in different positions by changing $k$ — watch the sliding red line in the diagram.</div>
     </div>
 
-    <div class="step" id="a2">
-      <div class="step-head"><span class="badge-num">Step 2</span></div>
-      <p>
-        The line \(3x - 4y + k = 0\) has constant slope \(\tfrac{3}{4}\).
-        The distance from the centre \((-1,1)\) to this line is
-      </p>
-      \[ d = \frac{|3(-1) - 4(1) + k|}{\sqrt{3^2 + (-4)^2}} = \frac{|k - 7|}{5}. \]
-      <div class="hint">
-        A line intersects a circle of radius \(r\) exactly when \(d \le r\). Here \(r = 3\), so we need
-        \(\dfrac{|k-7|}{5} \le 3 \iff |k-7| \le 15\).
-      </div>
-      <div class="answer">Condition: \(d \le 3\)</div>
+    <!-- STEP 2 -->
+    <div class="step" data-step="2">
+      <span class="tag">Step 2 · Distance from the centre to the line</span>
+      <p>For the line $3x-4y+k=0$, the distance from $P(-1,1)$ is</p>
+      <p>$$d=\frac{|3(-1)-4(1)+k|}{\sqrt{3^{2}+(-4)^{2}}}=\frac{|k-7|}{5}.$$</p>
+      <p>This is exactly the purple dashed segment shown in the diagram.</p>
     </div>
 
-    <div class="step" id="a3">
-      <div class="step-head"><span class="badge-num">Step 3</span></div>
-      <p>Solve the inequality:</p>
-      \[ |k - 7| \le 15 \]
-      \[ -15 \le k - 7 \le 15 \]
-      \[ -8 \le k \le 22 \]
-      <div class="hint">This is exactly option B.</div>
-      <div class="answer">\(-8 \le k \le 22\)</div>
+    <!-- STEP 3 -->
+    <div class="step" data-step="3">
+      <span class="tag">Step 3 · Condition for intersection</span>
+      <p>Circle and line intersect (touch or cross) $\iff$ distance $\le$ radius:</p>
+      <p>$$\frac{|k-7|}{5}\le 3$$</p>
+      <p>$$|k-7|\le 15$$</p>
     </div>
 
-    <button class="btn" data-target="a1,a2,a3">Next step →</button>
-    <span class="counter" id="cnt-a1,a2,a3">0 / 3</span>
+    <!-- STEP 4 -->
+    <div class="step" data-step="4">
+      <span class="tag">Step 4 · Solve the inequality</span>
+      <p>$$-15\le k-7\le 15$$</p>
+      <p>$$-8\le k\le 22$$</p>
+      <p>At the endpoints the line is <b>tangent</b> to the circle (exactly one intersection), which still counts as intersecting — hence "$\le$".</p>
+      <div class="answer"><span class="lbl">ANSWER</span>$\;-8\le k\le 22\;$ → choice <b>B</b></div>
+      <div class="hint">🔁 Alternative (algebraic): substitute $y=\frac{3x+k}{4}$ into the circle, then require the resulting quadratic in $x$ to have $\Delta\ge 0$: $$25x^{2}+(6k+8)x+(k^{2}-8k-112)=0$$ $$\Delta=(k+8)(k-22)\cdot(-64)\ge 0\;\Rightarrow\;-8\le k\le 22.$$</div>
+      <p class="note">Try the slider in the diagram panel: pull $k$ past $-8$ or $22$ and the line no longer meets the circle.</p>
+    </div>
   </section>
 
-  <!-- ============ PART B: ALGEBRAIC METHOD ============ -->
-  <section class="card">
-    <h2><span class="num">B</span> Algebraic Method — Substitution &amp; Discriminant</h2>
-    <p>
-      The standard exam technique: substitute the line into the circle to get a quadratic
-      in \(x\), then require a real solution (\(\Delta \ge 0\)).
-    </p>
-
-    <div class="canvas-box">
-      <canvas id="cvB" width="820" height="380"></canvas>
-      <div class="controls">
-        <label class="ctrl">
-          k = <span id="kValB" style="color:#059669">0</span>
-          <input type="range" id="kSliderB" min="-30" max="30" step="0.5" value="0">
-        </label>
-        <label class="ctrl"><input type="checkbox" id="showRegionB" checked> Show valid k region</label>
-      </div>
-      <div class="readout" id="readoutB"></div>
-    </div>
-
-    <div class="step" id="b1">
-      <div class="step-head"><span class="badge-num">Step 1</span></div>
-      <p>From the line, make \(y\) the subject:</p>
-      \[ 3x - 4y + k = 0 \;\Longrightarrow\; y = \frac{3x + k}{4} \]
-      <div class="hint">This expression for \(y\) is then substituted into the circle equation.</div>
-    </div>
-
-    <div class="step" id="b2">
-      <div class="step-head"><span class="badge-num">Step 2</span></div>
-      <p>Substitute into \(x^2 + y^2 + 2x - 2y - 7 = 0\):</p>
-      \[ x^2 + \left(\frac{3x+k}{4}\right)^2 + 2x - 2\left(\frac{3x+k}{4}\right) - 7 = 0 \]
-      <p>Multiply throughout by 16 to clear the denominator:</p>
-      \[ 16x^2 + (3x+k)^2 + 32x - 8(3x+k) - 112 = 0 \]
-      \[ 16x^2 + (9x^2 + 6kx + k^2) + 32x - 24x - 8k - 112 = 0 \]
-      \[ 25x^2 + (6k + 8)x + (k^2 - 8k - 112) = 0 \quad \cdots (*) \]
-      <div class="hint">Collect like terms carefully: \(6kx + 32x - 24x = (6k+8)x\).</div>
-      <div class="answer">\(25x^2 + (6k+8)x + (k^2 - 8k - 112) = 0\)</div>
-    </div>
-
-    <div class="step" id="b3">
-      <div class="step-head"><span class="badge-num">Step 3</span></div>
-      <p>For intersection, \((*)\) must have a real root, i.e. its discriminant \(\Delta \ge 0\):</p>
-      \[ \Delta = (6k+8)^2 - 4(25)(k^2 - 8k - 112) \ge 0 \]
-      \[ (36k^2 + 96k + 64) - 100k^2 + 800k + 11200 \ge 0 \]
-      \[ -64k^2 + 896k + 11264 \ge 0 \]
-      <p>Divide by \(-64\) (reverse the inequality):</p>
-      \[ k^2 - 14k - 176 \le 0 \]
-      <div class="hint">\(896 \div (-64) = -14\) and \(11264 \div (-64) = -176\).</div>
-    </div>
-
-    <div class="step" id="b4">
-      <div class="step-head"><span class="badge-num">Step 4</span></div>
-      <p>Factorise the quadratic:</p>
-      \[ k^2 - 14k - 176 = (k + 8)(k - 22) \le 0 \]
-      \[ \therefore\; -8 \le k \le 22 \]
-      <div class="hint">
-        The roots are \(k = -8\) and \(k = 22\). Since the quadratic opens upwards, the
-        solution of \(\le 0\) lies <em>between</em> the roots.
-      </div>
-      <div class="answer">\(-8 \le k \le 22\) &nbsp;(Answer B)</div>
-    </div>
-
-    <button class="btn" data-target="b1,b2,b3,b4">Next step →</button>
-    <span class="counter" id="cnt-b1,b2,b3,b4">0 / 4</span>
-  </section>
-
-  <!-- ============ SUMMARY ============ -->
-  <section class="summary">
-    <h2>📋 Summary of Answers</h2>
-    <ul>
-      <li><strong>Circle centre &amp; radius:</strong> \((-1,\,1)\), \(r = 3\)</li>
-      <li><strong>Line:</strong> \(3x - 4y + k = 0\) has slope \(\tfrac{3}{4}\) (a family of parallel lines)</li>
-      <li><strong>Distance from centre to line:</strong> \(d = \dfrac{|k-7|}{5}\)</li>
-      <li><strong>Intersection condition:</strong> \(d \le r \Rightarrow \dfrac{|k-7|}{5} \le 3\)</li>
-      <li><strong>Range of \(k\):</strong> \(-8 \le k \le 22\)</li>
-      <li><strong>Correct option:</strong> <strong>B</strong></li>
-    </ul>
-  </section>
-
-  <footer>HKDSE Mathematics · Paper 2 · 2013 Q42 · Interactive Solution</footer>
 </div>
 
 <script>
-/* ============================================================
-   SHARED SETUP
-   ============================================================ */
-const C = { x: -1, y: 1, r: 3 };   // circle centre and radius
+(function(){
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
 
-/* ---- Step reveal engine (works on buttons with data-target) ---- */
-document.querySelectorAll('.btn').forEach(btn => {
-  const ids = btn.dataset.target.split(',');
-  const counter = document.getElementById('cnt-' + btn.dataset.target);
-  let i = 0;
-  btn.addEventListener('click', () => {
-    if (i >= ids.length) return;
-    document.getElementById(ids[i]).classList.add('show');
-    i++;
-    counter.textContent = i + ' / ' + ids.length;
-    if (i === ids.length) {
-      btn.disabled = true;
-      btn.textContent = 'All steps revealed ✓';
+  const W = cv.width, H = cv.height;
+  const cx = -1, cy = 1, r = 3;          // circle
+  const unit = 46;                        // px per unit
+  const ox = W/2 - cx*unit;               // screen origin so that centre maps near middle
+  const oy = H/2 + cy*unit;
+
+  // world -> screen
+  const sx = x => ox + x*unit;
+  const sy = y => oy - y*unit;
+
+  let k = 7;          // current line parameter
+  let mode = 1;
+
+  // slider
+  const slider = document.createElement('input');
+  slider.type = 'range';
+  slider.min = -30; slider.max = 40; slider.step = 1; slider.value = k;
+  slider.style.cssText = 'width:100%;margin-top:10px;accent-color:#e11d48;';
+  slider.addEventListener('input', ()=>{ k = +slider.value; draw(); });
+  cv.parentNode.appendChild(slider);
+
+  const kLbl = document.createElement('div');
+  kLbl.style.cssText = 'font-size:.78rem;font-weight:700;color:#e11d48;margin-top:2px;text-align:center;';
+  cv.parentNode.appendChild(kLbl);
+
+  function draw(){
+    kLbl.textContent = 'k = ' + k + (k>=-8 && k<=22 ? '  (line meets circle ✓)' : '  (no intersection ✗)');
+
+    ctx.clearRect(0,0,W,H);
+
+    // grid
+    ctx.strokeStyle = '#e6edf9'; ctx.lineWidth = 1;
+    for(let gx=-8; gx<=8; gx++){
+      ctx.beginPath(); ctx.moveTo(sx(gx),0); ctx.lineTo(sx(gx),H); ctx.stroke();
     }
-  });
-});
+    for(let gy=-8; gy<=8; gy++){
+      ctx.beginPath(); ctx.moveTo(0,sy(gy)); ctx.lineTo(W,sy(gy)); ctx.stroke();
+    }
+    // axes
+    ctx.strokeStyle = '#b9c6de'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(0,sy(0)); ctx.lineTo(W,sy(0)); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(sx(0),0); ctx.lineTo(sx(0),H); ctx.stroke();
 
-/* ============================================================
-   CANVAS A — Geometry of the circle and the sliding line
-   ============================================================ */
-const cvA = document.getElementById('cvA');
-const ctxA = cvA.getContext('2d');
-const kSliderA = document.getElementById('kSliderA');
-const kValA = document.getElementById('kValA');
-const showCentreA = document.getElementById('showCentreA');
-const showIntersectA = document.getElementById('showIntersectA');
-const readoutA = document.getElementById('readoutA');
+    // ---- circle ----
+    ctx.beginPath();
+    ctx.arc(sx(cx), sy(cy), r*unit, 0, Math.PI*2);
+    const grad = ctx.createLinearGradient(sx(cx)-r*unit, sy(cy)-r*unit, sx(cx)+r*unit, sy(cy)+r*unit);
+    grad.addColorStop(0,'rgba(37,99,235,.10)');
+    grad.addColorStop(1,'rgba(124,58,237,.12)');
+    ctx.fillStyle = grad;
+    ctx.fill();
+    ctx.strokeStyle = '#2563eb';
+    ctx.lineWidth = (mode===1||mode===2) ? 4 : 2.5;
+    ctx.stroke();
 
-/* world -> screen mapping */
-const A_SCALE = 34;                 // pixels per unit
-const A_ORIGIN = { x: 410, y: 260 }; // screen position of world (0,0)
+    // radius
+    ctx.beginPath();
+    ctx.moveTo(sx(cx), sy(cy));
+    ctx.lineTo(sx(cx)+r*unit*Math.cos(-Math.PI/6), sy(cy)+r*unit*Math.sin(-Math.PI/6));
+    ctx.strokeStyle = '#059669'; ctx.lineWidth = 2.5;
+    ctx.stroke();
+    ctx.fillStyle = '#059669'; ctx.font = 'bold 14px Segoe UI';
+    ctx.fillText('r = 3', sx(cx)+ r*unit*0.62, sy(cy) - r*unit*0.28);
 
-function w2sA(x, y) {
-  return { x: A_ORIGIN.x + x * A_SCALE, y: A_ORIGIN.y - y * A_SCALE };
-}
+    // ---- line 3x - 4y + k = 0  =>  y = (3x + k)/4 ----
+    const xL = -9, xR = 9;
+    const yA = (3*xL + k)/4, yB = (3*xR + k)/4;
+    // intersection test
+    const dist = Math.abs(3*cx - 4*cy + k)/5;
+    const hit = dist <= r + 1e-9;
 
-function drawGridA() {
-  ctxA.clearRect(0, 0, cvA.width, cvA.height);
-  // grid
-  ctxA.strokeStyle = '#e2e8f0';
-  ctxA.lineWidth = 1;
-  for (let gx = -12; gx <= 12; gx++) {
-    const p = w2sA(gx, 0);
-    ctxA.beginPath(); ctxA.moveTo(p.x, 0); ctxA.lineTo(p.x, cvA.height); ctxA.stroke();
-  }
-  for (let gy = -7; gy <= 7; gy++) {
-    const p = w2sA(0, gy);
-    ctxA.beginPath(); ctxA.moveTo(0, p.y); ctxA.lineTo(cvA.width, p.y); ctxA.stroke();
-  }
-  // axes
-  ctxA.strokeStyle = '#94a3b8';
-  ctxA.lineWidth = 1.8;
-  const ox = w2sA(0, 0);
-  ctxA.beginPath(); ctxA.moveTo(0, ox.y); ctxA.lineTo(cvA.width, ox.y); ctxA.stroke();
-  ctxA.beginPath(); ctxA.moveTo(ox.x, 0); ctxA.lineTo(ox.x, cvA.height); ctxA.stroke();
-  // axis labels
-  ctxA.fillStyle = '#64748b';
-  ctxA.font = '13px sans-serif';
-  ctxA.fillText('x', cvA.width - 18, ox.y - 8);
-  ctxA.fillText('y', ox.x + 10, 16);
-  // ticks
-  ctxA.font = '11px monospace';
-  for (let gx = -5; gx <= 5; gx++) {
-    if (gx === 0) continue;
-    const p = w2sA(gx, 0);
-    ctxA.beginPath(); ctxA.moveTo(p.x, ox.y - 4); ctxA.lineTo(p.x, ox.y + 4);
-    ctxA.strokeStyle = '#94a3b8'; ctxA.stroke();
-    ctxA.fillStyle = '#94a3b8';
-    ctxA.fillText(gx, p.x - 5, ox.y + 17);
-  }
-  for (let gy = -5; gy <= 5; gy++) {
-    if (gy === 0) continue;
-    const p = w2sA(0, gy);
-    ctxA.beginPath(); ctxA.moveTo(ox.x - 4, p.y); ctxA.lineTo(ox.x + 4, p.y);
-    ctxA.strokeStyle = '#94a3b8'; ctxA.stroke();
-    ctxA.fillStyle = '#94a3b8';
-    ctxA.fillText(gy, ox.x + 8, p.y + 4);
-  }
-}
+    ctx.beginPath();
+    ctx.moveTo(sx(xL), sy(yA));
+    ctx.lineTo(sx(xR), sy(yB));
+    ctx.strokeStyle = hit ? '#e11d48' : '#9ca3af';
+    ctx.lineWidth = (mode===2||mode===3) ? 4 : 3;
+    if(!hit) ctx.setLineDash([8,6]);
+    ctx.stroke();
+    ctx.setLineDash([]);
 
-function drawCircleA() {
-  const c = w2sA(C.x, C.y);
-  ctxA.beginPath();
-  ctxA.arc(c.x, c.y, C.r * A_SCALE, 0, Math.PI * 2);
-  ctxA.fillStyle = 'rgba(37, 99, 235, 0.10)';
-  ctxA.fill();
-  ctxA.strokeStyle = '#2563eb';
-  ctxA.lineWidth = 3;
-  ctxA.stroke();
-}
+    // label the line
+    ctx.fillStyle = hit ? '#e11d48' : '#6b7280';
+    ctx.font = 'bold 13px Segoe UI';
+    ctx.fillText('3x − 4y + k = 0', sx(-8.6), sy((3*(-8.6)+k)/4) - 10);
 
-function drawLineA(k) {
-  // 3x - 4y + k = 0  ->  y = (3x + k)/4
-  const x1 = -12, y1 = (3 * x1 + k) / 4;
-  const x2 = 12, y2 = (3 * x2 + k) / 4;
-  const p1 = w2sA(x1, y1), p2 = w2sA(x2, y2);
-  const d = Math.abs(k - 7) / 5;
+    // ---- foot of perpendicular (highlight in step 2/3) ----
+    // foot = P + t*(-3,4)/5 where t = distance signed
+    const s = (3*cx - 4*cy + k)/25;
+    const fx = cx - 3*s, fy = cy + 4*s;
+    if(mode>=2){
+      ctx.beginPath();
+      ctx.setLineDash([5,4]);
+      ctx.moveTo(sx(cx), sy(cy));
+      ctx.lineTo(sx(fx), sy(fy));
+      ctx.strokeStyle = '#7c3aed'; ctx.lineWidth = 2.5;
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#7c3aed'; ctx.font = 'bold 12px Segoe UI';
+      ctx.fillText('d = |k−7|/5', sx((cx+fx)/2)+8, sy((cy+fy)/2)-6);
+      // right angle marker
+      ctx.beginPath();
+      ctx.arc(sx(fx), sy(fy), 8, 0, Math.PI*2);
+      ctx.strokeStyle = '#7c3aed'; ctx.lineWidth = 1.5; ctx.stroke();
+    }
 
-  ctxA.beginPath();
-  ctxA.moveTo(p1.x, p1.y); ctxA.lineTo(p2.x, p2.y);
-  if (d <= C.r + 1e-9) {
-    ctxA.strokeStyle = '#059669';         // intersecting -> green
-  } else {
-    ctxA.strokeStyle = '#dc2626';         // missing -> red
-  }
-  ctxA.lineWidth = 2.5;
-  ctxA.stroke();
-}
+    // ---- centre ----
+    ctx.beginPath();
+    ctx.arc(sx(cx), sy(cy), 6, 0, Math.PI*2);
+    ctx.fillStyle = '#7c3aed'; ctx.fill();
+    ctx.fillStyle = '#4c1d95'; ctx.font = 'bold 14px Segoe UI';
+    ctx.fillText('P(−1, 1)', sx(cx)+10, sy(cy)-10);
 
-function drawIntersectionsA(k) {
-  // Solve 25x^2 + (6k+8)x + (k^2 - 8k - 112) = 0
-  const a = 25, b = 6 * k + 8, c = k * k - 8 * k - 112;
-  const disc = b * b - 4 * a * c;
-  if (disc < 0) return;
-  const sq = Math.sqrt(disc);
-  const xs = [(-b + sq) / (2 * a), (-b - sq) / (2 * a)];
-  xs.forEach(x => {
-    const y = (3 * x + k) / 4;
-    if (x < -12 || x > 12 || y < -7 || y > 7) return;
-    const p = w2sA(x, y);
-    ctxA.beginPath();
-    ctxA.arc(p.x, p.y, 7, 0, Math.PI * 2);
-    ctxA.fillStyle = '#f59e0b';
-    ctxA.fill();
-    ctxA.strokeStyle = '#b45309';
-    ctxA.lineWidth = 2;
-    ctxA.stroke();
-    ctxA.fillStyle = '#78350f';
-    ctxA.font = 'bold 12px monospace';
-    ctxA.fillText('(' + x.toFixed(2) + ', ' + y.toFixed(2) + ')', p.x + 10, p.y - 8);
-  });
-}
+    // ---- intersection points ----
+    if(hit){
+      // solve for points on the line at distance <= r
+      const t = Math.sqrt(Math.max(0, r*r - dist*dist));
+      // unit vector along line: (4,3)/5
+      const ex = 4/5, ey = 3/5;
+      const ix1 = fx + t*ex, iy1 = fy + t*ey;
+      const ix2 = fx - t*ex, iy2 = fy - t*ey;
+      [[ix1,iy1],[ix2,iy2]].forEach(([px,py])=>{
+        ctx.beginPath();
+        ctx.arc(sx(px), sy(py), 7, 0, Math.PI*2);
+        ctx.fillStyle = '#d97706'; ctx.fill();
+        ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+      });
+      // chord
+      ctx.beginPath();
+      ctx.moveTo(sx(ix1), sy(iy1));
+      ctx.lineTo(sx(ix2), sy(iy2));
+      ctx.strokeStyle = 'rgba(217,119,6,.85)'; ctx.lineWidth = (mode>=3)?5:3.5;
+      ctx.stroke();
+    }
 
-function drawCentreA() {
-  const c = w2sA(C.x, C.y);
-  ctxA.beginPath();
-  ctxA.arc(c.x, c.y, 5.5, 0, Math.PI * 2);
-  ctxA.fillStyle = '#1e40af';
-  ctxA.fill();
-  ctxA.fillStyle = '#1e40af';
-  ctxA.font = 'bold 12px sans-serif';
-  ctxA.fillText('C(-1, 1)', c.x + 10, c.y + 18);
-  // radius line to a fixed point on the circle
-  const rim = w2sA(C.x + C.r, C.y);
-  ctxA.beginPath();
-  ctxA.moveTo(c.x, c.y); ctxA.lineTo(rim.x, rim.y);
-  ctxA.strokeStyle = '#1e40af';
-  ctxA.lineWidth = 2;
-  ctxA.setLineDash([6, 4]);
-  ctxA.stroke();
-  ctxA.setLineDash([]);
-  ctxA.fillStyle = '#1e40af';
-  ctxA.font = 'italic bold 12px sans-serif';
-  ctxA.fillText('r = 3', (c.x + rim.x) / 2 - 12, (c.y + rim.y) / 2 - 6);
-}
-
-function updateA() {
-  const k = parseFloat(kSliderA.value);
-  kValA.textContent = k;
-  drawGridA();
-  drawCircleA();
-  if (showCentreA.checked) drawCentreA();
-  drawLineA(k);
-  if (showIntersectA.checked) drawIntersectionsA(k);
-
-  const d = Math.abs(k - 7) / 5;
-  const status = d <= C.r + 1e-9 ? 'INTERSECT ✔' : 'DO NOT INTERSECT ✘';
-  const disc = (6 * k + 8) ** 2 - 4 * 25 * (k * k - 8 * k - 112);
-  readoutA.innerHTML =
-    'k = <b>' + k.toFixed(1) + '</b> &nbsp;|&nbsp; ' +
-    'd = |k − 7| / 5 = <b>' + d.toFixed(3) + '</b> &nbsp;|&nbsp; ' +
-    'r = <b>3</b> &nbsp;|&nbsp; Δ = <b>' + disc.toFixed(0) + '</b> &nbsp;|&nbsp; ' +
-    status;
-}
-
-kSliderA.addEventListener('input', updateA);
-showCentreA.addEventListener('change', updateA);
-showIntersectA.addEventListener('change', updateA);
-
-/* ============================================================
-   CANVAS B — Number line of k, with Δ ≥ 0 region
-   ============================================================ */
-const cvB = document.getElementById('cvB');
-const ctxB = cvB.getContext('2d');
-const kSliderB = document.getElementById('kSliderB');
-const kValB = document.getElementById('kValB');
-const showRegionB = document.getElementById('showRegionB');
-const readoutB = document.getElementById('readoutB');
-
-const B_MIN = -30, B_MAX = 30;
-const B_X0 = 70, B_X1 = 780;
-const B_Y = 200;
-
-function kToScreenB(k) {
-  return B_X0 + ((k - B_MIN) / (B_MAX - B_MIN)) * (B_X1 - B_X0);
-}
-
-function updateB() {
-  const k = parseFloat(kSliderB.value);
-  kValB.textContent = k;
-
-  ctxB.clearRect(0, 0, cvB.width, cvB.height);
-
-  // baseline
-  ctxB.strokeStyle = '#94a3b8';
-  ctxB.lineWidth = 2;
-  ctxB.beginPath();
-  ctxB.moveTo(B_X0, B_Y); ctxB.lineTo(B_X1, B_Y);
-  ctxB.stroke();
-
-  // ticks every 5
-  ctxB.font = '12px monospace';
-  for (let t = B_MIN; t <= B_MAX; t += 5) {
-    const x = kToScreenB(t);
-    ctxB.beginPath();
-    ctxB.moveTo(x, B_Y - 6); ctxB.lineTo(x, B_Y + 6);
-    ctxB.strokeStyle = '#cbd5e1'; ctxB.stroke();
-    ctxB.fillStyle = '#64748b';
-    ctxB.fillText(t, x - 8, B_Y + 24);
+    // current k value box
+    ctx.fillStyle = 'rgba(255,255,255,.92)';
+    ctx.strokeStyle = '#dbe4f3';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect ? ctx.roundRect(10,10,150,30,8) : ctx.rect(10,10,150,30);
+    ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#1c2541'; ctx.font = 'bold 14px Segoe UI';
+    ctx.fillText('k = ' + k, 22, 31);
+    ctx.fillStyle = hit ? '#059669' : '#e11d48';
+    ctx.font = 'bold 12px Segoe UI';
+    ctx.fillText(hit ? 'intersecting' : 'no intersection', 62, 31);
   }
 
-  // callout: ±8, 22
-  const labels = [
-    { k: -8, color: '#059669', label: 'k = −8' },
-    { k: 22, color: '#059669', label: 'k = 22' }
-  ];
-  labels.forEach(o => {
-    const x = kToScreenB(o.k);
-    ctxB.beginPath();
-    ctxB.moveTo(x, B_Y - 30); ctxB.lineTo(x, B_Y);
-    ctxB.strokeStyle = o.color;
-    ctxB.lineWidth = 2;
-    ctxB.setLineDash([4, 3]);
-    ctxB.stroke();
-    ctxB.setLineDash([]);
-    ctxB.beginPath();
-    ctxB.arc(x, B_Y, 5, 0, Math.PI * 2);
-    ctxB.fillStyle = o.color;
-    ctxB.fill();
-    ctxB.fillStyle = o.color;
-    ctxB.font = 'bold 12px monospace';
-    ctxB.fillText(o.label, x - 22, B_Y - 38);
-  });
+  // ---- scroll sync ----
+  const steps = Array.from(document.querySelectorAll('.step'));
+  const obs = new IntersectionObserver((es)=>{
+    es.forEach(e=>{
+      if(e.isIntersecting){
+        const m = +e.target.dataset.step;
+        mode = m;
+        steps.forEach(st=>st.classList.toggle('active', st===e.target));
+        if(m===2||m===3){ k = 7; slider.value = 7; }
+        if(m===4){ k = 22; slider.value = 22; }
+        draw();
+      }
+    });
+  },{rootMargin:'-15% 0px -55% 0px',threshold:0});
+  steps.forEach(st=>obs.observe(st));
 
-  // shaded valid region [-8, 22]
-  if (showRegionB.checked) {
-    const x1 = kToScreenB(-8), x2 = kToScreenB(22);
-    const grad = ctxB.createLinearGradient(x1, 0, x2, 0);
-    grad.addColorStop(0, 'rgba(5, 150, 105, 0.10)');
-    grad.addColorStop(0.5, 'rgba(5, 150, 105, 0.30)');
-    grad.addColorStop(1, 'rgba(5, 150, 105, 0.10)');
-    ctxB.fillStyle = grad;
-    ctxB.fillRect(x1, B_Y - 55, x2 - x1, 55);
-
-    ctxB.fillStyle = '#065f46';
-    ctxB.font = 'bold 14px sans-serif';
-    ctxB.fillText('Valid k: −8 ≤ k ≤ 22  (Δ ≥ 0)', (x1 + x2) / 2 - 120, B_Y - 68);
-
-    // boundary labels
-    ctxB.fillStyle = '#065f46';
-    ctxB.font = '11px sans-serif';
-    ctxB.fillText('Δ < 0', kToScreenB(-27) - 10, B_Y - 14);
-    ctxB.fillText('Δ < 0', kToScreenB(27) - 10, B_Y - 14);
-  }
-
-  // current k marker
-  const xk = kToScreenB(k);
-  ctxB.beginPath();
-  ctxB.moveTo(xk, B_Y - 34); ctxB.lineTo(xk - 9, B_Y - 50);
-  ctxB.lineTo(xk + 9, B_Y - 50);
-  ctxB.closePath();
-  ctxB.fillStyle = '#2563eb';
-  ctxB.fill();
-  ctxB.fillStyle = '#1e3a8a';
-  ctxB.font = 'bold 14px monospace';
-  ctxB.fillText('k = ' + k.toFixed(1), xk - 24, B_Y - 56);
-
-  // discriminant readout
-  const disc = -64 * k * k + 896 * k + 11264;
-  const ok = disc >= 0;
-  ctxB.fillStyle = ok ? '#059669' : '#dc2626';
-  ctxB.font = 'bold 13px monospace';
-  ctxB.fillText((ok ? 'Δ = ' : 'Δ = ') + disc.toFixed(0) + (ok ? '  ≥ 0 ✔' : '  < 0 ✘'),
-                xk - 45, B_Y + 52);
-
-  // summary banner
-  readoutB.innerHTML =
-    'k = <b>' + k.toFixed(1) + '</b> &nbsp;|&nbsp; ' +
-    'Δ = <b>' + disc.toFixed(0) + '</b> &nbsp;|&nbsp; ' +
-    (ok ? 'line meets circle at 2 points ✔' : 'line misses the circle ✘');
-}
-
-kSliderB.addEventListener('input', updateB);
-showRegionB.addEventListener('change', updateB);
-
-/* ============================================================
-   INITIAL DRAW
-   ============================================================ */
-window.addEventListener('load', () => { updateA(); updateB(); });
-updateA();
-updateB();
+  steps[0] && steps[0].classList.add('active');
+  draw();
+})();
 </script>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
-
 </body>
 </html>

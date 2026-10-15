@@ -1,1103 +1,397 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>HKDSE 2022 Paper 2 · Q24 — Coordinate Geometry</title>
-
-<!-- MathJax -->
-<script>
-  window.MathJax = {
-    tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['\\[', '\\]']] },
-    svg: { fontCache: 'global' }
-  };
-</script>
-<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2022 Paper 2 Q24 — Coordinate Geometry</title>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
-  :root {
-    --blue: #1d4ed8;
-    --blue-dark: #1e3a8a;
-    --amber: #f59e0b;
-    --amber-soft: #fef3c7;
-    --emerald: #059669;
-    --emerald-soft: #d1fae5;
-    --ink: #1f2937;
-    --muted: #6b7280;
-    --line: #e5e7eb;
-    --card: #ffffff;
-    --bg: #f4f6fb;
+  :root{
+    --blue:#2563eb; --red:#e11d48; --green:#059669; --amber:#d97706;
+    --purple:#7c3aed; --ink:#1e293b; --muted:#64748b; --bg:#f1f5f9;
   }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-    background: var(--bg);
-    color: var(--ink);
-    line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
+  *{box-sizing:border-box;}
+  body{
+    margin:0; padding:14px; background:var(--bg); color:var(--ink);
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    line-height:1.5;
   }
-  .wrap { max-width: 1000px; margin: 0 auto; padding: 0 16px 60px; }
-
-  /* ---------- HERO ---------- */
-  .hero {
-    background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 45%, #0ea5e9 100%);
-    color: #fff;
-    padding: 42px 16px 52px;
-    position: relative;
-    overflow: hidden;
+  .split{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    gap:12px;
+    align-items:start;
   }
-  .hero::after {
-    content: "";
-    position: absolute;
-    width: 420px; height: 420px;
-    right: -140px; top: -180px;
-    background: radial-gradient(circle, rgba(255,255,255,.22), transparent 70%);
-    border-radius: 50%;
+  @media(min-width:900px){
+    .split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}
   }
-  .hero-inner { max-width: 1000px; margin: 0 auto; position: relative; z-index: 2; }
-  .eyebrow {
-    font-size: .78rem; letter-spacing: .16em; text-transform: uppercase;
-    opacity: .85; font-weight: 700;
+  .panel{
+    background:#fff; border-radius:16px; padding:14px;
+    box-shadow:0 6px 20px rgba(15,23,42,.08);
   }
-  .hero h1 {
-    margin: 8px 0 4px; font-size: clamp(1.5rem, 4vw, 2.3rem); font-weight: 800;
-    letter-spacing: -.02em;
+  .diagram{
+    position:sticky; top:16px;
+    max-height:calc(100vh - 2rem);
+    overflow-y:auto;
   }
-  .hero .subtitle { font-size: 1.02rem; opacity: .95; margin-bottom: 18px; }
-  .pills { display: flex; flex-wrap: wrap; gap: 8px; }
-  .pill {
-    background: rgba(255,255,255,.18);
-    border: 1px solid rgba(255,255,255,.35);
-    padding: 5px 13px; border-radius: 999px;
-    font-size: .78rem; font-weight: 600; backdrop-filter: blur(4px);
+  canvas{width:100%; height:auto; display:block; border-radius:12px; background:#fbfdff;}
+  .legend{
+    display:flex; flex-wrap:wrap; gap:8px 14px; margin-top:10px;
+    font-size:12px; color:var(--muted);
   }
-
-  /* ---------- CARDS ---------- */
-  .card {
-    background: var(--card);
-    border-radius: 16px;
-    box-shadow: 0 6px 24px rgba(30,58,138,.08), 0 1px 3px rgba(0,0,0,.04);
-    padding: 24px 26px;
-    margin-top: 26px;
-    border: 1px solid rgba(229,231,235,.9);
+  .legend span{display:flex; align-items:center; gap:5px;}
+  .swatch{width:14px; height:4px; border-radius:2px; display:inline-block;}
+  .title{font-size:15px; font-weight:700; margin:0 0 8px; color:var(--ink);}
+  h1{font-size:17px; margin:0 0 4px;}
+  .qtext{font-size:15px; margin:8px 0 0;}
+  .qbox{
+    background:#eff6ff; border-left:5px solid var(--blue);
+    border-radius:10px; padding:10px 12px; margin-top:8px; font-size:15px;
   }
-  .card h2 {
-    margin: 0 0 14px;
-    font-size: 1.18rem;
-    color: var(--blue-dark);
-    display: flex; align-items: center; gap: 10px;
-    font-weight: 800;
+  .step{
+    border:1.5px solid #e2e8f0; border-radius:12px; padding:10px 12px;
+    margin-top:12px; background:#fff; transition:.25s;
   }
-  .card h2 .num {
-    background: var(--blue);
-    color: #fff;
-    min-width: 30px; height: 30px;
-    border-radius: 9px;
-    display: inline-flex; align-items: center; justify-content: center;
-    font-size: .95rem; font-weight: 800;
-    box-shadow: 0 3px 8px rgba(29,78,216,.35);
+  .step.active{
+    border-color:var(--blue); background:#f8faff;
+    box-shadow:0 0 0 3px rgba(37,99,235,.10);
   }
-  .marks-tag {
-    margin-left: auto;
-    background: #fff7ed;
-    color: #b45309;
-    border: 1px solid #fcd34d;
-    font-size: .72rem; font-weight: 700;
-    padding: 2px 9px; border-radius: 999px;
+  .tag{
+    display:inline-block; font-size:11.5px; font-weight:800; letter-spacing:.04em;
+    color:#fff; background:var(--blue); padding:3px 9px; border-radius:999px;
+    margin-bottom:6px;
   }
-  .qtext { font-size: 1.02rem; }
-  .qtext ol { padding-left: 22px; }
-
-  /* ---------- STEPS ---------- */
-  .step {
-    display: none;
-    border-left: 4px solid var(--blue);
-    background: #f8fafc;
-    border-radius: 0 12px 12px 0;
-    padding: 14px 18px;
-    margin-top: 14px;
-    animation: slideIn .35s ease;
+  .step:nth-child(odd) .tag{background:var(--purple);}
+  .step p{margin:5px 0; font-size:14.5px;}
+  .ans{
+    margin-top:14px; background:linear-gradient(135deg,#ecfdf5,#d1fae5);
+    border:1.5px solid var(--green); border-radius:12px; padding:10px 12px;
+    font-weight:700; color:#065f46;
   }
-  .step.visible { display: block; }
-  @keyframes slideIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to   { opacity: 1; transform: translateY(0); }
+  .hint{
+    margin-top:12px; background:#fffbeb; border-left:5px solid var(--amber);
+    border-radius:10px; padding:9px 12px; font-size:13.5px; color:#78350f;
   }
-  .step-head {
-    display: flex; align-items: center; gap: 9px; margin-bottom: 8px;
-    flex-wrap: wrap;
-  }
-  .badge-step {
-    background: var(--blue); color: #fff; font-weight: 700;
-    font-size: .74rem; padding: 3px 10px; border-radius: 999px;
-  }
-  .badge-m {
-    background: #ede9fe; color: #5b21b6; border: 1px solid #c4b5fd;
-    font-size: .7rem; font-weight: 700; padding: 2px 8px; border-radius: 999px;
-  }
-  .badge-a {
-    background: #fce7f3; color: #9d174d; border: 1px solid #f9a8d4;
-    font-size: .7rem; font-weight: 700; padding: 2px 8px; border-radius: 999px;
-  }
-  .hint {
-    background: var(--amber-soft);
-    border-left: 4px solid var(--amber);
-    padding: 9px 14px;
-    border-radius: 0 8px 8px 0;
-    margin-top: 10px;
-    font-size: .92rem;
-  }
-  .hint strong { color: #92400e; }
-  .answer {
-    background: var(--emerald-soft);
-    border-left: 4px solid var(--emerald);
-    padding: 9px 14px;
-    border-radius: 0 8px 8px 0;
-    margin-top: 10px;
-    font-size: .95rem;
-    font-weight: 600;
-    color: #065f46;
-  }
-
-  /* ---------- CONTROL BAR ---------- */
-  .controls {
-    display: flex; align-items: center; gap: 14px;
-    margin-top: 16px; flex-wrap: wrap;
-  }
-  .btn {
-    background: linear-gradient(135deg, #1d4ed8, #2563eb);
-    color: #fff; border: none;
-    padding: 10px 20px; border-radius: 10px;
-    font-size: .9rem; font-weight: 700; cursor: pointer;
-    box-shadow: 0 4px 12px rgba(29,78,216,.32);
-    transition: transform .15s, box-shadow .15s, opacity .2s;
-    font-family: inherit;
-  }
-  .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(29,78,216,.4); }
-  .btn:disabled {
-    background: #cbd5e1; box-shadow: none; cursor: not-allowed; color: #64748b;
-  }
-  .counter {
-    font-size: .82rem; font-weight: 700; color: var(--muted);
-    background: #f1f5f9; padding: 5px 12px; border-radius: 999px;
-  }
-
-  /* ---------- CANVAS ---------- */
-  .canvas-wrap {
-    background: #fbfdff;
-    border: 1px solid #dbeafe;
-    border-radius: 12px;
-    padding: 10px;
-    margin: 14px 0 6px;
-    overflow: hidden;
-  }
-  canvas { width: 100%; display: block; border-radius: 8px; }
-  .slider-row {
-    display: flex; align-items: center; gap: 12px;
-    margin: 8px 0; flex-wrap: wrap;
-  }
-  .slider-row label { font-size: .86rem; font-weight: 700; color: var(--blue-dark); min-width: 120px; }
-  input[type=range] {
-    -webkit-appearance: none; appearance: none;
-    flex: 1; min-width: 150px; height: 6px; border-radius: 6px;
-    background: linear-gradient(90deg, #93c5fd, #1d4ed8);
-    outline: none;
-  }
-  input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none; appearance: none;
-    width: 20px; height: 20px; border-radius: 50%;
-    background: #fff; border: 3px solid #1d4ed8;
-    cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,.25);
-  }
-  input[type=range]::-moz-range-thumb {
-    width: 18px; height: 18px; border-radius: 50%;
-    background: #fff; border: 3px solid #1d4ed8; cursor: pointer;
-  }
-  .val-chip {
-    font-family: "Consolas", monospace; font-weight: 700;
-    background: #eff6ff; color: var(--blue-dark);
-    border: 1px solid #bfdbfe; border-radius: 8px;
-    padding: 2px 10px; font-size: .85rem; min-width: 58px; text-align: center;
-  }
-  .toggle-row { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 8px; font-size: .86rem; }
-  .toggle-row label { display: flex; align-items: center; gap: 7px; font-weight: 600; cursor: pointer; }
-  .toggle-row input[type=checkbox] { width: 17px; height: 17px; accent-color: var(--blue); cursor: pointer; }
-
-  /* ---------- READOUTS ---------- */
-  .readouts {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 10px; margin-top: 12px;
-  }
-  .readout {
-    background: #f8fafc; border: 1px solid var(--line);
-    border-radius: 10px; padding: 8px 12px;
-  }
-  .readout .k { font-size: .68rem; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 700; }
-  .readout .v { font-family: "Consolas", monospace; font-size: 1rem; font-weight: 700; color: var(--blue-dark); }
-
-  /* ---------- SUMMARY ---------- */
-  .summary {
-    background: linear-gradient(140deg, #0f172a, #1e293b);
-    color: #e2e8f0;
-    border-radius: 16px;
-    padding: 26px 28px;
-    margin-top: 26px;
-    box-shadow: 0 10px 32px rgba(15,23,42,.35);
-  }
-  .summary h2 { color: #fff; margin: 0 0 16px; font-size: 1.2rem; display: flex; gap: 10px; align-items: center; }
-  .summary h2 .num { background: var(--amber); color: #1f2937; }
-  .summary ul { list-style: none; padding: 0; margin: 0; }
-  .summary li {
-    padding: 9px 0 9px 26px;
-    position: relative;
-    border-bottom: 1px dashed rgba(148,163,184,.25);
-    font-size: .96rem;
-  }
-  .summary li:last-child { border-bottom: none; }
-  .summary li::before {
-    content: "✓";
-    position: absolute; left: 0; top: 9px;
-    color: #34d399; font-weight: 900;
-  }
-  .summary strong { color: #fbbf24; }
-
-  footer {
-    text-align: center; color: var(--muted);
-    font-size: .82rem; margin-top: 36px; padding-top: 18px;
-    border-top: 1px solid var(--line);
-  }
-
-  .mc-options {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-    gap: 10px; margin-top: 14px;
-  }
-  .mc-opt {
-    background: #f8fafc; border: 2px solid var(--line);
-    border-radius: 10px; padding: 9px 12px; font-weight: 700;
-    text-align: center; font-size: .92rem;
-    transition: all .25s;
-  }
-  .mc-opt.correct {
-    background: var(--emerald-soft); border-color: var(--emerald);
-    color: #065f46; box-shadow: 0 0 0 3px rgba(5,150,105,.15);
-  }
-  .mc-opt span { display: block; font-weight: 500; font-size: .78rem; color: var(--muted); margin-top: 2px; }
-
-  .note { font-size: .88rem; color: var(--muted); margin-top: 8px; }
-  .kbd { background:#eef2ff; border:1px solid #c7d2fe; border-radius:6px; padding:1px 7px; font-family:"Consolas",monospace; font-size:.85rem; }
-  @media (max-width: 600px) {
-    .card { padding: 18px 16px; }
-    .hero { padding: 32px 16px 40px; }
+  .chk{color:var(--green); font-weight:800;}
+  .xmark{color:var(--red); font-weight:800;}
+  mjx-container{font-size:102% !important;}
+  @media(max-width:520px){
+    body{padding:8px;}
+    .panel{padding:10px; border-radius:12px;}
+    .qtext,.qbox{font-size:13px;}
+    .step p{font-size:12.5px;}
+    h1{font-size:14px;}
   }
 </style>
 </head>
 <body>
+<div class="split">
 
-<!-- ============ HERO ============ -->
-<header class="hero">
-  <div class="hero-inner">
-    <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</div>
-    <h1>2022 Paper 2 · Question 24</h1>
-    <p class="subtitle">Straight Lines · Intercepts and Slope from a Graph</p>
-    <div class="pills">
-      <span class="pill">Equation of a Straight Line</span>
-      <span class="pill">x-intercept / y-intercept</span>
-      <span class="pill">Slope Comparison</span>
-      <span class="pill">Signs of m and n</span>
-    </div>
-  </div>
-</header>
-
-<div class="wrap">
-
-  <!-- ============ QUESTION ============ -->
-  <section class="card">
-    <h2><span class="num">Q</span> The Question <span class="marks-tag">Multiple Choice</span></h2>
-    <div class="qtext">
-      <p>The figure shows the graph of the straight line \(mx+ny=3\).</p>
-      <p>Which of the following are true?</p>
-      <ol type="I">
-        <li>\(m&lt;0\)</li>
-        <li>\(n&gt;3\)</li>
-        <li>\(m+n&gt;0\)</li>
-      </ol>
-      <div class="mc-options">
-        <div class="mc-opt" id="optA">A<span>I and II only</span></div>
-        <div class="mc-opt" id="optB">B<span>I and III only</span></div>
-        <div class="mc-opt" id="optC">C<span>II and III only</span></div>
-        <div class="mc-opt" id="optD">D<span>I, II and III</span></div>
-      </div>
-    </div>
-  </section>
-<section style="margin:16px 0;padding:16px;background:var(--bg,#fff);border:1px solid #e2e8f0;border-radius:10px;">
-  <h2 style="font-size:1rem;font-weight:600;margin:0 0 10px;color:var(--fg,#1a1a1a);">Original Figure</h2>
-  <div style="text-align:center;">
-    <img src="figures/2022_P2_24.png" alt="Original figure" style="max-width:100%;height:auto;border-radius:6px;">
-  </div>
-</section>
-
-
-  <!-- ============ INTERACTIVE EXPLORER ============ -->
-  <section class="card">
-    <h2><span class="num">★</span> Interactive Exploration of \(mx+ny=3\)</h2>
-    <p class="note">Move the sliders for \(m\) and \(n\) and watch how the graph of \(mx+ny=3\) behaves. Keep the <strong>sign conditions from the given figure</strong> in mind:
-      a <em>negative</em> x-intercept, a <em>positive</em> y-intercept <em>less than 1</em>, and a slope less than \(1\).</p>
-
-    <div class="slider-row">
-      <label for="mSlider">\(m =\)</label>
-      <input type="range" id="mSlider" min="-6" max="6" step="0.1" value="-3" />
-      <span class="val-chip" id="mVal">-3.0</span>
-    </div>
-    <div class="slider-row">
-      <label for="nSlider">\(n =\)</label>
-      <input type="range" id="nSlider" min="-6" max="10" step="0.1" value="4" />
-      <span class="val-chip" id="nVal">4.0</span>
-    </div>
-
-    <div class="toggle-row">
-      <label><input type="checkbox" id="showX" checked /> Show x-intercept</label>
-      <label><input type="checkbox" id="showY" checked /> Show y-intercept</label>
-      <label><input type="checkbox" id="showRef" checked /> Show reference line through \((-1,0)\) &amp; \((0,1)\)</label>
-      <label><input type="checkbox" id="showRegion" /> Shade valid region</label>
-    </div>
-
-    <div class="canvas-wrap">
-      <canvas id="exploreCanvas" width="900" height="520"></canvas>
-    </div>
-
-    <div class="readouts">
-      <div class="readout"><div class="k">x-intercept = 3/m</div><div class="v" id="rX">-1.00</div></div>
-      <div class="readout"><div class="k">y-intercept = 3/n</div><div class="v" id="rY">0.75</div></div>
-      <div class="readout"><div class="k">Slope = −m/n</div><div class="v" id="rS">0.75</div></div>
-      <div class="readout"><div class="k">m + n</div><div class="v" id="rMN">1.00</div></div>
-    </div>
-    <p class="note" id="statusMsg">Adjust sliders — the sign conditions I, II, III are checked live.</p>
-  </section>
-
-  <!-- ============ PART I ============ -->
-  <section class="card">
-    <h2><span class="num">I</span> Statement I — Is \(m&lt;0\)? </h2>
-
-    <div class="canvas-wrap">
-      <canvas id="canvasI" width="900" height="420"></canvas>
-    </div>
-
-    <div class="controls">
-      <button class="btn" data-target="partI">Next step →</button>
-      <span class="counter" id="cnt-partI">0 / 2</span>
-    </div>
-
-    <!-- Step 1 -->
-    <div class="step" data-part="partI">
-      <div class="step-head">
-        <span class="badge-step">Step 1</span>
-        
-      </div>
-      <p>From the graph, line \(L: mx+ny=3\) cuts the \(x\)-axis at a <strong>negative</strong> value (to the left of \(O\)).</p>
-      <div>\[ \text{x-intercept} = \frac{3}{m} \quad\text{and it is negative.} \]</div>
-      <div class="hint"><strong>Hint:</strong> Set \(y=0\): \(mx=3 \Rightarrow x=\dfrac{3}{m}\). If this is negative, the numerator \(3\) and denominator \(m\) must have opposite signs.</div>
-      <div>\[ \frac{3}{m} &lt; 0 \;\Longrightarrow\; m &lt; 0 \]</div>
-    </div>
-
-    <!-- Step 2 -->
-    <div class="step" data-part="partI">
-      <div class="step-head">
-        <span class="badge-step">Step 2</span>
-        
-      </div>
-      <p>Since \(3&gt;0\), the inequality \(\dfrac{3}{m}&lt;0\) forces \(m\) to be negative.</p>
-      <div class="answer">Statement I is TRUE: \(m &lt; 0\).</div>
+  <!-- ================= LEFT : DIAGRAM ================= -->
+  <section class="panel diagram">
+    <p class="title">Graph of the straight line \(mx+ny=3\)</p>
+    <canvas id="cv" width="720" height="560"></canvas>
+    <div class="legend">
+      <span><i class="swatch" style="background:#2563eb"></i>Line \(L:mx+ny=3\)</span>
+      <span><i class="swatch" style="background:#e11d48"></i>x-intercept (negative)</span>
+      <span><i class="swatch" style="background:#059669"></i>y-intercept \((0,\tfrac3n)\)</span>
+      <span><i class="swatch" style="background:#7c3aed"></i>Slope triangle</span>
+      <span><i class="swatch" style="background:#d97706"></i>Reference line (−1,0)→(0,1)</span>
     </div>
   </section>
 
-  <!-- ============ PART II ============ -->
-  <section class="card">
-    <h2><span class="num">II</span> Statement II — Is \(n&gt;3\)? </h2>
+  <!-- ================= RIGHT : SOLUTION ================= -->
+  <section class="panel">
+    <h1>HKDSE 2022 Paper 2 · Q24</h1>
+    <p class="qtext">
+      The figure shows the graph of the straight line \(mx+ny=3\).
+      Which of the following are true?
+    </p>
+    <div class="qbox">
+      I. &nbsp; \(m&lt;0\) <br>
+      II. &nbsp;\(n&gt;3\) <br>
+      III. The slope of the line is smaller than the slope of the straight line
+      passing through \((-1,0)\) and \((0,1)\). <br>
+      A. I and II only &nbsp;&nbsp; B. I and III only &nbsp;&nbsp;
+      C. II and III only &nbsp;&nbsp; D. I, II and III
+    </div>
+    <!-- FIGURE_HERE -->
 
-    <div class="canvas-wrap">
-      <canvas id="canvasII" width="900" height="440"></canvas>
+    <div class="step" data-step="0">
+      <span class="tag">STEP 1 · Read the graph</span>
+      <p>Denote the line \(mx+ny=3\) by \(L\).</p>
+      <p>From the figure: \(L\) cuts the <b>negative</b> \(x\)-axis
+         (a negative \(x\)-intercept) and cuts the <b>positive</b> \(y\)-axis at a
+         point <b>below</b> \(1\). The line rises to the right, but gently.</p>
+      <p>So we need: \(\dfrac{3}{m}&lt;0\), \(\dfrac{3}{n}&gt;0\) and \(\dfrac{3}{n}&lt;1\).</p>
     </div>
 
-    <div class="slider-row">
-      <label for="nSliderII">Change \(n\):</label>
-      <input type="range" id="nSliderII" min="0.5" max="8" step="0.1" value="4" />
-      <span class="val-chip" id="nValII">4.0</span>
+    <div class="step" data-step="1">
+      <span class="tag">STEP 2 · Test statement I</span>
+      <p>Set \(y=0\): \(\;mx=3\Rightarrow x=\dfrac{3}{m}\).</p>
+      <p>\(L\) has a negative \(x\)-intercept:</p>
+      <p>$$\frac{3}{m}&lt;0 \;\Rightarrow\; m&lt;0$$</p>
+      <p><span class="chk">✓ Statement I is TRUE.</span></p>
     </div>
 
-    <div class="controls">
-      <button class="btn" data-target="partII">Next step →</button>
-      <span class="counter" id="cnt-partII">0 / 3</span>
+    <div class="step" data-step="2">
+      <span class="tag">STEP 3 · Test statement II</span>
+      <p>Set \(x=0\): \(\;ny=3\Rightarrow y=\dfrac{3}{n}\).</p>
+      <p>\(L\) has a positive \(y\)-intercept: \(\dfrac{3}{n}&gt;0\Rightarrow n&gt;0\).</p>
+      <p>That \(y\)-intercept is smaller than \(1\):</p>
+      <p>$$\frac{3}{n}&lt;1 \;\Rightarrow\; 3&lt;n \;\Rightarrow\; n&gt;3$$</p>
+      <p><span class="chk">✓ Statement II is TRUE.</span></p>
     </div>
 
-    <!-- Step 1 -->
-    <div class="step" data-part="partII">
-      <div class="step-head">
-        <span class="badge-step">Step 1</span>
-        
-      </div>
-      <p>The graph shows the line crossing the positive \(y\)-axis at a value <strong>smaller than \(1\)</strong>.</p>
-      <div>\[ \text{y-intercept} = \frac{3}{n} \quad\text{with } 0 &lt; \frac{3}{n} &lt; 1. \]</div>
-      <div class="hint"><strong>Hint:</strong> Setting \(x=0\) gives \(ny=3\), so \(y=\dfrac{3}{n}\). The graph shows this value is positive but less than 1.</div>
+    <div class="step" data-step="3">
+      <span class="tag">STEP 4 · Test statement III</span>
+      <p>Slope of \(L\) is \(-\dfrac{m}{n}\).</p>
+      <p>Slope of the line through \((-1,0)\) and \((0,1)\) is
+         \(\dfrac{1-0}{0-(-1)}=1\).</p>
+      <p>Condition “slope of \(L\) smaller than \(1\)”:</p>
+      <p>$$-\frac{m}{n}&lt;1 \;\Rightarrow\; -m&lt;n \;\Rightarrow\; m+n&gt;0$$</p>
+      <p>But \(m&lt;0\) and \(n&gt;0\) give no fixed sign of \(m+n\).
+         For example \(m=-5,\;n=1\) gives \(m+n=-4&lt;0\), which is <b>impossible</b>
+         to decide from the figure alone.</p>
+      <p><span class="xmark">✗ Statement III is NOT necessarily true.</span></p>
     </div>
 
-    <!-- Step 2 -->
-    <div class="step" data-part="partII">
-      <div class="step-head">
-        <span class="badge-step">Step 2</span>
-        
-      </div>
-      <p>Because \(\dfrac{3}{n}&gt;0\), we get \(n&gt;0\). Multiply the upper bound by \(n\) (positive, so the inequality direction is preserved):</p>
-      <div>\[ \frac{3}{n} &lt; 1 \;\Longrightarrow\; 3 &lt; n \quad (n&gt;0) \]</div>
+    <div class="step" data-step="4">
+      <span class="tag">STEP 5 · Conclusion</span>
+      <p>Only statements I and II are true.</p>
+      <div class="ans">Answer: A (I and II only)</div>
     </div>
 
-    <!-- Step 3 -->
-    <div class="step" data-part="partII">
-      <div class="step-head">
-        <span class="badge-step">Step 3</span>
-        
-      </div>
-      <p>Combining both facts: \(n&gt;0\) and \(n&gt;3\), so \(n&gt;3\).</p>
-      <div class="answer">Statement II is TRUE: \(n &gt; 3\).</div>
-    </div>
-  </section>
-
-  <!-- ============ PART III ============ -->
-  <section class="card">
-    <h2><span class="num">III</span> Statement III — Is \(m+n&gt;0\)? </h2>
-
-    <div class="canvas-wrap">
-      <canvas id="canvasIII" width="900" height="460"></canvas>
-    </div>
-
-    <div class="toggle-row">
-      <label><input type="checkbox" id="showSlopeComp" checked /> Show slope comparison</label>
-      <label><input type="checkbox" id="showTriangle" checked /> Show rise/run triangle</label>
-    </div>
-
-    <div class="controls">
-      <button class="btn" data-target="partIII">Next step →</button>
-      <span class="counter" id="cnt-partIII">0 / 3</span>
-    </div>
-
-    <!-- Step 1 -->
-    <div class="step" data-part="partIII">
-      <div class="step-head">
-        <span class="badge-step">Step 1</span>
-        
-      </div>
-      <p>Rewrite \(mx+ny=3\) as \(y=-\dfrac{m}{n}x+\dfrac{3}{n}\), so the slope of \(L\) is \(-\dfrac{m}{n}\).</p>
-      <div>\[ \text{slope of } L = -\frac{m}{n} \]</div>
-      <div class="hint"><strong>Hint:</strong> From the graph, the slope of \(L\) is smaller than the slope of the line through \((-1,0)\) and \((0,1)\), which is \(\dfrac{1-0}{0-(-1)}=1\).</div>
-    </div>
-
-    <!-- Step 2 -->
-    <div class="step" data-part="partIII">
-      <div class="step-head">
-        <span class="badge-step">Step 2</span>
-        
-      </div>
-      <p>Since \(L\) is less steep than the reference line of slope \(1\):</p>
-      <div>\[ -\frac{m}{n} &lt; \frac{1-0}{0-(-1)} = 1 \]</div>
-      <p>Multiply both sides by \(n&gt;0\) (already established in Part II):</p>
-      <div>\[ -m &lt; n \;\Longrightarrow\; m+n &gt; 0 \]</div>
-    </div>
-
-    <!-- Step 3 -->
-    <div class="step" data-part="partIII">
-      <div class="step-head">
-        <span class="badge-step">Step 3</span>
-        
-      </div>
-      <p>Rearranging gives \(m+n&gt;0\).</p>
-      <div class="answer">Statement III is TRUE: \(m+n &gt; 0\).</div>
+    <div class="hint">
+      <b>Hint:</b> Read intercepts off the graph in terms of \(m\) and \(n\)
+      (\(x\)-intercept \(=\frac{3}{m}\), \(y\)-intercept \(=\frac{3}{n}\)), then
+      convert each picture clue into an inequality.
     </div>
   </section>
-
-  <!-- ============ SUMMARY ============ -->
-  <section class="summary">
-    <h2><span class="num"></span> Final Answer &amp; Summary</h2>
-    <ul>
-      <li><strong>I.</strong> \(m&lt;0\) — TRUE (negative x-intercept \(\Rightarrow \tfrac{3}{m}&lt;0\))</li>
-      <li><strong>II.</strong> \(n&gt;3\) — TRUE (y-intercept \(0&lt;\tfrac{3}{n}&lt;1 \Rightarrow n&gt;3\))</li>
-      <li><strong>III.</strong> \(m+n&gt;0\) — TRUE (slope \(-\tfrac{m}{n}&lt;1 \Rightarrow m+n&gt;0\))</li>
-      <li><strong>Conclusion:</strong> All three statements are true. Answer is <strong>A — I, II and III</strong>.</li>
-    </ul>
-  </section>
-
-  <footer>
-    HKDSE Mathematics (Compulsory Part) · 2022 Paper 2 Q24 · Interactive Solution
-  </footer>
 </div>
 
 <script>
-/* ============================================================
-   SHARED CANVAS HELPERS
-   ============================================================ */
-function setupHiDPI(canvas) {
-  const dpr = window.devicePixelRatio || 1;
-  const rect = canvas.getBoundingClientRect();
-  const w = rect.width || canvas.width;
-  const h = canvas.height * (w / canvas.width);
-  canvas.width = w * dpr;
-  canvas.height = h * dpr;
-  canvas.style.height = h + "px";
-  const ctx = canvas.getContext("2d");
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  return { ctx, w, h };
-}
+(function(){
+  const canvas=document.getElementById('cv');
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width, H=canvas.height;
+  let mode=0;
 
-function makeMapper(w, h, xMin, xMax, yMin, yMax) {
-  const padL = 52, padR = 22, padT = 22, padB = 40;
-  const plotW = w - padL - padR;
-  const plotH = h - padT - padB;
-  const sx = plotW / (xMax - xMin);
-  const sy = plotH / (yMax - yMin);
-  const s = Math.min(sx, sy);
-  const ox = padL + (plotW - s * (xMax - xMin)) / 2;
-  const oy = padT + (plotH - s * (yMax - yMin)) / 2;
-  return {
-    X: x => ox + (x - xMin) * s,
-    Y: y => oy + (yMax - y) * s,
-    s,
-    xMin, xMax, yMin, yMax, w, h, ox, oy
-  };
-}
+  // ---------- coordinate system ----------
+  // world: x from -2.6 .. 2.2 ; y from -1.4 .. 2.6
+  const xMin=-2.6, xMax=2.2, yMin=-1.4, yMax=2.6;
+  const padL=70, padR=45, padT=45, padB=60;
+  const plotW=W-padL-padR, plotH=H-padT-padB;
+  const sx=plotW/(xMax-xMin), sy=plotH/(yMax-yMin);
+  const S=Math.min(sx,sy);           // uniform scale
+  const ox=padL+(0-xMin)*sx;
+  const oy=padT+(yMax-0)*sy;
 
-function drawGrid(ctx, m, stepX = 1, stepY = 1) {
-  ctx.save();
-  ctx.strokeStyle = "#e2e8f0";
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  const x0 = Math.ceil(m.xMin / stepX) * stepX;
-  for (let x = x0; x <= m.xMax; x += stepX) {
-    const px = m.X(x), py0 = m.Y(m.yMin), py1 = m.Y(m.yMax);
-    ctx.moveTo(px, py0); ctx.lineTo(px, py1);
-  }
-  const y0 = Math.ceil(m.yMin / stepY) * stepY;
-  for (let y = y0; y <= m.yMax; y += stepY) {
-    const py = m.Y(y), px0 = m.X(m.xMin), px1 = m.X(m.xMax);
-    ctx.moveTo(px0, py); ctx.lineTo(px1, py);
-  }
-  ctx.stroke();
-  ctx.restore();
-}
+  const X=v=>ox+v*S;
+  const Y=v=>oy-v*S;
 
-function drawAxes(ctx, m) {
-  ctx.save();
-  ctx.strokeStyle = "#334155";
-  ctx.lineWidth = 2;
-  // x-axis
-  const yAxis = m.Y(0);
-  ctx.beginPath();
-  ctx.moveTo(m.X(m.xMin), yAxis);
-  ctx.lineTo(m.X(m.xMax), yAxis);
-  ctx.stroke();
-  // y-axis
-  const xAxis = m.X(0);
-  ctx.beginPath();
-  ctx.moveTo(xAxis, m.Y(m.yMin));
-  ctx.lineTo(xAxis, m.Y(m.yMax));
-  ctx.stroke();
+  // a representative line: y-intercept 0.6 (<1), slope ~ 0.42
+  const b=0.6, slope=0.42;
+  const fy=x=>b+slope*x;
+  const xInt=-b/slope;                 // ≈ -1.43 (negative)
 
-  // arrows
-  ctx.fillStyle = "#334155";
-  // x arrow
-  const ax = m.X(m.xMax), ay = m.Y(0);
-  ctx.beginPath();
-  ctx.moveTo(ax, ay); ctx.lineTo(ax - 10, ay - 5); ctx.lineTo(ax - 10, ay + 5);
-  ctx.closePath(); ctx.fill();
-  // y arrow
-  const bx = m.X(0), by = m.Y(m.yMax);
-  ctx.beginPath();
-  ctx.moveTo(bx, by); ctx.lineTo(bx - 5, by + 10); ctx.lineTo(bx + 5, by + 10);
-  ctx.closePath(); ctx.fill();
-
-  // axis labels
-  ctx.fillStyle = "#0f172a";
-  ctx.font = "italic 500 15px Georgia, serif";
-  ctx.fillText("x", m.X(m.xMax) - 4, m.Y(0) + 20);
-  ctx.fillText("y", m.X(0) + 12, m.Y(m.yMax) + 6);
-
-  // ticks + numbers
-  ctx.font = "600 11px Consolas, monospace";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "top";
-  const xStart = Math.ceil(m.xMin);
-  for (let x = xStart; x <= m.xMax; x++) {
-    if (x === 0) continue;
-    const px = m.X(x);
-    ctx.strokeStyle = "#94a3b8"; ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.moveTo(px, m.Y(0) - 4); ctx.lineTo(px, m.Y(0) + 4); ctx.stroke();
-    ctx.fillStyle = "#475569";
-    ctx.fillText(x, px, m.Y(0) + 7);
-  }
-  ctx.textAlign = "right";
-  ctx.textBaseline = "middle";
-  const yStart = Math.ceil(m.yMin);
-  for (let y = yStart; y <= m.yMax; y++) {
-    if (y === 0) continue;
-    const py = m.Y(y);
-    ctx.strokeStyle = "#94a3b8"; ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.moveTo(m.X(0) - 4, py); ctx.lineTo(m.X(0) + 4, py); ctx.stroke();
-    ctx.fillStyle = "#475569";
-    ctx.fillText(y, m.X(0) - 8, py);
-  }
-  // origin 0
-  ctx.textAlign = "right"; ctx.textBaseline = "top";
-  ctx.fillStyle = "#475569";
-  ctx.fillText("0", m.X(0) - 6, m.Y(0) + 4);
-  ctx.restore();
-}
-
-function drawDashedLine(ctx, m, x1, y1, x2, y2, color, dash = [7, 5], width = 1.8) {
-  ctx.save();
-  ctx.setLineDash(dash);
-  ctx.strokeStyle = color;
-  ctx.lineWidth = width;
-  ctx.beginPath();
-  ctx.moveTo(m.X(x1), m.Y(y1));
-  ctx.lineTo(m.X(x2), m.Y(y2));
-  ctx.stroke();
-  ctx.restore();
-}
-
-function drawPoint(ctx, m, x, y, color, label, labelDx = 8, labelDy = -10, radius = 6) {
-  const px = m.X(x), py = m.Y(y);
-  ctx.save();
-  ctx.beginPath();
-  ctx.arc(px, py, radius + 3, 0, Math.PI * 2);
-  ctx.fillStyle = color + "33";
-  ctx.fill();
-  ctx.beginPath();
-  ctx.arc(px, py, radius, 0, Math.PI * 2);
-  ctx.fillStyle = color;
-  ctx.fill();
-  ctx.strokeStyle = "#fff"; ctx.lineWidth = 2;
-  ctx.stroke();
-  if (label) {
-    ctx.font = "bold 12px Consolas, monospace";
-    ctx.fillStyle = "#0f172a";
-    ctx.textAlign = "left"; ctx.textBaseline = "middle";
-    const tx = px + labelDx, ty = py + labelDy;
-    const tw = ctx.measureText(label).width;
-    ctx.fillStyle = "rgba(255,255,255,0.85)";
-    ctx.fillRect(tx - 3, ty - 9, tw + 6, 18);
-    ctx.fillStyle = color;
-    ctx.fillText(label, tx, ty);
-  }
-  ctx.restore();
-}
-
-/* ============================================================
-   EXPLORER CANVAS (m, n sliders)
-   ============================================================ */
-const exploreCanvas = document.getElementById("exploreCanvas");
-const mSlider = document.getElementById("mSlider");
-const nSlider = document.getElementById("nSlider");
-const mVal = document.getElementById("mVal");
-const nVal = document.getElementById("nVal");
-const rX = document.getElementById("rX");
-const rY = document.getElementById("rY");
-const rS = document.getElementById("rS");
-const rMN = document.getElementById("rMN");
-const statusMsg = document.getElementById("statusMsg");
-const showX = document.getElementById("showX");
-const showY = document.getElementById("showY");
-const showRef = document.getElementById("showRef");
-const showRegion = document.getElementById("showRegion");
-
-function drawExplorer() {
-  const { ctx, w, h } = setupHiDPI(exploreCanvas);
-  const m = +mSlider.value;
-  const n = +nSlider.value;
-  mVal.textContent = m.toFixed(1);
-  nVal.textContent = n.toFixed(1);
-
-  const MAP = makeMapper(w, h, -5, 5, -3.2, 4.2);
-
-  ctx.clearRect(0, 0, w, h);
-  ctx.fillStyle = "#fbfdff";
-  ctx.fillRect(0, 0, w, h);
-
-  drawGrid(ctx, MAP, 1, 1);
-  drawAxes(ctx, MAP);
-
-  // Valid region shading
-  if (showRegion.checked) {
+  function grid(){
     ctx.save();
-    ctx.fillStyle = "rgba(5,150,105,0.10)";
-    ctx.beginPath();
-    ctx.rect(MAP.X(-5), MAP.Y(0), MAP.X(0)-MAP.X(-5), MAP.Y(-3.2)-MAP.Y(0));
-    ctx.fill();
+    ctx.strokeStyle='#e8eef7'; ctx.lineWidth=1;
+    for(let v=Math.ceil(xMin);v<=Math.floor(xMax);v++){
+      ctx.beginPath(); ctx.moveTo(X(v),padT); ctx.lineTo(X(v),H-padB); ctx.stroke();
+    }
+    for(let v=Math.ceil(yMin);v<=Math.floor(yMax);v++){
+      ctx.beginPath(); ctx.moveTo(padL,Y(v)); ctx.lineTo(W-padR,Y(v)); ctx.stroke();
+    }
     ctx.restore();
   }
 
-  // Reference line y = x + 1 (through (-1,0) and (0,1))
-  if (showRef.checked) {
-    drawDashedLine(ctx, MAP, -5, -4, 5, 6, "#a855f7", [8, 5], 1.8);
-    drawPoint(ctx, MAP, -1, 0, "#a855f7", "(-1, 0)", -60, -14, 5);
-    drawPoint(ctx, MAP, 0, 1, "#a855f7", "(0, 1)", 8, -12, 5);
+  function axes(){
+    ctx.save();
+    ctx.strokeStyle='#334155'; ctx.lineWidth=2;
+    // x axis
+    ctx.beginPath(); ctx.moveTo(padL-18,oy); ctx.lineTo(W-padR+18,oy); ctx.stroke();
+    // y axis
+    ctx.beginPath(); ctx.moveTo(ox,padT-12); ctx.lineTo(ox,H-padB+14); ctx.stroke();
+    // arrows
+    ctx.fillStyle='#334155';
+    ctx.beginPath(); ctx.moveTo(W-padR+22,oy); ctx.lineTo(W-padR+8,oy-6);
+    ctx.lineTo(W-padR+8,oy+6); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(ox,padT-16); ctx.lineTo(ox-6,padT-2);
+    ctx.lineTo(ox+6,padT-2); ctx.closePath(); ctx.fill();
+    // labels
+    ctx.fillStyle='#334155'; ctx.font='italic 18px Georgia, serif';
+    ctx.fillText('x', W-padR+26, oy-10);
+    ctx.fillText('y', ox+12, padT-6);
+    ctx.fillText('O', ox-16, oy+18);
+    // tick labels -1 and 1
+    ctx.font='13px sans-serif'; ctx.fillStyle='#64748b';
+    ctx.textAlign='center';
+    ctx.fillText('-1', X(-1), oy+20);
+    ctx.fillText('1',  X(1),  oy+20);
+    // tick marks
+    ctx.strokeStyle='#94a3b8'; ctx.lineWidth=1.6;
+    [[-1],[1]].forEach(([v])=>{
+      ctx.beginPath(); ctx.moveTo(X(v),oy-5); ctx.lineTo(X(v),oy+5); ctx.stroke();
+    });
+    // y tick at 1
+    ctx.beginPath(); ctx.moveTo(ox-5,Y(1)); ctx.lineTo(ox+5,Y(1)); ctx.stroke();
+    ctx.fillStyle='#64748b'; ctx.textAlign='right';
+    ctx.fillText('1', ox-9, Y(1)+5);
+    ctx.restore();
   }
 
-  // Line mx + ny = 3
-  if (Math.abs(n) < 0.001) {
-    // vertical line x = 3/m
-    const xv = 3 / m;
-    if (isFinite(xv)) {
+  function drawLine(color,lw){
+    ctx.save();
+    ctx.strokeStyle=color; ctx.lineWidth=lw;
+    ctx.beginPath();
+    let first=true;
+    for(let px=padL;px<=W-padR;px+=2){
+      const wx=(px-ox)/S;
+      const wy=fy(wx);
+      const py=Y(wy);
+      if(py<padT-2||py>H-padB+2) {continue;}
+      if(first){ctx.moveTo(px,py);first=false;} else ctx.lineTo(px,py);
+    }
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function dot(x,y,color,r=7){
+    ctx.save();
+    ctx.beginPath(); ctx.arc(X(x),Y(y),r,0,Math.PI*2);
+    ctx.fillStyle=color; ctx.fill();
+    ctx.strokeStyle='#fff'; ctx.lineWidth=2.5; ctx.stroke();
+    ctx.restore();
+  }
+
+  function label(text,x,y,color,dx=10,dy=-10,font='bold 15px sans-serif'){
+    ctx.save();
+    ctx.fillStyle=color; ctx.font=font;
+    ctx.fillText(text,X(x)+dx,Y(y)+dy);
+    ctx.restore();
+  }
+
+  function slopeTriangle(){
+    // slope triangle from xInt to xInt+1
+    const x0=xInt, x1=xInt+1;
+    const y0=fy(x0), y1=fy(x1);
+    ctx.save();
+    ctx.strokeStyle='#7c3aed'; ctx.lineWidth=2.2; ctx.setLineDash([6,5]);
+    ctx.beginPath(); ctx.moveTo(X(x0),Y(y0)); ctx.lineTo(X(x1),Y(y0)); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(X(x1),Y(y0)); ctx.lineTo(X(x1),Y(y1)); ctx.stroke();
+    ctx.restore();
+    ctx.save();
+    ctx.fillStyle='#7c3aed'; ctx.font='bold 13px sans-serif';
+    ctx.fillText('1', X(x0+0.5)-4, Y(y0)+18);
+    ctx.save();
+    ctx.translate(X(x1)+12, Y(y0+ (y1-y0)/2));
+    ctx.fillText('rise', 0, 0);
+    ctx.restore();
+    ctx.restore();
+  }
+
+  function refLine(){
+    // line through (-1,0) and (0,1): y = x+1
+    ctx.save();
+    ctx.strokeStyle='#d97706'; ctx.lineWidth=2.4; ctx.setLineDash([9,6]);
+    ctx.beginPath();
+    // draw from x=-1.4 to x=1.4
+    for(let wx=-1.4; wx<=1.35; wx+=0.05){
+      const wy=wx+1;
+      const px=X(wx), py=Y(wy);
+      if(py<padT-4||py>H-padB+4) continue;
+      if(wx===-1.4) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+    }
+    ctx.stroke();
+    ctx.restore();
+    dot(-1,0,'#d97706',6);
+    dot(0,1,'#d97706',6);
+    ctx.save();
+    ctx.fillStyle='#b45309'; ctx.font='bold 13px sans-serif';
+    ctx.fillText('(-1,0)', X(-1)-26, Y(0)+22);
+    ctx.fillText('(0,1)', X(0)+8, Y(1)-10);
+    ctx.restore();
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    grid();
+    axes();
+
+    // base line always shown lightly
+    drawLine('#93c5fd',3.5);
+    // main line blue
+    drawLine('#2563eb',3.2);
+
+    // intercept points
+    dot(xInt,0,'#e11d48',7);
+    dot(0,b,'#059669',7);
+    label('(3/m, 0)', xInt, 0,'#be123c',-30,24,'bold 13px sans-serif');
+    label('(0, 3/n)', 0, b,'#047857',12,-8,'bold 13px sans-serif');
+
+    // mode highlighting
+    if(mode===1){
+      // x-intercept emphasis
       ctx.save();
-      ctx.strokeStyle = "#1d4ed8"; ctx.lineWidth = 3;
+      ctx.strokeStyle='rgba(225,29,72,.35)'; ctx.lineWidth=8;
+      ctx.beginPath(); ctx.moveTo(X(xInt),Y(0)); ctx.lineTo(X(0),Y(0)); ctx.stroke();
+      ctx.restore();
+    }
+    if(mode===2){
+      ctx.save();
+      ctx.strokeStyle='rgba(5,150,105,.35)'; ctx.lineWidth=8;
+      ctx.beginPath(); ctx.moveTo(X(0),Y(0)); ctx.lineTo(X(0),Y(b)); ctx.stroke();
+      ctx.restore();
+      // show the "1" level
+      ctx.save();
+      ctx.strokeStyle='rgba(220,38,38,.55)'; ctx.lineWidth=2; ctx.setLineDash([6,5]);
+      ctx.beginPath(); ctx.moveTo(padL, Y(1)); ctx.lineTo(W-padR, Y(1)); ctx.stroke();
+      ctx.restore();
+      ctx.save();
+      ctx.fillStyle='#dc2626'; ctx.font='bold 13px sans-serif';
+      ctx.fillText('y = 1', padL+6, Y(1)-8);
+      ctx.restore();
+    }
+    if(mode===3){
+      refLine();
+      slopeTriangle();
+    }
+    if(mode===4){
+      refLine();
+      slopeTriangle();
+      ctx.save();
+      ctx.strokeStyle='rgba(37,99,235,.30)'; ctx.lineWidth=9;
       ctx.beginPath();
-      ctx.moveTo(MAP.X(xv), MAP.Y(MAP.yMin));
-      ctx.lineTo(MAP.X(xv), MAP.Y(MAP.yMax));
+      let first=true;
+      for(let px=padL;px<=W-padR;px+=3){
+        const wx=(px-ox)/S, wy=fy(wx), py=Y(wy);
+        if(py<padT-2||py>H-padB+2) continue;
+        if(first){ctx.moveTo(px,py);first=false;} else ctx.lineTo(px,py);
+      }
       ctx.stroke();
       ctx.restore();
     }
-  } else {
-    const yAt = x => (3 - m * x) / n;
-    const y1 = yAt(MAP.xMin), y2 = yAt(MAP.xMax);
-    ctx.save();
-    ctx.strokeStyle = "#1d4ed8"; ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(MAP.X(MAP.xMin), MAP.Y(y1));
-    ctx.lineTo(MAP.X(MAP.xMax), MAP.Y(y2));
-    ctx.stroke();
-    ctx.restore();
   }
 
-  // intercepts
-  const xInt = (Math.abs(m) > 0.001) ? 3 / m : NaN;
-  const yInt = (Math.abs(n) > 0.001) ? 3 / n : NaN;
+  // ---------- scroll sync ----------
+  const steps=Array.from(document.querySelectorAll('.step'));
+  const obs=new IntersectionObserver((es)=>{
+    es.forEach(e=>{
+      if(e.isIntersecting){
+        const m=+e.target.dataset.step;
+        mode=m;
+        steps.forEach(st=>st.classList.toggle('active',st===e.target));
+        draw();
+      }
+    });
+  },{rootMargin:'-15% 0px -55% 0px',threshold:0});
+  steps.forEach(st=>obs.observe(st));
 
-  rX.textContent = isFinite(xInt) ? xInt.toFixed(2) : "—";
-  rY.textContent = isFinite(yInt) ? yInt.toFixed(2) : "—";
-  rS.textContent = (Math.abs(n) > 0.001) ? (-m / n).toFixed(2) : "—";
-  rMN.textContent = (m + n).toFixed(2);
-
-  if (showX.checked && isFinite(xInt) && xInt >= MAP.xMin && xInt <= MAP.xMax) {
-    drawPoint(ctx, MAP, xInt, 0, "#dc2626", "x=" + xInt.toFixed(2), 10, 16, 6);
-  }
-  if (showY.checked && isFinite(yInt) && yInt >= MAP.yMin && yInt <= MAP.yMax) {
-    drawPoint(ctx, MAP, 0, yInt, "#059669", "y=" + yInt.toFixed(2), 10, -12, 6);
-  }
-
-  // Status
-  const cond1 = m < 0;
-  const cond2 = n > 3;
-  const cond3 = (m + n) > 0;
-  const parts = [];
-  parts.push((cond1 ? "✓" : "✗") + " m<0");
-  parts.push((cond2 ? "✓" : "✗") + " n>3");
-  parts.push((cond3 ? "✓" : "✗") + " m+n>0");
-  const allOk = cond1 && cond2 && cond3;
-  statusMsg.innerHTML = "Conditions: <strong>" + parts.join(" · ") + "</strong>" +
-    (allOk
-      ? " — all three hold! This is the situation shown in the given figure. ✅"
-      : " — the given figure requires ALL three conditions to hold. Adjust sliders! ⚠️");
-  statusMsg.style.color = allOk ? "#065f46" : "#92400e";
-
-  // legend
-  ctx.save();
-  ctx.font = "600 12px Segoe UI, sans-serif";
-  ctx.fillStyle = "#1e3a8a";
-  ctx.fillText("L: " + m.toFixed(1) + "x + " + n.toFixed(1) + "y = 3", 16, 22);
-  ctx.fillStyle = "#a855f7";
-  ctx.fillText("Reference: y = x + 1  (slope 1)", 16, 40);
-  ctx.restore();
-}
-
-[mSlider, nSlider, showX, showY, showRef, showRegion].forEach(el =>
-  el.addEventListener("input", drawExplorer));
-
-/* ============================================================
-   CANVAS I — Negative x-intercept ⟹ m<0
-   ============================================================ */
-const canvasI = document.getElementById("canvasI");
-function drawI() {
-  const { ctx, w, h } = setupHiDPI(canvasI);
-  const MAP = makeMapper(w, h, -4.5, 3.8, -2.2, 2.6);
-  ctx.clearRect(0, 0, w, h);
-  ctx.fillStyle = "#fbfdff"; ctx.fillRect(0, 0, w, h);
-  drawGrid(ctx, MAP, 1, 0.5);
-  drawAxes(ctx, MAP);
-
-  // A sample line with negative x-intercept and positive y-intercept small
-  const m = -3, n = 4;                 // slope = 3/4
-  const yAt = x => (3 - m * x) / n;
-  ctx.save();
-  ctx.strokeStyle = "#1d4ed8"; ctx.lineWidth = 3;
-  ctx.beginPath();
-  ctx.moveTo(MAP.X(-4.5), MAP.Y(yAt(-4.5)));
-  ctx.lineTo(MAP.X(3.8), MAP.Y(yAt(3.8)));
-  ctx.stroke();
-  ctx.restore();
-
-  // x-intercept highlight
-  const xInt = 3 / m; // = -1
-  drawPoint(ctx, MAP, xInt, 0, "#dc2626", "(" + xInt.toFixed(2) + ", 0)", -110, 22, 7);
-
-  // zoom-in annotation: the intercept is left of O
-  ctx.save();
-  ctx.setLineDash([5,4]);
-  ctx.strokeStyle = "rgba(220,38,38,0.6)"; ctx.lineWidth = 1.5;
-  ctx.beginPath();
-  ctx.moveTo(MAP.X(xInt), MAP.Y(0));
-  ctx.lineTo(MAP.X(xInt), MAP.Y(-0.9));
-  ctx.stroke();
-  ctx.restore();
-
-  // labels
-  ctx.save();
-  ctx.font = "700 13px Segoe UI, sans-serif";
-  ctx.fillStyle = "#dc2626";
-  ctx.fillText("x-intercept = 3/m  <  0", MAP.X(-4.4), MAP.Y(2.25));
-  ctx.fillStyle = "#1d4ed8";
-  ctx.fillText("L: mx + ny = 3", MAP.X(0.9), MAP.Y(2.0));
-  ctx.font = "600 12px Consolas, monospace";
-  ctx.fillStyle = "#475569";
-  ctx.fillText("Since 3 > 0, m must be negative.", MAP.X(-4.4), MAP.Y(-1.7));
-  ctx.fillStyle = "#059669";
-  ctx.fillText("x = 3/m < 0  ⟹  m < 0", MAP.X(-4.4), MAP.Y(-2.05));
-  ctx.restore();
-}
-
-/* ============================================================
-   CANVAS II — y-intercept between 0 and 1 ⟹ n>3
-   ============================================================ */
-const canvasII = document.getElementById("canvasII");
-const nSliderII = document.getElementById("nSliderII");
-const nValII = document.getElementById("nValII");
-function drawII() {
-  const { ctx, w, h } = setupHiDPI(canvasII);
-  const MAP = makeMapper(w, h, -2.4, 3.6, -0.6, 3.0);
-  const n = +nSliderII.value;
-  nValII.textContent = n.toFixed(1);
-
-  ctx.clearRect(0, 0, w, h);
-  ctx.fillStyle = "#fbfdff"; ctx.fillRect(0, 0, w, h);
-  drawGrid(ctx, MAP, 1, 0.5);
-  drawAxes(ctx, MAP);
-
-  // Reference band: y between 0 and 1
-  ctx.save();
-  ctx.fillStyle = "rgba(5,150,105,0.10)";
-  ctx.fillRect(MAP.X(-2.4), MAP.Y(1), MAP.X(3.6) - MAP.X(-2.4), MAP.Y(0) - MAP.Y(1));
-  ctx.restore();
-  ctx.save();
-  ctx.strokeStyle = "rgba(5,150,105,0.65)";
-  ctx.setLineDash([6,4]); ctx.lineWidth = 1.6;
-  ctx.beginPath();
-  ctx.moveTo(MAP.X(-2.4), MAP.Y(1));
-  ctx.lineTo(MAP.X(3.6), MAP.Y(1));
-  ctx.stroke();
-  ctx.restore();
-  ctx.save();
-  ctx.font = "600 12px Segoe UI, sans-serif";
-  ctx.fillStyle = "#059669";
-  ctx.fillText("Graph shows: 0 < y-intercept < 1", MAP.X(-2.3), MAP.Y(1.12));
-  ctx.restore();
-
-  // y = 3/n, using a fixed sample line with m = -3
-  const m = -3;
-  const yAt = x => (3 - m * x) / n;
-  ctx.save();
-  ctx.strokeStyle = "#1d4ed8"; ctx.lineWidth = 3;
-  ctx.beginPath();
-  ctx.moveTo(MAP.X(-2.4), MAP.Y(yAt(-2.4)));
-  ctx.lineTo(MAP.X(3.6), MAP.Y(yAt(3.6)));
-  ctx.stroke();
-  ctx.restore();
-
-  const yInt = 3 / n;
-  drawPoint(ctx, MAP, 0, yInt, "#059669", "y-int = 3/n = " + yInt.toFixed(2), 12, -14, 7);
-
-  // Show inequality chain
-  ctx.save();
-  ctx.font = "700 13px Segoe UI, sans-serif";
-  ctx.fillStyle = "#1d4ed8";
-  ctx.fillText("L: " + m + "x + " + n.toFixed(1) + "y = 3", MAP.X(-2.3), MAP.Y(2.85));
-  ctx.fillStyle = "#059669";
-  ctx.fillText("0 < 3/n < 1", MAP.X(-2.3), MAP.Y(2.5));
-  ctx.fillStyle = "#b45309";
-  ctx.fillText(n > 3 ? "n = " + n.toFixed(1) + " > 3  ✓" : "n = " + n.toFixed(1) + " ≤ 3  ✗",
-                MAP.X(-2.3), MAP.Y(2.15));
-  ctx.restore();
-}
-
-/* ============================================================
-   CANVAS III — Slope comparison ⟹ m+n>0
-   ============================================================ */
-const canvasIII = document.getElementById("canvasIII");
-const showSlopeComp = document.getElementById("showSlopeComp");
-const showTriangle = document.getElementById("showTriangle");
-function drawIII() {
-  const { ctx, w, h } = setupHiDPI(canvasIII);
-  const MAP = makeMapper(w, h, -3.2, 3.6, -1.0, 3.2);
-
-  ctx.clearRect(0, 0, w, h);
-  ctx.fillStyle = "#fbfdff"; ctx.fillRect(0, 0, w, h);
-  drawGrid(ctx, MAP, 1, 1);
-  drawAxes(ctx, MAP);
-
-  // Reference line y = x+1
-  if (showSlopeComp.checked) {
-    ctx.save();
-    ctx.strokeStyle = "#a855f7"; ctx.setLineDash([8,5]); ctx.lineWidth = 2.2;
-    ctx.beginPath();
-    ctx.moveTo(MAP.X(-3.2), MAP.Y(-3.2 + 1));
-    ctx.lineTo(MAP.X(3.6), MAP.Y(3.6 + 1));
-    ctx.stroke();
-    ctx.restore();
-    drawPoint(ctx, MAP, -1, 0, "#a855f7", "(-1, 0)", -68, 14, 5);
-    drawPoint(ctx, MAP, 0, 1, "#a855f7", "(0, 1)", 8, -14, 5);
-    ctx.save();
-    ctx.font = "700 12px Segoe UI, sans-serif";
-    ctx.fillStyle = "#7e22ce";
-    ctx.fillText("Reference slope = 1", MAP.X(0.1), MAP.Y(3.05));
-    ctx.restore();
-  }
-
-  // Line L: mx + ny = 3 with m=-3, n=4 => slope 3/4
-  const m = -3, n = 4;
-  const yAt = x => (3 - m * x) / n;
-  ctx.save();
-  ctx.strokeStyle = "#1d4ed8"; ctx.lineWidth = 3;
-  ctx.beginPath();
-  ctx.moveTo(MAP.X(-3.2), MAP.Y(yAt(-3.2)));
-  ctx.lineTo(MAP.X(3.6), MAP.Y(yAt(3.6)));
-  ctx.stroke();
-  ctx.restore();
-
-  // Slope triangle for L (rise / run)
-  if (showTriangle.checked) {
-    const x1 = -2, x2 = 0;
-    const y1 = yAt(x1), y2 = yAt(x2);
-    // triangle
-    ctx.save();
-    ctx.strokeStyle = "#f59e0b"; ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(MAP.X(x1), MAP.Y(y1));
-    ctx.lineTo(MAP.X(x2), MAP.Y(y1));
-    ctx.lineTo(MAP.X(x2), MAP.Y(y2));
-    ctx.stroke();
-    ctx.fillStyle = "rgba(245,158,11,0.14)";
-    ctx.beginPath();
-    ctx.moveTo(MAP.X(x1), MAP.Y(y1));
-    ctx.lineTo(MAP.X(x2), MAP.Y(y1));
-    ctx.lineTo(MAP.X(x2), MAP.Y(y2));
-    ctx.closePath();
-    ctx.fill();
-    ctx.restore();
-
-    // run = 2, rise = 1.5
-    ctx.save();
-    ctx.font = "700 12px Consolas, monospace";
-    ctx.fillStyle = "#b45309";
-    ctx.textAlign = "center";
-    ctx.fillText("run = " + (x2 - x1), MAP.X((x1 + x2) / 2), MAP.Y(y1) - 10);
-    ctx.textAlign = "left";
-    ctx.fillStyle = "#b45309";
-    ctx.fillText("rise = " + (y2 - y1).toFixed(1), MAP.X(x2) + 8, MAP.Y((y1 + y2) / 2));
-    ctx.restore();
-  }
-
-  // Slope labels at bottom
-  ctx.save();
-  ctx.font = "700 13px Segoe UI, sans-serif";
-  ctx.fillStyle = "#1d4ed8";
-  ctx.fillText("slope of L = −m/n = " + (-m / n).toFixed(2), MAP.X(-3.1), MAP.Y(-0.55));
-  ctx.fillStyle = "#7e22ce";
-  ctx.fillText("reference slope = 1", MAP.X(-3.1), MAP.Y(-0.85));
-  ctx.fillStyle = "#065f46";
-  ctx.fillText("−m/n < 1  ⟹  m + n > 0", MAP.X(-3.1), MAP.Y(-1.15));
-  ctx.restore();
-}
-
-/* ============================================================
-   STEP REVEAL
-   ============================================================ */
-document.querySelectorAll(".btn[data-target]").forEach(btn => {
-  const part = btn.dataset.target;
-  const steps = Array.from(document.querySelectorAll('.step[data-part="' + part + '"]'));
-  const counter = document.getElementById("cnt-" + part);
-  let idx = 0;
-
-  function update() {
-    counter.textContent = idx + " / " + steps.length;
-    if (idx >= steps.length) {
-      btn.textContent = "All steps revealed ✓";
-      btn.disabled = true;
-    }
-  }
-  update();
-
-  btn.addEventListener("click", () => {
-    if (idx < steps.length) {
-      steps[idx].classList.add("visible");
-      idx++;
-      if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([steps[idx - 1]]);
-      update();
-    }
-  });
-});
-
-/* ============================================================
-   INIT + RESIZE
-   ============================================================ */
-function redrawAll() {
-  drawExplorer();
-  drawI();
-  drawII();
-  drawIII();
-}
-window.addEventListener("resize", redrawAll);
-window.addEventListener("load", () => {
-  redrawAll();
-  // highlight correct option D
-  document.getElementById("optD").classList.add("correct");
-  // wire slider II
-  nSliderII.addEventListener("input", drawII);
-  showSlopeComp.addEventListener("input", drawIII);
-  showTriangle.addEventListener("input", drawIII);
-});
-// initial draw immediately (before load fires)
-redrawAll();
-document.getElementById("optD").classList.add("correct");
-nSliderII.addEventListener("input", drawII);
-showSlopeComp.addEventListener("input", drawIII);
-showTriangle.addEventListener("input", drawIII);
+  window.addEventListener('resize',()=>{ /* fixed canvas size, just redraw */ draw(); });
+  draw();
+})();
 </script>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
-
 </body>
 </html>

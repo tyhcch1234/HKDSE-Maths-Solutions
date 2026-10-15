@@ -3,740 +3,398 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HKDSE Math 2022 Paper 2 Q41 — Circumcentre on a Line</title>
-<script>
-  window.MathJax = {
-    tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['\\[', '\\]']] },
-    svg: { fontCache: 'global' }
-  };
-</script>
+<title>HKDSE Math 2022 P2 Q41 — Coordinate Geometry</title>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
-  :root{
-    --blue:#1e3a8a; --blue2:#2563eb; --sky:#e0ecff;
-    --amber:#b45309; --amber-bg:#fef3c7; --amber-br:#f59e0b;
-    --emerald:#047857; --emerald-bg:#d1fae5; --emerald-br:#10b981;
-    --ink:#0f172a; --slate:#475569; --line:#e2e8f0;
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: #eef2f9;
+    color: #1e2a3a;
+    padding: 16px;
   }
-  *{box-sizing:border-box;}
-  body{
-    margin:0; padding:0 0 60px;
-    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
-    background:#f1f5f9; color:var(--ink); line-height:1.55;
-    -webkit-font-smoothing:antialiased;
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 12px;
+    align-items: start;
   }
-  /* ---------- HERO ---------- */
-  header.hero{
-    background:linear-gradient(135deg,#0f2661 0%,#1e3a8a 35%,#2563eb 70%,#0ea5e9 100%);
-    color:#fff; padding:38px 22px 34px;
-    box-shadow:0 8px 30px rgba(15,38,97,.35);
-    position:relative; overflow:hidden;
+  @media (min-width: 900px) {
+    .split { grid-template-columns: minmax(0, 46%) minmax(0, 54%); gap: 18px; }
   }
-  header.hero::after{
-    content:""; position:absolute; inset:0;
-    background:radial-gradient(circle at 85% 15%, rgba(255,255,255,.18), transparent 45%);
-    pointer-events:none;
+  .panel {
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(30, 42, 58, 0.08);
+    padding: 16px;
   }
-  .wrap{max-width:960px; margin:0 auto; position:relative; z-index:1;}
-  .eyebrow{font-size:.78rem; letter-spacing:.16em; text-transform:uppercase; opacity:.85; font-weight:600;}
-  h1.qt{font-size:clamp(1.5rem,4.4vw,2.25rem); margin:.25em 0 .1em; font-weight:800; letter-spacing:.01em;}
-  .sub{font-size:clamp(.95rem,2.4vw,1.08rem); opacity:.94; margin:0 0 16px;}
-  .pills{display:flex; flex-wrap:wrap; gap:8px;}
-  .pill{
-    background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35);
-    padding:5px 13px; border-radius:999px; font-size:.78rem; font-weight:600;
-    backdrop-filter:blur(4px);
+  .diagram {
+    position: sticky;
+    top: 16px;
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
   }
-  /* ---------- CARDS ---------- */
-  main{max-width:960px; margin:0 auto; padding:26px 16px 0;}
-  .card{
-    background:#fff; border-radius:18px; padding:22px 22px 24px;
-    box-shadow:0 4px 18px rgba(15,23,42,.08); border:1px solid var(--line);
-    margin-bottom:26px;
+  .diagram h2 {
+    font-size: 1rem;
+    margin: 0 0 8px 0;
+    color: #2563eb;
+    letter-spacing: 0.02em;
   }
-  .card h2{
-    margin:0 0 6px; font-size:1.16rem; font-weight:800; color:var(--blue);
-    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  canvas {
+    width: 100%;
+    display: block;
+    border-radius: 12px;
+    background: #fbfdff;
   }
-  .card h2 .num{
-    background:linear-gradient(135deg,var(--blue2),#0ea5e9); color:#fff;
-    width:30px; height:30px; min-width:30px; border-radius:9px;
-    display:inline-flex; align-items:center; justify-content:center;
-    font-size:.9rem; font-weight:800;
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    margin-top: 10px;
+    font-size: 0.8rem;
   }
-  .marks-badge{
-    background:var(--sky); color:var(--blue); font-size:.72rem; font-weight:700;
-    padding:3px 9px; border-radius:999px; border:1px solid #bfdbfe;
+  .legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
   }
-  .qtext{
-    background:#f8fafc; border-left:4px solid var(--blue2); border-radius:10px;
-    padding:14px 16px; margin:12px 0 4px; font-size:.97rem;
+  .swatch {
+    width: 14px; height: 4px; border-radius: 2px; display: inline-block;
   }
-  .options{margin:12px 0 0; padding:0; list-style:none;}
-  .options li{
-    display:inline-block; background:#f1f5f9; border:1px solid var(--line);
-    border-radius:10px; padding:5px 14px; margin:4px 8px 4px 0; font-weight:600;
-    font-size:.92rem; color:var(--slate);
+  .dot {
+    width: 10px; height: 10px; border-radius: 50%; display: inline-block;
   }
-  /* ---------- CANVAS ---------- */
-  .canvas-wrap{
-    background:#fbfdff; border:1px solid var(--line); border-radius:14px;
-    padding:10px; margin:14px 0 8px;
+  .q-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
   }
-  canvas{width:100%; height:auto; display:block; border-radius:9px; touch-action:none;}
-  .controls{
-    display:flex; flex-wrap:wrap; gap:14px 22px; align-items:center;
-    margin-top:12px; font-size:.86rem; font-weight:600; color:var(--slate);
+  .q-tag {
+    background: #2563eb;
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+    letter-spacing: 0.04em;
   }
-  .ctrl{display:flex; align-items:center; gap:8px;}
-  input[type=range]{
-    -webkit-appearance:none; appearance:none; width:150px; height:6px; border-radius:99px;
-    background:linear-gradient(90deg,#93c5fd,#2563eb); outline:none;
+  .q-topic {
+    font-size: 0.72rem;
+    color: #64748b;
+    font-weight: 600;
   }
-  input[type=range]::-webkit-slider-thumb{
-    -webkit-appearance:none; width:18px; height:18px; border-radius:50%;
-    background:#fff; border:3px solid var(--blue2); cursor:pointer; box-shadow:0 1px 4px rgba(0,0,0,.25);
+  .question { font-size: 0.95rem; line-height: 1.55; }
+  .options {
+    margin: 10px 0 0 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 8px;
+    font-size: 0.9rem;
   }
-  input[type=range]::-moz-range-thumb{
-    width:16px; height:16px; border-radius:50%; background:#fff; border:3px solid var(--blue2); cursor:pointer;
+  .options div {
+    background: #f1f5fb;
+    border-radius: 8px;
+    padding: 5px 10px;
   }
-  input[type=checkbox]{width:16px; height:16px; accent-color:var(--blue2); cursor:pointer;}
-  .val{
-    font-family:"Consolas",monospace; background:#0f172a; color:#7dd3fc;
-    padding:2px 8px; border-radius:7px; font-size:.8rem;
+  .options b { color: #2563eb; }
+
+  .step {
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-top: 12px;
+    transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
   }
-  .readout{
-    display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-    gap:8px; margin-top:12px;
+  .step.active {
+    border-color: #2563eb;
+    background: #eef4ff;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.10);
   }
-  .ro{
-    background:#f8fafc; border:1px solid var(--line); border-radius:10px; padding:8px 11px;
-    font-size:.82rem; color:var(--slate); font-weight:600;
+  .step .tag {
+    display: block;
+    font-weight: 800;
+    font-size: 0.78rem;
+    letter-spacing: 0.05em;
+    color: #2563eb;
+    margin-bottom: 6px;
+    text-transform: uppercase;
   }
-  .ro b{display:block; color:var(--ink); font-family:Consolas,monospace; font-size:.95rem; margin-top:2px; font-weight:700;}
-  /* ---------- STEPS ---------- */
-  .steps{margin-top:6px;}
-  .step{
-    display:none; border-left:4px solid var(--amber-br);
-    background:#fffbeb; border-radius:12px; padding:14px 16px; margin:12px 0;
-    animation:fade .38s ease;
+  .step p { margin: 6px 0; font-size: 0.9rem; line-height: 1.5; }
+  .hint {
+    background: #fff7ed;
+    border-left: 4px solid #f59e0b;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.83rem;
+    color: #92400e;
+    margin-top: 8px;
   }
-  .step.show{display:block;}
-  @keyframes fade{from{opacity:0; transform:translateY(7px);} to{opacity:1; transform:none;}}
-  .step-head{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:8px;}
-  .badge{
-    background:linear-gradient(135deg,var(--blue),var(--blue2)); color:#fff;
-    font-size:.74rem; font-weight:800; padding:3px 10px; border-radius:999px; letter-spacing:.02em;
+  .answer {
+    background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+    border: 2px solid #10b981;
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-top: 14px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #065f46;
   }
-  .badge.m{background:linear-gradient(135deg,#7c2d12,#ea580c);}
-  .badge.a{background:linear-gradient(135deg,#065f46,#10b981);}
-  .step p{margin:.5em 0; font-size:.95rem;}
-  .hint{
-    background:var(--amber-bg); border-left:4px solid var(--amber-br); color:#7c2d12;
-    border-radius:8px; padding:9px 13px; font-size:.88rem; margin-top:10px; font-weight:600;
-  }
-  .ansbox{
-    background:var(--emerald-bg); border-left:4px solid var(--emerald-br); color:#064e3b;
-    border-radius:8px; padding:10px 14px; margin-top:10px; font-weight:700; font-size:.95rem;
-  }
-  .btnrow{display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-top:14px;}
-  button.next{
-    background:linear-gradient(135deg,var(--blue2),#0ea5e9); color:#fff; border:none;
-    padding:10px 20px; border-radius:11px; font-size:.94rem; font-weight:700;
-    cursor:pointer; box-shadow:0 4px 12px rgba(37,99,235,.35); transition:.18s;
-  }
-  button.next:hover:not(:disabled){transform:translateY(-1px); box-shadow:0 6px 18px rgba(37,99,235,.45);}
-  button.next:disabled{background:#cbd5e1; color:#64748b; box-shadow:none; cursor:default;}
-  .counter{font-size:.85rem; font-weight:700; color:var(--slate); font-variant-numeric:tabular-nums;}
-  /* ---------- SUMMARY ---------- */
-  .summary{
-    background:linear-gradient(135deg,#0f172a,#1e293b); color:#e2e8f0;
-    border:none; box-shadow:0 8px 28px rgba(15,23,42,.4);
-  }
-  .summary h2{color:#7dd3fc;}
-  .summary ul{list-style:none; padding:0; margin:10px 0 0;}
-  .summary li{
-    padding:11px 14px; background:rgba(255,255,255,.06); border-radius:11px;
-    margin-bottom:9px; border-left:4px solid #0ea5e9; font-size:.95rem;
-  }
-  .summary li b{color:#fcd34d;}
-  footer{
-    text-align:center; color:#94a3b8; font-size:.82rem; padding:22px 16px 0;
-  }
-  @media (max-width:560px){
-    .card{padding:17px 15px 19px;}
-    input[type=range]{width:110px;}
-  }
+  .answer .tag { color: #059669; }
+  mjx-container { overflow-x: auto; overflow-y: hidden; max-width: 100%; }
 </style>
 </head>
 <body>
-
-<header class="hero">
-  <div class="wrap">
-    <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</div>
-    <h1 class="qt">2022 Paper 2 · Question 41</h1>
-    <p class="sub">Coordinate Geometry — Circumcentre of a Right Triangle on a Given Straight Line</p>
-    <div class="pills">
-      <span class="pill">Coordinate Geometry</span>
-      <span class="pill">Right Triangle</span>
-      <span class="pill">Circumcentre</span>
-      <span class="pill">Angle in Semicircle</span>
-      <span class="pill">Mid-point Formula</span>
-    </div>
-  </div>
-</header>
-
-<main>
-
-  <!-- ============ QUESTION CARD ============ -->
-  <section class="card">
-    <h2><span class="num">Q</span>Question <span class="marks-badge">Multiple Choice</span></h2>
-    <div class="qtext">
-      <p>Let \(O\) be the origin. The coordinates of the points \(A\) and \(B\) are \((a,\,0)\) and \((0,\,b)\) respectively, where \(a\) and \(b\) are positive numbers. If the circumcentre of \(\triangle OAB\) lies on the straight line \(4x+16y=17a\), then \(a:b=\)</p>
-      <ul class="options">
-        <li>A. \(8:15\)</li>
-        <li>B. \(15:8\)</li>
-        <li>C. \(16:47\)</li>
-        <li>D. \(47:16\)</li>
-      </ul<figure style="margin:12px 0;text-align:center;"><img src="figures/2022_P2_Q41.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>>
+<div class="split">
+  <!-- LEFT: DIAGRAM -->
+  <section class="panel diagram">
+    <h2>Interactive Diagram</h2>
+    <canvas id="cv" width="640" height="640"></canvas>
+    <div class="legend">
+      <span><i class="swatch" style="background:#2563eb"></i> Circle (circumcircle)</span>
+      <span><i class="swatch" style="background:#ef4444"></i> Line \(4x+16y=17a\)</span>
+      <span><i class="swatch" style="background:#16a34a"></i> Triangle \(OAB\)</span>
+      <span><i class="dot" style="background:#7c3aed"></i> Centre</span>
+      <span><i class="dot" style="background:#f59e0b"></i> Points</span>
     </div>
   </section>
 
-  <!-- ============ PART 1 : RIGHT ANGLE ============ -->
-  <section class="card">
-    <h2><span class="num">1</span>Why \(\angle AOB = 90^\circ\) </h2>
+  <!-- RIGHT: QUESTION + SOLUTION -->
+  <section class="panel">
+    <div class="q-header">
+      <span class="q-tag">[2022MC#41]</span>
+      <span class="q-topic">12. Coordinate Geometry</span>
+    </div>
 
-    <div class="canvas-wrap">
-      <canvas id="cv1" width="900" height="470"></canvas>
-      <div class="controls">
-        <div class="ctrl">
-          <label for="s1">Scale (stretch):</label>
-          <input type="range" id="s1" min="60" max="150" value="100">
-          <span class="val" id="v1">100%</span>
-        </div>
-        <div class="ctrl">
-          <input type="checkbox" id="c1" checked>
-          <label for="c1">Show circumcircle of \(\triangle OAB\)</label>
-        </div>
-      </div>
-      <div class="readout">
-        <div class="ro">\(\angle AOB\)<b id="ro-angle">90.0°</b></div>
-        <div class="ro">Mid-point \(M\) of \(AB\)<b id="ro-mid">(50, 30)</b></div>
-        <div class="ro">Radius (circumradius)<b id="ro-r">58.3</b></div>
+    <div class="question">
+      <p>Let \(O\) be the origin. The coordinates of the points \(A\) and \(B\) are \((a,\,0)\) and \((0,\,b)\) respectively, where \(a\) and \(b\) are positive numbers. If the circumcentre of \(\Delta OAB\) lies on the straight line \(4x+16y=17a\), then \(a:b =\)</p>
+      <div class="options">
+        <div><b>A.</b> \(8:15\)</div>
+        <div><b>B.</b> \(15:8\)</div>
+        <div><b>C.</b> \(16:47\)</div>
+        <div><b>D.</b> \(47:16\)</div>
       </div>
     </div>
 
-    <div class="steps" id="steps1">
-      <div class="step">
-        <div class="step-head"><span class="badge">Step 1</span></div>
-        <p>\(A=(a,0)\) lies on the \(x\)-axis and \(B=(0,b)\) lies on the \(y\)-axis. Since the \(x\)-axis and \(y\)-axis are perpendicular at the origin \(O\),</p>
-        \[ \angle AOB = 90^\circ \]
-        <div class="hint">Hint: any point on the \(x\)-axis together with any point on the \(y\)-axis always forms a right angle at \(O\). Use the slider to stretch the triangle — the angle stays \(90^\circ\).</div>
-        <div class="ansbox">Answer: \(\angle AOB = 90^\circ\), so \(\triangle OAB\) is a right-angled triangle.</div>
-      </div>
-      <div class="step">
-        <div class="step-head"><span class="badge">Step 2</span></div>
-        <p>By the <b>converse of the angle in a semicircle</b>: if a triangle is right-angled, then the <b>hypotenuse is a diameter of its circumcircle</b>.</p>
-        \[ \therefore\; AB \text{ is a diameter of the circumcircle of } \triangle OAB \]
-        <div class="hint">Hint: tick the checkbox "Show circumcircle" and watch the circle pass through \(O\), \(A\) and \(B\) with centre exactly at the mid-point of \(AB\).</div>
-        <div class="ansbox">Answer: \(AB\) is a diameter, so the circumcentre is the mid-point of \(AB\).</div>
-      </div>
+    <figure style="margin:12px 0;text-align:center;"><img src="figures/2022_P2_Q41.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
+
+    <!-- STEP 1 -->
+    <div class="step" data-step="1">
+      <span class="tag">Step 1 · Recognise the right angle</span>
+      <p>Since \(A=(a,0)\) lies on the \(x\)-axis and \(B=(0,b)\) lies on the \(y\)-axis, the axes are perpendicular. Hence \(\angle AOB = 90^\circ\).</p>
     </div>
 
-    <div class="btnrow">
-      <button class="next" data-target="steps1">Next step →</button>
-      <span class="counter" id="cnt1">0 / 2</span>
-    </div>
-  </section>
-
-  <!-- ============ PART 2 : MID-POINT ============ -->
-  <section class="card">
-    <h2><span class="num">2</span>The Circumcentre is the Mid-point of \(AB\) </h2>
-
-    <div class="canvas-wrap">
-      <canvas id="cv2" width="900" height="470"></canvas>
-      <div class="controls">
-        <div class="ctrl">
-          <label for="s2">Ratio \(a:b\) (drag):</label>
-          <input type="range" id="s2" min="20" max="180" value="62">
-          <span class="val" id="v2">a : b = 8 : 15</span>
-        </div>
-        <div class="ctrl">
-          <input type="checkbox" id="c2" checked>
-          <label for="c2">Show the circle centre \(M\) &amp; radius \(MA\)</label>
-        </div>
-      </div>
-      <div class="readout">
-        <div class="ro">Mid-point \(M\)<b id="ro2-m">(a/2, b/2)</b></div>
-        <div class="ro">\(MA = MB = MO\)<b id="ro2-r">—</b></div>
-        <div class="ro">Centre on line? <b id="ro2-on">—</b></div>
-      </div>
+    <!-- STEP 2 -->
+    <div class="step" data-step="2">
+      <span class="tag">Step 2 · Locate the circumcentre</span>
+      <p>By the converse of the angle in a semicircle, if \(\angle AOB = 90^\circ\), then \(AB\) is a <b>diameter</b> of the circumcircle of \(\Delta OAB\).</p>
+      <p>Therefore the circumcentre is the midpoint of \(AB\):</p>
+      <p>\[ M = \left(\frac{a+0}{2},\ \frac{0+b}{2}\right) = \left(\frac{a}{2},\ \frac{b}{2}\right) \]</p>
+      <div class="hint">💡 A right-angled triangle always has its hypotenuse as the diameter of its circumcircle — so the centre is simply the midpoint of the hypotenuse.</div>
     </div>
 
-    <div class="steps" id="steps2">
-      <div class="step">
-        <div class="step-head"><span class="badge">Step 1</span></div>
-        <p>The circumcentre \(M\) is the mid-point of the diameter \(AB\). Using the mid-point formula on \(A(a,0)\) and \(B(0,b)\):</p>
-        \[ M=\left(\frac{a+0}{2},\ \frac{0+b}{2}\right)=\left(\frac{a}{2},\ \frac{b}{2}\right) \]
-        <div class="hint">Hint: drag the ratio slider — the centre \(M\) always stays exactly halfway between \(A\) and \(B\), and \(MO=MA=MB\).</div>
-        <div class="ansbox">Answer: \(M\left(\dfrac{a}{2},\ \dfrac{b}{2}\right)\)</div>
-      </div>
+    <!-- STEP 3 -->
+    <div class="step" data-step="3">
+      <span class="tag">Step 3 · Substitute into the given line</span>
+      <p>The circumcentre \(M\) lies on \(4x+16y=17a\). Substitute \(x=\dfrac{a}{2}\) and \(y=\dfrac{b}{2}\):</p>
+      <p>\[ 4\left(\frac{a}{2}\right) + 16\left(\frac{b}{2}\right) = 17a \]</p>
+      <p>\[ 2a + 8b = 17a \]</p>
+      <p>\[ 8b = 15a \]</p>
+      <p>\[ \frac{a}{b} = \frac{8}{15} \quad\Rightarrow\quad a:b = 8:15 \]</p>
     </div>
 
-    <div class="btnrow">
-      <button class="next" data-target="steps2">Next step →</button>
-      <span class="counter" id="cnt2">0 / 1</span>
+    <div class="answer">
+      <span class="tag" style="display:block;font-size:0.78rem;letter-spacing:0.05em;">Answer</span>
+      \[\boxed{a:b = 8:15} \quad \text{(Option A)}\]
     </div>
   </section>
-
-  <!-- ============ PART 3 : SUBSTITUTE ============ -->
-  <section class="card">
-    <h2><span class="num">3</span>Substitute \(M\) into \(4x+16y=17a\) </h2>
-
-    <div class="canvas-wrap">
-      <canvas id="cv3" width="900" height="470"></canvas>
-      <div class="controls">
-        <div class="ctrl">
-          <label for="s3">Try \(a:b\) slider:</label>
-          <input type="range" id="s3" min="10" max="120" value="53">
-          <span class="val" id="v3">8 : 15</span>
-        </div>
-        <div class="ctrl">
-          <input type="checkbox" id="c3" checked>
-          <label for="c3">Show line \(4x+16y=17a\)</label>
-        </div>
-      </div>
-      <div class="readout">
-        <div class="ro">\(4x+16y\) at \(M\)<b id="ro3-lhs">—</b></div>
-        <div class="ro">\(17a\)<b id="ro3-rhs">—</b></div>
-        <div class="ro">On the line?<b id="ro3-ok">—</b></div>
-      </div>
-    </div>
-
-    <div class="steps" id="steps3">
-      <div class="step">
-        <div class="step-head"><span class="badge">Step 1</span></div>
-        <p>Since the circumcentre \(M\) lies on the straight line \(4x+16y=17a\), substitute \(x=\dfrac{a}{2}\) and \(y=\dfrac{b}{2}\):</p>
-        \[ 4\left(\frac{a}{2}\right)+16\left(\frac{b}{2}\right)=17a \]
-        <div class="hint">Hint: only the point \(M\) must satisfy the line equation. Slide to a non-\(8\!:\!15\) ratio and the green dot leaves the line.</div>
-        <div class="ansbox">Equation obtained: \(2a+8b=17a\)</div>
-      </div>
-      <div class="step">
-        <div class="step-head"><span class="badge">Step 2</span></div>
-        <p>Simplify and rearrange to isolate the ratio:</p>
-        \[ 2a+8b=17a \]
-        \[ 8b = 15a \]
-        \[ \frac{a}{b}=\frac{8}{15} \]
-        <div class="hint">Hint: divide both sides by \(15b\) — this gives the required ratio directly in the form \(a:b\).</div>
-        <div class="ansbox">Answer: \(a:b = 8:15\) — choice <b>A</b>.</div>
-      </div>
-    </div>
-
-    <div class="btnrow">
-      <button class="next" data-target="steps3">Next step →</button>
-      <span class="counter" id="cnt3">0 / 2</span>
-    </div>
-  </section>
-
-  <!-- ============ SUMMARY ============ -->
-  <section class="card summary">
-    <h2><span class="num"></span>Summary of Answers</h2>
-    <ul>
-      <li>\(\angle AOB = 90^\circ\) because \(OA\perp OB\) (axes are perpendicular).</li>
-      <li>By the converse of the angle in a semicircle, the hypotenuse \(AB\) is a diameter of the circumcircle of \(\triangle OAB\).</li>
-      <li>Circumcentre \(M\) = mid-point of \(AB=\left(\dfrac{a}{2},\ \dfrac{b}{2}\right)\).</li>
-      <li>Substituting into \(4x+16y=17a\): \(2a+8b=17a\Rightarrow 8b=15a\).</li>
-      <li><b>Final answer:</b> \(a:b = 8:15\), i.e. choice <b>A</b>.</li>
-    </ul>
-  </section>
-
-  <footer>HKDSE Mathematics (Compulsory Part) · Paper 2 · 2022 Q41 · Interactive Solution</footer>
-</main>
+</div>
 
 <script>
-/* =========================================================
-   Generic helpers
-   ========================================================= */
-function setupCanvas(id){
-  const cv = document.getElementById(id);
+  const cv = document.getElementById('cv');
   const ctx = cv.getContext('2d');
-  return {cv, ctx};
-}
+  let mode = 1;
 
-/* =========================================================
-   CANVAS 1 — right angle at O
-   ========================================================= */
-(function(){
-  const {cv, ctx} = setupCanvas('cv1');
-  const s1 = document.getElementById('s1');
-  const v1 = document.getElementById('v1');
-  const c1 = document.getElementById('c1');
-  const roA = document.getElementById('ro-angle');
-  const roM = document.getElementById('ro-mid');
-  const roR = document.getElementById('ro-r');
+  // Geometry: choose a=8, b=15 (i.e. 8:15)
+  const a = 8, b = 15;
 
-  // fixed a, b for view; scale stretches the drawing
-  const a0 = 100, b0 = 60;
+  // World-to-canvas transform (uniform scale)
+  const W = cv.width, H = cv.height;
+  const pad = 70;
+  const worldW = a, worldH = b;
+  const maxDim = Math.max(worldW, worldH);
+  const scale = (Math.min(W, H) - 2 * pad) / maxDim;
+  const ox = (W - worldW * scale) / 2;
+  const oy = H - (H - worldH * scale) / 2;
 
-  function draw(){
-    const W = cv.width, H = cv.height;
-    ctx.clearRect(0,0,W,H);
+  function X(x) { return ox + x * scale; }
+  function Y(y) { return oy - y * scale; }
 
-    const scale = (+s1.value)/100;
-    const a = a0*scale, b = b0*scale;
-    v1.textContent = s1.value + '%';
-
-    const padL = 70, padB = 60, padT = 40, padR = 80;
-    const plotW = W - padL - padR;
-    const plotH = H - padT - padB;
-    const maxX = 160, maxY = 150;
-    const sx = plotW/maxX, sy = plotH/maxY;
-    const X = x => padL + x*sx;
-    const Y = y => H - padB - y*sy;
-
-    // grid
-    ctx.strokeStyle = '#e8eef7'; ctx.lineWidth = 1;
-    for(let x=0; x<=maxX; x+=20){ctx.beginPath(); ctx.moveTo(X(x),Y(0)); ctx.lineTo(X(x),Y(maxY)); ctx.stroke();}
-    for(let y=0; y<=maxY; y+=20){ctx.beginPath(); ctx.moveTo(X(0),Y(y)); ctx.lineTo(X(maxX),Y(y)); ctx.stroke();}
-
-    // axes
-    ctx.strokeStyle = '#334155'; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(X(0),Y(maxY-10)); ctx.lineTo(X(0),Y(0)); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(X(0),Y(0)); ctx.lineTo(X(maxX-10),Y(0)); ctx.stroke();
-    ctx.fillStyle = '#334155'; ctx.font = 'bold 14px Consolas';
-    ctx.fillText('x', X(maxX-20), Y(0)+22);
-    ctx.fillText('y', X(0)-24, Y(maxY-14));
-    ctx.fillText('O', X(0)-20, Y(0)+20);
-
-    // circumcircle
-    const Mx = a/2, My = b/2;
-    const R = Math.sqrt(a*a+b*b)/2;
-    if(c1.checked){
-      ctx.beginPath();
-      ctx.arc(X(Mx), Y(My), R*sx, 0, Math.PI*2);
-      ctx.fillStyle = 'rgba(37,99,235,0.07)';
-      ctx.fill();
-      ctx.strokeStyle = '#2563eb'; ctx.lineWidth = 2; ctx.setLineDash([6,5]);
-      ctx.stroke(); ctx.setLineDash([]);
-    }
-
-    // triangle
+  function drawAxes() {
+    ctx.strokeStyle = '#cbd5e1';
+    ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(X(0),Y(0)); ctx.lineTo(X(a),Y(0)); ctx.lineTo(X(0),Y(b)); ctx.closePath();
-    ctx.fillStyle = 'rgba(16,185,129,0.13)'; ctx.fill();
-    ctx.strokeStyle = '#0f766e'; ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.moveTo(X(0),Y(0)); ctx.lineTo(X(a),Y(0)); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(X(0),Y(0)); ctx.lineTo(X(0),Y(b)); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(X(a),Y(0)); ctx.lineTo(X(0),Y(b)); ctx.stroke();
+    // x-axis
+    ctx.moveTo(X(-0.5), Y(0));
+    ctx.lineTo(X(a + 0.6), Y(0));
+    // y-axis
+    ctx.moveTo(X(0), Y(-0.5));
+    ctx.lineTo(X(0), Y(b + 0.6));
+    ctx.stroke();
 
-    // right-angle marker at O
-    const m = 22;
-    ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 2.5;
-    ctx.beginPath(); ctx.moveTo(X(0)+m, Y(0)); ctx.lineTo(X(0)+m, Y(0)-m); ctx.lineTo(X(0), Y(0)-m); ctx.stroke();
+    // arrow tips
+    ctx.fillStyle = '#94a3b8';
+    ctx.beginPath();
+    ctx.moveTo(X(a + 0.6), Y(0));
+    ctx.lineTo(X(a + 0.35), Y(0) - 5);
+    ctx.lineTo(X(a + 0.35), Y(0) + 5);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(X(0), Y(b + 0.6));
+    ctx.lineTo(X(0) - 5, Y(b + 0.35));
+    ctx.lineTo(X(0) + 5, Y(b + 0.35));
+    ctx.fill();
 
-    // diameter / radius
-    ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 2; ctx.setLineDash([4,4]);
-    ctx.beginPath(); ctx.moveTo(X(Mx),Y(My)); ctx.lineTo(X(a),Y(0)); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(X(Mx),Y(My)); ctx.lineTo(X(0),Y(b)); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(X(Mx),Y(My)); ctx.lineTo(X(0),Y(0)); ctx.stroke();
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '13px Segoe UI';
+    ctx.fillText('x', X(a + 0.35), Y(0) + 18);
+    ctx.fillText('y', X(0) + 8, Y(b + 0.5));
+  }
+
+  function drawTriangle(highlight) {
+    // Triangle O-A-B
+    ctx.lineWidth = highlight ? 4 : 2.5;
+    ctx.strokeStyle = highlight ? '#15803d' : '#16a34a';
+    ctx.beginPath();
+    ctx.moveTo(X(0), Y(0));
+    ctx.lineTo(X(a), Y(0));
+    ctx.lineTo(X(0), Y(b));
+    ctx.closePath();
+    ctx.stroke();
+
+    // Right angle marker at O
+    ctx.strokeStyle = '#16a34a';
+    ctx.lineWidth = 1.5;
+    const s = 14;
+    ctx.beginPath();
+    ctx.moveTo(X(0) + s, Y(0));
+    ctx.lineTo(X(0) + s, Y(0) - s);
+    ctx.lineTo(X(0), Y(0) - s);
+    ctx.stroke();
+  }
+
+  function drawCircle(highlight) {
+    const Cx = a / 2, Cy = b / 2;
+    const R = Math.sqrt(a * a + b * b) / 2;
+    ctx.beginPath();
+    ctx.arc(X(Cx), Y(Cy), R * scale, 0, Math.PI * 2);
+    ctx.strokeStyle = highlight ? '#1d4ed8' : '#2563eb';
+    ctx.lineWidth = highlight ? 3.5 : 2;
+    ctx.setLineDash([6, 4]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  function drawLine(highlight) {
+    // 4x + 16y = 17a  =>  y = (17a - 4x)/16
+    const x1 = -0.5;
+    const x2 = a + 0.6;
+    const y1 = (17 * a - 4 * x1) / 16;
+    const y2 = (17 * a - 4 * x2) / 16;
+    ctx.beginPath();
+    ctx.moveTo(X(x1), Y(y1));
+    ctx.lineTo(X(x2), Y(y2));
+    ctx.strokeStyle = highlight ? '#dc2626' : '#ef4444';
+    ctx.lineWidth = highlight ? 3.5 : 2;
+    ctx.stroke();
+  }
+
+  function drawMidpoint(highlight) {
+    const Cx = a / 2, Cy = b / 2;
+    // dashed AB (diameter / hypotenuse)
+    ctx.setLineDash([5, 5]);
+    ctx.strokeStyle = '#7c3aed';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(X(a), Y(0));
+    ctx.lineTo(X(0), Y(b));
+    ctx.stroke();
     ctx.setLineDash([]);
 
-    // points
-    function dot(x,y,color,label,dx,dy){
-      ctx.beginPath(); ctx.arc(X(x),Y(y),6,0,Math.PI*2);
-      ctx.fillStyle = color; ctx.fill();
-      ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
-      ctx.fillStyle = '#0f172a'; ctx.font = 'bold 15px Consolas';
-      ctx.fillText(label, X(x)+dx, Y(y)+dy);
-    }
-    dot(0,0,'#0f172a','O(0,0)',-16,20);
-    dot(a,0,'#dc2626','A(a,0)',8,22);
-    dot(0,b,'#1d4ed8','B(0,b)',-64,-10);
-    dot(Mx,My,'#f59e0b','M',12,-10);
-
-    // right angle label
-    ctx.fillStyle = '#dc2626'; ctx.font = 'bold 15px Segoe UI';
-    ctx.fillText('90°', X(0)+30, Y(0)-30);
-
-    // text info
-    ctx.font = 'bold 15px Segoe UI';
-    ctx.fillStyle = '#0f172a';
-    ctx.fillText('AB is a diameter  ⇒  M is the circumcentre', X(0)+30, Y(maxY-20));
-
-    // readouts
-    roA.textContent = '90.0°';
-    roM.textContent = '(' + Mx.toFixed(1) + ', ' + My.toFixed(1) + ')';
-    roR.textContent = R.toFixed(1);
-  }
-  s1.addEventListener('input', draw);
-  c1.addEventListener('change', draw);
-  window.addEventListener('resize', draw);
-  draw();
-})();
-
-/* =========================================================
-   CANVAS 2 — mid-point of AB
-   ========================================================= */
-(function(){
-  const {cv, ctx} = setupCanvas('cv2');
-  const s2 = document.getElementById('s2');
-  const v2 = document.getElementById('v2');
-  const c2 = document.getElementById('c2');
-  const roM = document.getElementById('ro2-m');
-  const roR = document.getElementById('ro2-r');
-  const roOn = document.getElementById('ro2-on');
-
-  function gcd(x,y){return y===0?x:gcd(y,x%y);}
-
-  function draw(){
-    const W = cv.width, H = cv.height;
-    ctx.clearRect(0,0,W,H);
-
-    // slider maps to a from 20..180, keeping 8:15 by default; but we want free exploration
-    const a = +s2.value;
-    const b = a*15/8;
-    // value label
-    const g = gcd(Math.round(a), Math.round(b));
-    v2.textContent = 'a : b = ' + Math.round(a/g) + ' : ' + Math.round(b/g);
-
-    const padL = 70, padB = 60, padT = 40, padR = 80;
-    const plotW = W-padL-padR, plotH = H-padT-padB;
-    const maxX = 200, maxY = 400;
-    const sx = plotW/maxX, sy = plotH/maxY;
-    const X = x => padL + x*sx;
-    const Y = y => H - padB - y*sy;
-
-    // grid
-    ctx.strokeStyle = '#e8eef7'; ctx.lineWidth = 1;
-    for(let x=0;x<=maxX;x+=20){ctx.beginPath();ctx.moveTo(X(x),Y(0));ctx.lineTo(X(x),Y(maxY));ctx.stroke();}
-    for(let y=0;y<=maxY;y+=50){ctx.beginPath();ctx.moveTo(X(0),Y(y));ctx.lineTo(X(maxX),Y(y));ctx.stroke();}
-
-    // axes
-    ctx.strokeStyle='#334155'; ctx.lineWidth=2;
-    ctx.beginPath(); ctx.moveTo(X(0),Y(maxY-50)); ctx.lineTo(X(0),Y(0)); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(X(0),Y(0)); ctx.lineTo(X(maxX-15),Y(0)); ctx.stroke();
-    ctx.fillStyle='#334155'; ctx.font='bold 14px Consolas';
-    ctx.fillText('x',X(maxX-25),Y(0)+22);
-    ctx.fillText('y',X(0)-24,Y(maxY-60));
-    ctx.fillText('O',X(0)-20,Y(0)+20);
-
-    const Mx=a/2, My=b/2, R=Math.sqrt(a*a+b*b)/2;
-
-    if(c2.checked){
-      ctx.beginPath(); ctx.arc(X(Mx),Y(My),R*sx,0,Math.PI*2);
-      ctx.fillStyle='rgba(245,158,11,0.08)'; ctx.fill();
-      ctx.strokeStyle='#f59e0b'; ctx.lineWidth=2.5; ctx.setLineDash([6,5]);
-      ctx.stroke(); ctx.setLineDash([]);
-    }
-
-    // triangle
+    // centre dot
     ctx.beginPath();
-    ctx.moveTo(X(0),Y(0)); ctx.lineTo(X(a),Y(0)); ctx.lineTo(X(0),Y(b)); ctx.closePath();
-    ctx.fillStyle='rgba(37,99,235,0.10)'; ctx.fill();
-    ctx.strokeStyle='#2563eb'; ctx.lineWidth=2.5; ctx.stroke();
+    ctx.arc(X(Cx), Y(Cy), highlight ? 9 : 7, 0, Math.PI * 2);
+    ctx.fillStyle = '#7c3aed';
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 2;
+    ctx.stroke();
 
-    // AB diameter
-    ctx.strokeStyle='#0f766e'; ctx.lineWidth=3;
-    ctx.beginPath(); ctx.moveTo(X(a),Y(0)); ctx.lineTo(X(0),Y(b)); ctx.stroke();
-
-    // radii
-    if(c2.checked){
-      ctx.strokeStyle='#f59e0b'; ctx.lineWidth=1.8; ctx.setLineDash([4,4]);
-      ctx.beginPath(); ctx.moveTo(X(Mx),Y(My)); ctx.lineTo(X(a),Y(0)); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(X(Mx),Y(My)); ctx.lineTo(X(0),Y(b)); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(X(Mx),Y(My)); ctx.lineTo(X(0),Y(0)); ctx.stroke();
-      ctx.setLineDash([]);
-    }
-
-    // points
-    function dot(x,y,color,label,dx,dy){
-      ctx.beginPath(); ctx.arc(X(x),Y(y),6,0,Math.PI*2); ctx.fillStyle=color; ctx.fill();
-      ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
-      ctx.fillStyle='#0f172a'; ctx.font='bold 15px Consolas';
-      ctx.fillText(label,X(x)+dx,Y(y)+dy);
-    }
-    dot(0,0,'#0f172a','O',-14,20);
-    dot(a,0,'#dc2626','A(a,0)',8,22);
-    dot(0,b,'#1d4ed8','B(0,b)',-70,-8);
-    dot(Mx,My,'#f59e0b','M(a/2,b/2)',12,-10);
-
-    // right angle at O
-    const m=20;
-    ctx.strokeStyle='#dc2626'; ctx.lineWidth=2;
-    ctx.beginPath(); ctx.moveTo(X(0)+m,Y(0)); ctx.lineTo(X(0)+m,Y(0)-m); ctx.lineTo(X(0),Y(0)-m); ctx.stroke();
-
-    // readouts
-    roM.textContent = '(' + Mx.toFixed(1) + ', ' + My.toFixed(1) + ')';
-    roR.textContent = 'R = ' + R.toFixed(1);
-    roOn.textContent = 'MO = ' + (Math.sqrt(Mx*Mx+My*My)).toFixed(1);
+    // label
+    ctx.fillStyle = '#5b21b6';
+    ctx.font = 'bold 14px Segoe UI';
+    ctx.fillText('M (circumcentre)', X(Cx) + 12, Y(Cy) - 10);
   }
-  s2.addEventListener('input', draw);
-  c2.addEventListener('change', draw);
-  window.addEventListener('resize', draw);
-  draw();
-})();
 
-/* =========================================================
-   CANVAS 3 — the line 4x + 16y = 17a
-   ========================================================= */
-(function(){
-  const {cv, ctx} = setupCanvas('cv3');
-  const s3 = document.getElementById('s3');
-  const v3 = document.getElementById('v3');
-  const c3 = document.getElementById('c3');
-  const roLHS = document.getElementById('ro3-lhs');
-  const roRHS = document.getElementById('ro3-rhs');
-  const roOK = document.getElementById('ro3-ok');
+  function drawPoints() {
+    const pts = [
+      { x: 0, y: 0, label: 'O', dx: -22, dy: 22 },
+      { x: a, y: 0, label: 'A (a, 0)', dx: 12, dy: 22 },
+      { x: 0, y: b, label: 'B (0, b)', dx: -78, dy: -14 },
+    ];
+    pts.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(X(p.x), Y(p.y), 6, 0, Math.PI * 2);
+      ctx.fillStyle = '#f59e0b';
+      ctx.fill();
+      ctx.strokeStyle = '#b45309';
+      ctx.lineWidth = 2;
+      ctx.stroke();
 
-  function gcd(x,y){return y===0?x:gcd(y,x%y);}
-
-  function draw(){
-    const W = cv.width, H = cv.height;
-    ctx.clearRect(0,0,W,H);
-
-    // a fixed at 80, b derived from slider ratio (a:b)
-    const a = 80;
-    const ratio = +s3.value;         // b = a * ratio/100 roughly
-    const b = a*ratio/100 * (15/8) * (8/15); // keep simple
-    const bVal = a*ratio/100 * (15/8);
-    const bb = bVal; // b value
-
-    // ratio display
-    const g = gcd(Math.round(a), Math.round(bb));
-    v3.textContent = Math.round(a/g) + ' : ' + Math.round(bb/g);
-
-    const padL=70, padB=60, padT=40, padR=80;
-    const plotW=W-padL-padR, plotH=H-padT-padB;
-    const maxX=220, maxY=240;
-    const sx=plotW/maxX, sy=plotH/maxY;
-    const X=x=>padL+x*sx, Y=y=>H-padB-y*sy;
-
-    // grid
-    ctx.strokeStyle='#e8eef7'; ctx.lineWidth=1;
-    for(let x=0;x<=maxX;x+=20){ctx.beginPath();ctx.moveTo(X(x),Y(0));ctx.lineTo(X(x),Y(maxY));ctx.stroke();}
-    for(let y=0;y<=maxY;y+=20){ctx.beginPath();ctx.moveTo(X(0),Y(y));ctx.lineTo(X(maxX),Y(y));ctx.stroke();}
-
-    // axes
-    ctx.strokeStyle='#334155'; ctx.lineWidth=2;
-    ctx.beginPath(); ctx.moveTo(X(0),Y(maxY-20)); ctx.lineTo(X(0),Y(0)); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(X(0),Y(0)); ctx.lineTo(X(maxX-15),Y(0)); ctx.stroke();
-    ctx.fillStyle='#334155'; ctx.font='bold 14px Consolas';
-    ctx.fillText('x',X(maxX-25),Y(0)+22);
-    ctx.fillText('y',X(0)-24,Y(maxY-30));
-    ctx.fillText('O',X(0)-20,Y(0)+20);
-
-    // line 4x + 16y = 17a  ->  y = (17a - 4x)/16
-    if(c3.checked){
-      const x1 = 0;
-      const y1 = 17*a/16;
-      const x2 = 17*a/4;
-      const y2 = 0;
-      ctx.strokeStyle='#db2777'; ctx.lineWidth=2.5;
-      ctx.beginPath(); ctx.moveTo(X(x1),Y(y1)); ctx.lineTo(X(x2),Y(y2)); ctx.stroke();
-      // label
-      ctx.fillStyle='#db2777'; ctx.font='bold 14px Segoe UI';
-      const lx = Math.min(x2, maxX-70);
-      const ly = (17*a-4*lx)/16;
-      ctx.fillText('4x + 16y = 17a', X(lx)-40, Y(ly)-10);
-    }
-
-    // triangle
-    ctx.beginPath();
-    ctx.moveTo(X(0),Y(0)); ctx.lineTo(X(a),Y(0)); ctx.lineTo(X(0),Y(bb)); ctx.closePath();
-    ctx.fillStyle='rgba(37,99,235,0.10)'; ctx.fill();
-    ctx.strokeStyle='#2563eb'; ctx.lineWidth=2.5; ctx.stroke();
-
-    // circumcircle
-    const Mx=a/2, My=bb/2, R=Math.sqrt(a*a+bb*bb)/2;
-    ctx.beginPath(); ctx.arc(X(Mx),Y(My),R*sx,0,Math.PI*2);
-    ctx.strokeStyle='rgba(245,158,11,0.6)'; ctx.lineWidth=2; ctx.setLineDash([6,5]);
-    ctx.stroke(); ctx.setLineDash([]);
-
-    // points
-    function dot(x,y,color,label,dx,dy){
-      ctx.beginPath(); ctx.arc(X(x),Y(y),6,0,Math.PI*2); ctx.fillStyle=color; ctx.fill();
-      ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
-      ctx.fillStyle='#0f172a'; ctx.font='bold 14px Consolas';
-      ctx.fillText(label,X(x)+dx,Y(y)+dy);
-    }
-    dot(0,0,'#0f172a','O',-14,20);
-    dot(a,0,'#dc2626','A(a,0)',8,22);
-    dot(0,bb,'#1d4ed8','B(0,b)',-64,-8);
-
-    // M point
-    const onLine = Math.abs(4*Mx+16*My-17*a) < 0.5;
-    dot(Mx,My, onLine?'#10b981':'#f59e0b','M',12,-10);
-
-    // highlight M
-    ctx.beginPath(); ctx.arc(X(Mx),Y(My),11,0,Math.PI*2);
-    ctx.strokeStyle= onLine?'#10b981':'#ef4444'; ctx.lineWidth=2.5; ctx.stroke();
-
-    // readouts
-    roLHS.textContent = (4*Mx+16*My).toFixed(1);
-    roRHS.textContent = (17*a).toFixed(1);
-    roOK.textContent = onLine? 'YES ✓' : 'NO ✗';
-    roOK.style.color = onLine? '#047857':'#b91c1c';
+      ctx.fillStyle = '#92400e';
+      ctx.font = 'bold 15px Segoe UI';
+      ctx.fillText(p.label, X(p.x) + p.dx, Y(p.y) + p.dy);
+    });
   }
-  s3.addEventListener('input', draw);
-  c3.addEventListener('change', draw);
-  window.addEventListener('resize', draw);
-  draw();
-})();
 
-/* =========================================================
-   STEP-BY-STEP REVEAL
-   ========================================================= */
-document.querySelectorAll('button.next').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    const id = btn.dataset.target;
-    const steps = document.querySelectorAll('#'+id+' .step');
-    const counter = document.getElementById('cnt' + id.replace('steps',''));
-    let shown = 0;
-    steps.forEach(s=>{ if(s.classList.contains('show')) shown++; });
-    if(shown < steps.length){
-      steps[shown].classList.add('show');
-      shown++;
-      if(counter) counter.textContent = shown + ' / ' + steps.length;
-      if(shown === steps.length){
-        btn.disabled = true;
-        btn.textContent = 'All steps revealed ✓';
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    drawAxes();
+
+    if (mode === 1) {
+      drawTriangle(true);
+      drawPoints();
+    } else if (mode === 2) {
+      drawTriangle(false);
+      drawCircle(true);
+      drawMidpoint(true);
+      drawPoints();
+    } else if (mode === 3) {
+      drawTriangle(false);
+      drawCircle(false);
+      drawLine(true);
+      drawMidpoint(true);
+      drawPoints();
+    }
+  }
+
+  const steps = Array.from(document.querySelectorAll('.step'));
+  const obs = new IntersectionObserver((es) => {
+    es.forEach(e => {
+      if (e.isIntersecting) {
+        const m = +e.target.dataset.step;
+        mode = m;
+        steps.forEach(st => st.classList.toggle('active', st === e.target));
+        draw();
       }
-      if(window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise();
-    }
-  });
-});
-</script>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
+    });
+  }, { rootMargin: '-15% 0px -55% 0px', threshold: 0 });
+  steps.forEach(st => obs.observe(st));
 
+  draw();
+  window.addEventListener('resize', draw);
+</script>
 </body>
 </html>
