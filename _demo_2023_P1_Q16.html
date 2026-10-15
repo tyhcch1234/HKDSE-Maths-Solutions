@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2023 Paper 1 Q16 — Interactive Demo (left diagram · right maths)</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] }, svg:{fontCache:'global'} };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root{
+    --ink:#0f172a; --muted:#64748b; --line:#e2e8f0; --bg:#f1f5f9;
+    --blue:#2563eb; --red:#ef4444; --green:#10b981; --orange:#f59e0b;
+    --purple:#7c3aed; --pink:#ec4899; --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans SC",sans-serif;line-height:1.65;}
+  .wrap{max-width:1280px;margin:0 auto;padding:20px 16px 60px;}
+
+  /* hero */
+  .hero{background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 55%,#7c3aed 130%);color:#fff;
+    border-radius:var(--radius);padding:22px 26px;margin-bottom:18px;}
+  .hero h1{margin:0 0 4px;font-size:1.35rem;font-weight:800;}
+  .hero p{margin:0;opacity:.92;font-size:.92rem;}
+
+  /* split: left diagram / right maths */
+  .split{display:grid;grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;align-items:start;}
+  @media(max-width:900px){.split{grid-template-columns:1fr;}}
+
+  .panel{background:#fff;border:1px solid var(--line);border-radius:var(--radius);
+    padding:18px;box-shadow:0 4px 16px rgba(15,23,42,.06);}
+  .panel h2{margin:0 0 12px;font-size:1.02rem;font-weight:800;color:var(--blue);
+    display:flex;align-items:center;gap:8px;border-bottom:2px solid #f1f5f9;padding-bottom:10px;}
+  .panel h2 .dot{width:10px;height:10px;border-radius:50%;background:var(--blue);}
+
+  /* left */
+  .diagram{position:sticky;top:16px;}
+  canvas{width:100%;height:auto;display:block;border-radius:12px;background:#fff;border:1px solid #f1f5f9;}
+  .ctrl{margin-top:12px;background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:12px 14px;}
+  .ctrl label{font-weight:700;font-size:.9rem;display:flex;justify-content:space-between;gap:10px;}
+  .ctrl label b{color:var(--red);font-variant-numeric:tabular-nums;}
+  input[type=range]{width:100%;margin-top:8px;accent-color:var(--red);}
+  .readout{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+  .ro{font-size:.82rem;font-weight:700;border-radius:10px;padding:6px 12px;
+    background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;font-variant-numeric:tabular-nums;}
+  .ro.good{background:#ecfdf5;color:#047857;border-color:#a7f3d0;}
+  .ro.bad{background:#fef2f2;color:#b91c1c;border-color:#fecaca;}
+
+  /* legend */
+  .legend{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:10px;font-size:.8rem;font-weight:600;color:#334155;}
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .legend i{width:12px;height:12px;border-radius:3px;display:inline-block;}
+
+  /* right: steps */
+  .step{margin-top:12px;padding:14px 16px;border-radius:12px;background:#f8fafc;
+    border:1px solid var(--line);border-left:4px solid var(--blue);}
+  .step .tag{font-weight:800;font-size:.8rem;color:var(--blue);letter-spacing:.03em;}
+  .math{overflow-x:auto;padding:4px 0;}
+  .hint{background:#fffbeb;border:1px solid #fde68a;border-left:4px solid var(--orange);
+    border-radius:10px;padding:9px 13px;margin-top:10px;font-size:.88rem;color:#78350f;}
+  .answer{background:#ecfdf5;border:1px solid #a7f3d0;border-left:4px solid var(--green);
+    border-radius:10px;padding:9px 13px;margin-top:10px;font-size:.9rem;color:#065f46;font-weight:700;}
+
+  /* question options */
+  .qtext{font-size:.98rem;}
+  .optlist{list-style:none;margin:8px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;}
+  .optlist li{background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-weight:600;}
+  .optlist .k{color:var(--blue);font-weight:800;margin-right:6px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>2023 Paper 1 · Question 16 — Coordinate Geometry</h1>
+    <p>Circle C meets the line y = mx through the origin. Drag <b>m</b> and watch the points Q, R and the ratio OQ : QR change.</p>
+  </header>
+
+  <div class="split">
+
+    <!-- ============ LEFT: interactive diagram ============ -->
+    <section class="panel diagram">
+      <h2><span class="dot"></span> Interactive diagram</h2>
+      <canvas id="cv" width="680" height="640"></canvas>
+
+      <div class="ctrl">
+        <label>Line slope <b>m = <span id="mv">0.75</span></b></label>
+        <input type="range" id="sl" min="-0.5" max="3" step="0.01" value="0.75">
+      </div>
+
+      <div class="readout" id="ro"></div>
+
+      <div class="legend">
+        <span><i style="background:#2563eb"></i> Circle C</span>
+        <span><i style="background:#ef4444"></i> Line y = mx</span>
+        <span><i style="background:#7c3aed"></i> Centre (3,6)</span>
+        <span><i style="background:#10b981"></i> Point Q</span>
+        <span><i style="background:#f59e0b"></i> Point R</span>
+        <span><i style="background:#64748b"></i> Origin O</span>
+      </div>
+    </section>
+
+    <!-- ============ RIGHT: question + maths ============ -->
+    <section class="panel">
+      <h2><span class="dot"></span> Question &amp; solution</h2>
+
+      <div class="qtext">
+        <p><b>(b)</b> Denote the circle \(x^2+y^2-6x-12y+20=0\) by \(C\). Find the constant \(m\) such that the straight line \(y=mx\) cuts \(C\) at the points \(Q\) and \(R\) with \(OQ:QR=1:4\), where \(O\) is the origin.</p>
+      </div>
+
+      <div class="step">
+        <div class="tag">STEP 1 · Centre &amp; radius of C</div>
+        <div class="math">\[ x^2+y^2-6x-12y+20=0 \;\Rightarrow\; (x-3)^2+(y-6)^2=25 \]</div>
+        <p>Centre \((3,6)\), radius \(5\).</p>
+      </div>
+
+      <div class="step">
+        <div class="tag">STEP 2 · Substitute y = mx</div>
+        <div class="math">\[ x^2+(mx)^2-6x-12(mx)+20=0 \;\Rightarrow\; (m^2+1)x^2-(12m+6)x+20=0 \]</div>
+        <p>Let the \(x\)-coordinates of \(Q\) and \(R\) be \(t\) and \(5t\) (since \(OR=OQ+QR=5\,OQ\)).</p>
+        <div class="hint"><b>Why \(5t\)?</b> \(OQ:QR=1:4\) means \(QR=4\,OQ\), so \(OR=OQ+QR=5\,OQ\). On the line through \(O\), distance scales with \(x\).</div>
+      </div>
+
+      <div class="step">
+        <div class="tag">STEP 3 · Sum &amp; product of roots</div>
+        <div class="math">\[ t+5t=\frac{12m+6}{m^2+1},\qquad t\cdot 5t=\frac{20}{m^2+1} \]</div>
+        <p>Using \(5a^2=36b\) from part (a) with \(a=-\,\dfrac{12m+6}{m^2+1}\) and \(b=\dfrac{20}{m^2+1}\):</p>
+        <div class="math">\[ 5\left(\frac{12m+6}{m^2+1}\right)^2 = 36\left(\frac{20}{m^2+1}\right) \]</div>
+      </div>
+
+      <div class="step">
+        <div class="tag">STEP 4 · Solve for m</div>
+        <div class="math">\[ (12m+6)^2=144(m^2+1)\;\Rightarrow\;(m+\tfrac12)^2=m^2+1\;\Rightarrow\;m=\frac34 \]</div>
+        <div class="answer">Answer: \(m=\dfrac{3}{4}\)</div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<script>
+(function(){
+  const cv = document.getElementById('cv');
+  const sl = document.getElementById('sl');
+  const mv = document.getElementById('mv');
+  const ro = document.getElementById('ro');
+  const dpr = window.devicePixelRatio || 1;
+  const W = 680, H = 640;
+  cv.width = W*dpr; cv.height = H*dpr;
+  cv.style.width = '100%'; cv.style.height = 'auto';
+  const ctx = cv.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+
+  // view: x in [-2,10], y in [-2,12]
+  const xmin=-2, xmax=10, ymin=-2, ymax=12;
+  const padL=52, padR=24, padT=24, padB=44;
+  const sx=(xmax-xmin)/(W-padL-padR), sy=(ymax-ymin)/(H-padT-padB);
+  const X=x=>padL+(x-xmin)/sx;
+  const Y=y=>H-padB-(y-ymin)/sy;
+
+  function grid(){
+    ctx.save();
+    ctx.strokeStyle='#eef2f7'; ctx.lineWidth=1; ctx.font='600 12px system-ui,sans-serif';
+    ctx.fillStyle='#94a3b8';
+    for(let x=0;x<=xmax;x+=1){
+      ctx.beginPath();ctx.moveTo(X(x),Y(ymin));ctx.lineTo(X(x),Y(ymax));ctx.stroke();
+      ctx.textAlign='center';ctx.textBaseline='top';ctx.fillText(x,X(x),Y(0)+6);
+    }
+    for(let y=0;y<=ymax;y+=2){
+      ctx.beginPath();ctx.moveTo(X(xmin),Y(y));ctx.lineTo(X(xmax),Y(y));ctx.stroke();
+      ctx.textAlign='right';ctx.textBaseline='middle';ctx.fillText(y,X(0)-6,Y(y));
+    }
+    // axes
+    ctx.strokeStyle='#334155';ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(X(xmin),Y(0));ctx.lineTo(X(xmax),Y(0));ctx.stroke();
+    ctx.beginPath();ctx.moveTo(X(0),Y(ymin));ctx.lineTo(X(0),Y(ymax));ctx.stroke();
+    ctx.fillStyle='#334155';ctx.font='italic 700 14px Georgia,serif';
+    ctx.textAlign='right';ctx.textBaseline='top';ctx.fillText('x',X(xmax)-2,Y(0)+4);
+    ctx.textAlign='left';ctx.textBaseline='bottom';ctx.fillText('y',X(0)+6,Y(ymax));
+    ctx.fillStyle='#94a3b8';ctx.font='600 12px system-ui';ctx.textAlign='right';ctx.textBaseline='top';
+    ctx.fillText('O',X(0)-4,Y(0)+4);
+    ctx.restore();
+  }
+
+  function dot(x,y,color,r,label,dx,dy){
+    ctx.save();
+    ctx.beginPath();ctx.arc(X(x),Y(y),r,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();
+    if(color==='#10b981'||color==='#f59e0b'||color==='#7c3aed'){ctx.lineWidth=2;ctx.strokeStyle='#fff';ctx.stroke();}
+    if(label){
+      ctx.fillStyle=color;ctx.font='800 14px system-ui,sans-serif';
+      ctx.textAlign='left';ctx.textBaseline='bottom';
+      ctx.fillText(label,X(x)+dx,Y(y)+dy);
+    }
+    ctx.restore();
+  }
+
+  function draw(){
+    const m = parseFloat(sl.value);
+    mv.textContent = m.toFixed(2);
+    ctx.clearRect(0,0,W,H);
+    grid();
+
+    // circle C: centre (3,6) r=5
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(X(3),Y(6),5/sx,0,Math.PI*2);
+    ctx.strokeStyle='#2563eb';ctx.lineWidth=3;ctx.stroke();
+    ctx.restore();
+    dot(3,6,'#7c3aed',6,'(3,6)',8,14);
+
+    // line y=mx (draw from xmin to xmax)
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(X(xmin),Y(m*xmin));
+    ctx.lineTo(X(xmax),Y(m*xmax));
+    ctx.strokeStyle='#ef4444';ctx.lineWidth=2.5;ctx.stroke();
+    ctx.fillStyle='#b91c1c';ctx.font='700 13px system-ui,sans-serif';
+    ctx.textAlign='left';ctx.textBaseline='bottom';
+    ctx.fillText('y = '+m.toFixed(2)+'x', X(8.4), Y(m*8.4)-6);
+    ctx.restore();
+
+    // intersections of line and circle
+    // (m^2+1)x^2 - (12m+6)x + 20 = 0
+    const A=m*m+1, B=-(12*m+6), Cc=20;
+    const disc=B*B-4*A*Cc;
+    let qx=null, rx=null;
+    if(disc>=0){
+      const x1=(-B-Math.sqrt(disc))/(2*A);
+      const x2=(-B+Math.sqrt(disc))/(2*A);
+      // smaller x = Q (nearer origin), larger = R
+      qx=Math.min(x1,x2); rx=Math.max(x1,x2);
+      if(qx>0){
+        const qy=m*qx, ry=m*rx;
+        dot(qx,qy,'#10b981',7,'Q',10,-6);
+        dot(rx,ry,'#f59e0b',7,'R',10,-6);
+        // segment OQ and QR highlight
+        ctx.save();
+        ctx.lineWidth=4;
+        ctx.beginPath();ctx.moveTo(X(0),Y(0));ctx.lineTo(X(qx),Y(qy));ctx.strokeStyle='#10b981';ctx.stroke();
+        ctx.beginPath();ctx.moveTo(X(qx),Y(qy));ctx.lineTo(X(rx),Y(ry));ctx.strokeStyle='#f59e0b';ctx.stroke();
+        ctx.restore();
+      }
+    }
+    dot(0,0,'#64748b',5);
+
+    // readout
+    let html='';
+    if(qx!==null && qx>0){
+      const qy=m*qx, ry=m*rx;
+      const OQ=Math.hypot(qx,qy), QR=Math.hypot(rx-qx,ry-qy);
+      const ratio=OQ/QR;
+      const good=Math.abs(ratio-0.25)<0.01;
+      html =
+        `<span class="ro">Q = (${qx.toFixed(2)}, ${qy.toFixed(2)})</span>`+
+        `<span class="ro">R = (${rx.toFixed(2)}, ${ry.toFixed(2)})</span>`+
+        `<span class="ro">OQ:QR = ${ratio.toFixed(3)}</span>`+
+        `<span class="ro ${good?'good':'bad'}">${good?'✓ OQ:QR = 1:4  (m = 0.75)':'target: OQ:QR = 1:4'}</span>`;
+    } else {
+      html = `<span class="ro bad">Line does not meet the circle on the positive side — increase m</span>`;
+    }
+    ro.innerHTML = html;
+  }
+
+  sl.addEventListener('input', draw);
+  draw();
+})();
+</script>
+</body>
+</html>
