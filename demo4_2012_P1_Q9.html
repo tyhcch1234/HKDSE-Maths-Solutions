@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2012 Paper 1 Q9 — Mensuration (trapezoidal prism)</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] }, svg:{fontCache:'global'} };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root{--ink:#0f172a;--muted:#64748b;--line:#e2e8f0;--bg:#f1f5f9;--blue:#2563eb;--red:#ef4444;
+    --green:#10b981;--orange:#f59e0b;--purple:#7c3aed;--pink:#ec4899;--radius:16px;}
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans SC",sans-serif;line-height:1.65;}
+  .wrap{max-width:1280px;margin:0 auto;padding:20px 16px 60px;}
+  .hero{background:linear-gradient(135deg,#0f172a,#1e3a8a 55%,#7c3aed 130%);color:#fff;
+    border-radius:var(--radius);padding:22px 26px;margin-bottom:18px;}
+  .hero h1{margin:0 0 4px;font-size:1.35rem;font-weight:800;}
+  .hero p{margin:0;opacity:.92;font-size:.92rem;}
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start;}
+  @media(min-width:900px){.split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}}
+  .panel{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:18px;
+    box-shadow:0 4px 16px rgba(15,23,42,.06);}
+  .panel h2{margin:0 0 12px;font-size:1.02rem;font-weight:800;color:var(--blue);
+    display:flex;align-items:center;gap:8px;border-bottom:2px solid #f1f5f9;padding-bottom:10px;}
+  .panel h2 .dot{width:10px;height:10px;border-radius:50%;background:var(--blue);}
+  .diagram{position:sticky;top:16px;}
+  canvas{width:100%;height:auto;display:block;border-radius:12px;background:#fff;border:1px solid #f1f5f9;}
+  .readout{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+  .ro{font-size:.82rem;font-weight:700;border-radius:10px;padding:6px 12px;background:#eff6ff;color:#1d4ed8;
+    border:1px solid #bfdbfe;font-variant-numeric:tabular-nums;}
+  .ro.good{background:#ecfdf5;color:#047857;border-color:#a7f3d0;}
+  .legend{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:10px;font-size:.8rem;font-weight:600;color:#334155;}
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .legend i{width:12px;height:12px;border-radius:3px;display:inline-block;}
+  .step{margin-top:12px;padding:14px 16px;border-radius:12px;background:#f8fafc;border:1px solid var(--line);
+    border-left:4px solid var(--blue);}
+  .step.active{border-left-color:var(--green);background:#f0fdf4;}
+  .step .tag{font-weight:800;font-size:.8rem;color:var(--blue);letter-spacing:.03em;}
+  .step.active .tag{color:#047857;}
+  .math{overflow-x:auto;padding:4px 0;}
+  .hint{background:#fffbeb;border:1px solid #fde68a;border-left:4px solid var(--orange);
+    border-radius:10px;padding:9px 13px;margin-top:10px;font-size:.88rem;color:#78350f;}
+  .answer{background:#ecfdf5;border:1px solid #a7f3d0;border-left:4px solid var(--green);
+    border-radius:10px;padding:9px 13px;margin-top:10px;font-size:.9rem;color:#065f46;font-weight:700;}
+  .qtext{font-size:.98rem;}
+  @media(max-width:640px){
+    body{font-size:14.5px;}
+    .wrap{padding:10px 8px 40px;}
+    .hero{padding:14px 15px;border-radius:12px;}
+    .hero h1{font-size:1.02rem;}
+    .hero p{font-size:.82rem;}
+    .panel{padding:10px;border-radius:12px;}
+    .panel h2{font-size:.88rem;margin:0 0 8px;padding-bottom:8px;}
+    .step{margin-top:8px;padding:9px 11px;border-radius:9px;}
+    .step .tag{font-size:.72rem;}
+    .qtext{font-size:.88rem;}
+    .ro{font-size:.7rem;padding:4px 8px;border-radius:8px;}
+    .legend{font-size:.68rem;gap:5px 8px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>2012 Paper 1 · Question 9 — Trapezoidal Prism</h1>
+    <p>Volume 1020 cm³, trapezium base. Scroll the solution — the prism highlights the matching part.</p>
+  </header>
+
+  <div class="split">
+    <section class="panel diagram">
+      <h2><span class="dot"></span> Interactive diagram</h2>
+      <canvas id="cv" width="680" height="560"></canvas>
+      <div class="readout" id="ro"></div>
+      <div class="legend">
+        <span><i style="background:#2563eb"></i> Base ABCD</span>
+        <span><i style="background:#94a3b8"></i> Top EFGH</span>
+        <span><i style="background:#ef4444"></i> Height DE</span>
+        <span><i style="background:#10b981"></i> AD (find)</span>
+        <span><i style="background:#f59e0b"></i> CD</span>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2><span class="dot"></span> Question &amp; solution</h2>
+      <div class="qtext">
+        <p>In Figure 2, the volume of the solid right prism \(ABCDEFGH\) is \(1020\text{ cm}^3\). The base \(ABCD\) is a trapezium with \(AD\parallel BC\). It is given that \(\angle BAD=90^\circ\), \(AB=12\text{ cm}\), \(BC=6\text{ cm}\) and \(DE=10\text{ cm}\).</p>
+        <p><b>(a)</b> Find the length of \(AD\).</p>
+        <p><b>(b)</b> Find the total surface area of the prism.</p>
+      </div>
+
+      <div class="step" data-step="1">
+        <div class="tag">STEP 1 · Volume formula</div>
+        <div class="math">\[ \text{Volume} = \text{base area} \times \text{height} \]</div>
+        <p>Base area of trapezium \(ABCD\):</p>
+        <div class="math">\[ \frac{AD+BC}{2}\times AB = \frac{AD+6}{2}\times 12 = 6(AD+6) \]</div>
+      </div>
+
+      <div class="step" data-step="2">
+        <div class="tag">STEP 2 · Find AD (a)</div>
+        <div class="math">\[ 6(AD+6)\times 10 = 1020 \;\Rightarrow\; 60(AD+6)=1020 \]</div>
+        <div class="math">\[ AD+6=17 \;\Rightarrow\; AD=11\text{ cm} \]</div>
+        <div class="answer">Answer (a): \(AD=11\text{ cm}\)</div>
+      </div>
+
+      <div class="step" data-step="3">
+        <div class="tag">STEP 3 · Surface area (b)</div>
+        <p>First find \(CD\) (drop a perpendicular):</p>
+        <div class="math">\[ CD=\sqrt{(11-6)^2+12^2}=\sqrt{25+144}=13\text{ cm} \]</div>
+        <p>Base area \(=102\), and the four rectangular faces:</p>
+        <div class="math">\[ 12{\cdot}10+6{\cdot}10+13{\cdot}10+11{\cdot}10=120+60+130+110=420 \]</div>
+        <div class="math">\[ \text{Total}=2(102)+420=624\text{ cm}^2 \]</div>
+        <div class="answer">Answer (b): total surface area \(=624\text{ cm}^2\)</div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+(function(){
+  const cv=document.getElementById('cv'), ro=document.getElementById('ro');
+  const dpr=window.devicePixelRatio||1, W=680, H=560;
+  cv.width=W*dpr; cv.height=H*dpr; cv.style.width='100%'; cv.style.height='auto';
+  const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
+  let mode=1;
+
+  // prism vertices (front base ABCD, back top EFGH)
+  const A=[70,470], B=[70,260], C=[190,260], D=[290,470];
+  const dx=85, dy=-110;               // oblique offset (depth + height)
+  const E=[A[0]+dx,A[1]+dy], F=[B[0]+dx,B[1]+dy], G=[C[0]+dx,C[1]+dy], H=[D[0]+dx,D[1]+dy];
+
+  function seg(p,q,color,w,dash){
+    ctx.save();ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(q[0],q[1]);
+    ctx.strokeStyle=color;ctx.lineWidth=w;if(dash)ctx.setLineDash([6,4]);ctx.stroke();ctx.setLineDash([]);ctx.restore();
+  }
+  function pt(p,color,r,label,dx2,dy2){
+    ctx.save();ctx.beginPath();ctx.arc(p[0],p[1],r,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();
+    ctx.lineWidth=2;ctx.strokeStyle='#fff';ctx.stroke();
+    if(label){ctx.fillStyle=color;ctx.font='800 14px system-ui';ctx.textAlign='left';ctx.textBaseline='bottom';
+      ctx.fillText(label,p[0]+dx2,p[1]+dy2);}
+    ctx.restore();
+  }
+  function face(pts,color,alpha){
+    ctx.save();ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);
+    for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i][0],pts[i][1]);
+    ctx.closePath();ctx.fillStyle=color;ctx.globalAlpha=alpha;ctx.fill();ctx.globalAlpha=1;ctx.restore();
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    const base='#2563eb', top='#94a3b8', edge='#2563eb';
+
+    if(mode===1){
+      // highlight base + height
+      face([A,B,C,D],'#2563eb',0.15);
+      seg(D,H,'#ef4444',3,true);   // height DE/DH
+    } else if(mode===2){
+      face([A,B,C,D],'#2563eb',0.1);
+      seg(A,D,'#10b981',4);        // AD
+      seg(A,B,'#334155',3);        // AB=12
+      seg(B,C,'#334155',3);        // BC=6
+    } else if(mode===3){
+      // highlight all faces
+      face([A,B,C,D],'#2563eb',0.12);
+      face([E,F,G,H],'#94a3b8',0.12);
+      face([A,B,F,E],'#f59e0b',0.15);
+      face([B,C,G,F],'#ef4444',0.15);
+      face([C,D,H,G],'#7c3aed',0.15);
+      face([D,A,E,H],'#10b981',0.15);
+      seg(A,D,'#10b981',3);
+    }
+
+    // front base
+    seg(A,B,base,2.5);seg(B,C,base,2.5);seg(C,D,base,2.5);seg(D,A,base,2.5);
+    // top
+    seg(E,F,top,2);seg(F,G,top,2);seg(G,H,top,2);seg(H,E,top,2);
+    // vertical edges
+    seg(A,E,edge,2);seg(B,F,edge,2);seg(C,G,edge,2);seg(D,H,edge,2);
+
+    // labels
+    pt(A,'#334155',5,'A',-20,-2);
+    pt(B,'#334155',5,'B',-20,-2);
+    pt(C,'#334155',5,'C',8,-2);
+    pt(D,'#334155',5,'D',10,-2);
+    pt(E,'#64748b',5,'E',8,-8);
+    pt(F,'#64748b',5,'F',8,-8);
+    pt(G,'#64748b',5,'G',8,-8);
+    pt(H,'#64748b',5,'H',10,-8);
+
+    ctx.save();ctx.font='700 13px system-ui';
+    if(mode===1){
+      ctx.fillStyle='#2563eb';ctx.textAlign='center';ctx.textBaseline='bottom';
+      ctx.fillText('base = trapezium ABCD', (A[0]+D[0])/2, 500);
+      ctx.fillStyle='#ef4444';ctx.textAlign='left';ctx.textBaseline='middle';
+      ctx.fillText('height DE = 10', D[0]+10, (D[1]+H[1])/2);
+    } else if(mode===2){
+      ctx.fillStyle='#334155';ctx.textAlign='right';ctx.textBaseline='middle';ctx.fillText('AB=12',A[0]-6,(A[1]+B[1])/2);
+      ctx.fillStyle='#334155';ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText('BC=6',(B[0]+C[0])/2,B[1]-4);
+      ctx.fillStyle='#10b981';ctx.textAlign='center';ctx.textBaseline='top';ctx.fillText('AD=11',(A[0]+D[0])/2,D[1]+6);
+      ctx.fillStyle='#f59e0b';ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText('CD=13',(C[0]+D[0])/2,(C[1]+D[1])/2);
+    } else {
+      ctx.fillStyle='#f59e0b';ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText('ABFE=120',(A[0]+F[0])/2,(A[1]+F[1])/2-8);
+      ctx.fillStyle='#ef4444';ctx.textAlign='left';ctx.textBaseline='bottom';ctx.fillText('BCGF=60',(B[0]+G[0])/2+6,(B[1]+G[1])/2);
+      ctx.fillStyle='#7c3aed';ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText('CDHG=130',(C[0]+H[0])/2,(C[1]+H[1])/2-6);
+      ctx.fillStyle='#10b981';ctx.textAlign='right';ctx.textBaseline='bottom';ctx.fillText('DAHE=110',(D[0]+E[0])/2-6,(D[1]+E[1])/2);
+    }
+    ctx.restore();
+
+    let html='';
+    if(mode===1) html=`<span class="ro">Volume = base × height</span><span class="ro">base = 6(AD+6)</span>`;
+    else if(mode===2) html=`<span class="ro">60(AD+6)=1020</span><span class="ro good">AD = 11 cm</span>`;
+    else html=`<span class="ro">2×102 + 420</span><span class="ro good">Total = 624 cm²</span>`;
+    ro.innerHTML=html;
+  }
+
+  const steps=Array.from(document.querySelectorAll('.step'));
+  const obs=new IntersectionObserver((es)=>{
+    es.forEach(e=>{ if(e.isIntersecting){ const m=+e.target.dataset.step; if(m!==mode){mode=m;
+      steps.forEach(st=>st.classList.toggle('active',st===e.target)); draw(); }} });
+  },{rootMargin:'-15% 0px -55% 0px',threshold:0});
+  steps.forEach(st=>obs.observe(st));
+  draw();
+})();
+</script>
+</body>
+</html>

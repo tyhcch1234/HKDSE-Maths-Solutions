@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2013 Paper 1 Q18 — Trigonometry (folding a triangle)</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] }, svg:{fontCache:'global'} };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root{--ink:#0f172a;--muted:#64748b;--line:#e2e8f0;--bg:#f1f5f9;--blue:#2563eb;--red:#ef4444;
+    --green:#10b981;--orange:#f59e0b;--purple:#7c3aed;--pink:#ec4899;--radius:16px;}
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans SC",sans-serif;line-height:1.65;}
+  .wrap{max-width:1280px;margin:0 auto;padding:20px 16px 60px;}
+  .hero{background:linear-gradient(135deg,#0f172a,#1e3a8a 55%,#7c3aed 130%);color:#fff;
+    border-radius:var(--radius);padding:22px 26px;margin-bottom:18px;}
+  .hero h1{margin:0 0 4px;font-size:1.35rem;font-weight:800;}
+  .hero p{margin:0;opacity:.92;font-size:.92rem;}
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start;}
+  @media(min-width:900px){.split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}}
+  .panel{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:18px;
+    box-shadow:0 4px 16px rgba(15,23,42,.06);}
+  .panel h2{margin:0 0 12px;font-size:1.02rem;font-weight:800;color:var(--blue);
+    display:flex;align-items:center;gap:8px;border-bottom:2px solid #f1f5f9;padding-bottom:10px;}
+  .panel h2 .dot{width:10px;height:10px;border-radius:50%;background:var(--blue);}
+  .diagram{position:sticky;top:16px;}
+  canvas{width:100%;height:auto;display:block;border-radius:12px;background:#fff;border:1px solid #f1f5f9;}
+  .readout{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+  .ro{font-size:.82rem;font-weight:700;border-radius:10px;padding:6px 12px;background:#eff6ff;color:#1d4ed8;
+    border:1px solid #bfdbfe;font-variant-numeric:tabular-nums;}
+  .ro.good{background:#ecfdf5;color:#047857;border-color:#a7f3d0;}
+  .legend{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:10px;font-size:.8rem;font-weight:600;color:#334155;}
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .legend i{width:12px;height:12px;border-radius:3px;display:inline-block;}
+  .step{margin-top:12px;padding:14px 16px;border-radius:12px;background:#f8fafc;border:1px solid var(--line);
+    border-left:4px solid var(--blue);}
+  .step.active{border-left-color:var(--green);background:#f0fdf4;}
+  .step .tag{font-weight:800;font-size:.8rem;color:var(--blue);letter-spacing:.03em;}
+  .step.active .tag{color:#047857;}
+  .math{overflow-x:auto;padding:4px 0;}
+  .hint{background:#fffbeb;border:1px solid #fde68a;border-left:4px solid var(--orange);
+    border-radius:10px;padding:9px 13px;margin-top:10px;font-size:.88rem;color:#78350f;}
+  .answer{background:#ecfdf5;border:1px solid #a7f3d0;border-left:4px solid var(--green);
+    border-radius:10px;padding:9px 13px;margin-top:10px;font-size:.9rem;color:#065f46;font-weight:700;}
+  .qtext{font-size:.98rem;}
+  @media(max-width:640px){
+    body{font-size:14.5px;}
+    .wrap{padding:10px 8px 40px;}
+    .hero{padding:14px 15px;border-radius:12px;}
+    .hero h1{font-size:1.02rem;}
+    .hero p{font-size:.82rem;}
+    .panel{padding:10px;border-radius:12px;}
+    .panel h2{font-size:.88rem;margin:0 0 8px;padding-bottom:8px;}
+    .step{margin-top:8px;padding:9px 11px;border-radius:9px;}
+    .step .tag{font-size:.72rem;}
+    .qtext{font-size:.88rem;}
+    .ro{font-size:.7rem;padding:4px 8px;border-radius:8px;}
+    .legend{font-size:.68rem;gap:5px 8px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>2013 Paper 1 · Question 18 — Folding a Triangle</h1>
+    <p>Triangle ABC is right-angled at B. Scroll the solution — the diagram tracks each step, including the 3-D fold.</p>
+  </header>
+
+  <div class="split">
+    <section class="panel diagram">
+      <h2><span class="dot"></span> Interactive diagram</h2>
+      <canvas id="cv" width="680" height="600"></canvas>
+      <div class="readout" id="ro"></div>
+      <div class="legend">
+        <span><i style="background:#2563eb"></i> △ABC</span>
+        <span><i style="background:#7c3aed"></i> △BCM</span>
+        <span><i style="background:#f59e0b"></i> Fold BM</span>
+        <span><i style="background:#10b981"></i> Ground (A,B,C)</span>
+        <span><i style="background:#ef4444"></i> M (raised)</span>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2><span class="dot"></span> Question &amp; solution</h2>
+      <div class="qtext">
+        <p><b>(a)</b> Figure 3(a) shows a triangular paper card \(ABC\) with \(AB=28\text{ cm}\), \(BC=21\text{ cm}\), \(AC=35\text{ cm}\). \(M\) lies on \(AC\) such that \(\angle BMC=75^\circ\). Find (i) \(\angle BCM\), (ii) \(CM\).</p>
+        <p><b>(b)</b> The card is folded along \(BM\) so that \(AB\) and \(BC\) lie on the horizontal ground, with \(\angle AMC=107^\circ\). (i) Find the distance between \(A\) and \(C\). (ii) \(N\) lies on \(BC\) with \(MN\perp BC\). Is the angle between face \(BCM\) and the ground equal to \(\angle ANM\)?</p>
+      </div>
+
+      <div class="step" data-step="1">
+        <div class="tag">STEP 1 · ∠BCM (a)(i)</div>
+        <div class="math">\[ 28^2+21^2=784+441=1225=35^2 \;\Rightarrow\; \angle ABC=90^\circ \]</div>
+        <div class="math">\[ \sin\angle BCM=\frac{AB}{AC}=\frac{28}{35}=\frac45 \;\Rightarrow\; \angle BCM \approx 53.1^\circ \]</div>
+      </div>
+
+      <div class="step" data-step="2">
+        <div class="tag">STEP 2 · CM (a)(ii)</div>
+        <p>In \(\triangle BCM\): \(BC=21\), \(\angle BCM=53.13^\circ\), \(\angle BMC=75^\circ\), so \(\angle CBM=51.87^\circ\).</p>
+        <div class="math">\[ \frac{CM}{\sin 51.87^\circ}=\frac{21}{\sin 75^\circ}\;\Rightarrow\; CM=\frac{21\sin 51.87^\circ}{\sin 75^\circ}\approx 17.1\text{ cm} \]</div>
+        <div class="answer">Answer (a): \(\angle BCM\approx 53.1^\circ,\ CM\approx 17.1\text{ cm}\)</div>
+      </div>
+
+      <div class="step" data-step="3">
+        <div class="tag">STEP 3 · Distance AC on ground (b)(i)</div>
+        <p>After folding, \(AM=35-17.1=17.9\text{ cm}\) and \(CM=17.1\text{ cm}\) stay fixed, with \(\angle AMC=107^\circ\).</p>
+        <div class="math">\[ AC^2=17.9^2+17.1^2-2(17.9)(17.1)\cos107^\circ \]</div>
+        <div class="math">\[ AC\approx 28.1\text{ cm} \]</div>
+        <div class="answer">Answer (b)(i): \(AC\approx 28.1\text{ cm}\)</div>
+      </div>
+
+      <div class="step" data-step="4">
+        <div class="tag">STEP 4 · Angle between faces (b)(ii)</div>
+        <p>The angle between face \(BCM\) and the ground is measured along the line of intersection \(BC\), using two lines both \(\perp BC\).</p>
+        <p>\(MN\perp BC\) is the line in face \(BCM\), but in the ground the perpendicular to \(BC\) through \(N\) does <b>not</b> pass through \(A\).</p>
+        <div class="hint"><b>So</b> \(\angle ANM\) is <b>not</b> the required angle — Peter is wrong.</div>
+        <div class="answer">Answer (b)(ii): Disagree — the ground-side perpendicular to \(BC\) does not pass through \(A\).</div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+(function(){
+  const cv=document.getElementById('cv'), ro=document.getElementById('ro');
+  const dpr=window.devicePixelRatio||1, W=680, H=600;
+  cv.width=W*dpr; cv.height=H*dpr; cv.style.width='100%'; cv.style.height='auto';
+  const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
+  let mode=1;
+
+  // 2D view for part (a)
+  const X2=x=>80+(x+4)*22, Y2=y=>H-60-(y+4)*15.5;   // x∈[-4,26], y∈[-4,32]
+
+  function grid2(){
+    ctx.save();ctx.strokeStyle='#eef2f7';ctx.lineWidth=1;
+    for(let x=0;x<=25;x+=5){ctx.beginPath();ctx.moveTo(X2(x),Y2(-4));ctx.lineTo(X2(x),Y2(32));ctx.stroke();}
+    for(let y=0;y<=30;y+=5){ctx.beginPath();ctx.moveTo(X2(-4),Y2(y));ctx.lineTo(X2(26),Y2(y));ctx.stroke();}
+    ctx.restore();
+  }
+  function pt2(x,y,color,r,label,dx,dy){
+    ctx.save();ctx.beginPath();ctx.arc(X2(x),Y2(y),r,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();
+    ctx.lineWidth=2;ctx.strokeStyle='#fff';ctx.stroke();
+    if(label){ctx.fillStyle=color;ctx.font='800 14px system-ui';ctx.textAlign='left';ctx.textBaseline='bottom';
+      ctx.fillText(label,X2(x)+dx,Y2(y)+dy);}
+    ctx.restore();
+  }
+  function seg2(x1,y1,x2,y2,color,w,dash){
+    ctx.save();ctx.beginPath();ctx.moveTo(X2(x1),Y2(y1));ctx.lineTo(X2(x2),Y2(y2));
+    ctx.strokeStyle=color;ctx.lineWidth=w;if(dash)ctx.setLineDash([6,4]);ctx.stroke();ctx.setLineDash([]);ctx.restore();
+  }
+  function poly2(pts,color,alpha){
+    ctx.save();ctx.beginPath();ctx.moveTo(X2(pts[0][0]),Y2(pts[0][1]));
+    for(let i=1;i<pts.length;i++)ctx.lineTo(X2(pts[i][0]),Y2(pts[i][1]));
+    ctx.closePath();ctx.fillStyle=color;ctx.globalAlpha=alpha;ctx.fill();ctx.globalAlpha=1;
+    ctx.strokeStyle=color;ctx.lineWidth=2.5;ctx.stroke();ctx.restore();
+  }
+
+  function draw2D(){
+    grid2();
+    const A=[0,28],B=[0,0],C=[21,0],M=[10.74,13.68];
+    seg2(A[0],A[1],B[0],B[1],'#94a3b8',2);   // AB=28
+    seg2(B[0],B[1],C[0],C[1],'#94a3b8',2);   // BC=21
+    seg2(A[0],A[1],C[0],C[1],'#94a3b8',2);   // AC=35
+    // right angle marker at B
+    ctx.save();ctx.strokeStyle='#2563eb';ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(X2(0),Y2(0)-12);ctx.lineTo(X2(0)+12,Y2(0)-12);ctx.lineTo(X2(0)+12,Y2(0));ctx.stroke();
+    ctx.restore();
+
+    if(mode>=2){
+      seg2(B[0],B[1],M[0],M[1],'#f59e0b',2.5,true);   // BM fold
+      poly2([B,C,M],'#7c3aed',0.15);
+      pt2(M[0],M[1],'#ef4444',6,'M',8,8);
+    }
+    pt2(A[0],A[1],'#334155',5,'A',-14,-4);
+    pt2(B[0],B[1],'#334155',5,'B',8,-4);
+    pt2(C[0],C[1],'#334155',5,'C',8,-6);
+
+    if(mode===1){
+      ctx.save();ctx.font='700 13px system-ui';
+      ctx.fillStyle='#334155';ctx.textAlign='right';ctx.textBaseline='middle';ctx.fillText('AB=28',X2(0)-6,Y2(14));
+      ctx.textAlign='center';ctx.textBaseline='top';ctx.fillText('BC=21',X2(10.5),Y2(0)+6);
+      ctx.textAlign='left';ctx.textBaseline='bottom';ctx.fillText('AC=35',X2(11),Y2(17));
+      ctx.restore();
+    }
+    if(mode>=2){
+      ctx.save();ctx.font='700 13px system-ui';
+      ctx.fillStyle='#7c3aed';ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText('∠BCM=53.1°',X2(15),Y2(3));
+      ctx.fillStyle='#ef4444';ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText('∠BMC=75°',X2(8),Y2(12));
+      ctx.fillStyle='#f59e0b';ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText('CM=17.1',X2(5),Y2(6.5));
+      ctx.restore();
+    }
+  }
+
+  // 3D tent sketch for part (b)
+  function draw3D(showAngle){
+    ctx.save();
+    // ground plane
+    ctx.fillStyle='#f0fdf4';ctx.beginPath();ctx.moveTo(80,H-60);ctx.lineTo(W-60,H-60);ctx.lineTo(W-40,H-110);ctx.lineTo(100,H-110);ctx.closePath();ctx.fill();
+    ctx.strokeStyle='#10b981';ctx.lineWidth=2;ctx.stroke();
+    // ground line
+    ctx.beginPath();ctx.moveTo(80,H-60);ctx.lineTo(W-60,H-60);ctx.stroke();
+    // A, B, C on ground
+    const gB=[150,H-60], gC=[540,H-60], gA=[250,H-70];
+    // M raised (apex)
+    const gM=[360,H-240];
+    ctx.fillStyle='#334155';
+    [gA,gB,gC].forEach(p=>{ctx.beginPath();ctx.arc(p[0],p[1],5,0,Math.PI*2);ctx.fill();});
+    ctx.fillStyle='#ef4444';ctx.beginPath();ctx.arc(gM[0],gM[1],7,0,Math.PI*2);ctx.fill();
+    // edges
+    ctx.strokeStyle='#94a3b8';ctx.lineWidth=1.5;
+    [[gB,gC],[gA,gC],[gA,gB]].forEach(e=>{ctx.beginPath();ctx.moveTo(e[0][0],e[0][1]);ctx.lineTo(e[1][0],e[1][1]);ctx.stroke();});
+    ctx.strokeStyle='#f59e0b';ctx.lineWidth=2;
+    [gM,gA],[gM,gB],[gM,gC].forEach(()=>{});
+    ctx.beginPath();ctx.moveTo(gM[0],gM[1]);ctx.lineTo(gA[0],gA[1]);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(gM[0],gM[1]);ctx.lineTo(gB[0],gB[1]);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(gM[0],gM[1]);ctx.lineTo(gC[0],gC[1]);ctx.stroke();
+    // labels
+    ctx.fillStyle='#334155';ctx.font='800 14px system-ui';
+    ctx.fillText('A',gA[0]-12,gA[1]-6);ctx.fillText('B',gB[0]-14,gB[1]+18);ctx.fillText('C',gC[0]+8,gC[1]+16);
+    ctx.fillStyle='#ef4444';ctx.fillText('M',gM[0]+10,gM[1]-8);
+    // angle AMC arc
+    if(showAngle){
+      ctx.strokeStyle='#ef4444';ctx.lineWidth=2;
+      ctx.beginPath();ctx.arc(gM[0],gM[1],40,Math.atan2(gC[1]-gM[1],gC[0]-gM[0]),Math.atan2(gA[1]-gM[1],gA[0]-gM[0]));ctx.stroke();
+      ctx.fillStyle='#b91c1c';ctx.font='700 13px system-ui';
+      ctx.fillText('107°',gM[0]+8,gM[1]-40);
+    }
+    ctx.restore();
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    if(mode<=2) draw2D();
+    else draw3D(mode===3);
+    let html='';
+    if(mode===1) html=`<span class="ro">28²+21²=35² ⇒ ∠B=90°</span><span class="ro">∠BCM = 53.1°</span>`;
+    else if(mode===2) html=`<span class="ro">CM = 21·sin51.87° / sin75°</span><span class="ro good">CM ≈ 17.1 cm</span>`;
+    else if(mode===3) html=`<span class="ro">∠AMC = 107° (folded)</span><span class="ro good">AC ≈ 28.1 cm on ground</span>`;
+    else html=`<span class="ro bad">∠ANM ≠ angle between faces</span><span class="ro">ground-side ⊥BC does not pass A</span>`;
+    ro.innerHTML=html;
+  }
+
+  const steps=Array.from(document.querySelectorAll('.step'));
+  const obs=new IntersectionObserver((es)=>{
+    es.forEach(e=>{ if(e.isIntersecting){ const m=+e.target.dataset.step; if(m!==mode){mode=m;
+      steps.forEach(st=>st.classList.toggle('active',st===e.target)); draw(); }} });
+  },{rootMargin:'-15% 0px -55% 0px',threshold:0});
+  steps.forEach(st=>obs.observe(st));
+  draw();
+})();
+</script>
+</body>
+</html>

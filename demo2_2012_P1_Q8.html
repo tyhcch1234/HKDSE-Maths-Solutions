@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2012 Paper 1 Q8 — Geometry (intersecting chords)</title>
+<script>
+window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] }, svg:{fontCache:'global'} };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root{--ink:#0f172a;--muted:#64748b;--line:#e2e8f0;--bg:#f1f5f9;--blue:#2563eb;--red:#ef4444;
+    --green:#10b981;--orange:#f59e0b;--purple:#7c3aed;--pink:#ec4899;--radius:16px;}
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans SC",sans-serif;line-height:1.65;}
+  .wrap{max-width:1280px;margin:0 auto;padding:20px 16px 60px;}
+  .hero{background:linear-gradient(135deg,#0f172a,#1e3a8a 55%,#7c3aed 130%);color:#fff;
+    border-radius:var(--radius);padding:22px 26px;margin-bottom:18px;}
+  .hero h1{margin:0 0 4px;font-size:1.35rem;font-weight:800;}
+  .hero p{margin:0;opacity:.92;font-size:.92rem;}
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start;}
+  @media(min-width:900px){.split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}}
+  .panel{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:18px;
+    box-shadow:0 4px 16px rgba(15,23,42,.06);}
+  .panel h2{margin:0 0 12px;font-size:1.02rem;font-weight:800;color:var(--blue);
+    display:flex;align-items:center;gap:8px;border-bottom:2px solid #f1f5f9;padding-bottom:10px;}
+  .panel h2 .dot{width:10px;height:10px;border-radius:50%;background:var(--blue);}
+  .diagram{position:sticky;top:16px;}
+  canvas{width:100%;height:auto;display:block;border-radius:12px;background:#fff;border:1px solid #f1f5f9;}
+  .readout{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+  .ro{font-size:.82rem;font-weight:700;border-radius:10px;padding:6px 12px;background:#eff6ff;color:#1d4ed8;
+    border:1px solid #bfdbfe;font-variant-numeric:tabular-nums;}
+  .ro.good{background:#ecfdf5;color:#047857;border-color:#a7f3d0;}
+  .legend{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:10px;font-size:.8rem;font-weight:600;color:#334155;}
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .legend i{width:12px;height:12px;border-radius:3px;display:inline-block;}
+  .step{margin-top:12px;padding:14px 16px;border-radius:12px;background:#f8fafc;border:1px solid var(--line);
+    border-left:4px solid var(--blue);}
+  .step.active{border-left-color:var(--green);background:#f0fdf4;}
+  .step .tag{font-weight:800;font-size:.8rem;color:var(--blue);letter-spacing:.03em;}
+  .step.active .tag{color:#047857;}
+  .math{overflow-x:auto;padding:4px 0;}
+  .hint{background:#fffbeb;border:1px solid #fde68a;border-left:4px solid var(--orange);
+    border-radius:10px;padding:9px 13px;margin-top:10px;font-size:.88rem;color:#78350f;}
+  .answer{background:#ecfdf5;border:1px solid #a7f3d0;border-left:4px solid var(--green);
+    border-radius:10px;padding:9px 13px;margin-top:10px;font-size:.9rem;color:#065f46;font-weight:700;}
+  .qtext{font-size:.98rem;}
+  @media(max-width:640px){
+    body{font-size:14.5px;}
+    .wrap{padding:10px 8px 40px;}
+    .hero{padding:14px 15px;border-radius:12px;}
+    .hero h1{font-size:1.02rem;}
+    .hero p{font-size:.82rem;}
+    .panel{padding:10px;border-radius:12px;}
+    .panel h2{font-size:.88rem;margin:0 0 8px;padding-bottom:8px;}
+    .step{margin-top:8px;padding:9px 11px;border-radius:9px;}
+    .step .tag{font-size:.72rem;}
+    .qtext{font-size:.88rem;}
+    .ro{font-size:.7rem;padding:4px 8px;border-radius:8px;}
+    .legend{font-size:.68rem;gap:5px 8px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>2012 Paper 1 · Question 8 — Intersecting Chords</h1>
+    <p>Chords AC and BD meet at E. Scroll the solution — the diagram highlights the matching step.</p>
+  </header>
+
+  <div class="split">
+    <section class="panel diagram">
+      <h2><span class="dot"></span> Interactive diagram</h2>
+      <canvas id="cv" width="680" height="620"></canvas>
+      <div class="readout" id="ro"></div>
+      <div class="legend">
+        <span><i style="background:#2563eb"></i> Circle</span>
+        <span><i style="background:#7c3aed"></i> △ABE</span>
+        <span><i style="background:#f59e0b"></i> △DCE</span>
+        <span><i style="background:#10b981"></i> Right angle (part b)</span>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2><span class="dot"></span> Question &amp; solution</h2>
+      <div class="qtext">
+        <p>In Figure 1, \(AB\), \(BC\), \(CD\) and \(AD\) are chords of the circle. \(AC\) and \(BD\) intersect at \(E\). It is given that \(BE=8\text{ cm}\), \(CE=20\text{ cm}\) and \(DE=15\text{ cm}\).</p>
+        <p><b>(a)</b> Write down a pair of similar triangles. Also find \(AE\).</p>
+        <p><b>(b)</b> Suppose \(AB=10\text{ cm}\). Are \(AC\) and \(BD\) perpendicular? Explain.</p>
+      </div>
+
+      <div class="step" data-step="1">
+        <div class="tag">STEP 1 · Similar triangles</div>
+        <p>Angles in the same segment are equal:</p>
+        <div class="math">\[ \angle ABE=\angle DCE,\qquad \angle BAE=\angle CDE \]</div>
+        <p>and \(\angle AEB=\angle DEC\) (vertically opposite). So</p>
+        <div class="math">\[ \triangle ABE \sim \triangle DCE \]</div>
+      </div>
+
+      <div class="step" data-step="2">
+        <div class="tag">STEP 2 · Find AE</div>
+        <p>Corresponding sides are proportional:</p>
+        <div class="math">\[ \frac{AE}{DE}=\frac{BE}{CE}\;\Rightarrow\; AE=\frac{BE\cdot DE}{CE}=\frac{8\times15}{20}=6\text{ cm} \]</div>
+        <div class="answer">Answer (a): \(AE=6\text{ cm}\)</div>
+      </div>
+
+      <div class="step" data-step="3">
+        <div class="tag">STEP 3 · Perpendicular? (b)</div>
+        <p>In \(\triangle ABE\): \(AB=10\), \(AE=6\), \(BE=8\).</p>
+        <div class="math">\[ 6^2+8^2=36+64=100=10^2 \]</div>
+        <p>So \(\angle AEB=90^\circ\) by the converse of Pythagoras' theorem, hence \(AC\perp BD\).</p>
+        <div class="answer">Answer (b): Yes, \(AC\perp BD\).</div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+(function(){
+  const cv=document.getElementById('cv'), ro=document.getElementById('ro');
+  const dpr=window.devicePixelRatio||1, W=680, H=620;
+  cv.width=W*dpr; cv.height=H*dpr; cv.style.width='100%'; cv.style.height='auto';
+  const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
+
+  // circle centre (7,-3.5), radius 13.46; A(-6,0) B(0,8) C(20,0) D(0,-15) E(0,0)
+  const cx=7, cy=-3.5, R=Math.sqrt(181.25);
+  const xmin=-10, xmax=24, ymin=-18, ymax=12;
+  const padL=52, padR=24, padT=24, padB=44;
+  const plotW=W-padL-padR, plotH=H-padT-padB;
+  const s=Math.min(plotW/(xmax-xmin), plotH/(ymax-ymin));
+  const offX=(plotW-(xmax-xmin)*s)/2, offY=(plotH-(ymax-ymin)*s)/2;
+  const X=x=>padL+offX+(x-xmin)*s, Y=y=>H-padB-offY-(y-ymin)*s;
+
+  let mode=1;
+
+  function grid(){
+    ctx.save();
+    ctx.strokeStyle='#eef2f7';ctx.lineWidth=1;
+    for(let x=-10;x<=24;x+=2){ctx.beginPath();ctx.moveTo(X(x),Y(ymin));ctx.lineTo(X(x),Y(ymax));ctx.stroke();}
+    for(let y=-15;y<=12;y+=2){ctx.beginPath();ctx.moveTo(X(xmin),Y(y));ctx.lineTo(X(xmax),Y(y));ctx.stroke();}
+    ctx.restore();
+  }
+  function pt(x,y,color,r,label,dx,dy){
+    ctx.save();
+    ctx.beginPath();ctx.arc(X(x),Y(y),r,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();
+    ctx.lineWidth=2;ctx.strokeStyle='#fff';ctx.stroke();
+    if(label){ctx.fillStyle=color;ctx.font='800 14px system-ui';ctx.textAlign='left';ctx.textBaseline='bottom';
+      ctx.fillText(label,X(x)+dx,Y(y)+dy);}
+    ctx.restore();
+  }
+  function poly(pts,color,alpha){
+    ctx.save();
+    ctx.beginPath();ctx.moveTo(X(pts[0][0]),Y(pts[0][1]));
+    for(let i=1;i<pts.length;i++)ctx.lineTo(X(pts[i][0]),Y(pts[i][1]));
+    ctx.closePath();ctx.fillStyle=color;ctx.globalAlpha=alpha;ctx.fill();ctx.globalAlpha=1;
+    ctx.strokeStyle=color;ctx.lineWidth=2.5;ctx.stroke();
+    ctx.restore();
+  }
+  function chord(x1,y1,x2,y2,color,w){
+    ctx.save();ctx.beginPath();ctx.moveTo(X(x1),Y(y1));ctx.lineTo(X(x2),Y(y2));
+    ctx.strokeStyle=color;ctx.lineWidth=w;ctx.stroke();ctx.restore();
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H); grid();
+    // circle
+    ctx.save();ctx.beginPath();ctx.arc(X(cx),Y(cy),R*s,0,Math.PI*2);
+    ctx.strokeStyle='#2563eb';ctx.lineWidth=3;ctx.stroke();ctx.restore();
+
+    const A=[-6,0],B=[0,8],C=[20,0],D=[0,-15],E=[0,0];
+
+    // chords AC and BD
+    chord(A[0],A[1],C[0],C[1],'#94a3b8',2);
+    chord(B[0],B[1],D[0],D[1],'#94a3b8',2);
+
+    // highlight triangles per mode
+    if(mode===1){
+      poly([A,B,E],'#7c3aed',0.18);
+      poly([D,C,E],'#f59e0b',0.18);
+    } else if(mode===2){
+      // highlight the four segments BE, CE, DE, AE
+      chord(B[0],B[1],E[0],E[1],'#7c3aed',4);
+      chord(E[0],E[1],C[0],C[1],'#f59e0b',4);
+      chord(E[0],E[1],D[0],D[1],'#ef4444',4);
+      chord(A[0],A[1],E[0],E[1],'#10b981',4);
+      // labels for lengths
+      ctx.save();ctx.font='700 13px system-ui';
+      ctx.fillStyle='#7c3aed';ctx.textAlign='right';ctx.textBaseline='middle';ctx.fillText('BE=8',X(0)-6,Y(4));
+      ctx.fillStyle='#f59e0b';ctx.textAlign='left';ctx.textBaseline='bottom';ctx.fillText('CE=20',X(10),Y(0)-4);
+      ctx.fillStyle='#ef4444';ctx.textAlign='right';ctx.textBaseline='top';ctx.fillText('DE=15',X(0)-6,Y(-7.5));
+      ctx.fillStyle='#10b981';ctx.textAlign='left';ctx.textBaseline='bottom';ctx.fillText('AE=?',X(-3),Y(0)-4);
+      ctx.restore();
+    } else if(mode===3){
+      // triangle ABE is right-angled at E (6-8-10)
+      poly([A,B,E],'#7c3aed',0.22);
+      // right angle marker at E
+      ctx.save();ctx.strokeStyle='#10b981';ctx.lineWidth=2;
+      ctx.beginPath();ctx.moveTo(X(-1.2),Y(0));ctx.lineTo(X(-1.2),Y(1.2));ctx.lineTo(X(0),Y(1.2));ctx.stroke();
+      ctx.restore();
+      chord(A[0],A[1],E[0],E[1],'#10b981',4);   // AE=6
+      chord(B[0],B[1],E[0],E[1],'#7c3aed',4);   // BE=8
+      chord(A[0],A[1],B[0],B[1],'#ef4444',4);   // AB=10
+      ctx.save();ctx.font='700 13px system-ui';
+      ctx.fillStyle='#10b981';ctx.textAlign='left';ctx.textBaseline='top';ctx.fillText('AE=6',X(-3),Y(1.5));
+      ctx.fillStyle='#7c3aed';ctx.textAlign='right';ctx.textBaseline='bottom';ctx.fillText('BE=8',X(0)-5,Y(5));
+      ctx.fillStyle='#ef4444';ctx.textAlign='right';ctx.textBaseline='bottom';ctx.fillText('AB=10',X(-3.5),Y(5.5));
+      ctx.restore();
+    }
+
+    pt(A[0],A[1],'#334155',5,'A',-14,-4);
+    pt(B[0],B[1],'#334155',5,'B',8,8);
+    pt(C[0],C[1],'#334155',5,'C',8,-6);
+    pt(D[0],D[1],'#334155',5,'D',8,-8);
+    pt(E[0],E[1],'#1d4ed8',5,'E',8,8);
+
+    let html='';
+    if(mode===1) html=`<span class="ro">△ABE ~ △DCE</span><span class="ro">∠ABE=∠DCE · ∠BAE=∠CDE</span>`;
+    else if(mode===2) html=`<span class="ro">AE = BE×DE ÷ CE</span><span class="ro">= 8×15 ÷ 20 = 6 cm</span>`;
+    else html=`<span class="ro good">6²+8²=10² ⇒ ∠AEB=90°</span><span class="ro">AC ⟂ BD</span>`;
+    ro.innerHTML=html;
+  }
+
+  const steps=Array.from(document.querySelectorAll('.step'));
+  const obs=new IntersectionObserver((es)=>{
+    es.forEach(e=>{ if(e.isIntersecting){ const m=+e.target.dataset.step; if(m!==mode){mode=m;
+      steps.forEach(st=>st.classList.toggle('active',st===e.target)); draw(); }} });
+  },{rootMargin:'-15% 0px -55% 0px',threshold:0});
+  steps.forEach(st=>obs.observe(st));
+  draw();
+})();
+</script>
+</body>
+</html>
