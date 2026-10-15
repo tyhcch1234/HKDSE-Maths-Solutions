@@ -156,9 +156,11 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
   // view: x in [-2,10], y in [-2,12]
   const xmin=-2, xmax=10, ymin=-2, ymax=12;
   const padL=52, padR=24, padT=24, padB=44;
-  const sx=(xmax-xmin)/(W-padL-padR), sy=(ymax-ymin)/(H-padT-padB);
-  const X=x=>padL+(x-xmin)/sx;
-  const Y=y=>H-padB-(y-ymin)/sy;
+  const plotW=W-padL-padR, plotH=H-padT-padB;
+  const s=Math.min(plotW/(xmax-xmin), plotH/(ymax-ymin));
+  const offX=(plotW-(xmax-xmin)*s)/2, offY=(plotH-(ymax-ymin)*s)/2;
+  const X=x=>padL+offX+(x-xmin)*s;
+  const Y=y=>H-padB-offY-(y-ymin)*s;
 
   function grid(){
     ctx.save();
@@ -205,7 +207,7 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
     // circle C: centre (3,6) r=5
     ctx.save();
     ctx.beginPath();
-    ctx.arc(X(3),Y(6),5/sx,0,Math.PI*2);
+    ctx.arc(X(3),Y(6),5*s,0,Math.PI*2);
     ctx.strokeStyle='#2563eb';ctx.lineWidth=3;ctx.stroke();
     ctx.restore();
     dot(3,6,'#7c3aed',6,'(3,6)',8,14);
