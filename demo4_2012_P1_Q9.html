@@ -46,6 +46,9 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
   .answer{background:#ecfdf5;border:1px solid #a7f3d0;border-left:4px solid var(--green);
     border-radius:10px;padding:9px 13px;margin-top:10px;font-size:.9rem;color:#065f46;font-weight:700;}
   .qtext{font-size:.98rem;}
+  .origfig{margin:12px 0;text-align:center;}
+  .origfig img{max-width:100%;height:auto;border:1px solid var(--line);border-radius:10px;background:#fff;}
+  .origfig figcaption{font-size:.78rem;color:var(--muted);margin-top:6px;}
   @media(max-width:640px){
     body{font-size:14.5px;}
     .wrap{padding:10px 8px 40px;}
@@ -67,13 +70,13 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
 
   <header class="hero">
     <h1>2012 Paper 1 · Question 9 — Trapezoidal Prism</h1>
-    <p>Volume 1020 cm³, trapezium base. Scroll the solution — the prism highlights the matching part.</p>
+    <p>Volume 1020 cm³. Scroll the solution — the prism highlights the matching part. The left diagram follows the original figure's orientation.</p>
   </header>
 
   <div class="split">
     <section class="panel diagram">
       <h2><span class="dot"></span> Interactive diagram</h2>
-      <canvas id="cv" width="680" height="560"></canvas>
+      <canvas id="cv" width="680" height="520"></canvas>
       <div class="readout" id="ro"></div>
       <div class="legend">
         <span><i style="background:#2563eb"></i> Base ABCD</span>
@@ -91,6 +94,11 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
         <p><b>(a)</b> Find the length of \(AD\).</p>
         <p><b>(b)</b> Find the total surface area of the prism.</p>
       </div>
+
+      <figure class="origfig">
+        <img src="figures/2012_P1_9.png" alt="Figure 2 (original)">
+        <figcaption>Figure 2 (original exam diagram)</figcaption>
+      </figure>
 
       <div class="step" data-step="1">
         <div class="tag">STEP 1 · Volume formula</div>
@@ -122,15 +130,15 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
 <script>
 (function(){
   const cv=document.getElementById('cv'), ro=document.getElementById('ro');
-  const dpr=window.devicePixelRatio||1, W=680, H=560;
-  cv.width=W*dpr; cv.height=H*dpr; cv.style.width='100%'; cv.style.height='auto';
+  const dpr=window.devicePixelRatio||1, W=680, Hh=520;
+  cv.width=W*dpr; cv.height=Hh*dpr; cv.style.width='100%'; cv.style.height='auto';
   const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
   let mode=1;
 
-  // prism vertices (front base ABCD, back top EFGH)
-  const A=[80,470], B=[80,254], C=[188,254], D=[278,470];
-  const dx=85, dy=-110;               // oblique offset (depth + height)
-  const E=[A[0]+dx,A[1]+dy], F=[B[0]+dx,B[1]+dy], G=[C[0]+dx,C[1]+dy], Ht=[D[0]+dx,D[1]+dy];
+  // Vertices follow the ORIGINAL figure orientation (view from upper-left-front).
+  // A(back-left) F(above A) · B(front-left) G(above B) · C(front-middle) H(above C) · D(right) E(above D)
+  const A=[180,420], B=[70,225], C=[185,225], D=[400,420];
+  const F=[180,235], G=[70,40], Ht=[185,40], E=[400,235];
 
   function seg(p,q,color,w,dash){
     ctx.save();ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(q[0],q[1]);
@@ -150,62 +158,68 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
   }
 
   function draw(){
-    ctx.clearRect(0,0,W,H);
+    ctx.clearRect(0,0,W,Hh);
     const base='#2563eb', top='#94a3b8', edge='#2563eb';
 
     if(mode===1){
-      // highlight base + height
       face([A,B,C,D],'#2563eb',0.15);
-      seg(D,H,'#ef4444',3,true);   // height DE/DH
+      seg(D,E,'#ef4444',3,true);   // height DE
     } else if(mode===2){
       face([A,B,C,D],'#2563eb',0.1);
       seg(A,D,'#10b981',4);        // AD
       seg(A,B,'#334155',3);        // AB=12
       seg(B,C,'#334155',3);        // BC=6
     } else if(mode===3){
-      // highlight all faces
       face([A,B,C,D],'#2563eb',0.12);
-      face([E,F,G,H],'#94a3b8',0.12);
-      face([A,B,F,E],'#f59e0b',0.15);
-      face([B,C,G,F],'#ef4444',0.15);
-      face([C,D,Ht,G],'#7c3aed',0.15);
-      face([D,A,E,Ht],'#10b981',0.15);
+      face([F,G,Ht,E],'#94a3b8',0.12);
+      face([B,C,Ht,G],'#f59e0b',0.15);
+      face([C,D,E,Ht],'#7c3aed',0.15);
+      face([D,A,F,E],'#10b981',0.15);
+      face([A,B,G,F],'#ef4444',0.15);
       seg(A,D,'#10b981',3);
     }
 
-    // front base
-    seg(A,B,base,2.5);seg(B,C,base,2.5);seg(C,D,base,2.5);seg(D,A,base,2.5);
-    // top
-    seg(E,F,top,2);seg(F,G,top,2);seg(G,Ht,top,2);seg(Ht,E,top,2);
-    // vertical edges
-    seg(A,E,edge,2);seg(B,F,edge,2);seg(C,G,edge,2);seg(D,Ht,edge,2);
+    // base edges — hidden edges AB, AD dashed (matches original figure)
+    seg(A,B,base,2.5,true);      // BA dashed
+    seg(B,C,base,2.5);           // BC solid (front)
+    seg(C,D,base,2.5);           // CD solid (right)
+    seg(D,A,base,2.5,true);      // AD dashed
+
+    // top edges (all solid)
+    seg(F,G,top,2);seg(G,Ht,top,2);seg(Ht,E,top,2);seg(E,F,top,2);
+
+    // vertical edges — AF dashed (hidden), others solid
+    seg(D,E,edge,2);             // DE solid
+    seg(C,Ht,edge,2);            // CH solid
+    seg(B,G,edge,2);             // BG solid
+    seg(A,F,edge,2,true);        // AF dashed
 
     // labels
-    pt(A,'#334155',5,'A',-20,-2);
-    pt(B,'#334155',5,'B',-20,-2);
+    pt(A,'#334155',5,'A',-22,4);
+    pt(B,'#334155',5,'B',-24,-2);
     pt(C,'#334155',5,'C',8,-2);
-    pt(D,'#334155',5,'D',10,-2);
-    pt(E,'#64748b',5,'E',8,-8);
+    pt(D,'#334155',5,'D',10,4);
+    pt(E,'#64748b',5,'E',10,-6);
     pt(F,'#64748b',5,'F',8,-8);
     pt(G,'#64748b',5,'G',8,-8);
-    pt(Ht,'#64748b',5,'H',10,-8);
+    pt(Ht,'#64748b',5,'H',8,-8);
 
     ctx.save();ctx.font='700 13px system-ui';
     if(mode===1){
       ctx.fillStyle='#2563eb';ctx.textAlign='center';ctx.textBaseline='bottom';
-      ctx.fillText('base = trapezium ABCD', (A[0]+D[0])/2, 500);
+      ctx.fillText('base = trapezium ABCD', (A[0]+D[0])/2, 460);
       ctx.fillStyle='#ef4444';ctx.textAlign='left';ctx.textBaseline='middle';
-      ctx.fillText('height DE = 10', D[0]+10, (D[1]+Ht[1])/2);
+      ctx.fillText('height DE = 10', D[0]+12, (D[1]+E[1])/2);
     } else if(mode===2){
-      ctx.fillStyle='#334155';ctx.textAlign='right';ctx.textBaseline='middle';ctx.fillText('AB=12',A[0]-6,(A[1]+B[1])/2);
+      ctx.fillStyle='#334155';ctx.textAlign='right';ctx.textBaseline='middle';ctx.fillText('AB=12',(A[0]+B[0])/2,(A[1]+B[1])/2);
       ctx.fillStyle='#334155';ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText('BC=6',(B[0]+C[0])/2,B[1]-4);
-      ctx.fillStyle='#10b981';ctx.textAlign='center';ctx.textBaseline='top';ctx.fillText('AD=11',(A[0]+D[0])/2,D[1]+6);
-      ctx.fillStyle='#f59e0b';ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText('CD=13',(C[0]+D[0])/2,(C[1]+D[1])/2);
+      ctx.fillStyle='#10b981';ctx.textAlign='center';ctx.textBaseline='top';ctx.fillText('AD=11',(A[0]+D[0])/2,D[1]+8);
+      ctx.fillStyle='#f59e0b';ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText('CD=13',(C[0]+D[0])/2,(C[1]+D[1])/2-4);
     } else {
-      ctx.fillStyle='#f59e0b';ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText('ABFE=120',(A[0]+F[0])/2,(A[1]+F[1])/2-8);
-      ctx.fillStyle='#ef4444';ctx.textAlign='left';ctx.textBaseline='bottom';ctx.fillText('BCGF=60',(B[0]+G[0])/2+6,(B[1]+G[1])/2);
-      ctx.fillStyle='#7c3aed';ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText('CDHG=130',(C[0]+Ht[0])/2,(C[1]+Ht[1])/2-6);
-      ctx.fillStyle='#10b981';ctx.textAlign='right';ctx.textBaseline='bottom';ctx.fillText('DAHE=110',(D[0]+E[0])/2-6,(D[1]+E[1])/2);
+      ctx.fillStyle='#f59e0b';ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText('BCGH=60',(B[0]+Ht[0])/2,(B[1]+Ht[1])/2);
+      ctx.fillStyle='#7c3aed';ctx.textAlign='left';ctx.textBaseline='bottom';ctx.fillText('CDHE=130',(C[0]+E[0])/2,(C[1]+E[1])/2);
+      ctx.fillStyle='#10b981';ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText('ADEF=110',(D[0]+F[0])/2,(D[1]+F[1])/2);
+      ctx.fillStyle='#ef4444';ctx.textAlign='right';ctx.textBaseline='bottom';ctx.fillText('ABGF=120',(A[0]+G[0])/2,(A[1]+G[1])/2);
     }
     ctx.restore();
 
