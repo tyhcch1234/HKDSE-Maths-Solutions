@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>2012 Paper 1 Q9 — Mensuration (trapezoidal prism, 3D)</title>
+<title>2012 Paper 1 Q9 — Mensuration (trapezoidal prism)</title>
 <script>
 window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] }, svg:{fontCache:'global'} };
 </script>
@@ -27,10 +27,7 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
     display:flex;align-items:center;gap:8px;border-bottom:2px solid #f1f5f9;padding-bottom:10px;}
   .panel h2 .dot{width:10px;height:10px;border-radius:50%;background:var(--blue);}
   .diagram{position:sticky;top:16px;max-height:calc(100vh - 2rem);overflow-y:auto;}
-  canvas{width:100%;height:auto;display:block;border-radius:12px;background:#fff;border:1px solid #f1f5f9;
-    cursor:grab;touch-action:none;}
-  canvas:active{cursor:grabbing;}
-  .tip{font-size:.78rem;color:var(--muted);margin-top:8px;text-align:center;}
+  canvas{width:100%;height:auto;display:block;border-radius:12px;background:#fff;border:1px solid #f1f5f9;}
   .readout{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
   .ro{font-size:.82rem;font-weight:700;border-radius:10px;padding:6px 12px;background:#eff6ff;color:#1d4ed8;
     border:1px solid #bfdbfe;font-variant-numeric:tabular-nums;}
@@ -72,15 +69,14 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
 <div class="wrap">
 
   <header class="hero">
-    <h1>2012 Paper 1 · Question 9 — Trapezoidal Prism (3D)</h1>
-    <p>Volume 1020 cm³. <b>Drag the prism to rotate it</b> — scroll the right solution to highlight each step.</p>
+    <h1>2012 Paper 1 · Question 9 — Trapezoidal Prism</h1>
+    <p>Volume 1020 cm³. Scroll the right solution — the prism highlights each step. Orientation matches the original figure.</p>
   </header>
 
   <div class="split">
     <section class="panel diagram">
-      <h2><span class="dot"></span> Interactive 3D diagram</h2>
+      <h2><span class="dot"></span> Interactive diagram</h2>
       <canvas id="cv" width="680" height="520"></canvas>
-      <div class="tip">↻ 拖拽旋轉 · 初始視角跟原圖</div>
       <div class="readout" id="ro"></div>
       <div class="legend">
         <span><i style="background:#2563eb"></i> Base ABCD</span>
@@ -138,91 +134,93 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
   const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
   let mode=1;
 
-  // ---- 3D model (x: AD/BC, y: AB, z: height) ----
-  const V=[ [0,0,0],[0,12,0],[6,12,0],[11,0,0],[0,0,10],[0,12,10],[6,12,10],[11,0,10] ];
-  const LAB=['A','B','C','D','F','G','H','E'];
-  const FACES=[
-    {i:[0,1,2,3], n:'base',  c:'#2563eb'},
-    {i:[4,7,6,5], n:'top',   c:'#94a3b8'},
-    {i:[1,5,6,2], n:'front', c:'#f59e0b'},
-    {i:[2,6,7,3], n:'right', c:'#7c3aed'},
-    {i:[3,7,4,0], n:'back',  c:'#10b981'},
-    {i:[0,4,5,1], n:'left',  c:'#ef4444'},
-  ];
-  const EDGE_FACES=[
-    {e:[0,1],f:['base','left']},{e:[1,2],f:['base','front']},{e:[2,3],f:['base','right']},{e:[3,0],f:['base','back']},
-    {e:[4,5],f:['top','left']},{e:[5,6],f:['top','front']},{e:[6,7],f:['top','right']},{e:[7,4],f:['top','back']},
-    {e:[0,4],f:['left','back']},{e:[1,5],f:['left','front']},{e:[2,6],f:['front','right']},{e:[3,7],f:['right','back']},
-  ];
+  // Fixed 2D projection matching the ORIGINAL figure orientation:
+  // A back-left (top-left), B front-left (bottom-left), C front-middle (bottom-middle), D back-right (top-right)
+  const A=[150,220], B=[150,424], C=[252,424], D=[337,220];
+  const F=[150,50],  G=[150,254], Ht=[252,254], E=[337,50];
 
-  let yaw=-20*Math.PI/180, pitch=25*Math.PI/180;
-  const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
-  function normal(f){const a=V[f.i[0]],b=V[f.i[1]],c=V[f.i[2]];
-    return cross([b[0]-a[0],b[1]-a[1],b[2]-a[2]],[c[0]-a[0],c[1]-a[1],c[2]-a[2]]);}
-  function rot3(p){let[x,y,z]=p;
-    let cy=Math.cos(yaw),sy=Math.sin(yaw);let x1=x*cy+z*sy,z1=-x*sy+z*cy;
-    let cp=Math.cos(pitch),sp=Math.sin(pitch);return [x1, y*cp-z1*sp, y*sp+z1*cp];}
-  const SCALE=15.5, CX=W/2-60, CY=Hh/2-35;
-  function proj(p){const r=rot3(p); return [CX + r[0]*SCALE, CY + r[1]*SCALE];}
-  function faceVisible(f){return rot3(normal(f))[2]>0;}
+  function seg(p,q,color,w,dash){
+    ctx.save();ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(q[0],q[1]);
+    ctx.strokeStyle=color;ctx.lineWidth=w;if(dash)ctx.setLineDash([6,4]);ctx.stroke();ctx.setLineDash([]);ctx.restore();
+  }
+  function pt(p,color,r,label,dx,dy){
+    ctx.save();ctx.beginPath();ctx.arc(p[0],p[1],r,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();
+    ctx.lineWidth=2;ctx.strokeStyle='#fff';ctx.stroke();
+    if(label){ctx.fillStyle=color;ctx.font='800 14px system-ui';ctx.textAlign='left';ctx.textBaseline='bottom';
+      ctx.fillText(label,p[0]+dx,p[1]+dy);}
+    ctx.restore();
+  }
+  function face(pts,color,alpha){
+    ctx.save();ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);
+    for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i][0],pts[i][1]);
+    ctx.closePath();ctx.fillStyle=color;ctx.globalAlpha=alpha;ctx.fill();ctx.globalAlpha=1;ctx.restore();
+  }
 
   function draw(){
     ctx.clearRect(0,0,W,Hh);
-    const vis={}; FACES.forEach(f=>vis[f.n]=faceVisible(f));
+    const base='#2563eb', top='#94a3b8', edge='#2563eb';
 
-    // faces
-    FACES.forEach(f=>{
-      const pts=f.i.map(k=>proj(V[k]));
-      ctx.save();ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);
-      for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i][0],pts[i][1]);
-      ctx.closePath();
-      let fill=false, alpha=0.10;
-      if(mode===1){ fill=(f.n==='base'); alpha=0.22; }
-      else if(mode===2){ fill=(f.n==='base'); alpha=0.14; }
-      else if(mode===3){ fill=true; alpha=vis[f.n]?0.20:0.08; }
-      if(fill){ ctx.fillStyle=f.c; ctx.globalAlpha=alpha; ctx.fill(); }
-      ctx.globalAlpha=1; ctx.restore();
-    });
-
-    // edges (dashed if both adjacent faces hidden)
-    EDGE_FACES.forEach(ef=>{
-      const solid = vis[ef.f[0]] || vis[ef.f[1]];
-      const p=proj(V[ef.e[0]]), q=proj(V[ef.e[1]]);
-      ctx.save();ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(q[0],q[1]);
-      ctx.strokeStyle='#334155';ctx.lineWidth=solid?2:1.5;
-      if(!solid)ctx.setLineDash([5,4]);ctx.stroke();ctx.setLineDash([]);ctx.restore();
-    });
-
-    // mode highlights
     if(mode===1){
-      const p=proj(V[3]),q=proj(V[7]);  // D->E height
-      ctx.save();ctx.strokeStyle='#ef4444';ctx.lineWidth=3.5;ctx.setLineDash([6,4]);
-      ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(q[0],q[1]);ctx.stroke();ctx.setLineDash([]);
-      ctx.fillStyle='#b91c1c';ctx.font='700 13px system-ui';
-      ctx.fillText('height DE = 10', (p[0]+q[0])/2+8, (p[1]+q[1])/2);
-      ctx.restore();
+      face([A,B,C,D],'#2563eb',0.18);
+      seg(D,E,'#ef4444',3,true);   // height DE
     } else if(mode===2){
-      const pa=proj(V[0]),pd=proj(V[3]),pb=proj(V[1]),pc=proj(V[2]);
-      ctx.save();ctx.lineWidth=4;
-      ctx.strokeStyle='#10b981';ctx.beginPath();ctx.moveTo(pa[0],pa[1]);ctx.lineTo(pd[0],pd[1]);ctx.stroke();
-      ctx.strokeStyle='#334155';ctx.beginPath();ctx.moveTo(pa[0],pa[1]);ctx.lineTo(pb[0],pb[1]);ctx.stroke();
-      ctx.beginPath();ctx.moveTo(pb[0],pb[1]);ctx.lineTo(pc[0],pc[1]);ctx.stroke();
-      ctx.font='700 13px system-ui';
-      ctx.fillStyle='#10b981';ctx.fillText('AD=11',(pa[0]+pd[0])/2,(pa[1]+pd[1])/2+18);
-      ctx.fillStyle='#334155';ctx.fillText('AB=12',(pa[0]+pb[0])/2-26,(pa[1]+pb[1])/2);
-      ctx.fillText('BC=6',(pb[0]+pc[0])/2,(pb[1]+pc[1])/2-8);
-      ctx.restore();
+      face([A,B,C,D],'#2563eb',0.10);
+      seg(A,D,'#10b981',4);        // AD
+      seg(A,B,'#334155',3);        // AB=12
+      seg(B,C,'#334155',3);        // BC=6
+    } else if(mode===3){
+      face([A,B,C,D],'#2563eb',0.12);
+      face([F,G,Ht,E],'#94a3b8',0.12);
+      face([B,C,Ht,G],'#f59e0b',0.15);
+      face([C,D,E,Ht],'#7c3aed',0.15);
+      face([D,A,F,E],'#10b981',0.15);
+      face([A,B,G,F],'#ef4444',0.15);
+      seg(A,D,'#10b981',3);
     }
 
-    // vertex labels
-    const off=[[-20,4],[-20,-2],[8,-2],[10,4],[8,-8],[8,-8],[8,-8],[10,-6]];
-    V.forEach((v,k)=>{
-      const p=proj(v);
-      ctx.save();ctx.fillStyle='#0f172a';ctx.font='800 13px system-ui';
-      ctx.textAlign='left';ctx.textBaseline='bottom';
-      ctx.fillText(LAB[k], p[0]+off[k][0], p[1]+off[k][1]);
-      ctx.restore();
-    });
+    // base edges — AB, AD dashed (hidden), matching original
+    seg(A,B,base,2.5,true);      // BA dashed
+    seg(B,C,base,2.5);           // BC solid (front)
+    seg(C,D,base,2.5);           // CD solid (right)
+    seg(D,A,base,2.5,true);      // AD dashed
+
+    // top edges (all solid)
+    seg(F,G,top,2);seg(G,Ht,top,2);seg(Ht,E,top,2);seg(E,F,top,2);
+
+    // vertical edges — AF dashed (hidden), others solid
+    seg(D,E,edge,2);             // DE solid
+    seg(C,Ht,edge,2);            // CH solid
+    seg(B,G,edge,2);             // BG solid
+    seg(A,F,edge,2,true);        // AF dashed
+
+    // labels
+    pt(A,'#334155',5,'A',-22,4);
+    pt(B,'#334155',5,'B',-24,-2);
+    pt(C,'#334155',5,'C',8,-2);
+    pt(D,'#334155',5,'D',10,4);
+    pt(E,'#64748b',5,'E',10,-6);
+    pt(F,'#64748b',5,'F',8,-8);
+    pt(G,'#64748b',5,'G',8,-8);
+    pt(Ht,'#64748b',5,'H',8,-8);
+
+    ctx.save();ctx.font='700 13px system-ui';
+    if(mode===1){
+      ctx.fillStyle='#2563eb';ctx.textAlign='center';ctx.textBaseline='bottom';
+      ctx.fillText('base = trapezium ABCD', (A[0]+D[0])/2, 460);
+      ctx.fillStyle='#ef4444';ctx.textAlign='left';ctx.textBaseline='middle';
+      ctx.fillText('height DE = 10', D[0]+12, (D[1]+E[1])/2);
+    } else if(mode===2){
+      ctx.fillStyle='#334155';ctx.textAlign='right';ctx.textBaseline='middle';ctx.fillText('AB=12',(A[0]+B[0])/2-6,(A[1]+B[1])/2);
+      ctx.fillStyle='#334155';ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText('BC=6',(B[0]+C[0])/2,B[1]-4);
+      ctx.fillStyle='#10b981';ctx.textAlign='center';ctx.textBaseline='top';ctx.fillText('AD=11',(A[0]+D[0])/2,D[1]+8);
+      ctx.fillStyle='#f59e0b';ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText('CD=13',(C[0]+D[0])/2,(C[1]+D[1])/2-4);
+    } else {
+      ctx.fillStyle='#f59e0b';ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText('BCGH=60',(B[0]+Ht[0])/2,(B[1]+Ht[1])/2);
+      ctx.fillStyle='#7c3aed';ctx.textAlign='left';ctx.textBaseline='bottom';ctx.fillText('CDHE=130',(C[0]+E[0])/2,(C[1]+E[1])/2);
+      ctx.fillStyle='#10b981';ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText('ADEF=110',(D[0]+F[0])/2,(D[1]+F[1])/2);
+      ctx.fillStyle='#ef4444';ctx.textAlign='right';ctx.textBaseline='bottom';ctx.fillText('ABGF=120',(A[0]+G[0])/2,(A[1]+G[1])/2);
+    }
+    ctx.restore();
 
     let html='';
     if(mode===1) html=`<span class="ro">Volume = base × height</span><span class="ro">base = 6(AD+6)</span>`;
@@ -231,25 +229,6 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
     ro.innerHTML=html;
   }
 
-  // drag to rotate
-  let dragging=false, lx=0, ly=0;
-  function start(x,y){dragging=true;lx=x;ly=y;}
-  function move(x,y){
-    if(!dragging)return;
-    yaw += (x-lx)*0.012;
-    pitch += (y-ly)*0.012;
-    pitch=Math.max(-Math.PI/2+0.05, Math.min(Math.PI/2-0.05, pitch));
-    lx=x;ly=y; draw();
-  }
-  function end(){dragging=false;}
-  cv.addEventListener('mousedown',e=>start(e.clientX,e.clientY));
-  window.addEventListener('mousemove',e=>move(e.clientX,e.clientY));
-  window.addEventListener('mouseup',end);
-  cv.addEventListener('touchstart',e=>{const t=e.touches[0];start(t.clientX,t.clientY);e.preventDefault();},{passive:false});
-  cv.addEventListener('touchmove',e=>{const t=e.touches[0];move(t.clientX,t.clientY);e.preventDefault();},{passive:false});
-  cv.addEventListener('touchend',end);
-
-  // scroll-sync
   const steps=Array.from(document.querySelectorAll('.step'));
   const obs=new IntersectionObserver((es)=>{
     es.forEach(e=>{ if(e.isIntersecting){ const m=+e.target.dataset.step; if(m!==mode){mode=m;
