@@ -1,925 +1,384 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>HKDSE 2016 Paper 1 Q16 · Statistics</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2016 P1 Q16 — Statistics</title>
 <script>
-  window.MathJax = {
-    tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['\\[', '\\]']] },
-    svg: { fontCache: 'global' }
-  };
+window.MathJax = {
+  tex: { inlineMath: [['$','$'], ['\\(','\\)']], displayMath: [['$$','$$'], ['\\[','\\]']] },
+  svg: { fontCache: 'global' }
+};
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
   :root{
-    --blue:#1d4ed8;
-    --blue-l:#3b82f6;
-    --amber:#f59e0b;
-    --amber-l:#fde68a;
-    --green:#059669;
-    --green-l:#d1fae5;
-    --dark:#0f172a;
-    --slate:#475569;
-    --slate-l:#94a3b8;
-    --bg:#f1f5f9;
-    --card:#ffffff;
-    --radius:18px;
-    --shadow:0 6px 24px rgba(15,23,42,.08);
+    --ink:#1b2430; --muted:#5c6b7a; --line:#e2e8f0;
+    --blue:#2563eb; --red:#dc2626; --green:#16a34a; --amber:#d97706; --violet:#7c3aed;
   }
   *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
   body{
-    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
-    background:var(--bg);
-    color:var(--dark);
-    line-height:1.65;
-    -webkit-font-smoothing:antialiased;
+    margin:0; font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    color:var(--ink); background:#f6f8fb; line-height:1.55; font-size:16px;
   }
-  .wrap{max-width:1000px;margin:0 auto;padding:0 16px 60px;}
+  .wrap{padding:18px 20px 60px; max-width:1500px; margin:0 auto;}
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start;}
+  @media(min-width:900px){.split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}}
+  .diagram{position:sticky;top:16px;max-height:calc(100vh - 2rem);overflow-y:auto;}
+  @media(max-width:640px){body{font-size:14.5px;}.wrap{padding:10px 8px 40px;}}
 
-  /* ---------- HERO ---------- */
-  .hero{
-    background:linear-gradient(135deg,#1e3a8a 0%,#1d4ed8 45%,#0ea5e9 100%);
-    color:#fff;
-    padding:48px 16px 56px;
-    position:relative;
-    overflow:hidden;
-  }
-  .hero::after{
-    content:"";
-    position:absolute;right:-80px;top:-80px;width:280px;height:280px;
-    border-radius:50%;
-    background:radial-gradient(circle,rgba(253,230,138,.35),transparent 70%);
-  }
-  .hero-inner{max-width:1000px;margin:0 auto;position:relative;z-index:2;}
-  .eyebrow{
-    text-transform:uppercase;
-    letter-spacing:.16em;
-    font-size:.72rem;
-    font-weight:700;
-    color:#bae6fd;
-    margin:0 0 10px;
-  }
-  .hero h1{
-    font-size:clamp(1.6rem,4.2vw,2.5rem);
-    margin:0 0 6px;
-    line-height:1.2;
-    font-weight:800;
-  }
-  .hero .topic{
-    font-size:clamp(.95rem,2.2vw,1.15rem);
-    color:#e0f2fe;
-    margin:0 0 18px;
-    font-weight:500;
-  }
-  .pills{display:flex;flex-wrap:wrap;gap:8px;}
-  .pill{
-    background:rgba(255,255,255,.16);
-    border:1px solid rgba(255,255,255,.35);
-    color:#fff;
-    font-size:.76rem;
-    font-weight:600;
-    padding:5px 13px;
-    border-radius:999px;
-    backdrop-filter:blur(4px);
-  }
+  .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;box-shadow:0 2px 10px rgba(20,40,80,.06);}
+  .diagram canvas{width:100%;height:auto;display:block;border-radius:10px;background:#fff;}
+  .ro{margin:8px 2px 0;font-size:13.5px;color:var(--muted);text-align:center;}
 
-  /* ---------- CARDS ---------- */
-  .card{
-    background:var(--card);
-    border-radius:var(--radius);
-    box-shadow:var(--shadow);
-    padding:26px 24px;
-    margin-top:26px;
-    border:1px solid #e2e8f0;
-  }
-  .card h2{
-    font-size:1.25rem;
-    margin:0 0 4px;
-    color:var(--blue);
-    font-weight:800;
-    display:flex;
-    align-items:center;
-    gap:10px;
-  }
-  .card h2 .num{
-    background:linear-gradient(135deg,var(--blue),#0ea5e9);
-    color:#fff;
-    font-size:.85rem;
-    width:30px;height:30px;
-    border-radius:9px;
-    display:inline-flex;align-items:center;justify-content:center;
-    flex:0 0 auto;
-  }
-  .sub{color:var(--slate);font-size:.92rem;margin:0 0 16px;}
-
-  .qbox{
-    background:linear-gradient(180deg,#f8fafc,#eef2f7);
-    border-left:5px solid var(--blue);
-    border-radius:12px;
-    padding:18px 20px;
-    font-size:1.02rem;
-  }
-  .marks{
-    display:inline-block;
-    background:var(--amber-l);
-    color:#92400e;
-    font-weight:700;
-    font-size:.78rem;
-    padding:3px 11px;
-    border-radius:999px;
-    white-space:nowrap;
-  }
-
-  /* ---------- STEPS ---------- */
+  h1{font-size:1.15rem;margin:0 0 8px;}
+  h2{font-size:1rem;margin:20px 0 8px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
+  .qbox{background:#fff;border:1px solid var(--line);border-left:5px solid var(--blue);border-radius:12px;padding:12px 16px;box-shadow:0 2px 10px rgba(20,40,80,.06);}
+  .badge{display:inline-block;background:var(--blue);color:#fff;border-radius:999px;font-size:.72rem;padding:2px 10px;font-weight:700;letter-spacing:.05em;margin-bottom:6px;}
   .step{
-    display:none;
-    border:1px solid #e2e8f0;
-    border-left:4px solid var(--blue-l);
-    border-radius:12px;
-    padding:16px 18px;
-    margin-top:14px;
-    background:#fcfdff;
-    animation:pop .32s ease;
+    background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px 12px 16px;
+    margin:12px 0;position:relative;box-shadow:0 1px 6px rgba(20,40,80,.05);
+    transition:box-shadow .25s,border-color .25s, transform .25s;
   }
-  .step.show{display:block;}
-  @keyframes pop{
-    from{opacity:0;transform:translateY(10px);}
-    to{opacity:1;transform:translateY(0);}
+  .step.active{border-color:var(--amber);box-shadow:0 6px 22px rgba(217,119,6,.22);transform:translateX(2px);}
+  .tag{display:inline-flex;align-items:center;gap:8px;font-weight:800;font-size:.9rem;margin-bottom:6px;}
+  .chip{
+    display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;
+    color:#fff;font-size:.8rem;font-weight:800;background:var(--blue);
   }
-  .step-head{
-    display:flex;align-items:center;gap:10px;flex-wrap:wrap;
-    margin-bottom:8px;
-  }
-  .badge-num{
-    background:var(--blue);color:#fff;font-weight:800;font-size:.76rem;
-    padding:3px 10px;border-radius:8px;
-  }
-  .badge-mark{
-    background:#e0e7ff;color:#3730a3;font-weight:800;font-size:.72rem;
-    padding:3px 9px;border-radius:999px;border:1px solid #c7d2fe;
-  }
-  .step .working{font-size:1.02rem;}
-
-  .hint{
-    background:#fffbeb;
-    border:1px solid var(--amber-l);
-    border-left:4px solid var(--amber);
-    border-radius:10px;
-    padding:11px 14px;
-    margin-top:12px;
-    font-size:.92rem;
-    color:#78350f;
-  }
-  .hint b{color:#b45309;}
-
-  .answer{
-    background:var(--green-l);
-    border:1px solid #6ee7b7;
-    border-left:4px solid var(--green);
-    border-radius:10px;
-    padding:11px 14px;
-    margin-top:12px;
-    font-size:.98rem;
-    color:#064e3b;
-    font-weight:600;
-  }
-  .answer b{color:#047857;}
-
-  .controls{
-    display:flex;align-items:center;gap:14px;flex-wrap:wrap;
-    margin-top:18px;
-  }
-  button.next{
-    background:linear-gradient(135deg,var(--blue),#0ea5e9);
-    color:#fff;border:none;
-    padding:11px 22px;
-    border-radius:11px;
-    font-size:.95rem;font-weight:700;
-    cursor:pointer;
-    box-shadow:0 4px 14px rgba(29,78,216,.32);
-    transition:transform .12s ease, box-shadow .12s ease;
-    font-family:inherit;
-  }
-  button.next:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 7px 20px rgba(29,78,216,.4);}
-  button.next:disabled{
-    background:#cbd5e1;color:#64748b;box-shadow:none;cursor:not-allowed;
-  }
-  .counter{
-    font-size:.86rem;font-weight:700;color:var(--slate);
-    background:#f1f5f9;padding:6px 13px;border-radius:999px;
-    border:1px solid #e2e8f0;
-  }
-
-  /* ---------- CANVAS ---------- */
-  .canvas-wrap{
-    background:#f8fafc;
-    border:1px solid #e2e8f0;
-    border-radius:14px;
-    padding:14px;
-    margin:16px 0 6px;
-  }
-  canvas{width:100%;display:block;border-radius:10px;background:#fff;}
-  .readout{
-    display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;
-  }
-  .ro{
-    flex:1 1 130px;
-    background:#fff;
-    border:1px solid #e2e8f0;
-    border-radius:10px;
-    padding:8px 12px;
-    font-size:.83rem;
-    color:var(--slate);
-    font-weight:600;
-  }
-  .ro span{display:block;font-size:1.05rem;color:var(--blue);font-weight:800;}
-  .ro.g span{color:var(--green);}
-  .ro.a span{color:#b45309;}
-
-  .slider-row{
-    display:flex;align-items:center;gap:12px;flex-wrap:wrap;
-    margin-top:14px;font-size:.88rem;font-weight:600;color:var(--slate);
-  }
-  input[type=range]{
-    -webkit-appearance:none;appearance:none;
-    flex:1 1 180px;height:6px;border-radius:6px;
-    background:linear-gradient(90deg,var(--blue-l),var(--amber));
-    outline:none;
-  }
-  input[type=range]::-webkit-slider-thumb{
-    -webkit-appearance:none;appearance:none;
-    width:20px;height:20px;border-radius:50%;
-    background:#fff;border:3px solid var(--blue);
-    cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.2);
-  }
-  input[type=range]::-moz-range-thumb{
-    width:16px;height:16px;border-radius:50%;
-    background:#fff;border:3px solid var(--blue);cursor:pointer;
-  }
-  .chk{
-    display:inline-flex;align-items:center;gap:7px;
-    font-size:.86rem;font-weight:600;color:var(--slate);
-    cursor:pointer;user-select:none;
-    background:#fff;border:1px solid #e2e8f0;border-radius:999px;
-    padding:6px 14px;
-  }
-  .chk input{accent-color:var(--blue);width:16px;height:16px;cursor:pointer;}
-
-  /* ---------- SUMMARY ---------- */
-  .summary{
-    background:linear-gradient(135deg,#0f172a,#1e293b);
-    color:#e2e8f0;
-    border:none;
-  }
-  .summary h2{color:#fff;}
-  .summary h2 .num{background:linear-gradient(135deg,var(--amber),#f97316);}
-  .summary ul{margin:14px 0 0;padding-left:0;list-style:none;}
-  .summary li{
-    padding:11px 0 11px 30px;
-    border-bottom:1px solid rgba(255,255,255,.1);
-    position:relative;
-    font-size:.98rem;
-  }
-  .summary li:last-child{border-bottom:none;}
-  .summary li::before{
-    content:"✓";
-    position:absolute;left:0;top:11px;
-    color:#4ade80;font-weight:900;
-  }
-  .summary li b{color:#fbbf24;}
-
-  footer{
-    text-align:center;
-    color:var(--slate-l);
-    font-size:.82rem;
-    padding:34px 16px 10px;
-  }
-
-  @media (max-width:560px){
-    .card{padding:20px 16px;}
-    .hero{padding:36px 16px 42px;}
-  }
+  .step[data-step="1"] .chip{background:var(--blue);}
+  .step[data-step="2"] .chip{background:var(--green);}
+  .step[data-step="3"] .chip{background:var(--red);}
+  .step[data-step="4"] .chip{background:var(--violet);}
+  .hint{font-size:.87rem;color:var(--muted);border-left:3px solid var(--line);padding-left:8px;margin-top:8px;}
+  .ans{background:#ecfdf5;border:1px solid #a7f3d0;border-radius:12px;padding:12px 16px;margin-top:16px;}
+  .ans b{color:#047857;}
+  .mathline{margin:6px 0;}
+  .key{color:var(--red);font-weight:700;}
+  table.t{width:100%;border-collapse:collapse;margin:8px 0;font-size:.92rem;}
+  table.t td,table.t th{border:1px solid var(--line);padding:5px 8px;text-align:center;}
+  table.t th{background:#f1f5f9;}
 </style>
 </head>
 <body>
-
-<!-- ============ HERO ============ -->
-<header class="hero">
-  <div class="hero-inner">
-    <p class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 1</p>
-    <h1>2016 Paper 1 · Question 16</h1>
-    <p class="topic">Statistics — Standard Score, Mean &amp; Range of a Distribution</p>
-    <div class="pills">
-      <span class="pill">Standard Score</span>
-      <span class="pill">Mean</span>
-      <span class="pill">Range</span>
-      <span class="pill">Reasoning &amp; Justification</span>
-    </div>
-  </div>
-</header>
-
 <div class="wrap">
+  <div class="split">
 
-  <!-- ============ QUESTION ============ -->
-  <section class="card">
-    <h2><span class="num">Q</span> The Question</h2>
-    <p class="sub">Read carefully — the key words are <em>“at most 59 marks.”</em></p>
-    <div class="qbox">
-      <p>In a test, the mean of the distribution of the scores of a class of students is \(61\) marks.
-      The standard scores of Albert and Mary are \(-2.6\) and \(1.4\) respectively.
-      Albert gets \(22\) marks. A student claims that the range of the distribution is at most
-      \(59\) marks. Is the claim correct? Explain your answer.</p>
-      <p style="margin-top:10px;"><span class="marks">[3 marks]</span></p>
-    </div>
-  </section>
-
-  <!-- ============ PART (a) ============ -->
-  <section class="card">
-    <h2><span class="num">a</span> Part (a) — Find the standard deviation \(\sigma\)</h2>
-    <p class="sub">Use Albert’s known score together with his standard score.</p>
-
-    <div class="canvas-wrap">
-      <canvas id="cv1" height="600"></canvas>
-      <div class="readout">
-        <div class="ro">Mean \(\mu\)<span id="ro-mean">61</span></div>
-        <div class="ro a">Albert’s z<span id="ro-z">−2.6</span></div>
-        <div class="ro a">Albert’s score<span id="ro-score">22</span></div>
-        <div class="ro g">\(\sigma\)<span id="ro-sd">15</span></div>
-      </div>
-      <div class="slider-row">
-        <label for="sdSlider">Drag \(\sigma\):</label>
-        <input type="range" id="sdSlider" min="5" max="30" step="0.5" value="15" />
-        <span id="sdVal" style="font-weight:800;color:var(--blue);min-width:60px;">15.0</span>
-      </div>
-      <p style="font-size:.83rem;color:var(--slate);margin:10px 0 0;">
-        The amber marker is Albert’s position. Only when the marker lands exactly on \(22\) does the choice of \(\sigma\) fit the data — that happens at \(\sigma = 15\).
-      </p>
+    <!-- ================= LEFT : DIAGRAM ================= -->
+    <div class="diagram card">
+      <h1>Standard-score diagram</h1>
+      <canvas id="cv" width="760" height="620"></canvas>
+      <p class="ro" id="ro">Step 1 — given information</p>
     </div>
 
-    <div id="steps-a"></div>
-    <div class="controls">
-      <button class="next" data-target="steps-a">Next step →</button>
-      <span class="counter">0 / 3</span>
-    </div>
-  </section>
-
-  <!-- ============ PART (b) ============ -->
-  <section class="card">
-    <h2><span class="num">b</span> Part (b) — Compare the difference with the range</h2>
-    <p class="sub">Find Mary’s score, take the difference with Albert’s, then compare with \(59\).</p>
-
-    <div class="canvas-wrap">
-      <canvas id="cv2" height="600"></canvas>
-      <div class="readout">
-        <div class="ro">Mary’s score<span id="ro-mary">82</span></div>
-        <div class="ro a">Difference<span id="ro-diff">60</span></div>
-        <div class="ro g">Claimed max range<span>59</span></div>
-        <div class="ro" id="ro-verdict-box">Verdict<span id="ro-verdict">Incorrect</span></div>
+    <!-- ================= RIGHT : QUESTION + SOLUTION ================= -->
+    <div>
+      <div class="qbox">
+        <span class="badge">HKDSE 2016 · Paper 1 · Q16 · [3 marks]</span>
+        <p style="margin:.2rem 0 .6rem;">
+          In a test, the mean of the distribution of the scores of a class of students is $61$ marks.
+          The standard scores of Albert and Mary are $-2.6$ and $1.4$ respectively.
+          Albert gets $22$ marks. A student claims that the range of the distribution is at most
+          $59$ marks. Is the claim correct? Explain your answer.
+        </p>
       </div>
-      <label class="chk" style="margin-top:12px;">
-        <input type="checkbox" id="showRange" checked /> Show an illustrative interval of width 59
-      </label>
-      <div class="slider-row">
-        <label for="mSlider">Explore Mary’s z (default 1.4):</label>
-        <input type="range" id="mSlider" min="0" max="3" step="0.1" value="1.4" />
-        <span id="mVal" style="font-weight:800;color:var(--blue);min-width:50px;">1.4</span>
+
+      
+
+      <h2>Solution</h2>
+
+      <div class="step" data-step="1">
+        <div class="tag"><span class="chip">1</span>Find the standard deviation $\sigma$</div>
+        <p>Let $\sigma$ marks be the standard deviation. For Albert, score $=22$, standard score $=-2.6$:</p>
+        <div class="mathline">$$\frac{22-61}{\sigma}=-2.6$$</div>
+        <p>Make $\sigma$ the subject: $\sigma=\dfrac{22-61}{-2.6}=\dfrac{39}{2.6}=\mathbf{15}$ <span class="key">(1M)</span></p>
+        <div class="hint">Standard score $z=\dfrac{x-\bar{x}}{\sigma}$ — rearrange it to get $\sigma$. Note $61-22$ is a drop of $39$, so $\sigma=\frac{39}{2.6}=15$.</div>
+      </div>
+
+      <div class="step" data-step="2">
+        <div class="tag"><span class="chip">2</span>Find Mary's score</div>
+        <p>Mary's standard score is $1.4$, so she is $1.4\sigma$ above the mean:</p>
+        <div class="mathline">$$\text{Mary's score}=61+1.4\sigma=61+1.4(15)=61+21=\mathbf{82}\ \text{marks}\quad\text{(1A)}$$</div>
+        <table class="t">
+          <tr><th>Student</th><th>$z$</th><th>Score</th></tr>
+          <tr><td>Albert</td><td>$-2.6$</td><td>$61+(-2.6)(15)=22$</td></tr>
+          <tr><td>Mary</td><td>$1.4$</td><td>$61+(1.4)(15)=82$</td></tr>
+        </table>
+        <div class="hint">$x=\bar{x}+z\sigma$, and every standard score is measured in units of $\sigma=15$ marks.</div>
+      </div>
+
+      <div class="step" data-step="3">
+        <div class="tag"><span class="chip">3</span>Compare the difference with the claimed range</div>
+        <p>Difference between Mary's and Albert's scores:</p>
+        <div class="mathline">$$82-22=60 \text{ marks} \quad > \quad 59 \text{ marks}$$</div>
+        <p>Since the range is at least the difference between any two scores in the distribution,</p>
+        <div class="mathline">$$\text{range}\ \ge\ 60 > 59$$</div>
+        <div class="hint">Key idea: the range $\ge$ (largest value $-$ smallest value) $\ge$ (any two given values' difference).</div>
+      </div>
+
+      <div class="step" data-step="4">
+        <div class="tag"><span class="chip">4</span>Conclusion <span class="key">(1A)</span></div>
+        <p>The range of the distribution exceeds $59$ marks.</p>
+        <div class="ans"><b>Answer:</b> The claim is <b>incorrect</b>. The range is at least $60$ marks, which is greater than $59$ marks.</div>
       </div>
     </div>
 
-    <div id="steps-b"></div>
-    <div class="controls">
-      <button class="next" data-target="steps-b">Next step →</button>
-      <span class="counter">0 / 3</span>
-    </div>
-  </section>
-
-  <!-- ============ SUMMARY ============ -->
-  <section class="card summary">
-    <h2><span class="num">★</span> Summary of Answers</h2>
-    <ul>
-      <li>The standard deviation of the distribution is <b>\(\sigma = 15\) marks</b>.</li>
-      <li>Mary’s score is <b>\(61 + 1.4(15) = 82\) marks</b>.</li>
-      <li>The difference between Mary’s score and Albert’s score is <b>\(82 - 22 = 60\) marks</b>.</li>
-      <li>Since the range \(\ge\) the difference between any two scores, <b>the range is at least \(60\) marks \(> 59\) marks</b>.</li>
-      <li>Hence the claim is <b>incorrect</b>.</li>
-    </ul>
-  </section>
-
-  <footer>
-    HKDSE Mathematics (Compulsory Part) · Paper 1 · 2016 Question 16 — Interactive Solution
-  </footer>
+  </div>
 </div>
 
-<!-- ===================================================================== -->
 <script>
-/* ------------------------------------------------------------------
-   Shared helpers for drawing
------------------------------------------------------------------- */
-function setupCanvas(canvas, cssHeight){
-  const dpr = window.devicePixelRatio || 1;
-  const w = canvas.clientWidth || 600;
-  const h = cssHeight;
-  canvas.width = w * dpr;
-  canvas.height = h * dpr;
-  canvas.style.height = h + 'px';
-  const ctx = canvas.getContext('2d');
-  ctx.setTransform(dpr,0,0,dpr,0,0);
-  return {ctx, w, h};
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+const ro  = document.getElementById('ro');
+
+const W = cv.width, H = cv.height;
+
+/* ---------- geometry helpers ---------- */
+// score axis: 0 marks .. 100 marks  ->  x pixel range
+const X0 = 70, X1 = W - 30;
+const sMin = 0, sMax = 100;
+const sx = s => X0 + (s - sMin) / (sMax - sMin) * (X1 - X0);
+// number-line y
+const AY = 300;      // axis y
+const BELL_TOP = 70; // top of bell
+const BELL_BASE = 250;
+
+const MEAN = 61, SD = 15;
+
+function yBell(x){
+  // gaussian with mean MEAN sd SD, mapped so peak at BELL_TOP
+  const d = (x - MEAN) / SD;
+  const g = Math.exp(-0.5 * d * d);
+  return BELL_BASE - g * (BELL_BASE - BELL_TOP);
 }
 
-/* ==================================================================
-   DIAGRAM 1 — number line for Albert / sigma slider
-================================================================== */
-const cv1 = document.getElementById('cv1');
-const sdSlider = document.getElementById('sdSlider');
-const sdVal = document.getElementById('sdVal');
-const roSd = document.getElementById('ro-sd');
-const roScore = document.getElementById('ro-score');
+/* ---------- drawing ---------- */
+function draw(step){
+  ctx.clearRect(0,0,W,H);
+  ctx.lineJoin = 'round';
 
-function drawDiagram1(){
-  const {ctx, w, h} = setupCanvas(cv1, 300);
-  ctx.clearRect(0,0,w,h);
+  // ------- headline -------
+  ctx.font = 'bold 20px Segoe UI, Arial';
+  ctx.fillStyle = '#1b2430';
+  ctx.textAlign = 'left';
+  ctx.fillText('Scores of the class', 24, 34);
 
-  const mu = 61;
-  const sigma = parseFloat(sdSlider.value);
-  const zAlbert = -2.6;
-  const albert = mu + zAlbert * sigma;   // = 61 - 2.6 sigma
-
-  const padL = 45, padR = 25;
-  const axisY = h - 70;
-  const xMin = 0, xMax = 120;
-  const sx = x => padL + (x - xMin) / (xMax - xMin) * (w - padL - padR);
-
-  /* ----- axis ----- */
-  ctx.strokeStyle = '#0f172a';
+  // ------- distribution curve -------
+  ctx.beginPath();
+  ctx.moveTo(sx(sMin), BELL_BASE);
+  for (let s = sMin; s <= sMax; s += 0.5) ctx.lineTo(sx(s), yBell(s));
+  ctx.lineTo(sx(sMax), BELL_BASE);
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(37,99,235,.10)';
+  ctx.fill();
+  ctx.strokeStyle = '#93c5fd';
   ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.moveTo(padL-14, axisY);
-  ctx.lineTo(w-padR+8, axisY);
+  ctx.moveTo(sx(sMin), BELL_BASE);
+  for (let s = sMin; s <= sMax; s += 0.5) ctx.lineTo(sx(s), yBell(s));
   ctx.stroke();
 
-  /* arrow head */
+  // ------- axis -------
+  ctx.strokeStyle = '#94a3b8';
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(X0 - 12, BELL_BASE); ctx.lineTo(X1 + 10, BELL_BASE); ctx.stroke();
+  // arrow
   ctx.beginPath();
-  ctx.moveTo(w-padR+8, axisY);
-  ctx.lineTo(w-padR-2, axisY-5);
-  ctx.lineTo(w-padR-2, axisY+5);
-  ctx.closePath();
-  ctx.fillStyle = '#0f172a';
-  ctx.fill();
+  ctx.moveTo(X1 + 10, BELL_BASE); ctx.lineTo(X1 + 2, BELL_BASE - 5); ctx.lineTo(X1 + 2, BELL_BASE + 5);
+  ctx.closePath(); ctx.fillStyle = '#94a3b8'; ctx.fill();
 
-  /* ticks & labels every 10 */
-  ctx.font = '600 11px Segoe UI, sans-serif';
+  // ticks every 10 marks
+  ctx.font = '13px Segoe UI, Arial';
+  ctx.fillStyle = '#5c6b7a';
   ctx.textAlign = 'center';
-  for(let x = 0; x <= 120; x += 10){
-    const px = sx(x);
-    ctx.strokeStyle = '#cbd5e1';
-    ctx.lineWidth = 1.4;
+  for (let s = 0; s <= 100; s += 10){
+    const px = sx(s);
+    ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(px, BELL_BASE); ctx.lineTo(px, BELL_BASE + 6); ctx.stroke();
+    ctx.fillText(s, px, BELL_BASE + 22);
+  }
+  ctx.fillText('marks', X1 - 6, BELL_BASE + 42);
+
+  // ------- mean line -------
+  ctx.setLineDash([6,5]);
+  ctx.strokeStyle = '#7c3aed'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(sx(MEAN), BELL_BASE); ctx.lineTo(sx(MEAN), BELL_TOP - 22); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = '#7c3aed'; ctx.textAlign = 'center';
+  ctx.font = 'bold 14px Segoe UI, Arial';
+  ctx.fillText('mean = 61', sx(MEAN), BELL_TOP - 32);
+
+  // ------- Albert (22) -------
+  if (step >= 1){
+    drawMarker(22, -2.6, 22, '#dc2626', 'Albert', 'below');
+  }
+  // ------- Mary (82) -------
+  if (step >= 2){
+    drawMarker(82, 1.4, 82, '#16a34a', 'Mary', 'below');
+  }
+  // ------- σ band / difference bracket  -------
+  if (step >= 3){
+    // shaded band from 22 to 82
+    ctx.save();
+    ctx.globalAlpha = 0.16;
+    ctx.fillStyle = '#f59e0b';
+    ctx.fillRect(sx(22), BELL_TOP - 6, sx(82) - sx(22), BELL_BASE - (BELL_TOP - 6));
+    ctx.restore();
+
+    // arrow line below axis
+    const yb = BELL_BASE + 66;
+    ctx.strokeStyle = '#d97706'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(sx(22), yb); ctx.lineTo(sx(82), yb); ctx.stroke();
+    // arrow heads
+    arrowHead(sx(22), yb, -1, '#d97706');
+    arrowHead(sx(82), yb,  1, '#d97706');
+    // vertical connectors
+    ctx.setLineDash([4,4]); ctx.lineWidth = 1.5; ctx.strokeStyle = '#d97706';
     ctx.beginPath();
-    ctx.moveTo(px, axisY-6);
-    ctx.lineTo(px, axisY+6);
-    ctx.stroke();
-    ctx.fillStyle = '#64748b';
-    ctx.fillText(x, px, axisY+21);
+    ctx.moveTo(sx(22), BELL_BASE); ctx.lineTo(sx(22), yb);
+    ctx.moveTo(sx(82), BELL_BASE); ctx.lineTo(sx(82), yb);
+    ctx.stroke(); ctx.setLineDash([]);
+
+    ctx.fillStyle = '#b45309'; ctx.textAlign = 'center';
+    ctx.font = 'bold 16px Segoe UI, Arial';
+    ctx.fillText('82 − 22 = 60 marks', (sx(22) + sx(82))/2, yb + 26);
+    ctx.font = '13px Segoe UI, Arial';
+    ctx.fillText('so range ≥ 60 > 59', (sx(22) + sx(82))/2, yb + 46);
   }
-  ctx.fillStyle = '#94a3b8';
-  ctx.font = '700 11px Segoe UI, sans-serif';
-  ctx.textAlign = 'right';
-  ctx.fillText('score', w-padR+6, axisY+38);
 
-  /* ----- mean marker ----- */
-  const mx = sx(mu);
-  ctx.strokeStyle = '#1d4ed8';
-  ctx.lineWidth = 2.5;
-  ctx.setLineDash([6,5]);
-  ctx.beginPath();
-  ctx.moveTo(mx, 28);
-  ctx.lineTo(mx, axisY);
-  ctx.stroke();
-  ctx.setLineDash([]);
+  // ------- σ interval marker (step 1 & 2) -------
+  if (step === 1 || step === 2){
+    const yb = BELL_BASE + 66;
+    ctx.strokeStyle = '#2563eb'; ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.moveTo(sx(MEAN), yb); ctx.lineTo(sx(MEAN - SD), yb); ctx.stroke();
+    arrowHead(sx(MEAN - SD), yb, -1, '#2563eb');
+    arrowHead(sx(MEAN),     yb,  1, '#2563eb');
+    ctx.setLineDash([4,4]); ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(sx(MEAN), BELL_BASE); ctx.lineTo(sx(MEAN), yb);
+    ctx.moveTo(sx(MEAN - SD), BELL_BASE); ctx.lineTo(sx(MEAN - SD), yb);
+    ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = '#1d4ed8'; ctx.textAlign = 'center';
+    ctx.font = 'bold 15px Segoe UI, Arial';
+    ctx.fillText('σ = 15', (sx(MEAN) + sx(MEAN - SD))/2, yb + 24);
+  }
 
-  ctx.fillStyle = '#1d4ed8';
-  ctx.beginPath(); ctx.arc(mx, axisY, 6, 0, Math.PI*2); ctx.fill();
-  ctx.font = '800 12px Segoe UI, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('mean = 61', mx, 20);
+  // ------- legend -------
+  legend(step);
 
-  /* ----- sigma zone shading : within 1 sigma ----- */
-  const s1 = sx(mu - sigma), s2 = sx(mu + sigma);
-  ctx.fillStyle = 'rgba(59,130,246,.08)';
-  ctx.fillRect(s1, 36, s2 - s1, axisY - 36);
-  ctx.strokeStyle = 'rgba(59,130,246,.45)';
-  ctx.lineWidth = 1.2;
-  ctx.setLineDash([4,4]);
-  ctx.beginPath(); ctx.moveTo(s1, 36); ctx.lineTo(s1, axisY); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(s2, 36); ctx.lineTo(s2, axisY); ctx.stroke();
-  ctx.setLineDash([]);
-  ctx.fillStyle = '#3b82f6';
-  ctx.font = '700 10px Segoe UI, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('μ−σ', s1, axisY-10);
-  ctx.fillText('μ+σ', s2, axisY-10);
+  // ------- conclusion banner (step 4) -------
+  if (step >= 4){
+    ctx.fillStyle = '#ecfdf5';
+    ctx.strokeStyle = '#16a34a'; ctx.lineWidth = 2;
+    roundRect(24, H - 66, W - 48, 48, 10);
+    ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#047857'; ctx.textAlign = 'center';
+    ctx.font = 'bold 17px Segoe UI, Arial';
+    ctx.fillText('Range ≥ 60 > 59  ⟹  the claim is INCORRECT', W/2, H - 36);
+  }
 
-  /* ----- Albert marker ----- */
-  const ax = sx(albert);
-  const clampedAx = Math.max(padL+6, Math.min(w-padR-6, ax));
-
-  ctx.strokeStyle = '#f59e0b';
-  ctx.lineWidth = 2.5;
-  ctx.beginPath();
-  ctx.moveTo(clampedAx, axisY);
-  ctx.lineTo(clampedAx, axisY-42);
-  ctx.stroke();
-  ctx.fillStyle = '#f59e0b';
-  ctx.beginPath(); ctx.arc(clampedAx, axisY, 7, 0, Math.PI*2); ctx.fill();
-  ctx.fillStyle = '#fff';
-  ctx.beginPath(); ctx.arc(clampedAx, axisY, 3, 0, Math.PI*2); ctx.fill();
-
-  ctx.fillStyle = '#b45309';
-  ctx.font = '800 12px Segoe UI, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('Albert (z = −2.6)', clampedAx, axisY-52);
-  ctx.font = '700 11px Segoe UI, sans-serif';
-  ctx.fillText(albert.toFixed(1) + ' marks', clampedAx, axisY-38);
-
-  /* ----- the "target" line at 22 ----- */
-  const tx = sx(22);
-  ctx.strokeStyle = '#ef4444';
-  ctx.lineWidth = 2;
-  ctx.setLineDash([3,4]);
-  ctx.beginPath();
-  ctx.moveTo(tx, 46);
-  ctx.lineTo(tx, axisY);
-  ctx.stroke();
-  ctx.setLineDash([]);
-  ctx.fillStyle = '#dc2626';
-  ctx.font = '800 11px Segoe UI, sans-serif';
-  ctx.textAlign = 'left';
-  ctx.fillText('given: 22', tx + 6, 44);
-
-  /* ----- status text ----- */
-  const diff = Math.abs(albert - 22);
-  const ok = diff < 0.25;
-  ctx.textAlign = 'left';
-  ctx.font = '800 13px Segoe UI, sans-serif';
-  ctx.fillStyle = ok ? '#059669' : '#94a3b8';
-  ctx.fillText(
-    ok
-      ? '✓ σ = ' + sigma.toFixed(1) + ' makes 61 + (−2.6)σ = 22 exactly.'
-      : '61 + (−2.6)(' + sigma.toFixed(1) + ') = ' + albert.toFixed(1) + '  (≠ 22)',
-    padL, h - 20
-  );
-
-  /* readouts */
-  roSd.textContent = sigma.toFixed(1);
-  roScore.textContent = albert.toFixed(1);
-  sdVal.textContent = sigma.toFixed(1);
+  // ------- readout text -------
+  const txt = [
+    'Step 1 — the mean and Albert\'s standard score give σ = 15.',
+    'Step 2 — Mary\'s score = 61 + 1.4(15) = 82 marks.',
+    'Step 3 — 82 − 22 = 60 marks, so the range is at least 60.',
+    'Step 4 — 60 > 59, therefore the claim is incorrect.'
+  ];
+  ro.textContent = txt[Math.min(4, Math.max(1, step)) - 1];
 }
 
-sdSlider.addEventListener('input', drawDiagram1);
+function drawMarker(score, z, label2, colour, name, side){
+  const px = sx(score);
+  const py = yBell(score);
 
-/* ==================================================================
-   DIAGRAM 2 — position of Albert & Mary + range argument
-================================================================== */
-const cv2 = document.getElementById('cv2');
-const mSlider = document.getElementById('mSlider');
-const showRange = document.getElementById('showRange');
-const mVal = document.getElementById('mVal');
-const roMary = document.getElementById('ro-mary');
-const roDiff = document.getElementById('ro-diff');
-const roVerdict = document.getElementById('ro-verdict');
+  // vertical drop line
+  ctx.setLineDash([5,4]);
+  ctx.strokeStyle = colour; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px, BELL_BASE); ctx.stroke();
+  ctx.setLineDash([]);
 
-function drawDiagram2(){
-  const {ctx, w, h} = setupCanvas(cv2, 320);
-  ctx.clearRect(0,0,w,h);
+  // dot on curve
+  ctx.beginPath(); ctx.arc(px, py, 7, 0, Math.PI*2);
+  ctx.fillStyle = colour; ctx.fill();
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 2.5; ctx.stroke();
 
-  const mu = 61, sigma = 15;
-  const zAlbert = -2.6;
-  const zMary = parseFloat(mSlider.value);
-  const albert = mu + zAlbert * sigma;   // 22
-  const mary   = mu + zMary * sigma;
-  const diff = mary - albert;
-  const claimedRange = 59;
+  // label box above
+  const label = name + '  ' + score + '  (z = ' + z + ')';
+  ctx.font = 'bold 13.5px Segoe UI, Arial';
+  const tw = ctx.measureText(label).width;
+  const bw = tw + 18, bh = 26;
+  let bx = px - bw/2;
+  bx = Math.max(X0 - 8, Math.min(X1 - bw + 8, bx));
+  let by = py - 46;
+  if (by < 6) by = py + 16;
 
-  const padL = 45, padR = 25;
-  const axisY = h - 88;
-  const xMin = 0, xMax = 130;
-  const sx = x => padL + (x - xMin) / (xMax - xMin) * (w - padL - padR);
+  ctx.fillStyle = colour;
+  roundRect(bx, by, bw, bh, 8); ctx.fill();
+  ctx.fillStyle = '#fff'; ctx.textAlign = 'center';
+  ctx.font = 'bold 13.5px Segoe UI, Arial';
+  ctx.fillText(label, bx + bw/2, by + 18);
 
-  /* ---------- shading for claimed range of width 59 ---------- */
-  if(showRange.checked){
-    const a1 = sx(0), a2 = sx(claimedRange);
-    ctx.fillStyle = 'rgba(148,163,184,.16)';
-    ctx.fillRect(a1, 40, a2 - a1, axisY - 40);
-    ctx.strokeStyle = '#94a3b8';
-    ctx.lineWidth = 1.6;
-    ctx.setLineDash([5,5]);
-    ctx.beginPath(); ctx.moveTo(a2, 40); ctx.lineTo(a2, axisY); ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.fillStyle = '#64748b';
-    ctx.font = '800 11px Segoe UI, sans-serif';
-    ctx.textAlign = 'left';
-    ctx.fillText('range ≤ 59 would need every score ≤ 59', a1+8, 34);
-  }
+  // tick number under axis
+  ctx.fillStyle = colour; ctx.textAlign = 'center';
+  ctx.font = 'bold 13px Segoe UI, Arial';
+  ctx.fillText(score, px, BELL_BASE + 22);
+}
 
-  /* ---------- axis ---------- */
-  ctx.strokeStyle = '#0f172a';
-  ctx.lineWidth = 2;
+function arrowHead(x, y, dir, colour){
+  ctx.fillStyle = colour;
   ctx.beginPath();
-  ctx.moveTo(padL-14, axisY);
-  ctx.lineTo(w-padR+8, axisY);
-  ctx.stroke();
+  ctx.moveTo(x, y);
+  ctx.lineTo(x - dir*11, y - 6);
+  ctx.lineTo(x - dir*11, y + 6);
+  ctx.closePath(); ctx.fill();
+}
+
+function legend(step){
+  const items = [];
+  items.push(['#7c3aed', 'mean = 61 marks']);
+  if (step >= 1) items.push(['#dc2626', 'Albert = 22 marks (z = −2.6)']);
+  if (step >= 2) items.push(['#16a34a', 'Mary = 82 marks (z = 1.4)']);
+  if (step >= 3) items.push(['#d97706', 'difference = 60 marks']);
+
+  let x = 24, y = 58;
+  ctx.font = '12.5px Segoe UI, Arial';
+  items.forEach(([c, t]) => {
+    ctx.fillStyle = c;
+    roundRect(x, y - 10, 14, 14, 4); ctx.fill();
+    ctx.fillStyle = '#334155'; ctx.textAlign = 'left';
+    ctx.fillText(t, x + 20, y + 2);
+    x += ctx.measureText(t).width + 48;
+    if (x > W - 160){ x = 24; y += 24; }
+  });
+}
+
+function roundRect(x, y, w, h, r){
   ctx.beginPath();
-  ctx.moveTo(w-padR+8, axisY);
-  ctx.lineTo(w-padR-2, axisY-5);
-  ctx.lineTo(w-padR-2, axisY+5);
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y,     x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x,     y + h, r);
+  ctx.arcTo(x,     y + h, x,     y,     r);
+  ctx.arcTo(x,     y,     x + w, y,     r);
   ctx.closePath();
-  ctx.fillStyle = '#0f172a';
-  ctx.fill();
-
-  ctx.font = '600 10px Segoe UI, sans-serif';
-  ctx.textAlign = 'center';
-  for(let x = 0; x <= 130; x += 10){
-    const px = sx(x);
-    ctx.strokeStyle = '#cbd5e1';
-    ctx.lineWidth = 1.2;
-    ctx.beginPath(); ctx.moveTo(px, axisY-5); ctx.lineTo(px, axisY+5); ctx.stroke();
-    ctx.fillStyle = '#94a3b8';
-    ctx.fillText(x, px, axisY+19);
-  }
-
-  /* ---------- mean ---------- */
-  const mx = sx(mu);
-  ctx.strokeStyle = '#1d4ed8';
-  ctx.lineWidth = 2;
-  ctx.setLineDash([6,5]);
-  ctx.beginPath(); ctx.moveTo(mx, 48); ctx.lineTo(mx, axisY); ctx.stroke();
-  ctx.setLineDash([]);
-  ctx.fillStyle = '#1d4ed8';
-  ctx.beginPath(); ctx.arc(mx, axisY, 5, 0, Math.PI*2); ctx.fill();
-  ctx.font = '800 11px Segoe UI, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('mean 61', mx, 44);
-
-  /* ---------- the crucial difference bracket ---------- */
-  const ax = sx(albert), bx = sx(mary);
-  const brY = axisY - 62;
-
-  ctx.strokeStyle = '#ef4444';
-  ctx.lineWidth = 2.6;
-  ctx.beginPath(); ctx.moveTo(ax, brY); ctx.lineTo(bx, brY); ctx.stroke();
-  // end caps
-  ctx.beginPath(); ctx.moveTo(ax, brY-8); ctx.lineTo(ax, brY+8); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(bx, brY-8); ctx.lineTo(bx, brY+8); ctx.stroke();
-
-  ctx.fillStyle = '#dc2626';
-  ctx.font = '800 13px Segoe UI, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('difference = ' + diff.toFixed(0) + ' marks', (ax+bx)/2, brY - 14);
-
-  /* ---------- markers ---------- */
-  function marker(px, color, label, score, z){
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 2.4;
-    ctx.beginPath(); ctx.moveTo(px, axisY); ctx.lineTo(px, brY + 8); ctx.stroke();
-    ctx.fillStyle = color;
-    ctx.beginPath(); ctx.arc(px, axisY, 7, 0, Math.PI*2); ctx.fill();
-    ctx.fillStyle = '#fff';
-    ctx.beginPath(); ctx.arc(px, axisY, 3, 0, Math.PI*2); ctx.fill();
-    ctx.fillStyle = color;
-    ctx.font = '800 11px Segoe UI, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText(label, px, axisY - 14);
-    ctx.font = '700 10px Segoe UI, sans-serif';
-    ctx.fillText('z = ' + z.toFixed(1) + ' → ' + score.toFixed(0), px, axisY - 1);
-  }
-  marker(ax, '#f59e0b', 'Albert', albert, zAlbert);
-  marker(bx, '#059669', 'Mary', mary, zMary);
-
-  /* ---------- verdict banner ---------- */
-  const ok = diff > claimedRange;
-  ctx.fillStyle = ok ? '#fee2e2' : '#e0f2fe';
-  ctx.strokeStyle = ok ? '#ef4444' : '#0ea5e9';
-  ctx.lineWidth = 2;
-  const bw = Math.min(430, w - 60), bh = 40;
-  const bx2 = (w - bw) / 2, by2 = h - 48;
-  ctx.beginPath();
-  if(ctx.roundRect){ ctx.roundRect(bx2, by2, bw, bh, 12); }
-  else{ ctx.rect(bx2, by2, bw, bh); }
-  ctx.fill(); ctx.stroke();
-
-  ctx.fillStyle = ok ? '#b91c1c' : '#0369a1';
-  ctx.font = '800 12.5px Segoe UI, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText(
-    ok
-      ? 'difference ' + diff.toFixed(0) + ' > 59  ⟹  range ≥ ' + diff.toFixed(0) + ' > 59  ⟹  claim WRONG'
-      : 'difference ' + diff.toFixed(0) + ' ≤ 59  (not our case)',
-    w/2, by2 + 25
-  );
-
-  /* readouts */
-  roMary.textContent = mary.toFixed(0);
-  roDiff.textContent = diff.toFixed(0);
-  roVerdict.textContent = ok ? 'Incorrect ✗' : '—';
-  roVerdict.style.color = ok ? '#dc2626' : '#64748b';
-  mVal.textContent = zMary.toFixed(1);
 }
 
-mSlider.addEventListener('input', drawDiagram2);
-showRange.addEventListener('change', drawDiagram2);
-
-/* ==================================================================
-   STEP-BY-STEP REVEAL ENGINE
-================================================================== */
-const stepsA = document.getElementById('steps-a');
-stepsA.innerHTML = `
-  <div class="step">
-    <div class="step-head">
-      <span class="badge-num">Step 1</span>
-      <span class="badge-mark">1M</span>
-    </div>
-    <div class="working">
-      Let \(\sigma\) marks be the standard deviation of the distribution.<br><br>
-      Since Albert’s score is \(22\) and his standard score is \(-2.6\),
-      \[
-        \frac{22-61}{\sigma} = -2.6 .
-      \]
-    </div>
-    <div class="hint"><b>Hint:</b> Standard score \(z = \dfrac{\text{score} - \text{mean}}{\text{standard deviation}}\). Substituting Albert’s known values gives an equation in the single unknown \(\sigma\).</div>
-  </div>
-
-  <div class="step">
-    <div class="step-head">
-      <span class="badge-num">Step 2</span>
-      <span class="badge-mark">1A</span>
-    </div>
-    <div class="working">
-      Solve for the standard deviation:
-      \[
-        \begin{aligned}
-          \frac{22-61}{\sigma} &= -2.6 \\[4pt]
-          \frac{-39}{\sigma} &= -2.6 \\[4pt]
-          \sigma &= \frac{-39}{-2.6} = 15 .
-        \end{aligned}
-      \]
-    </div>
-    <div class="hint"><b>Hint:</b> Cross-multiply: \(\sigma = \dfrac{61-22}{2.6} = \dfrac{39}{2.6} = 15\). A standard deviation must be positive — our value \(15\) passes this check.</div>
-    <div class="answer">
-      <b>Answer (a):</b> The standard deviation of the distribution is \(\boxed{\sigma = 15 \text{ marks}}\).
-    </div>
-  </div>
-
-  <div class="step">
-    <div class="step-head">
-      <span class="badge-num">Step 3</span>
-      <span class="badge-mark">—</span>
-    </div>
-    <div class="working">
-      Now everything about the distribution is known:
-      \[
-        \mu = 61, \qquad \sigma = 15.
-      \]
-    </div>
-    <div class="hint"><b>Hint:</b> With \(\mu\) and \(\sigma\) both known, we can convert <em>any</em> standard score into an actual score. This is exactly what Part (b) requires.</div>
-  </div>
-`;
-
-const stepsB = document.getElementById('steps-b');
-stepsB.innerHTML = `
-  <div class="step">
-    <div class="step-head">
-      <span class="badge-num">Step 1</span>
-      <span class="badge-mark">1A</span>
-    </div>
-    <div class="working">
-      Compute Mary’s score using her standard score \(1.4\):
-      \[
-        \begin{aligned}
-          \text{Mary’s score} &= 61 + 1.4\sigma \\
-          &= 61 + 1.4(15) \\
-          &= 82 \text{ marks}.
-        \end{aligned}
-      \]
-    </div>
-    <div class="hint"><b>Hint:</b> Rearranging \(z = \dfrac{x-\mu}{\sigma}\) gives \(x = \mu + z\sigma\). This is the same conversion used for Albert — just with a positive \(z\).</div>
-    <div class="answer"><b>Answer (b):</b> Mary’s score is \(\boxed{82 \text{ marks}}\).</div>
-  </div>
-
-  <div class="step">
-    <div class="step-head">
-      <span class="badge-num">Step 2</span>
-      <span class="badge-mark">1A</span>
-    </div>
-    <div class="working">
-      Take the difference between Mary’s score and Albert’s score:
-      \[
-        \begin{aligned}
-          \text{Difference} &= \text{Mary’s score} - \text{Albert’s score} \\
-          &= 82 - 22 \\
-          &= 60 \text{ marks}.
-        \end{aligned}
-      \]
-    </div>
-    <div class="hint"><b>Hint:</b> This difference is a concrete, verifiable quantity — it does not depend on knowing the whole distribution, only on the two scores we have found.</div>
-    <div class="answer"><b>Answer (b):</b> The difference is \(\boxed{60 \text{ marks}}\).</div>
-  </div>
-
-  <div class="step">
-    <div class="step-head">
-      <span class="badge-num">Step 3</span>
-      <span class="badge-mark">1A</span>
-    </div>
-    <div class="working">
-      The range of a distribution is the difference between its largest and smallest scores.
-      Since \(82\) and \(22\) are both scores in this distribution,
-      \[
-        \text{range} \ge \text{difference between Mary’s and Albert’s scores} = 60 .
-      \]
-      Therefore,
-      \[
-        \text{range} \ge 60 > 59 .
-      \]
-      So the range <em>exceeds</em> \(59\) marks, and the claim is <b>incorrect</b>.
-    </div>
-    <div class="hint"><b>Hint:</b> You do <em>not</em> need the actual maximum and minimum scores. Because the range must be at least as large as the gap between any two existing scores, \(60\) marks is already a <b>lower bound</b> for the range. A lower bound greater than \(59\) immediately disproves “at most \(59\).”</div>
-    <div class="answer"><b>Answer (b):</b> The claim is <b>incorrect</b> because the range of the distribution is at least \(60\) marks, which is greater than \(59\) marks.</div>
-  </div>
-`;
-
-function initReveal(targetId){
-  const container = document.getElementById(targetId);
-  const steps = container.querySelectorAll('.step');
-  const controls = container.nextElementSibling;
-  const btn = controls.querySelector('button.next');
-  const counter = controls.querySelector('.counter');
-  let idx = 0;
-  const total = steps.length;
-
-  function update(){
-    counter.textContent = idx + ' / ' + total;
-    if(idx >= total){
-      btn.disabled = true;
-      btn.textContent = 'All steps revealed ✓';
-    }
-  }
-  btn.addEventListener('click', () => {
-    if(idx < total){
-      steps[idx].classList.add('show');
-      idx++;
-      if(window.MathJax && MathJax.typesetPromise){
-        MathJax.typesetPromise([steps[idx-1]]).catch(()=>{});
-      }
-      update();
-      steps[idx-1].scrollIntoView({behavior:'smooth', block:'nearest'});
+/* ---------- scroll sync ---------- */
+let current = 1;
+const io = new IntersectionObserver(es => {
+  es.forEach(e => {
+    if (e.isIntersecting){
+      current = +e.target.dataset.step;
+      document.querySelectorAll('.step').forEach(s =>
+        s.classList.toggle('active', +s.dataset.step === current));
+      draw(current);
     }
   });
-  update();
-}
-initReveal('steps-a');
-initReveal('steps-b');
+}, {rootMargin:'-25% 0px -55% 0px'});
+document.querySelectorAll('.step').forEach(s => io.observe(s));
 
-/* ==================================================================
-   INIT & RESPONSIVE REDRAW
-================================================================== */
-function redrawAll(){ drawDiagram1(); drawDiagram2(); }
-window.addEventListener('load', redrawAll);
-window.addEventListener('resize', redrawAll);
-// draw immediately too (before fonts finish)
-redrawAll();
+draw(1);
+document.querySelector('.step[data-step="1"]').classList.add('active');
+window.addEventListener('resize', () => draw(current));
 </script>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
-
 </body>
 </html>

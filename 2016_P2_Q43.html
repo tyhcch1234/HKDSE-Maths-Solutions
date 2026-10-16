@@ -3,693 +3,306 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HKDSE Math 2016 Paper 2 Q43 — Interactive Solution</title>
-<!-- Tailwind CSS -->
-<script src="https://cdn.tailwindcss.com"></script>
-<!-- MathJax -->
+<title>HKDSE 2016 Paper 2 Q43 — Probability (Committees)</title>
 <script>
 window.MathJax = {
-  tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$','$$'], ['\\[','\\]']] },
+  tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
   svg: { fontCache: 'global' }
 };
 </script>
-<script>
-window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] }, svg:{fontCache:'global'} };
-</script>
-<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
-  body {
-    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    background: #f8fafc;
-    -webkit-tap-highlight-color: transparent;
+  :root{
+    --ink:#1f2937; --muted:#6b7280; --line:#e5e7eb;
+    --blue:#2563eb; --red:#dc2626; --green:#059669; --amber:#d97706;
+    --purple:#7c3aed; --pink:#db2777; --teal:#0d9488;
+    --bg:#f8fafc;
   }
-  .step-card {
-    transition: all 0.3s ease;
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
+    font-size:16px; line-height:1.55;
   }
-  .step-card.collapsed .step-body {
-    display: none;
+  .wrap{padding:16px 18px 60px; max-width:1280px; margin:0 auto;}
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start;}
+  @media(min-width:900px){.split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}}
+  .diagram{position:sticky;top:16px;max-height:calc(100vh - 2rem);overflow-y:auto;}
+  @media(max-width:640px){body{font-size:14.5px;}.wrap{padding:10px 8px 40px;}}
+
+  .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;box-shadow:0 1px 2px rgba(15,23,42,.04);}
+  .card + .card{margin-top:12px;}
+
+  h1{font-size:1.05rem;margin:0 0 4px;letter-spacing:.2px;}
+  .qtag{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.6px;color:#fff;background:var(--blue);padding:2px 9px;border-radius:999px;vertical-align:middle;}
+  .topic{font-size:.8rem;color:var(--muted);margin-left:6px;}
+
+  .qtext{font-size:.98rem;}
+  .choices{list-style:none;padding:0;margin:10px 0 0;display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+  @media(max-width:420px){.choices{grid-template-columns:1fr;}}
+  .choices li{background:#f1f5f9;border:1px solid var(--line);border-radius:9px;padding:6px 10px;font-weight:600;font-size:.92rem;}
+  .choices li.correct{background:#dcfce7;border-color:#86efac;color:#065f46;}
+
+  canvas{width:100%;height:auto;display:block;border-radius:12px;background:#fff;border:1px solid var(--line);}
+  .ro{font-size:.82rem;color:var(--muted);margin:8px 2px 0;min-height:2.4em;}
+
+  h2{font-size:.85rem;text-transform:uppercase;letter-spacing:.9px;color:var(--muted);margin:0 0 10px;}
+  .step{position:relative;padding:10px 12px 11px 46px;border-radius:11px;margin-bottom:10px;background:#fbfcfe;border:1px solid var(--line);}
+  .step .chip{
+    position:absolute;left:10px;top:10px;width:26px;height:26px;border-radius:50%;
+    display:grid;place-items:center;font-weight:800;font-size:.78rem;color:#fff;background:var(--blue);
   }
-  .step-card.collapsed .chevron {
-    transform: rotate(0deg);
-  }
-  .step-card .chevron {
-    transform: rotate(180deg);
-    transition: transform 0.3s ease;
-  }
-  .highlight-box {
-    background: #eef2ff;
-    border-left: 4px solid #6366f1;
-  }
-  .formula-box {
-    background: #f1f5f9;
-    border-radius: 12px;
-  }
-  .btn-primary {
-    background: #4f46e5;
-    transition: background 0.2s;
-  }
-  .btn-primary:hover {
-    background: #4338ca;
-  }
-  .option-btn {
-    transition: all 0.2s ease;
-  }
-  .option-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-  }
-  .option-btn.selected {
-    border-color: #4f46e5;
-    background: #eef2ff;
-    box-shadow: 0 0 0 3px rgba(79,70,229,0.2);
-  }
-  .option-btn.correct {
-    border-color: #10b981;
-    background: #ecfdf5;
-    box-shadow: 0 0 0 3px rgba(16,185,129,0.2);
-  }
-  .option-btn.wrong {
-    border-color: #ef4444;
-    background: #fef2f2;
-    box-shadow: 0 0 0 3px rgba(239,68,68,0.2);
-  }
-  .ball {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    font-size: 11px;
-    font-weight: 700;
-    color: #fff;
-    flex-shrink: 0;
-  }
-  .ball-boy {
-    background: #3b82f6;
-  }
-  .ball-girl {
-    background: #ec4899;
-  }
-  .committee-slot {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    border: 2px dashed #cbd5e1;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 11px;
-    font-weight: 700;
-    color: #94a3b8;
-    flex-shrink: 0;
-  }
-  .fade-in {
-    animation: fadeIn 0.4s ease;
-  }
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .pulse-ring {
-    animation: pulseRing 1.5s infinite;
-  }
-  @keyframes pulseRing {
-    0% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.05); opacity: 0.7; }
-    100% { transform: scale(1); opacity: 1; }
-  }
-  input[type=range]::-webkit-slider-thumb {
-    background: #4f46e5;
-  }
+  .step[data-step="1"] .chip{background:var(--purple);}
+  .step[data-step="2"] .chip{background:var(--teal);}
+  .step[data-step="3"] .chip{background:var(--amber);}
+  .step[data-step="4"] .chip{background:var(--pink);}
+  .step[data-step="5"] .chip{background:var(--green);}
+  .step.active{background:#eff6ff;border-color:#bfdbfe;box-shadow:0 2px 10px rgba(37,99,235,.10);}
+  .step b.tag{display:block;font-size:.8rem;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin-bottom:3px;}
+  .step .hint{display:block;margin-top:6px;font-size:.8rem;color:var(--muted);font-style:italic;}
+  .ans{background:#065f46;color:#fff;border-radius:12px;padding:12px 16px;font-weight:700;font-size:1rem;margin-top:6px;}
+  .ans span{font-weight:500;opacity:.9;font-size:.85rem;display:block;}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;font-size:.78rem;color:var(--muted);}
+  .legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;}
 </style>
 </head>
-<body class="min-h-screen" data-correct="A">
+<body>
+<div class="wrap">
+  <div class="split">
 
-<!-- ============ HEADER ============ -->
-<header class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
-  <div class="max-w-4xl mx-auto px-4 py-6 sm:py-8">
-    <p class="text-indigo-200 text-xs sm:text-sm font-semibold tracking-wider uppercase mb-1">HKDSE Mathematics 2016 · Paper 2</p>
-    <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">Question 43 — Committees &amp; Combinations</h1>
-    <div class="flex flex-wrap gap-2 mt-3">
-      <span class="bg-white/20 backdrop-blur text-xs font-medium px-3 py-1 rounded-full">Probability</span>
-      <span class="bg-white/20 backdrop-blur text-xs font-medium px-3 py-1 rounded-full">Combinations</span>
-      <span class="bg-white/20 backdrop-blur text-xs font-medium px-3 py-1 rounded-full">Counting</span>
-      <span class="bg-white/20 backdrop-blur text-xs font-medium px-3 py-1 rounded-full">Case-by-case</span>
+    <!-- ================= LEFT: DIAGRAM ================= -->
+    <div class="diagram">
+      <div class="card">
+        <h2>Committee Selection Tree</h2>
+        <canvas id="cv" width="620" height="640"></canvas>
+        <p class="ro" id="ro">Drag the sliders to count committees with 0, 1 or 2 girls.</p>
+        <div class="legend">
+          <span><i style="background:#2563eb"></i>choose from boys</span>
+          <span><i style="background:#db2777"></i>choose from girls</span>
+          <span><i style="background:#059669"></i>total committees</span>
+        </div>
+      </div>
     </div>
+
+    <!-- ================= RIGHT: QUESTION + SOLUTION ================= -->
+    <div>
+      <div class="card">
+        <h1><span class="qtag">2016 P2 Q43</span><span class="topic">14. Probability / Counting</span></h1>
+        <p class="qtext">
+          There are <b>20 boys</b> and <b>15 girls</b> in a class. If <b>6 students</b> are selected
+          from the class to form a committee consisting of <b>at most 2 girls</b>, how many
+          different committees can be formed?
+        </p>
+        <ul class="choices">
+          <li>A. 271 320</li>
+          <li>B. 324 415</li>
+          <li>C. 508 725</li>
+          <li class="correct">D. 780 045</li>
+        </ul>
+      </div>
+
+      <figure style="margin:12px 0;text-align:center;"><img src="figures/2016_P2_Q43.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
+
+      <div class="card">
+        <h2>Step-by-step solution</h2>
+
+        <div class="step" data-step="1">
+          <span class="chip">1</span>
+          <b class="tag">Interpret "at most 2 girls"</b>
+          A committee of 6 with <b>at most 2 girls</b> means the number of girls $g$ can be
+          $$g = 0,\;1,\;\text{or }2.$$
+          Each case is counted separately, then added (mutually exclusive cases).
+          <span class="hint">Hint: "at most" = ≤, so list the allowed numbers of girls.</span>
+        </div>
+
+        <div class="step" data-step="2">
+          <span class="chip">2</span>
+          <b class="tag">Case g = 0: all 6 are boys</b>
+          Choose 6 boys from 20, no girls:
+          $$C^{20}_{6} = \binom{20}{6} = 38\,760.$$
+          <span class="hint">Hint: $\binom{n}{r}$ counts unordered selections of $r$ objects from $n$.</span>
+        </div>
+
+        <div class="step" data-step="3">
+          <span class="chip">3</span>
+          <b class="tag">Case g = 1: 5 boys + 1 girl</b>
+          Choose 5 boys from 20 <i>and</i> 1 girl from 15:
+          $$C^{20}_{5}\cdot C^{15}_{1} = 15\,504 \times 15 = 232\,560.$$
+          <span class="hint">Hint: multiply when the choices are made together (product rule).</span>
+        </div>
+
+        <div class="step" data-step="4">
+          <span class="chip">4</span>
+          <b class="tag">Case g = 2: 4 boys + 2 girls</b>
+          Choose 4 boys from 20 <i>and</i> 2 girls from 15:
+          $$C^{20}_{4}\cdot C^{15}_{2} = 4\,845 \times 105 = 508\,725.$$
+          <span class="hint">Hint: $\binom{15}{2}=\frac{15\times14}{2}=105$.</span>
+        </div>
+
+        <div class="step" data-step="5">
+          <span class="chip">5</span>
+          <b class="tag">Add the three cases</b>
+          $$\binom{20}{6}+\binom{20}{5}\binom{15}{1}+\binom{20}{4}\binom{15}{2}$$
+          $$= 38\,760 + 232\,560 + 508\,725 = 780\,045.$$
+          <span class="hint">Hint: "or" in counting means adding the disjoint cases.</span>
+        </div>
+
+        <div class="ans">
+          Answer: D. 780 045
+          <span>$\binom{20}{6}+\binom{20}{5}\binom{15}{1}+\binom{20}{4}\binom{15}{2} = 780\,045$</span>
+        </div>
+      </div>
+    </div>
+
   </div>
-</header>
-
-<main class="max-w-4xl mx-auto px-4 py-6 sm:py-8 space-y-6">
-
-  <!-- ============ QUESTION CARD ============ -->
-  <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-7">
-    <div class="flex items-center gap-2 mb-4">
-      <span class="bg-indigo-100 text-indigo-700 text-xs font-bold px-3 py-1 rounded-full">Question</span>
-      <span class="text-slate-400 text-xs font-medium">[2016MC#43]</span>
-    </div>
-
-    <p class="text-slate-800 text-base sm:text-lg leading-relaxed">
-      There are <strong class="text-blue-600">20 boys</strong> and <strong class="text-pink-600">15 girls</strong> in a class.
-      If <strong>6 students</strong> are selected from the class to form a committee consisting of
-      <strong>at most 2 girls</strong>, how many different committees can be formed?
-    </p>
-
-    <!-- Visual class representation -->
-    <div class="mt-5 bg-slate-50 rounded-xl p-4 border border-slate-100">
-      <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Class Roster</p>
-      <div id="classRoster" class="flex flex-wrap gap-1.5"></div>
-      <div class="flex items-center gap-4 mt-3 text-xs text-slate-500">
-        <span class="flex items-center gap-1.5"><span class="ball ball-boy" style="width:14px;height:14px;"></span> Boy (20)</span>
-        <span class="flex items-center gap-1.5"><span class="ball ball-girl" style="width:14px;height:14px;"></span> Girl (15)</span>
-      </div>
-    </div>
-
-    <!-- Options -->
-    <div class="mt-6">
-      <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Choose your answer:</p>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="optionsContainer">
-        <button class="option-btn text-left border-2 border-slate-200 rounded-xl p-3.5 flex items-center gap-3 bg-white" data-answer="A">
-          <span class="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-sm font-bold text-slate-600 shrink-0">A</span>
-          <span class="font-semibold text-slate-700">271 320</span>
-        </button>
-        <button class="option-btn text-left border-2 border-slate-200 rounded-xl p-3.5 flex items-center gap-3 bg-white" data-answer="B">
-          <span class="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-sm font-bold text-slate-600 shrink-0">B</span>
-          <span class="font-semibold text-slate-700">324 415</span>
-        </button>
-        <button class="option-btn text-left border-2 border-slate-200 rounded-xl p-3.5 flex items-center gap-3 bg-white" data-answer="C">
-          <span class="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-sm font-bold text-slate-600 shrink-0">C</span>
-          <span class="font-semibold text-slate-700">508 725</span>
-        </button>
-        <button class="option-btn text-left border-2 border-slate-200 rounded-xl p-3.5 flex items-center gap-3 bg-white" data-answer="D">
-          <span class="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-sm font-bold text-slate-600 shrink-0">D</span>
-          <span class="font-semibold text-slate-700">780 045</span>
-        </button>
-      </div>
-      <p id="answerFeedback" class="mt-3 text-sm font-medium hidden"></p><figure style="margin:12px 0;text-align:center;"><img src="figures/2016_P2_Q43.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
-    </div>
-  </section>
-
-  <!-- ============ KEY CONCEPT ============ -->
-  <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-7">
-    <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2 mb-3">
-      <span class="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center text-amber-600 text-base">💡</span>
-      Key Concept: Combination Formula
-    </h2>
-    <p class="text-slate-600 text-sm leading-relaxed mb-4">
-      When choosing $r$ items from $n$ items where <strong>order does not matter</strong>, we use the combination formula:
-    </p>
-    <div class="formula-box p-4 text-center">
-      $$C_r^n = C^{n}_{r} = \frac{n!}{r!\,(n-r)!}$$
-    </div>
-    <p class="text-slate-500 text-xs mt-3 leading-relaxed">
-      \(C_r^n\) counts the number of ways to choose a group of \(r\) objects from \(n\) distinct objects.
-      The order of selection inside the committee is irrelevant.
-    </p>
-
-    <div class="highlight-box rounded-r-xl p-4 mt-5">
-      <p class="text-sm font-semibold text-indigo-800 mb-1">📌 "At most 2 girls" means:</p>
-      <p class="text-sm text-indigo-700">
-        The committee can have <strong>0 girls</strong>, <strong>1 girl</strong>, or <strong>2 girls</strong>.
-        We must count each case separately and add them together.
-      </p>
-    </div>
-  </section>
-
-  <!-- ============ INTERACTIVE BUILDER ============ -->
-  <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-7">
-    <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2 mb-1">
-      <span class="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600 text-base">🧩</span>
-      Interactive Committee Builder
-    </h2>
-    <p class="text-slate-500 text-sm mb-4">Choose how many girls you want on the committee. The committee always has <strong>6 members</strong> total.</p>
-
-    <!-- Girl slider -->
-    <div class="mb-5">
-      <div class="flex justify-between items-center mb-2">
-        <label class="text-sm font-semibold text-slate-700">Number of girls: <span id="girlCountLabel" class="text-pink-600 font-extrabold">0</span></label>
-        <span class="text-xs text-slate-400">At most 2 allowed</span>
-      </div>
-      <input type="range" id="girlSlider" min="0" max="4" value="0" step="1"
-             class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
-      <div class="flex justify-between text-xs text-slate-400 mt-1 px-0.5">
-        <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span>
-      </div>
-      <p id="invalidCaseMsg" class="text-xs font-semibold text-red-500 mt-2 hidden">⚠️ This exceeds "at most 2 girls" — not a valid committee type for this question.</p>
-    </div>
-
-    <!-- Committee visual -->
-    <div class="bg-slate-50 rounded-xl p-4 border border-slate-100">
-      <div class="flex items-center justify-between mb-3">
-        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Your Committee (6 seats)</p>
-        <div class="flex gap-3 text-xs font-semibold">
-          <span class="text-pink-600">Girls: <span id="girlsDisplay">0</span></span>
-          <span class="text-blue-600">Boys: <span id="boysDisplay">6</span></span>
-        </div>
-      </div>
-      <div id="committeeSeats" class="flex flex-wrap gap-2 justify-center"></div>
-    </div>
-
-    <!-- Calculation for current selection -->
-    <div class="mt-4 formula-box p-4">
-      <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Calculation</p>
-      <div id="currentCalc" class="text-center text-sm text-slate-700">
-        <!-- filled by JS -->
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ STEP BY STEP SOLUTION ============ -->
-  <section class="space-y-4">
-    <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2 px-1">
-      <span class="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-600 text-base">📖</span>
-      Step-by-Step Solution
-    </h2>
-
-    <!-- Step 1 -->
-    <div class="step-card bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden" data-step="1">
-      <button class="step-toggle w-full flex items-center justify-between p-5 text-left">
-        <div class="flex items-center gap-3">
-          <span class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center text-sm font-bold shrink-0">1</span>
-          <div>
-            <p class="font-bold text-slate-800 text-sm sm:text-base">Translate the condition</p>
-            <p class="text-xs text-slate-400 mt-0.5">What does "at most 2 girls" mean?</p>
-          </div>
-        </div>
-        <svg class="chevron w-5 h-5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-      </button>
-      <div class="step-body px-5 pb-5">
-        <div class="border-t border-slate-100 pt-4">
-          <p class="text-slate-600 text-sm leading-relaxed mb-3">
-            The committee has exactly 6 members. "At most 2 girls" means the number of girls can be:
-          </p>
-          <div class="grid grid-cols-3 gap-2 sm:gap-3">
-            <div class="bg-pink-50 border border-pink-200 rounded-xl p-3 text-center">
-              <p class="text-2xl font-extrabold text-pink-600">0</p>
-              <p class="text-xs text-pink-500 font-medium mt-1">girls</p>
-            </div>
-            <div class="bg-pink-50 border border-pink-200 rounded-xl p-3 text-center">
-              <p class="text-2xl font-extrabold text-pink-600">1</p>
-              <p class="text-xs text-pink-500 font-medium mt-1">girl</p>
-            </div>
-            <div class="bg-pink-50 border border-pink-200 rounded-xl p-3 text-center">
-              <p class="text-2xl font-extrabold text-pink-600">2</p>
-              <p class="text-xs text-pink-500 font-medium mt-1">girls</p>
-            </div>
-          </div>
-          <p class="text-slate-500 text-xs mt-3">
-            Since the committee must have exactly 6 members, the number of boys is <strong>6 − (number of girls)</strong>.
-          </p>
-          <div class="hint-box bg-amber-50 border border-amber-200 rounded-xl p-3 mt-4">
-            <p class="text-xs text-amber-800 leading-relaxed">
-              <strong>⚠️ Common mistake:</strong> Don't forget the "0 girls" case! "At most 2" includes 0, 1, and 2.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Step 2 -->
-    <div class="step-card bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden" data-step="2">
-      <button class="step-toggle w-full flex items-center justify-between p-5 text-left">
-        <div class="flex items-center gap-3">
-          <span class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center text-sm font-bold shrink-0">2</span>
-          <div>
-            <p class="font-bold text-slate-800 text-sm sm:text-base">Case 1 — 0 girls, 6 boys</p>
-            <p class="text-xs text-slate-400 mt-0.5">Choose all 6 from the boys</p>
-          </div>
-        </div>
-        <svg class="chevron w-5 h-5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-      </button>
-      <div class="step-body px-5 pb-5">
-        <div class="border-t border-slate-100 pt-4">
-          <p class="text-slate-600 text-sm leading-relaxed mb-3">
-            We select <strong>6 boys</strong> from the 20 boys, and <strong>0 girls</strong> from the 15 girls.
-          </p>
-          <div class="formula-box p-4 text-center mb-3">
-            $$C^{20}_{6} \times C^{15}_{0} = 38\,760 \times 1 = 38\,760$$
-          </div>
-          <p class="text-slate-500 text-xs">
-            Recall: \(C^{n}_{0} = 1\) for any \(n\).
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Step 3 -->
-    <div class="step-card bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden" data-step="3">
-      <button class="step-toggle w-full flex items-center justify-between p-5 text-left">
-        <div class="flex items-center gap-3">
-          <span class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center text-sm font-bold shrink-0">3</span>
-          <div>
-            <p class="font-bold text-slate-800 text-sm sm:text-base">Case 2 — 1 girl, 5 boys</p>
-            <p class="text-xs text-slate-400 mt-0.5">Choose 1 girl and 5 boys</p>
-          </div>
-        </div>
-        <svg class="chevron w-5 h-5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-      </button>
-      <div class="step-body px-5 pb-5">
-        <div class="border-t border-slate-100 pt-4">
-          <p class="text-slate-600 text-sm leading-relaxed mb-3">
-            We select <strong>5 boys</strong> from the 20 boys, and <strong>1 girl</strong> from the 15 girls.
-          </p>
-          <div class="formula-box p-4 text-center mb-3">
-            $$C^{20}_{5} \times C^{15}_{1} = 15\,504 \times 15 = 232\,560$$
-          </div>
-          <p class="text-slate-500 text-xs">
-            \(C^{20}_{5} = 15\,504\) and \(C^{15}_{1} = 15\).
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Step 4 -->
-    <div class="step-card bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden" data-step="4">
-      <button class="step-toggle w-full flex items-center justify-between p-5 text-left">
-        <div class="flex items-center gap-3">
-          <span class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center text-sm font-bold shrink-0">4</span>
-          <div>
-            <p class="font-bold text-slate-800 text-sm sm:text-base">Case 3 — 2 girls, 4 boys</p>
-            <p class="text-xs text-slate-400 mt-0.5">Choose 2 girls and 4 boys</p>
-          </div>
-        </div>
-        <svg class="chevron w-5 h-5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-      </button>
-      <div class="step-body px-5 pb-5">
-        <div class="border-t border-slate-100 pt-4">
-          <p class="text-slate-600 text-sm leading-relaxed mb-3">
-            We select <strong>4 boys</strong> from the 20 boys, and <strong>2 girls</strong> from the 15 girls.
-          </p>
-          <div class="formula-box p-4 text-center mb-3">
-            $$C^{20}_{4} \times C^{15}_{2} = 4\,845 \times 105 = 508\,725$$
-          </div>
-          <p class="text-slate-500 text-xs">
-            \(C^{20}_{4} = 4\,845\) and \(C^{15}_{2} = 105\).
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Step 5 -->
-    <div class="step-card bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden" data-step="5">
-      <button class="step-toggle w-full flex items-center justify-between p-5 text-left">
-        <div class="flex items-center gap-3">
-          <span class="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center text-sm font-bold shrink-0">5</span>
-          <div>
-            <p class="font-bold text-slate-800 text-sm sm:text-base">Add all cases together</p>
-            <p class="text-xs text-slate-400 mt-0.5">Final answer</p>
-          </div>
-        </div>
-        <svg class="chevron w-5 h-5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-      </button>
-      <div class="step-body px-5 pb-5">
-        <div class="border-t border-slate-100 pt-4">
-          <p class="text-slate-600 text-sm leading-relaxed mb-3">
-            Since the three cases are mutually exclusive, we add them:
-          </p>
-          <div class="formula-box p-4 text-center mb-3">
-            $$C^{20}_{6} + C^{20}_{5}C^{15}_{1} + C^{20}_{4}C^{15}_{2}$$
-            $$= 38\,760 + 232\,560 + 508\,725$$
-            $$= \mathbf{780\,045}$$
-          </div>
-          <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-center">
-            <p class="text-xs text-emerald-600 font-semibold uppercase tracking-wide mb-1">Answer</p>
-            <p class="text-2xl font-extrabold text-emerald-700">D. 780 045</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ SUMMARY TABLE ============ -->
-  <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-7">
-    <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2 mb-4">
-      <span class="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center text-purple-600 text-base">📊</span>
-      Summary of All Cases
-    </h2>
-    <div class="overflow-x-auto -mx-1">
-      <table class="w-full text-sm border-collapse min-w-[400px]">
-        <thead>
-          <tr class="bg-slate-100 text-slate-600 text-xs uppercase tracking-wide">
-            <th class="p-3 text-left rounded-tl-lg">Case</th>
-            <th class="p-3 text-center">Girls</th>
-            <th class="p-3 text-center">Boys</th>
-            <th class="p-3 text-center">Calculation</th>
-            <th class="p-3 text-right rounded-tr-lg">Ways</th>
-          </tr>
-        </thead>
-        <tbody class="text-slate-700">
-          <tr class="border-b border-slate-100">
-            <td class="p-3 font-medium">0 girls</td>
-            <td class="p-3 text-center text-pink-600 font-semibold">0</td>
-            <td class="p-3 text-center text-blue-600 font-semibold">6</td>
-            <td class="p-3 text-center text-xs">\(C^{20}_{6}C^{15}_{0}\)</td>
-            <td class="p-3 text-right font-semibold">38 760</td>
-          </tr>
-          <tr class="border-b border-slate-100 bg-slate-50/50">
-            <td class="p-3 font-medium">1 girl</td>
-            <td class="p-3 text-center text-pink-600 font-semibold">1</td>
-            <td class="p-3 text-center text-blue-600 font-semibold">5</td>
-            <td class="p-3 text-center text-xs">\(C^{20}_{5}C^{15}_{1}\)</td>
-            <td class="p-3 text-right font-semibold">232 560</td>
-          </tr>
-          <tr class="border-b-2 border-slate-200">
-            <td class="p-3 font-medium">2 girls</td>
-            <td class="p-3 text-center text-pink-600 font-semibold">2</td>
-            <td class="p-3 text-center text-blue-600 font-semibold">4</td>
-            <td class="p-3 text-center text-xs">\(C^{20}_{4}C^{15}_{2}\)</td>
-            <td class="p-3 text-right font-semibold">508 725</td>
-          </tr>
-          <tr class="bg-emerald-50">
-            <td colspan="4" class="p-3 font-bold text-emerald-800">Total</td>
-            <td class="p-3 text-right font-extrabold text-emerald-700 text-base">780 045</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <!-- ============ EXAM TIP ============ -->
-  <section class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl border border-indigo-100 p-5 sm:p-6">
-    <h2 class="text-base font-bold text-indigo-900 flex items-center gap-2 mb-3">
-      <span class="text-xl">🎯</span> Exam Tip
-    </h2>
-    <ul class="space-y-2 text-sm text-indigo-800">
-      <li class="flex items-start gap-2">
-        <span class="text-indigo-400 mt-0.5">▸</span>
-        <span>Whenever you see <strong>"at most"</strong> or <strong>"at least"</strong>, break the problem into separate cases and add them.</span>
-      </li>
-      <li class="flex items-start gap-2">
-        <span class="text-indigo-400 mt-0.5">▸</span>
-        <span>Check that the <strong>total</strong> number of people in each case is always the same (here: 6).</span>
-      </li>
-      <li class="flex items-start gap-2">
-        <span class="text-indigo-400 mt-0.5">▸</span>
-        <span>Use the complement method as a check: total committees minus committees with 3, 4, 5, or 6 girls.</span>
-      </li>
-    </ul>
-  </section>
-
-</main>
-
-<footer class="text-center text-xs text-slate-400 py-6">
-  HKDSE Math 2016 Paper 2 Q43 · Interactive Solution
-</footer>
+</div>
 
 <script>
-// ============ CLASS ROSTER VISUAL ============
-(function buildRoster() {
-  const container = document.getElementById('classRoster');
-  for (let i = 0; i < 20; i++) {
-    const b = document.createElement('span');
-    b.className = 'ball ball-boy';
-    b.textContent = 'B';
-    container.appendChild(b);
-  }
-  for (let i = 0; i < 15; i++) {
-    const g = document.createElement('span');
-    g.className = 'ball ball-girl';
-    g.textContent = 'G';
-    container.appendChild(g);
-  }
-})();
+/* ---------- data ---------- */
+const CASES = [
+  {tag:'g = 0', boys:6, girls:0, ways:38760,  color:'#2563eb'},
+  {tag:'g = 1', boys:5, girls:1, ways:232560, color:'#7c3aed'},
+  {tag:'g = 2', boys:4, girls:2, ways:508725, color:'#db2777'}
+];
+const TOTAL = 780045;
 
-// ============ ACCORDION ============
-document.querySelectorAll('.step-toggle').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const card = btn.closest('.step-card');
-    const wasCollapsed = card.classList.contains('collapsed');
-    // Close all others (optional: keep open for learning, so we don't force close)
-    card.classList.toggle('collapsed');
-  });
-});
+/* ---------- canvas setup ---------- */
+const cv  = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+const ro  = document.getElementById('ro');
+const W = cv.width, H = cv.height;
 
-// Initially collapse all steps except step 1
-document.querySelectorAll('.step-card').forEach((card, idx) => {
-  if (idx !== 0) card.classList.add('collapsed');
-});
-
-// ============ OPTION FEEDBACK ============
-const optionsContainer = document.getElementById('optionsContainer');
-const feedback = document.getElementById('answerFeedback');
-const CORRECT = 'D';
-
-optionsContainer.querySelectorAll('.option-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const chosen = btn.dataset.answer;
-    optionsContainer.querySelectorAll('.option-btn').forEach(b => {
-      b.classList.remove('selected', 'correct', 'wrong');
-    });
-    if (chosen === CORRECT) {
-      btn.classList.add('correct');
-      feedback.textContent = '✅ Correct! Well done.';
-      feedback.className = 'mt-3 text-sm font-semibold text-emerald-600';
-    } else {
-      btn.classList.add('wrong');
-      optionsContainer.querySelector(`[data-answer="${CORRECT}"]`).classList.add('correct');
-      feedback.textContent = '❌ Not quite. The correct answer is D. Follow the steps below to see why.';
-      feedback.className = 'mt-3 text-sm font-semibold text-red-500';
-    }
-    feedback.classList.remove('hidden');
-    // Auto-scroll to solution
-    setTimeout(() => {
-      document.querySelector('[data-step="1"]')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 600);
-  });
-});
-
-// ============ INTERACTIVE BUILDER ============
-const girlSlider = document.getElementById('girlSlider');
-const girlCountLabel = document.getElementById('girlCountLabel');
-const committeeSeats = document.getElementById('committeeSeats');
-const girlsDisplay = document.getElementById('girlsDisplay');
-const boysDisplay = document.getElementById('boysDisplay');
-const currentCalc = document.getElementById('currentCalc');
-const invalidCaseMsg = document.getElementById('invalidCaseMsg');
-
-const nCr = (n, r) => {
-  if (r < 0 || r > n) return 0;
-  let res = 1;
-  for (let i = 1; i <= r; i++) {
-    res = res * (n - r + i) / i;
-  }
-  return Math.round(res);
-};
-
-function updateBuilder() {
-  const girls = parseInt(girlSlider.value, 10);
-  const boys = 6 - girls;
-
-  girlCountLabel.textContent = girls;
-  girlsDisplay.textContent = girls;
-  boysDisplay.textContent = boys;
-
-  // Update slider color track
-  const percent = (girls / 4) * 100;
-  girlSlider.style.background = `linear-gradient(to right, #6366f1 0%, #6366f1 ${percent}%, #e2e8f0 ${percent}%, #e2e8f0 100%)`;
-
-  // Render seats
-  committeeSeats.innerHTML = '';
-  // Girls first
-  for (let i = 0; i < girls; i++) {
-    const seat = document.createElement('span');
-    seat.className = 'ball ball-girl';
-    seat.textContent = 'G';
-    committeeSeats.appendChild(seat);
-  }
-  // Boys
-  for (let i = 0; i < boys; i++) {
-    const seat = document.createElement('span');
-    seat.className = 'ball ball-boy';
-    seat.textContent = 'B';
-    committeeSeats.appendChild(seat);
-  }
-  // Empty seats if invalid
-  if (girls > 2) {
-    committeeSeats.innerHTML = '';
-    // show a red-ish invalid display with the chosen count
-    for (let i = 0; i < 6; i++) {
-      const seat = document.createElement('span');
-      if (i < girls) {
-        seat.className = 'ball ball-girl';
-        seat.textContent = 'G';
-      } else {
-        seat.className = 'ball ball-boy';
-        seat.textContent = 'B';
-      }
-      committeeSeats.appendChild(seat);
-    }
-    invalidCaseMsg.classList.remove('hidden');
-  } else {
-    invalidCaseMsg.classList.add('hidden');
-  }
-
-  // Calculation
-  const ways = nCr(20, boys) * nCr(15, girls);
-  const boysWays = nCr(20, boys);
-  const girlsWays = nCr(15, girls);
-
-  if (girls > 2) {
-    currentCalc.innerHTML = `
-      <p class="text-red-500 font-semibold text-sm mb-1">Invalid case for this question</p>
-      <p class="text-slate-500 text-xs">This committee has ${girls} girls, which is more than "at most 2".</p>
-      <p class="text-xs text-slate-400 mt-2">Mathematically: \\(\C^{20}_{${boys}}\C^{15}_{${girls}} = ${boysWays} \\times ${girlsWays} = ${ways.toLocaleString()}\\) (but not counted here)</p>
-    `;
-  } else {
-    currentCalc.innerHTML = `
-      <p class="text-sm">
-        <span class="font-semibold text-slate-700">${girls} girl${girls !== 1 ? 's' : ''} + ${boys} boy${boys !== 1 ? 's' : ''}:</span>
-        &nbsp;\\(\C^{20}_{${boys}} \\times \C^{15}_{${girls}} = ${boysWays.toLocaleString()} \\times ${girlsWays.toLocaleString()} = \\mathbf{${ways.toLocaleString()}}\\)
-      </p>
-    `;
-  }
-
-  if (window.MathJax && window.MathJax.typesetPromise) {
-    MathJax.typesetPromise([currentCalc]);
-  }
+/* ---------- drawing helpers ---------- */
+function rounded(x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+function dot(cx,cy,r,fill,stroke){
+  ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
+  ctx.fillStyle=fill; ctx.fill();
+  if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=2;ctx.stroke();}
+}
+function txt(s,x,y,font,color,align){
+  ctx.font=font; ctx.fillStyle=color; ctx.textAlign=align||'left'; ctx.textBaseline='middle';
+  ctx.fillText(s,x,y);
 }
 
-girlSlider.addEventListener('input', updateBuilder);
-updateBuilder();
+/* node positions: root at centre top, 3 branches */
+const rootX = W/2, rootY = 58;
+const NODE_R = 30;
+const nodeY = 200;
+const nodeX = [W*0.18, W*0.5, W*0.82];
 
-// ============ RE-TYPESET MATHJAX AFTER LOAD ============
-window.addEventListener('load', () => {
-  if (window.MathJax && window.MathJax.typesetPromise) {
-    MathJax.typesetPromise();
-  }
-});
-</script>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
+function draw(step){
+  ctx.clearRect(0,0,W,H);
 
+  /* background grid (subtle) */
+  ctx.strokeStyle = '#eef2f7'; ctx.lineWidth = 1;
+  for(let x=0;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+  const active = step;              // 1..5
+  const focusIdx = active-2;        // -1,0,1,2,3
+
+  /* ---- root node: the class of 6 chosen from 35 ---- */
+  const rootHot = (active>=1);
+  dot(rootX, rootY, NODE_R+2, rootHot?'#dbeafe':'#f1f5f9', rootHot?'#2563eb':'#cbd5e1');
+  txt('35', rootX, rootY-7, 'bold 15px Segoe UI', rootHot?'#1e3a8a':'#94a3b8', 'center');
+  txt('students', rootX, rootY+9, '10px Segoe UI', '#64748b', 'center');
+  txt('(20 boys + 15 girls)', rootX, rootY-48, '11px Segoe UI', '#94a3b8', 'center');
+
+  /* ---- branch lines ---- */
+  CASES.forEach((c,i)=>{
+    const nx = nodeX[i], ny = nodeY;
+    const on = (active>=2 && i===focusIdx) || (active>=5);
+    ctx.beginPath();
+    ctx.moveTo(rootX, rootY+NODE_R+3);
+    ctx.bezierCurveTo(rootX, rootY+90, nx, ny-100, nx, ny-NODE_R-3);
+    ctx.strokeStyle = on ? c.color : '#cbd5e1';
+    ctx.lineWidth = on ? 4 : 2.2;
+    ctx.setLineDash(on?[]:[6,5]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  });
+
+  /* ---- case nodes ---- */
+  CASES.forEach((c,i)=>{
+    const nx = nodeX[i], ny = nodeY;
+    const on  = (active>=2 && i===focusIdx);
+    const onAll = (active>=5);
+    const hot = on || onAll;
+
+    /* circle */
+    dot(nx, ny, NODE_R, hot?'#ffffff':'#f8fafc', hot?c.color:'#cbd5e1');
+    txt(c.tag, nx, ny-8, 'bold 13px Segoe UI', hot?c.color:'#94a3b8', 'center');
+    txt('girls', nx, ny+8, '10px Segoe UI', '#94a3b8', 'center');
+
+    /* boy / girl split under each node */
+    const by = ny + NODE_R + 34;
+    /* boys chip */
+    rounded(nx-58, by-14, 56, 28, 8);
+    ctx.fillStyle = hot ? '#dbeafe' : '#f1f5f9'; ctx.fill();
+    ctx.strokeStyle = hot ? '#2563eb' : '#cbd5e1'; ctx.lineWidth = 1.5; ctx.stroke();
+    txt(c.boys+' boys', nx-30, by, 'bold 11px Segoe UI', hot?'#1d4ed8':'#94a3b8', 'center');
+
+    /* girls chip */
+    rounded(nx+4, by-14, 56, 28, 8);
+    ctx.fillStyle = hot ? '#fce7f3' : '#f1f5f9'; ctx.fill();
+    ctx.strokeStyle = hot ? '#db2777' : '#cbd5e1'; ctx.lineWidth = 1.5; ctx.stroke();
+    txt(c.girls+' girl'+(c.girls!==1?'s':''), nx+32, by, 'bold 11px Segoe UI', hot?'#be185d':'#94a3b8', 'center');
+
+    /* ways count */
+    const wy = by + 40;
+    rounded(nx-66, wy-20, 132, 40, 10);
+    ctx.fillStyle = hot ? '#ecfdf5' : '#f8fafc'; ctx.fill();
+    ctx.strokeStyle = hot ? '#059669' : '#e2e8f0'; ctx.lineWidth = 1.5; ctx.stroke();
+    txt(c.ways.toLocaleString(), nx, wy-6, 'bold 14px Segoe UI', hot?'#047857':'#94a3b8', 'center');
+    txt('committees', nx, wy+10, '9px Segoe UI', '#94a3b8', 'center');
+  });
+
+  /* ---- total bar at bottom ---- */
+  const barX = 40, barY = H-96, barW = W-80, barH = 40;
+  rounded(barX, barY, barW, barH, 12);
+  ctx.fillStyle = (active>=5) ? '#065f46' : '#f1f5f9'; ctx.fill();
+  ctx.strokeStyle = (active>=5) ? '#065f46' : '#cbd5e1'; ctx.lineWidth = 2; ctx.stroke();
+  txt('TOTAL  =  38 760  +  232 560  +  508 725  =  780 045',
+      W/2, barY+barH/2, 'bold 15px Segoe UI',
+      (active>=5)?'#ffffff':'#94a3b8', 'center');
+
+  /* ---- step label ---- */
+  txt('Step '+Math.min(active,5), 14, 20, 'bold 12px Segoe UI', '#94a3b8', 'left');
+
+  /* ---- readout ---- */
+  let msg = '';
+  if(active<=1) msg = 'Step 1 — "At most 2 girls" allows g = 0, 1 or 2 (three disjoint cases).';
+  else if(active===2) msg = 'Step 2 — Case g = 0: choose 6 boys from 20 → ' + CASES[0].ways.toLocaleString() + '.';
+  else if(active===3) msg = 'Step 3 — Case g = 1: choose 5 boys from 20 and 1 girl from 15 → ' + CASES[1].ways.toLocaleString() + '.';
+  else if(active===4) msg = 'Step 4 — Case g = 2: choose 4 boys from 20 and 2 girls from 15 → ' + CASES[2].ways.toLocaleString() + '.';
+  else msg = 'Step 5 — Add the three cases: 38 760 + 232 560 + 508 725 = 780 045 committees.';
+  ro.textContent = msg;
+}
+
+/* ---------- scroll sync ---------- */
+let current = 1;
+const io = new IntersectionObserver(es=>{
+  es.forEach(e=>{
+    if(e.isIntersecting){
+      current = +e.target.dataset.step;
+      document.querySelectorAll('.step').forEach(s=>s.classList.toggle('active', +s.dataset.step===current));
+      draw(current);
+    }
+  });
+},{rootMargin:'-25% 0px -55% 0px'});
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
+
+/* initial paint */
+draw(1);
+document.querySelector('.step[data-step="1"]').classList.add('active');
+</script>
 </body>
 </html>

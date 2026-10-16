@@ -1,345 +1,299 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HKDSE Math 2024 Paper 1 Q16 – Interactive Solution</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- KaTeX for math rendering -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
-            onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}]});"></script>
-    <style>
-        .step-card {
-            transition: all 0.3s ease;
-        }
-        .step-card.hidden {
-            display: none;
-        }
-        .cup-icon {
-            display: inline-block;
-            width: 1.2rem;
-            height: 1.2rem;
-            border-radius: 50%;
-            margin: 0.1rem;
-        }
-        .red-cup { background-color: #ef4444; }
-        .white-cup { background-color: #e5e7eb; border: 2px solid #9ca3af; }
-        .bag-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 2px;
-            max-width: 400px;
-        }
-        .slider-container {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-        input[type=range] {
-            accent-color: #3b82f6;
-        }
-    </style>
-</head>
-<body class="bg-slate-50 font-sans text-slate-800">
-
-    <div class="max-w-4xl mx-auto px-4 py-8">
-
-        <!-- Header -->
-        <div class="text-center mb-6">
-            <span class="inline-block bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full mb-2">HKDSE Math 2024 Paper 1 Q16</span>
-            <h1 class="text-2xl md:text-3xl font-bold text-slate-900">Probability with Combinations</h1>
-            <p class="text-slate-500 mt-1">Red &amp; White Cups – Draw 5 without replacement</p>
-            <div class="mt-3 flex flex-wrap justify-center gap-2">
-                <span class="bg-indigo-100 text-indigo-800 text-xs font-medium px-3 py-1 rounded-full">Combinations \(C^n_r\)</span>
-                <span class="bg-emerald-100 text-emerald-800 text-xs font-medium px-3 py-1 rounded-full">Probability</span>
-                <span class="bg-amber-100 text-amber-800 text-xs font-medium px-3 py-1 rounded-full">Complementary Events</span>
-            </div>
-        </div>
-
-        <!-- Question Card -->
-        <div class="bg-white rounded-2xl shadow-md p-6 mb-8 border border-slate-100">
-            <h2 class="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2">
-                <span class="text-2xl">📋</span> Question
-            </h2>
-            <p class="mb-3 leading-relaxed">
-                In a bag, there are <strong class="text-red-600">16 red cups</strong> and <strong class="text-gray-600">4 white cups</strong>. 
-                If 5 cups are randomly drawn from the bag at the same time, find
-            </p>
-            <ol class="list-decimal list-inside space-y-2 ml-2 font-medium">
-                <li>the probability that <strong>exactly 1 white cup</strong> is drawn; <span class="text-sm text-slate-400 font-normal">(2 marks)</span></li>
-                <li>the probability that <strong>at most 3 red cups</strong> are drawn. <span class="text-sm text-slate-400 font-normal">(2 marks)</span></li>
-            </ol>
-        </div>
-
-        <!-- Visualisation: Interactive bag -->
-        <div class="bg-white rounded-2xl shadow-md p-6 mb-8 border border-slate-100">
-            <h3 class="text-md font-bold text-slate-700 mb-3 flex items-center gap-2">
-                <span class="text-xl">🎨</span> Visualise the Bag
-            </h3>
-            <div class="flex flex-col items-center gap-4">
-                <div class="bag-grid" id="bagGrid"></div>
-                <div class="flex items-center gap-4 text-sm text-slate-600">
-                    <span class="flex items-center gap-1"><span class="cup-icon red-cup"></span> Red (16)</span>
-                    <span class="flex items-center gap-1"><span class="cup-icon white-cup"></span> White (4)</span>
-                </div>
-            </div>
-            <p class="text-xs text-slate-400 mt-3 text-center italic">Total 20 cups in the bag. 5 will be drawn at random.</p>
-        </div>
-
-        <!-- Step-by-step solution -->
-        <div class="space-y-4" id="solutionSteps">
-
-            <!-- Step 1 -->
-            <div class="step-card bg-white rounded-2xl shadow-md border border-slate-100 overflow-hidden" data-step="1">
-                <button class="w-full text-left px-5 py-4 flex items-center justify-between hover:bg-slate-50 transition" onclick="toggleStep(1)">
-                    <span class="font-semibold text-slate-800 flex items-center gap-3">
-                        <span class="bg-blue-600 text-white text-sm w-7 h-7 rounded-full flex items-center justify-center">1</span>
-                        Total number of ways to choose 5 cups
-                    </span>
-                    <span class="text-slate-400 text-xl step-arrow">▾</span>
-                </button>
-                <div class="step-content hidden px-5 pb-5 text-slate-700">
-                    <div class="bg-blue-50 border-l-4 border-blue-400 p-3 rounded-r mb-3 text-sm">
-                        <strong>Hint:</strong> "Drawn at the same time" means order does not matter → use combinations \(C^n_r = \frac{n!}{r!(n-r)!}\).
-                    </div>
-                    <p class="mb-2">Total cups = \(16 + 4 = 20\). We choose 5 from 20.</p>
-                    <p class="text-lg">\[
-                        \text{Total outcomes} = C^{20}_5 = 15504
-                    \]</p>
-                </div>
-            </div>
-
-            <!-- Step 2 -->
-            <div class="step-card bg-white rounded-2xl shadow-md border border-slate-100 overflow-hidden" data-step="2">
-                <button class="w-full text-left px-5 py-4 flex items-center justify-between hover:bg-slate-50 transition" onclick="toggleStep(2)">
-                    <span class="font-semibold text-slate-800 flex items-center gap-3">
-                        <span class="bg-blue-600 text-white text-sm w-7 h-7 rounded-full flex items-center justify-center">2</span>
-                        Part (a) – Exactly 1 white cup
-                    </span>
-                    <span class="text-slate-400 text-xl step-arrow">▾</span>
-                </button>
-                <div class="step-content hidden px-5 pb-5 text-slate-700">
-                    <div class="bg-blue-50 border-l-4 border-blue-400 p-3 rounded-r mb-3 text-sm">
-                        <strong>Hint:</strong> Choosing exactly 1 white cup means the other 4 cups must be red.
-                    </div>
-                    <p class="mb-2">Choose \(1\) white from \(4\): \(C^4_1\)</p>
-                    <p class="mb-2">Choose \(4\) red from \(16\): \(C^{16}_4\)</p>
-                    <p class="mb-2">Favourable outcomes = \(C^4_1 \times C^{16}_4\)</p>
-                    <div class="bg-slate-50 p-3 rounded-lg mt-3">
-                        <p class="text-lg">\[
-                            P(\text{exactly 1 white}) = \frac{C^{16}_4 \, C^4_1}{C^{20}_5}
-                        \]</p>
-                        <p class="text-lg mt-2">\[
-                            = \frac{1820 \times 4}{15504} = \frac{7280}{15504} = \frac{455}{969}
-                        \]</p>
-                    </div>
-                    <p class="mt-3 text-sm text-slate-500">✅ Answer for (a): \(\dfrac{455}{969}\)</p>
-                </div>
-            </div>
-
-            <!-- Step 3 -->
-            <div class="step-card bg-white rounded-2xl shadow-md border border-slate-100 overflow-hidden" data-step="3">
-                <button class="w-full text-left px-5 py-4 flex items-center justify-between hover:bg-slate-50 transition" onclick="toggleStep(3)">
-                    <span class="font-semibold text-slate-800 flex items-center gap-3">
-                        <span class="bg-blue-600 text-white text-sm w-7 h-7 rounded-full flex items-center justify-center">3</span>
-                        Part (b) – Understanding "at most 3 red cups"
-                    </span>
-                    <span class="text-slate-400 text-xl step-arrow">▾</span>
-                </button>
-                <div class="step-content hidden px-5 pb-5 text-slate-700">
-                    <div class="bg-blue-50 border-l-4 border-blue-400 p-3 rounded-r mb-3 text-sm">
-                        <strong>Hint:</strong> Using the complement is easier! "At most 3 red" means \(0,1,2,\) or \(3\) red. The complement is \(4\) or \(5\) red.
-                    </div>
-                    <p class="mb-2">Since we draw 5 cups, the only way to have more than 3 red cups is to draw <strong>4 red</strong> or <strong>5 red</strong>.</p>
-                    <p class="mb-2">Complement event: \(P(\text{at least 4 red}) = P(4R) + P(5R)\)</p>
-                    <p class="text-sm text-slate-500">Remember: total red = 16, so 4R means 1 white; 5R means 0 white.</p>
-                </div>
-            </div>
-
-            <!-- Step 4 -->
-            <div class="step-card bg-white rounded-2xl shadow-md border border-slate-100 overflow-hidden" data-step="4">
-                <button class="w-full text-left px-5 py-4 flex items-center justify-between hover:bg-slate-50 transition" onclick="toggleStep(4)">
-                    <span class="font-semibold text-slate-800 flex items-center gap-3">
-                        <span class="bg-blue-600 text-white text-sm w-7 h-7 rounded-full flex items-center justify-center">4</span>
-                        Part (b) – Calculate complementary probability
-                    </span>
-                    <span class="text-slate-400 text-xl step-arrow">▾</span>
-                </button>
-                <div class="step-content hidden px-5 pb-5 text-slate-700">
-                    <p class="mb-2">\(P(4\text{ red}) = \dfrac{C^{16}_4 C^4_1}{C^{20}_5} = \dfrac{455}{969}\) (same as part a)</p>
-                    <p class="mb-2">\(P(5\text{ red}) = \dfrac{C^{16}_5}{C^{20}_5} = \dfrac{4368}{15504} = \dfrac{91}{323} = \dfrac{273}{969}\)</p>
-                    <div class="bg-slate-50 p-3 rounded-lg mt-3">
-                        <p>\[
-                            P(\text{at least 4 red}) = \frac{455}{969} + \frac{273}{969} = \frac{728}{969}
-                        \]</p>
-                    </div>
-                    <p class="mt-3">So, \(P(\text{at most 3 red}) = 1 - \dfrac{728}{969} = \dfrac{241}{969}\)</p>
-                    <p class="mt-3 text-sm text-slate-500">✅ Answer for (b): \(\dfrac{241}{969}\)</p>
-                </div>
-            </div>
-
-            <!-- Step 5 (Summary) -->
-            <div class="step-card bg-white rounded-2xl shadow-md border border-slate-100 overflow-hidden" data-step="5">
-                <button class="w-full text-left px-5 py-4 flex items-center justify-between hover:bg-slate-50 transition" onclick="toggleStep(5)">
-                    <span class="font-semibold text-slate-800 flex items-center gap-3">
-                        <span class="bg-emerald-600 text-white text-sm w-7 h-7 rounded-full flex items-center justify-center">✓</span>
-                        Summary &amp; Key Takeaway
-                    </span>
-                    <span class="text-slate-400 text-xl step-arrow">▾</span>
-                </button>
-                <div class="step-content hidden px-5 pb-5 text-slate-700">
-                    <ul class="list-disc list-inside space-y-2">
-                        <li>Use combinations \(C^n_r\) when order doesn't matter.</li>
-                        <li>Favourable outcomes = product of combinations for each colour.</li>
-                        <li>For "at most" problems, consider the complement event to simplify.</li>
-                    </ul>
-                    <div class="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-                        <p class="font-semibold">Final answers:</p>
-                        <p>(a) \(\dfrac{455}{969}\)  (b) \(\dfrac{241}{969}\)</p>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- Reveal all / Reset -->
-        <div class="flex justify-center gap-4 mt-8">
-            <button onclick="revealAll()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-full shadow transition">Reveal All Steps</button>
-            <button onclick="resetAll()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium px-6 py-2 rounded-full shadow transition">Reset</button>
-        </div>
-
-        <!-- Simulator slider -->
-        <div class="mt-10 bg-white rounded-2xl shadow-md p-6 border border-slate-100">
-            <h3 class="text-md font-bold text-slate-700 mb-3 flex items-center gap-2">
-                <span class="text-xl">🔬</span> Explore: Probability of exactly \(k\) white cups
-            </h3>
-            <div class="slider-container mb-4">
-                <label for="whiteSlider" class="text-sm font-medium">Number of white cups drawn (k):</label>
-                <input type="range" id="whiteSlider" min="0" max="4" value="1" step="1" class="w-48">
-                <span id="sliderValue" class="font-bold text-blue-600">1</span>
-            </div>
-            <div class="bg-slate-50 rounded-lg p-4">
-                <p id="probDisplay" class="text-lg">\(P(k=1) = \dfrac{C^4_1 C^{16}_4}{C^{20}_5} = \dfrac{455}{969} \approx 0.4696\)</p>
-            </div>
-            <p class="text-xs text-slate-400 mt-2 italic">Move the slider to see how the probability changes for different numbers of white cups.</p>
-        </div>
-
-    </div>
-
-    <script>
-        // Build bag grid (16 red, 4 white)
-        function buildBag() {
-            const bag = document.getElementById('bagGrid');
-            bag.innerHTML = '';
-            for (let i = 0; i < 16; i++) {
-                const d = document.createElement('div');
-                d.className = 'cup-icon red-cup';
-                bag.appendChild(d);
-            }
-            for (let i = 0; i < 4; i++) {
-                const d = document.createElement('div');
-                d.className = 'cup-icon white-cup';
-                bag.appendChild(d);
-            }
-        }
-        buildBag();
-
-        // Toggle step visibility
-        function toggleStep(n) {
-            const card = document.querySelector(`.step-card[data-step="${n}"]`);
-            const content = card.querySelector('.step-content');
-            const arrow = card.querySelector('.step-arrow');
-            if (content.classList.contains('hidden')) {
-                content.classList.remove('hidden');
-                arrow.textContent = '▴';
-            } else {
-                content.classList.add('hidden');
-                arrow.textContent = '▾';
-            }
-        }
-
-        function revealAll() {
-            document.querySelectorAll('.step-content').forEach(el => el.classList.remove('hidden'));
-            document.querySelectorAll('.step-arrow').forEach(el => el.textContent = '▴');
-        }
-
-        function resetAll() {
-            document.querySelectorAll('.step-content').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.step-arrow').forEach(el => el.textContent = '▾');
-        }
-
-        // Slider interaction
-        const slider = document.getElementById('whiteSlider');
-        const sliderValue = document.getElementById('sliderValue');
-        const probDisplay = document.getElementById('probDisplay');
-
-        // Precompute combinations (small numbers)
-        function C(n, r) {
-            if (r < 0 || r > n) return 0;
-            let res = 1;
-            for (let i = 1; i <= r; i++) {
-                res = res * (n - i + 1) / i;
-            }
-            return Math.round(res);
-        }
-
-        function updateProbability() {
-            const k = parseInt(slider.value);
-            sliderValue.textContent = k;
-            const favourable = C(4, k) * C(16, 5 - k);
-            const total = C(20, 5);
-            const prob = favourable / total;
-            const frac = `${favourable}/${total}`;
-            let simplified = frac;
-            // simple simplify
-            const gcd = (a, b) => b ? gcd(b, a % b) : a;
-            const g = gcd(favourable, total);
-            if (g > 1) simplified = `${favourable / g}/${total / g}`;
-            probDisplay.innerHTML = `\\(P(k=${k}) = \\dfrac{C^4_{${k}} C^{16}_{${5 - k}}}{C^{20}_5} = \\dfrac{${favourable}}{${total}} ${g > 1 ? '= \\dfrac{' + simplified.split('/')[0] + '}{' + simplified.split('/')[1] + '}' : ''} \\approx ${prob.toFixed(4)}\\)`;
-            if (window.renderMathInElement) {
-                renderMathInElement(probDisplay, {delimiters: [{left: '\\(', right: '\\)', display: false}]});
-            }
-        }
-
-        slider.addEventListener('input', updateProbability);
-        // Initialize
-        updateProbability();
-    </script>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2024 P1 Q16 — Probability</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
+  svg: { fontCache: 'global' }
+};
 </script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:#f4f7fb;color:#1c2536;font-size:16px;line-height:1.55;}
+  .wrap{max-width:1240px;margin:0 auto;padding:16px 14px 60px;}
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start;}
+  @media(min-width:900px){.split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}}
+  @media(max-width:640px){body{font-size:14.5px;}.wrap{padding:10px 8px 40px;}}
 
+  .diagram{position:sticky;top:16px;max-height:calc(100vh - 2rem);overflow-y:auto;}
+  .card{background:#fff;border:1px solid #dde5f0;border-radius:14px;box-shadow:0 4px 16px rgba(30,60,110,.07);}
+  .diagram .card{padding:12px;}
+  .panel{padding:16px 18px;}
+
+  h1{font-size:1.05rem;margin:0 0 4px;color:#0d3a6e;letter-spacing:.2px;}
+  .badge{display:inline-block;background:#e8f0fe;color:#14509b;border-radius:999px;padding:2px 10px;font-size:.72rem;font-weight:700;margin-bottom:10px;}
+  .qtext{background:#fbfdff;border-left:4px solid #2f7de1;border-radius:8px;padding:10px 14px;margin-bottom:6px;}
+  .step{background:#fbfdff;border:1px solid #e3ecf8;border-left:5px solid #2f7de1;border-radius:10px;padding:10px 14px;margin:12px 0;}
+  .step[data-step="0"]{border-left-color:#8b95a7;}
+  .tag{display:inline-flex;align-items:center;gap:7px;font-weight:800;color:#0d3a6e;margin-bottom:5px;}
+  .chip{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:#2f7de1;color:#fff;font-size:.8rem;font-weight:800;}
+  .hint{font-size:.83rem;color:#5b6b85;background:#eef4fd;border-radius:7px;padding:5px 9px;margin-top:7px;display:inline-block;}
+  .ans{background:#eafaf0;border:1px solid #b6e6c8;border-left:5px solid #18a558;border-radius:10px;padding:12px 15px;margin-top:18px;font-weight:600;}
+  .ans .chip{background:#18a558;}
+  .ro{font-size:.83rem;color:#46536b;background:#f1f6fd;border-radius:8px;padding:6px 9px;margin:8px 0 0;min-height:36px;}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;font-size:.78rem;color:#46536b;margin-top:8px;}
+  .legend span{display:inline-flex;align-items:center;gap:5px;}
+  .sw{width:12px;height:12px;border-radius:3px;display:inline-block;}
+  canvas{width:100%;height:auto;display:block;border-radius:10px;background:#ffffff;}
+  mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="split">
+
+  <!-- ================= LEFT PANE ================= -->
+  <div class="diagram">
+    <div class="card">
+      <canvas id="cv" width="560" height="470"></canvas>
+      <p class="ro" id="readout"></p>
+      <div class="legend">
+        <span><i class="sw" style="background:#e23b3b"></i>Red cup</span>
+        <span><i class="sw" style="background:#f0f2f5;border:1px solid #c7cfdb"></i>White cup</span>
+        <span><i class="sw" style="background:#2f7de1"></i>Selected / highlighted</span>
+        <span><i class="sw" style="background:#18a558"></i>Counted case</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= RIGHT PANE ================= -->
+  <div class="panel">
+    <div class="card" style="padding:16px 18px;">
+      <span class="badge">HKDSE 2024 · Paper 1 · Q16 · Probability</span>
+      <h1>Question 16</h1>
+      <div class="qtext">
+        In a bag, there are 16 red cups and 4 white cups. If 5 cups are randomly drawn from the bag at the same time, find
+        <br>(a) the probability that exactly 1 white cup is drawn; <em>(2 marks)</em>
+        <br>(b) the probability that at most 3 red cups are drawn. <em>(2 marks)</em>
+      </div>
+      
+      <div class="step" data-step="0">
+        <div class="tag"><span class="chip">0</span>Set up the counting model</div>
+        The bag contains $16$ red and $4$ white cups, so $N = 16+4 = 20$ cups in total. We draw $5$ cups <strong>at the same time</strong>, so the order does not matter — use <strong>combinations</strong>.
+        <div class="hint">"At the same time" ⇒ unordered sample ⇒ denominator $C_5^{20}$.</div>
+      </div>
+
+      <div class="step" data-step="1">
+        <div class="tag"><span class="chip">1</span>(a) Identify the favourable case</div>
+        Exactly $1$ white cup drawn means we draw <strong>1 white and 4 red</strong>.
+        Number of ways: $C_1^{4} \times C_4^{16}$.
+        <div class="hint">Split the draw into "white part" × "red part".</div>
+      </div>
+
+      <div class="step" data-step="2">
+        <div class="tag"><span class="chip">2</span>(a) Compute the probability</div>
+        \[
+        \frac{C_1^{4}\,C_4^{16}}{C_5^{20}}
+        = \frac{4 \times 1820}{15504}
+        = \frac{7280}{15504}
+        = \frac{455}{969}
+        \]
+        <div class="hint">Cancel the common factor $16$: $\dfrac{7280}{15504}=\dfrac{455}{969}$.</div>
+      </div>
+
+      <div class="step" data-step="3">
+        <div class="tag"><span class="chip">3</span>(b) Use the complement</div>
+        "At most 3 red cups" is hard to list directly, so use the complement:
+        \[
+        P(\text{at most }3 \text{ red}) = 1 - P(4 \text{ red or } 5 \text{ red})
+        \]
+        <div class="hint">Complement of "at most 3 red" is "4 red or 5 red".</div>
+      </div>
+
+      <div class="step" data-step="4">
+        <div class="tag"><span class="chip">4</span>(b) Evaluate the complement</div>
+        $P(4 \text{ red}) = \dfrac{C_4^{16}}{C_5^{20}} = \dfrac{1820}{15504} = \dfrac{91}{323}$ (draw 1 white + 4 red)
+        <br>$P(5 \text{ red}) = \dfrac{C_5^{16}}{C_5^{20}} = \dfrac{4368}{15504} = \dfrac{455}{969}$
+        <div class="hint">Note $P(4\text{ red})=\frac{91}{323}$ and $P(5\text{ red})=\frac{455}{969}$ have common denominator $969$.</div>
+      </div>
+
+      <div class="step" data-step="5">
+        <div class="tag"><span class="chip">5</span>(b) Finish the calculation</div>
+        \[
+        1 - \frac{91}{323} - \frac{455}{969}
+        = 1 - \frac{273}{969} - \frac{455}{969}
+        = 1 - \frac{728}{969}
+        = \frac{241}{969}
+        \]
+        <div class="hint">Rewrite $\frac{91}{323}=\frac{273}{969}$ so all fractions share denominator $969$.</div>
+      </div>
+
+      <div class="ans">
+        <span class="chip">✓</span> Answer:
+        (a) $\dfrac{455}{969}$ &nbsp;&nbsp;&nbsp; (b) $\dfrac{241}{969}$
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+(function(){
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  const ro = document.getElementById('readout');
+  const W = cv.width, H = cv.height;
+
+  const RED = '#e23b3b', WHITE = '#f0f2f5', WHITE_EDGE = '#c7cfdb';
+  const BLUE = '#2f7de1', GREEN = '#18a558', GREY = '#8b95a7';
+
+  // layout of the 20 cups: 16 red then 4 white
+  const cols = 5, r = 24, gap = 12;
+  const cupW = 2*r, cupH = 2*r;
+  const totalW = cols*cupW + (cols-1)*gap;
+  const startX = (W - totalW)/2 + r;
+  const startY = 60;
+
+  function cup(cx, cy, colour, edge, alpha, label){
+    ctx.globalAlpha = alpha===undefined?1:alpha;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI*2);
+    ctx.fillStyle = colour;
+    ctx.fill();
+    ctx.lineWidth = 2.5;
+    ctx.strokeStyle = edge;
+    ctx.stroke();
+    if(label){
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = colour===RED? '#ffffff' : '#334155';
+      ctx.font = 'bold 15px Segoe UI, sans-serif';
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText(label, cx, cy+1);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function title(t, colour){
+    ctx.fillStyle = colour;
+    ctx.font = 'bold 15px Segoe UI, sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    ctx.fillText(t, W/2, 26);
+  }
+
+  function tick(cx, cy, colour){
+    ctx.beginPath();
+    ctx.moveTo(cx-r*0.42, cy);
+    ctx.lineTo(cx-r*0.1, cy+r*0.32);
+    ctx.lineTo(cx+r*0.45, cy-r*0.35);
+    ctx.lineWidth = 4; ctx.strokeStyle = colour; ctx.lineCap='round'; ctx.lineJoin='round';
+    ctx.stroke();
+  }
+
+  function cross(cx, cy, colour){
+    ctx.beginPath();
+    ctx.moveTo(cx-r*0.35, cy-r*0.35); ctx.lineTo(cx+r*0.35, cy+r*0.35);
+    ctx.moveTo(cx+r*0.35, cy-r*0.35); ctx.lineTo(cx-r*0.35, cy+r*0.35);
+    ctx.lineWidth = 4; ctx.strokeStyle = colour; ctx.lineCap='round';
+    ctx.stroke();
+  }
+
+  function draw(step){
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,W,H);
+
+    // ---- caption per step ----
+    const captions = {
+      0:'The bag: 16 red cups + 4 white cups = 20 cups. Draw 5 at the same time.',
+      1:'(a) Exactly 1 white drawn  ⇒  1 white (of 4)  +  4 red (of 16).',
+      2:'(a) Count:  C₁⁴ × C₄¹⁶  out of  C₅²⁰   →  455/969 .',
+      3:'(b) "At most 3 red" → use the complement: 4 red or 5 red.',
+      4:'(b) Complement cases:  4 red (1 white)  and  5 red.',
+      5:'(b) Sum the complement: 273/969 + 455/969 = 728/969,  so  1 − 728/969 = 241/969 .'
+    };
+    title(captions[step] || captions[0], '#0d3a6e');
+
+    // ---- draw all 20 cups ----
+    // 16 red (indices 0..15) then 4 white (16..19)
+    let highlight = new Set();
+    let mark = null; // 'tick' or 'cross'
+
+    if(step===1){
+      // highlight 1 white (first white) + 4 reds
+      highlight.add(16);
+      [0,1,2,3].forEach(i=>highlight.add(i));
+    } else if(step===2){
+      highlight.add(16);
+      [0,1,2,3].forEach(i=>highlight.add(i));
+      mark='tick';
+    } else if(step===4){
+      // complement: 1 white (index16) + 4 red, and 5 red
+      highlight.add(16);
+      [0,1,2,3,4].forEach(i=>highlight.add(i));
+      mark='cross';
+    } else if(step===5){
+      highlight.add(16);
+      [0,1,2,3,4].forEach(i=>highlight.add(i));
+      mark='cross';
+    }
+
+    for(let i=0;i<20;i++){
+      const col = i % cols, row = Math.floor(i/cols);
+      const cx = startX + col*(cupW+gap);
+      const cy = startY + row*(cupH+gap);
+      const isRed = i < 16;
+      const base = isRed ? RED : WHITE;
+      const edge = isRed ? '#a81f1f' : WHITE_EDGE;
+      const on = highlight.has(i);
+
+      // glow for selected
+      if(on){
+        ctx.beginPath();
+        ctx.arc(cx,cy,r+6,0,Math.PI*2);
+        ctx.fillStyle = step===4||step===5 ? 'rgba(226,59,59,.18)' : 'rgba(47,125,225,.20)';
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(cx,cy,r+5,0,Math.PI*2);
+        ctx.lineWidth=3;
+        ctx.strokeStyle = step===4||step===5 ? '#e23b3b' : BLUE;
+        ctx.stroke();
+      }
+
+      cup(cx, cy, base, on ? (BLUE) : edge, 1, isRed ? 'R' : 'W');
+
+      if(on && mark==='tick') tick(cx, cy, GREEN);
+      if(on && mark==='cross') cross(cx, cy, '#8a1010');
+    }
+
+    // ---- summary bar ----
+    ctx.textAlign='left'; ctx.textBaseline='middle';
+    const baseY = startY + 4*(cupH+gap) + 6;
+    ctx.font = 'bold 14px Segoe UI, sans-serif';
+    ctx.fillStyle = '#0d3a6e';
+    ctx.fillText('Red: 16', 40, baseY+8);
+    ctx.fillStyle = '#334155';
+    ctx.fillText('White: 4', 150, baseY+8);
+    ctx.fillStyle = '#0d3a6e';
+    ctx.fillText('Total: 20', 265, baseY+8);
+    ctx.fillStyle = '#5b6b85';
+    ctx.font = '13px Segoe UI, sans-serif';
+    ctx.fillText('Draw 5 without replacement (order irrelevant)', 380, baseY+8);
+
+    // ---- readout ----
+    const roText = {
+      0:'Total cups N = 20. Denominator of every probability = C₅²⁰ = 15504.',
+      1:'Step 1: choose 1 white from 4 → C₁⁴ = 4;  choose 4 red from 16 → C₄¹⁶ = 1820.',
+      2:'Step 2: P = (C₁⁴ × C₄¹⁶)/C₅²⁰ = 7280/15504 = 455/969.',
+      3:'Step 3: P(at most 3 red) = 1 − P(4 red) − P(5 red).',
+      4:'Step 4: P(4 red)=1820/15504=91/323=273/969 ;  P(5 red)=4368/15504=455/969.',
+      5:'Step 5: 1 − 273/969 − 455/969 = 241/969.  Final: (a) 455/969,  (b) 241/969.'
+    };
+    ro.textContent = roText[step] || roText[0];
+  }
+
+  // ---- scroll sync ----
+  let current = 0;
+  const io = new IntersectionObserver(es=>{
+    es.forEach(e=>{ if(e.isIntersecting){ current = +e.target.dataset.step; draw(current); } });
+  }, {rootMargin:'-25% 0px -55% 0px'});
+  document.querySelectorAll('.step').forEach(s=>io.observe(s));
+
+  draw(0);
+})();
+</script>
 </body>
 </html>

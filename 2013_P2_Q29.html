@@ -1,956 +1,475 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>HKDSE 2013 Paper 2 Q29 · Box-and-Whisker Diagram</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HKDSE 2013 Paper 2 Q29 — Box-and-Whisker from Stem-and-Leaf</title>
 <script>
-  window.MathJax = {
-    tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['\\[', '\\]']] },
-    svg: { fontCache: 'global' }
-  };
+window.MathJax = {
+  tex: {inlineMath: [['$','$'],['\\(','\\)']]},
+  svg: {fontCache: 'global'}
+};
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
   :root{
-    --blue:#1e3a8a;
-    --blue-2:#2563eb;
-    --indigo:#4338ca;
-    --amber:#f59e0b;
-    --amber-bg:#fef3c7;
-    --green:#059669;
-    --green-bg:#d1fae5;
-    --slate:#0f172a;
-    --muted:#475569;
-    --line:#e2e8f0;
+    --ink:#15202b;
+    --muted:#5a6b7b;
+    --line:#d7e0e8;
+    --bg:#f6f9fc;
     --card:#ffffff;
-    --bg:#f1f5f9;
+    --a:#2563eb;
+    --b:#dc2626;
+    --c:#059669;
+    --d:#d97706;
+    --p:#7c3aed;
   }
-  *{box-sizing:border-box}
-  html,body{margin:0;padding:0}
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
   body{
-    font-family: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
-    background: var(--bg);
-    color: var(--slate);
-    line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
   }
-  .wrap{max-width: 980px; margin: 0 auto; padding: 0 16px 48px;}
-
-  /* ---------- Hero ---------- */
-  .hero{
-    background: linear-gradient(135deg, #1e3a8a 0%, #4338ca 55%, #2563eb 100%);
-    color:#fff;
-    padding: 42px 20px 56px;
-    border-radius: 0 0 28px 28px;
-    box-shadow: 0 12px 30px rgba(30,58,138,.35);
-    position: relative;
-    overflow: hidden;
+  .wrap{max-width:1280px;margin:0 auto;padding:16px 14px 60px;}
+  .split{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    gap:12px;
+    align-items:start;
   }
-  .hero::after{
-    content:"";
-    position:absolute;
-    right:-80px; top:-80px;
-    width:260px; height:260px;
-    background: radial-gradient(circle, rgba(255,255,255,.18), transparent 70%);
-    border-radius:50%;
+  @media(min-width:900px){
+    .split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}
   }
-  .hero-inner{max-width: 980px; margin:0 auto; position:relative; z-index:1;}
-  .eyebrow{
-    font-size:.8rem;
-    letter-spacing:.14em;
-    text-transform:uppercase;
-    color:#c7d2fe;
-    font-weight:600;
-  }
-  .hero h1{
-    margin:.35rem 0 .2rem;
-    font-size:clamp(1.5rem, 4.5vw, 2.3rem);
-    line-height:1.2;
-    font-weight:800;
-  }
-  .hero .subtitle{
-    margin:0 0 1rem;
-    font-size: clamp(.95rem, 2.5vw, 1.05rem);
-    color:#e0e7ff;
-  }
-  .pills{display:flex; flex-wrap:wrap; gap:8px;}
-  .pill{
-    display:inline-block;
-    background: rgba(255,255,255,.15);
-    border:1px solid rgba(255,255,255,.35);
-    color:#fff;
-    font-size:.78rem;
-    padding:4px 12px;
-    border-radius:999px;
-    font-weight:600;
-    backdrop-filter: blur(4px);
+  @media(max-width:640px){
+    body{font-size:14.5px;}
+    .wrap{padding:10px 8px 40px;}
   }
 
-  /* ---------- Cards ---------- */
+  /* ---------- LEFT PANE ---------- */
+  .diagram{
+    position:sticky;
+    top:16px;
+    max-height:calc(100vh - 2rem);
+    overflow-y:auto;
+  }
   .card{
-    background: var(--card);
-    border-radius:18px;
-    box-shadow: 0 6px 22px rgba(15,23,42,.08);
-    padding: 24px 22px;
-    margin-top: 24px;
-    border: 1px solid var(--line);
-  }
-  .card > h2{
-    margin:0 0 6px;
-    font-size:1.22rem;
-    font-weight:800;
-    color: var(--blue);
-    display:flex; align-items:center; gap:10px;
-  }
-  .card > h2 .num{
-    background: var(--blue);
-    color:#fff;
-    width:30px;height:30px;
-    border-radius:9px;
-    display:inline-flex;
-    align-items:center; justify-content:center;
-    font-size:.95rem;
-    flex:0 0 auto;
-  }
-  .marks-line{
-    display:inline-block;
-    font-size:.8rem;
-    font-weight:700;
-    color:#92400e;
-    background:var(--amber-bg);
-    border-radius:999px;
-    padding:3px 12px;
-    margin-bottom:14px;
-  }
-  .qtext{font-size:1.02rem;}
-  .qtext p{margin:.55rem 0;}
-
-  /* ---------- Canvas ---------- */
-  .canvas-holder{
-    position:relative;
-    background:#f8fafc;
+    background:var(--card);
     border:1px solid var(--line);
     border-radius:14px;
-    padding:10px;
-    margin: 6px 0 16px;
+    padding:14px;
+    box-shadow:0 1px 2px rgba(20,40,60,.05),0 8px 24px -18px rgba(20,40,60,.35);
   }
-  canvas{width:100%; height:auto; display:block; border-radius:10px;}
-  .canvas-note{
-    font-size:.82rem;
+  .card h2{
+    margin:0 0 8px;
+    font-size:1rem;
+    letter-spacing:.02em;
     color:var(--muted);
-    text-align:center;
-    margin:6px 2px 0;
-    font-style:italic;
+    text-transform:uppercase;
+    font-weight:700;
   }
-
-  /* ---------- Controls ---------- */
-  .controls{
-    display:flex;
-    flex-wrap:wrap;
-    gap:14px;
-    align-items:center;
-    background:#f8fafc;
-    border:1px dashed #cbd5e1;
-    border-radius:12px;
-    padding:12px 14px;
-    margin-bottom:14px;
-  }
-  .control{
-    display:flex; align-items:center; gap:10px;
-    font-size:.88rem;
-    font-weight:600;
-    color:var(--muted);
-  }
-  input[type=range]{ width:180px; accent-color: var(--blue-2); }
-  input[type=checkbox]{ width:18px;height:18px; accent-color: var(--green); }
-  .readout{
-    font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  canvas{width:100%;height:auto;display:block;border-radius:10px;}
+  .ro{
+    margin:8px 0 0;
     font-size:.85rem;
-    background:#eef2ff;
-    color:#3730a3;
-    border:1px solid #c7d2fe;
-    border-radius:8px;
-    padding:7px 12px;
-    flex:1 1 100%;
-  }
-  .readout b{color:#1e3a8a;}
-
-  /* ---------- Steps ---------- */
-  .steps{margin-top:6px;}
-  .step{
-    display:none;
-    border-left:4px solid var(--blue-2);
-    background:#f8fafc;
-    border-radius:0 12px 12px 0;
-    padding:14px 16px;
-    margin:12px 0;
-    animation: fadeIn .35s ease;
-  }
-  .step.visible{display:block;}
-  @keyframes fadeIn{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
-  .step-head{
-    display:flex; align-items:center; gap:10px;
-    flex-wrap:wrap;
-    margin-bottom:8px;
-  }
-  .badge{
-    background: var(--blue-2);
-    color:#fff;
-    font-size:.75rem;
-    font-weight:800;
-    border-radius:999px;
-    padding:3px 11px;
-    letter-spacing:.03em;
-    white-space:nowrap;
-  }
-  .badge.m{ background: var(--amber); color:#3b2600; }
-  .badge.a{ background: var(--green); }
-  .working{font-size:.98rem;}
-  .hint{
-    background: var(--amber-bg);
-    border-left:4px solid var(--amber);
-    border-radius:0 10px 10px 0;
-    padding:10px 14px;
-    margin-top:10px;
-    font-size:.92rem;
-    color:#78350f;
-  }
-  .hint strong{color:#92400e}
-  .answer{
-    background: var(--green-bg);
-    border-left:4px solid var(--green);
-    border-radius:0 10px 10px 0;
-    padding:10px 14px;
-    margin-top:10px;
-    font-size:.95rem;
-    color:#064e3b;
-    font-weight:600;
-  }
-  .answer strong{color:#065f46}
-
-  .step-ctrl{
-    display:flex; align-items:center; gap:14px; flex-wrap:wrap;
-    margin-top:16px;
-  }
-  button.next{
-    background: linear-gradient(135deg, var(--blue), var(--indigo));
-    color:#fff;
-    border:none;
-    border-radius:12px;
-    padding:11px 22px;
-    font-size:.95rem;
-    font-weight:700;
-    cursor:pointer;
-    box-shadow: 0 5px 14px rgba(30,58,138,.32);
-    transition: transform .12s ease, opacity .2s ease;
-  }
-  button.next:hover:not(:disabled){ transform: translateY(-2px); }
-  button.next:disabled{
-    background:#94a3b8;
-    box-shadow:none;
-    cursor:not-allowed;
-  }
-  .counter{
-    font-size:.88rem;
-    font-weight:700;
     color:var(--muted);
-    background:#e2e8f0;
-    border-radius:999px;
-    padding:5px 14px;
+    background:#eef6ff;
+    border:1px dashed #b9d4f5;
+    border-radius:8px;
+    padding:8px 10px;
+    min-height:3.2em;
   }
+  .ro b{color:var(--a);}
+  .legend{
+    display:flex;flex-wrap:wrap;gap:10px 16px;
+    margin-top:10px;font-size:.82rem;color:var(--muted);
+  }
+  .legend span{display:flex;align-items:center;gap:6px;}
+  .sw{width:14px;height:10px;border-radius:2px;display:inline-block;}
 
-  /* ---------- Summary ---------- */
-  .summary{
-    background: linear-gradient(140deg, #0f172a, #1e293b);
-    color:#e2e8f0;
-    border:1px solid #334155;
+  /* ---------- RIGHT PANE ---------- */
+  .qbox{background:#fffdf3;border:1px solid #f0e2b4;border-radius:12px;padding:12px 14px;}
+  .qbox .tag{
+    display:inline-block;background:#fde68a;color:#7c4a03;
+    font-size:.72rem;font-weight:800;letter-spacing:.06em;
+    padding:2px 8px;border-radius:999px;text-transform:uppercase;margin-bottom:8px;
   }
-  .summary h2{color:#93c5fd;}
-  .summary h2 .num{background:#3b82f6;}
-  .summary ul{margin:10px 0 0; padding-left:6px; list-style:none;}
-  .summary li{
-    padding:9px 0 9px 30px;
-    position:relative;
-    border-bottom:1px dashed #334155;
+  .stemleaf{
+    font-family:"Courier New",ui-monospace,monospace;
+    font-size:.9rem;background:#fff;border:1px solid var(--line);
+    border-radius:10px;padding:10px 14px;display:inline-block;margin:8px 0;
+    line-height:1.6;
   }
-  .summary li:last-child{border-bottom:none;}
-  .summary li::before{
-    content:"✔";
-    position:absolute;
-    left:0; top:9px;
-    color:#34d399;
-    font-weight:900;
+  .stemleaf .hdr{color:var(--muted);font-size:.78rem;}
+  .stemleaf b{color:var(--b);}
+  .opts{margin:10px 0 0;padding-left:0;list-style:none;}
+  .opts li{
+    display:flex;gap:10px;align-items:flex-start;
+    padding:6px 8px;border-radius:8px;margin-bottom:4px;
+    background:#fff;border:1px solid var(--line);
   }
-  .summary .key{color:#fbbf24; font-weight:800;}
-  .final-ans{
-    margin-top:16px;
-    background: rgba(52,211,153,.12);
-    border:1px solid #10b981;
-    color:#a7f3d0;
-    border-radius:12px;
-    padding:12px 16px;
-    font-weight:800;
-    font-size:1.02rem;
-    text-align:center;
+  .opts .k{
+    flex:0 0 auto;width:22px;height:22px;border-radius:6px;
+    background:var(--a);color:#fff;font-weight:800;font-size:.78rem;
+    display:flex;align-items:center;justify-content:center;
   }
+  .opts.correct{background:#eafaf0;border-color:#a7e2c0;}
+  .opts.correct .k{background:var(--c);}
+  .opts small{color:var(--muted);}
 
-  footer{
-    text-align:center;
-    color:#64748b;
-    font-size:.82rem;
-    padding:28px 12px 10px;
+  .step{
+    background:#fff;border:1px solid var(--line);border-left:5px solid var(--a);
+    border-radius:10px;padding:10px 14px;margin:12px 0;
+    transition:box-shadow .25s,border-color .25s,transform .25s;
   }
-
-  /* table for stem-and-leaf */
-  .sl-table{
-    border-collapse: collapse;
-    margin: 6px 0 4px;
-    font-family: ui-monospace, Consolas, monospace;
-    font-size:.92rem;
-    background:#fff;
-    border:1px solid var(--line);
-    border-radius:10px;
-    overflow:hidden;
+  .step.live{box-shadow:0 0 0 3px #dbeafe;border-left-color:var(--p);transform:translateX(2px);}
+  .step .stepno{
+    display:inline-flex;align-items:center;gap:8px;
+    font-weight:800;font-size:.8rem;letter-spacing:.05em;
+    text-transform:uppercase;color:var(--a);margin-bottom:6px;
   }
-  .sl-table th, .sl-table td{
-    padding:4px 10px;
-    text-align:left;
-    border-bottom:1px solid #eef2f7;
+  .chip{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:22px;height:22px;border-radius:50%;
+    background:var(--a);color:#fff;font-size:.75rem;font-weight:800;
   }
-  .sl-table th{background:#eef2ff; color:#3730a3; font-weight:700;}
-  .sl-table td:first-child{color:#64748b;}
-  .sep{ text-align:center; color:#94a3b8;}
-
-  @media (max-width:560px){
-    .card{padding:18px 14px;}
-    input[type=range]{width:130px;}
-    .hero{padding:32px 16px 44px;}
+  .step:nth-of-type(2n) .chip{background:var(--b);}
+  .step:nth-of-type(3n) .chip{background:var(--c);}
+  .hint{
+    margin-top:6px;font-size:.82rem;color:var(--muted);
+    background:#f8fafc;border-radius:8px;padding:6px 10px;border:1px dashed var(--line);
   }
+  .answer{
+    margin-top:16px;background:#eafaf0;border:1px solid #a7e2c0;
+    border-radius:12px;padding:12px 14px;font-weight:700;
+  }
+  .answer span{color:var(--c);font-size:1.05rem;}
+  h1{font-size:1.05rem;margin:0 0 10px;color:var(--muted);font-weight:700;letter-spacing:.02em;}
+  .mathline{margin:6px 0;}
+  hr{border:none;border-top:1px solid var(--line);margin:14px 0;}
 </style>
 </head>
 <body>
+<div class="wrap">
+  <h1>HKDSE 2013 · Paper 2 · Q29 — Statistics</h1>
+  <div class="split">
 
-<header class="hero">
-  <div class="hero-inner">
-    <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</div>
-    <h1>2013 Paper 2 · Question 29</h1>
-    <p class="subtitle">Statistics — Reading a stem-and-leaf diagram &amp; matching a box-and-whisker diagram</p>
-    <div class="pills">
-      <span class="pill">Stem-and-Leaf Diagram</span>
-      <span class="pill">Median</span>
-      <span class="pill">Quartiles</span>
-      <span class="pill">Box-and-Whisker Diagram</span>
-      <span class="pill">Five-Number Summary</span>
+    <!-- ============ LEFT: DIAGRAM ============ -->
+    <div class="diagram">
+      <div class="card">
+        <h2>Interactive Figure</h2>
+        <canvas id="cv" width="720" height="820"></canvas>
+        <p class="ro" id="ro">Loading…</p>
+        <div class="legend">
+          <span><i class="sw" style="background:#2563eb"></i>Five-number summary</span>
+          <span><i class="sw" style="background:#dc2626"></i>Quartiles / median</span>
+          <span><i class="sw" style="background:#059669"></i>Whiskers (min / max)</span>
+          <span><i class="sw" style="background:#d97706"></i>Chosen option D</span>
+        </div>
+      </div>
     </div>
-  </div>
-</header>
 
-<main class="wrap">
+    <!-- ============ RIGHT: QUESTION + SOLUTION ============ -->
+    <div class="qbox">
+      <span class="tag">HKDSE 2013 P2 Q29 — 15. Statistics</span>
+      <p><b>[2013MC#29]</b> The stem-and-leaf diagram below shows the distribution of the hourly wages (in dollars) of some workers.</p>
 
-  <!-- ===== QUESTION CARD ===== -->
-  <section class="card">
-    <h2><span class="num">Q</span>Question</h2>
-    
-    <div class="qtext">
-      <p><strong>[2013MC#29]</strong> The stem-and-leaf diagram below shows the distribution of the hourly wages (in dollars) of some workers.</p>
-
-      <table class="sl-table">
-        <thead>
-          <tr><th>Stem (tens)</th><th>Leaf (units)</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>4</td><td>0 &nbsp; 2 &nbsp; 2 &nbsp; 2 &nbsp; 4 &nbsp; 4 &nbsp; 4 &nbsp; 7</td></tr>
-          <tr><td>5</td><td>0 &nbsp; 0 &nbsp; 1 &nbsp; 2 &nbsp; 2 &nbsp; 6 &nbsp; 8 &nbsp; 9</td></tr>
-          <tr><td>6</td><td>3 &nbsp; 5 &nbsp; 5 &nbsp; 7</td></tr>
-          <tr><td>7</td><td>0</td></tr>
-          <tr><td>8</td><td>2 &nbsp; 6</td></tr>
-          <tr><td>9</td><td>5</td></tr>
-        </tbody>
-      </table>
+      <div class="stemleaf">
+        <div class="hdr">Stem (tens) &nbsp;|&nbsp; Leaf (units)</div>
+        <pre style="margin:0;font:inherit;">
+  <b>4</b> | 0  2  2  2  4  4  4  7
+  <b>5</b> | 0  0  1  2  2  6  8  9
+  <b>6</b> | 3  5  5  7
+  <b>7</b> | 0
+  <b>8</b> | 2  6
+  <b>9</b> | 5
+        </pre>
+      </div>
 
       <p>Which of the following box-and-whisker diagrams may represent the distribution of their hourly wages?</p>
-      <p style="color:#64748b; font-size:.9rem;">(Options A, B, C, D are four different box-and-whisker plots — see the interactive reconstruction below.)</p><figure style="margin:12px 0;text-align:center;"><img src="figures/2013_P2_Q29.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
-    </div>
-  </section>
 
-  <!-- ===== PART (a) ===== -->
-  <section class="card">
-    <h2><span class="num">a</span>Part (a) — List the data &amp; find the five-number summary</h2>
-    <span class="marks-line">Working towards the answer</span>
+      <ul class="opts">
+        <li><span class="k">A</span><span>A box-and-whisker diagram with a very long right whisker and a small box near the left.</span></li>
+        <li><span class="k">B</span><span>A box-and-whisker diagram with a long left whisker and a long right whisker.</span></li>
+        <li><span class="k">C</span><span>A box-and-whisker diagram with a nearly symmetric long box and two medium whiskers.</span></li>
+        <li class="correct"><span class="k">D</span><span>A short left whisker, a compact box close to the left, and a long right whisker — skew to the right. <small>(Correct)</small></span></li>
+      </ul>
 
-    <div class="canvas-holder">
-      <canvas id="cvData" width="900" height="600" aria-label="Interactive line plot of hourly wages"></canvas>
-      <div class="canvas-note">Drag the slider to highlight each datum. The data are ordered from smallest to largest.</div>
-    </div>
+      <figure style="margin:12px 0;text-align:center;"><img src="figures/2013_P2_Q29.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
 
-    <div class="controls">
-      <div class="control">
-        <label for="idxSlider">Highlight datum #:</label>
-        <input type="range" id="idxSlider" min="0" max="22" value="0" step="1" />
-        <span id="idxVal" style="min-width:44px;display:inline-block;text-align:right;font-family:ui-monospace,monospace;color:#1e3a8a;">#1</span>
-      </div>
-      <div class="readout" id="dataReadout"></div>
-    </div>
+      <hr>
 
-    <div class="steps" id="stepsA">
-      <div class="step">
-        <div class="step-head"><span class="badge">Step 1</span></div>
-        <div class="working">
-          <p>Read the stem-and-leaf diagram. The stem is the <strong>tens</strong> digit and the leaf is the <strong>units</strong> digit, so every entry is a two-digit number.</p>
-          \[
-          \begin{aligned}
-          \text{Stem }4 &: 40,42,42,42,44,44,44,47\\
-          \text{Stem }5 &: 50,50,51,52,52,56,58,59\\
-          \text{Stem }6 &: 63,65,65,67\\
-          \text{Stem }7 &: 70\\
-          \text{Stem }8 &: 82,86\\
-          \text{Stem }9 &: 95
-          \end{aligned}
-          \]
-          <p>There are \(8+8+4+1+2+1 = 24\) data values in total.</p>
-        </div>
-        <div class="hint"><strong>Hint:</strong> Always count the number of leaves carefully — the number of data values will be needed for locating the median and quartiles.</div>
+      <div class="step" data-step="1">
+        <div class="stepno"><span class="chip">1</span>Read the data</div>
+        <p class="mathline">Each row lists leaves (units) for a given stem (tens). Listing every datum in order:</p>
+        <p class="mathline">\(40,\ 42,\ 42,\ 42,\ 44,\ 44,\ 44,\ 47,\ 50,\ 50,\ 51,\ 52,\ 52,\ 56,\ 58,\ 59,\ 63,\ 65,\ 65,\ 67,\ 70,\ 82,\ 86,\ 95\)</p>
+        <p class="mathline">There are \(24\) data values in total.</p>
+        <div class="hint">Count the leaves: \(8+8+4+1+2+1 = 24\). Each leaf is one worker's wage.</div>
       </div>
 
-      <div class="step">
-        <div class="step-head"><span class="badge">Step 2</span></div>
-        <div class="working">
-          <p>The smallest datum and the largest datum are read directly from the ends of the diagram:</p>
-          \[
-            \text{Smallest} = 40, \qquad \text{Largest} = 95
-          \]
-        </div>
-        <div class="hint"><strong>Hint:</strong> The smallest value is the first leaf of the first stem, and the largest value is the last leaf of the last stem.</div>
+      <div class="step" data-step="2">
+        <div class="stepno"><span class="chip">2</span>Find the extremes</div>
+        <p class="mathline">Smallest datum \(= 40\) (first leaf of stem 4).</p>
+        <p class="mathline">Largest datum \(= 95\) (leaf of stem 9).</p>
+        <p class="mathline">Range \(= 95 - 40 = 55\).</p>
+        <div class="hint">The two extreme whisker ends sit at 40 and 95.</div>
       </div>
 
-      <div class="step">
-        <div class="step-head"><span class="badge">Step 3</span></div>
-        <div class="working">
-          <p>There are \(24\) data values (even), so the median is the average of the \(12^{\text{th}}\) and \(13^{\text{th}}\) values.</p>
-          <p>Counting in order: the \(12^{\text{th}}\) value is \(52\) and the \(13^{\text{th}}\) value is also \(52\). Hence</p>
-          \[
-            \text{Median} = \frac{52+52}{2} = 52
-          \]
-        </div>
-        <div class="hint"><strong>Hint:</strong> When \(n\) is even, \(\text{Median} = \dfrac{x_{(n/2)}+x_{(n/2+1)}}{2}\).</div>
+      <div class="step" data-step="3">
+        <div class="stepno"><span class="chip">3</span>Find the median</div>
+        <p class="mathline">With \(24\) data, the median is the average of the \(12\)th and \(13\)th values:</p>
+        <p class="mathline">\(12\text{th} = 52,\quad 13\text{th} = 52\)</p>
+        <p class="mathline">\(\text{Median} = \dfrac{52+52}{2} = 52\)</p>
+        <div class="hint">Median splits the 24 data into two groups of 12.</div>
       </div>
 
-      <div class="step">
-        <div class="step-head"><span class="badge">Step 4</span></div>
-        <div class="working">
-          <p>For the lower quartile \(Q_1\) we take the median of the lower half (the first \(12\) values), i.e. the average of the \(6^{\text{th}}\) and \(7^{\text{th}}\) values:</p>
-          \[
-            Q_1 = \frac{44+44}{2} = 44
-          \]
-          <p>For the upper quartile \(Q_3\) we take the median of the upper half (the last \(12\) values), i.e. the average of the \(18^{\text{th}}\) and \(19^{\text{th}}\) values:</p>
-          \[
-            Q_3 = \frac{65+65}{2} = 65
-          \]
-        </div>
-        <div class="hint"><strong>Hint:</strong> The five-number summary is \(x_{\min},\; Q_1,\; \text{Median},\; Q_3,\; x_{\max}\). Notice how the gaps between consecutive numbers grow: \(40\to44\to52\to65\to95\).</div>
-        <div class="answer"><strong>Five-number summary:</strong> \(40,\ 44,\ 52,\ 65,\ 95\)</div>
+      <div class="step" data-step="4">
+        <div class="stepno"><span class="chip">4</span>Find the quartiles</div>
+        <p class="mathline">Lower half (12 values): \(40,\dots,52\). Its median is the average of the \(6\)th and \(7\)th values:</p>
+        <p class="mathline">\(Q_1 = \dfrac{44+44}{2} = 44\)</p>
+        <p class="mathline">Upper half (12 values): \(52,\dots,95\). Its median is the average of the \(6\)th and \(7\)th values of the upper half:</p>
+        <p class="mathline">\(Q_3 = \dfrac{65+65}{2} = 65\)</p>
+        <p class="mathline">\(\mathrm{IQR} = Q_3 - Q_1 = 65 - 44 = 21\)</p>
+        <div class="hint">Each half contains 12 values, so the quartiles use positions 6–7 within each half.</div>
       </div>
+
+      <div class="step" data-step="5">
+        <div class="stepno"><span class="chip">5</span>Match with a box-and-whisker diagram</div>
+        <p class="mathline">Five-number summary: \(\min = 40,\ Q_1 = 44,\ \mathrm{med} = 52,\ Q_3 = 65,\ \max = 95\).</p>
+        <p class="mathline">Segment lengths: \(40\to44 = 4,\ 44\to52 = 8,\ 52\to65 = 13,\ 65\to95 = 30\).</p>
+        <p class="mathline">The gaps increase steadily towards the right, i.e. the distribution is <b>skewed to the right</b> (positively skewed).</p>
+        <div class="hint">Left whisker shortest, right whisker much longer, box shifted to the left — exactly option D.</div>
+      </div>
+
+      <div class="step" data-step="6">
+        <div class="stepno"><span class="chip">6</span>Check the other options</div>
+        <p class="mathline">A: small box far left with an extremely long right whisker — box width unrealistic.</p>
+        <p class="mathline">B: long left <em>and</em> long right whiskers — would give a wide left whisker, but here \(40\to44=4\) is the shortest.</p>
+        <p class="mathline">C: nearly symmetric box with equal whiskers — our left whisker is far shorter than the right.</p>
+        <div class="hint">Only D has the shortest segment on the left and increasing gaps to the right.</div>
+      </div>
+
+      <div class="answer">Answer: <span>D</span></div>
     </div>
 
-    <div class="step-ctrl">
-      <button class="next" id="btnA">Next step →</button>
-      <span class="counter" id="cntA">0 / 4</span>
-    </div>
-  </section>
-
-  <!-- ===== PART (b) ===== -->
-  <section class="card">
-    <h2><span class="num">b</span>Part (b) — Match the correct box-and-whisker diagram</h2>
-    <span class="marks-line">Choosing the answer</span>
-
-    <div class="canvas-holder">
-      <canvas id="cvBox" width="900" height="600" aria-label="Interactive box-and-whisker diagram reconstruction"></canvas>
-      <div class="canvas-note">Toggle the options to compare. The correct diagram must have the five-number summary \(40,\ 44,\ 52,\ 65,\ 95\).</div>
-    </div>
-
-    <div class="controls">
-      <div class="control"><input type="checkbox" id="showA" /><label for="showA">Show Option A</label></div>
-      <div class="control"><input type="checkbox" id="showB" /><label for="showB">Show Option B</label></div>
-      <div class="control"><input type="checkbox" id="showC" /><label for="showC">Show Option C</label></div>
-      <div class="control"><input type="checkbox" id="showD" checked /><label for="showD">Show Option D (correct)</label></div>
-      <div class="control">
-        <label for="sepSlider">Separation exaggeration ×:</label>
-        <input type="range" id="sepSlider" min="1" max="3" step="0.1" value="1" />
-        <span id="sepVal" style="font-family:ui-monospace,monospace;color:#1e3a8a;">1.0</span>
-      </div>
-      <div class="readout" id="boxReadout"></div>
-    </div>
-
-    <div class="steps" id="stepsB">
-      <div class="step">
-        <div class="step-head"><span class="badge">Step 1</span></div>
-        <div class="working">
-          <p>From part (a), the correct diagram must show:</p>
-          \[
-            \text{Min}=40,\quad Q_1=44,\quad Q_2=52,\quad Q_3=65,\quad \text{Max}=95
-          \]
-          <p>So the left whisker spans \(40\)–\(44\), the box spans \(44\)–\(65\) (with a line at \(52\)), and the right whisker spans \(65\)–\(95\).</p>
-        </div>
-        <div class="hint"><strong>Hint:</strong> A box-and-whisker diagram is completely determined by its five-number summary.</div>
-      </div>
-
-      <div class="step">
-        <div class="step-head"><span class="badge">Step 2</span></div>
-        <div class="working">
-          <p>Compute the lengths of the segments in the correct diagram:</p>
-          \[
-          \begin{aligned}
-          \text{Left whisker} &: 44-40 = 4 \\
-          Q_1 \to Q_2 &: 52-44 = 8 \\
-          Q_2 \to Q_3 &: 65-52 = 13 \\
-          \text{Right whisker} &: 95-65 = 30
-          \end{aligned}
-          \]
-          <p>The segment lengths clearly <strong>increase</strong> from left to right: \(4 < 8 < 13 < 30\).</p>
-        </div>
-        <div class="hint"><strong>Hint:</strong> The right whisker should be much longer than each of the other three segments — a strongly right-skewed distribution.</div>
-      </div>
-
-      <div class="step">
-        <div class="step-head"><span class="badge">Step 3</span></div>
-        <div class="working">
-          <p>Compare with the four options:</p>
-          <ul>
-            <li><strong>A</strong> — the whiskers are short and the box is wide: doesn't match.</li>
-            <li><strong>B</strong> — median sits in the middle with two short whiskers: doesn't match.</li>
-            <li><strong>C</strong> — a roughly symmetric box with a very short right whisker: doesn't match.</li>
-            <li><strong>D</strong> — a short left whisker and a long right whisker, with median nearer the left: this fits the increasing-separation pattern.</li>
-          </ul>
-        </div>
-        <div class="hint"><strong>Hint:</strong> In a right-skewed distribution the right whisker is the longest; in a left-skewed one the left whisker is the longest.</div>
-        <div class="answer"><strong>Answer:</strong> Option <strong>D</strong>.</div>
-      </div>
-    </div>
-
-    <div class="step-ctrl">
-      <button class="next" id="btnB">Next step →</button>
-      <span class="counter" id="cntB">0 / 3</span>
-    </div>
-  </section>
-
-  <!-- ===== SUMMARY ===== -->
-  <section class="card summary">
-    <h2><span class="num"></span>Summary &amp; Answer</h2>
-    <ul>
-      <li>The stem-and-leaf diagram gives \(24\) hourly wages, ranging from \(40\) to \(95\) dollars.</li>
-      <li><span class="key">Minimum</span> \(= 40\)</li>
-      <li><span class="key">\(Q_1\)</span> \(= \dfrac{44+44}{2} = 44\)</li>
-      <li><span class="key">Median</span> \(= \dfrac{52+52}{2} = 52\)</li>
-      <li><span class="key">\(Q_3\)</span> \(= \dfrac{65+65}{2} = 65\)</li>
-      <li><span class="key">Maximum</span> \(= 95\)</li>
-      <li>The gaps between the five number summary values increase to the right, so the diagram must show an <em>increasing</em> separation — option <strong>D</strong>.</li>
-    </ul>
-    <div class="final-ans">Correct answer: &nbsp;D</div>
-  </section>
-
-</main>
-
-<footer>
-  HKDSE Mathematics (Compulsory Part) · 2013 Paper 2 Question 29 · Interactive solution
-</footer>
+  </div>
+</div>
 
 <script>
-/* =====================================================
-   DATA
-   ===================================================== */
-const DATA = [
-  40,42,42,42,44,44,44,47,
-  50,50,51,52,52,56,58,59,
-  63,65,65,67,
-  70,
-  82,86,
-  95
-];
-const MIN=40, Q1=44, MED=52, Q3=65, MAX=95;
+/* =========================================================
+   Canvas drawing — stem-and-leaf, five-number summary,
+   and the four box-and-whisker options with the chosen one.
+   ========================================================= */
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+const ro  = document.getElementById('ro');
 
-/* =====================================================
-   PART (a) CANVAS — dot plot of the actual data
-   ===================================================== */
-const cvData = document.getElementById('cvData');
-const ctxData = cvData.getContext('2d');
-const idxSlider = document.getElementById('idxSlider');
-const idxVal = document.getElementById('idxVal');
-const dataReadout = document.getElementById('dataReadout');
+const W = cv.width, H = cv.height;
+let currentStep = 1;
 
-function drawDataPlot(highlight){
-  const W = cvData.width, H = cvData.height;
-  ctxData.clearRect(0,0,W,H);
-  ctxData.fillStyle = '#ffffff';
-  ctxData.fillRect(0,0,W,H);
+/* data */
+const DATA = [40,42,42,42,44,44,44,47,50,50,51,52,52,56,58,59,63,65,65,67,70,82,86,95];
+const MIN = 40, Q1 = 44, MED = 52, Q3 = 65, MAX = 95;
 
-  const padL = 60, padR = 30, padT = 40, padB = 55;
-  const plotW = W - padL - padR;
-  const plotH = H - padT - padB;
+/* axis scale helper: map dollar value -> x pixel */
+function makeScale(x0, x1, v0, v1){
+  const s = (x1 - x0) / (v1 - v0);
+  return v => x0 + (v - v0) * s;
+}
 
-  const xMin = 35, xMax = 100;
-  const xToPx = v => padL + (v - xMin) / (xMax - xMin) * plotW;
+/* ---------- generic helpers ---------- */
+function rrect(x,y,w,h,r){
+  r = Math.min(r, h/2, w/2);
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+function txt(s,x,y,{size=14,color='#15202b',align='left',baseline='middle',weight='400',font='Segoe UI, system-ui, sans-serif'}={}){
+  ctx.fillStyle=color;
+  ctx.font=`${weight} ${size}px ${font}`;
+  ctx.textAlign=align;
+  ctx.textBaseline=baseline;
+  ctx.fillText(s,x,y);
+}
 
-  /* ---- number line ---- */
-  ctxData.strokeStyle = '#334155';
-  ctxData.lineWidth = 2;
-  const axisY = padT + plotH * 0.72;
-  ctxData.beginPath();
-  ctxData.moveTo(padL - 12, axisY);
-  ctxData.lineTo(padL + plotW + 16, axisY);
-  ctxData.stroke();
-
-  /* arrow head */
-  ctxData.beginPath();
-  ctxData.moveTo(padL + plotW + 16, axisY);
-  ctxData.lineTo(padL + plotW + 4, axisY - 5);
-  ctxData.lineTo(padL + plotW + 4, axisY + 5);
-  ctxData.closePath();
-  ctxData.fillStyle = '#334155';
-  ctxData.fill();
-
-  /* ticks 40..100 step 10 */
-  ctxData.font = '13px ui-monospace, monospace';
-  ctxData.textAlign = 'center';
-  for(let v = 40; v <= 100; v += 10){
-    const x = xToPx(v);
-    ctxData.strokeStyle = '#94a3b8';
-    ctxData.lineWidth = 1.5;
-    ctxData.beginPath();
-    ctxData.moveTo(x, axisY - 6);
-    ctxData.lineTo(x, axisY + 6);
-    ctxData.stroke();
-    ctxData.fillStyle = '#475569';
-    ctxData.fillText(v, x, axisY + 24);
-  }
-
-  /* ---- five-number summary markers ---- */
-  const marks = [
-    {v:MIN, label:'Min', col:'#0ea5e9'},
-    {v:Q1,  label:'Q₁',  col:'#8b5cf6'},
-    {v:MED, label:'Med', col:'#f59e0b'},
-    {v:Q3,  label:'Q₃',  col:'#ef4444'},
-    {v:MAX, label:'Max', col:'#10b981'}
+/* =========================================================
+   Draw stem-and-leaf table
+   ========================================================= */
+function drawStemTable(y0, highlight){
+  const rows = [
+    ['4', ['0','2','2','2','4','4','4','7']],
+    ['5', ['0','0','1','2','2','6','8','9']],
+    ['6', ['3','5','5','7']],
+    ['7', ['0']],
+    ['8', ['2','6']],
+    ['9', ['5']]
   ];
-  marks.forEach(m => {
-    const x = xToPx(m.v);
-    ctxData.strokeStyle = m.col;
-    ctxData.lineWidth = 2;
-    ctxData.setLineDash([5,4]);
-    ctxData.beginPath();
-    ctxData.moveTo(x, padT - 6);
-    ctxData.lineTo(x, axisY - 12);
-    ctxData.stroke();
-    ctxData.setLineDash([]);
-
-    ctxData.fillStyle = m.col;
-    ctxData.font = 'bold 12px "Segoe UI", sans-serif';
-    ctxData.fillText(m.label, x, padT - 12);
-    ctxData.font = '11px ui-monospace, monospace';
-    ctxData.fillText(m.v, x, padT - 26);
-  });
-
-  /* ---- jittered dots for each datum ---- */
-  const counts = {};
-  DATA.forEach((v,i)=>{
-    counts[v] = (counts[v]||0) + 1;
-    const level = counts[v];
-    const x = xToPx(v);
-    const y = axisY - 18 - (level-1)*16;
-    const isHi = (i === highlight);
-    ctxData.beginPath();
-    ctxData.arc(x, y, isHi ? 8 : 5, 0, Math.PI*2);
-    if(isHi){
-      ctxData.fillStyle = '#dc2626';
-      ctxData.strokeStyle = '#7f1d1d';
-      ctxData.lineWidth = 2;
-      ctxData.fill();
-      ctxData.stroke();
-    } else {
-      ctxData.fillStyle = 'rgba(37,99,235,0.75)';
-      ctxData.fill();
-    }
-  });
-
-  /* highlight label */
-  if(highlight >= 0 && highlight < DATA.length){
-    const v = DATA[highlight];
-    const x = xToPx(v);
-    const counts2 = {};
-    let level = 1;
-    for(let i=0;i<=highlight;i++){
-      counts2[DATA[i]] = (counts2[DATA[i]]||0)+1;
-      if(i===highlight) level = counts2[DATA[i]];
-    }
-    const y = axisY - 18 - (level-1)*16;
-    ctxData.fillStyle = '#dc2626';
-    ctxData.font = 'bold 13px "Segoe UI", sans-serif';
-    ctxData.textAlign = 'center';
-    ctxData.fillText(v, x, y - 16);
-    ctxData.textAlign = 'left';
-  }
-
-  /* title */
-  ctxData.fillStyle = '#1e3a8a';
-  ctxData.font = 'bold 15px "Segoe UI", sans-serif';
-  ctxData.textAlign = 'left';
-  ctxData.fillText('Hourly wages of 24 workers (dollars)', padL - 10, 22);
-
-  /* readout */
-  const v = DATA[highlight] ?? DATA[0];
-  const rank = highlight + 1;
-  dataReadout.innerHTML = `Datum #${rank} of 24 = <b>${v}</b> dollars &nbsp;|&nbsp; `
-    + `Position rule: median is the average of the 12th &amp; 13th values.`;
-
-  idxVal.textContent = '#' + rank;
-}
-
-idxSlider.addEventListener('input', e => drawDataPlot(parseInt(e.target.value,10)));
-drawDataPlot(0);
-
-/* =====================================================
-   PART (b) CANVAS — reconstruct the box-and-whisker plots
-   ===================================================== */
-const cvBox = document.getElementById('cvBox');
-const ctxBox = cvBox.getContext('2d');
-const boxReadout = document.getElementById('boxReadout');
-const sepSlider = document.getElementById('sepSlider');
-const sepVal = document.getElementById('sepVal');
-const chkA = document.getElementById('showA');
-const chkB = document.getElementById('showB');
-const chkC = document.getElementById('showC');
-const chkD = document.getElementById('showD');
-
-/* Options represented by their five-number summaries.
-   D is the exact correct one; A,B,C are decoys. */
-const OPTIONS = {
-  A: { name:'A', min:40, q1:46, med:56, q3:70, max:82, color:'#0ea5e9' },
-  B: { name:'B', min:38, q1:50, med:58, q3:66, max:78, color:'#8b5cf6' },
-  C: { name:'C', min:40, q1:46, med:58, q3:68, max:74, color:'#f59e0b' },
-  D: { name:'D', min:40, q1:44, med:52, q3:65, max:95, color:'#10b981' }
-};
-
-function drawBoxPlots(){
-  const W = cvBox.width, H = cvBox.height;
-  ctxBox.clearRect(0,0,W,H);
-  ctxBox.fillStyle = '#ffffff';
-  ctxBox.fillRect(0,0,W,H);
-
-  const padL = 70, padR = 40, padT = 52, padB = 46;
-  const plotW = W - padL - padR;
-
-  const xMin = 30, xMax = 100;
-  const xToPx = v => padL + (v - xMin) / (xMax - xMin) * plotW;
-
-  /* ---- shared number line at bottom ---- */
-  const axisY = H - padB;
-  ctxBox.strokeStyle = '#334155';
-  ctxBox.lineWidth = 2;
-  ctxBox.beginPath();
-  ctxBox.moveTo(padL - 14, axisY);
-  ctxBox.lineTo(padL + plotW + 18, axisY);
-  ctxBox.stroke();
-
-  ctxBox.font = '13px ui-monospace, monospace';
-  ctxBox.textAlign = 'center';
-  ctxBox.fillStyle = '#475569';
-  for(let v = 30; v <= 100; v += 10){
-    const x = xToPx(v);
-    ctxBox.strokeStyle = '#94a3b8';
-    ctxBox.lineWidth = 1.5;
-    ctxBox.beginPath();
-    ctxBox.moveTo(x, axisY - 6);
-    ctxBox.lineTo(x, axisY + 6);
-    ctxBox.stroke();
-    ctxBox.fillStyle = '#475569';
-    ctxBox.fillText(v, x, axisY + 22);
-  }
-  ctxBox.fillStyle = '#1e3a8a';
-  ctxBox.font = 'bold 13px "Segoe UI", sans-serif';
-  ctxBox.fillText('Hourly wage (dollars)', W/2, axisY + 42);
-
-  /* vertical guide lines for the correct five-number summary */
-  [MIN,Q1,MED,Q3,MAX].forEach(v=>{
-    const x = xToPx(v);
-    ctxBox.strokeStyle = 'rgba(16,185,129,0.28)';
-    ctxBox.setLineDash([4,5]);
-    ctxBox.lineWidth = 1.5;
-    ctxBox.beginPath();
-    ctxBox.moveTo(x, padT - 12);
-    ctxBox.lineTo(x, axisY);
-    ctxBox.stroke();
-    ctxBox.setLineDash([]);
-    ctxBox.fillStyle = 'rgba(5,150,105,0.85)';
-    ctxBox.font = '11px ui-monospace, monospace';
-    ctxBox.fillText(v, x, padT - 20);
-  });
-
-  const show = {
-    A: chkA.checked,
-    B: chkB.checked,
-    C: chkC.checked,
-    D: chkD.checked
-  };
-
-  let rowIndex = 0;
-  const totalVisible = Object.values(show).filter(Boolean).length;
-  const rowH = totalVisible > 0 ? Math.min(70, (axisY - padT - 20) / totalVisible) : 60;
-  const boxH = Math.min(30, rowH * 0.5);
-
-  ['A','B','C','D'].forEach(key => {
-    if(!show[key]) return;
-    const o = OPTIONS[key];
-    const rowY = padT + 20 + rowIndex * rowH + rowH/2;
-    rowIndex++;
-
-    const xMinPx = xToPx(o.min);
-    const xQ1Px = xToPx(o.q1);
-    const xMedPx = xToPx(o.med);
-    const xQ3Px = xToPx(o.q3);
-    const xMaxPx = xToPx(o.max);
-
-    /* whisker line */
-    ctxBox.strokeStyle = o.color;
-    ctxBox.lineWidth = 2.5;
-    ctxBox.beginPath();
-    ctxBox.moveTo(xMinPx, rowY);
-    ctxBox.lineTo(xMaxPx, rowY);
-    ctxBox.stroke();
-
-    /* whisker caps */
-    [xMinPx, xMaxPx].forEach(x=>{
-      ctxBox.beginPath();
-      ctxBox.moveTo(x, rowY - boxH*0.5);
-      ctxBox.lineTo(x, rowY + boxH*0.5);
-      ctxBox.stroke();
+  txt('Stem (tens)', 200, y0-22, {size:12,color:'#5a6b7b',weight:'700',align:'right'});
+  txt('Leaf (units)', 214, y0-22, {size:12,color:'#5a6b7b',weight:'700'});
+  const rowH = 30;
+  rows.forEach((r, i) => {
+    const y = y0 + i*rowH;
+    rrect(196, y-13, 20, 26, 5); ctx.fillStyle = '#eef6ff'; ctx.fill();
+    ctx.strokeStyle = '#b9d4f5'; ctx.lineWidth = 1; ctx.stroke();
+    txt(r[0], 206, y, {size:15,color:'#2563eb',align:'center',weight:'700',font:'Courier New, monospace'});
+    /* dividing bar */
+    ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(216, y-15); ctx.lineTo(216, y+15); ctx.stroke();
+    r[1].forEach((leaf, j) => {
+      const x = 228 + j*20;
+      txt(leaf, x, y, {size:15,color:'#15202b',align:'center',font:'Courier New, monospace'});
     });
-
-    /* box */
-    ctxBox.fillStyle = o.color + '22';
-    ctxBox.strokeStyle = o.color;
-    ctxBox.lineWidth = 2.5;
-    ctxBox.beginPath();
-    ctxBox.rect(xQ1Px, rowY - boxH/2, xQ3Px - xQ1Px, boxH);
-    ctxBox.fill();
-    ctxBox.stroke();
-
-    /* median line */
-    ctxBox.strokeStyle = '#b91c1c';
-    ctxBox.lineWidth = 3;
-    ctxBox.beginPath();
-    ctxBox.moveTo(xMedPx, rowY - boxH/2);
-    ctxBox.lineTo(xMedPx, rowY + boxH/2);
-    ctxBox.stroke();
-
-    /* label */
-    ctxBox.fillStyle = o.color;
-    ctxBox.font = 'bold 16px "Segoe UI", sans-serif';
-    ctxBox.textAlign = 'right';
-    ctxBox.fillText('Option ' + o.name, padL - 18, rowY + 5);
-    ctxBox.textAlign = 'center';
-
-    /* value labels on box for option D */
-    if(key === 'D'){
-      ctxBox.font = 'bold 11px ui-monospace, monospace';
-      ctxBox.fillStyle = '#065f46';
-      ctxBox.fillText(o.min, xMinPx, rowY - boxH/2 - 8);
-      ctxBox.fillText(o.q1, xQ1Px, rowY - boxH/2 - 8);
-      ctxBox.fillText(o.med, xMedPx, rowY - boxH/2 - 8);
-      ctxBox.fillText(o.q3, xQ3Px, rowY - boxH/2 - 8);
-      ctxBox.fillText(o.max, xMaxPx, rowY - boxH/2 - 8);
-    }
   });
-
-  if(totalVisible === 0){
-    ctxBox.fillStyle = '#94a3b8';
-    ctxBox.font = 'italic 15px "Segoe UI", sans-serif';
-    ctxBox.textAlign = 'center';
-    ctxBox.fillText('Tick a checkbox to display an option.', W/2, axisY - 60);
-  }
-
-  /* readout */
-  const ex = parseFloat(sepSlider.value).toFixed(1);
-  boxReadout.innerHTML =
-    `<b>Correct summary:</b> Min 40 · Q₁ 44 · Med 52 · Q₃ 65 · Max 95 &nbsp;|&nbsp; ` +
-    `segment lengths 4, 8, 13, 30 (strictly increasing). ` +
-    `Exaggeration ×${ex}.`;
+  /* note */
+  txt('24 data values in total', 300, y0-22, {size:12,color:'#5a6b7b',weight:'700'});
+  ctx.strokeStyle='#d7e0e8'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(44, y0-30); ctx.lineTo(W-30, y0-30); ctx.stroke();
 }
 
-['showA','showB','showC','showD'].forEach(id=>{
-  document.getElementById(id).addEventListener('change', drawBoxPlots);
-});
-sepSlider.addEventListener('input', ()=>{
-  sepVal.textContent = parseFloat(sepSlider.value).toFixed(1);
-  drawBoxPlots();
-});
-drawBoxPlots();
+/* =========================================================
+   Draw a single box-and-whisker diagram in a given band
+   ========================================================= */
+function drawBox(y, label, opts){
+  const {min,q1,med,q3,max,color,active} = opts;
+  const X = makeScale(150, W-56, 35, 100);
+  const boxH = 34;
 
-/* =====================================================
-   STEP-BY-STEP REVEAL
-   ===================================================== */
-function setupSteps(stepsId, btnId, cntId, total){
-  const steps = Array.from(document.querySelectorAll('#' + stepsId + ' .step'));
-  const btn = document.getElementById(btnId);
-  const cnt = document.getElementById(cntId);
-  let shown = 0;
+  /* baseline of this band */
+  if(active){
+    rrect(120, y-boxH/2-26, W-160, boxH+46, 12);
+    ctx.fillStyle = 'rgba(217,119,6,.08)'; ctx.fill();
+    ctx.strokeStyle = '#d97706'; ctx.lineWidth=2; ctx.stroke();
+  }
 
-  btn.addEventListener('click', ()=>{
-    if(shown < steps.length){
-      steps[shown].classList.add('visible');
-      shown++;
-      cnt.textContent = shown + ' / ' + steps.length;
-      if(shown === steps.length){
-        btn.disabled = true;
-        btn.textContent = 'All steps revealed ✓';
-      }
-    }
-  });
-  cnt.textContent = '0 / ' + steps.length;
+  /* label chip */
+  rrect(126, y-15, 30, 30, 8);
+  ctx.fillStyle = active ? color : '#e2e8f0'; ctx.fill();
+  txt(label, 141, y, {size:16,weight:'800',align:'center',color: active?'#fff':'#5a6b7b'});
+
+  /* main axis line */
+  ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(X(min), y); ctx.lineTo(X(max), y); ctx.stroke();
+
+  /* whiskers */
+  ctx.strokeStyle = color; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.moveTo(X(min), y); ctx.lineTo(X(q1), y); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(X(q3), y); ctx.lineTo(X(max), y); ctx.stroke();
+  /* end caps */
+  ctx.lineWidth=3;
+  ctx.beginPath(); ctx.moveTo(X(min), y-9); ctx.lineTo(X(min), y+9); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(X(max), y-9); ctx.lineTo(X(max), y+9); ctx.stroke();
+
+  /* box */
+  rrect(X(q1), y-boxH/2, X(q3)-X(q1), boxH, 4);
+  ctx.fillStyle = color + '33'; ctx.fill();
+  ctx.strokeStyle = color; ctx.lineWidth=3; ctx.stroke();
+
+  /* median line */
+  ctx.beginPath(); ctx.moveTo(X(med), y-boxH/2); ctx.lineTo(X(med), y+boxH/2);
+  ctx.strokeStyle = '#dc2626'; ctx.lineWidth=3; ctx.stroke();
+
+  /* numeric labels */
+  if(active){
+    const ticks = [[min,'40'],[q1,'44'],[med,'52'],[q3,'65'],[max,'95']];
+    ticks.forEach(([v,lab])=>{
+      ctx.strokeStyle='#94a3b8'; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+      ctx.beginPath(); ctx.moveTo(X(v), y-boxH/2-4); ctx.lineTo(X(v), y+boxH/2+16); ctx.stroke();
+      ctx.setLineDash([]);
+      txt(lab, X(v), y+boxH/2+28, {size:11,color:'#5a6b7b',align:'center',weight:'700'});
+    });
+  } else {
+    txt(min, X(min), y-22, {size:11,color:'#94a3b8',align:'center'});
+    txt(max, X(max), y-22, {size:11,color:'#94a3b8',align:'center'});
+  }
 }
 
-setupSteps('stepsA', 'btnA', 'cntA', 4);
-setupSteps('stepsB', 'btnB', 'cntB', 3);
-</script>
+/* =========================================================
+   Main draw(step)
+   ========================================================= */
+function draw(step){
+  ctx.clearRect(0,0,W,H);
+  /* background */
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0,0,W,H);
 
-<script>
-/* re-run MathJax after dynamic step insertion (harmless if already loaded) */
-window.addEventListener('load', function(){
-  if(window.MathJax && MathJax.typesetPromise){
-    MathJax.typesetPromise();
+  /* header band */
+  rrect(0,0,W,44,0); ctx.fillStyle='#f1f6fb'; ctx.fill();
+  txt('Hourly wages (dollars) — $n = 24$', 20, 23, {size:16,weight:'800',color:'#15202b'});
+  txt('min 40 · Q1 44 · median 52 · Q3 65 · max 95', W-20, 23,
+      {size:13,weight:'700',color:'#2563eb',align:'right'});
+
+  /* stem-and-leaf at top */
+  drawStemTable(96, step===1);
+
+  /* five-number summary bar strip */
+  const sy = 330;
+  txt('Five-number summary', 20, sy-26, {size:13,weight:'800',color:'#5a6b7b'});
+  const X5 = makeScale(150, W-56, 35, 100);
+  const y5 = sy + 14;
+  const segs = [
+    {v0:MIN, v1:Q1, col:'#059669', lab:'min→Q1 = 4'},
+    {v0:Q1,  v1:MED,col:'#dc2626', lab:'Q1→med = 8'},
+    {v0:MED, v1:Q3, col:'#dc2626', lab:'med→Q3 = 13'},
+    {v0:Q3,  v1:MAX,col:'#059669', lab:'Q3→max = 30'}
+  ];
+  segs.forEach(s=>{
+    rrect(X5(s.v0), y5-11, X5(s.v1)-X5(s.v0), 22, 4);
+    ctx.fillStyle = s.col + (step>=5 ? 'cc':'55'); ctx.fill();
+    ctx.strokeStyle = s.col; ctx.lineWidth=1.5; ctx.stroke();
+  });
+  const marks = [[MIN,'40'],[Q1,'44'],[MED,'52'],[Q3,'65'],[MAX,'95']];
+  marks.forEach(([v,l])=>{
+    ctx.strokeStyle='#64748b'; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(X5(v), y5-16); ctx.lineTo(X5(v), y5+16); ctx.stroke();
+    txt(l, X5(v), y5+28, {size:12,color:'#334155',align:'center',weight:'700'});
+  });
+  txt('segment gaps grow to the right  →  positively skewed',
+      150, y5+52, {size:12,color: step>=5?'#d97706':'#94a3b8', weight:'700'});
+
+  /* box strips */
+  const yA = 520, yB = 620, yC = 720, yD = 820-14;
+  drawBox(yA,'A',{min:40,q1:47,med:50,q3:60,max:64,color:'#94a3b8',active:false});
+  drawBox(yB,'B',{min:30,q1:48,med:55,q3:62,max:82,color:'#94a3b8',active:false});
+  drawBox(yC,'C',{min:34,q1:46,med:55,q3:64,max:78,color:'#94a3b8',active:false});
+  drawBox(yD,'D',{min:MIN,q1:Q1,med:MED,q3:Q3,max:MAX,color:'#d97706',active: step>=5});
+
+  /* step-specific readout */
+  if(step<=1){
+    ro.innerHTML = 'Step 1 — Read the <b>stem-and-leaf diagram</b>. There are 24 workers; leaves are units, stems are tens.';
+  } else if(step===2){
+    ro.innerHTML = 'Step 2 — Extremes: smallest = <b>40</b>, largest = <b>95</b> (range 55).';
+  } else if(step===3){
+    ro.innerHTML = 'Step 3 — Median = average of 12th &amp; 13th values = (52 + 52)/2 = <b>52</b>.';
+  } else if(step===4){
+    ro.innerHTML = 'Step 4 — Quartiles: Q₁ = <b>44</b>, Q₃ = <b>65</b>, so IQR = 65 − 44 = <b>21</b>.';
+  } else if(step===5){
+    ro.innerHTML = 'Step 5 — Five-number summary: 40, 44, <b>52</b>, 65, 95. Gaps 4, 8, 13, 30 increase → <b>skewed right</b>.';
+  } else {
+    ro.innerHTML = 'Step 6 — Compare with options: only <b>D</b> matches (short left whisker, box near the left, long right whisker).';
   }
-});
-</script>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
+}
 
+/* =========================================================
+   Scroll sync
+   ========================================================= */
+const io = new IntersectionObserver(es=>{
+  es.forEach(e=>{
+    if(e.isIntersecting){
+      currentStep = +e.target.dataset.step;
+      document.querySelectorAll('.step').forEach(s=>s.classList.toggle('live', +s.dataset.step===currentStep));
+      draw(currentStep);
+    }
+  });
+},{rootMargin:'-25% 0px -55% 0px'});
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
+
+draw(1);
+</script>
 </body>
 </html>

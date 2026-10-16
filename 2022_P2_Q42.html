@@ -1,647 +1,399 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>HKDSE Math 2022 Paper 2 Q42 — Permutations</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2022 Paper 2 Q42 — Probability</title>
 <script>
-  window.MathJax = {
-    tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['\\[', '\\]']] },
-    svg: { fontCache: 'global' }
-  };
+window.MathJax = {
+  tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
+  svg: { fontCache: 'global' }
+};
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
   :root{
-    --bg:#f5f8fc;
+    --bg:#f6f8fc;
+    --ink:#1c2333;
+    --muted:#5b6478;
     --card:#ffffff;
-    --ink:#1e293b;
-    --muted:#64748b;
-    --brand:#2563eb;
-    --brand-soft:#dbeafe;
-    --accent:#0d9488;
-    --accent-soft:#ccfbf1;
-    --warn:#d97706;
-    --warn-soft:#fef3c7;
-    --correct:#16a34a;
-    --correct-soft:#dcfce7;
-    --wrong:#dc2626;
-    --wrong-soft:#fee2e2;
-    --radius:18px;
-    --shadow:0 6px 24px rgba(30,41,59,.08);
+    --line:#e2e8f2;
+    --accent:#2563eb;
+    --accent2:#e11d48;
+    --accent3:#0d9488;
+    --accent4:#d97706;
+    --accent5:#7c3aed;
   }
   *{box-sizing:border-box;}
   body{
-    margin:0;
-    font-family:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
-    background:var(--bg);
-    color:var(--ink);
-    line-height:1.65;
-    -webkit-text-size-adjust:100%;
+    margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    line-height:1.55;
   }
-  .wrap{max-width:860px;margin:0 auto;padding:20px 16px 70px;}
+  .wrap{max-width:1280px;margin:0 auto;padding:18px 18px 60px;}
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start;}
+  @media(min-width:900px){.split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}}
+  @media(max-width:640px){body{font-size:14.5px;}.wrap{padding:10px 8px 40px;}}
 
-  /* HEADER */
-  header.top{
-    background:linear-gradient(135deg,#2563eb,#0d9488);
-    color:#fff;
-    border-radius:22px;
-    padding:22px 22px 24px;
-    box-shadow:var(--shadow);
-    margin-bottom:20px;
+  /* ---------- LEFT PANE ---------- */
+  .diagram{
+    position:sticky;top:16px;max-height:calc(100vh - 2rem);overflow-y:auto;
+    background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:14px;box-shadow:0 4px 18px rgba(30,50,90,.06);
   }
-  header.top .qnum{
-    display:inline-block;
-    background:rgba(255,255,255,.22);
-    border:1px solid rgba(255,255,255,.4);
-    padding:3px 12px;
-    border-radius:999px;
-    font-size:.78rem;
-    letter-spacing:.06em;
-    font-weight:600;
-    text-transform:uppercase;
-    margin-bottom:10px;
-  }
-  header.top h1{
-    font-size:1.32rem;
-    margin:0 0 4px;
-    line-height:1.4;
-    font-weight:700;
-  }
-  header.top p.sub{margin:0;font-size:.9rem;opacity:.92;}
+  .diagram h2{margin:0 0 8px;font-size:15px;letter-spacing:.02em;color:var(--muted);text-transform:uppercase;font-weight:700;}
+  canvas{width:100%;height:auto;display:block;border-radius:10px;background:#fbfcff;}
+  .ro{margin:10px 0 0;font-size:13.5px;color:var(--muted);background:#eef3ff;border-left:4px solid var(--accent);
+      padding:8px 10px;border-radius:8px;min-height:44px;}
+  .ro b{color:var(--ink);}
 
-  /* TAGS */
-  .tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;}
-  .tag{
-    background:rgba(255,255,255,.9);
-    color:#1e40af;
-    font-size:.75rem;
-    font-weight:700;
-    padding:4px 11px;
-    border-radius:999px;
-    letter-spacing:.02em;
-  }
+  /* ---------- RIGHT PANE ---------- */
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 16px 22px;
+         box-shadow:0 4px 18px rgba(30,50,90,.06);}
+  .qtag{display:inline-block;font-size:12.5px;font-weight:700;letter-spacing:.05em;color:#fff;
+        background:linear-gradient(135deg,#2563eb,#7c3aed);padding:3px 10px;border-radius:999px;margin-bottom:10px;}
+  .qtext{font-size:15.5px;background:#f3f7ff;border:1px solid #dbe6ff;border-radius:10px;padding:12px 14px;margin-bottom:14px;}
+  .choices{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:6px;}
+  .choices li{background:#fff;border:1px solid #e3eaf8;border-radius:8px;padding:5px 10px;font-size:15px;}
+  .choices b{color:var(--accent);margin-right:8px;}
 
-  /* CARDS */
-  .card{
-    background:var(--card);
-    border-radius:var(--radius);
-    box-shadow:var(--shadow);
-    padding:20px;
-    margin-bottom:18px;
-  }
-  .card h2{
-    font-size:1.05rem;
-    margin:0 0 12px;
-    display:flex;
-    align-items:center;
-    gap:9px;
-    color:#0f172a;
-  }
-  .card h2 .ico{
-    width:28px;height:28px;flex:0 0 28px;
-    background:var(--brand-soft);
-    color:var(--brand);
-    border-radius:9px;
-    display:grid;place-items:center;
-    font-size:.95rem;
-    font-weight:800;
-  }
-
-  /* QUESTION */
-  .qtext{
-    font-size:1rem;
-    background:#f8fafc;
-    border-left:5px solid var(--brand);
-    border-radius:10px;
-    padding:14px 16px;
-  }
-  .qtext b{color:var(--brand);}
-
-  /* OPTIONS */
-  .opts{
-    list-style:none;
-    padding:0;
-    margin:16px 0 0;
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
-    gap:10px;
-  }
-  .opt{
-    border:2px solid #e2e8f0;
-    border-radius:13px;
-    padding:11px 14px;
-    font-weight:600;
-    font-size:.97rem;
-    background:#fff;
-    cursor:pointer;
-    transition:.18s;
-    display:flex;
-    align-items:center;
-    gap:10px;
-    user-select:none;
-  }
-  .opt .k{
-    width:24px;height:24px;flex:0 0 24px;
-    border-radius:50%;
-    background:#eef2f7;
-    color:#475569;
-    display:grid;place-items:center;
-    font-size:.78rem;
-    font-weight:800;
-  }
-  .opt:hover{border-color:#93c5fd;transform:translateY(-1px);}
-  .opt.correct{border-color:var(--correct);background:var(--correct-soft);}
-  .opt.correct .k{background:var(--correct);color:#fff;}
-  .opt.wrong{border-color:var(--wrong);background:var(--wrong-soft);}
-  .opt.wrong .k{background:var(--wrong);color:#fff;}
-  .opt.locked{pointer-events:none;}
-  .feedback{
-    margin-top:12px;
-    font-size:.9rem;
-    font-weight:600;
-    min-height:22px;
-    padding-left:2px;
-  }
-  .feedback.ok{color:var(--correct);}
-  .feedback.no{color:var(--wrong);}
-
-  /* PASSWORD VISUALISER */
-  .pwvis{
-    display:flex;
-    flex-wrap:wrap;
-    gap:10px;
-    justify-content:center;
-    margin:18px 0 6px;
-    padding:16px 10px;
-    background:#f8fafc;
-    border-radius:14px;
-    border:1px dashed #cbd5e1;
-  }
-  .grp{display:flex;gap:8px;position:relative;padding:6px;border-radius:12px;}
-  .grp.first{background:var(--brand-soft);}
-  .grp.last{background:var(--accent-soft);}
-  .cell{
-    width:46px;height:54px;
-    border-radius:10px;
-    background:#fff;
-    border:2px solid #cbd5e1;
-    display:grid;place-items:center;
-    font-size:1.25rem;
-    font-weight:800;
-    color:#0f172a;
-    transition:.2s;
-    box-shadow:0 2px 6px rgba(0,0,0,.05);
-  }
-  .grp.first .cell{border-color:#93c5fd;}
-  .grp.last .cell{border-color:#5eead4;}
-  .cell.pop{transform:scale(1.12);box-shadow:0 4px 14px rgba(37,99,235,.35);}
-  .grp .lbl{
-    position:absolute;
-    top:-11px;left:12px;
-    font-size:.65rem;
-    font-weight:800;
-    letter-spacing:.05em;
-    text-transform:uppercase;
-    background:#fff;
-    padding:0 6px;
-    border-radius:6px;
-    color:var(--muted);
-  }
-  .visctrl{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:6px;}
-  .btn{
-    border:none;
-    cursor:pointer;
-    font-weight:700;
-    font-size:.88rem;
-    padding:10px 18px;
-    border-radius:11px;
-    transition:.18s;
-    font-family:inherit;
-  }
-  .btn.primary{background:var(--brand);color:#fff;box-shadow:0 4px 12px rgba(37,99,235,.3);}
-  .btn.primary:hover{background:#1d4ed8;transform:translateY(-1px);}
-  .btn.ghost{background:#eef2f7;color:#334155;}
-  .btn.ghost:hover{background:#e2e8f0;}
-  .counter{
-    text-align:center;
-    margin-top:12px;
-    font-size:.92rem;
-    color:var(--muted);
-  }
-  .counter b{color:var(--brand);font-size:1.3rem;}
-
-  /* STEPS */
-  .step{border:1px solid #e2e8f0;border-radius:14px;overflow:hidden;margin-bottom:12px;background:#fff;}
-  .step > button.head{
-    width:100%;
-    background:#fff;
-    border:none;
-    font-family:inherit;
-    text-align:left;
-    padding:14px 16px;
-    cursor:pointer;
-    display:flex;
-    align-items:center;
-    gap:12px;
-    font-size:.98rem;
-    font-weight:700;
-    color:#0f172a;
-    transition:background .18s;
-  }
-  .step > button.head:hover{background:#f8fafc;}
-  .step .num{
-    width:30px;height:30px;flex:0 0 30px;
-    border-radius:50%;
-    background:var(--brand-soft);
-    color:var(--brand);
-    display:grid;place-items:center;
-    font-size:.85rem;
-    font-weight:800;
-  }
-  .step .arrow{margin-left:auto;color:var(--muted);transition:transform .25s;font-size:.9rem;}
-  .step.open .arrow{transform:rotate(90deg);}
-  .step .body{
-    max-height:0;
-    overflow:hidden;
-    transition:max-height .32s ease;
-    padding:0 16px;
-  }
-  .step.open .body{max-height:1400px;padding:0 16px 16px;}
-  .step .body p{margin:0 0 10px;}
-  .step .body p:last-child{margin-bottom:0;}
-
-  .hint{
-    background:var(--warn-soft);
-    border-left:5px solid var(--warn);
-    border-radius:10px;
-    padding:11px 14px;
-    font-size:.9rem;
-    margin:10px 0;
-  }
-  .hint strong{color:#92400e;display:block;margin-bottom:3px;font-size:.8rem;letter-spacing:.05em;text-transform:uppercase;}
-  .box{
-    background:#f1f5f9;
-    border-radius:10px;
-    padding:12px 14px;
-    margin:10px 0;
-    overflow-x:auto;
-  }
-  .keyres{
-    background:var(--correct-soft);
-    border:2px solid var(--correct);
-    border-radius:12px;
-    padding:12px 15px;
-    font-weight:700;
-    color:#14532d;
-    text-align:center;
-    font-size:1rem;
-  }
-  .warnbox{
-    background:var(--wrong-soft);
-    border-left:5px solid var(--wrong);
-    border-radius:10px;
-    padding:11px 14px;
-    font-size:.9rem;
-    margin:10px 0;
-  }
-  .warnbox strong{color:#991b1b;}
-
-  /* PROGRESS */
-  .progresswrap{
-    position:sticky;
-    top:0;
-    z-index:20;
-    background:rgba(245,248,252,.94);
-    backdrop-filter:blur(6px);
-    padding:8px 0 10px;
-    margin-bottom:14px;
-  }
-  .bar{height:8px;background:#e2e8f0;border-radius:99px;overflow:hidden;}
-  .bar > i{
-    display:block;
-    height:100%;
-    width:0%;
-    background:linear-gradient(90deg,#2563eb,#0d9488);
-    border-radius:99px;
-    transition:width .35s ease;
-  }
-  .progtext{font-size:.78rem;color:var(--muted);text-align:right;margin-top:5px;font-weight:600;}
-
-  footer{text-align:center;color:#94a3b8;font-size:.78rem;margin-top:26px;}
-
-  @media (max-width:480px){
-    .wrap{padding:14px 11px 60px;}
-    header.top{padding:18px 16px 20px;border-radius:18px;}
-    header.top h1{font-size:1.12rem;}
-    .card{padding:16px;border-radius:15px;}
-    .cell{width:36px;height:44px;font-size:1.05rem;}
-    .grp{gap:6px;padding:5px;}
-    .opt{font-size:.9rem;padding:10px 12px;}
-    .opts{grid-template-columns:1fr 1fr;}
-  }
+  .step{background:#fff;border:1px solid var(--line);border-left:4px solid var(--accent);
+        border-radius:10px;padding:11px 13px;margin:12px 0;transition:box-shadow .25s,border-color .25s,background .25s;}
+  .step.active{border-left-color:var(--accent2);background:#fff7f8;box-shadow:0 0 0 2px #ffdbe2 inset,0 6px 16px rgba(225,29,72,.10);}
+  .step .tag{display:inline-flex;align-items:center;gap:7px;font-weight:700;font-size:13.5px;color:var(--accent);margin-bottom:6px;}
+  .step.active .tag{color:var(--accent2);}
+  .chip{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;
+        background:var(--accent);color:#fff;font-size:12.5px;font-weight:700;}
+  .step.active .chip{background:var(--accent2);}
+  .hint{font-size:13px;color:var(--muted);margin-top:7px;padding-top:6px;border-top:1px dashed #e2e8f2;}
+  .hint::before{content:"💡 ";}
+  .ans{margin-top:16px;background:linear-gradient(135deg,#0d9488,#0ea5a4);color:#fff;border-radius:12px;
+       padding:12px 15px;font-size:16px;font-weight:700;box-shadow:0 6px 18px rgba(13,148,136,.25);}
+  .ans span{font-weight:400;font-size:14px;opacity:.92;}
+  h3{font-size:15px;margin:16px 0 4px;color:var(--accent5);letter-spacing:.02em;}
 </style>
 </head>
-<body data-correct="B">
+<body>
 <div class="wrap">
+  <div class="split">
 
-  <!-- ===== HEADER ===== -->
-  <header class="top">
-    <span class="qnum">HKDSE Math 2022 · Paper 2 · Q42</span>
-    <h1>Seven‑Digit Password Permutations</h1>
-    <p class="sub">Counting · Fundamental Counting Principle · Factorial Notation</p>
-    <div class="tags">
-      <span class="tag">Permutation</span>
-      <span class="tag">Multiplication Rule</span>
-      <span class="tag">Factorials</span>
-      <span class="tag">Zero Repetition</span>
-    </div>
-  </header>
-
-  <!-- ===== PROGRESS ===== -->
-  <div class="progresswrap">
-    <div class="bar"><i id="barFill"></i></div>
-    <div class="progtext" id="progText">0 of 5 steps revealed</div>
-  </div>
-
-  <!-- ===== QUESTION ===== -->
-  <section class="card">
-    <h2><span class="ico">Q</span>Question</h2>
-    <div class="qtext">
-      If the first five digits and the last two digits of a seven-digit password are formed by a permutation of <b>1, 3, 5, 7, 9</b> and a permutation of <b>2, 8</b> respectively, how many different seven-digit passwords can be formed?
-    </div>
-    <ul class="opts" id="opts">
-      <li class="opt" data-key="A"><span class="k">A</span>10</li>
-      <li class="opt" data-key="B"><span class="k">B</span>240</li>
-      <li class="opt" data-key="C"><span class="k">C</span>480</li>
-      <li class="opt" data-key="D"><span class="k">D</span>5 040</li>
-    </ul<figure style="margin:12px 0;text-align:center;"><img src="figures/2022_P2_Q42.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>>
-    <div class="feedback" id="fb"></div>
-  </section>
-
-  <!-- ===== VISUALISER ===== -->
-  <section class="card">
-    <h2><span class="ico">▶</span>Interactive Demo: Watch the Password Build Itself</h2>
-    <p style="margin:0 0 4px;font-size:.9rem;color:var(--muted);">The first five positions are filled with a random arrangement of <b>1, 3, 5, 7, 9</b>; the last two with a random arrangement of <b>2, 8</b>. Press the button to generate a new valid password.</p>
-
-    <div class="pwvis" id="pwvis">
-      <div class="grp first">
-        <span class="lbl">first 5 digits</span>
-        <div class="cell" id="c0">–</div>
-        <div class="cell" id="c1">–</div>
-        <div class="cell" id="c2">–</div>
-        <div class="cell" id="c3">–</div>
-        <div class="cell" id="c4">–</div>
-      </div>
-      <div class="grp last">
-        <span class="lbl">last 2 digits</span>
-        <div class="cell" id="c5">–</div>
-        <div class="cell" id="c6">–</div>
-      </div>
+    <!-- ================= LEFT: DIAGRAM ================= -->
+    <div class="diagram">
+      <h2>Interactive Figure</h2>
+      <canvas id="cv" width="640" height="560"></canvas>
+      <p class="ro" id="ro"></p>
     </div>
 
-    <div class="visctrl">
-      <button class="btn primary" id="genBtn">🎲 Generate a password</button>
-      <button class="btn ghost" id="fillAll">Show many at once</button>
-    </div>
-    <div class="counter" id="counter">First 5 digits: <b>0</b> arrangements &nbsp;·&nbsp; Last 2 digits: <b>0</b> arrangements</div>
-  </section>
+    <!-- ================= RIGHT: QUESTION + SOLUTION ================= -->
+    <div class="panel">
+      <span class="qtag">HKDSE 2022 · Paper 2 · Q42 · 14. Probability</span>
 
-  <!-- ===== STEP BY STEP ===== -->
-  <section class="card">
-    <h2><span class="ico">✦</span>Step‑by‑Step Guided Solution</h2>
-    <p style="margin:0 0 14px;font-size:.88rem;color:var(--muted);">Tap each step to expand it. Try to predict the next line before you open it!</p>
-
-    <!-- Step 1 -->
-    <div class="step" data-step="1">
-      <button class="head"><span class="num">1</span>Understand the structure of the password
-        <span class="arrow">›</span></button>
-      <div class="body">
-        <p>A seven-digit password has <b>7 positions</b>. The question splits them into two independent blocks:</p>
-        <div class="box">\[ \underbrace{\_\ \_\ \_\ \_\ \_}_{\text{first 5 digits}}\ \underbrace{\_\ \_}_{\text{last 2 digits}} \]</div>
-        <p><b>Block 1 (positions 1–5):</b> must be a permutation (an arrangement, no repeats) of \(\{1,3,5,7,9\}\).<br>
-           <b>Block 2 (positions 6–7):</b> must be a permutation of \(\{2,8\}\).</p>
-        <div class="hint"><strong>Hint</strong>The two sets of digits do not overlap (\(1,3,5,7,9\) are all odd, \(2,8\) are even), so the choices in Block 1 have <em>no effect</em> on Block 2. That independence is why we will multiply later.</div>
-      </div>
-    </div>
-
-    <!-- Step 2 -->
-    <div class="step" data-step="2">
-      <button class="head"><span class="num">2</span>Count the arrangements of the first five digits
-        <span class="arrow">›</span></button>
-      <div class="body">
-        <p>We must place <b>all 5</b> of the digits \(1,3,5,7,9\) into 5 boxes, using each exactly once. That is the number of permutations of 5 distinct objects:</p>
-        <div class="box">\[ {}_5P_5 = 5! = 5 \times 4 \times 3 \times 2 \times 1 = 120 \]</div>
-        <div class="hint"><strong>Hint — the "slot" view</strong>Slot 1 has 5 choices → slot 2 has 4 → slot 3 has 3 → slot 4 has 2 → slot 5 has 1. Multiply them: \(5 \times 4 \times 3 \times 2 \times 1 = 120\).</div>
-        <p>So there are <b>120</b> ways to fill the first five positions.</p>
-      </div>
-    </div>
-
-    <!-- Step 3 -->
-    <div class="step" data-step="3">
-      <button class="head"><span class="num">3</span>Count the arrangements of the last two digits
-        <span class="arrow">›</span></button>
-      <div class="body">
-        <p>Now place \(2\) and \(8\) into the 2 remaining boxes, each used once:</p>
-        <div class="box">\[ {}_2P_2 = 2! = 2 \times 1 = 2 \]</div>
-        <p>The two possibilities are simply \(\;2\,8\;\) and \(\;8\,2\).</p>
-      </div>
-    </div>
-
-    <!-- Step 4 -->
-    <div class="step" data-step="4">
-      <button class="head"><span class="num">4</span>Combine the two blocks with the Multiplication Rule
-        <span class="arrow">›</span></button>
-      <div class="body">
-        <p>For <b>each</b> of the 120 arrangements of the first five digits, there are <b>2</b> arrangements of the last two digits. So we multiply:</p>
-        <div class="box">\[ \text{Total} = 5! \times 2! = 120 \times 2 = 240 \]</div>
-        <div class="hint"><strong>Hint — why multiply, not add?</strong>Adding would give \(120 + 2 = 122\), which would mean choosing <em>either</em> block. But a complete password needs <em>both</em> blocks filled at the same time — independent consecutive choices are multiplied.</div>
-        <p>There are <b>240</b> different seven-digit passwords.</p>
-      </div>
-    </div>
-
-    <!-- Step 5 -->
-    <div class="step" data-step="5">
-      <button class="head"><span class="num">5</span>Check the options &amp; common traps
-        <span class="arrow">›</span></button>
-      <div class="body">
-        <div class="keyres">Answer: B &nbsp;(240)</div>
-        <p style="margin-top:12px;">Why the other choices are tempting:</p>
-        <ul style="margin:0;padding-left:20px;font-size:.93rem;">
-          <li><b>A (10):</b> just \(5 + 2 +\) … an addition/digit-counting error — e.g. counting the number of digits used: \(5+2=7\), or \(5\times2=10\).</li>
-          <li><b>C (480):</b> computing \(5! \times 2 = 240\) then doubling — or using \(2^2\) instead of \(2!\).</li>
-          <li><b>D (5 040):</b> this is \(7! = 5040\), treating <em>all seven</em> digits as freely permutable. But the digits \(2, 8\) are <em>forced</em> into the last two positions, so \(7!\) over-counts badly.</li>
+      <div class="qtext">
+        If the first five digits and the last two digits of a seven-digit password are formed by
+        a permutation of $1,\ 3,\ 5,\ 7,\ 9$ and a permutation of $2,\ 8$ respectively, how many
+        different seven-digit passwords can be formed?
+        <ul class="choices">
+          <li><b>A.</b> $10$</li>
+          <li><b>B.</b> $240$</li>
+          <li><b>C.</b> $480$</li>
+          <li><b>D.</b> $5\,040$</li>
         </ul>
-        <div class="warnbox"><strong>Key takeaway:</strong> when a password is split into restricted blocks, count each block separately, then multiply the results.</div>
       </div>
-    </div>
-  </section>
 
-  <footer>HKDSE Mathematics · Paper 2 · 2022 · Q42 — Interactive Solution</footer>
+      <figure style="margin:12px 0;text-align:center;"><img src="figures/2022_P2_Q42.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
+
+      <div class="step" data-step="1">
+        <div class="tag"><span class="chip">1</span> Split the password into two blocks</div>
+        A seven-digit password is divided into the <b>first five digits</b> and the
+        <b>last two digits</b>. These two blocks are filled independently:
+        \[ \underbrace{\square\;\square\;\square\;\square\;\square}_{\text{5 digits from }\{1,3,5,7,9\}}
+           \;\underbrace{\square\;\square}_{\text{2 digits from }\{2,8\}} \]
+        <div class="hint">The digits used in each block are prescribed — block 1 uses only odds, block 2 uses only 2 and 8.</div>
+      </div>
+
+      <div class="step" data-step="2">
+        <div class="tag"><span class="chip">2</span> Count the first five digits (arrangements of 1,3,5,7,9)</div>
+        Arrange 5 distinct digits into 5 positions — an ordered arrangement of <b>all</b> of them:
+        \[ {}_5P_5 = 5! = 5\times4\times3\times2\times1 = 120 \]
+        <div class="hint">Since all five digits are used and order matters, this is simply $5!$.</div>
+      </div>
+
+      <div class="step" data-step="3">
+        <div class="tag"><span class="chip">3</span> Count the last two digits (arrangements of 2,8)</div>
+        Arrange 2 distinct digits into 2 positions:
+        \[ {}_2P_2 = 2! = 2\times1 = 2 \quad (28 \text{ or } 82) \]
+        <div class="hint">Two digits → only two orders: 28 and 82.</div>
+      </div>
+
+      <div class="step" data-step="4">
+        <div class="tag"><span class="chip">4</span> Multiplication rule</div>
+        The two blocks are chosen independently, so multiply the numbers of arrangements:
+        \[ 5! \times 2! = 120 \times 2 = 240 \]
+        <div class="hint">Independent stages ⇒ multiply the counts (fundamental counting principle).</div>
+      </div>
+
+      <div class="step" data-step="5">
+        <div class="tag"><span class="chip">5</span> Conclusion</div>
+        The number of different seven-digit passwords is
+        \[ 240 \]
+        which matches option <b>B</b>.
+        <div class="hint">A quick sanity check: total permutations of 7 distinct digits would be $7!=5040$ (option D), but here the digit sets for each block are fixed, so it is $5!\times2!=240$.</div>
+      </div>
+
+      <div class="ans">Answer: B &nbsp;<span>($5!\times 2! = 240$)</span></div>
+    </div>
+
+  </div>
 </div>
 
 <script>
-/* ---------- mathjax typeset helper ---------- */
-function typeset(el){
-  if(window.MathJax && MathJax.typesetPromise){
-    MathJax.typesetPromise(el ? [el] : undefined).catch(()=>{});
+(function(){
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  const ro = document.getElementById('ro');
+
+  const C = {
+    blue:'#2563eb', rose:'#e11d48', teal:'#0d9488', amber:'#d97706',
+    violet:'#7c3aed', ink:'#1c2333', muted:'#5b6478', line:'#e2e8f2',
+    soft:'#eef3ff'
+  };
+
+  // ---------- helper ----------
+  function roundRect(x,y,w,h,r){
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);
+    ctx.arcTo(x+w,y,x+w,y+h,r);
+    ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r);
+    ctx.arcTo(x,y,x+w,y,r);
+    ctx.closePath();
   }
-}
 
-/* ================= STEP ACCORDION + PROGRESS ================= */
-const steps = Array.from(document.querySelectorAll('.step'));
-const barFill = document.getElementById('barFill');
-const progText = document.getElementById('progText');
-const TOTAL = steps.length;
-const opened = new Set();
-
-function updateProgress(){
-  const n = opened.size;
-  const pct = Math.round((n / TOTAL) * 100);
-  barFill.style.width = pct + '%';
-  progText.textContent = n + ' of ' + TOTAL + ' steps revealed';
-}
-
-steps.forEach(step=>{
-  const head = step.querySelector('.head');
-  head.addEventListener('click', ()=>{
-    const isOpen = step.classList.toggle('open');
-    if(isOpen){
-      opened.add(step.dataset.step);
-      typeset(step);
-    }else{
-      // keep it marked as revealed once seen
-      opened.add(step.dataset.step);
-    }
-    updateProgress();
-  });
-});
-
-/* ================= OPTION CHECK ================= */
-const opts = document.querySelectorAll('#opts .opt');
-const fb = document.getElementById('fb');
-opts.forEach(o=>{
-  o.addEventListener('click', ()=>{
-    const picked = o.dataset.key;
-    opts.forEach(x=>x.classList.add('locked'));
-    if(picked === 'B'){
-      o.classList.add('correct');
-      fb.textContent = '✔ Correct! 5! × 2! = 120 × 2 = 240.';
-      fb.className = 'feedback ok';
-    }else{
-      o.classList.add('wrong');
-      fb.textContent = '✘ Not quite. Remember: count the first-5 block and the last-2 block separately, then multiply. Try again next time — the answer is B.';
-      fb.className = 'feedback no';
-      // also reveal the correct one
-      opts.forEach(x=>{ if(x.dataset.key==='B') x.classList.add('correct'); });
-    }
-  });
-});
-
-/* ================= PASSWORD VISUALISER ================= */
-const firstDigits = [1,3,5,7,9];
-const lastDigits  = [2,8];
-const cells = [];
-for(let i=0;i<7;i++) cells.push(document.getElementById('c'+i));
-const counter = document.getElementById('counter');
-const genBtn = document.getElementById('genBtn');
-const fillAll = document.getElementById('fillAll');
-
-function shuffle(a){
-  const arr = a.slice();
-  for(let i=arr.length-1;i>0;i--){
-    const j = Math.floor(Math.random()*(i+1));
-    [arr[i],arr[j]] = [arr[j],arr[i]];
+  function label(txt,x,y,color,font,align='center',baseline='middle'){
+    ctx.fillStyle = color;
+    ctx.font = font;
+    ctx.textAlign = align;
+    ctx.textBaseline = baseline;
+    ctx.fillText(txt,x,y);
   }
-  return arr;
-}
 
-let firstCount = 0;
-let lastCount  = 0;
+  // Draws a digit box
+  function box(x,y,w,h,fill,stroke,digit,tcol,digitFont){
+    ctx.save();
+    ctx.shadowColor = 'rgba(30,50,90,.14)';
+    ctx.shadowBlur = 6;
+    ctx.shadowOffsetY = 3;
+    roundRect(x,y,w,h,10);
+    ctx.fillStyle = fill; ctx.fill();
+    ctx.restore();
+    roundRect(x,y,w,h,10);
+    ctx.lineWidth = 2; ctx.strokeStyle = stroke; ctx.stroke();
 
-function render(firstArr, lastArr, animate){
-  const all = firstArr.concat(lastArr);
-  cells.forEach((c,i)=>{
-    if(animate){
-      c.classList.remove('pop');
-      c.textContent = '–';
+    label(digit, x+w/2, y+h/2+2, tcol, digitFont);
+  }
+
+  // ---------- draw ----------
+  function draw(step){
+    const W = cv.width, H = cv.height;
+    ctx.clearRect(0,0,W,H);
+
+    // background
+    ctx.fillStyle = '#fbfcff'; ctx.fillRect(0,0,W,H);
+
+    // title
+    label('Seven-digit password structure', W/2, 30, C.ink, '700 18px sans-serif');
+
+    // ----- geometry -----
+    const unitW = 66, unitH = 66, gap = 10;
+    const totalW = 7*unitW + 6*gap;      // 462 + 60 = 522
+    const startX = (W - totalW)/2;
+    const rowY = 120;
+
+    // highlight flag per step
+    const block1Active = (step===1 || step===2 || step===4 || step===5);
+    const block2Active = (step===1 || step===3 || step===4 || step===5);
+    const mulActive    = (step===4 || step===5);
+
+    const b1fill = block1Active ? '#dbe6ff' : '#f4f6fb';
+    const b1str  = block1Active ? C.blue : '#c8d0e0';
+    const b2fill = block2Active ? '#d9f6f0' : '#f4f6fb';
+    const b2str  = block2Active ? C.teal : '#c8d0e0';
+
+    const b1digits = ['1','3','5','7','9'];
+    const b2digits = ['2','8'];
+
+    // ----- Block 1 brackets -----
+    const b1X0 = startX - 6;
+    const b1X1 = startX + 5*unitW + 4*gap + 6;
+    ctx.lineWidth = 2.5;
+    ctx.strokeStyle = block1Active ? C.blue : '#c8d0e0';
+    ctx.beginPath();
+    ctx.moveTo(b1X0, rowY-16);
+    ctx.lineTo(b1X0, rowY-26);
+    ctx.lineTo(b1X1, rowY-26);
+    ctx.lineTo(b1X1, rowY-16);
+    ctx.stroke();
+
+    label('First five digits  →  permutation of 1, 3, 5, 7, 9',
+          (b1X0+b1X1)/2, rowY-44,
+          block1Active ? C.blue : C.muted,
+          (block1Active?'700 ':'600 ')+'14px sans-serif');
+
+    // ----- Block 2 brackets -----
+    const b2X0 = startX + 5*unitW + 5*gap - 6;
+    const b2X1 = startX + totalW + 6;
+    ctx.strokeStyle = block2Active ? C.teal : '#c8d0e0';
+    ctx.beginPath();
+    ctx.moveTo(b2X0, rowY-16);
+    ctx.lineTo(b2X0, rowY-26);
+    ctx.lineTo(b2X1, rowY-26);
+    ctx.lineTo(b2X1, rowY-16);
+    ctx.stroke();
+
+    label('Last two digits → perm. of 2, 8',
+          (b2X0+b2X1)/2, rowY-44,
+          block2Active ? C.teal : C.muted,
+          (block2Active?'700 ':'600 ')+'14px sans-serif');
+
+    // ----- draw boxes with digits -----
+    for(let i=0;i<7;i++){
+      const x = startX + i*(unitW+gap);
+      const inBlock1 = i<5;
+      const fill = inBlock1 ? b1fill : b2fill;
+      const str  = inBlock1 ? b1str : b2str;
+      const digit = inBlock1 ? b1digits[i] : b2digits[i-5];
+      const tcol  = inBlock1 ? (block1Active? C.blue : C.muted) : (block2Active? C.teal : C.muted);
+      box(x, rowY, unitW, unitH, fill, str, digit, tcol, '700 28px sans-serif');
+
+      // highlight pulse ring on active block during step 2 / 3
+      if(step===2 && inBlock1){
+        ctx.save();
+        ctx.strokeStyle = 'rgba(37,99,235,.55)';
+        ctx.lineWidth = 4;
+        roundRect(x-3,rowY-3,unitW+6,unitH+6,12);
+        ctx.stroke();
+        ctx.restore();
+      }
+      if(step===3 && !inBlock1){
+        ctx.save();
+        ctx.strokeStyle = 'rgba(13,148,136,.55)';
+        ctx.lineWidth = 4;
+        roundRect(x-3,rowY-3,unitW+6,unitH+6,12);
+        ctx.stroke();
+        ctx.restore();
+      }
     }
-  });
-  if(animate){
-    all.forEach((val,i)=>{
-      setTimeout(()=>{
-        cells[i].textContent = val;
-        cells[i].classList.add('pop');
-        setTimeout(()=>cells[i].classList.remove('pop'), 220);
-      }, i*85);
+
+    // ----- step 1 : brace / "independent blocks" note -----
+    if(step===1){
+      label('The two parts are filled independently',
+            W/2, rowY+unitH+42, C.violet, '700 15px sans-serif');
+    }
+
+    // ----- step 2 : 5! = 120 over block 1 -----
+    if(step===2){
+      ctx.save();
+      ctx.fillStyle = 'rgba(37,99,235,.08)';
+      roundRect(b1X0, rowY-8, b1X1-b1X0, unitH+16, 14);
+      ctx.fill();
+      ctx.restore();
+
+      label('5! = 5 × 4 × 3 × 2 × 1 = 120',
+            (b1X0+b1X1)/2, rowY+unitH+52, C.blue, '700 19px sans-serif');
+    }
+
+    // ----- step 3 : 2! = 2 over block 2 -----
+    if(step===3){
+      ctx.save();
+      ctx.fillStyle = 'rgba(13,148,136,.09)';
+      roundRect(b2X0, rowY-8, b2X1-b2X0, unitH+16, 14);
+      ctx.fill();
+      ctx.restore();
+
+      label('2! = 2 × 1 = 2',
+            (b2X0+b2X1)/2, rowY+unitH+52, C.teal, '700 19px sans-serif');
+      label('( 28 or 82 )',
+            (b2X0+b2X1)/2, rowY+unitH+78, C.muted, '600 14px sans-serif');
+    }
+
+    // ----- step 4 & 5 : multiplication result -----
+    if(mulActive){
+      // top product banner
+      ctx.save();
+      ctx.fillStyle = 'rgba(225,29,72,.06)';
+      roundRect(startX, rowY-96, totalW, 40, 10);
+      ctx.fill();
+      ctx.restore();
+
+      label('5!  ×  2!  =  120  ×  2  =  240',
+            W/2, rowY-76, C.rose, '700 22px sans-serif');
+
+      // product diagram under boxes
+      label('Number of passwords',
+            W/2, rowY+unitH+48, C.muted, '600 14px sans-serif');
+      label('= 5! × 2! = 240',
+            W/2, rowY+unitH+78, C.rose, '700 22px sans-serif');
+    }
+
+    // ----- bottom step-map (helps all steps) -----
+    const steps = ['Split blocks','5! = 120','2! = 2','Multiply','= 240'];
+    const sx = 30, sy = H - 90, sw = 104, sh = 46, sgap = 14;
+    for(let i=0;i<steps.length;i++){
+      const x = sx + i*(sw+sgap);
+      const active = (step === i+1);
+      ctx.save();
+      ctx.shadowColor = 'rgba(30,50,90,.10)';
+      ctx.shadowBlur = 5; ctx.shadowOffsetY = 2;
+      roundRect(x, sy, sw, sh, 10);
+      ctx.fillStyle = active ? C.violet : '#ffffff';
+      ctx.fill();
+      ctx.restore();
+
+      roundRect(x, sy, sw, sh, 10);
+      ctx.lineWidth = 1.6;
+      ctx.strokeStyle = active ? C.violet : C.line;
+      ctx.stroke();
+
+      label(String(i+1), x+16, sy+sh/2, active ? '#ffffff' : C.violet, '700 14px sans-serif');
+      label(steps[i], x+22, sy+sh/2, active ? '#ffffff' : C.muted, '600 13px sans-serif', 'left');
+    }
+
+    // ----- readout -----
+    if(step===1){
+      ro.innerHTML = '<b>Step 1:</b> A password has 7 slots. The first 5 use the odd digits {1,3,5,7,9}, and the last 2 use {2,8}. The two blocks are chosen independently.';
+    } else if(step===2){
+      ro.innerHTML = '<b>Step 2:</b> Arrange all 5 odd digits in the first five slots: <b>5! = 120</b> different arrangements.';
+    } else if(step===3){
+      ro.innerHTML = '<b>Step 3:</b> Arrange the two digits {2,8} in the last two slots: <b>2! = 2</b> arrangements (28 or 82).';
+    } else if(step===4){
+      ro.innerHTML = '<b>Step 4:</b> By the multiplication principle, total passwords = <b>5! × 2! = 120 × 2 = 240</b>.';
+    } else {
+      ro.innerHTML = '<b>Result:</b> The number of different seven-digit passwords is <b>240</b>. Correct option: <b>B</b>.';
+    }
+  }
+
+  // ---------- scroll sync ----------
+  let current = 1;
+  const io = new IntersectionObserver(es=>{
+    es.forEach(e=>{
+      if(e.isIntersecting){
+        const s = +e.target.dataset.step;
+        if(s !== current){
+          current = s;
+          document.querySelectorAll('.step').forEach(el=>{
+            el.classList.toggle('active', +el.dataset.step === current);
+          });
+          draw(current);
+        }
+      }
     });
-  }else{
-    all.forEach((val,i)=>{ cells[i].textContent = val; });
-  }
-}
+  }, {rootMargin:'-25% 0px -55% 0px'});
+  document.querySelectorAll('.step').forEach(s=>io.observe(s));
 
-genBtn.addEventListener('click', ()=>{
-  const f = shuffle(firstDigits);
-  const l = shuffle(lastDigits);
-  firstCount++; lastCount++;
-  render(f, l, true);
-  counter.innerHTML = 'First 5 digits: <b>' + firstCount + '</b> arrangement' + (firstCount>1?'s':'')
-                    + ' &nbsp;·&nbsp; Last 2 digits: <b>' + lastCount + '</b> arrangement' + (lastCount>1?'s':'');
-});
-
-fillAll.addEventListener('click', ()=>{
-  // show a few rapid samples to hint at the variety
-  let i = 0;
-  const tick = setInterval(()=>{
-    const f = shuffle(firstDigits);
-    const l = shuffle(lastDigits);
-    render(f, l, false);
-    firstCount++; lastCount++;
-    i++;
-    if(i >= 8){
-      clearInterval(tick);
-      counter.innerHTML = 'First 5 digits: <b>' + firstCount + '</b> arrangements &nbsp;·&nbsp; Last 2 digits: <b>' + lastCount + '</b> arrangements'
-        + ' &nbsp;— but there are <b>120 × 2 = 240</b> in total!';
-    }
-  }, 260);
-});
-
-/* ================= INIT ================= */
-render([1,3,5,7,9],[2,8], false);
-updateProgress();
-window.addEventListener('load', ()=>typeset());
+  // initial
+  document.querySelector('.step[data-step="1"]').classList.add('active');
+  draw(1);
+})();
 </script>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
-
 </body>
 </html>

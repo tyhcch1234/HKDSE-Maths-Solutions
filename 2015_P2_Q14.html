@@ -2,440 +2,361 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>2015 Paper 2 Q14 — Estimation, Approximation and Error</title>
-<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>HKDSE 2015 P2 Q14 — Estimation &amp; Error</title>
+<script>
+window.MathJax={
+  tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},
+  svg:{fontCache:'global'}
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
-/* ==========================================================================
-   HKDSE Mathematics (Compulsory Part) — Unified Design System
-   Canonical source of truth. This exact block is inlined into every
-   question page, index.html and DSE_Maths_By_Topic.html so that all
-   deliverables share one visual identity.
-   ========================================================================== */
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+       background:#f4f7fb;color:#1d2433;line-height:1.55;}
+  .wrap{padding:16px 14px 60px;max-width:1200px;margin:0 auto;}
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start;}
+  @media(min-width:900px){.split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}}
+  .diagram{position:sticky;top:16px;max-height:calc(100vh - 2rem);overflow-y:auto;}
+  @media(max-width:640px){body{font-size:14.5px;}.wrap{padding:10px 8px 40px;}}
 
-:root {
-  /* Palette */
-  --slate-900: #1e293b;   /* Primary / header surface */
-  --slate-800: #334155;
-  --slate-600: #475569;
-  --slate-400: #94a3b8;
-  --slate-200: #e2e8f0;
-  --slate-100: #f1f5f9;
-  --slate-50:  #f8fafc;
-  --indigo:    #3b82f6;   /* Primary accent */
-  --indigo-600:#2563eb;
-  --amber-bg:  #fef3c7;   /* Hints / concepts */
-  --amber-bd:  #f59e0b;
-  --emerald-bg:#d1fae5;   /* Final answers */
-  --emerald-bd:#10b981;
-  --badge-bg:  #dbeafe;   /* Badges / marks */
-  --badge-fg:  #1e40af;
+  /* ---- panels ---- */
+  .panel{background:#fff;border-radius:14px;box-shadow:0 4px 18px rgba(20,40,80,.09);
+         border:1px solid #e3eaf4;padding:16px;}
+  .panel h2{margin:0 0 10px;font-size:1.05rem;letter-spacing:.3px;color:#0d3b78;
+            display:flex;align-items:center;gap:8px;}
+  .panel h2 .badge{background:#0d3b78;color:#fff;font-size:.72rem;padding:2px 9px;border-radius:20px;
+                   font-weight:600;letter-spacing:.5px;}
 
-  /* Shape & depth */
-  --radius: 12px;
-  --radius-sm: 8px;
-  --pad-card: 1.5rem;
-  --shadow-sm: 0 1px 2px rgba(15, 23, 42, .06), 0 1px 3px rgba(15, 23, 42, .08);
-  --shadow-md: 0 4px 12px rgba(15, 23, 42, .08), 0 2px 4px rgba(15, 23, 42, .04);
+  canvas{width:100%;height:auto;display:block;border-radius:10px;background:#fbfdff;border:1px solid #e6eef8;}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;font-size:.8rem;color:#41506b;}
+  .legend span{display:flex;align-items:center;gap:5px;}
+  .dot{width:12px;height:12px;border-radius:3px;display:inline-block;}
 
-  /* Type */
-  --font-body: "Source Serif 4", "Noto Serif TC", Georgia, "Times New Roman", serif;
-  --font-ui: "Inter Tight", "Noto Sans TC", "Segoe UI", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
-  --lh-tight: 1.25;
-  --lh-body: 1.7;
-}
+  .ro{margin:10px 0 0;font-size:.86rem;color:#274060;background:#eef5ff;border-left:4px solid #3b82f6;
+      padding:8px 10px;border-radius:6px;font-variant-numeric:tabular-nums;}
 
-* { box-sizing: border-box; }
+  /* ---- question ---- */
+  .qhead{font-size:.78rem;font-weight:700;letter-spacing:1px;color:#8a99b3;text-transform:uppercase;margin-bottom:4px;}
+  .qtext{font-size:1.02rem;color:#182236;}
+  .qtext b{color:#0d3b78;}
 
-html { -webkit-text-size-adjust: 100%; }
+  /* ---- steps ---- */
+  .step{position:relative;margin:0 0 12px;padding:12px 14px 12px 56px;border-radius:12px;
+        background:#f8fbff;border:1px solid #e4eefb;transition:.35s;}
+  .step .chip{position:absolute;left:12px;top:12px;width:32px;height:32px;border-radius:50%;
+              background:#dbe9ff;color:#1355a8;font-weight:700;display:flex;align-items:center;
+              justify-content:center;font-size:.95rem;transition:.35s;}
+  .step .tag{display:block;font-weight:700;color:#0d3b78;font-size:.94rem;margin-bottom:3px;}
+  .step .hint{display:block;margin-top:7px;font-size:.82rem;color:#607089;font-style:italic;
+              border-top:1px dashed #d7e3f3;padding-top:6px;}
+  .step.active{background:#fff8e8;border-color:#f5c96b;box-shadow:0 0 0 3px rgba(245,201,107,.28);}
+  .step.active .chip{background:#f5a623;color:#fff;transform:scale(1.08);}
 
-body {
-  margin: 0;
-  background: var(--slate-50);
-  background-image:
-    radial-gradient(circle at 12% -10%, rgba(59, 130, 246, .10), transparent 45%),
-    radial-gradient(circle at 95% 0%, rgba(30, 41, 59, .08), transparent 40%);
-  background-attachment: fixed;
-  color: var(--slate-900);
-  font-family: var(--font-body);
-  font-size: 17px;
-  line-height: var(--lh-body);
-}
+  .answer{margin-top:14px;padding:14px 16px;border-radius:12px;background:linear-gradient(135deg,#0d3b78,#1d6fd8);
+          color:#fff;font-size:1.02rem;font-weight:600;box-shadow:0 6px 18px rgba(13,59,120,.25);}
+  .answer small{display:block;font-weight:400;opacity:.85;font-size:.8rem;margin-top:4px;}
 
-/* ---------- Layout shells ------------------------------------------------ */
-
-.container {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 1.5rem 1.25rem 3rem;
-}
-
-.split {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 1.5rem 1.25rem 3rem;
-  display: grid;
-  grid-template-columns: minmax(0, 42%) minmax(0, 58%);
-  gap: 1.5rem;
-  align-items: start;
-}
-
-.split__aside {
-  position: sticky;
-  top: 1rem;
-  max-height: calc(100vh - 2rem);
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
-
-.split__main {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
-
-/* ---------- Hero header -------------------------------------------------- */
-
-.hero {
-  background: linear-gradient(135deg, var(--slate-900) 0%, #27364f 55%, #1d4ed8 160%);
-  color: #fff;
-  border-radius: var(--radius);
-  padding: 2rem var(--pad-card);
-  box-shadow: var(--shadow-md);
-  margin-bottom: 1.5rem;
-}
-
-.hero__eyebrow {
-  font-family: var(--font-ui);
-  font-size: .75rem;
-  font-weight: 600;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  color: #93c5fd;
-  margin: 0 0 .5rem;
-}
-
-.hero__title {
-  font-family: var(--font-ui);
-  font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.1rem);
-  line-height: var(--lh-tight);
-  font-weight: 700;
-  margin: 0 0 .5rem;
-}
-
-.hero__subtitle {
-  margin: 0;
-  color: #cbd5e1;
-  font-size: .95rem;
-}
-
-.hero__meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: .5rem;
-  margin-top: 1rem;
-}
-
-/* ---------- Cards -------------------------------------------------------- */
-
-.card {
-  background: #fff;
-  border: 1px solid var(--slate-200);
-  border-radius: var(--radius);
-  padding: var(--pad-card);
-  box-shadow: var(--shadow-sm);
-}
-
-.card + .card { margin-top: 0; }
-
-.card__title {
-  font-family: var(--font-ui);
-  font-size: 1.05rem;
-  font-weight: 700;
-  margin: 0 0 1rem;
-  padding-bottom: .6rem;
-  border-bottom: 2px solid var(--slate-100);
-  display: flex;
-  align-items: center;
-  gap: .6rem;
-  flex-wrap: wrap;
-}
-
-/* ---------- Step cards --------------------------------------------------- */
-
-.step {
-  border-left: 4px solid var(--indigo);
-  background: #fff;
-  border-radius: var(--radius);
-  padding: var(--pad-card);
-  box-shadow: var(--shadow-sm);
-}
-
-.step__head {
-  display: flex;
-  align-items: center;
-  gap: .6rem;
-  flex-wrap: wrap;
-  margin-bottom: .85rem;
-  font-family: var(--font-ui);
-  font-weight: 600;
-}
-
-/* ---------- Callouts ----------------------------------------------------- */
-
-.hint,
-.answer,
-.note {
-  border-radius: var(--radius-sm);
-  padding: 1rem 1.15rem;
-  margin: 1rem 0;
-}
-
-.hint {
-  background: var(--amber-bg);
-  border-left: 4px solid var(--amber-bd);
-}
-
-.answer {
-  background: var(--emerald-bg);
-  border-left: 4px solid var(--emerald-bd);
-}
-
-.note {
-  background: var(--slate-100);
-  border-left: 4px solid var(--slate-400);
-}
-
-.hint__label,
-.answer__label {
-  font-family: var(--font-ui);
-  font-size: .72rem;
-  font-weight: 700;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  display: block;
-  margin-bottom: .35rem;
-}
-
-.hint__label   { color: #92400e; }
-.answer__label { color: #065f46; }
-
-/* ---------- Badges ------------------------------------------------------- */
-
-.badge {
-  display: inline-block;
-  font-family: var(--font-ui);
-  font-size: .72rem;
-  font-weight: 700;
-  letter-spacing: .04em;
-  padding: .2rem .55rem;
-  border-radius: 999px;
-  background: var(--badge-bg);
-  color: var(--badge-fg);
-  white-space: nowrap;
-}
-
-.badge--mark  { background: var(--badge-bg); color: var(--badge-fg); }
-.badge--topic { background: var(--slate-100); color: var(--slate-600); }
-.badge--hard  { background: #fee2e2; color: #991b1b; }
-.badge--rate  { background: #ecfdf5; color: #047857; }
-
-/* ---------- Option list (Paper 2) --------------------------------------- */
-
-.options {
-  list-style: none;
-  margin: .5rem 0 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-  gap: .5rem;
-}
-
-.options li {
-  background: var(--slate-100);
-  border: 1px solid var(--slate-200);
-  border-radius: var(--radius-sm);
-  padding: .6rem .85rem;
-}
-
-.option-key {
-  font-family: var(--font-ui);
-  font-weight: 700;
-  color: var(--slate-600);
-  margin-right: .35rem;
-}
-
-/* ---------- Figures ----------------------------------------------------- */
-
-.figure {
-  background: #fff;
-  border: 1px solid var(--slate-200);
-  border-radius: var(--radius);
-  padding: .75rem;
-  text-align: center;
-}
-
-.figure img,
-.question-img {
-  max-width: 100%;
-  height: auto;
-  border-radius: var(--radius-sm);
-  display: block;
-  margin: 0 auto;
-}
-
-.figure figcaption {
-  font-family: var(--font-ui);
-  font-size: .78rem;
-  color: var(--slate-600);
-  margin-top: .5rem;
-}
-
-.figure svg { max-width: 100%; height: auto; }
-
-/* ---------- Tables ------------------------------------------------------- */
-
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: .95rem;
-}
-
-.table th,
-.table td {
-  border: 1px solid var(--slate-200);
-  padding: .5rem .65rem;
-  text-align: left;
-}
-
-.table th {
-  background: var(--slate-100);
-  font-family: var(--font-ui);
-  font-weight: 600;
-}
-
-/* ---------- Index pages -------------------------------------------------- */
-
-.index-section { margin-bottom: 1.5rem; }
-
-.index-table td:first-child { white-space: nowrap; }
-
-a { color: var(--indigo-600); }
-
-a.qlink {
-  font-family: var(--font-mono);
-  font-weight: 600;
-  text-decoration: none;
-  border-bottom: 1px solid transparent;
-}
-
-a.qlink:hover { border-bottom-color: currentColor; }
-
-/* ---------- Footer ------------------------------------------------------- */
-
-.footer {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 1.5rem 1.25rem 2.5rem;
-  text-align: center;
-  font-family: var(--font-ui);
-  font-size: .8rem;
-  color: var(--slate-600);
-}
-
-/* ---------- MathJax tweaks ---------------------------------------------- */
-
-mjx-container[display="true"] { margin: .75rem 0 !important; }
-
-/* ---------- Responsive -------------------------------------------------- */
-
-@media (max-width: 900px) {
-  .split { grid-template-columns: minmax(0, 1fr); }
-  .split__aside {
-    position: static;
-    max-height: none;
-    overflow-y: visible;
-  }
-}
-
-@media (max-width: 480px) {
-  body { font-size: 16px; }
-  :root { --pad-card: 1.15rem; }
-  .hero { padding: 1.5rem 1.15rem; }
-}
-
-
-/* ---- solution page extras ---- */
-.hero__title .qstar { color:#fbbf24; }
-.qcard__body { font-size: 1.02rem; }
-.qcard__body .part { border-left: 4px solid var(--indigo); background: var(--slate-50);
-  padding: .7rem 1rem; margin: .7rem 0; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
-.qcard__body .part b { color: var(--indigo-600); font-family: var(--font-ui); }
-.marks-inline { font-family: var(--font-ui); font-size: .75rem; font-weight: 700;
-  color: var(--badge-fg); background: var(--badge-bg); padding: .1rem .5rem; border-radius: 999px; margin-left: .4rem; }
-.options { list-style:none; margin:.75rem 0 0; padding:0; display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:.55rem; }
-.options li { background:var(--slate-50); border:1px solid var(--slate-200);
-  border-radius:var(--radius-sm); padding:.6rem .9rem; }
-.opt-key { font-family:var(--font-ui); font-weight:700; color:var(--slate-600); margin-right:.4rem; }
-.step { border:1px solid var(--slate-200); border-left:4px solid var(--indigo);
-  border-radius:var(--radius); padding:var(--pad-card); box-shadow:var(--shadow-sm); }
-.step + .step { margin-top:1rem; }
-.step__head { display:flex; align-items:center; gap:.6rem; flex-wrap:wrap; margin-bottom:.75rem;
-  font-family:var(--font-ui); font-weight:700; }
-.step__num { background:var(--indigo); color:#fff; border-radius:8px; min-width:1.9rem;
-  text-align:center; padding:.15rem .4rem; font-size:.85rem; }
-.math { margin:.65rem 0; overflow-x:auto; overflow-y:hidden; padding-bottom:2px; }
-.distractor { background:#fff; border:1px solid var(--slate-200); border-radius:var(--radius-sm);
-  padding:.75rem .95rem; margin:.5rem 0; }
-.distractor .opt-tag { font-family:var(--font-ui); font-weight:800; display:inline-block;
-  min-width:1.6rem; color:var(--slate-600); }
-.distractor.correct { background:var(--emerald-bg); border-color:var(--emerald-bd); }
-.distractor.correct .opt-tag { color:#065f46; }
-.distractor.wrong .opt-tag { color:#991b1b; }
-.distractor.wrong { background:#fef2f2; border-color:#fecaca; }
-.figure svg { max-width:100%; height:auto; }
-.step p { margin:.55em 0; }
-
+  .opt{margin-top:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(70px,1fr));gap:8px;}
+  .opt div{border:1px solid #e0e9f6;border-radius:9px;padding:7px 8px;font-size:.86rem;background:#fafcff;color:#3c4a63;}
+  .opt div.correct{background:#e6f7ec;border-color:#7fd39b;color:#0f6b34;font-weight:700;}
 </style>
 </head>
 <body>
-<div class="container"><header class="hero"><p class="hero__eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</p><h1 class="hero__title">2015 Paper 2 · Question 14<span class="qstar"></span></h1><p class="hero__subtitle">Estimation, Approximation and Error</p><div class="hero__meta"><span class="badge badge--topic">Estimation, Approximation and Error</span><span class="badge badge--rate">Passing rate 57%</span></div></header><section class="card"><h2 class="card__title">Question</h2><div class="qcard__body"><p>There is a bag of white sugar. The weight of sugar in the bag is measured as \(5\) kg correct to the nearest kg. If it is packed into \(n\) packets such that the weight in each packet is measured as \(10\) g correct to the nearest g, find the greatest possible value of \(n\).</p><ul class="options"><li><span class="opt-key">A.</span>429</li><li><span class="opt-key">B.</span>500</li><li><span class="opt-key">C.</span>578</li><li><span class="opt-key">D.</span>579</li></ul><figure style="margin:12px 0;text-align:center;"><img src="figures/2015_P2_Q14.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure></div></section><section class="card"><h2 class="card__title">Solution</h2><div class="qcard__body"><div class="step"><div class="step__head"><span class="step__num">1</span>Bounds</div><div class="math">\[4500\ \text{g}\le W&lt;5500\ \text{g},\qquad 9.5\ \text{g}\le w_i&lt;10.5\ \text{g}\]</div></div><div class="step"><div class="step__head"><span class="step__num">2</span>Inequality</div><div class="math">\[9.5n&lt;5500 \quad\Rightarrow\quad n&lt;578.95 \quad\Rightarrow\quad n_{\max}=578\]</div><div class="answer"><span class="answer__label">Answer</span>\(\;\mathbf{C}.\;\;\(578\)\)</div></div><div class="step"><div class="step__head"><span class="step__num">◆</span>Distractor analysis</div><div class="distractor correct"><span class="opt-tag">A</span>429 — wrong bounds.</div><div class="distractor correct"><span class="opt-tag">B</span>500 — uses exact 10 g.</div><div class="distractor correct"><span class="opt-tag">C</span>578 — correct.</div><div class="distractor correct"><span class="opt-tag">D</span>579 — rounds up incorrectly.</div></div></div></section><section class="card"><h2 class="card__title">Answer</h2><div class="qcard__body"><div class="answer"><span class="answer__label">Answer</span>\(\mathbf{C.}\) \(578\)</div></div></section></div><footer class="footer">HKDSE Mathematics (Compulsory Part) · 2015 Paper 2 Q14 · <a href="index.html">Index by year</a> · <a href="DSE_Maths_By_Topic.html">Index by topic</a></footer>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
+<div class="wrap">
+  <div class="split">
 
+    <!-- ============ LEFT : DIAGRAM ============ -->
+    <div class="diagram">
+      <div class="panel">
+        <h2><span class="badge">FIGURE</span> Sugar bag &amp; packets</h2>
+        <canvas id="cv" width="640" height="620"></canvas>
+        <div class="legend">
+          <span><i class="dot" style="background:#1d6fd8"></i>Bag weight range (kg)</span>
+          <span><i class="dot" style="background:#e8622c"></i>Packet weight range (g)</span>
+          <span><i class="dot" style="background:#199a5b"></i>Lower bound &times; n</span>
+        </div>
+        <p class="ro" id="ro">Scroll the solution to highlight each step.</p>
+      </div>
+    </div>
+
+    <!-- ============ RIGHT : QUESTION + SOLUTION ============ -->
+    <div>
+      <div class="panel" style="margin-bottom:14px;">
+        <div class="qhead">HKDSE 2015 · Paper 2 · Q14</div>
+        <div class="qtext">
+          There is a bag of white sugar. The weight of white sugar in the bag is measured as
+          <b>$5$ kg</b> correct to the nearest kg. If the bag of white sugar is packed into $n$ packets
+          such that the weight of white sugar in each packet is measured as <b>$10$ g</b>
+          correct to the nearest g, find the greatest possible value of $n$.
+        </div>
+        <div class="opt">
+          <div>A. 429</div>
+          <div>B. 500</div>
+          <div class="correct">C. 578</div>
+          <div>D. 579</div>
+        </div>
+      </div>
+
+      <figure style="margin:12px 0;text-align:center;"><img src="figures/2015_P2_Q14.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
+
+      <div class="panel">
+        <h2><span class="badge">SOLUTION</span> Step by step</h2>
+
+        <div class="step" data-step="1">
+          <div class="chip">1</div>
+          <span class="tag">Write the maximum possible total weight</span>
+          Let $W$ kg be the true weight of the sugar in the bag. Measured $5$ kg correct to the nearest
+          kg means
+          \[4.5 \le W < 5.5\]
+          Converting to grams (multiply by 1000):
+          \[4500 \le 1000W < 5500\]
+          <span class="hint">Hint: “correct to the nearest kg” gives the range $\pm 0.5$ kg, and the upper
+          end is <b>strictly</b> below 5500 g.</span>
+        </div>
+
+        <div class="step" data-step="2">
+          <div class="chip">2</div>
+          <span class="tag">Range of each packet</span>
+          Let $w_i$ g be the true weight in the $i$-th packet ($i=1,2,\dots,n$). Measured $10$ g correct
+          to the nearest g means
+          \[9.5 \le w_i < 10.5\]
+          <span class="hint">Hint: each packet weighs at least 9.5 g — this is the key to making $n$ large.</span>
+        </div>
+
+        <div class="step" data-step="3">
+          <div class="chip">3</div>
+          <span class="tag">Add up the packets</span>
+          The total weight is conserved, so
+          \[1000W = w_1 + w_2 + \cdots + w_n\]
+          Using the lower bound of each packet:
+          \[9.5n \le w_1 + w_2 + \cdots + w_n = 1000W < 5500\]
+          <span class="hint">Hint: use the <b>smallest</b> allowed packet weight to maximise the number of packets.</span>
+        </div>
+
+        <div class="step" data-step="4">
+          <div class="chip">4</div>
+          <span class="tag">Solve the inequality for n</span>
+          \[9.5n < 5500\]
+          \[n < \frac{5500}{9.5} = 578.947\ldots\]
+          <span class="hint">Hint: the upper limit is strict, so $n$ cannot equal 579.</span>
+        </div>
+
+        <div class="step" data-step="5">
+          <div class="chip">5</div>
+          <span class="tag">Take the greatest integer</span>
+          Since $n$ is a positive integer and $n < 578.947\ldots$, the greatest possible value is
+          \[n = 578\]
+          (Check: $578 \times 9.5 = 5491 \text{ g} < 5500$ ✔; while $579 \times 9.5 = 5500.5 \text{ g} \not< 5500$ ✘.)
+
+          <div class="answer">Answer: C — the greatest possible value of $n$ is <b>578</b>.
+            <small>Total weight $< 5500$ g and each packet $\ge 9.5$ g, so $n < 5500/9.5 = 578.95\ldots$</small>
+          </div>
+          <span class="hint">Hint: watch the strict inequality — always round <b>down</b> to an integer.</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function(){
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  const ro  = document.getElementById('ro');
+  const W = cv.width, H = cv.height;
+
+  const C = {
+    blue:'#1d6fd8', blueL:'#dbe9ff', blueD:'#0d3b78',
+    orange:'#e8622c', orangeL:'#fde6da',
+    green:'#199a5b', greenL:'#dff3e6',
+    amber:'#f5a623', grey:'#8a99b3', ink:'#1d2433', faint:'#c9d6e8'
+  };
+
+  function roundRect(x,y,w,h,r,fill,stroke,lw){
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);
+    ctx.arcTo(x+w,y,x+w,y+h,r);
+    ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r);
+    ctx.arcTo(x,y,x+w,y,r);
+    ctx.closePath();
+    if(fill){ctx.fillStyle=fill;ctx.fill();}
+    if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lw||2;ctx.stroke();}
+  }
+  function text(s,x,y,color,size,weight,align){
+    ctx.fillStyle=color||C.ink;
+    ctx.font=(weight||'500')+' '+(size||14)+'px "Segoe UI",system-ui,Arial,sans-serif';
+    ctx.textAlign=align||'left';
+    ctx.textBaseline='middle';
+    ctx.fillText(s,x,y);
+  }
+  function dashedLine(x1,y1,x2,y2,color,lw,dash){
+    ctx.save();
+    ctx.setLineDash(dash||[6,5]);
+    ctx.strokeStyle=color; ctx.lineWidth=lw||2;
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+    ctx.restore();
+  }
+
+  /* ---------- bag drawing (shared top area) ---------- */
+  function drawBag(active){
+    const bx=210, by=30, bw=220, bh=150;
+    // shadow
+    ctx.save(); ctx.globalAlpha=.12; ctx.fillStyle='#0d3b78';
+    roundRect(bx+6,by+8,bw,bh,18,true,null); ctx.restore();
+
+    const g=ctx.createLinearGradient(bx,by,bx+bw,by+bh);
+    g.addColorStop(0, active? '#cfe3ff':'#eef4fc');
+    g.addColorStop(1, active? '#a9c9f5':'#dde9f8');
+    roundRect(bx,by,bw,bh,18,g, active?C.blue:C.faint, 3);
+
+    // sugar grains
+    ctx.save(); ctx.globalAlpha=.55; ctx.fillStyle= active? '#3b82f6':'#b8cbe3';
+    for(let i=0;i<34;i++){
+      const gx = bx+18+((i*57)%(bw-36));
+      const gy = by+bh-18-((i*31)%(bh-52));
+      ctx.beginPath(); ctx.arc(gx,gy,3,0,7); ctx.fill();
+    }
+    ctx.restore();
+
+    // label
+    text('WHITE SUGAR', bx+bw/2, by+bh/2-10, C.blueD, 17,'700','center');
+    text('5 kg (nearest kg)', bx+bw/2, by+bh/2+16, active?C.blue:C.grey, 14,'600','center');
+
+    // true weight tag
+    text('true weight W', bx+bw/2, by+bh+16, C.ink, 13,'600','center');
+  }
+
+  /* ---------- number line for the range ---------- */
+  function numberLine(active){
+    const lx=60, ly=300, lw=W-120;
+    // axis
+    ctx.strokeStyle=C.blueD; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(lx,ly); ctx.lineTo(lx+lw,ly); ctx.stroke();
+    // arrow
+    ctx.beginPath(); ctx.moveTo(lx+lw,ly); ctx.lineTo(lx+lw-12,ly-7); ctx.lineTo(lx+lw-12,ly+7); ctx.closePath();
+    ctx.fillStyle=C.blueD; ctx.fill();
+
+    const total=200; // 4300 -> 5700
+    const pos = v => lx + (v-4300)/total*lw;
+
+    // ticks
+    [4300,4500,5000,5500,5700].forEach(v=>{
+      const x=pos(v);
+      ctx.strokeStyle=C.grey; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.moveTo(x,ly-7); ctx.lineTo(x,ly+7); ctx.stroke();
+      text(v+'', x, ly+24, C.grey, 12,'600','center');
+    });
+    text('grams', lx+lw, ly+44, C.grey, 12,'600','right');
+
+    // allowed region 4500 <= W < 5500
+    ctx.fillStyle = active>=1 ? 'rgba(29,111,216,0.18)' : 'rgba(29,111,216,0.10)';
+    ctx.fillRect(pos(4500), ly-30, pos(5500)-pos(4500), 30*1.6 + 30);
+    ctx.strokeStyle=C.blue; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(pos(4500),ly-46); ctx.lineTo(pos(4500),ly); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(pos(5500),ly-46); ctx.lineTo(pos(5500),ly); ctx.stroke();
+
+    // inclusive / exclusive markers
+    ctx.fillStyle=C.blue;
+    ctx.beginPath(); ctx.arc(pos(4500),ly,7,0,7); ctx.fill();
+    ctx.fillStyle='#fff';
+    ctx.beginPath(); ctx.arc(pos(5500),ly,7,0,7); ctx.fill();
+    ctx.strokeStyle=C.blue; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.arc(pos(5500),ly,7,0,7); ctx.stroke();
+
+    text('4500 ≤ 1000W < 5500', (pos(4500)+pos(5500))/2, ly-70, C.blueD, 15,'700','center');
+    text('inclusive', pos(4500), ly+46, C.blue, 11,'600','center');
+    text('exclusive', pos(5500), ly+46, C.blue, 11,'600','center');
+  }
+
+  /* ---------- packet row ---------- */
+  function packetRow(active){
+    const ry=370, rh=70;
+    text('Each packet: 9.5 g ≤ wᵢ < 10.5 g', 30, ry-14, C.orange, 14,'700','left');
+
+    for(let i=0;i<10;i++){
+      const px=34+i*58, py=ry, pw=48, ph=62;
+      const on = active>=2;
+      const g=ctx.createLinearGradient(px,py,px+pw,py+ph);
+      g.addColorStop(0, on? '#ffe0cd':'#f7ece6');
+      g.addColorStop(1, on? '#f7b58c':'#eed9cd');
+      roundRect(px,py,pw,ph,9,g, on?C.orange:'#e0c9bb', 2);
+      text('w'+(i+1), px+pw/2, py+ph/2, on? '#8a3410':C.grey, 14,'700','center');
+    }
+    text('…', 34+10*58+6, ry+31, C.orange, 22,'700','left');
+    text('n packets', 34+10*58+34, ry+31, C.orange, 15,'700','left');
+  }
+
+  /* ---------- inequality / result box ---------- */
+  function resultBox(active){
+    const bx=34, by=468, bw=W-68, bh=120;
+    roundRect(bx,by,bw,bh,14,'#f8fbff', active>=4?C.green:C.faint, 2.5);
+
+    const big = active>=5 ? 'n = 578' : (active>=4 ? 'n < 578.947…' : '9.5n < 5500');
+    const sub = active>=5
+      ? 'greatest integer → 578'
+      : (active>=4 ? 'take the largest integer below' : '5491 g < 5500 g  (578 packets ✔)');
+
+    text(big, bx+bw/2, by+bh/2-12, active>=5?C.green:C.blueD, 30,'800','center');
+    text(sub, bx+bw/2, by+bh/2+26, C.grey, 14,'600','center');
+
+    if(active>=5){
+      ctx.fillStyle=C.green;
+      ctx.beginPath(); ctx.arc(bx+26, by+26, 13,0,7); ctx.fill();
+      ctx.strokeStyle='#fff'; ctx.lineWidth=3;
+      ctx.beginPath(); ctx.moveTo(bx+19,by+26); ctx.lineTo(bx+24,by+32); ctx.lineTo(bx+34,by+19); ctx.stroke();
+    }
+  }
+
+  function draw(step){
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#fbfdff'; ctx.fillRect(0,0,W,H);
+
+    if(step===0) step=1;
+    drawBag(step===1 || step===3);
+    numberLine(step);
+    if(step>=2) packetRow(step);
+    resultBox(step);
+
+    switch(step){
+      case 1: ro.textContent='Step 1 — Range for the bag: 4.5 ≤ W < 5.5 kg, i.e. 4500 ≤ 1000W < 5500 g.'; break;
+      case 2: ro.textContent='Step 2 — Range for each packet: 9.5 ≤ wᵢ < 10.5 g.'; break;
+      case 3: ro.textContent='Step 3 — Total: 9.5n ≤ w₁ + … + wₙ = 1000W < 5500.'; break;
+      case 4: ro.textContent='Step 4 — 9.5n < 5500 ⇒ n < 5500/9.5 = 578.947…'; break;
+      default: ro.textContent='Step 5 — n is an integer, so the greatest possible value is n = 578 (Answer C).';
+    }
+  }
+
+  /* ---------- scroll sync ---------- */
+  let current=0;
+  const io=new IntersectionObserver(es=>{
+    es.forEach(e=>{
+      if(e.isIntersecting){
+        const n=+e.target.dataset.step;
+        if(n!==current){current=n;draw(n);}
+      }
+    });
+  },{rootMargin:'-25% 0px -55% 0px'});
+
+  document.querySelectorAll('.step').forEach(s=>io.observe(s));
+
+  /* highlight the active step panel */
+  const io2=new IntersectionObserver(es=>{
+    es.forEach(e=>{
+      if(e.isIntersecting){
+        document.querySelectorAll('.step').forEach(x=>x.classList.remove('active'));
+        e.target.classList.add('active');
+      }
+    });
+  },{rootMargin:'-25% 0px -55% 0px'});
+  document.querySelectorAll('.step').forEach(s=>io2.observe(s));
+
+  draw(1);
+  window.addEventListener('resize',()=>draw(current||1));
+})();
+</script>
 </body>
 </html>

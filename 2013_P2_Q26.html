@@ -3,856 +3,570 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HKDSE Math 2013 Paper 2 Q26 – Interactive Solution</title>
-<script>
-  window.MathJax = {
-    tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['\\[', '\\]']] },
-    svg: { fontCache: 'global' }
-  };
-</script>
+<title>HKDSE 2013 Paper 2 Q26 — Probability</title>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$'], ['\\(','\\)']], displayMath: [['$$','$$'], ['\\[','\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
 <style>
-  :root {
-    --bg: #f4f7fb;
-    --card: #ffffff;
-    --ink: #1e293b;
-    --muted: #64748b;
-    --brand: #2563eb;
-    --brand-dark: #1d4ed8;
-    --brand-soft: #dbeafe;
-    --accent: #f59e0b;
-    --accent-soft: #fef3c7;
-    --ok: #059669;
-    --ok-soft: #d1fae5;
-    --line: #e2e8f0;
-    --shadow: 0 6px 20px rgba(15, 23, 42, 0.07);
-    --radius: 16px;
+  :root{
+    --bg:#f4f7fb;
+    --card:#ffffff;
+    --ink:#1d2733;
+    --muted:#5c6b7a;
+    --blue:#1e6fd9;
+    --green:#1a9e6b;
+    --red:#d9384f;
+    --amber:#e08a1e;
+    --line:#dbe4ee;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    background:
+      radial-gradient(1200px 600px at 100% -10%, #e8f1ff 0%, transparent 55%),
+      radial-gradient(900px 500px at -10% 110%, #e9fbf2 0%, transparent 55%),
+      var(--bg);
+    color:var(--ink);
+    font-size:16px;
+    line-height:1.6;
+  }
+  .wrap{
+    max-width:1180px;
+    margin:0 auto;
+    padding:18px 16px 60px;
+  }
+  .split{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    gap:12px;
+    align-items:start;
+  }
+  @media(min-width:900px){
+    .split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}
   }
 
-  * { box-sizing: border-box; }
+  /* ---------- LEFT DIAGRAM PANE ---------- */
+  .diagram{
+    position:sticky;
+    top:16px;
+    max-height:calc(100vh - 2rem);
+    overflow-y:auto;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:14px;
+    box-shadow:0 10px 26px rgba(30,60,110,.07);
+  }
+  .diagram h2{
+    margin:2px 0 10px;
+    font-size:1rem;
+    letter-spacing:.02em;
+    color:var(--blue);
+    text-transform:uppercase;
+  }
+  canvas{
+    width:100%;
+    height:auto;
+    display:block;
+    border-radius:12px;
+    background:#fbfdff;
+    border:1px solid var(--line);
+  }
+  .ro{
+    margin:10px 2px 2px;
+    font-size:.86rem;
+    color:var(--muted);
+    line-height:1.45;
+  }
+  .legend{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 14px;
+    margin-top:10px;
+    font-size:.8rem;
+    color:var(--muted);
+  }
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .dot{width:11px;height:11px;border-radius:3px;display:inline-block;}
 
-  body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-    background: var(--bg);
-    color: var(--ink);
-    line-height: 1.65;
-    -webkit-font-smoothing: antialiased;
+  /* ---------- RIGHT PANE ---------- */
+  .panel{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:18px 18px 22px;
+    box-shadow:0 10px 26px rgba(30,60,110,.07);
   }
+  .qhead{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:10px;
+  }
+  .tag{
+    background:#e8f1ff;
+    color:var(--blue);
+    font-weight:700;
+    font-size:.78rem;
+    letter-spacing:.05em;
+    padding:4px 10px;
+    border-radius:999px;
+    border:1px solid #c9dffb;
+  }
+  .topic{font-size:.78rem;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;}
+  .question{
+    background:#f8fbff;
+    border-left:4px solid var(--blue);
+    border-radius:10px;
+    padding:12px 14px;
+    margin-bottom:14px;
+  }
+  .question p{margin:0;}
 
-  .wrap {
-    max-width: 880px;
-    margin: 0 auto;
-    padding: 18px 16px 64px;
+  .optgrid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px 14px;
+    margin:14px 0 4px;
   }
+  .opt{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    padding:8px 10px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:#fff;
+    transition:.25s;
+  }
+  .opt .lbl{
+    font-weight:700;
+    color:var(--muted);
+    width:1.2em;
+    text-align:center;
+  }
+  .opt.correct{
+    border-color:var(--green);
+    background:#eefaf4;
+    color:#0d6a47;
+    box-shadow:0 0 0 2px rgba(26,158,107,.14) inset;
+  }
+  .opt.correct .lbl{color:var(--green);}
 
-  /* ---------- Header ---------- */
-  header.top {
-    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-    color: #fff;
-    border-radius: var(--radius);
-    padding: 22px 22px 20px;
-    box-shadow: var(--shadow);
-    margin-bottom: 18px;
-  }
-  header.top .eyebrow {
-    font-size: 0.78rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    opacity: 0.85;
-    font-weight: 600;
-  }
-  header.top h1 {
-    margin: 6px 0 10px;
-    font-size: 1.45rem;
-    line-height: 1.3;
-    font-weight: 700;
-  }
-  .tags { display: flex; flex-wrap: wrap; gap: 8px; }
-  .tag {
-    background: rgba(255,255,255,0.18);
-    border: 1px solid rgba(255,255,255,0.32);
-    padding: 4px 11px;
-    border-radius: 999px;
-    font-size: 0.78rem;
-    font-weight: 600;
-    backdrop-filter: blur(4px);
-  }
-
-  /* ---------- Cards ---------- */
-  .card {
-    background: var(--card);
-    border-radius: var(--radius);
-    padding: 20px 20px;
-    box-shadow: var(--shadow);
-    margin-bottom: 18px;
-    border: 1px solid var(--line);
-  }
-  .card h2 {
-    font-size: 1.08rem;
-    margin: 0 0 12px;
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    font-weight: 700;
-  }
-  .card h2 .num {
-    background: var(--brand);
-    color: #fff;
-    width: 26px; height: 26px;
-    flex: 0 0 26px;
-    border-radius: 8px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.85rem;
-    font-weight: 700;
-  }
-
-  .question-text {
-    font-size: 1.03rem;
-    background: var(--brand-soft);
-    border-left: 5px solid var(--brand);
-    border-radius: 10px;
-    padding: 14px 16px;
-    margin-bottom: 6px;
-  }
-
-  .options {
-    list-style: none;
-    margin: 16px 0 0;
-    padding: 0;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-  }
-  .options li {
-    background: #f8fafc;
-    border: 1.5px solid var(--line);
-    border-radius: 11px;
-    padding: 9px 14px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 1rem;
-  }
-  .options li .letter {
-    font-weight: 700;
-    color: var(--brand);
-    width: 20px;
-  }
-
-  /* ---------- Step cards ---------- */
-  .step {
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    margin-bottom: 12px;
-    overflow: hidden;
-    transition: box-shadow 0.2s ease;
-  }
-  .step.open { box-shadow: 0 4px 16px rgba(37, 99, 235, 0.13); border-color: #bfdbfe; }
-
-  .step-head {
-    width: 100%;
-    border: none;
-    background: #f8fafc;
-    padding: 14px 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    cursor: pointer;
-    font-family: inherit;
-    font-size: 0.98rem;
-    font-weight: 600;
-    color: var(--ink);
-    text-align: left;
-    transition: background 0.18s ease;
-  }
-  .step-head:hover { background: #eff6ff; }
-  .step-head .step-no {
-    flex: 0 0 28px;
-    width: 28px; height: 28px;
-    border-radius: 50%;
-    background: var(--brand);
-    color: #fff;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.82rem;
-    font-weight: 700;
-  }
-  .step.open .step-head { background: #eff6ff; }
-  .step-head .chev {
-    margin-left: auto;
-    color: var(--muted);
-    transition: transform 0.25s ease;
-    font-size: 0.9rem;
-    flex: 0 0 auto;
-  }
-  .step.open .chev { transform: rotate(180deg); }
-
-  .step-body {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.35s ease;
-  }
-  .step.open .step-body { max-height: 1400px; }
-  .step-inner { padding: 4px 16px 16px; font-size: 0.96rem; }
-
-  .hint {
-    background: var(--accent-soft);
-    border-left: 4px solid var(--accent);
-    border-radius: 8px;
-    padding: 10px 13px;
-    font-size: 0.9rem;
-    margin-top: 12px;
-    color: #78350f;
-  }
-  .hint strong { color: #92400e; }
-
-  .math-block {
-    background: #f8fafc;
-    border: 1px dashed #cbd5e1;
-    border-radius: 10px;
-    padding: 10px 14px;
-    margin: 10px 0;
-    overflow-x: auto;
-    font-size: 1.05rem;
+  h3.sec{
+    font-size:.95rem;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin:20px 0 8px;
+    border-bottom:1px dashed var(--line);
+    padding-bottom:6px;
   }
 
-  .answer-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--ok-soft);
-    color: #065f46;
-    font-weight: 700;
-    border-radius: 999px;
-    padding: 6px 16px;
-    font-size: 0.95rem;
-    margin-top: 10px;
+  .step{
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:12px 14px 10px 14px;
+    margin-bottom:12px;
+    background:#fff;
+    transition:.25s;
   }
+  .step:hover{border-color:#bfd6f4;}
+  .step-head{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:6px;
+  }
+  .chip{
+    width:26px;height:26px;
+    border-radius:50%;
+    display:grid;place-items:center;
+    font-size:.82rem;
+    font-weight:700;
+    color:#fff;
+    background:var(--blue);
+    flex:0 0 auto;
+  }
+  .step[data-step="2"] .chip{background:var(--amber);}
+  .step[data-step="3"] .chip{background:var(--green);}
+  .step[data-step="4"] .chip{background:var(--red);}
+  .step[data-step="5"] .chip{background:#7a4fd0;}
+  .step-title{font-weight:700;font-size:.95rem;}
+  .hint{
+    font-size:.82rem;
+    color:var(--muted);
+    background:#f6f9fd;
+    border-radius:8px;
+    padding:7px 10px;
+    margin-top:8px;
+  }
+  .hint b{color:#3d7bd0;}
 
-  /* ---------- Interactive lab ---------- */
-  .lab-controls {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 10px 16px;
-    margin-bottom: 14px;
+  .ans{
+    margin-top:16px;
+    padding:12px 14px;
+    border-radius:12px;
+    background:#eefaf4;
+    border:1px solid #b8e6d0;
+    font-weight:700;
+    color:#0d6a47;
   }
-  .seg {
-    display: inline-flex;
-    border: 1.5px solid var(--line);
-    border-radius: 10px;
-    overflow: hidden;
-    background: #f8fafc;
-  }
-  .seg button {
-    border: none;
-    background: transparent;
-    padding: 8px 16px;
-    font-family: inherit;
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--muted);
-    cursor: pointer;
-    transition: all 0.18s ease;
-  }
-  .seg button.active {
-    background: var(--brand);
-    color: #fff;
-  }
+  .mono{font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;font-size:.92em;}
 
-  .chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
-  .chip {
-    padding: 8px 15px;
-    border-radius: 999px;
-    border: 1.5px solid var(--line);
-    background: #fff;
-    font-family: inherit;
-    font-size: 0.9rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.18s ease;
-    color: var(--ink);
-  }
-  .chip:hover { border-color: #93c5fd; }
-  .chip.picked {
-    background: var(--brand);
-    border-color: var(--brand);
-    color: #fff;
-  }
-  .chip.taken {
-    opacity: 0.32;
-    cursor: not-allowed;
-  }
-
-  .status-line {
-    margin: 12px 0 6px;
-    font-size: 0.93rem;
-    font-weight: 600;
-  }
-  .verdict {
-    border-radius: 10px;
-    padding: 10px 14px;
-    font-weight: 600;
-    font-size: 0.94rem;
-    margin-top: 10px;
-  }
-  .verdict.good { background: var(--ok-soft); color: #065f46; border-left: 4px solid var(--ok); }
-  .verdict.bad { background: #fee2e2; color: #991b1b; border-left: 4px solid #ef4444; }
-
-  .table-scroll { overflow-x: auto; }
-
-  table.outcomes {
-    border-collapse: collapse;
-    width: 100%;
-    min-width: 480px;
-    font-size: 0.88rem;
-  }
-  table.outcomes td, table.outcomes th {
-    border: 1px solid var(--line);
-    padding: 7px 8px;
-    text-align: center;
-    vertical-align: middle;
-  }
-  table.outcomes th {
-    background: #f1f5f9;
-    font-weight: 700;
-    color: var(--muted);
-    font-size: 0.8rem;
-  }
-  td.cell-box {
-    font-weight: 600;
-    background: #fff;
-    transition: background 0.25s ease, color 0.25s ease, transform 0.15s ease;
-  }
-  td.cell-box.valid { background: var(--ok-soft); color: #065f46; }
-  td.cell-box.invalid { background: #fef2f2; color: #b91c1c; }
-  td.cell-box.highlight { outline: 2px solid var(--brand); outline-offset: -2px; }
-
-  .legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 12px; font-size: 0.85rem; color: var(--muted); }
-  .legend span { display: inline-flex; align-items: center; gap: 6px; }
-  .dot { width: 13px; height: 13px; border-radius: 4px; display: inline-block; }
-  .dot.g { background: var(--ok-soft); border: 1px solid var(--ok); }
-  .dot.r { background: #fef2f2; border: 1px solid #ef4444; }
-
-  /* ---------- Counting readout ---------- */
-  .counters {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin-top: 14px;
-  }
-  .counter {
-    background: #f8fafc;
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    padding: 10px;
-    text-align: center;
-  }
-  .counter .val { font-size: 1.35rem; font-weight: 800; color: var(--brand-dark); line-height: 1.2; }
-  .counter .lbl { font-size: 0.74rem; color: var(--muted); font-weight: 600; letter-spacing: 0.03em; text-transform: uppercase; }
-
-  /* ---------- Alternative method toggle ---------- */
-  .method-toggle {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 14px;
-    flex-wrap: wrap;
-  }
-  .method-toggle button {
-    border: 1.5px solid var(--line);
-    background: #f8fafc;
-    border-radius: 10px;
-    padding: 8px 14px;
-    font-family: inherit;
-    font-size: 0.88rem;
-    font-weight: 600;
-    color: var(--muted);
-    cursor: pointer;
-  }
-  .method-toggle button.active {
-    background: var(--brand-soft);
-    border-color: var(--brand);
-    color: var(--brand-dark);
-  }
-  .method-panel { display: none; }
-  .method-panel.active { display: block; animation: fade 0.3s ease; }
-  @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
-
-  footer.foot {
-    text-align: center;
-    color: var(--muted);
-    font-size: 0.8rem;
-    margin-top: 26px;
-  }
-
-  @media (max-width: 560px) {
-    header.top h1 { font-size: 1.2rem; }
-    .options { grid-template-columns: 1fr; }
-    .counters { grid-template-columns: repeat(3, 1fr); gap: 7px; }
-    .counter .val { font-size: 1.1rem; }
-    .counter .lbl { font-size: 0.66rem; }
-    .card { padding: 16px 14px; }
-    .wrap { padding: 14px 12px 56px; }
+  @media(max-width:640px){
+    body{font-size:14.5px;}
+    .wrap{padding:10px 8px 40px;}
+    .panel{padding:14px 12px 18px;}
+    .diagram{padding:10px;}
+    .optgrid{grid-template-columns:1fr;}
   }
 </style>
 </head>
 <body>
 <div class="wrap">
+  <div class="split">
 
-  <!-- ============ HEADER ============ -->
-  <header class="top">
-    <div class="eyebrow">HKDSE Mathematics · Paper 2</div>
-    <h1>2013 Paper 2 — Question 26</h1>
-    <div class="tags">
-      <span class="tag">Probability</span>
-      <span class="tag">Counting Outcomes</span>
-      <span class="tag">Combinations</span>
-      <span class="tag">Parity (Odd / Even)</span>
+    <!-- ============ LEFT: DIAGRAM ============ -->
+    <div class="diagram">
+      <h2>Interactive Figure</h2>
+      <canvas id="cv" width="620" height="700"></canvas>
+      <p class="ro" id="ro">Step 1 — The seven cards 1, 2, 3, 4, 5, 6, 7.</p>
+      <div class="legend">
+        <span><i class="dot" style="background:#1e6fd9"></i>Odd card (1, 3, 5, 7)</span>
+        <span><i class="dot" style="background:#d9384f"></i>Even card (2, 4, 6)</span>
+        <span><i class="dot" style="background:#1a9e6b"></i>Chosen pair {a, b}</span>
+        <span><i class="dot" style="background:#e08a1e"></i>Blocked (repeated)</span>
+      </div>
     </div>
-  </header>
 
-  <!-- ============ QUESTION ============ -->
-  <section class="card">
-    <h2><span class="num">Q</span>Question</h2>
-    <div class="question-text">
-      Two numbers are randomly drawn <strong>at the same time</strong> from seven cards numbered
-      \(1, 2, 3, 4, 5, 6\) and \(7\) respectively. Find the probability that the product
-      of the numbers drawn is an <strong>odd number</strong>.
-    </div>
-    <ul class="options">
-      <li><span class="letter">A.</span> \(\dfrac{2}{7}\)</li>
-      <li><span class="letter">B.</span> \(\dfrac{4}{7}\)</li>
-      <li><span class="letter">C.</span> \(\dfrac{12}{49}\)</li>
-      <li><span class="letter">D.</span> \(\dfrac{16}{49}\)</li>
-    </ul<figure style="margin:12px 0;text-align:center;"><img src="figures/2013_P2_Q26.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>>
-  </section>
+    <!-- ============ RIGHT: QUESTION + SOLUTION ============ -->
+    <div class="panel">
+      <div class="qhead">
+        <span class="tag">2013MC#26</span>
+        <span class="topic">14. Probability</span>
+      </div>
 
-  <!-- ============ STEP-BY-STEP ============ -->
-  <section class="card">
-    <h2><span class="num">1</span>Guided Solution — Step by Step</h2>
+      <div class="question">
+        <p>Two numbers are randomly drawn <b>at the same time</b> from seven cards numbered
+        $1,\ 2,\ 3,\ 4,\ 5,\ 6$ and $7$ respectively. Find the probability that the
+        product of the numbers drawn is an odd number.</p>
+      </div>
 
-    <!-- Step 1 -->
-    <div class="step" id="step1">
-      <button class="step-head" onclick="toggleStep('step1')">
-        <span class="step-no">1</span>
-        Understand what "same time" means for sampling
-        <span class="chev">▼</span>
-      </button>
-      <div class="step-body">
-        <div class="step-inner">
-          Choosing two cards <em>at the same time</em> means the order does <strong>not</strong> matter.
-          So \(\{1,2\}\) and \(\{2,1\}\) count as the <strong>same</strong> outcome.
-          <div class="hint">
-            <strong>Key idea:</strong> "At the same time" ⇒ unordered selection ⇒ we count
-            <em>sets</em> of two numbers, not ordered pairs.
-          </div>
+      <div class="optgrid">
+        <div class="opt" id="optA"><span class="lbl">A.</span> $\dfrac{2}{7}$</div>
+        <div class="opt" id="optB"><span class="lbl">B.</span> $\dfrac{4}{7}$</div>
+        <div class="opt" id="optC"><span class="lbl">C.</span> $\dfrac{12}{49}$</div>
+        <div class="opt" id="optD"><span class="lbl">D.</span> $\dfrac{16}{49}$</div>
+      </div>
+
+      <figure style="margin:12px 0;text-align:center;"><img src="figures/2013_P2_Q26.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
+
+      <h3 class="sec">Step-by-step Solution</h3>
+
+      <div class="step" data-step="1">
+        <div class="step-head">
+          <span class="chip">1</span>
+          <span class="step-title">List the sample space</span>
         </div>
+        <p>Two cards are drawn <b>at the same time</b> (order does not matter), so each
+        outcome is an unordered pair $\{a,b\}$ with $a\ne b$.</p>
+        <p class="mono">$\{1,2\}\ \{1,3\}\ \{1,4\}\ \{1,5\}\ \{1,6\}\ \{1,7\}$<br>
+           $\{2,3\}\ \{2,4\}\ \{2,5\}\ \{2,6\}\ \{2,7\}$<br>
+           $\{3,4\}\ \{3,5\}\ \{3,6\}\ \{3,7\}$<br>
+           $\{4,5\}\ \{4,6\}\ \{4,7\}$<br>
+           $\{5,6\}\ \{5,7\}$<br>
+           $\{6,7\}$</p>
+        <div class="hint"><b>Hint:</b> "At the same time" means unordered — do <i>not</i> use $7\times 7$.</div>
       </div>
-    </div>
 
-    <!-- Step 2 -->
-    <div class="step" id="step2">
-      <button class="step-head" onclick="toggleStep('step2')">
-        <span class="step-no">2</span>
-        Count the total number of possible outcomes
-        <span class="chev">▼</span>
-      </button>
-      <div class="step-body">
-        <div class="step-inner">
-          We need to choose \(2\) cards out of \(7\), with order irrelevant:
-          <div class="math-block">
-            \[ C^{7}_{2} = \frac{7 \times 6}{2 \times 1} = 21 \]
-          </div>
-          <div class="hint">
-            <strong>Formula used:</strong> \(C^n_r = \dfrac{n!}{r!\,(n-r)!}\)<br>
-            For \(C^{7}_{2}\): divide by \(2!\) to remove the double counting of ordered pairs.
-          </div>
+      <div class="step" data-step="2">
+        <div class="step-head">
+          <span class="chip">2</span>
+          <span class="step-title">Count the total number of outcomes</span>
         </div>
+        <p>Choosing $2$ cards from $7$:</p>
+        <p>$$\binom{7}{2}=\frac{7\times 6}{2}=21$$</p>
+        <p>(Equivalently: $6+5+4+3+2+1=21$ from the list above.)</p>
+        <div class="hint"><b>Hint:</b> $n(\text{total}) = 21$ is the denominator.</div>
       </div>
-    </div>
 
-    <!-- Step 3 -->
-    <div class="step" id="step3">
-      <button class="step-head" onclick="toggleStep('step3')">
-        <span class="step-no">3</span>
-        Decide when a product is odd
-        <span class="chev">▼</span>
-      </button>
-      <div class="step-body">
-        <div class="step-inner">
-          A product of two integers is odd <strong>only when both factors are odd</strong>.
-          If either factor is even, the product is even.
-          <div class="math-block">
-            odd × odd = odd &nbsp;&nbsp;|&nbsp;&nbsp; odd × even = even &nbsp;&nbsp;|&nbsp;&nbsp; even × even = even
-          </div>
-          <div class="hint">
-            <strong>Why?</strong> An even number contains a factor of \(2\), which can never disappear
-            by multiplying — so the product stays even.
-          </div>
+      <div class="step" data-step="3">
+        <div class="step-head">
+          <span class="chip">3</span>
+          <span class="step-title">Translate the condition</span>
         </div>
+        <p>The product of two integers is <b>odd</b> exactly when <b>both</b> numbers are odd.</p>
+        <p>Odd cards available: $1,\ 3,\ 5,\ 7$ &nbsp;→&nbsp; $4$ cards.</p>
+        <p>Even cards: $2,\ 4,\ 6$ &nbsp;→&nbsp; $3$ cards (any even card makes the product even).</p>
+        <div class="hint"><b>Hint:</b> odd × odd = odd; odd × even = even; even × even = even.</div>
       </div>
-    </div>
 
-    <!-- Step 4 -->
-    <div class="step" id="step4">
-      <button class="step-head" onclick="toggleStep('step4')">
-        <span class="step-no">4</span>
-        Count favourable outcomes (both odd)
-        <span class="chev">▼</span>
-      </button>
-      <div class="step-body">
-        <div class="step-inner">
-          Among \(1,2,3,4,5,6,7\), the odd numbers are \(\{1, 3, 5, 7\}\) — there are \(4\) of them.
-          We must pick <strong>both</strong> cards from these four:
-          <div class="math-block">
-            \[ C^{4}_{2} = \frac{4 \times 3}{2 \times 1} = 6 \]
-          </div>
-          They are \(\{1,3\},\{1,5\},\{1,7\},\{3,5\},\{3,7\},\{5,7\}\).
+      <div class="step" data-step="4">
+        <div class="step-head">
+          <span class="chip">4</span>
+          <span class="step-title">Count the favourable outcomes</span>
         </div>
+        <p>Favourable pairs = choose $2$ odd cards from $1,3,5,7$:</p>
+        <p class="mono">$\{1,3\}\ \{1,5\}\ \{1,7\}\ \{3,5\}\ \{3,7\}\ \{5,7\}$</p>
+        <p>$$\binom{4}{2}=\frac{4\times 3}{2}=6$$</p>
+        <div class="hint"><b>Hint:</b> $n(\text{favourable}) = 6$.</div>
       </div>
-    </div>
 
-    <!-- Step 5 -->
-    <div class="step" id="step5">
-      <button class="step-head" onclick="toggleStep('step5')">
-        <span class="step-no">5</span>
-        Compute the probability
-        <span class="chev">▼</span>
-      </button>
-      <div class="step-body">
-        <div class="step-inner">
-          \[ P = \frac{\text{number of favourable outcomes}}{\text{total number of outcomes}} = \frac{6}{21} = \frac{2}{7} \]
-          <div class="answer-badge">✓ Answer: A — \(\dfrac{2}{7}\)</div>
-          <div class="hint">
-            <strong>Check the alternatives:</strong> \(\frac{12}{49}\) and \(\frac{16}{49}\) would arise if
-            you (wrongly) treated the two draws as <em>ordered</em> with replacement. Since the cards are
-            distinct and drawn together, \(21\) is the correct denominator.
-          </div>
+      <div class="step" data-step="5">
+        <div class="step-head">
+          <span class="chip">5</span>
+          <span class="step-title">Compute the probability</span>
         </div>
+        <p>$$P=\frac{n(\text{favourable})}{n(\text{total})}=\frac{6}{21}=\frac{2}{7}$$</p>
+        <p>Check: $\dfrac{2}{7}\approx0.2857$, matching option A.</p>
+        <div class="hint"><b>Hint:</b> Always simplify the fraction to match the given options.</div>
       </div>
+
+      <div class="ans">Answer: A &nbsp;·&nbsp; $\dfrac{2}{7}$</div>
     </div>
-  </section>
-
-  <!-- ============ INTERACTIVE LAB ============ -->
-  <section class="card">
-    <h2><span class="num">2</span>Interactive Lab — Explore the Outcomes</h2>
-
-    <p style="margin-top:0;font-size:0.92rem;color:var(--muted);">
-      Pick two cards below. The highlighted table row/column shows the pair, and the counters update live.
-      Toggle "Useful only" to see just the winning (odd-product) pairs.
-    </p>
-
-    <div class="lab-controls">
-      <div class="seg" id="viewSeg">
-        <button class="active" data-view="all" onclick="setView('all')">All 21 pairs</button>
-        <button data-view="win" onclick="setView('win')">Only winners (6)</button>
-      </div>
-    </div>
-
-    <div class="chip-row" id="chipRow"></div>
-
-    <div class="status-line" id="statusLine">Selected: — (pick two cards)</div>
-
-    <div class="counters">
-      <div class="counter">
-        <div class="val" id="cTotal">21</div>
-        <div class="lbl">Total pairs</div>
-      </div>
-      <div class="counter">
-        <div class="val" id="cFav">0</div>
-        <div class="lbl">Odd product</div>
-      </div>
-      <div class="counter">
-        <div class="val" id="cProb">0</div>
-        <div class="lbl">P(odd) live</div>
-      </div>
-    </div>
-
-    <div id="verdictBox" class="verdict" style="display:none;"></div>
-
-    <h3 style="font-size:0.95rem;margin:22px 0 8px;">Outcome grid — lower triangle = unordered pairs</h3>
-    <div class="table-scroll">
-      <table class="outcomes" id="outcomeTable"></table>
-    </div>
-    <div class="legend">
-      <span><span class="dot g"></span> Product is odd (both cards odd)</span>
-      <span><span class="dot r"></span> Product is even</span>
-    </div>
-  </section>
-
-  <!-- ============ ALTERNATIVE METHOD ============ -->
-  <section class="card">
-    <h2><span class="num">3</span>Alternative Method — Using Conditional Logic</h2>
-    <div class="method-toggle">
-      <button class="active" data-m="m1" onclick="setMethod('m1')">Sequential draw (no replacement)</button>
-      <button data-m="m2" onclick="setMethod('m2')">Complement idea</button>
-    </div>
-
-    <div class="method-panel active" id="panel-m1">
-      <p>Draw the two cards one after another <em>without replacement</em> (equivalent to drawing together):</p>
-      <div class="math-block">
-        \[ P(\text{1st odd}) \times P(\text{2nd odd} \mid \text{1st odd}) = \frac{4}{7} \times \frac{3}{6} \]
-      </div>
-      <div class="math-block">
-        \[ = \frac{4}{7} \times \frac{1}{2} = \frac{2}{7} \]
-      </div>
-      <div class="hint">
-        <strong>Meaning of each number:</strong> \(\frac{4}{7}\) → 4 odd cards among 7.
-        After taking one odd card, only 3 odd cards remain among the 6 left, giving \(\frac{3}{6}\).
-      </div>
-    </div>
-
-    <div class="method-panel" id="panel-m2">
-      <p>Instead of counting favourable pairs, count the pairs that <em>fail</em> (product even):</p>
-      <div class="math-block">
-        Total pairs \(= 21\)
-      </div>
-      <div class="math-block">
-        Pairs containing at least one even card \(= 21 - C^{4}_{2} = 21 - 6 = 15\)
-      </div>
-      <div class="math-block">
-        \[ P(\text{odd}) = 1 - \frac{15}{21} = 1 - \frac{5}{7} = \frac{2}{7} \]
-      </div>
-      <div class="hint">
-        <strong>Why this works:</strong> "Product even" and "product odd" are complementary events.
-        Subtracting from 1 is often faster when the "bad" cases are easier to count.
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ QUICK SUMMARY ============ -->
-  <section class="card">
-    <h2><span class="num">4</span>Exam Tips &amp; Common Traps</h2>
-    <ul style="margin:0;padding-left:20px;font-size:0.95rem;">
-      <li><strong>"At the same time" ⇒ unordered:</strong> use \(C^{n}_{r}\), denominator \(= 21\), not \(49\) or \(42\).</li>
-      <li><strong>Odd product ⟺ both factors odd.</strong> This single fact collapses the whole question.</li>
-      <li>Odd numbers in \(1\ldots7\): \(1,3,5,7\) — that's \(4\) cards, so \(C^{4}_{2}=6\) pairs.</li>
-      <li>Options \(C\) and \(D\) have denominator \(49\) — a trap for students who assume replacement / ordered pairs.</li>
-      <li>Always reduce the fraction: \(\dfrac{6}{21} = \dfrac{2}{7}\) (option A).</li>
-    </ul>
-  </section>
-
-  <footer class="foot">HKDSE Mathematics (Compulsory Part) · Paper 2 · Probability · Interactive Revision</footer>
+  </div>
 </div>
 
 <script>
-/* ---------------- Accordion ---------------- */
-function toggleStep(id) {
-  const el = document.getElementById(id);
-  const wasOpen = el.classList.contains('open');
-  // close all
-  document.querySelectorAll('.step').forEach(s => s.classList.remove('open'));
-  if (!wasOpen) el.classList.add('open');
-  // re-render math in newly opened card
-  if (window.MathJax && MathJax.typesetPromise) {
-    MathJax.typesetPromise().catch(() => {});
+(function(){
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  const ro = document.getElementById('ro');
+
+  const W = cv.width, H = cv.height;
+
+  // colour palette
+  const C = {
+    blue:'#1e6fd9', red:'#d9384f', green:'#1a9e6b',
+    amber:'#e08a1e', purple:'#7a4fd0', ink:'#1d2733',
+    muted:'#7b8a9a', line:'#dbe4ee', grey:'#c3cdd8'
+  };
+
+  // ---- helpers ----
+  function rr(x,y,w,h,r,fill,stroke,lw){
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);
+    ctx.arcTo(x+w,y,x+w,y+h,r);
+    ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r);
+    ctx.arcTo(x,y,x+w,y,r);
+    ctx.closePath();
+    if(fill){ctx.fillStyle=fill;ctx.fill();}
+    if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lw||1.5;ctx.stroke();}
   }
-}
 
-/* ---------------- Interactive Lab ---------------- */
-const CARDS = [1,2,3,4,5,6,7];
-const isOdd = n => n % 2 === 1;
-
-let selected = [];
-let viewMode = 'all';
-
-// Build chip row
-const chipRow = document.getElementById('chipRow');
-CARDS.forEach(n => {
-  const b = document.createElement('button');
-  b.className = 'chip';
-  b.textContent = n;
-  b.dataset.n = n;
-  b.onclick = () => pickCard(n);
-  chipRow.appendChild(b);
-});
-
-function pickCard(n) {
-  const idx = selected.indexOf(n);
-  if (idx > -1) {
-    selected.splice(idx, 1);
-  } else {
-    if (selected.length >= 2) {
-      // replace oldest
-      selected.shift();
-    }
-    selected.push(n);
+  function label(txt,x,y,font,color,align,baseline){
+    ctx.font = font || 'bold 18px "Segoe UI",Arial';
+    ctx.fillStyle = color || C.ink;
+    ctx.textAlign = align || 'center';
+    ctx.textBaseline = baseline || 'middle';
+    ctx.fillText(txt,x,y);
   }
-  selected.sort((a,b) => a-b);
-  render();
-}
 
-// Build outcome table (lower triangle)
-const table = document.getElementById('outcomeTable');
-function buildTable() {
-  table.innerHTML = '';
-  // header row
-  const head = document.createElement('tr');
-  const corner = document.createElement('th');
-  corner.textContent = '';
-  head.appendChild(corner);
-  CARDS.forEach(c => {
-    const th = document.createElement('th');
-    th.textContent = c;
-    head.appendChild(th);
-  });
-  table.appendChild(head);
+  function title(txt,sub){
+    label(txt, W/2, 34, 'bold 20px "Segoe UI",Arial', C.ink,'center');
+    if(sub) label(sub, W/2, 60, '14px "Segoe UI",Arial', C.muted,'center');
+  }
 
-  CARDS.forEach(r => {
-    const tr = document.createElement('tr');
-    const rh = document.createElement('th');
-    rh.textContent = r;
-    tr.appendChild(rh);
-    CARDS.forEach(c => {
-      const td = document.createElement('td');
-      if (c >= r) {
-        td.textContent = '';
-        td.className = 'cell-box empty';
-      } else {
-        const pair = [c, r];           // c < r
-        const prod = c * r;
-        const good = isOdd(prod);
-        td.textContent = prod;
-        td.className = 'cell-box ' + (good ? 'valid' : 'invalid');
-        td.dataset.pair = c + '-' + r;
-        td.title = `{${c}, ${r}} → product ${prod}`;
+  // ---------------- card drawing ----------------
+  // draws a "card" tile
+  function card(x,y,w,h,num,type){
+    const isOdd = (num % 2 === 1);
+    let fill, stroke, textC;
+    if(type==='odd'){ fill='#e8f1ff'; stroke=C.blue; textC=C.blue; }
+    else if(type==='even'){ fill='#fdeaec'; stroke=C.red; textC=C.red; }
+    else if(type==='pair'){ fill='#e9f8f1'; stroke=C.green; textC=C.green; }
+    else if(type==='ghost'){ fill='#f5f7fa'; stroke=C.grey; textC=C.grey; }
+    else { fill='#ffffff'; stroke=C.line; textC=C.ink; }
+
+    rr(x,y,w,h,8,fill,stroke, type==='ghost'?1.2:2);
+    label(num, x+w/2, y+h/2, 'bold '+Math.round(h*0.45)+'px "Segoe UI",Arial', textC);
+  }
+
+  // ------------------------------------------------
+  // MAIN DRAW FUNCTION
+  // ------------------------------------------------
+  let current = 1;
+  function draw(step){
+    ctx.clearRect(0,0,W,H);
+
+    const cardW = 60, cardH = 82, gap = 12;
+    const rowStart = (W - (7*cardW + 6*gap))/2; // centred 7-card row
+
+    // ---- Step 1 : the given cards ----
+    if(step === 1){
+      title('Seven cards','Each card shows one number 1–7');
+      for(let i=0;i<7;i++){
+        const n = i+1;
+        card(rowStart + i*(cardW+gap), 110, cardW, cardH, n, n%2? 'odd':'even');
       }
-      tr.appendChild(td);
+      // count labels
+      label('4 odd cards  (1, 3, 5, 7)', W/2, 245, 'bold 17px "Segoe UI",Arial', C.blue);
+      label('3 even cards  (2, 4, 6)', W/2, 275, 'bold 17px "Segoe UI",Arial', C.red);
+
+      // two drawn at the same time → two slots
+      rr(W/2-150, 320, 300, 92, 14, '#f8fbff', C.line, 1.5);
+      label('Draw two cards at the same time', W/2, 350, 'bold 15px "Segoe UI",Arial', C.ink);
+      label('→ one unordered pair { a , b }', W/2, 385, '15px "Segoe UI",Arial', C.muted);
+
+      ro.textContent = 'Step 1 — There are 7 cards: four odd (1,3,5,7) and three even (2,4,6).';
+      return;
+    }
+
+    // ---- Step 2 : sample space size ----
+    if(step === 2){
+      title('Sample space','All unordered pairs of 2 cards from 7');
+      // 6 rows of pairs
+      const pairs = [[1,2],[1,3],[1,4],[1,5],[1,6],[1,7],
+                     [2,3],[2,4],[2,5],[2,6],[2,7],
+                     [3,4],[3,5],[3,6],[3,7],
+                     [4,5],[4,6],[4,7],
+                     [5,6],[5,7],
+                     [6,7]];
+      const top = 95, cw = 78, ch = 34, gx = 8, gy = 8;
+      let cols = 6;
+      const startX = (W - (cols*cw + (cols-1)*gx))/2;
+      pairs.forEach((p,i)=>{
+        const r = Math.floor(i/cols), c = i%cols;
+        const x = startX + c*(cw+gx);
+        const y = top + r*(ch+gy);
+        const oddPair = (p[0]%2===1) && (p[1]%2===1);
+        rr(x,y,cw,ch,8, oddPair? '#e9f8f1':'#f6f9fd', oddPair? C.green:C.line, oddPair?2:1.2);
+        label('{'+p[0]+','+p[1]+'}', x+cw/2, y+ch/2, '13px "Segoe UI",Arial',
+              oddPair? C.green : C.muted);
+      });
+      const rows = Math.ceil(pairs.length/cols);
+      const endY = top + rows*(ch+gy);
+      label('Total outcomes = C(7,2) = 21', W/2, endY+26, 'bold 17px "Segoe UI",Arial', C.blue);
+      label('= 6 + 5 + 4 + 3 + 2 + 1', W/2, endY+52, '14px "Segoe UI",Arial', C.muted);
+      ro.textContent = 'Step 2 — The 21 unordered pairs form the sample space (green = both odd).';
+      return;
+    }
+
+    // ---- Step 3 : odd / even structure ----
+    if(step === 3){
+      title('Why both must be odd','odd × odd = odd, otherwise the product is even');
+      for(let i=0;i<7;i++){
+        const n = i+1;
+        card(rowStart + i*(cardW+gap), 100, cardW, cardH, n, n%2? 'odd':'even');
+      }
+      label('ODD group  {1, 3, 5, 7}', 165, 235, 'bold 16px "Segoe UI",Arial', C.blue,'center');
+      label('EVEN group  {2, 4, 6}', W-165, 235, 'bold 16px "Segoe UI",Arial', C.red,'center');
+
+      // rule box
+      rr(60, 280, W-120, 150, 14, '#ffffff', C.line, 1.6);
+      label('Product rule', W/2, 308, 'bold 16px "Segoe UI",Arial', C.ink);
+      label('odd × odd  =  odd   ✔', W/2-100, 345, '15px "Segoe UI",Arial', C.green);
+      label('odd × even =  even  ✘', W/2+90, 345, '15px "Segoe UI",Arial', C.red);
+      label('even × even = even  ✘', W/2, 385, '15px "Segoe UI",Arial', C.red);
+      label('So we must pick 2 cards from the 4 odd cards.', W/2, 418, 'bold 15px "Segoe UI",Arial', C.ink);
+
+      ro.textContent = 'Step 3 — A product is odd only when BOTH chosen cards are odd.';
+      return;
+    }
+
+    // ---- Step 4 : favourable pairs ----
+    if(step === 4){
+      title('Favourable outcomes','Choose 2 cards from {1, 3, 5, 7}');
+      const odds = [1,3,5,7];
+      // the 4 odd cards
+      const ow = 76, oh = 96, og = 22;
+      const osx = (W - (4*ow + 3*og))/2;
+      odds.forEach((n,i)=> card(osx + i*(ow+og), 95, ow, oh, n, 'odd'));
+
+      // favourable pairs
+      const fav = [[1,3],[1,5],[1,7],[3,5],[3,7],[5,7]];
+      const top = 250, cw = 108, ch = 44, gx = 14, gy = 14, cols = 3;
+      const startX = (W - (cols*cw + (cols-1)*gx))/2;
+      fav.forEach((p,i)=>{
+        const r = Math.floor(i/cols), c = i%cols;
+        const x = startX + c*(cw+gx);
+        const y = top + r*(ch+gy);
+        rr(x,y,cw,ch,10,'#e9f8f1',C.green,2);
+        label('{'+p[0]+','+p[1]+'}', x+cw/2, y+ch/2, 'bold 15px "Segoe UI",Arial', C.green);
+      });
+      const endY = top + 2*(ch+gy);
+      label('Favourable outcomes = C(4,2) = 6', W/2, endY+28, 'bold 17px "Segoe UI",Arial', C.green);
+
+      ro.textContent = 'Step 4 — Exactly 6 of the 21 pairs are made of two odd cards.';
+      return;
+    }
+
+    // ---- Step 5 : probability ----
+    if(step >= 5){
+      title('Probability','favourable ÷ total');
+      // big fraction visual
+      rr(60, 90, W-120, 200, 16, '#f8fbff', C.line, 1.6);
+
+      label('P(product is odd)', W/2, 125, 'bold 16px "Segoe UI",Arial', C.ink);
+
+      // numerator
+      label('6', W/2 - 90, 190, 'bold 46px "Segoe UI",Arial', C.green);
+      ctx.beginPath(); ctx.moveTo(W/2-140, 218); ctx.lineTo(W/2-40, 218);
+      ctx.strokeStyle=C.ink; ctx.lineWidth=3; ctx.stroke();
+      label('21', W/2 - 90, 250, 'bold 46px "Segoe UI",Arial', C.blue);
+
+      label('=', W/2 + 15, 220, 'bold 40px "Segoe UI",Arial', C.ink);
+
+      label('2', W/2 + 105, 190, 'bold 46px "Segoe UI",Arial', C.green);
+      ctx.beginPath(); ctx.moveTo(W/2+55, 218); ctx.lineTo(W/2+155, 218);
+      ctx.strokeStyle=C.ink; ctx.lineWidth=3; ctx.stroke();
+      label('7', W/2 + 105, 250, 'bold 46px "Segoe UI",Arial', C.blue);
+
+      // summary chips
+      const info = [
+        ['Total outcomes', '21', C.blue],
+        ['Favourable', '6', C.green],
+        ['Answer', '2/7', C.amber]
+      ];
+      const bw = (W-120-2*16)/3;
+      info.forEach((it,i)=>{
+        const x = 60 + i*(bw+16);
+        rr(x, 340, bw, 86, 12, '#ffffff', it[2], 2);
+        label(it[0], x+bw/2, 366, '13px "Segoe UI",Arial', C.muted);
+        label(it[1], x+bw/2, 398, 'bold 24px "Segoe UI",Arial', it[2]);
+      });
+
+      label('Option A', W/2, 470, 'bold 18px "Segoe UI",Arial', C.amber);
+
+      ro.textContent = 'Step 5 — P = 6 / 21 = 2 / 7, so the answer is A.';
+      return;
+    }
+  }
+
+  // initial
+  draw(1);
+
+  // ---- scroll sync ----
+  const io = new IntersectionObserver(es=>{
+    es.forEach(e=>{
+      if(e.isIntersecting){
+        const s = +e.target.dataset.step;
+        if(s !== current){ current = s; draw(s); }
+      }
     });
-    table.appendChild(tr);
-  });
-}
-buildTable();
+  }, {rootMargin:'-25% 0px -55% 0px', threshold:0});
 
-function setView(v) {
-  viewMode = v;
-  document.querySelectorAll('#viewSeg button').forEach(b => {
-    b.classList.toggle('active', b.dataset.view === v);
-  });
-  render();
-}
+  document.querySelectorAll('.step').forEach(s=>io.observe(s));
 
-function render() {
-  // chips
-  document.querySelectorAll('.chip').forEach(b => {
-    const n = Number(b.dataset.n);
-    b.classList.remove('picked','taken');
-    if (selected.includes(n)) b.classList.add('picked');
-    else if (selected.length === 2) b.classList.add('taken');
-  });
+  // highlight correct option once answer step is seen
+  const ansObs = new IntersectionObserver(es=>{
+    es.forEach(e=>{
+      if(e.isIntersecting) document.getElementById('optA').classList.add('correct');
+    });
+  }, {threshold:0.5});
+  ansObs.observe(document.querySelector('.ans'));
 
-  // table highlight
-  document.querySelectorAll('#outcomeTable td.cell-box').forEach(td => {
-    td.classList.remove('highlight');
-    if (!td.dataset.pair) return;
-    const [a, b] = td.dataset.pair.split('-').map(Number);
-    if (selected.length === 2 && selected[0] === a && selected[1] === b) {
-      td.classList.add('highlight');
-    }
-  });
-
-  // counters
-  const totalPairs = 21;
-  const favPairs = 6;
-  document.getElementById('cTotal').textContent = totalPairs;
-  const favPct = ((favPairs / totalPairs) * 100).toFixed(1);
-  document.getElementById('cFav').textContent = favPairs;
-  document.getElementById('cProb').textContent = (favPairs / totalPairs).toFixed(4);
-
-  // status + verdict
-  const statusEl = document.getElementById('statusLine');
-  const verdictBox = document.getElementById('verdictBox');
-
-  if (selected.length === 0) {
-    statusEl.textContent = 'Selected: — (pick two cards)';
-    verdictBox.style.display = 'none';
-  } else if (selected.length === 1) {
-    statusEl.textContent = `Selected: {${selected[0]}} — pick one more card`;
-    verdictBox.style.display = 'none';
-  } else {
-    const [a, b] = selected;
-    const prod = a * b;
-    const good = isOdd(prod);
-    statusEl.textContent = `Selected: {${a}, ${b}}  →  product = ${a} × ${b} = ${prod}`;
-    verdictBox.style.display = 'block';
-    if (good) {
-      verdictBox.className = 'verdict good';
-      verdictBox.innerHTML = `✓ Product is <strong>odd</strong>. Both ${a} and ${b} are odd — this pair counts as a favourable outcome.`;
-    } else {
-      verdictBox.className = 'verdict bad';
-      verdictBox.innerHTML = `✗ Product is <strong>even</strong>. At least one of ${a}, ${b} is even — this pair does <em>not</em> count.`;
-    }
-  }
-
-  // view mode: dim non-winning pairs invisibly? Instead just visually emphasise
-  document.querySelectorAll('#outcomeTable td.cell-box').forEach(td => {
-    if (viewMode === 'win' && td.dataset.pair) {
-      const good = td.classList.contains('valid');
-      td.style.opacity = good ? '1' : '0.18';
-    } else {
-      td.style.opacity = '1';
-    }
-  });
-}
-
-/* ---------------- Alternative method toggle ---------------- */
-function setMethod(m) {
-  document.querySelectorAll('.method-toggle button').forEach(b => {
-    b.classList.toggle('active', b.dataset.m === m);
-  });
-  document.querySelectorAll('.method-panel').forEach(p => {
-    p.classList.toggle('active', p.id === 'panel-' + m);
-  });
-  if (window.MathJax && MathJax.typesetPromise) {
-    MathJax.typesetPromise().catch(() => {});
-  }
-}
-
-/* ---------------- Init ---------------- */
-document.addEventListener('DOMContentLoaded', () => {
-  render();
-  // open first step by default
-  document.getElementById('step1').classList.add('open');
-  if (window.MathJax && MathJax.typesetPromise) {
-    MathJax.typesetPromise().catch(() => {});
-  }
-});
+  // redraw on resize for crispness (canvas has fixed logical size; keep simple)
+  window.addEventListener('resize', ()=>draw(current));
+})();
 </script>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
-
 </body>
 </html>

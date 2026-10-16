@@ -1,523 +1,499 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HKDSE Math 2021 Paper 2 Q43 — Probability</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HKDSE 2021 P2 Q43 — Probability (Balls without replacement)</title>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']]
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
 <style>
-  body { font-family: 'Inter', system-ui, sans-serif; }
-  .step-hidden { display: none; }
-  .step-content { transition: max-height 0.35s ease, opacity 0.35s ease; overflow: hidden; }
-  .fade-in { animation: fadeIn 0.35s ease forwards; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0);} }
-  .ball { width: 28px; height: 28px; border-radius: 50%; display:inline-flex; align-items:center; justify-content:center;
-          font-size: 11px; font-weight: 700; color:#fff; box-shadow: inset -3px -3px 6px rgba(0,0,0,0.25); }
-  .red-ball { background: radial-gradient(circle at 30% 30%, #f87171, #dc2626); }
-  .yellow-ball { background: radial-gradient(circle at 30% 30%, #fde047, #ca8a04); }
-  .black-ball { background: radial-gradient(circle at 30% 30%, #6b7280, #111827); }
-  .tree-line { stroke: #cbd5e1; stroke-width: 2; }
-  .tree-node text { font-size: 11px; font-weight: 600; }
-  .highlight-step { background: #ecfdf5; border-color:#10b981; }
-  code { background: #f1f5f9; padding: 1px 5px; border-radius: 5px; font-size: 0.85em; }
+  :root{
+    --bg:#f4f7fb;
+    --card:#ffffff;
+    --ink:#1f2937;
+    --muted:#5b6675;
+    --red:#e8433f;
+    --yellow:#f0b429;
+    --black:#2b2f36;
+    --blue:#2b6cb0;
+    --green:#2f9e63;
+    --line:#d7dfea;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.55;
+    font-size:15px;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:14px 14px 60px;}
+
+  /* ---------- layout ---------- */
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start;}
+  @media(min-width:900px){.split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}}
+  .diagram{position:sticky;top:16px;max-height:calc(100vh - 2rem);overflow-y:auto;}
+  @media(max-width:640px){body{font-size:14.5px;}.wrap{padding:10px 8px 40px;}}
+
+  /* ---------- cards ---------- */
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 2px 10px rgba(31,41,55,.06);}
+  .diagram .card{padding:12px 12px 8px;}
+  .panel{padding:16px 18px;margin-bottom:12px;}
+
+  h1{font-size:17px;margin:0 0 4px;letter-spacing:.2px;}
+  .sub{font-size:12.5px;color:var(--muted);margin:0 0 12px;}
+
+  .qtext{font-size:15px;}
+  .qtext p{margin:.4em 0;}
+
+  /* ---------- diagram ---------- */
+  .canvaswrap{position:relative;width:100%;}
+  canvas{width:100%;height:auto;display:block;border-radius:10px;background:#fbfdff;border:1px solid var(--line);}
+  .ro{font-size:12.5px;color:var(--muted);margin:8px 2px 4px;min-height:2.6em;}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;font-size:12px;color:var(--muted);margin-top:6px;}
+  .legend span{display:inline-flex;align-items:center;gap:5px;}
+  .dot{width:11px;height:11px;border-radius:50%;display:inline-block;}
+
+  /* ---------- steps ---------- */
+  .step{border-left:4px solid var(--line);padding:10px 12px;margin:12px 0;border-radius:0 10px 10px 0;background:#f9fbfe;
+        transition:border-color .25s ease, background .25s ease, transform .25s ease;}
+  .step.active{border-left-color:var(--blue);background:#eef5ff;transform:translateX(2px);}
+  .tag{display:inline-block;font-weight:700;font-size:12.5px;letter-spacing:.4px;text-transform:uppercase;
+       color:#fff;background:var(--blue);border-radius:999px;padding:2px 10px;margin-right:8px;vertical-align:1px;}
+  .step .hint{display:block;margin-top:6px;font-size:12.8px;color:var(--muted);font-style:italic;}
+
+  .answer{margin-top:16px;padding:12px 14px;border-radius:12px;background:#eafaf1;border:1px solid #b9e6cd;font-weight:600;}
+  .answer .big{color:var(--green);font-size:17px;}
+
+  .opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0 4px;}
+  .opt{border:1px solid var(--line);border-radius:10px;padding:6px 10px;background:#fbfdff;font-size:14.5px;}
+  .opt.right{border-color:#b9e6cd;background:#eafaf1;font-weight:600;}
+  .opt b{color:var(--muted);margin-right:6px;}
+
+  .kbd{font-family:ui-monospace,Menlo,Consolas,monospace;background:#eef2f7;border:1px solid var(--line);
+       border-radius:6px;padding:0 5px;font-size:12.5px;}
+  h2{font-size:14px;margin:4px 0 8px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;}
 </style>
 </head>
-<body class="bg-slate-50 text-slate-800" data-correct="D">
+<body>
+<div class="wrap">
+  <div class="split">
 
-  <!-- ===== HEADER ===== -->
-  <header class="bg-gradient-to-r from-indigo-600 via-indigo-500 to-sky-500 text-white shadow-lg">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 py-6">
-      <p class="text-indigo-100 text-xs sm:text-sm font-semibold tracking-wider uppercase">HKDSE Mathematics · Paper 2 · Multiple Choice</p>
-      <h1 class="text-xl sm:text-2xl font-extrabold mt-1">2021 Paper 2 — Question 43</h1>
-      <p class="text-indigo-100 text-sm mt-1">Topic 14: Probability — Without Replacement &amp; "At Most" Cases</p><figure style="margin:12px 0;text-align:center;"><img src="figures/2021_P2_Q43.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
-      <div class="flex flex-wrap gap-2 mt-3">
-        <span class="bg-white/20 backdrop-blur px-3 py-1 rounded-full text-xs font-semibold">#Probability</span>
-        <span class="bg-white/20 backdrop-blur px-3 py-1 rounded-full text-xs font-semibold">#WithoutReplacement</span>
-        <span class="bg-white/20 backdrop-blur px-3 py-1 rounded-full text-xs font-semibold">#ComplementRule</span>
-        <span class="bg-white/20 backdrop-blur px-3 py-1 rounded-full text-xs font-semibold">#Combinations</span>
+    <!-- ============ LEFT: DIAGRAM ============ -->
+    <div class="diagram">
+      <div class="card">
+        <h1>Interactive Figure</h1>
+        <p class="sub">Scroll the steps on the right — the figure updates.</p>
+        <div class="canvaswrap">
+          <canvas id="cv" width="640" height="760"></canvas>
+        </div>
+        <p class="ro" id="readout"></p>
+        <div class="legend">
+          <span><i class="dot" style="background:#e8433f"></i>Red ×7</span>
+          <span><i class="dot" style="background:#f0b429"></i>Yellow ×3</span>
+          <span><i class="dot" style="background:#2b2f36"></i>Black ×5</span>
+        </div>
       </div>
     </div>
-  </header>
 
-  <main class="max-w-4xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+    <!-- ============ RIGHT: QUESTION + SOLUTION ============ -->
+    <div class="panel-col">
 
-    <!-- ===== QUESTION CARD ===== -->
-    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6">
-      <h2 class="text-sm font-bold text-indigo-600 uppercase tracking-wide mb-3">The Question</h2>
-      <p class="text-slate-700 leading-relaxed">
-        A bag contains <b class="text-red-600">7 red</b> balls, <b class="text-yellow-600">3 yellow</b> balls and
-        <b class="text-slate-900">5 black</b> balls. A child repeats drawing one ball at a time randomly from the bag
-        <b>without replacement</b> until a black ball is drawn. Find the probability that the child needs
-        <b>at most three draws</b>.
-      </p>
-
-      <!-- Bag visual -->
-      <div class="mt-4 flex flex-wrap items-center gap-2 bg-slate-50 rounded-xl p-3 border border-slate-200">
-        <span class="text-xs font-semibold text-slate-500 mr-1">Bag (15 balls):</span>
-        <span id="bagVis" class="flex flex-wrap gap-1"></span>
-      </div>
-
-      <!-- Options -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5">
-        <button onclick="checkAnswer('A')" data-opt="A" class="option-btn bg-white border-2 border-slate-200 rounded-xl py-3 px-2 font-bold text-slate-700 hover:border-indigo-400 hover:bg-indigo-50 transition text-sm">
-          A &nbsp; \(\frac{4}{7}\)
-        </button>
-        <button onclick="checkAnswer('B')" data-opt="B" class="option-btn bg-white border-2 border-slate-200 rounded-xl py-3 px-2 font-bold text-slate-700 hover:border-indigo-400 hover:bg-indigo-50 transition text-sm">
-          B &nbsp; \(\frac{5}{9}\)
-        </button>
-        <button onclick="checkAnswer('C')" data-opt="C" class="option-btn bg-white border-2 border-slate-200 rounded-xl py-3 px-2 font-bold text-slate-700 hover:border-indigo-400 hover:bg-indigo-50 transition text-sm">
-          C &nbsp; \(\frac{19}{27}\)
-        </button>
-        <button onclick="checkAnswer('D')" data-opt="D" class="option-btn bg-white border-2 border-slate-200 rounded-xl py-3 px-2 font-bold text-slate-700 hover:border-indigo-400 hover:bg-indigo-50 transition text-sm">
-          D &nbsp; \(\frac{67}{91}\)
-        </button>
-      </div>
-      <p id="feedback" class="mt-3 text-sm font-semibold min-h-[1.25rem]"></p>
-    </section>
-
-    <!-- ===== KEY IDEA ===== -->
-    <section class="bg-amber-50 border border-amber-200 rounded-2xl p-5">
-      <h2 class="text-sm font-bold text-amber-700 uppercase tracking-wide mb-2">💡 Core Idea — "At Most" → Think Complement</h2>
-      <p class="text-amber-900 text-sm leading-relaxed">
-        "Needs <b>at most 3 draws</b>" means the first black ball appears on draw 1, 2 or 3.
-        Instead of adding three separate cases, it is much cleaner to use the <b>complement rule</b>:
-      </p>
-      <p class="text-center text-amber-900 mt-3 text-base font-semibold">
-        \(P(\text{at most 3 draws}) = 1 - P(\text{more than 3 draws})\)
-      </p>
-      <p class="text-amber-800 text-sm mt-2">
-        "More than 3 draws" means the <b>first three balls are all non-black</b> (red or yellow).
-      </p>
-    </section>
-
-    <!-- ===== INTERACTIVE DEMO ===== -->
-    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6">
-      <h2 class="text-sm font-bold text-indigo-600 uppercase tracking-wide mb-3">🎲 Interactive Draw Simulator</h2>
-      <p class="text-slate-600 text-sm mb-4">
-        Watch how the probability of drawing a black ball changes after each non-black ball is removed.
-        Press <b>Draw Next Ball</b> to simulate drawing <i>without replacement</i>.
-      </p>
-
-      <div class="flex flex-wrap gap-3 mb-4">
-        <button id="drawBtn" onclick="drawBall()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-5 py-2.5 rounded-xl shadow transition text-sm">
-          Draw Next Ball
-        </button>
-        <button onclick="resetDemo()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-5 py-2.5 rounded-xl transition text-sm border border-slate-200">
-          Reset Bag
-        </button>
-      </div>
-
-      <!-- Current state -->
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
-          <p class="text-xs font-semibold text-slate-500 uppercase">Black balls left</p>
-          <p id="statBlack" class="text-2xl font-extrabold text-slate-900">5</p>
+      <div class="card panel">
+        <h1>HKDSE 2021 Paper 2 — Q43</h1>
+        <p class="sub">Topic 14 · Probability (drawing without replacement)</p>
+        <div class="qtext">
+          <p>A bag contains $7$ red balls, $3$ yellow balls and $5$ black balls. A child repeats drawing one ball at a time randomly from the bag without replacement until a black ball is drawn. Find the probability that the child needs <b>at most three draws</b>.</p>
         </div>
-        <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
-          <p class="text-xs font-semibold text-slate-500 uppercase">Total balls left</p>
-          <p id="statTotal" class="text-2xl font-extrabold text-slate-900">15</p>
-        </div>
-        <div class="bg-indigo-50 rounded-xl p-4 border border-indigo-200">
-          <p class="text-xs font-semibold text-indigo-600 uppercase">P(black next)</p>
-          <p id="statProb" class="text-2xl font-extrabold text-indigo-700">\(\frac{5}{15}\)</p>
+        <div class="opts">
+          <div class="opt"><b>A.</b> $\dfrac{4}{7}$</div>
+          <div class="opt"><b>B.</b> $\dfrac{5}{9}$</div>
+          <div class="opt"><b>C.</b> $\dfrac{19}{27}$</div>
+          <div class="opt right"><b>D.</b> $\dfrac{67}{91}$</div>
         </div>
       </div>
 
-      <!-- Draw history -->
-      <div class="mt-4">
-        <p class="text-xs font-semibold text-slate-500 uppercase mb-2">Draw history</p>
-        <div id="history" class="flex flex-wrap gap-1.5 min-h-[34px] bg-slate-50 rounded-xl p-3 border border-slate-200">
-          <span class="text-xs text-slate-400 italic">No draws yet…</span>
+      <figure style="margin:12px 0;text-align:center;"><img src="figures/2021_P2_Q43.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
+
+      <div class="card panel">
+        <h2>Step-by-step solution</h2>
+
+        <div class="step" data-step="1">
+          <span class="tag">Step 1</span><b>Read off the bag.</b>
+          Total balls $=7+3+5=15$. Only the $5$ black balls stop the process, so the
+          <b>non-black</b> balls are $10$ in number.
+          <span class="hint">Hint: “needs at most 3 draws” = a black ball appears in draw 1, 2 or 3.</span>
+        </div>
+
+        <div class="step" data-step="2">
+          <span class="tag">Step 2</span><b>Use the complement.</b>
+          Counting the complement is much easier: the child needs <i>more</i> than $3$ draws exactly when
+          the first three balls drawn are all non-black.
+          $$P(>3\text{ draws}) = ?$$
+          <span class="hint">Hint: “more than 3 draws” happens iff the first 3 draws are red or yellow.</span>
+        </div>
+
+        <div class="step" data-step="3">
+          <span class="tag">Step 3</span><b>Method 1.1 — count combinations.</b>
+          Total ways of choosing the first $3$ balls: $C_3^{15}$. Favourable ways (all non-black): $C_3^{10}$.
+          $$P(>3\text{ draws})=\frac{C_3^{10}}{C_3^{15}}=\frac{120}{455}=\frac{24}{91}.$$
+          <span class="hint">Hint: $C_3^{10}=\frac{10\cdot9\cdot8}{6}=120$, $C_3^{15}=\frac{15\cdot14\cdot13}{6}=455$.</span>
+        </div>
+
+        <div class="step" data-step="4">
+          <span class="tag">Step 4</span><b>Method 1.2 — multiply the fractions.</b>
+          $$\frac{10}{15}\times\frac{9}{14}\times\frac{8}{13}=\frac{24}{91}.$$
+          <span class="hint">Hint: the numerators 10, 9, 8 decrease because each non-black ball removed is not replaced.</span>
+        </div>
+
+        <div class="step" data-step="5">
+          <span class="tag">Step 5</span><b>Take the complement.</b>
+          $$P(\le 3\text{ draws}) = 1 - P(>3\text{ draws}) = 1-\frac{24}{91}=\frac{67}{91}.$$
+          <span class="hint">Hint: subtract from 1 — the complement of “at most 3” is “more than 3”.</span>
+        </div>
+
+        <div class="answer">
+          Answer: <span class="big">D</span> &nbsp;$\dfrac{67}{91}$
         </div>
       </div>
 
-      <p id="demoMsg" class="mt-3 text-sm font-semibold text-slate-600 min-h-[1.25rem]"></p>
-    </section>
-
-    <!-- ===== STEP-BY-STEP SOLUTION ===== -->
-    <section class="space-y-4">
-      <h2 class="text-lg font-extrabold text-slate-800 flex items-center gap-2">
-        <span class="bg-indigo-600 text-white text-xs rounded-lg px-2 py-1">STEP BY STEP</span>
-        Guided Solution
-      </h2>
-
-      <!-- Step 1 -->
-      <div class="step-card bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-        <button onclick="toggleStep(this)" class="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-slate-50 transition">
-          <span class="font-bold text-slate-800 text-sm sm:text-base"><span class="text-indigo-600">Step 1.</span> Identify the total &amp; the "success" condition</span>
-          <span class="chev text-slate-400 text-xl font-light">+</span>
-        </button>
-        <div class="step-content px-5 pb-5 text-slate-700 text-sm leading-relaxed" style="display:none;">
-          <p>Total balls: \(7 + 3 + 5 = 15\).</p>
-          <p class="mt-2">A draw is a "success" the moment a <b class="text-slate-900">black ball</b> is drawn.</p>
-          <p class="mt-2">We want <b>at most 3 draws</b>: the first black ball appears on draw \(1\), \(2\) or \(3\).</p>
-          <div class="mt-3 bg-slate-50 border border-slate-200 rounded-xl p-3">
-            <p class="text-xs font-bold text-slate-500 uppercase mb-1">Hint · Complement Formula</p>
-            <p>\(P(\text{at most 3}) = 1 - P(\text{more than 3 draws})\)</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Step 2 -->
-      <div class="step-card bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-        <button onclick="toggleStep(this)" class="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-slate-50 transition">
-          <span class="font-bold text-slate-800 text-sm sm:text-base"><span class="text-indigo-600">Step 2.</span> What does "more than 3 draws" mean?</span>
-          <span class="chev text-slate-400 text-xl font-light">+</span>
-        </button>
-        <div class="step-content px-5 pb-5 text-slate-700 text-sm leading-relaxed" style="display:none;">
-          <p>The child needs <b>more than 3 draws</b> ⟺ the first three balls drawn are <b>all non-black</b>.</p>
-          <p class="mt-2">Non-black balls = red + yellow = \(7 + 3 = 10\).</p>
-          <div class="flex items-center gap-2 mt-3">
-            <span class="ball red-ball">R</span><span class="ball red-ball">R</span><span class="ball yellow-ball">Y</span>
-            <span class="text-slate-500 text-xs">… any 3 of the 10 non-black balls.</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Step 3 -->
-      <div class="step-card bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-        <button onclick="toggleStep(this)" class="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-slate-50 transition">
-          <span class="font-bold text-slate-800 text-sm sm:text-base"><span class="text-indigo-600">Step 3.</span> Method A — Whole-process counting with combinations</span>
-          <span class="chev text-slate-400 text-xl font-light">+</span>
-        </button>
-        <div class="step-content px-5 pb-5 text-slate-700 text-sm leading-relaxed" style="display:none;">
-          <p>Consider choosing the first <b>3</b> balls from the <b>15</b> balls.</p>
-          <p class="mt-2">Total ways: \(\displaystyle C^{15}_{3}\)</p>
-          <p class="mt-2">Favourable ways (all non-black, chosen from the \(10\) non-black balls): \(\displaystyle C^{10}_{3}\)</p>
-          <p class="mt-3 text-center bg-indigo-50 rounded-xl py-3 font-semibold text-indigo-800 text-base">
-            \(\displaystyle P(>3)= \frac{C^{10}_{3}}{C^{15}_{3}} = \frac{120}{455} = \frac{24}{91}\)
-          </p>
-          <div class="mt-3 bg-slate-50 border border-slate-200 rounded-xl p-3">
-            <p class="text-xs font-bold text-slate-500 uppercase mb-1">Hint · Combination Formula</p>
-            <p>\(C^{n}_{r} = \dfrac{n!}{r!\,(n-r)!}\)  — ways of choosing \(r\) objects from \(n\) without order.</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Step 4 -->
-      <div class="step-card bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-        <button onclick="toggleStep(this)" class="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-slate-50 transition">
-          <span class="font-bold text-slate-800 text-sm sm:text-base"><span class="text-indigo-600">Step 4.</span> Method B — Multiply probabilities step by step</span>
-          <span class="chev text-slate-400 text-xl font-light">+</span>
-        </button>
-        <div class="step-content px-5 pb-5 text-slate-700 text-sm leading-relaxed" style="display:none;">
-          <p>Because we draw <b>without replacement</b>, each numerator and denominator decreases by 1.</p>
-          <ol class="mt-2 space-y-1 list-decimal list-inside">
-            <li>Draw 1 non-black: \(\dfrac{10}{15}\)</li>
-            <li>Draw 2 non-black: \(\dfrac{9}{14}\)</li>
-            <li>Draw 3 non-black: \(\dfrac{8}{13}\)</li>
-          </ol>
-          <p class="mt-3 text-center bg-emerald-50 rounded-xl py-3 font-semibold text-emerald-800 text-base">
-            \(\displaystyle P(>3)= \frac{10}{15}\cdot\frac{9}{14}\cdot\frac{8}{13} = \frac{24}{91}\)
-          </p>
-          <div class="mt-3 bg-slate-50 border border-slate-200 rounded-xl p-3">
-            <p class="text-xs font-bold text-slate-500 uppercase mb-1">Hint</p>
-            <p>Independent events multiply: \(P(A\cap B\cap C)=P(A)\,P(B|A)\,P(C|A\cap B)\).</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Step 5 -->
-      <div class="step-card bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-        <button onclick="toggleStep(this)" class="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-slate-50 transition">
-          <span class="font-bold text-slate-800 text-sm sm:text-base"><span class="text-indigo-600">Step 5.</span> Use complement to get the final answer</span>
-          <span class="chev text-slate-400 text-xl font-light">+</span>
-        </button>
-        <div class="step-content px-5 pb-5 text-slate-700 text-sm leading-relaxed" style="display:none;">
-          <p>Required probability:</p>
-          <p class="text-center bg-indigo-50 rounded-xl py-3 font-semibold text-indigo-800 text-base mt-2">
-            \(\displaystyle 1 - \frac{24}{91} = \frac{91-24}{91} = \frac{67}{91}\)
-          </p>
-          <p class="mt-3 bg-emerald-100 border border-emerald-300 rounded-xl p-3 text-emerald-900 font-bold text-center">
-            ✅ Answer: Option D &nbsp; \(\dfrac{67}{91}\)
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== TREE DIAGRAM ===== -->
-    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6">
-      <h2 class="text-sm font-bold text-indigo-600 uppercase tracking-wide mb-3">🌳 Decision Tree (First 3 Draws)</h2>
-      <p class="text-slate-600 text-sm mb-4">Each branch shows the probability of drawing a non-black or black ball at that stage.</p>
-      <div class="overflow-x-auto">
-        <svg id="tree" viewBox="0 0 640 320" class="w-full min-w-[520px]" style="max-height:340px;"></svg>
-      </div>
-      <div class="mt-3 flex flex-wrap gap-4 text-xs text-slate-600">
-        <span class="flex items-center gap-1"><span class="inline-block w-3 h-3 rounded" style="background:#10b981"></span>Non-black branch (R/Y)</span>
-        <span class="flex items-center gap-1"><span class="inline-block w-3 h-3 rounded" style="background:#6366f1"></span>Black branch (stop = success)</span>
-      </div>
-    </section>
-
-    <!-- ===== SUMMARY ===== -->
-    <section class="bg-gradient-to-r from-indigo-600 to-sky-500 text-white rounded-2xl p-5 sm:p-6 shadow-lg">
-      <h2 class="text-sm font-bold uppercase tracking-wide text-indigo-100 mb-2">Key Takeaway</h2>
-      <p class="text-sm leading-relaxed">
-        When a question says <b>"at most \(k\)"</b> or <b>"at least \(k\)"</b>, first check whether the
-        <b>complement</b> gives a shorter calculation. Here "more than 3 draws" collapses three cases into one:
-        <b>the first three balls are all non-black</b>.
-      </p>
-      <p class="mt-3 bg-white/15 rounded-xl p-3 text-center font-bold text-base">
-        \(P = 1 - \dfrac{10}{15}\cdot\dfrac{9}{14}\cdot\dfrac{8}{13} = 1 - \dfrac{24}{91} = \dfrac{67}{91}\)
-      </p>
-    </section>
-
-    <p class="text-center text-xs text-slate-400 pb-6">HKDSE 2021 Paper 2 Q43 · Interactive Solution</p>
-  </main>
+    </div><!-- /right -->
+  </div><!-- /split -->
+</div><!-- /wrap -->
 
 <script>
-/* ---------- Bag visual (static) ---------- */
-const bagEl = document.getElementById('bagVis');
-for (let i = 0; i < 7; i++) bagEl.insertAdjacentHTML('beforeend', '<span class="ball red-ball">R</span>');
-for (let i = 0; i < 3; i++) bagEl.insertAdjacentHTML('beforeend', '<span class="ball yellow-ball">Y</span>');
-for (let i = 0; i < 5; i++) bagEl.insertAdjacentHTML('beforeend', '<span class="ball black-ball">B</span>');
+(function(){
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  const ro  = document.getElementById('readout');
 
-/* ---------- MCQ checking ---------- */
-const CORRECT = 'D';
-function checkAnswer(opt) {
-  const fb = document.getElementById('feedback');
-  document.querySelectorAll('.option-btn').forEach(b => {
-    b.classList.remove('bg-emerald-100','border-emerald-500','bg-rose-100','border-rose-500');
-  });
-  const btn = document.querySelector(`.option-btn[data-opt="${opt}"]`);
-  if (opt === CORRECT) {
-    btn.classList.add('bg-emerald-100','border-emerald-500');
-    fb.textContent = '✅ Correct! The answer is D = 67/91.';
-    fb.className = 'mt-3 text-sm font-semibold min-h-[1.25rem] text-emerald-600';
-  } else {
-    btn.classList.add('bg-rose-100','border-rose-500');
-    fb.textContent = '❌ Not quite. Hint: try the complement — P(more than 3 draws).';
-    fb.className = 'mt-3 text-sm font-semibold min-h-[1.25rem] text-rose-600';
+  const W = cv.width, H = cv.height;
+
+  function roundRect(c,x,y,w,h,r){
+    c.beginPath();
+    c.moveTo(x+r,y);
+    c.arcTo(x+w,y,x+w,y+h,r);
+    c.arcTo(x+w,y+h,x,y+h,r);
+    c.arcTo(x,y+h,x,y,r);
+    c.arcTo(x,y,x+w,y,r);
+    c.closePath();
   }
-}
 
-/* ---------- Accordion steps ---------- */
-function toggleStep(btn) {
-  const content = btn.nextElementSibling;
-  const chev = btn.querySelector('.chev');
-  if (content.style.display === 'block') {
-    content.style.display = 'none';
-    chev.textContent = '+';
-  } else {
-    content.style.display = 'block';
-    content.classList.add('fade-in');
-    chev.textContent = '−';
-    if (window.MathJax && window.MathJax.typesetPromise) window.MathJax.typesetPromise([content]);
-  }
-}
-
-/* ---------- Draw simulator ---------- */
-let state = { red: 7, yellow: 3, black: 5, history: [], stopped: false, neededDraws: null };
-
-function updateStats() {
-  const total = state.red + state.yellow + state.black;
-  document.getElementById('statBlack').textContent = state.black;
-  document.getElementById('statTotal').textContent = total;
-  const probEl = document.getElementById('statProb');
-  probEl.innerHTML = total > 0
-    ? `\\(\\frac{${state.black}}{${total}}\\)`
-    : '0';
-  if (window.MathJax && window.MathJax.typesetPromise) window.MathJax.typesetPromise([probEl]);
-}
-
-function renderHistory() {
-  const h = document.getElementById('history');
-  if (state.history.length === 0) {
-    h.innerHTML = '<span class="text-xs text-slate-400 italic">No draws yet…</span>';
-    return;
-  }
-  h.innerHTML = state.history.map((c, i) => {
-    const cls = c === 'R' ? 'red-ball' : c === 'Y' ? 'yellow-ball' : 'black-ball';
-    return `<span class="ball ${cls}" title="Draw ${i+1}">${c}</span>`;
-  }).join('');
-}
-
-function drawBall() {
-  const btn = document.getElementById('drawBtn');
-  const msg = document.getElementById('demoMsg');
-  if (state.stopped) {
-    msg.textContent = 'The process has stopped (a black ball was drawn). Press Reset to try again.';
-    return;
-  }
-  const total = state.red + state.yellow + state.black;
-  if (total === 0) return;
-
-  const r = Math.random() * total;
-  let color;
-  if (r < state.red) { color = 'R'; state.red--; }
-  else if (r < state.red + state.yellow) { color = 'Y'; state.yellow--; }
-  else { color = 'B'; state.black--; }
-
-  state.history.push(color);
-  renderHistory();
-  updateStats();
-  msg.className = 'mt-3 text-sm font-semibold min-h-[1.25rem] text-slate-600';
-
-  if (color === 'B') {
-    state.stopped = true;
-    const n = state.history.length;
-    state.neededDraws = n;
-    if (n <= 3) {
-      msg.textContent = `Black drawn on draw ${n} → qualifies for "at most 3 draws". ✔`;
-      msg.classList.add('text-emerald-600');
-    } else {
-      msg.textContent = `Black only appeared on draw ${n} → this is a "more than 3 draws" case. ✘`;
-      msg.classList.add('text-rose-600');
+  // draw a ball at (x,y) with radius r and colour
+  function ball(c,x,y,r,color,dark,label){
+    const g = c.createRadialGradient(x-r*0.35,y-r*0.4,r*0.15,x,y,r);
+    g.addColorStop(0,color);
+    g.addColorStop(1,dark);
+    c.beginPath();
+    c.arc(x,y,r,0,Math.PI*2);
+    c.fillStyle=g;
+    c.fill();
+    c.lineWidth=1.2;
+    c.strokeStyle='rgba(0,0,0,.28)';
+    c.stroke();
+    if(label){
+      c.fillStyle = (label==='B') ? '#fff' : 'rgba(0,0,0,.75)';
+      c.font = 'bold '+(r*0.95)+'px Segoe UI, Arial';
+      c.textAlign='center'; c.textBaseline='middle';
+      c.fillText(label,x,y+0.5);
     }
-    btn.disabled = true;
-    btn.classList.add('opacity-50','cursor-not-allowed');
-  } else {
-    const totalNow = state.red + state.yellow + state.black;
-    msg.textContent = `Drew ${color} (non-black). ${totalNow} balls left — the black-ball probability has gone up!`;
   }
-}
 
-function resetDemo() {
-  state = { red: 7, yellow: 3, black: 5, history: [], stopped: false, neededDraws: null };
-  const btn = document.getElementById('drawBtn');
-  btn.disabled = false;
-  btn.classList.remove('opacity-50','cursor-not-allowed');
-  document.getElementById('demoMsg').textContent = '';
-  document.getElementById('demoMsg').className = 'mt-3 text-sm font-semibold min-h-[1.25rem] text-slate-600';
-  renderHistory();
-  updateStats();
-}
+  const REDC='#ff6b66', REDD='#c02a26';
+  const YELC='#ffd76a', YELD='#c98d09';
+  const BLC ='#5b626d', BLD ='#191c21';
 
-/* ---------- SVG Decision Tree ---------- */
-(function buildTree() {
-  const svg = document.getElementById('tree');
-  const NS = 'http://www.w3.org/2000/svg';
-  const nodes = [];
-  const edges = [];
+  function drawBag(c,x,y,w,h,highlight){
+    c.save();
+    c.lineWidth = highlight?3:1.6;
+    c.strokeStyle = highlight ? '#2b6cb0' : '#9aa7ba';
+    c.fillStyle = '#f2f6fb';
+    roundRect(c,x,y,w,h,14);
+    c.fill(); c.stroke();
+    c.restore();
+  }
 
-  // Level positions
-  const levels = [
-    { x: 320, y: 30 },   // start
-    { x: 180, y: 110 },  // after draw1 non-black
-    { x: 460, y: 110 },  // after draw1 black -> stop
-    { x: 100, y: 200 },  // after draw2 non-black
-    { x: 260, y: 200 },  // after draw2 black -> stop
-    { x: 60,  y: 290 },  // after draw3 non-black
-    { x: 160, y: 290 }   // after draw3 black -> stop
+  function title(c,txt,x,y,size,color){
+    c.fillStyle=color||'#1f2937';
+    c.font='bold '+(size||15)+'px Segoe UI, Arial';
+    c.textAlign='left'; c.textBaseline='alphabetic';
+    c.fillText(txt,x,y);
+  }
+
+  function sub(c,txt,x,y,size,color){
+    c.fillStyle=color||'#5b6675';
+    c.font=(size||12.5)+'px Segoe UI, Arial';
+    c.textAlign='left'; c.textBaseline='alphabetic';
+    c.fillText(txt,x,y);
+  }
+
+  function chip(c,x,y,label,color,txtColor){
+    c.font='bold 13px Segoe UI, Arial';
+    const w = c.measureText(label).width + 20;
+    roundRect(c,x,y,w,24,12);
+    c.fillStyle=color; c.fill();
+    c.fillStyle=txtColor||'#fff';
+    c.textAlign='center'; c.textBaseline='middle';
+    c.fillText(label,x+w/2,y+12.5);
+    return w;
+  }
+
+  function clear(){
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#fbfdff';
+    ctx.fillRect(0,0,W,H);
+  }
+
+  /* ---------- the balls in the bag, positions computed once ---------- */
+  const bag = {x:30,y:120,w:290,h:250};
+  const rBall = 16;
+
+  const positions = [];
+  const cols = 4;
+  // layout: 7 red, 3 yellow, 5 black -> rows
+  const groups = [
+    {n:7, colors:[REDC,REDD], label:'R'},
+    {n:3, colors:[YELC,YELD], label:'Y'},
+    {n:5, colors:[BLC,BLD],   label:'B'}
   ];
-
-  const edgeData = [
-    { from: 0, to: 1, label: '10/15', color: '#10b981' },
-    { from: 0, to: 2, label: '5/15',  color: '#6366f1' },
-    { from: 1, to: 3, label: '9/14',  color: '#10b981' },
-    { from: 1, to: 4, label: '5/14',  color: '#6366f1' },
-    { from: 3, to: 5, label: '8/13',  color: '#10b981' },
-    { from: 3, to: 6, label: '5/13',  color: '#6366f1' }
-  ];
-
-  // Draw edges
-  edgeData.forEach(e => {
-    const a = levels[e.from], b = levels[e.to];
-    const line = document.createElementNS(NS, 'line');
-    line.setAttribute('x1', a.x); line.setAttribute('y1', a.y + 6);
-    line.setAttribute('x2', b.x); line.setAttribute('y2', b.y - 14);
-    line.setAttribute('stroke', e.color);
-    line.setAttribute('stroke-width', '2');
-    line.setAttribute('opacity', '0.85');
-    svg.appendChild(line);
-
-    const midX = (a.x + b.x) / 2, midY = (a.y + b.y) / 2;
-    const txt = document.createElementNS(NS, 'text');
-    txt.setAttribute('x', midX + (e.from === 0 ? (e.to === 1 ? 12 : -12) : 0));
-    txt.setAttribute('y', midY - 2);
-    txt.setAttribute('fill', e.color);
-    txt.setAttribute('font-size', '11');
-    txt.setAttribute('font-weight', '700');
-    txt.textContent = e.label;
-    svg.appendChild(txt);
-  });
-
-  // Draw nodes
-  const nodeLabels = [
-    'Start (15 balls)',
-    'Non-black\n(10 balls)',
-    'BLACK → stop\n(success)',
-    'Non-black\n(9 balls)',
-    'BLACK → stop\n(success)',
-    'Non-black ×3',
-    'BLACK → stop\n(success)'
-  ];
-
-  levels.forEach((p, i) => {
-    const isStop = nodeLabels[i].includes('BLACK');
-    const circle = document.createElementNS(NS, 'circle');
-    circle.setAttribute('cx', p.x);
-    circle.setAttribute('cy', p.y);
-    circle.setAttribute('r', isStop ? 14 : 17);
-    circle.setAttribute('fill', i === 0 ? '#e0e7ff' : (isStop ? '#6366f1' : '#d1fae5'));
-    circle.setAttribute('stroke', isStop ? '#4338ca' : '#10b981');
-    circle.setAttribute('stroke-width', '2');
-    svg.appendChild(circle);
-
-    const lines = nodeLabels[i].split('\n');
-    lines.forEach((ln, k) => {
-      const t = document.createElementNS(NS, 'text');
-      t.setAttribute('x', p.x);
-      t.setAttribute('y', p.y + 24 + k * 13);
-      t.setAttribute('text-anchor', 'middle');
-      t.setAttribute('fill', isStop ? '#4338ca' : '#065f46');
-      t.setAttribute('font-size', '10.5');
-      t.setAttribute('font-weight', '700');
-      t.textContent = ln;
-      svg.appendChild(t);
+  (function(){
+    let idx = 0;
+    const startX = bag.x + 46;
+    const startY = bag.y + 42;
+    const dx = 72, dy = 62;
+    groups.forEach(g=>{
+      for(let i=0;i<g.n;i++){
+        const col = i % cols;
+        const row = Math.floor(i/cols) + Math.floor(idx/ cols === 0 ? 0 : 0);
+        positions.push({color:g.colors[0], dark:g.colors[1], label:g.label});
+        idx++;
+      }
     });
-  });
+  })();
 
-  // Footer note
-  const note = document.createElementNS(NS, 'text');
-  note.setAttribute('x', 320);
-  note.setAttribute('y', 318);
-  note.setAttribute('text-anchor', 'middle');
-  note.setAttribute('fill', '#64748b');
-  note.setAttribute('font-size', '11');
-  note.textContent = 'P(more than 3) = (10/15)(9/14)(8/13) = 24/91';
-  svg.appendChild(note);
+  // simpler explicit layout grid 4 columns
+  const layout = [
+    // red 7
+    {c:0,r:0,t:'r'},{c:1,r:0,t:'r'},{c:2,r:0,t:'r'},{c:3,r:0,t:'r'},
+    {c:0,r:1,t:'r'},{c:1,r:1,t:'r'},{c:2,r:1,t:'r'},
+    // yellow 3
+    {c:0,r:2,t:'y'},{c:1,r:2,t:'y'},{c:2,r:2,t:'y'},
+    // black 5
+    {c:0,r:3,t:'b'},{c:1,r:3,t:'b'},{c:2,r:3,t:'b'},{c:3,r:3,t:'b'},
+    {c:0,r:4,t:'b'}
+  ];
+
+  function drawBagBalls(step){
+    const colors = {
+      r:[REDC,REDD,'R'], y:[YELC,YELD,'Y'], b:[BLC,BLD,'B']
+    };
+    const nonBlackDim = (step>=2 && step<=4);
+    layout.forEach(p=>{
+      const x = bag.x + 46 + p.c*72;
+      const y = bag.y + 44 + p.r*56;
+      let cc = colors[p.t][0], dd = colors[p.t][1];
+      ctx.globalAlpha = 1;
+      if(nonBlackDim && p.t!=='b'){ ctx.globalAlpha = 1; }
+      if(nonBlackDim && p.t==='b'){ ctx.globalAlpha = 0.28; }
+      ball(ctx,x,y,rBall,cc,dd,colors[p.t][2]);
+      ctx.globalAlpha = 1;
+    });
+  }
+
+  /* ---------- tree diagram ---------- */
+  function drawTree(step){
+    const x0 = 360;
+    const y0 = 70;
+    const colW = [0, 118, 118];
+    const nodes = [];
+
+    title(ctx,'Tree diagram — first 3 draws', x0, 46, 15, '#1f2937');
+    sub(ctx,'15 balls: 10 non-black, 5 black', x0, 63, 12.5);
+
+    // level 0
+    const L0 = {x:x0, y:y0+40};
+    // level 1
+    const L1b = {x:x0+colW[1]+colW[1]*0.55, y:y0+40};
+    const L1n = {x:x0+colW[1]+colW[1]*0.55, y:y0+150};
+
+    // level 2
+    const L2b = {x:x0+2*(colW[1]+colW[1]*0.55), y:y0+20};
+    const L2n = {x:x0+2*(colW[1]+colW[1]*0.55), y:y0+110};
+
+    // level 3
+    const L3b = {x:x0+3*(colW[1]+colW[1]*0.55), y:y0+0};
+    const L3n = {x:x0+3*(colW[1]+colW[1]*0.55), y:y0+70};
+
+    function edge(a,b,label,prob,color,dash){
+      ctx.save();
+      ctx.strokeStyle=color;
+      ctx.lineWidth = dash?1.6:2;
+      if(dash) ctx.setLineDash([5,4]);
+      ctx.beginPath(); ctx.moveTo(a.x,a.y);
+      const mx=(a.x+b.x)/2;
+      ctx.bezierCurveTo(mx,a.y, mx,b.y, b.x,b.y);
+      ctx.stroke();
+      ctx.restore();
+
+      // label
+      ctx.fillStyle=color;
+      ctx.font='bold 11.5px Segoe UI, Arial';
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText(label,(a.x+b.x)/2, (a.y+b.y)/2 - 7);
+      ctx.fillStyle='#5b6675';
+      ctx.font='11.5px Segoe UI, Arial';
+      ctx.fillText(prob,(a.x+b.x)/2, (a.y+b.y)/2 + 8);
+    }
+
+    function node(p,label,color){
+      ctx.beginPath(); ctx.arc(p.x,p.y,4.5,0,Math.PI*2);
+      ctx.fillStyle=color; ctx.fill();
+      ctx.fillStyle='#1f2937';
+      ctx.font='bold 12px Segoe UI, Arial';
+      ctx.textAlign='center'; ctx.textBaseline='bottom';
+      ctx.fillText(label,p.x,p.y-8);
+    }
+
+    const fade = (step<2);
+
+    ctx.globalAlpha = fade?0.28:1;
+
+    // L0 -> L1
+    edge(L0,L1b,'Black','5/15','#2b2f36');
+    edge(L0,L1n,'Non-black','10/15','#2b6cb0');
+    node(L0,'start','#2b6cb0');
+
+    // L1 non-black -> L2
+    edge(L1n,L2b,'Black','5/14','#2b2f36');
+    edge(L1n,L2n,'Non-black','9/14','#2b6cb0');
+    node(L1n,'','#2b6cb0');
+
+    // L2 non-black -> L3
+    edge(L2n,L3b,'Black','5/13','#2b2f36');
+    edge(L2n,L3n,'Non-black','8/13','#2b6cb0');
+    node(L2n,'','#2b6cb0');
+
+    // endpoints
+    node(L1b,'','#2b2f36');
+    node(L2b,'','#2b2f36');
+    node(L3b,'','#2b2f36');
+    node(L3n,'','#2b6cb0');
+
+    ctx.globalAlpha=1;
+
+    if(step>=2){
+      // highlight the path "non-black, non-black, non-black" when relevant
+      ctx.save();
+      ctx.strokeStyle='#e8433f';
+      ctx.lineWidth=3.5;
+      if(step>=2){
+        ctx.globalAlpha=0.9;
+        ctx.beginPath(); ctx.moveTo(L0.x,L0.y); ctx.lineTo(L1n.x,L1n.y); ctx.lineTo(L2n.x,L2n.y); ctx.lineTo(L3n.x,L3n.y);
+        ctx.stroke();
+        ctx.restore();
+      } else { ctx.restore(); }
+    }
+
+    if(step>=2 && step<=4){
+      ctx.fillStyle='#e8433f';
+      ctx.font='bold 12.5px Segoe UI, Arial';
+      ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+      ctx.fillText('Highlighted path: 1st, 2nd and 3rd draws are all non-black  ⇒  > 3 draws', x0, y0+250);
+    }
+  }
+
+  /* ---------- step map chips ---------- */
+  function drawSteps(step){
+    const bx = 30, by = 430;
+    title(ctx,'Solution map', bx, by, 15, '#1f2937');
+    const items = [
+      ['1','15 balls: 10 non-black, 5 black', '#2b6cb0'],
+      ['2','Complement: P(>3 draws)', '#2b6cb0'],
+      ['3','C(10,3)/C(15,3) = 24/91', '#7c3aed'],
+      ['4','(10/15)(9/14)(8/13) = 24/91', '#7c3aed'],
+      ['5','1 − 24/91 = 67/91', '#2f9e63']
+    ];
+    items.forEach((it,i)=>{
+      const y = by + 14 + i*40;
+      const active = (i+1)===step;
+      ctx.globalAlpha = active?1:0.45;
+      chip(ctx,bx,y,it[0],it[2]);
+      ctx.fillStyle='#1f2937';
+      ctx.font=(active?'bold ':'')+'13.5px Segoe UI, Arial';
+      ctx.textAlign='left'; ctx.textBaseline='middle';
+      ctx.fillText(it[1], bx+40, y+12.5);
+      ctx.globalAlpha=1;
+    });
+  }
+
+  /* ---------- main draw ---------- */
+  let current = 1;
+  function draw(step){
+    current = step||current;
+    clear();
+
+    // header
+    title(ctx,'A bag of 15 balls', 30, 34, 18, '#1f2937');
+    sub(ctx,'7 red   •   3 yellow   •   5 black   (drawn without replacement)', 30, 55, 12.5);
+
+    // ---- bag on the left ----
+    const bagHL = (current===1);
+    drawBag(ctx, bag.x, bag.y, bag.w, bag.h, bagHL);
+    drawBagBalls(current);
+
+    // counts under bag
+    sub(ctx,'Red 7      Yellow 3      Black 5', bag.x+18, bag.y+bag.h+24, 13, '#1f2937');
+    sub(ctx,'Non-black balls = 7 + 3 = 10', bag.x+18, bag.y+bag.h+44, 13, '#2b6cb0');
+
+    // faded black balls indicator
+    if(current>=2 && current<=4){
+      ctx.fillStyle='#e8433f';
+      ctx.font='bold 12.5px Segoe UI, Arial';
+      ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+      ctx.fillText('“> 3 draws” must avoid ALL black balls', bag.x+18, bag.y+bag.h+66);
+    }
+
+    // ---- tree on the right ----
+    drawTree(current);
+
+    // ---- step chips ----
+    drawSteps(current);
+
+    // ---- readout ----
+    const texts = {
+      1:'Step 1 — Total 15 balls: 7 red + 3 yellow + 5 black. Non-black = 10.',
+      2:'Step 2 — Use the complement: P(> 3 draws) = P(first 3 balls are all non-black).',
+      3:'Step 3 — Method 1.1: C(10,3) / C(15,3) = 120 / 455 = 24/91.',
+      4:'Step 4 — Method 1.2: (10/15)(9/14)(8/13) = 24/91.',
+      5:'Step 5 — P(≤ 3 draws) = 1 − 24/91 = 67/91.  Answer: D.'
+    };
+    ro.textContent = texts[current] || texts[1];
+  }
+
+  /* ---------- scroll sync ---------- */
+  const io = new IntersectionObserver(es=>{
+    es.forEach(e=>{
+      if(e.isIntersecting){
+        const s = +e.target.dataset.step;
+        document.querySelectorAll('.step').forEach(el=>el.classList.toggle('active', +el.dataset.step===s));
+        draw(s);
+      }
+    });
+  },{rootMargin:'-25% 0px -55% 0px'});
+
+  document.querySelectorAll('.step').forEach(s=>io.observe(s));
+
+  draw(1);
 })();
-
-/* ---------- Init ---------- */
-renderHistory();
-updateStats();
-if (window.MathJax && window.MathJax.typesetPromise) {
-  window.MathJax.typesetPromise();
-}
 </script>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
-
 </body>
 </html>

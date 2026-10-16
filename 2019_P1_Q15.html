@@ -5,808 +5,408 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HKDSE Math 2019 Paper 1 Q15 — Probability</title>
 <script>
-  MathJax = {
-    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
-    svg: { fontCache: 'global' }
-  };
+window.MathJax = {
+  tex: { inlineMath: [['$','$'], ['\\(','\\)']], displayMath: [['$$','$$'], ['\\[','\\]']] },
+  svg: { fontCache: 'global' }
+};
 </script>
-<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root{
+    --blue:#2563eb; --red:#e11d48; --green:#059669; --amber:#d97706;
+    --purple:#7c3aed; --ink:#1e293b; --muted:#64748b; --line:#e2e8f0;
+    --bg:#f8fafc; --card:#ffffff;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    background:linear-gradient(180deg,#eef2ff 0%,var(--bg) 220px); color:var(--ink);
+    line-height:1.55; font-size:16px;
+  }
+  .wrap{padding:16px 14px 48px; max-width:1400px; margin:0 auto;}
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start;}
+  @media(min-width:900px){.split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}}
 
-  :root {
-    --brand: #2563eb;
-    --brand-dark: #1e40af;
-    --accent: #f59e0b;
-    --green: #16a34a;
-    --red: #dc2626;
-    --bg: #f1f5f9;
-    --card: #ffffff;
-    --text: #1e293b;
-    --muted: #64748b;
-    --border: #e2e8f0;
+  .diagram{
+    position:sticky; top:16px; max-height:calc(100vh - 2rem); overflow-y:auto;
+    background:var(--card); border:1px solid var(--line); border-radius:16px;
+    padding:14px 14px 10px; box-shadow:0 6px 22px rgba(15,23,42,.07);
   }
+  .diagram h2{margin:2px 0 10px; font-size:1.02rem; letter-spacing:.2px; color:var(--blue);}
+  canvas{width:100%; height:auto; display:block; border-radius:12px; background:#ffffff;}
+  .ro{
+    font-size:.86rem; color:var(--muted); margin:10px 2px 2px; min-height:2.4em;
+    border-left:3px solid var(--blue); padding-left:8px;
+  }
+  .legend{display:flex; flex-wrap:wrap; gap:6px 14px; font-size:.82rem; margin:10px 2px 0;}
+  .legend span{display:inline-flex; align-items:center; gap:6px;}
+  .sw{width:12px; height:12px; border-radius:3px; display:inline-block;}
 
-  body {
-    font-family: 'Segoe UI', 'PingFang HK', 'Microsoft JhengHei', system-ui, sans-serif;
-    background: linear-gradient(160deg, #eff6ff 0%, #f8fafc 40%, #f1f5f9 100%);
-    color: var(--text);
-    line-height: 1.65;
-    padding: 16px;
-    min-height: 100vh;
+  .qbox{
+    background:var(--card); border:1px solid var(--line); border-radius:16px;
+    padding:14px 16px; box-shadow:0 6px 22px rgba(15,23,42,.07);
   }
+  .qbox .tag{
+    display:inline-block; background:#eef2ff; color:var(--blue); font-weight:700;
+    font-size:.78rem; padding:2px 10px; border-radius:999px; margin-bottom:8px;
+  }
+  .qtext{font-size:1.02rem;}
+  .marks{text-align:right; color:var(--muted); font-weight:600; font-size:.9rem; margin-top:6px;}
 
-  .wrap { max-width: 860px; margin: 0 auto; }
-
-  /* ---------- Header ---------- */
-  .exam-tag {
-    display: inline-block;
-    background: var(--brand);
-    color: #fff;
-    font-size: 0.8rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    padding: 6px 14px;
-    border-radius: 999px;
-    margin-bottom: 12px;
+  .solutions{margin-top:14px; display:flex; flex-direction:column; gap:12px;}
+  .step{
+    background:var(--card); border:1px solid var(--line); border-left:5px solid var(--blue);
+    border-radius:14px; padding:12px 14px; box-shadow:0 4px 14px rgba(15,23,42,.05);
+    transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
   }
-
-  h1 {
-    font-size: clamp(1.3rem, 4vw, 1.8rem);
-    line-height: 1.3;
-    color: var(--brand-dark);
-    margin-bottom: 18px;
+  .step:hover{transform:translateY(-1px); box-shadow:0 8px 20px rgba(15,23,42,.1);}
+  .chip{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:26px; height:26px; border-radius:50%; font-size:.85rem; font-weight:800;
+    color:#fff; background:var(--blue); margin-right:8px; flex:none;
   }
-
-  /* ---------- Cards ---------- */
-  .card {
-    background: var(--card);
-    border-radius: 18px;
-    padding: 20px;
-    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.07);
-    border: 1px solid var(--border);
-    margin-bottom: 18px;
+  .step h3{
+    display:flex; align-items:center; margin:0 0 6px; font-size:.98rem; letter-spacing:.2px;
   }
-
-  .card h2 {
-    font-size: 1.05rem;
-    color: var(--brand-dark);
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+  .step .body{font-size:.97rem;}
+  .hint{
+    margin-top:8px; font-size:.85rem; color:#475569; background:#f1f5f9;
+    border-radius:9px; padding:6px 10px; border-left:3px solid #cbd5e1;
   }
-
-  .card h2 .dot {
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    background: var(--accent);
-    flex: 0 0 auto;
+  .ans{
+    background:linear-gradient(135deg,#ecfdf5,#d1fae5); border:1px solid #6ee7b7;
+    border-left:5px solid var(--green); border-radius:14px; padding:12px 14px;
+    font-weight:700; color:#065f46; font-size:1.03rem;
   }
-
-  /* ---------- Tags ---------- */
-  .tags { display: flex; flex-wrap: wrap; gap: 8px; }
-  .tag {
-    background: #e0edff;
-    color: var(--brand-dark);
-    font-size: 0.78rem;
-    font-weight: 600;
-    padding: 5px 12px;
-    border-radius: 999px;
-    border: 1px solid #cfe0ff;
-  }
-  .tag.green { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
-  .tag.amber { background: #fef3c7; color: #92400e; border-color: #fde68a; }
-
-  /* ---------- Question text ---------- */
-  .q-text {
-    font-size: 1rem;
-    background: #f8fafc;
-    border-left: 4px solid var(--brand);
-    border-radius: 8px;
-    padding: 14px 16px;
-    margin-bottom: 14px;
-  }
-  .q-text strong { color: var(--brand-dark); }
-
-  .marks { font-weight: 700; color: var(--red); font-size: 0.9rem; }
-
-  /* ---------- Counters / info chips ---------- */
-  .counter-row {
-    display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px;
-  }
-  .counter {
-    flex: 1 1 100px;
-    text-align: center;
-    background: #f1f5f9;
-    border-radius: 12px;
-    padding: 10px 6px;
-    border: 1px solid var(--border);
-  }
-  .counter .num { font-size: 1.4rem; font-weight: 800; color: var(--brand); }
-  .counter .lbl { font-size: 0.75rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
-
-  /* ---------- Steps ---------- */
-  .step {
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    margin-bottom: 12px;
-    overflow: hidden;
-    background: #fff;
-    transition: box-shadow .25s;
-  }
-  .step.open { box-shadow: 0 4px 16px rgba(37,99,235,.14); border-color: #bfdbfe; }
-
-  .step-head {
-    display: flex; align-items: center; gap: 12px;
-    padding: 14px 16px;
-    cursor: pointer;
-    user-select: none;
-    background: #f8fafc;
-    transition: background .2s;
-  }
-  .step-head:hover { background: #eff6ff; }
-  .step.open .step-head { background: #eff6ff; }
-
-  .step-num {
-    flex: 0 0 auto;
-    width: 30px; height: 30px;
-    border-radius: 50%;
-    background: var(--brand);
-    color: #fff;
-    font-weight: 700;
-    font-size: 0.9rem;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .step.open .step-num { background: var(--green); }
-
-  .step-title {
-    flex: 1;
-    font-weight: 700;
-    font-size: 0.95rem;
-    color: var(--text);
-  }
-
-  .chev {
-    flex: 0 0 auto;
-    font-size: 0.9rem;
-    color: var(--muted);
-    transition: transform .3s;
-  }
-  .step.open .chev { transform: rotate(180deg); }
-
-  .step-body {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height .4s ease;
-    padding: 0 16px;
-    border-top: 1px solid transparent;
-  }
-  .step.open .step-body {
-    max-height: 1200px;
-    padding: 14px 16px 18px;
-    border-top-color: var(--border);
-  }
-
-  .step-body p { margin-bottom: 10px; font-size: .95rem; }
-  .step-body ul { margin: 8px 0 10px 20px; font-size: .95rem; }
-  .step-body li { margin-bottom: 5px; }
-
-  /* Hint box */
-  .hint {
-    background: #fffbeb;
-    border: 1px dashed #fbbf24;
-    border-radius: 10px;
-    padding: 10px 14px;
-    font-size: 0.88rem;
-    color: #78350f;
-    margin-top: 10px;
-  }
-  .hint b { color: #b45309; }
-
-  .formula-box {
-    background: #f0f9ff;
-    border: 1px solid #bae6fd;
-    border-radius: 10px;
-    padding: 12px;
-    text-align: center;
-    margin: 10px 0;
-    overflow-x: auto;
-  }
-
-  .highlight {
-    background: #dbeafe;
-    padding: 2px 7px;
-    border-radius: 6px;
-    font-weight: 700;
-    color: var(--brand-dark);
-  }
-  .highlight.red { background: #fee2e2; color: #991b1b; }
-  .highlight.green { background: #dcfce7; color: #166534; }
-
-  /* ---------- Case table ---------- */
-  table.case-tbl {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: .88rem;
-    margin: 12px 0;
-    overflow: hidden;
-    border-radius: 10px;
-  }
-  table.case-tbl th, table.case-tbl td {
-    border: 1px solid var(--border);
-    padding: 8px 8px;
-    text-align: center;
-  }
-  table.case-tbl th {
-    background: #eff6ff; color: var(--brand-dark); font-size: .82rem;
-  }
-  table.case-tbl tr.bad td { background: #fff1f2; color: #b91c1c; }
-  table.case-tbl tr.good td { background: #f0fdf4; }
-  table.case-tbl tr.total td { background: #fef9c3; font-weight: 800; }
-
-  /* ---------- Buttons ---------- */
-  .btn-row {
-    display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px;
-  }
-  button {
-    font-family: inherit;
-    font-size: 0.88rem;
-    font-weight: 700;
-    border: none;
-    border-radius: 10px;
-    padding: 11px 18px;
-    cursor: pointer;
-    transition: transform .12s, background .2s, box-shadow .2s;
-    min-height: 44px;
-  }
-  button:active { transform: scale(.97); }
-
-  .btn-primary { background: var(--brand); color: #fff; }
-  .btn-primary:hover { background: var(--brand-dark); }
-  .btn-ghost { background: #e2e8f0; color: #334155; }
-  .btn-ghost:hover { background: #cbd5e1; }
-  .btn-amber { background: var(--accent); color: #fff; }
-  .btn-amber:hover { background: #d97706; }
-
-  /* ---------- Answer reveal ---------- */
-  .final-answer {
-    background: linear-gradient(135deg, #16a34a, #15803d);
-    color: #fff;
-    border-radius: 16px;
-    padding: 22px;
-    text-align: center;
-    box-shadow: 0 8px 24px rgba(22,163,74,.28);
-    margin-bottom: 18px;
-    display: none;
-    animation: pop .45s cubic-bezier(.34,1.56,.64,1);
-  }
-  @keyframes pop { 0% { transform: scale(.85); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-  .final-answer .lbl { font-size: .85rem; letter-spacing: .12em; text-transform: uppercase; opacity: .9; font-weight: 700; }
-  .final-answer .val { font-size: 2.1rem; font-weight: 900; margin: 6px 0; letter-spacing: .02em; }
-  .final-answer .note { font-size: .85rem; opacity: .95; }
-
-  /* ---------- Progress bar ---------- */
-  .progress-wrap {
-    background: #e2e8f0; border-radius: 999px; height: 8px;
-    margin-bottom: 18px; overflow: hidden;
-  }
-  .progress-bar {
-    height: 100%; width: 0%;
-    background: linear-gradient(90deg, #3b82f6, #22c55e);
-    border-radius: 999px;
-    transition: width .4s ease;
-  }
-
-  /* ---------- Interactive ---------- */
-  .slider-row { display: flex; align-items: center; gap: 12px; margin: 10px 0; }
-  .slider-row label { font-weight: 700; font-size: .9rem; min-width: 90px; }
-  input[type=range] {
-    flex: 1; accent-color: var(--brand); height: 30px; cursor: pointer;
-  }
-  .slider-val {
-    min-width: 44px; text-align: center; font-weight: 800; color: var(--brand);
-    background: #eff6ff; border-radius: 8px; padding: 4px 8px; font-size: .95rem;
-  }
-
-  .girl-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; justify-content: center; }
-  .seat {
-    width: 40px; height: 40px; border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 800; font-size: .9rem; color: #fff;
-    box-shadow: 0 2px 6px rgba(0,0,0,.12);
-    transition: transform .2s, background .3s;
-  }
-  .seat.boy { background: #3b82f6; }
-  .seat.girl { background: #ec4899; }
-  .seat.invalid { background: #ef4444; animation: shake .4s; }
-  @keyframes shake {
-    0%,100% { transform: translateX(0); }
-    25% { transform: translateX(-3px); }
-    75% { transform: translateX(3px); }
-  }
-
-  .verdict {
-    text-align: center; font-weight: 800; font-size: 1rem;
-    padding: 10px; border-radius: 10px; margin-top: 8px;
-  }
-  .verdict.ok { background: #dcfce7; color: #166534; }
-  .verdict.no { background: #fee2e2; color: #991b1b; }
-
-  .ncr-display {
-    font-size: .9rem; color: var(--muted); text-align: center;
-    margin-top: 6px; word-break: break-word;
-  }
-
-  /* ---------- Footer ---------- */
-  .footer {
-    text-align: center;
-    font-size: .78rem;
-    color: var(--muted);
-    padding: 12px 0 24px;
-  }
-
-  /* ---------- Mobile tweaks ---------- */
-  @media (max-width: 520px) {
-    body { padding: 10px; }
-    .card { padding: 16px; border-radius: 14px; }
-    .step-title { font-size: .88rem; }
-    .counter .num { font-size: 1.2rem; }
-    button { padding: 10px 14px; font-size: .84rem; }
-    .seat { width: 34px; height: 34px; font-size: .8rem; }
-    .final-answer .val { font-size: 1.6rem; }
-  }
+  .ans .lbl{color:#047857; font-weight:800; letter-spacing:.4px;}
+  code{background:#f1f5f9; padding:1px 6px; border-radius:6px; font-size:.92em;}
+  @media(max-width:640px){body{font-size:14.5px;}.wrap{padding:10px 8px 40px;}}
 </style>
 </head>
 <body>
 <div class="wrap">
+  <div class="split">
 
-  <!-- ===== HEADER ===== -->
-  <span class="exam-tag">HKDSE MATH · PAPER 1</span>
-  <h1>2019 Paper 1 — Question 15</h1>
-
-  <!-- ===== PROGRESS ===== -->
-  <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
-
-  <!-- ===== QUESTION ===== -->
-  <div class="card">
-    <h2><span class="dot"></span>Question</h2>
-    <div class="q-text">
-      There are <strong>21 boys</strong> and <strong>11 girls</strong> in a class.
-      If <strong>5 students</strong> are selected from the class to form a committee
-      consisting of <strong>at least 1 boy</strong>, how many different committees can be formed?
-    </div>
-    <p class="marks">[3 marks]</p>
-
-    <div class="counter-row">
-      <div class="counter"><div class="num">21</div><div class="lbl">Boys</div></div>
-      <div class="counter"><div class="num">11</div><div class="lbl">Girls</div></div>
-      <div class="counter"><div class="num">32</div><div class="lbl">Total Students</div></div>
-      <div class="counter"><div class="num">5</div><div class="lbl">Chosen</div></div>
+    <!-- ================= LEFT PANE : DIAGRAM ================= -->
+    <div class="diagram">
+      <h2>Counting the possible committees</h2>
+      <canvas id="cv" width="640" height="520"></canvas>
+      <p class="ro" id="ro">Total students: 21 boys + 11 girls = 32 students. Choose 5.</p>
+      <div class="legend">
+        <span><i class="sw" style="background:#2563eb"></i>Boys (21)</span>
+        <span><i class="sw" style="background:#db2777"></i>Girls (11)</span>
+        <span><i class="sw" style="background:#059669"></i>Chosen committee (5)</span>
+        <span><i class="sw" style="background:#e11d48"></i>Rejected case (all girls)</span>
+      </div>
     </div>
 
-    <div class="tags" style="margin-top:14px;">
-      <span class="tag">Probability &amp; Counting</span>
-      <span class="tag green">Combinations \(C^n_r\)</span>
-      <span class="tag amber">Complementary Counting</span>
-      <span class="tag">"at least 1"</span>
+    <!-- ================= RIGHT PANE : QUESTION + SOLUTION ================= -->
+    <div>
+      <div class="qbox">
+        <span class="tag">HKDSE 2019 · Paper 1 · Q15 · Probability</span>
+        <div class="qtext">
+          There are $21$ boys and $11$ girls in a class. If $5$ students are selected
+          from the class to form a committee consisting of <em>at least $1$ boy</em>,
+          how many different committees can be formed?
+        </div>
+        <div class="marks">[3 marks]</div>
+      </div>
+
+      
+      <div class="solutions">
+
+        <div class="step" data-step="1">
+          <h3><span class="chip">1</span>Find the total number of students</h3>
+          <div class="body">
+            Boys $=21$, girls $=11$, so the class has
+            \[21+11=32\ \text{students.}\]
+            A committee is a selection of $5$ students from these $32$.
+          </div>
+          <div class="hint">Hint: a committee is just a <em>combination</em> — order does not matter.</div>
+        </div>
+
+        <div class="step" data-step="2">
+          <h3><span class="chip">2</span>Count all possible 5-person committees</h3>
+          <div class="body">
+            With no restriction, choosing any $5$ from the $32$ students gives
+            \[C_5^{32}=\binom{32}{5}=\frac{32!}{5!\,27!}=201\,376.\]
+          </div>
+          <div class="hint">Use $\binom{n}{r}=\dfrac{n!}{r!(n-r)!}$.</div>
+        </div>
+
+        <div class="step" data-step="3">
+          <h3><span class="chip">3</span>Subtract the "<em>no boy</em>" committees</h3>
+          <div class="body">
+            "At least $1$ boy" means we exclude the committees with <em>no boys</em>,
+            i.e. all $5$ members chosen from the $11$ girls:
+            \[C_5^{11}=\binom{11}{5}=\frac{11!}{5!\,6!}=462.\]
+            These are the only rejected cases.
+          </div>
+          <div class="hint">Complementary counting: (all cases) − (bad cases).</div>
+        </div>
+
+        <div class="step" data-step="4">
+          <h3><span class="chip">4</span>Apply the complement and simplify</h3>
+          <div class="body">
+            \[
+              C_5^{32}-C_5^{11}=201\,376-462=200\,914.
+            \]
+          </div>
+          <div class="hint">Answer is between the two prior numbers, as expected.</div>
+        </div>
+
+        <div class="ans">
+          <span class="lbl">Answer:</span> $\;C_5^{32}-C_5^{11}=200\,914$ &nbsp; committees.
+        </div>
+
+      </div>
     </div>
+
   </div>
-
-  <!-- ===== KEY CONCEPT ===== -->
-  <div class="card">
-    <h2><span class="dot"></span>Core Idea</h2>
-    <p style="font-size:.95rem;">
-      When a question says <span class="highlight">"at least 1 boy"</span>, it is usually
-      <strong>much faster</strong> to subtract the unwanted case from the total.
-    </p>
-    <div class="formula-box">
-      \[
-      \text{(At least 1 boy)} \;=\; \text{(All cases)} \;-\; \text{(No boys at all)}
-      \]
-    </div>
-    <p style="font-size:.88rem;color:var(--muted);">
-      "No boys" means the committee is made up <strong>entirely of girls</strong> —
-      and there are only 11 girls, so we choose 5 of them.
-    </p>
-  </div>
-
-  <!-- ===== STEP BY STEP ===== -->
-  <div class="card">
-    <h2><span class="dot"></span>Step-by-Step Solution</h2>
-    <p style="font-size:.85rem;color:var(--muted);margin-bottom:14px;">
-      Tap each step to reveal the reasoning. Try to answer before you open it!
-    </p>
-
-    <!-- STEP 1 -->
-    <div class="step" data-step>
-      <div class="step-head" onclick="toggleStep(this)">
-        <div class="step-num">1</div>
-        <div class="step-title">Understand the constraint: "at least 1 boy"</div>
-        <div class="chev">▼</div>
-      </div>
-      <div class="step-body">
-        <p>The committee has 5 members. The allowed compositions are:</p>
-        <ul>
-          <li>1 boy + 4 girls</li>
-          <li>2 boys + 3 girls</li>
-          <li>3 boys + 2 girls</li>
-          <li>4 boys + 1 girl</li>
-          <li>5 boys + 0 girls</li>
-        </ul>
-        <p>These are <strong>5 separate cases</strong>. Counting them one by one works — but it is slow.</p>
-        <div class="hint">
-          <b>Hint:</b> The only <em>forbidden</em> composition is <strong>0 boys + 5 girls</strong>.
-          That's just <strong>one</strong> case to exclude!
-        </div>
-      </div>
-    </div>
-
-    <!-- STEP 2 -->
-    <div class="step" data-step>
-      <div class="step-head" onclick="toggleStep(this)">
-        <div class="step-num">2</div>
-        <div class="step-title">Recall the combination formula \(C^n_r\)</div>
-        <div class="chev">▼</div>
-      </div>
-      <div class="step-body">
-        <p>When order does <strong>not</strong> matter (a committee is just a group of people),
-        we use <strong>combinations</strong>:</p>
-        <div class="formula-box">
-          \[
-          C^{n}_{r} \;=\; \frac{n!}{r!\,(n-r)!}
-          \]
-        </div>
-        <ul>
-          <li><strong>\(n\)</strong> = total number of items available to choose from</li>
-          <li><strong>\(r\)</strong> = number of items we actually pick</li>
-        </ul>
-        <div class="hint">
-          <b>Why not permutations?</b> Because selecting \(\{A,B\}\) is the <em>same committee</em>
-          as \(\{B,A\}\) — order does not create a new committee.
-        </div>
-      </div>
-    </div>
-
-    <!-- STEP 3 -->
-    <div class="step" data-step>
-      <div class="step-head" onclick="toggleStep(this)">
-        <div class="step-num">3</div>
-        <div class="step-title">Count the TOTAL number of committees (no restriction)</div>
-        <div class="chev">▼</div>
-      </div>
-      <div class="step-body">
-        <p>Total students \(= 21 + 11 = 32\).</p>
-        <p>We simply choose <strong>any 5</strong> from these 32 students:</p>
-        <div class="formula-box">
-          \[
-          \text{Total} \;=\; C^{32}_{5} \;=\; C^{32}_{5}
-          \]
-        </div>
-        <p>Compute it:</p>
-        <div class="formula-box">
-          \[
-          C^{32}_{5} = \frac{32 \times 31 \times 30 \times 29 \times 28}{5 \times 4 \times 3 \times 2 \times 1}
-          = \frac{24\,165\,120}{120} = 201\,376
-          \]
-        </div>
-        <div class="hint">
-          <b>Calculator tip:</b> On many calculators, key in <code>32</code> → <code>nCr</code> → <code>5</code> → <code>=</code>.
-        </div>
-      </div>
-    </div>
-
-    <!-- STEP 4 -->
-    <div class="step" data-step>
-      <div class="step-head" onclick="toggleStep(this)">
-        <div class="step-num">4</div>
-        <div class="step-title">Count the UNWANTED case: committees with NO boys</div>
-        <div class="chev">▼</div>
-      </div>
-      <div class="step-body">
-        <p>"No boys" means all 5 members are girls. There are <strong>11 girls</strong> available.</p>
-        <div class="formula-box">
-          \[
-          \text{No boys} \;=\; C^{11}_{5} \;=\; C^{11}_{5}
-          \]
-        </div>
-        <div class="formula-box">
-          \[
-          C^{11}_{5} = \frac{11 \times 10 \times 9 \times 8 \times 7}{5 \times 4 \times 3 \times 2 \times 1}
-          = \frac{55\,440}{120} = 462
-          \]
-        </div>
-        <div class="hint">
-          <b>Important:</b> Always check \(r \le n\). Here \(5 \le 11\), so this is valid.
-        </div>
-      </div>
-    </div>
-
-    <!-- STEP 5 -->
-    <div class="step" data-step>
-      <div class="step-head" onclick="toggleStep(this)">
-        <div class="step-num">5</div>
-        <div class="step-title">Subtract to get the required number</div>
-        <div class="chev">▼</div>
-      </div>
-      <div class="step-body">
-        <div class="formula-box">
-          \[
-          \text{Required} \;=\; C^{32}_{5} - C^{11}_{5}
-          \]
-        </div>
-        <div class="formula-box">
-          \[
-          = 201\,376 - 462 \;=\; \boxed{200\,914}
-          \]
-        </div>
-        <p>So the number of valid committees is <span class="highlight green">200 914</span>.</p>
-        <div class="hint">
-          <b>Exam marking (3 marks):</b> usually
-          <br>• <strong>1M</strong> for using \(C^{32}_{5}\) (total)
-          <br>• <strong>1M</strong> for using \(C^{11}_{5}\) (unwanted, all girls)
-          <br>• <strong>1A</strong> for the correct answer \(200\,914\)
-        </div>
-      </div>
-    </div>
-
-    <!-- STEP 6 -->
-    <div class="step" data-step>
-      <div class="step-head" onclick="toggleStep(this)">
-        <div class="step-num">6</div>
-        <div class="step-title">Double-check with the direct case-by-case method</div>
-        <div class="chev">▼</div>
-      </div>
-      <div class="step-body">
-        <p>Let's verify by adding all allowed cases (\(k\) boys, \(5-k\) girls):</p>
-        <div style="overflow-x:auto;">
-        <table class="case-tbl">
-          <thead>
-            <tr><th>Boys (\(k\))</th><th>Girls (\(5-k\))</th><th>Count \(= C^{21}_k \cdot C^{11}_{5-k}\)</th><th>Value</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>1</td><td>4</td><td>\(C^{21}_1 \cdot C^{11}_4\)</td><td>21 × 330 = 6 930</td></tr>
-            <tr><td>2</td><td>3</td><td>\(C^{21}_2 \cdot C^{11}_3\)</td><td>210 × 165 = 34 650</td></tr>
-            <tr><td>3</td><td>2</td><td>\(C^{21}_3 \cdot C^{11}_2\)</td><td>1 330 × 55 = 73 150</td></tr>
-            <tr><td>4</td><td>1</td><td>\(C^{21}_4 \cdot C^{11}_1\)</td><td>5 985 × 11 = 65 835</td></tr>
-            <tr><td>5</td><td>0</td><td>\(C^{21}_5 \cdot C^{11}_0\)</td><td>20 349 × 1 = 20 349</td></tr>
-            <tr class="total"><td colspan="3">Total</td><td>200 914 ✓</td></tr>
-          </tbody>
-        </table>
-        </div>
-        <p style="font-size:.88rem;color:var(--muted);">
-          Both methods give the same answer — but the complement method takes only two
-          combinations instead of five. <strong>Use the complement when you see "at least".</strong>
-        </p>
-      </div>
-    </div>
-
-    <div class="btn-row" style="margin-top:14px;">
-      <button class="btn-primary" onclick="openAll()">Open All Steps</button>
-      <button class="btn-ghost" onclick="closeAll()">Collapse All</button>
-    </div>
-  </div>
-
-  <!-- ===== INTERACTIVE ===== -->
-  <div class="card">
-    <h2><span class="dot"></span>Interactive: Build a Committee</h2>
-    <p style="font-size:.9rem;">
-      Drag the slider to change how many boys you pick. The app tells you whether the
-      committee is <strong>valid</strong> (at least 1 boy) and how many such committees exist.
-    </p>
-
-    <div class="slider-row">
-      <label for="boySlider">Boys:</label>
-      <input type="range" id="boySlider" min="0" max="5" value="3" step="1" oninput="updateSeats()">
-      <span class="slider-val" id="boyVal">3</span>
-    </div>
-
-    <div class="girl-row" id="seatRow"></div>
-
-    <div class="verdict" id="verdictBox"></div>
-    <div class="ncr-display" id="ncrText"></div>
-
-    <div class="hint" style="margin-top:14px;">
-      <b>Observation:</b> When boys = 0, every committee is all-girls → invalid.
-      As soon as boys ≥ 1, the combination count becomes valid.
-    </div>
-  </div>
-
-  <!-- ===== FINAL ANSWER ===== -->
-  <div class="final-answer" id="finalAnswer">
-    <div class="lbl">Required Number of Committees</div>
-    <div class="val">200 914</div>
-    <div class="note">\(C^{32}_{5} - C^{11}_{5} = 201\,376 - 462 = 200\,914\)</div>
-  </div>
-
-  <div class="btn-row" style="margin-bottom:24px;">
-    <button class="btn-amber" onclick="revealAnswer()" id="revealBtn" style="flex:1;">Reveal Final Answer</button>
-  </div>
-
-  <!-- ===== FINAL SUMMARY ===== -->
-  <div class="card" id="summaryCard" style="display:none;">
-    <h2><span class="dot"></span>Solution Summary</h2>
-    <div class="formula-box" style="font-size:1.05rem;">
-      \[
-      \text{Required} = C^{32}_{5} - C^{11}_{5}
-      \]
-      \[
-      = 201\,376 - 462 = \mathbf{200\,914}
-      \]
-    </div>
-    <div class="hint">
-      <b>Key technique:</b> For "at least one" questions, use the
-      <strong>complement method</strong>:
-      <br>\(\text{Required} = \text{Total} - \text{Unwanted}\)
-      <br>It saves time and avoids summing several cases.
-    </div>
-  </div>
-
-  <div class="footer">
-    HKDSE Mathematics 2019 · Paper 1 · Question 15 — Probability &amp; Combinations
-  </div>
-
 </div>
 
 <script>
-/* ---------- Accordion ---------- */
-function toggleStep(head) {
-  const step = head.parentElement;
-  step.classList.toggle('open');
-  updateProgress();
-}
+/* ---------- Canvas drawing ---------- */
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+const ro  = document.getElementById('ro');
 
-function openAll() {
-  document.querySelectorAll('.step').forEach(s => s.classList.add('open'));
-  updateProgress();
-}
+const W = cv.width, H = cv.height;
 
-function closeAll() {
-  document.querySelectorAll('.step').forEach(s => s.classList.remove('open'));
-  updateProgress();
-}
+const COL = {
+  boys:'#2563eb', girls:'#db2777', chosen:'#059669',
+  bad:'#e11d48', grid:'#e2e8f0', ink:'#1e293b', muted:'#64748b', amber:'#d97706'
+};
 
-function updateProgress() {
-  const all = document.querySelectorAll('.step');
-  const open = document.querySelectorAll('.step.open');
-  const pct = (open.length / all.length) * 100;
-  document.getElementById('progressBar').style.width = pct + '%';
-}
-
-/* ---------- Interactive committee builder ---------- */
-const TOTAL = 5;
-
-/* precomputed binomials (small, exact) */
-function nCr(n, r) {
-  if (r < 0 || r > n) return 0;
-  r = Math.min(r, n - r);
-  let res = 1;
-  for (let i = 1; i <= r; i++) {
-    res = res * (n - r + i) / i;
+/* Group of 32 dots laid out : 21 blue (boys) then 11 pink (girls) */
+function dotPositions(){
+  const pts = [];
+  const cols = 8, r = 11;
+  const startX = 46, startY = 74;
+  const dx = 34, dy = 38;
+  for(let i=0;i<32;i++){
+    const col = i % cols;
+    const row = Math.floor(i/cols);
+    pts.push({
+      x: startX + col*dx,
+      y: startY + row*dy,
+      type: i < 21 ? 'boy' : 'girl',
+      idx: i
+    });
   }
-  return Math.round(res);
+  return pts;
+}
+const DOTS = dotPositions();
+
+/* Which dot indices are "chosen" per step (illustrative) */
+const CHOICE_SETS = {
+  1: [0,1,2,3,4],                        // 5 chosen (mixed)
+  2: [0,1,2,3,4],                        // all combinations
+  3: [21,22,23,24,25],                   // all girls -> rejected
+  4: [0,1,2,3,4]                         // final acceptance
+};
+
+function roundRect(x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
 }
 
-function updateSeats() {
-  const boys = parseInt(document.getElementById('boySlider').value, 10);
-  const girls = TOTAL - boys;
-  document.getElementById('boyVal').textContent = boys;
+function drawDot(p, step){
+  const inChoice = CHOICE_SETS[step] && CHOICE_SETS[step].includes(p.idx);
+  const isBadSet = step === 3;
 
-  const row = document.getElementById('seatRow');
-  row.innerHTML = '';
+  let fill = p.type === 'boy' ? COL.boys : COL.girls;
+  let strokeC = fill;
+  let r = 11;
 
-  let anyInvalid = false;
-
-  for (let i = 0; i < TOTAL; i++) {
-    const seat = document.createElement('div');
-    if (i < boys) {
-      seat.className = 'seat boy';
-      seat.textContent = 'B';
-    } else {
-      seat.className = 'seat girl';
-      seat.textContent = 'G';
+  if(inChoice){
+    if(isBadSet){
+      fill = COL.bad;
+      strokeC = COL.bad;
+    }else{
+      fill = COL.chosen;
+      strokeC = COL.chosen;
     }
+    r = 14;
+  }
 
-    /* invalid case: boys = 0 → all girls, but only 11 girls exist.
-       In this simplified visual we mark the 0-boy case as invalid. */
-    if (boys === 0) {
-      seat.classList.add('invalid');
-      anyInvalid = true;
+  ctx.beginPath();
+  ctx.arc(p.x, p.y, r, 0, Math.PI*2);
+  ctx.fillStyle = fill;
+  ctx.fill();
+  ctx.lineWidth = inChoice ? 3 : 1.5;
+  ctx.strokeStyle = inChoice ? (isBadSet?'#9f1239':'#065f46') : '#ffffff';
+  ctx.stroke();
+
+  if(inChoice){
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 13px Segoe UI, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('✓', p.x, p.y+1);
+  }
+}
+
+function drawHeader(step){
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'alphabetic';
+
+  ctx.fillStyle = '#0f172a';
+  ctx.font = 'bold 17px Segoe UI, sans-serif';
+  ctx.fillText('21 boys  +  11 girls  =  32 students', 30, 34);
+
+  ctx.fillStyle = COL.muted;
+  ctx.font = '13px Segoe UI, sans-serif';
+  const msgs = {
+    1: 'Step 1 — Identify the total population (32 students).',
+    2: 'Step 2 — Choose any 5 from 32:  C(32,5) = 201 376',
+    3: 'Step 3 — Remove the all-girl committees:  C(11,5) = 462',
+    4: 'Step 4 — Subtract:  C(32,5) − C(11,5) = 200 914'
+  };
+  ctx.fillText(msgs[step] || msgs[1], 30, 56);
+
+  // underline
+  ctx.strokeStyle = '#e2e8f0';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(24, 66);
+  ctx.lineTo(W-24, 66);
+  ctx.stroke();
+}
+
+function drawFooter(step){
+  const y = H - 26;
+  ctx.textAlign = 'center';
+  ctx.font = 'bold 15px Segoe UI, sans-serif';
+  const txt = {
+    1: 'Class total = 32',
+    2: 'C(32,5) = 201 376',
+    3: 'Remove C(11,5) = 462',
+    4: 'Answer = 200 914'
+  };
+  ctx.fillStyle = (step===3) ? COL.bad : (step===4 ? COL.chosen : COL.boys);
+  ctx.fillText(txt[step] || txt[1], W/2, y);
+}
+
+function draw(step){
+  step = step || 1;
+  ctx.clearRect(0,0,W,H);
+
+  // background
+  const g = ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,'#ffffff');
+  g.addColorStop(1,'#f8fafc');
+  ctx.fillStyle = g;
+  ctx.fillRect(0,0,W,H);
+
+  // border
+  ctx.strokeStyle = '#e2e8f0';
+  ctx.lineWidth = 2;
+  roundRect(8,8,W-16,H-16,16);
+  ctx.stroke();
+
+  drawHeader(step);
+
+  // draw dots
+  DOTS.forEach(p => drawDot(p, step));
+
+  // labels for the two groups
+  ctx.font = 'bold 14px Segoe UI, sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillStyle = COL.boys;
+  ctx.fillText('Boys (21)', 30, 250);
+
+  ctx.fillStyle = COL.girls;
+  ctx.fillText('Girls (11)', 30, 388);
+
+  // group brackets
+  ctx.strokeStyle = COL.boys;
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(24, 86);
+  ctx.lineTo(14, 86);
+  ctx.lineTo(14, 216);
+  ctx.lineTo(24, 216);
+  ctx.stroke();
+
+  ctx.strokeStyle = COL.girls;
+  ctx.beginPath();
+  ctx.moveTo(24, 300);
+  ctx.lineTo(14, 300);
+  ctx.lineTo(14, 340);
+  ctx.lineTo(24, 340);
+  ctx.stroke();
+
+  // Step 3/4 explanatory badge for rejected case
+  if(step === 3){
+    ctx.fillStyle = '#fef2f2';
+    roundRect(W-232, 206, 216, 60, 10);
+    ctx.fill();
+    ctx.strokeStyle = COL.bad;
+    ctx.lineWidth = 2;
+    roundRect(W-232, 206, 216, 60, 10);
+    ctx.stroke();
+
+    ctx.fillStyle = COL.bad;
+    ctx.font = 'bold 13px Segoe UI, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('NOT allowed: all 5 from girls', W-124, 230);
+    ctx.font = '13px Segoe UI, sans-serif';
+    ctx.fillStyle = '#7f1d1d';
+    ctx.fillText('C(11,5) = 462 cases', W-124, 252);
+  }
+
+  if(step === 4){
+    ctx.fillStyle = '#ecfdf5';
+    roundRect(W-240, 200, 224, 74, 10);
+    ctx.fill();
+    ctx.strokeStyle = COL.chosen;
+    ctx.lineWidth = 2;
+    roundRect(W-240, 200, 224, 74, 10);
+    ctx.stroke();
+
+    ctx.fillStyle = '#065f46';
+    ctx.font = 'bold 14px Segoe UI, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Allowed committees', W-128, 226);
+    ctx.font = 'bold 16px Segoe UI, sans-serif';
+    ctx.fillStyle = '#047857';
+    ctx.fillText('= 200 914', W-128, 252);
+  }
+
+  drawFooter(step);
+
+  // readout text
+  const roText = {
+    1: 'Total students = 21 + 11 = 32. A committee is a selection of 5 students.',
+    2: 'Without restriction: C(32,5) = 201 376 possible committees.',
+    3: 'Only bad cases: all 5 members are girls → C(11,5) = 462 cases.',
+    4: 'Therefore the required number = C(32,5) − C(11,5) = 201 376 − 462 = 200 914.'
+  };
+  ro.textContent = roText[step] || roText[1];
+}
+
+/* ---------- Scroll sync ---------- */
+let current = 1;
+
+const io = new IntersectionObserver(es => {
+  es.forEach(e => {
+    if(e.isIntersecting){
+      current = +e.target.dataset.step;
+      draw(current);
     }
-    row.appendChild(seat);
-  }
+  });
+}, { rootMargin: '-25% 0px -55% 0px' });
 
-  /* verdict */
-  const vBox = document.getElementById('verdictBox');
-  if (boys >= 1 && boys <= 21 && girls <= 11) {
-    vBox.className = 'verdict ok';
-    vBox.textContent = '✓ Valid committee — contains at least 1 boy';
-  } else if (boys === 0 && girls > 11) {
-    vBox.className = 'verdict no';
-    vBox.textContent = '✗ Impossible — only 11 girls available, need ' + girls;
-  } else {
-    vBox.className = 'verdict no';
-    vBox.textContent = '✗ Not enough members available';
-  }
+document.querySelectorAll('.step').forEach(s => io.observe(s));
 
-  /* combination count for this specific composition */
-  const ways = nCr(21, boys) * nCr(11, girls);
-  const ncrEl = document.getElementById('ncrText');
-  ncrEl.innerHTML =
-    'Committees with exactly <strong>' + boys + ' boys</strong> and <strong>' +
-    girls + ' girls</strong>: ' +
-    '\\( C^{21}_{' + boys + '} \\times C^{11}_{' + girls + '} = ' +
-    nCr(21, boys).toLocaleString() + ' \\times ' +
-    nCr(11, girls).toLocaleString() + ' = ' +
-    ways.toLocaleString() + '\\)';
-
-  /* re-render MathJax for the dynamic content */
-  if (window.MathJax && window.MathJax.typesetPromise) {
-    window.MathJax.typesetPromise([ncrEl]).catch(() => {});
-  }
-}
-
-/* ---------- Reveal final answer ---------- */
-function revealAnswer() {
-  const box = document.getElementById('finalAnswer');
-  const card = document.getElementById('summaryCard');
-  const btn = document.getElementById('revealBtn');
-
-  box.style.display = 'block';
-  card.style.display = 'block';
-
-  btn.textContent = 'Answer Revealed ✓';
-  btn.disabled = true;
-  btn.style.opacity = '.6';
-  btn.style.cursor = 'default';
-
-  if (window.MathJax && window.MathJax.typesetPromise) {
-    window.MathJax.typesetPromise([box, card]).catch(() => {});
-  }
-}
-
-/* ---------- Init ---------- */
-document.addEventListener('DOMContentLoaded', () => {
-  updateSeats();
-  updateProgress();
-
-  /* open step 1 by default for a gentle start */
-  const first = document.querySelector('.step');
-  if (first) first.classList.add('open');
-  updateProgress();
-});
+/* initial */
+draw(1);
 </script>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
-
 </body>
 </html>

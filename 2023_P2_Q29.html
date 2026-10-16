@@ -5,746 +5,443 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HKDSE 2023 Paper 2 Q29 — Box-and-Whisker Diagram</title>
 <script>
-  window.MathJax = {
-    tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['\\[', '\\]']] },
-    svg: { fontCache: 'global' }
-  };
+window.MathJax = {
+  tex: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\\[','\\]']]
+  },
+  svg: { fontCache: 'global' }
+};
 </script>
-<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
-  :root{
-    --blue:#2563eb; --blue-d:#1e40af; --amber:#f59e0b; --amber-l:#fef3c7;
-    --emerald:#059669; --emerald-l:#d1fae5; --slate:#0f172a; --slate-2:#1e293b;
-    --ink:#0f172a; --muted:#64748b; --line:#e2e8f0; --bg:#f1f5f9;
-  }
   *{box-sizing:border-box;}
   body{
-    margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-    background:var(--bg); color:var(--ink); line-height:1.6;
+    margin:0;
+    font-family:"Segoe UI",system-ui,-apple-system,Helvetica,Arial,sans-serif;
+    background:#f4f7fb;
+    color:#1e293b;
+    line-height:1.55;
   }
-  /* ---------- Hero ---------- */
-  .hero{
-    background:linear-gradient(135deg,#1e3a8a 0%,#2563eb 55%,#0ea5e9 100%);
-    color:#fff; padding:38px 22px 30px; text-align:center;
-    border-radius:0 0 26px 26px; box-shadow:0 8px 26px rgba(37,99,235,.28);
+  .wrap{padding:16px 14px 60px;max-width:1200px;margin:0 auto;}
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start;}
+  @media(min-width:900px){.split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}}
+  .diagram{
+    position:sticky;top:16px;max-height:calc(100vh - 2rem);overflow-y:auto;
+    background:#ffffff;border-radius:14px;padding:12px;
+    box-shadow:0 4px 16px rgba(15,23,42,.08);
+    border:1px solid #e2e8f0;
   }
-  .hero .eyebrow{font-size:.78rem; letter-spacing:.18em; text-transform:uppercase; opacity:.85; font-weight:600;}
-  .hero h1{margin:.35em 0 .1em; font-size:clamp(1.5rem,4.5vw,2.3rem); font-weight:800; letter-spacing:-.02em;}
-  .hero .subtitle{font-size:clamp(.95rem,2.6vw,1.1rem); opacity:.95; margin-bottom:14px;}
-  .pills{display:flex; flex-wrap:wrap; gap:8px; justify-content:center;}
-  .pill{
-    background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.38);
-    padding:4px 13px; border-radius:999px; font-size:.78rem; font-weight:600; backdrop-filter:blur(3px);
+  @media(max-width:640px){body{font-size:14.5px;}.wrap{padding:10px 8px 40px;}}
+
+  h1{
+    font-size:1.25rem;margin:0 0 4px;color:#0f172a;letter-spacing:.3px;
   }
-  /* ---------- Layout ---------- */
-  .wrap{max-width:920px; margin:0 auto; padding:22px 16px 60px;}
-  .card{
-    background:#fff; border-radius:18px; padding:22px 22px 20px; margin-bottom:22px;
-    box-shadow:0 3px 14px rgba(15,23,42,.07); border:1px solid var(--line);
+  .subtitle{
+    font-size:.8rem;text-transform:uppercase;letter-spacing:1.2px;
+    color:#64748b;font-weight:700;margin-bottom:12px;
   }
-  .card h2{
-    margin:0 0 4px; font-size:1.16rem; font-weight:800; color:var(--blue-d);
-    display:flex; align-items:center; gap:9px; flex-wrap:wrap;
+  .qcard{
+    background:#ffffff;border-radius:14px;padding:16px 18px;margin-bottom:14px;
+    box-shadow:0 4px 16px rgba(15,23,42,.07);
+    border:1px solid #e2e8f0;
+    border-left:6px solid #2563eb;
+  }
+  .qcard p{margin:.55em 0;}
+  .tag{
+    display:inline-block;background:#dbeafe;color:#1d4ed8;
+    font-size:.72rem;font-weight:800;letter-spacing:.6px;
+    padding:3px 9px;border-radius:999px;margin-bottom:8px;
+  }
+  .choices{
+    display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:12px;
+  }
+  .choice{
+    background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:9px;
+    padding:8px 12px;font-weight:600;color:#334155;
+  }
+  .choice.correct{
+    background:#dcfce7;border-color:#16a34a;color:#166534;
+  }
+  .choice .lbl{font-weight:800;color:#2563eb;margin-right:6px;}
+  .choice.correct .lbl{color:#15803d;}
+
+  .step{
+    background:#ffffff;border-radius:12px;padding:14px 16px;margin-bottom:12px;
+    border:1px solid #e2e8f0;
+    box-shadow:0 2px 10px rgba(15,23,42,.05);
+    display:grid;grid-template-columns:34px 1fr;gap:12px;align-items:start;
+    transition:box-shadow .25s,border-color .25s,transform .25s;
+  }
+  .step.active{
+    border-color:#2563eb;box-shadow:0 6px 20px rgba(37,99,235,.18);
+    transform:translateX(3px);
   }
   .chip{
-    font-size:.68rem; font-weight:800; letter-spacing:.05em; text-transform:uppercase;
-    background:var(--amber-l); color:#92400e; padding:3px 10px; border-radius:999px;
+    width:34px;height:34px;border-radius:50%;
+    background:linear-gradient(135deg,#3b82f6,#1d4ed8);
+    color:#fff;font-weight:800;font-size:.95rem;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 2px 6px rgba(37,99,235,.35);
   }
-  .card p{margin:.55em 0;}
-  .qtext{font-size:1.02rem;}
-  .opts{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:9px; margin-top:12px;}
-  .opt{
-    background:#f8fafc; border:1px solid var(--line); border-radius:11px;
-    padding:9px 14px; font-weight:600; font-size:.95rem;
-  }
-  /* ---------- Canvas ---------- */
-  .canvas-box{
-    position:relative; background:linear-gradient(180deg,#fbfdff,#f4f8ff);
-    border:1px solid #dbeafe; border-radius:14px; padding:10px; margin-top:14px;
-  }
-  canvas{display:block; width:100%; height:auto; border-radius:9px; touch-action:manipulation;}
-  .readout{
-    display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;
-  }
-  .ro{
-    background:#fff; border:1px solid var(--line); border-radius:9px; padding:5px 11px;
-    font-size:.82rem; font-weight:600; box-shadow:0 1px 3px rgba(0,0,0,.04);
-  }
-  .ro b{font-weight:800;}
-  /* ---------- Controls ---------- */
-  .controls{display:flex; flex-wrap:wrap; gap:14px; align-items:center; margin-top:14px;}
-  .ctrl{
-    display:flex; align-items:center; gap:9px; background:#f8fafc; border:1px solid var(--line);
-    border-radius:11px; padding:8px 13px; font-size:.84rem; font-weight:600; color:var(--slate-2);
-  }
-  input[type=range]{-webkit-appearance:none; appearance:none; width:150px; height:5px; border-radius:5px; background:#cbd5e1; outline:none;}
-  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:17px; height:17px; border-radius:50%; background:var(--blue); cursor:pointer; box-shadow:0 0 0 3px rgba(37,99,235,.2);}
-  input[type=range]::-moz-range-thumb{width:17px; height:17px; border:none; border-radius:50%; background:var(--blue); cursor:pointer;}
-  input[type=checkbox]{width:17px; height:17px; accent-color:var(--emerald); cursor:pointer;}
-  /* ---------- Steps ---------- */
-  .step{
-    display:none; border-left:4px solid var(--blue); background:#f8fafc;
-    border-radius:0 12px 12px 0; padding:14px 16px; margin-top:14px; animation:fade .35s ease;
-  }
-  .step.show{display:block;}
-  @keyframes fade{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
-  .step-head{display:flex; align-items:center; gap:10px; margin-bottom:7px; flex-wrap:wrap;}
-  .badge-n{
-    background:var(--blue); color:#fff; font-weight:800; font-size:.76rem;
-    width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;
-  }
-  .badge-m{
-    background:var(--amber); color:#3b2600; font-weight:800; font-size:.7rem;
-    padding:2px 9px; border-radius:999px; letter-spacing:.03em;
-  }
+  .step.active .chip{background:linear-gradient(135deg,#f59e0b,#d97706);box-shadow:0 2px 6px rgba(217,119,6,.4);}
+  .step h3{margin:0 0 6px;font-size:.95rem;color:#0f172a;letter-spacing:.2px;}
+  .step p{margin:.4em 0;font-size:.93rem;}
   .hint{
-    background:var(--amber-l); border-left:4px solid var(--amber); border-radius:0 9px 9px 0;
-    padding:9px 13px; margin-top:10px; font-size:.88rem;
+    margin-top:8px;font-size:.82rem;color:#7c2d12;
+    background:#fef3c7;border-left:3px solid #f59e0b;
+    padding:6px 10px;border-radius:0 8px 8px 0;
   }
-  .hint b{color:#92400e;}
-  .ans{
-    background:var(--emerald-l); border-left:4px solid var(--emerald); border-radius:0 9px 9px 0;
-    padding:9px 13px; margin-top:10px; font-size:.92rem; font-weight:600;
+  .answer{
+    background:linear-gradient(135deg,#ecfdf5,#dcfce7);
+    border:1.5px solid #16a34a;border-radius:12px;
+    padding:14px 18px;font-weight:700;color:#14532d;font-size:1.02rem;
+    margin-top:6px;
   }
-  .ans b{color:#065f46;}
-  .btn{
-    margin-top:16px; background:var(--blue); color:#fff; border:none; border-radius:11px;
-    padding:11px 22px; font-size:.92rem; font-weight:700; cursor:pointer;
-    box-shadow:0 3px 10px rgba(37,99,235,.3); transition:transform .12s, background .2s;
+  .answer span{color:#16a34a;font-size:1.15rem;}
+
+  .legend{display:flex;flex-wrap:wrap;gap:10px 16px;margin-top:10px;font-size:.8rem;color:#475569;}
+  .legend i{display:inline-block;width:14px;height:14px;border-radius:4px;margin-right:5px;vertical-align:-2px;}
+  .ro{
+    margin:8px 0 0;font-size:.82rem;color:#475569;
+    background:#f1f5f9;border-radius:8px;padding:7px 10px;text-align:center;
   }
-  .btn:hover:not(:disabled){background:var(--blue-d); transform:translateY(-1px);}
-  .btn:disabled{background:#94a3b8; cursor:not-allowed; box-shadow:none;}
-  .counter{font-size:.82rem; color:var(--muted); font-weight:700; margin-left:12px;}
-  /* ---------- Summary ---------- */
-  .summary{background:linear-gradient(135deg,#0f172a,#1e293b); color:#e2e8f0; border:none;}
-  .summary h2{color:#7dd3fc;}
-  .summary ul{margin:10px 0 0; padding-left:20px;}
-  .summary li{margin:.45em 0; font-size:.98rem;}
-  .summary .final{color:#6ee7b7; font-weight:800;}
-  footer{
-    text-align:center; color:var(--muted); font-size:.8rem; padding:10px 16px 34px;
-  }
-  @media(max-width:560px){
-    .card{padding:17px 15px;}
-    .wrap{padding:16px 10px 50px;}
-    input[type=range]{width:110px;}
-  }
+  canvas{width:100%;height:auto;display:block;border-radius:10px;}
+  .diag-title{font-size:.82rem;font-weight:800;color:#334155;margin:0 0 6px;letter-spacing:.4px;}
 </style>
 </head>
 <body>
-
-<!-- ============ HERO ============ -->
-<header class="hero">
-  <div class="eyebrow">HKDSE Mathematics (Compulsory Part) &middot; Paper 2</div>
-  <h1>2023 Paper 2 &middot; Question 29</h1>
-  <div class="subtitle">Statistics &mdash; Reading a Box-and-Whisker Diagram</div>
-  <div class="pills">
-    <span class="pill">Box-and-Whisker Diagram</span>
-    <span class="pill">Quartiles</span>
-    <span class="pill">Five-Number Summary</span>
-    <span class="pill">Multiple Choice</span>
-  </div>
-</header>
-
 <div class="wrap">
+  <h1>HKDSE Mathematics 2023 · Paper 2 · Q29</h1>
+  <div class="subtitle">Topic 15 · Statistics — Box-and-Whisker Diagram</div>
 
-  <!-- ============ QUESTION ============ -->
-  <section class="card">
-    <h2>Question <span class="chip">4 options &middot; 1 mark</span></h2>
-    <p class="qtext">
-      The box-and-whisker diagram below shows the distribution of the numbers of training hours of
-      some engineers in a year. Find the upper quartile of the distribution.
-    </p><figure style="margin:12px 0;text-align:center;"><img src="figures/2023_P2_Q29.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
-    <div class="opts">
-      <div class="opt">A. \(20\)</div>
-      <div class="opt">B. \(40\)</div>
-      <div class="opt">C. \(60\)</div>
-      <div class="opt">D. \(70\)</div>
-    </div>
-  </section>
+  <div class="split">
 
-  <!-- ============ PART (a) : READ THE DIAGRAM ============ -->
-  <section class="card">
-    <h2>Part (a) &mdash; Meet the Box-and-Whisker Diagram</h2>
-    <p>
-      A box-and-whisker diagram packs the <b>five-number summary</b> of a data set onto a single
-      number line. Move the slider to highlight each of the five landmarks in the diagram below.
-    </p>
-
-    <div class="canvas-box">
-      <canvas id="cvA" width="880" height="600"></canvas>
-      <div class="readout">
-        <div class="ro">Highlighted: <b id="roA-label">Minimum</b></div>
-        <div class="ro">Value: <b id="roA-val">10</b></div>
-        <div class="ro">Position: <b id="roA-pos">Left whisker end</b></div>
+    <!-- ================= LEFT PANE : DIAGRAM ================= -->
+    <div class="diagram">
+      <p class="diag-title">📊 Interactive Box-and-Whisker Diagram</p>
+      <canvas id="cv" width="620" height="420"></canvas>
+      <div class="legend">
+        <span><i style="background:#2563eb"></i>Whiskers (min / max)</span>
+        <span><i style="background:#f59e0b"></i>Box (Q₁ to Q₃)</span>
+        <span><i style="background:#16a34a"></i>Median Q₂</span>
+        <span><i style="background:#dc2626"></i>Upper quartile Q₃</span>
       </div>
+      <p class="ro" id="ro">Step 1 — read the diagram: the right edge of the box is the upper quartile.</p>
     </div>
 
-    <div class="controls">
-      <label class="ctrl">
-        Landmark
-        <input type="range" id="slA" min="0" max="4" step="1" value="0">
-      </label>
-      <label class="ctrl">
-        <input type="checkbox" id="ckA" checked> Show scale guides
-      </label>
-    </div>
+    <!-- ================= RIGHT PANE : QUESTION + SOLUTION ================= -->
+    <div class="right">
 
-    <button class="btn" data-target="stepsA">Next step &rarr;</button>
-    <span class="counter" id="cntA">0 / 3</span>
+      <div class="qcard">
+        <span class="tag">[2023MC#29]</span>
+        <p>The box-and-whisker diagram below shows the distribution of the numbers of training hours of some engineers in a year. Find the upper quartile of the distribution.</p>
 
-    <div class="step" data-group="stepsA">
-      <div class="step-head"><span class="badge-n">1</span></div>
-      <p>Read the <b>five-number summary</b> off the diagram:</p>
-      \[
-        \text{min}=10,\quad Q_1=20,\quad \text{median}=40,\quad Q_3=60,\quad \text{max}=80
-      \]
-      <div class="hint"><b>Hint:</b> The two <i>whisker ends</i> give the minimum and maximum; the two <i>box ends</i> give the quartiles \(Q_1\) and \(Q_3\); the <i>vertical line inside the box</i> gives the median.</div>
-    </div>
+        <!-- FIGURE_HERE (the diagram is rendered in the left pane) -->
 
-    <div class="step" data-group="stepsA">
-      <div class="step-head"><span class="badge-n">2</span></div>
-      <p>The <b>upper quartile</b> \(Q_3\) is the right-hand edge of the box (the side closer to the maximum). From the diagram its position falls on \(60\).</p>
-      <div class="hint"><b>Hint:</b> The upper quartile separates the top \(25\%\) of the data, so it is always at the <b>upper (right) end of the box</b> — not at the whisker tip.</div>
-    </div>
-
-    <div class="step" data-group="stepsA">
-      <div class="step-head"><span class="badge-n">3</span></div>
-      <p>Hence the upper quartile is \(60\). Comparing with the options:</p>
-      <div class="ans"><b>Answer:</b> \[ Q_3 = 60 \quad\Longrightarrow\quad \boxed{\text{C}} \]</div>
-    </div>
-  </section>
-
-  <!-- ============ PART (b) : INTERACTIVE QUARTILE SPLIT ============ -->
-  <section class="card">
-    <h2>Part (b) &mdash; What "Upper Quartile" Really Means</h2>
-    <p>
-      \(Q_3\) cuts off the <b>top \(25\%\)</b> of the data. Drag the slider to move a split line
-      and watch the percentages below (and above) it change. At \(Q_3 = 60\) the split is exactly \(75\% / 25\%\).
-    </p>
-
-    <div class="canvas-box">
-      <canvas id="cvB" width="880" height="600"></canvas>
-      <div class="readout">
-        <div class="ro">Split value: <b id="roB-val">60</b></div>
-        <div class="ro">Below: <b id="roB-low">75%</b></div>
-        <div class="ro">Above: <b id="roB-high">25%</b></div>
+        <div class="choices">
+          <div class="choice"><span class="lbl">A.</span>20</div>
+          <div class="choice"><span class="lbl">B.</span>40</div>
+          <div class="choice correct"><span class="lbl">C.</span>60</div>
+          <div class="choice"><span class="lbl">D.</span>70</div>
+        </div>
       </div>
-    </div>
 
-    <div class="controls">
-      <label class="ctrl">
-        Split value
-        <input type="range" id="slB" min="10" max="80" step="1" value="60">
-      </label>
-      <label class="ctrl">
-        <input type="checkbox" id="ckB"> Snap to the true \(Q_3\)
-      </label>
-    </div>
-
-    <button class="btn" data-target="stepsB">Next step &rarr;</button>
-    <span class="counter" id="cntB">0 / 2</span>
-
-    <div class="step" data-group="stepsB">
-      <div class="step-head"><span class="badge-n">1</span></div>
-      <p>
-        The three quartiles divide the ordered data into four equal parts:
-      </p>
-      \[
-        \underbrace{\;\;25\%\;\;}_{10\to Q_1=20}\;\;
-        \underbrace{\;\;25\%\;\;}_{20\to 40}\;\;
-        \underbrace{\;\;25\%\;\;}_{40\to Q_3=60}\;\;
-        \underbrace{\;\;25\%\;\;}_{60\to 80}
-      \]
-      <div class="hint"><b>Hint:</b> The right-hand edge of the box (\(Q_3\)) is where \(75\%\) of the data lies below it and \(25\%\) lies above it.</div>
-    </div>
-
-    <div class="step" data-group="stepsB">
-      <div class="step-head"><span class="badge-n">2</span></div>
-      <p>So the value at the right edge of the box is the required upper quartile.</p>
-      <div class="ans"><b>Upper quartile</b> \(= Q_3 = \boxed{60}\) (option <b>C</b>)</div>
-    </div>
-  </section>
-
-  <!-- ============ PART (c) : WHY NOT THE OTHERS ============ -->
-  <section class="card">
-    <h2>Part (c) &mdash; Why the Other Options Are Wrong</h2>
-    <p>
-      Toggle each option to see which feature of the diagram it actually corresponds to. Only the
-      right-hand box edge is the upper quartile.
-    </p>
-
-    <div class="canvas-box">
-      <canvas id="cvC" width="880" height="600"></canvas>
-      <div class="readout">
-        <div class="ro" id="roC">Selected: none</div>
+      <!-- STEP 1 -->
+      <div class="step" data-step="1">
+        <div class="chip">1</div>
+        <div>
+          <h3>Read the five-number summary from the diagram</h3>
+          <p>A box-and-whisker diagram displays five key values: the minimum, the lower quartile $Q_1$, the median $Q_2$, the upper quartile $Q_3$, and the maximum.</p>
+          <p>From the given diagram:</p>
+          <p>Minimum $=10$, &nbsp; $Q_1=20$, &nbsp; $Q_2=30$, &nbsp; $Q_3=60$, &nbsp; Maximum $=80$.</p>
+          <div class="hint">💡 Hint: the <b>right edge of the box</b> is the upper quartile $Q_3$; the <b>left edge</b> is the lower quartile $Q_1$.</div>
+        </div>
       </div>
+
+      <!-- STEP 2 -->
+      <div class="step" data-step="2">
+        <div class="chip">2</div>
+        <div>
+          <h3>Identify the upper quartile</h3>
+          <p>The upper quartile $Q_3$ corresponds to the vertical line forming the <b>right side of the rectangular box</b>.</p>
+          <p>Looking at the diagram, this right edge aligns with the mark for $60$ on the number line.</p>
+          <p>Therefore, the upper quartile is:</p>
+          <p>$$Q_3 = 60$$</p>
+          <div class="hint">💡 Hint: the whiskers extend from the box to the minimum (left) and maximum (right); the box itself represents the interquartile range $Q_1$ to $Q_3$.</div>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="step" data-step="3">
+        <div class="chip">3</div>
+        <div>
+          <h3>Check the interquartile range (optional verification)</h3>
+          <p>Interquartile range $= Q_3 - Q_1 = 60 - 20 = 40$.</p>
+          <p>The median $Q_2 = 30$ lies within the box $[20,60]$, which is consistent with a valid box-and-whisker diagram.</p>
+          <div class="hint">💡 Hint: a quick consistency check — the median must lie between $Q_1$ and $Q_3$.</div>
+        </div>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="step" data-step="4">
+        <div class="chip">4</div>
+        <div>
+          <h3>Select the correct option</h3>
+          <p>The upper quartile is $60$, which matches option <b>C</b>.</p>
+          <div class="hint">💡 Hint: don't confuse the upper quartile (60) with the maximum (80) or the lower quartile (20).</div>
+        </div>
+      </div>
+
+      <div class="answer">
+        Answer: <span>C</span> &nbsp;(upper quartile $= 60$)
+      </div>
+
     </div>
-
-    <div class="controls">
-      <label class="ctrl"><input type="checkbox" class="ckC" data-v="20"> A &mdash; \(20\)</label>
-      <label class="ctrl"><input type="checkbox" class="ckC" data-v="40"> B &mdash; \(40\)</label>
-      <label class="ctrl"><input type="checkbox" class="ckC" data-v="60"> C &mdash; \(60\)</label>
-      <label class="ctrl"><input type="checkbox" class="ckC" data-v="70"> D &mdash; \(70\)</label>
-    </div>
-
-    <button class="btn" data-target="stepsC">Next step &rarr;</button>
-    <span class="counter" id="cntC">0 / 3</span>
-
-    <div class="step" data-group="stepsC">
-      <div class="step-head"><span class="badge-n">1</span></div>
-      <p>
-        \(20\) is the <b>lower quartile</b> \(Q_1\) (left edge of the box) — that separates the bottom
-        \(25\%\), not the top \(25\%\).
-      </p>
-      <div class="hint"><b>Hint:</b> Don't confuse the two ends of the box. Low value \(\to Q_1\), high value \(\to Q_3\).</div>
-    </div>
-
-    <div class="step" data-group="stepsC">
-      <div class="step-head"><span class="badge-n">2</span></div>
-      <p>
-        \(40\) is the <b>median</b> (the vertical line inside the box) — it splits the data into a lower
-        \(50\%\) and an upper \(50\%\).
-      </p>
-      <p>
-        \(70\) is <b>not a landmark</b> at all: it lies on the right whisker between \(Q_3=60\) and
-        \(\max=80\).
-      </p>
-      <div class="hint"><b>Hint:</b> Only five values are marked: min, \(Q_1\), median, \(Q_3\), max. Any other value read from the axis is just an interior data value.</div>
-    </div>
-
-    <div class="step" data-group="stepsC">
-      <div class="step-head"><span class="badge-n">3</span></div>
-      <p>Therefore the only correct choice is the right-hand box edge.</p>
-      <div class="ans"><b>Answer:</b> \(\boxed{\text{C}\;\;60}\)</div>
-    </div>
-  </section>
-
-  <!-- ============ SUMMARY ============ -->
-  <section class="card summary">
-    <h2>Summary &mdash; At a Glance</h2>
-    <ul>
-      <li>Read landmarks off the diagram: \(\min=10,\; Q_1=20,\; \text{median}=40,\; Q_3=60,\; \max=80\).</li>
-      <li>The <b>upper quartile</b> is the <b>right-hand edge of the box</b>.</li>
-      <li>It marks the \(75\%\) point, leaving the top \(25\%\) of the data above it.</li>
-      <li>\(20\) is \(Q_1\), \(40\) is the median, \(70\) is just a point on the right whisker.</li>
-      <li class="final">Final answer: C &mdash; \(60\)</li>
-    </ul>
-  </section>
-
+  </div>
 </div>
 
-<footer>HKDSE 2023 Paper 2 Q29 &middot; Interactive solution &middot; Built with HTML5 Canvas &amp; MathJax</footer>
-
 <script>
-/* ============================================================
-   SHARED DATA
-   ============================================================ */
-const DATA = { min: 10, q1: 20, med: 40, q3: 60, max: 80 };
-const XMIN = 0, XMAX = 90;
+(function(){
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  const ro  = document.getElementById('ro');
 
-/* ============================================================
-   STEP-BY-STEP REVEAL ENGINE
-   ============================================================ */
-document.querySelectorAll('.btn[data-target]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const group = btn.dataset.target;
-    const steps = Array.from(document.querySelectorAll(`.step[data-group="${group}"]`));
-    const counter = document.getElementById('cnt' + group.replace('steps', ''));
-    const hidden = steps.find(s => !s.classList.contains('show'));
-    if (hidden) hidden.classList.add('show');
-    const shown = steps.filter(s => s.classList.contains('show')).length;
-    if (counter) counter.textContent = shown + ' / ' + steps.length;
-    if (shown === steps.length) {
-      btn.disabled = true;
-      btn.textContent = 'All steps revealed \u2713';
-    }
-  });
-});
+  // Fixed diagram data (matches the exam figure)
+  const DATA = { min:10, q1:20, q2:30, q3:60, max:80 };
+  const AXIS_MIN = 0, AXIS_MAX = 90, TICK = 10;
 
-/* ============================================================
-   CANVAS A — LANDMARK HIGHLIGHTER
-   ============================================================ */
-const cvA = document.getElementById('cvA');
-const ctxA = cvA.getContext('2d');
+  // Layout constants
+  const M = { left:60, right:30, top:80, bottom:80 };
+  const W = cv.width, H = cv.height;
 
-const LANDMARKS = [
-  { key:'min',  val:10, label:'Minimum',  pos:'Left whisker end',    color:'#dc2626' },
-  { key:'q1',   val:20, label:'Lower Quartile Q\u2081', pos:'Left box edge', color:'#7c3aed' },
-  { key:'med',  val:40, label:'Median',   pos:'Vertical line in box', color:'#0891b2' },
-  { key:'q3',   val:60, label:'Upper Quartile Q\u2083', pos:'Right box edge', color:'#059669' },
-  { key:'max',  val:80, label:'Maximum',  pos:'Right whisker end',   color:'#dc2626' }
-];
-
-function xToPx(v, pad, w){
-  return pad + (v - XMIN) / (XMAX - XMIN) * (w - 2*pad);
-}
-
-function drawAxisA(ctx, W, H, showGuides){
-  const pad = 55, axisY = H - 62;
-  const x = v => xToPx(v, pad, W);
-
-  ctx.clearRect(0,0,W,H);
-
-  // grid
-  ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1;
-  for(let g = 0; g <= 90; g += 10){
-    if(!showGuides && g % 20 !== 0) continue;
-    ctx.beginPath(); ctx.moveTo(x(g), 26); ctx.lineTo(x(g), axisY); ctx.stroke();
+  function xPos(v){
+    const innerW = W - M.left - M.right;
+    return M.left + (v - AXIS_MIN) / (AXIS_MAX - AXIS_MIN) * innerW;
   }
 
-  // axis line
-  ctx.strokeStyle = '#334155'; ctx.lineWidth = 2;
-  ctx.beginPath(); ctx.moveTo(x(0)-14, axisY); ctx.lineTo(x(90)+18, axisY); ctx.stroke();
-
-  // ticks + labels
-  ctx.fillStyle = '#475569'; ctx.font = '600 12px -apple-system, Segoe UI, sans-serif';
-  ctx.textAlign = 'center';
-  for(let g = 0; g <= 90; g += 10){
-    ctx.beginPath(); ctx.moveTo(x(g), axisY); ctx.lineTo(x(g), axisY + 7); ctx.stroke();
-    if(g % 10 === 0){
-      ctx.fillText(g, x(g), axisY + 23);
-    }
-  }
-  ctx.textAlign = 'left';
-  ctx.fillStyle = '#64748b'; ctx.font = 'italic 12px -apple-system, Segoe UI, sans-serif';
-  ctx.fillText('Number of training hours', x(90) + 6, axisY - 6);
-}
-
-function drawBoxA(ctx, W, H, activeIdx){
-  const pad = 55, axisY = H - 62;
-  const x = v => xToPx(v, pad, W);
-  const boxTop = axisY - 46, boxH = 30;
-
-  const {min,q1,med,q3,max} = DATA;
-
-  // whiskers
-  ctx.strokeStyle = '#334155'; ctx.lineWidth = 2.5;
-  ctx.beginPath(); ctx.moveTo(x(min), axisY); ctx.lineTo(x(min), boxTop + boxH/2); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(x(max), axisY); ctx.lineTo(x(max), boxTop + boxH/2); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(x(min), boxTop + boxH/2); ctx.lineTo(x(q1), boxTop + boxH/2); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(x(q3), boxTop + boxH/2); ctx.lineTo(x(max), boxTop + boxH/2); ctx.stroke();
-
-  // box
-  ctx.fillStyle = 'rgba(37,99,235,.10)';
-  ctx.fillRect(x(q1), boxTop, x(q3) - x(q1), boxH);
-  ctx.strokeStyle = '#1e40af'; ctx.lineWidth = 2.5;
-  ctx.strokeRect(x(q1), boxTop, x(q3) - x(q1), boxH);
-
-  // median line
-  ctx.strokeStyle = '#1e40af'; ctx.lineWidth = 2.5;
-  ctx.beginPath(); ctx.moveTo(x(med), boxTop); ctx.lineTo(x(med), boxTop + boxH); ctx.stroke();
-
-  // highlight
-  const lm = LANDMARKS[activeIdx];
-  ctx.save();
-  ctx.strokeStyle = lm.color; ctx.lineWidth = 3.5;
-  ctx.setLineDash([7,5]);
-  ctx.beginPath(); ctx.moveTo(x(lm.val), 22); ctx.lineTo(x(lm.val), axisY); ctx.stroke();
-  ctx.restore();
-
-  ctx.fillStyle = lm.color;
-  ctx.beginPath(); ctx.arc(x(lm.val), boxTop + boxH/2, 6.5, 0, Math.PI*2); ctx.fill();
-  ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
-
-  // value tag
-  ctx.fillStyle = lm.color;
-  const tagW = 46, tx = Math.min(Math.max(x(lm.val) - tagW/2, 4), W - tagW - 4);
-  ctx.beginPath();
-  ctx.roundRect(tx, 4, tagW, 20, 6);
-  ctx.fill();
-  ctx.fillStyle = '#fff'; ctx.font = '800 12px -apple-system, Segoe UI, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText(lm.val, tx + tagW/2, 18);
-
-  // endpoints on axis
-  ctx.fillStyle = '#334155';
-  [min,q1,med,q3,max].forEach(v => {
-    ctx.beginPath(); ctx.arc(x(v), axisY, 3.5, 0, Math.PI*2); ctx.fill();
-  });
-}
-
-function refreshA(){
-  const idx = +document.getElementById('slA').value;
-  const guides = document.getElementById('ckA').checked;
-  const W = cvA.width, H = cvA.height;
-  drawAxisA(ctxA, W, H, guides);
-  drawBoxA(ctxA, W, H, idx);
-
-  const lm = LANDMARKS[idx];
-  document.getElementById('roA-label').textContent = lm.label;
-  document.getElementById('roA-val').textContent = lm.val;
-  document.getElementById('roA-pos').textContent = lm.pos;
-}
-document.getElementById('slA').addEventListener('input', refreshA);
-document.getElementById('ckA').addEventListener('change', refreshA);
-
-/* ============================================================
-   CANVAS B — QUARTILE SPLIT / PERCENTAGE
-   ============================================================ */
-const cvB = document.getElementById('cvB');
-const ctxB = cvB.getContext('2d');
-
-function intervalShare(v){
-  // piecewise-linear cumulative assumption between landmarks
-  const {min,q1,med,q3,max} = DATA;
-  if(v <= min) return 0;
-  if(v >= max) return 100;
-  if(v <= q1) return (v-min)/(q1-min)*25;
-  if(v <= med) return 25 + (v-q1)/(med-q1)*25;
-  if(v <= q3) return 50 + (v-med)/(q3-med)*25;
-  return 75 + (v-q3)/(max-q3)*25;
-}
-
-function drawB(){
-  const W = cvB.width, H = cvB.height;
-  const pad = 55, axisY = H - 70;
-  const x = v => xToPx(v, pad, W);
-  let v = +document.getElementById('slB').value;
-  const snap = document.getElementById('ckB').checked;
-  if(snap) v = DATA.q3;
-
-  ctxB.clearRect(0,0,W,H);
-
-  // grid
-  ctxB.strokeStyle = '#e8eef7'; ctxB.lineWidth = 1;
-  for(let g = 0; g <= 90; g += 10){
-    ctxB.beginPath(); ctxB.moveTo(x(g), 20); ctxB.lineTo(x(g), axisY); ctxB.stroke();
-  }
-
-  const boxTop = axisY - 50, boxH = 34;
-  const {min,q1,med,q3,max} = DATA;
-
-  // box fill
-  ctxB.fillStyle = 'rgba(37,99,235,.10)';
-  ctxB.fillRect(x(q1), boxTop, x(q3)-x(q1), boxH);
-
-  // shaded "below split" region on axis
-  const pct = intervalShare(v);
-  ctxB.save();
-  ctxB.beginPath();
-  ctxB.rect(x(min), axisY + 6, x(v) - x(min), 16);
-  ctxB.fillStyle = 'rgba(5,150,105,.35)';
-  ctxB.fill();
-  ctxB.restore();
-  ctxB.save();
-  ctxB.beginPath();
-  ctxB.rect(x(v), axisY + 6, x(max) - x(v), 16);
-  ctxB.fillStyle = 'rgba(245,158,11,.45)';
-  ctxB.fill();
-  ctxB.restore();
-  ctxB.strokeStyle = '#94a3b8'; ctxB.lineWidth = 1;
-  ctxB.strokeRect(x(min), axisY + 6, x(max) - x(min), 16);
-
-  // whiskers + box
-  ctxB.strokeStyle = '#334155'; ctxB.lineWidth = 2.5;
-  ctxB.beginPath(); ctxB.moveTo(x(min), axisY); ctxB.lineTo(x(min), boxTop + boxH/2); ctxB.stroke();
-  ctxB.beginPath(); ctxB.moveTo(x(max), axisY); ctxB.lineTo(x(max), boxTop + boxH/2); ctxB.stroke();
-  ctxB.beginPath(); ctxB.moveTo(x(min), boxTop + boxH/2); ctxB.lineTo(x(q1), boxTop + boxH/2); ctxB.stroke();
-  ctxB.beginPath(); ctxB.moveTo(x(q3), boxTop + boxH/2); ctxB.lineTo(x(max), boxTop + boxH/2); ctxB.stroke();
-  ctxB.strokeStyle = '#1e40af'; ctxB.lineWidth = 2.5;
-  ctxB.strokeRect(x(q1), boxTop, x(q3)-x(q1), boxH);
-  ctxB.beginPath(); ctxB.moveTo(x(med), boxTop); ctxB.lineTo(x(med), boxTop + boxH); ctxB.stroke();
-
-  // landmark labels
-  ctxB.font = '700 11px -apple-system, Segoe UI, sans-serif';
-  ctxB.textAlign = 'center';
-  ctxB.fillStyle = '#475569';
-  ctxB.fillText('Q\u2081=' + q1, x(q1), boxTop - 8);
-  ctxB.fillText('median=' + med, x(med), boxTop - 24);
-  ctxB.fillText('Q\u2083=' + q3, x(q3), boxTop - 8);
-
-  // moving split line
-  ctxB.save();
-  ctxB.strokeStyle = v === q3 ? '#059669' : '#d97706';
-  ctxB.lineWidth = 3; ctxB.setLineDash([6,4]);
-  ctxB.beginPath(); ctxB.moveTo(x(v), 16); ctxB.lineTo(x(v), axisY + 26); ctxB.stroke();
-  ctxB.restore();
-
-  // axis
-  ctxB.strokeStyle = '#334155'; ctxB.lineWidth = 2;
-  ctxB.beginPath(); ctxB.moveTo(x(0)-14, axisY); ctxB.lineTo(x(90)+18, axisY); ctxB.stroke();
-  ctxB.fillStyle = '#475569'; ctxB.font = '600 12px -apple-system, Segoe UI, sans-serif';
-  for(let g = 0; g <= 90; g += 10){
-    ctxB.beginPath(); ctxB.moveTo(x(g), axisY); ctxB.lineTo(x(g), axisY + 6); ctxB.stroke();
-    ctxB.fillText(g, x(g), axisY + 38);
-  }
-  ctxB.textAlign = 'left';
-  ctxB.fillStyle = '#64748b'; ctxB.font = 'italic 12px -apple-system, Segoe UI, sans-serif';
-  ctxB.fillText('hours', x(90) + 6, axisY - 6);
-
-  // split value tag
-  ctxB.fillStyle = v === q3 ? '#059669' : '#d97706';
-  const tw = 42, tx = Math.min(Math.max(x(v)-tw/2, 3), W-tw-3);
-  ctxB.beginPath(); ctxB.roundRect(tx, 2, tw, 20, 6); ctxB.fill();
-  ctxB.fillStyle = '#fff'; ctxB.font = '800 12px -apple-system, Segoe UI, sans-serif';
-  ctxB.textAlign = 'center';
-  ctxB.fillText(v, tx + tw/2, 16);
-
-  // percentage labels on the axis bar
-  ctxB.font = '800 12px -apple-system, Segoe UI, sans-serif';
-  ctxB.fillStyle = '#065f46';
-  ctxB.fillText(pct.toFixed(0) + '%', (x(min)+x(v))/2, axisY + 19);
-  ctxB.fillStyle = '#92400e';
-  ctxB.fillText((100-pct).toFixed(0) + '%', (x(v)+x(max))/2, axisY + 19);
-
-  document.getElementById('roB-val').textContent = v;
-  document.getElementById('roB-low').textContent = pct.toFixed(0) + '%';
-  document.getElementById('roB-high').textContent = (100-pct).toFixed(0) + '%';
-}
-
-document.getElementById('slB').addEventListener('input', drawB);
-document.getElementById('ckB').addEventListener('change', drawB);
-
-/* ============================================================
-   CANVAS C — OPTION DISCRIMINATOR
-   ============================================================ */
-const cvC = document.getElementById('cvC');
-const ctxC = cvC.getContext('2d');
-
-const OPT_INFO = {
-  20: { text:'\\(20\) = lower quartile \(Q_1\) (left box edge)', color:'#7c3aed' },
-  40: { text:'\\(40\) = median (line inside the box)', color:'#0891b2' },
-  60: { text:'\\(60\) = upper quartile \(Q_3\) \u2713 correct', color:'#059669' },
-  70: { text:'\\(70\) = a point on the right whisker, not a landmark', color:'#dc2626' }
-};
-
-function drawC(){
-  const W = cvC.width, H = cvC.height;
-  const pad = 55, axisY = H - 62;
-  const x = v => xToPx(v, pad, W);
-  const {min,q1,med,q3,max} = DATA;
-
-  ctxC.clearRect(0,0,W,H);
-
-  // grid
-  ctxC.strokeStyle = '#e8eef7'; ctxC.lineWidth = 1;
-  for(let g = 0; g <= 90; g += 10){
-    ctxC.beginPath(); ctxC.moveTo(x(g), 24); ctxC.lineTo(x(g), axisY); ctxC.stroke();
-  }
-
-  const boxTop = axisY - 46, boxH = 30;
-
-  // whiskers / box / median
-  ctxC.strokeStyle = '#334155'; ctxC.lineWidth = 2.5;
-  ctxC.beginPath(); ctxC.moveTo(x(min), axisY); ctxC.lineTo(x(min), boxTop + boxH/2); ctxC.stroke();
-  ctxC.beginPath(); ctxC.moveTo(x(max), axisY); ctxC.lineTo(x(max), boxTop + boxH/2); ctxC.stroke();
-  ctxC.beginPath(); ctxC.moveTo(x(min), boxTop + boxH/2); ctxC.lineTo(x(q1), boxTop + boxH/2); ctxC.stroke();
-  ctxC.beginPath(); ctxC.moveTo(x(q3), boxTop + boxH/2); ctxC.lineTo(x(max), boxTop + boxH/2); ctxC.stroke();
-  ctxC.fillStyle = 'rgba(37,99,235,.10)';
-  ctxC.fillRect(x(q1), boxTop, x(q3)-x(q1), boxH);
-  ctxC.strokeStyle = '#1e40af'; ctxC.lineWidth = 2.5;
-  ctxC.strokeRect(x(q1), boxTop, x(q3)-x(q1), boxH);
-  ctxC.beginPath(); ctxC.moveTo(x(med), boxTop); ctxC.lineTo(x(med), boxTop + boxH); ctxC.stroke();
-
-  // axis
-  ctxC.strokeStyle = '#334155'; ctxC.lineWidth = 2;
-  ctxC.beginPath(); ctxC.moveTo(x(0)-14, axisY); ctxC.lineTo(x(90)+18, axisY); ctxC.stroke();
-  ctxC.fillStyle = '#475569'; ctxC.font = '600 12px -apple-system, Segoe UI, sans-serif';
-  ctxC.textAlign = 'center';
-  for(let g = 0; g <= 90; g += 10){
-    ctxC.beginPath(); ctxC.moveTo(x(g), axisY); ctxC.lineTo(x(g), axisY + 7); ctxC.stroke();
-    ctxC.fillText(g, x(g), axisY + 23);
-  }
-  ctxC.textAlign = 'left';
-  ctxC.fillStyle = '#64748b'; ctxC.font = 'italic 12px -apple-system, Segoe UI, sans-serif';
-  ctxC.fillText('Number of training hours', x(90) + 6, axisY - 6);
-
-  // checked options
-  const checked = Array.from(document.querySelectorAll('.ckC'))
-                        .filter(c => c.checked)
-                        .map(c => +c.dataset.v);
-
-  let msgs = [];
-  checked.forEach(v => {
-    const info = OPT_INFO[v];
-    ctxC.save();
-    ctxC.strokeStyle = info.color; ctxC.lineWidth = 3; ctxC.setLineDash([6,4]);
-    ctxC.beginPath(); ctxC.moveTo(x(v), 26); ctxC.lineTo(x(v), axisY); ctxC.stroke();
-    ctxC.restore();
-    ctxC.fillStyle = info.color;
-    ctxC.beginPath(); ctxC.arc(x(v), boxTop + boxH/2, 6, 0, Math.PI*2); ctxC.fill();
-    ctxC.strokeStyle = '#fff'; ctxC.lineWidth = 2; ctxC.stroke();
-
-    const tw = 40, tx = Math.min(Math.max(x(v)-tw/2, 3), W-tw-3);
-    ctxC.beginPath(); ctxC.roundRect(tx, 4, tw, 20, 6); ctxC.fill();
-    ctxC.fillStyle = '#fff'; ctxC.font = '800 12px -apple-system, Segoe UI, sans-serif';
-    ctxC.textAlign = 'center';
-    ctxC.fillText(v, tx + tw/2, 18);
-    msgs.push(info.text);
-  });
-
-  const ro = document.getElementById('roC');
-  if(!msgs.length){
-    ro.textContent = 'Selected: none';
-  } else if(checked.length === 1){
-    const v = checked[0];
-    ctxC.beginPath(); ctxC.roundRect(tx, 4, tw, 20, 6); ctxC.fill();
-    ro.innerHTML = 'Selected: <b>' + v + '</b> &mdash; ' + OPT_INFO[v].text;
-  } else {
-    ro.innerHTML = 'Selected: <b>' + checked.join(', ') + '</b> &mdash; ' + msgs.length + ' options highlighted';
-  }
-}
-document.querySelectorAll('.ckC').forEach(c => c.addEventListener('change', drawC));
-
-/* ============================================================
-   INIT
-   ============================================================ */
-window.addEventListener('load', () => {
-  refreshA();
-  drawB();
-  drawC();
-});
-// also draw immediately in case load already fired
-refreshA(); drawB(); drawC();
-
-/* roundRect polyfill for older browsers */
-if(!CanvasRenderingContext2D.prototype.roundRect){
-  CanvasRenderingContext2D.prototype.roundRect = function(x,y,w,h,r){
-    if(w < 2*r) r = w/2;
-    if(h < 2*r) r = h/2;
-    this.beginPath();
-    this.moveTo(x+r,y);
-    this.arcTo(x+w,y,x+w,y+h,r);
-    this.arcTo(x+w,y+h,x,y+h,r);
-    this.arcTo(x,y+h,x,y,r);
-    this.arcTo(x,y,x+w,y,r);
-    this.closePath();
-    return this;
+  // Theme per step
+  const THEME = {
+    1: { boxFill:'#fef3c7', boxStroke:'#f59e0b', med:'#16a34a', whisk:'#2563eb',
+         highlight:null, glow:null, label:'Step 1 — identify the five-number summary' },
+    2: { boxFill:'#fee2e2', boxStroke:'#dc2626', med:'#16a34a', whisk:'#94a3b8',
+         highlight:'q3', glow:'#dc2626', label:'Step 2 — the right edge of the box = Q₃ = 60' },
+    3: { boxFill:'#e0f2fe', boxStroke:'#0284c7', med:'#16a34a', whisk:'#2563eb',
+         highlight:'iqr', glow:'#0284c7', label:'Step 3 — IQR = Q₃ − Q₁ = 60 − 20 = 40' },
+    4: { boxFill:'#dcfce7', boxStroke:'#16a34a', med:'#16a34a', whisk:'#2563eb',
+         highlight:'q3', glow:'#16a34a', label:'Step 4 — Q₃ = 60  ⇒  Answer C' }
   };
-}
-</script>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
 
+  function drawArrowHead(x,y,dir,color){
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x - dir*10, y - 5);
+    ctx.lineTo(x - dir*10, y + 5);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  function draw(step){
+    const t = THEME[step] || THEME[1];
+    ctx.clearRect(0,0,W,H);
+
+    // Background
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0,0,W,H);
+
+    const yAxis  = H - M.bottom;          // number line y
+    const yTop   = 150;                   // whisker y
+    const boxTop = 190, boxBot = 250;     // box top/bottom
+    const yMed   = (boxTop + boxBot)/2;
+
+    // ---------- Number line ----------
+    ctx.strokeStyle = '#334155';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(M.left - 18, yAxis);
+    ctx.lineTo(W - M.right + 22, yAxis);
+    ctx.stroke();
+    // arrow on right
+    drawArrowHead(W - M.right + 22, yAxis, -1, '#334155');
+
+    // Label
+    ctx.fillStyle = '#334155';
+    ctx.font = '600 13px "Segoe UI", Arial';
+    ctx.textAlign = 'left';
+    ctx.fillText('Number of training hours', W - M.right - 170, yAxis + 32);
+
+    // Ticks + labels
+    ctx.textAlign = 'center';
+    for (let v = AXIS_MIN; v <= AXIS_MAX; v += TICK){
+      const x = xPos(v);
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(x, yAxis - 6);
+      ctx.lineTo(x, yAxis + 6);
+      ctx.stroke();
+      ctx.fillStyle = '#475569';
+      ctx.font = '600 12px "Segoe UI", Arial';
+      ctx.fillText(v, x, yAxis + 24);
+
+      // light guide line up
+      ctx.strokeStyle = 'rgba(148,163,184,.28)';
+      ctx.setLineDash([3,4]);
+      ctx.beginPath();
+      ctx.moveTo(x, yTop - 26);
+      ctx.lineTo(x, yAxis - 6);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    // ---------- Whiskers ----------
+    const xMin = xPos(DATA.min), xMax = xPos(DATA.max);
+    const xQ1  = xPos(DATA.q1),  xQ3  = xPos(DATA.q3);
+    const xQ2  = xPos(DATA.q2);
+
+    ctx.strokeStyle = t.whisk;
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    // left whisker
+    ctx.beginPath(); ctx.moveTo(xMin, yTop); ctx.lineTo(xQ1, yTop); ctx.stroke();
+    // right whisker
+    ctx.beginPath(); ctx.moveTo(xQ3, yTop); ctx.lineTo(xMax, yTop); ctx.stroke();
+    // caps
+    ctx.beginPath(); ctx.moveTo(xMin, yTop-16); ctx.lineTo(xMin, yTop+16); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(xMax, yTop-16); ctx.lineTo(xMax, yTop+16); ctx.stroke();
+
+    // ---------- Box ----------
+    ctx.fillStyle = t.boxFill;
+    ctx.strokeStyle = t.boxStroke;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.rect(xQ1, boxTop, xQ3 - xQ1, boxBot - boxTop);
+    ctx.fill();
+    ctx.stroke();
+
+    // Median line
+    ctx.strokeStyle = t.med;
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(xQ2, boxTop);
+    ctx.lineTo(xQ2, boxBot);
+    ctx.stroke();
+
+    // ---------- Highlight glow ----------
+    if (t.highlight === 'q3'){
+      ctx.save();
+      ctx.shadowColor = t.glow;
+      ctx.shadowBlur = 18;
+      ctx.strokeStyle = t.glow;
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(xQ3, boxTop - 8);
+      ctx.lineTo(xQ3, boxBot + 8);
+      ctx.stroke();
+      ctx.restore();
+
+      // dashed drop line from Q3 to axis
+      ctx.strokeStyle = t.glow;
+      ctx.setLineDash([6,5]);
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(xQ3, boxBot + 8);
+      ctx.lineTo(xQ3, yAxis);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // dot on axis
+      ctx.fillStyle = t.glow;
+      ctx.beginPath();
+      ctx.arc(xQ3, yAxis, 6, 0, Math.PI*2);
+      ctx.fill();
+
+      // callout
+      const cx = xQ3 + 6, cy = boxTop - 42;
+      ctx.fillStyle = t.glow;
+      ctx.font = '800 15px "Segoe UI", Arial';
+      ctx.textAlign = 'left';
+      ctx.fillText('Q₃ = 60', cx + 6, cy);
+      ctx.beginPath();
+      ctx.moveTo(xQ3, boxTop - 10);
+      ctx.lineTo(cx, cy + 5);
+      ctx.strokeStyle = t.glow;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    if (t.highlight === 'iqr'){
+      // IQR bracket
+      const yBr = boxBot + 34;
+      ctx.strokeStyle = '#0284c7';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(xQ1, yBr); ctx.lineTo(xQ3, yBr);
+      ctx.stroke();
+      // end ticks
+      ctx.beginPath(); ctx.moveTo(xQ1, yBr-9); ctx.lineTo(xQ1, yBr+9); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(xQ3, yBr-9); ctx.lineTo(xQ3, yBr+9); ctx.stroke();
+      // arrows
+      drawArrowHead(xQ1+1, yBr, -1, '#0284c7');
+      drawArrowHead(xQ3-1, yBr,  1, '#0284c7');
+
+      ctx.fillStyle = '#0284c7';
+      ctx.font = '800 14px "Segoe UI", Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('IQR = 40', (xQ1+xQ3)/2, yBr + 24);
+    }
+
+    // ---------- Static labels (always) ----------
+    ctx.font = '700 12px "Segoe UI", Arial';
+    ctx.textAlign = 'center';
+
+    // min / max labels
+    ctx.fillStyle = '#2563eb';
+    ctx.fillText('min = 10', xMin, yTop - 26);
+    ctx.fillText('max = 80', xMax, yTop - 26);
+
+    // Q1 label
+    ctx.fillStyle = '#b45309';
+    ctx.fillText('Q₁ = 20', xQ1, boxBot + 58);
+
+    // Q2 label
+    ctx.fillStyle = '#15803d';
+    ctx.fillText('Q₂ = 30', xQ2, boxBot + 74);
+
+    // Q3 label (always shown; emphasised in steps 2 & 4)
+    if (t.highlight !== 'q3'){
+      ctx.fillStyle = '#b91c1c';
+      ctx.fillText('Q₃ = 60', xQ3, boxBot + 40);
+    }
+
+    // ---------- Readout ----------
+    ro.textContent = t.label;
+  }
+
+  // Initial draw
+  draw(1);
+
+  // ---------- Scroll-sync ----------
+  let current = 1;
+  const steps = document.querySelectorAll('.step');
+  const io = new IntersectionObserver(es => {
+    es.forEach(e => {
+      if (e.isIntersecting){
+        const n = +e.target.dataset.step;
+        current = n;
+        steps.forEach(s => s.classList.toggle('active', +s.dataset.step === n));
+        draw(n);
+      }
+    });
+  }, { rootMargin: '-25% 0px -55% 0px' });
+
+  steps.forEach(s => io.observe(s));
+  steps[0].classList.add('active');
+
+  // Redraw on resize (canvas is fixed-size; keep crisp)
+  window.addEventListener('resize', () => draw(current));
+})();
+</script>
 </body>
 </html>

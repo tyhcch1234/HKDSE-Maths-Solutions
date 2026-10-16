@@ -3,1009 +3,384 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HKDSE 2018 Paper 2 Q30 · Statistics</title>
+<title>HKDSE 2018 P2 Q30 — Stem-and-Leaf Diagram</title>
 <script>
-  window.MathJax = {
-    tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['\\[', '\\]']] },
-    options: { enableMenu: false }
-  };
+window.MathJax = {
+  tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
+  svg: { fontCache: 'global' }
+};
 </script>
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
-  :root{
-    --blue:#1d4ed8;
-    --blue-dark:#1e3a8a;
-    --amber:#f59e0b;
-    --emerald:#059669;
-    --slate:#0f172a;
-    --ink:#1e293b;
-    --soft:#64748b;
-    --bg:#f1f5f9;
-    --card:#ffffff;
-  }
   *{box-sizing:border-box;}
-  body{
-    margin:0;
-    font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
-    color:var(--ink);
-    background:var(--bg);
-    line-height:1.6;
-    -webkit-font-smoothing:antialiased;
-  }
-  /* ---------- HERO ---------- */
-  header.hero{
-    background:linear-gradient(125deg,#1e3a8a 0%,#1d4ed8 45%,#3b82f6 100%);
-    color:#fff;
-    padding:34px 20px 40px;
-    position:relative;
-    overflow:hidden;
-  }
-  header.hero::after{
-    content:"";
-    position:absolute;
-    right:-80px;top:-80px;
-    width:280px;height:280px;border-radius:50%;
-    background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.18), transparent 70%);
-  }
-  .hero-inner{max-width:960px;margin:0 auto;position:relative;z-index:2;}
-  .eyebrow{
-    font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;
-    color:#bfdbfe;font-weight:600;margin-bottom:8px;
-  }
-  .hero h1{margin:0 0 6px;font-size:1.9rem;line-height:1.25;}
-  .hero .sub{color:#dbeafe;font-size:1rem;margin:0 0 16px;}
-  .pills{display:flex;flex-wrap:wrap;gap:8px;}
-  .pill{
-    background:rgba(255,255,255,.16);
-    border:1px solid rgba(255,255,255,.35);
-    padding:5px 13px;border-radius:999px;
-    font-size:.78rem;font-weight:600;letter-spacing:.02em;
-  }
-  /* ---------- LAYOUT ---------- */
-  main{max-width:960px;margin:0 auto;padding:26px 16px 60px;}
-  section.card{
-    background:var(--card);
-    border-radius:18px;
-    box-shadow:0 8px 26px rgba(15,23,42,.08);
-    padding:24px 22px;
-    margin-bottom:26px;
-    border:1px solid #e2e8f0;
-  }
-  section.card h2{
-    margin:0 0 6px;
-    font-size:1.28rem;
-    color:var(--blue-dark);
-    display:flex;align-items:center;gap:10px;
-  }
-  section.card h2 .num{
-    display:inline-flex;align-items:center;justify-content:center;
-    width:34px;height:34px;border-radius:10px;
-    background:linear-gradient(135deg,#1d4ed8,#3b82f6);
-    color:#fff;font-size:.95rem;flex:none;
-  }
-  .qmark{
-    display:inline-block;background:#fef3c7;color:#92400e;
-    font-weight:700;font-size:.78rem;padding:3px 11px;border-radius:8px;
-    border:1px solid #fde68a;
-  }
-  .qtext{background:#f8fafc;border-left:5px solid var(--blue);
-    border-radius:10px;padding:14px 16px;margin:12px 0 4px;}
-  /* ---------- STEM-LEAF TABLE ---------- */
-  .stemwrap{display:flex;justify-content:center;margin:16px 0;}
-  table.stem{
-    border-collapse:collapse;font-family:"Consolas","Courier New",monospace;
-    font-size:1.05rem;background:#fff;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden;
-  }
-  table.stem th{
-    background:#e0e7ff;color:#3730a3;padding:7px 18px;font-size:.85rem;
-    letter-spacing:.06em;text-transform:uppercase;border-bottom:2px solid #a5b4fc;
-  }
-  table.stem td{padding:5px 18px;text-align:center;border-bottom:1px solid #e2e8f0;}
-  table.stem td.stem{border-right:2px solid #a5b4fc;font-weight:700;color:#1e40af;}
-  table.stem td.var{color:#b45309;font-weight:700;}
-  table.stem tr:last-child td{border-bottom:none;}
-  /* ---------- CANVAS ---------- */
-  .canvas-box{
-    background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;
-    padding:12px;margin:16px 0 8px;
-  }
-  canvas{width:100%;display:block;border-radius:10px;background:#fff;touch-action:none;}
-  .controls{
-    display:flex;flex-wrap:wrap;gap:18px;align-items:center;
-    margin-top:12px;padding:12px 14px;background:#fff;border-radius:12px;
-    border:1px solid #e2e8f0;
-  }
-  .ctrl{display:flex;flex-direction:column;gap:4px;min-width:170px;flex:1;}
-  .ctrl label{font-size:.82rem;font-weight:600;color:var(--soft);}
-  .ctrl .val{font-weight:700;color:var(--blue-dark);}
-  input[type=range]{width:100%;accent-color:var(--blue);cursor:pointer;}
-  .readouts{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;}
-  .ro{
-    background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;
-    padding:8px 14px;font-size:.87rem;font-weight:600;color:#1e3a8a;
-    min-width:120px;flex:1;
-  }
-  .ro b{display:block;font-size:.72rem;color:#3b82f6;letter-spacing:.06em;text-transform:uppercase;font-weight:700;}
-  .ro.good{background:#ecfdf5;border-color:#a7f3d0;color:#065f46;}
-  .ro.good b{color:#10b981;}
-  /* ---------- STEPS ---------- */
-  .step{
-    border-left:4px solid var(--amber);
-    background:#fffbeb;
-    border-radius:0 12px 12px 0;
-    padding:13px 16px 13px 14px;
-    margin:12px 0;
-    display:none;
-    animation:slidein .35s ease;
-  }
-  .step.show{display:block;}
-  @keyframes slidein{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
-  .step-head{display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap;}
-  .badge{
-    width:26px;height:26px;border-radius:50%;
-    background:var(--amber);color:#fff;font-weight:700;font-size:.8rem;
-    display:inline-flex;align-items:center;justify-content:center;flex:none;
-  }
-  .marks{
-    background:#1e293b;color:#fff;font-size:.7rem;font-weight:700;
-    padding:2px 9px;border-radius:7px;letter-spacing:.05em;
-  }
-  .step-title{font-weight:700;color:#92400e;font-size:.95rem;}
-  .hint{
-    background:#e0f2fe;border:1px dashed #7dd3fc;border-radius:10px;
-    padding:9px 13px;margin-top:9px;font-size:.9rem;color:#075985;
-  }
-  .hint::before{content:"💡 Hint: ";font-weight:700;}
-  .answer{
-    background:#ecfdf5;border:1px solid #6ee7b7;border-radius:10px;
-    padding:10px 13px;margin-top:9px;font-weight:600;color:#065f46;
-  }
-  .answer::before{content:"✓ ";font-weight:800;}
-  .stepbtn{
-    margin-top:14px;background:linear-gradient(135deg,#1d4ed8,#3b82f6);
-    color:#fff;border:none;border-radius:11px;padding:11px 22px;
-    font-size:.93rem;font-weight:700;cursor:pointer;
-    box-shadow:0 5px 15px rgba(29,78,216,.32);
-    transition:.18s;display:inline-flex;align-items:center;gap:9px;
-  }
-  .stepbtn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 20px rgba(29,78,216,.42);}
-  .stepbtn:disabled{background:#cbd5e1;box-shadow:none;cursor:not-allowed;color:#64748b;}
-  .counter{font-size:.82rem;color:var(--soft);font-weight:600;margin-left:10px;}
-  /* ---------- SUMMARY ---------- */
-  .summary{
-    background:linear-gradient(135deg,#0f172a,#1e293b);
-    color:#e2e8f0;border:none;
-  }
-  .summary h2{color:#fff;}
-  .summary h2 .num{background:linear-gradient(135deg,#f59e0b,#fbbf24);}
-  .summary ul{list-style:none;padding:0;margin:14px 0 0;}
-  .summary li{
-    padding:9px 0 9px 30px;position:relative;border-bottom:1px solid #334155;
-  }
-  .summary li:last-child{border-bottom:none;}
-  .summary li::before{
-    content:"▸";position:absolute;left:6px;color:#fbbf24;font-weight:700;
-  }
-  .verdict{
-    display:inline-block;padding:3px 12px;border-radius:8px;font-weight:700;
-    font-size:.84rem;margin-left:6px;
-  }
-  .yes{background:#065f46;color:#a7f3d0;}
-  .no{background:#7f1d1d;color:#fecaca;}
-  footer{
-    text-align:center;padding:26px 16px 40px;color:var(--soft);font-size:.83rem;
-  }
-  .small{font-size:.85rem;color:var(--soft);}
-  @media(max-width:560px){
-    .hero h1{font-size:1.45rem;}
-    section.card{padding:18px 15px;border-radius:14px;}
-    table.stem{font-size:.92rem;}
-    table.stem th,table.stem td{padding:5px 11px;}
-  }
+  body{margin:0;background:#f4f7fb;color:#1c2333;font-family:"Segoe UI",system-ui,-apple-system,Arial,sans-serif;line-height:1.5;}
+  .wrap{max-width:1180px;margin:0 auto;padding:16px 14px 50px;}
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start;}
+  @media(min-width:900px){.split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}}
+  @media(max-width:640px){body{font-size:14.5px;}.wrap{padding:10px 8px 40px;}}
+
+  .diagram{position:sticky;top:16px;max-height:calc(100vh - 2rem);overflow-y:auto;background:#fff;border:1px solid #dbe3ef;border-radius:14px;padding:12px;box-shadow:0 4px 14px rgba(30,50,90,.07);}
+  .diagram h3{margin:2px 0 8px;font-size:15px;color:#22437a;}
+  canvas{width:100%;height:auto;display:block;border-radius:10px;background:#fbfcff;border:1px solid #e6ecf6;}
+  .ro{margin:8px 0 0;font-size:13px;color:#33415c;background:#eef4ff;border-left:4px solid #4b7bec;padding:6px 9px;border-radius:6px;}
+
+  .qcard{background:#fff;border:1px solid #dbe3ef;border-radius:14px;padding:14px 16px;box-shadow:0 4px 14px rgba(30,50,90,.07);}
+  .qcard h2{margin:0 0 8px;font-size:16px;color:#22437a;}
+  .qtext{font-size:15px;}
+  .choices{margin:10px 0 0;padding-left:0;list-style:none;}
+  .choices li{margin:4px 0;padding:5px 10px;background:#f2f6ff;border-radius:8px;border:1px solid #e0e8f7;}
+
+  .step{margin:12px 0;background:#fff;border:1px solid #dbe3ef;border-left:6px solid #4b7bec;border-radius:12px;padding:10px 13px;box-shadow:0 3px 10px rgba(30,50,90,.06);transition:background .25s, border-color .25s, transform .2s;}
+  .step.active{background:#fffbe9;border-left-color:#f5a623;transform:translateX(2px);}
+  .tag{display:inline-block;font-weight:700;color:#fff;background:#4b7bec;border-radius:999px;padding:1px 10px;font-size:13px;margin-right:7px;}
+  .step.active .tag{background:#f5a623;}
+  .hint{margin-top:6px;font-size:13px;color:#5b6b88;font-style:italic;}
+  .ok{color:#1a8f4c;font-weight:700;}
+  .no{color:#d0342c;font-weight:700;}
+  .ans{margin-top:16px;background:#e9fbf0;border:1px solid #a9e6c3;border-left:6px solid #1a8f4c;border-radius:12px;padding:12px 14px;font-weight:700;font-size:16px;color:#0f5c31;}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;font-size:12.5px;color:#33415c;}
+  .legend span{display:flex;align-items:center;gap:5px;}
+  .sw{width:13px;height:13px;border-radius:3px;display:inline-block;}
 </style>
 </head>
 <body>
+<div class="wrap">
+  <div class="split">
 
-<header class="hero">
-  <div class="hero-inner">
-    <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</div>
-    <h1>2018 Paper 2 · Question 30</h1>
-    <p class="sub">Stem-and-Leaf Diagrams · Inter-quartile Range</p>
-    <div class="pills">
-      <span class="pill">Stem-and-Leaf Diagram</span>
-      <span class="pill">Quartiles &amp; IQR</span>
-      <span class="pill">Inequalities</span>
-      <span class="pill">MC Reasoning</span>
+    <!-- ============ LEFT PANE ============ -->
+    <div class="diagram">
+      <h3>Stem-and-Leaf Diagram (20 students)</h3>
+      <canvas id="cv" width="640" height="720"></canvas>
+      <p class="ro" id="ro">Scroll the solution to highlight each calculation.</p>
+      <div class="legend">
+        <span><i class="sw" style="background:#4b7bec"></i>Fixed data</span>
+        <span><i class="sw" style="background:#e8563f"></i>Unknown $a$</span>
+        <span><i class="sw" style="background:#9b59b6"></i>Unknown $b$</span>
+        <span><i class="sw" style="background:#16a085"></i>Quartile positions</span>
+      </div>
+    </div>
+
+    <!-- ============ RIGHT PANE ============ -->
+    <div>
+      <div class="qcard">
+        <h2>[2018 MC #30] — 15. Statistics</h2>
+        <div class="qtext">
+          The stem-and-leaf diagram below shows the distribution of the numbers of books read by 20 students in a year.
+          <div style="margin:10px 0;font-family:ui-monospace,Consolas,monospace;background:#f7f9ff;border:1px solid #e0e8f7;border-radius:8px;padding:10px 14px;display:inline-block;">
+            Stem (tens)&nbsp;&nbsp;|&nbsp;&nbsp;Leaf (units)<br>
+            &nbsp;&nbsp;&nbsp;2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;1&nbsp;&nbsp;2&nbsp;&nbsp;2&nbsp;&nbsp;8<br>
+            &nbsp;&nbsp;&nbsp;3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;$a$&nbsp;&nbsp;$a$<br>
+            &nbsp;&nbsp;&nbsp;4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;0&nbsp;&nbsp;2&nbsp;&nbsp;4&nbsp;&nbsp;5&nbsp;&nbsp;5&nbsp;&nbsp;7&nbsp;&nbsp;8<br>
+            &nbsp;&nbsp;&nbsp;5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;3<br>
+            &nbsp;&nbsp;&nbsp;6&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;$b$&nbsp;&nbsp;$b$&nbsp;&nbsp;9&nbsp;&nbsp;9<br>
+            &nbsp;&nbsp;&nbsp;7&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;0&nbsp;&nbsp;8
+          </div>
+          <p>If the inter-quartile range of the above distribution is at most $25$, which of the following must be true?</p>
+          <p style="margin:6px 0;">I. $\;5 \le a \le 9$<br>
+          II. $\;0 \le b \le 4$<br>
+          III. $\;1 \le a - b \le 6$</p>
+          <ul class="choices">
+            <li>A. I and II only</li>
+            <li>B. I and III only</li>
+            <li>C. II and III only</li>
+            <li>D. I, II and III</li>
+          </ul>
+        </div>
+      </div>
+
+      <figure style="margin:12px 0;text-align:center;"><img src="figures/2018_P2_Q30.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
+
+      <div class="step" data-step="1">
+        <span class="tag">Step 1</span><b>Order the data &amp; find quartile positions.</b>
+        <p>The 20 values, already in ascending order of stem then leaf, are read off directly. With $n=20$:</p>
+        <p>$Q_1$ is the $\tfrac{n}{4}=\tfrac{20}{4}=5$th value, and $Q_3$ is the $\tfrac{3n}{4}=\tfrac{60}{4}=15$th value.</p>
+        <div class="hint">Hint: for $n$ divisible by 4, HKDSE takes $Q_1$ = the $\frac{n}{4}$th datum and $Q_3$ = the $\frac{3n}{4}$th datum.</div>
+      </div>
+
+      <div class="step" data-step="2">
+        <span class="tag">Step 2</span><b>Locate $Q_1$ and $Q_3$ in the table.</b>
+        <p>Counting positions 1 to 20:</p>
+        <p>Positions 1–4: $\;21,22,22,28$ &nbsp;(stem 2)<br>
+        Positions 5–6: $\;3a,3a$ &nbsp;(stem 3)<br>
+        Positions 7–13: $\;40,42,44,45,45,47,48$ &nbsp;(stem 4)<br>
+        Position 14: $\;53$ &nbsp;(stem 5)<br>
+        Positions 15–18: $\;6b,6b,69,69$ &nbsp;(stem 6)<br>
+        Positions 19–20: $\;70,78$ &nbsp;(stem 7)</p>
+        <p>So the 5th value is $30+a$ &nbsp;and&nbsp; the 15th value is $60+b$. Hence
+          $Q_1 = 30+a$ and $Q_3 = 60+b$. Also notice $a$ occupies positions 5 and 6, so we need $a \ge 0$ and (to keep order) $a \le 4$ is <i>not</i> required — only that $3a$ lies after $28$ would force $a\ge 3$, but $a$ as leaf of stem 3 with two equal leaves is acceptable for any digit; we keep $a\in\{0,\dots,9\}$.</p>
+        <div class="hint">Hint: $Q_1$ sits at the stem-3 row, $Q_3$ at the stem-6 row (because $b$ repeats twice).</div>
+      </div>
+
+      <div class="step" data-step="3">
+        <span class="tag">Step 3</span><b>Apply IQR $\le 25$.</b>
+        <p>$$Q_3 - Q_1 = (60+b)-(30+a) = 30 + (b-a) \le 25$$</p>
+        <p>$$\Rightarrow \; b - a \le -5 \quad\Rightarrow\quad a - b \ge 5.$$</p>
+        <div class="hint">Hint: the IQR is $Q_3 - Q_1$, i.e. $30$ minus the "extra" $a$, plus the "extra" $b$.</div>
+      </div>
+
+      <div class="step" data-step="4">
+        <span class="tag">Step 4</span><b>Test statement I: $5 \le a \le 9$.</b>
+        <p>From $a-b \ge 5$ and $b \ge 0$: &nbsp;$a \ge b+5 \ge 5$.</p>
+        <p>Since $a$ is a digit, $a \le 9$ automatically. So $5 \le a \le 9$: <span class="ok">TRUE ✓</span></p>
+        <div class="hint">Hint: $b$ cannot be negative (it is a leaf digit), so $a$ must be at least 5.</div>
+      </div>
+
+      <div class="step" data-step="5">
+        <span class="tag">Step 5</span><b>Test statement II: $0 \le b \le 4$.</b>
+        <p>From $a-b \ge 5$ and $a \le 9$: &nbsp;$b \le a - 5 \le 9-5 = 4$.</p>
+        <p>Also $b \ge 0$ (digit). So $0 \le b \le 4$: <span class="ok">TRUE ✓</span></p>
+        <div class="hint">Hint: symmetry with Step 4 — now bound $b$ using the largest possible $a$.</div>
+      </div>
+
+      <div class="step" data-step="6">
+        <span class="tag">Step 6</span><b>Test statement III: $1 \le a - b \le 6$.</b>
+        <p>We know $a - b \ge 5$. The maximum of $a-b$ is $9-0=9$, which gives <b>no upper restriction</b> from the IQR condition alone.</p>
+        <p>Check a counter-example: take $a = 9$ and $b = 0$. Then $a-b = 9$, which violates $a-b \le 6$, yet $Q_3 - Q_1 = 30 + (0-9) = 21 \le 25$ is fine. So statement III need <b>not</b> be true.</p>
+        <p><span class="no">FALSE ✗</span></p>
+        <div class="hint">Hint: only $a-b \ge 5$ is forced — the IQR condition gives a lower bound, not an upper one.</div>
+      </div>
+
+      <div class="step" data-step="7">
+        <span class="tag">Step 7</span><b>Conclude.</b>
+        <p>Only statements I and II must be true → <b>Option A</b>.</p>
+        <div class="hint">Hint: "must be true" means true for <i>every</i> valid configuration — one counter-example kills a statement.</div>
+      </div>
+
+      <div class="ans">Answer: A (I and II only)</div>
     </div>
   </div>
-</header>
-
-<main>
-
-  <!-- ============ QUESTION CARD ============ -->
-  <section class="card">
-    <h2><span class="num">Q</span>Question <span class="qmark" style="margin-left:auto;">Multiple Choice</span></h2>
-    <div class="qtext">
-      <p>The stem-and-leaf diagram below shows the distribution of the numbers of books read by 20 students in a year.</p>
-
-      <div class="stemwrap">
-        <table class="stem">
-          <thead>
-            <tr><th>Stem (tens)</th><th>Leaf (units)</th></tr>
-          </thead>
-          <tbody>
-            <tr><td class="stem">2</td><td>1 &nbsp; 2 &nbsp; 2 &nbsp; 8</td></tr>
-            <tr><td class="stem">3</td><td class="var">a &nbsp; a</td></tr>
-            <tr><td class="stem">4</td><td>0 &nbsp; 2 &nbsp; 4 &nbsp; 5 &nbsp; 5 &nbsp; 7 &nbsp; 8</td></tr>
-            <tr><td class="stem">5</td><td>3</td></tr>
-            <tr><td class="stem">6</td><td class="var">b &nbsp; b</td></tr>
-            <tr><td class="stem">7</td><td>0 &nbsp; 8</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <p>If the inter-quartile range of the above distribution is at most \(25\), which of the following must be true?</p>
-      <p style="margin-left:8px;">
-        I. &nbsp;\(5 \le a \le 9\)<br>
-        II. &nbsp;\(0 \le b \le 4\)<br>
-        III. &nbsp;\(1 \le a - b \le 6\)
-      </p>
-      <p>
-        A. &nbsp;I and II only<br>
-        B. &nbsp;I and III only<br>
-        C. &nbsp;II and III only<br>
-        D. &nbsp;I, II and III
-      </p><figure style="margin:12px 0;text-align:center;"><img src="figures/2018_P2_Q30.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
-    </div>
-  </section>
-
-  <!-- ============ PART (a) ============ -->
-  <section class="card">
-    <h2><span class="num">a</span>Part (a) — Read off \(Q_1\) and \(Q_3\)</h2>
-    <p class="small">There are \(20\) students, so each quartile group wraps around the 5th and 6th, and 15th and 16th ordered values.</p>
-
-    <div class="canvas-box">
-      <canvas id="cvA" width="900" height="600"></canvas>
-      <div class="controls">
-        <div class="ctrl">
-          <label>Value of \(a\) (leaf on stem 3): <span class="val" id="avalA">5</span></label>
-          <input type="range" id="aSliderA" min="0" max="9" step="1" value="5">
-        </div>
-        <div class="ctrl">
-          <label>Value of \(b\) (leaf on stem 6): <span class="val" id="bvalA">0</span></label>
-          <input type="range" id="bSliderA" min="0" max="9" step="1" value="0">
-        </div>
-      </div>
-      <div class="readouts">
-        <div class="ro"><b>Q₁</b>\( \frac{32 + (30+a)}{2} \) = <span id="q1out">—</span></div>
-        <div class="ro"><b>Q₃</b>\( \frac{(60+b)+(60+b)}{2} \) = <span id="q3out">—</span></div>
-        <div class="ro good"><b>IQR</b><span id="iqrout">—</span></div>
-      </div>
-    </div>
-
-    <div class="step" id="a1">
-      <div class="step-head"><span class="badge">1</span><span class="step-title">Count &amp; order the data</span></div>
-      <p>Arrange all \(20\) values in ascending order and note the positions of the quartiles:</p>
-      \[Q_1 = \frac{5^{\text{th}} + 6^{\text{th}}}{2}, \qquad Q_3 = \frac{15^{\text{th}} + 16^{\text{th}}}{2}\]
-      <div class="hint">For \(n=20\), the lower quartile sits between the 5th and 6th values, and the upper quartile between the 15th and 16th values.</div>
-    </div>
-
-    <div class="step" id="a2">
-      <div class="step-head"><span class="badge">2</span><span class="step-title">Locate the 5th, 6th, 15th, 16th values</span></div>
-      <p>Reading from the ordered list (stems \(2,3,4,5,6,7\)):</p>
-      \[
-        \underbrace{21,22,22,28}_{1\text{–}4},\;
-        \underbrace{3a}_{5},\;
-        \underbrace{3a}_{6},\;
-        \dots,\;
-        \underbrace{60+b}_{15},\;
-        \underbrace{60+b}_{16},\;
-        \underbrace{70,78}_{19\text{–}20}
-      \]
-      <p>So the 5th and 6th values are both \(30+a\), and the 15th and 16th values are both \(60+b\).</p>
-    </div>
-
-    <div class="step" id="a3">
-      <div class="step-head"><span class="badge">3</span><span class="step-title">Write \(Q_1\) and \(Q_3\)</span></div>
-      \[
-        Q_1 = \frac{(30+a)+(30+a)}{2} = 30 + a
-      \]
-      \[
-        Q_3 = \frac{(60+b)+(60+b)}{2} = 60 + b
-      \]
-      <div class="answer">\(Q_1 = 30 + a \qquad Q_3 = 60 + b\)</div>
-    </div>
-
-    <div class="step" id="a4">
-      <div class="step-head"><span class="badge">4</span><span class="step-title">Form the IQR condition</span></div>
-      \[
-        \text{IQR} = Q_3 - Q_1 = (60 + b) - (30 + a) = 30 + b - a
-      \]
-      <p>Given \(\text{IQR} \le 25\):</p>
-      \[
-        30 + b - a \le 25
-      \]
-      \[
-        \boxed{a - b \ge 5}
-      \]
-      <div class="hint">This single inequality is the key that unlocks all three statements — everything else follows by squeezing \(a\) and \(b\) into their allowed digits \(0\) to \(9\).</div>
-      <div class="answer">\(\text{IQR} = 30 + b - a \le 25 \;\Longrightarrow\; a - b \ge 5\)</div>
-    </div>
-
-    <button class="stepbtn" data-target="A">Next step →</button>
-    <span class="counter" id="cntA">0 / 4</span>
-  </section>
-
-  <!-- ============ PART (b)(i) ============ -->
-  <section class="card">
-    <h2><span class="num">i</span>Part (b)(i) — Is \(5 \le a \le 9\) a must?</h2>
-    <p class="small">Explore the feasible region of \((a,b)\) implied by \(a-b\ge 5\), with \(a,b\in\{0,1,\dots,9\}\).</p>
-
-    <div class="canvas-box">
-      <canvas id="cvB" width="900" height="600"></canvas>
-      <div class="controls">
-        <div class="ctrl">
-          <label>Highlight column \(a\): <span class="val" id="aValB">5</span></label>
-          <input type="range" id="aSliderB" min="0" max="9" step="1" value="5">
-        </div>
-        <div class="ctrl">
-          <label>Highlight row \(b\): <span class="val" id="bValB">0</span></label>
-          <input type="range" id="bSliderB" min="0" max="9" step="1" value="0">
-        </div>
-      </div>
-      <div class="readouts">
-        <div class="ro good"><b>(a, b) feasible?</b><span id="feasOut">—</span></div>
-        <div class="ro"><b>a − b</b><span id="diffOut">—</span></div>
-        <div class="ro"><b>Smallest possible a</b><span id="minAOut">5</span></div>
-      </div>
-    </div>
-
-    <div class="step" id="b1">
-      <div class="step-head"><span class="badge">1</span><span class="step-title">Use \(b \ge 0\)</span></div>
-      <p>Since \(b\) is a digit and \(b \ge 0\), from \(a - b \ge 5\):</p>
-      \[ a \ge b + 5 \ge 5 \]
-      <div class="hint">Adding \(b\) to both sides of \(a - b \ge 5\) gives \(a \ge b + 5\); the smallest \(b\) can be is \(0\).</div>
-    </div>
-
-    <div class="step" id="b2">
-      <div class="step-head"><span class="badge">2</span><span class="step-title">Bound above by a digit</span></div>
-      <p>Also, \(a\) is a single digit, so \(a \le 9\). Combining:</p>
-      \[ 5 \le a \le 9 \]
-      <div class="answer">Statement I is TRUE \( \checkmark \)</div>
-    </div>
-
-    <div class="step" id="b3">
-      <div class="step-head"><span class="badge">3</span><span class="step-title">Which values of \(a\) are impossible?</span></div>
-      <p>If \(a \le 4\), then \(b \le a - 5 \le -1\), which is impossible since \(b \ge 0\). Hence \(a = 0,1,2,3,4\) are impossible, confirming \(a \ge 5\).</p>
-      <div class="hint">The diagram shows the lemon-yellow cells: they are exactly the impossible \((a,b)\) pairs. No yellow cell has \(a \le 4\) in a feasible spot.</div>
-    </div>
-
-    <button class="stepbtn" data-target="B">Next step →</button>
-    <span class="counter" id="cntB">0 / 3</span>
-  </section>
-
-  <!-- ============ PART (b)(ii) ============ -->
-  <section class="card">
-    <h2><span class="num">ii</span>Part (b)(ii) — Is \(0 \le b \le 4\) a must?</h2>
-    <p class="small">Drag the sliders to sweep through \(a\) and watch the maximum allowed value of \(b\).</p>
-
-    <div class="canvas-box">
-      <canvas id="cvC" width="900" height="600"></canvas>
-      <div class="controls">
-        <div class="ctrl">
-          <label>Value of \(a\): <span class="val" id="aValC">9</span></label>
-          <input type="range" id="aSliderC" min="5" max="9" step="1" value="9">
-        </div>
-      </div>
-      <div class="readouts">
-        <div class="ro"><b>Max allowed b</b>\(= a - 5 =\) <span id="maxBOut">4</span></div>
-        <div class="ro good"><b>Always b ≤ 4?</b><span id="bResultOut">YES</span></div>
-      </div>
-    </div>
-
-    <div class="step" id="c1">
-      <div class="step-head"><span class="badge">1</span><span class="step-title">Rearrange the key inequality</span></div>
-      <p>From Part (a):</p>
-      \[ a - b \ge 5 \;\Longrightarrow\; b \le a - 5 \]
-      <div class="hint">The larger \(a\) is, the larger \(b\) may be — so we must look at the worst case \(a = 9\).</div>
-    </div>
-
-    <div class="step" id="c2">
-      <div class="step-head"><span class="badge">2</span><span class="step-title">Use \(a \le 9\)</span></div>
-      <p>Since \(a\) is a digit, \(a \le 9\), hence:</p>
-      \[ b \le a - 5 \le 9 - 5 = 4 \]
-      \[ \therefore 0 \le b \le 4 \]
-      <div class="answer">Statement II is TRUE \( \checkmark \)</div>
-    </div>
-
-    <div class="step" id="c3">
-      <div class="step-head"><span class="badge">3</span><span class="step-title">Why values \(5\)–\(9\) are impossible for \(b\)</span></div>
-      <p>If \(b \ge 5\), then \(a \ge b + 5 \ge 10\), which is not a single digit. So \(b = 5,6,7,8,9\) are impossible for \(b\).</p>
-      <div class="hint">The horizontal dashed line in the diagram marks \(b = 4\): no feasible (blue) cell ever lies above it.</div>
-    </div>
-
-    <button class="stepbtn" data-target="C">Next step →</button>
-    <span class="counter" id="cntC">0 / 3</span>
-  </section>
-
-  <!-- ============ PART (b)(iii) ============ -->
-  <section class="card">
-    <h2><span class="num">iii</span>Part (b)(iii) — Is \(1 \le a - b \le 6\) a must?</h2>
-    <p class="small">We know \(a-b \ge 5\). The question is the upper bound: must \(a-b \le 6\)?</p>
-
-    <div class="canvas-box">
-      <canvas id="cvD" width="900" height="600"></canvas>
-      <div class="controls">
-        <div class="ctrl">
-          <label>Choose \(a\): <span class="val" id="aValD">9</span></label>
-          <input type="range" id="aSliderD" min="5" max="9" step="1" value="9">
-        </div>
-        <div class="ctrl">
-          <label>Choose \(b\): <span class="val" id="bValD">0</span></label>
-          <input type="range" id="bSliderD" min="0" max="9" step="1" value="0">
-        </div>
-      </div>
-      <div class="readouts">
-        <div class="ro"><b>a − b</b><span id="diffOutD">—</span></div>
-        <div class="ro good"><b>Feasible &amp; a−b ≤ 6?</b><span id="thirdOut">—</span></div>
-        <div class="ro"><b>Possible values of a−b</b><span id="rangeOutD">—</span></div>
-      </div>
-    </div>
-
-    <div class="step" id="d1">
-      <div class="step-head"><span class="badge">1</span><span class="step-title">Test the extreme case \(a = 9,\; b = 0\)</span></div>
-      <p>Take \(a = 9\) (max) and \(b = 0\) (min). Then \(a\) and \(b\) are legal digits and:</p>
-      \[ a - b = 9 - 0 = 9 \]
-      <p>But \(9 > 6\), which would violate statement III.</p>
-      <div class="hint">Statements with "must be true" fail as soon as ONE valid example breaks them. Here \(a=9,\ b=0\) also satisfies \(\text{IQR} = 30 + 0 - 9 = 21 \le 25\).</div>
-    </div>
-
-    <div class="step" id="d2">
-      <div class="step-head"><span class="badge">2</span><span class="step-title">Find all possible values of \(a-b\)</span></div>
-      <p>With \(a \in \{5,\dots,9\}\), \(b \in \{0,\dots,4\}\) and \(a - b \ge 5\):</p>
-      <ul>
-        <li>Largest: \(a = 9,\; b = 0 \Rightarrow a - b = 9\)</li>
-        <li>Smallest allowed: \(a - b = 5\) (i.e. \(b = a - 5\))</li>
-      </ul>
-      <p>So \(a - b\) can take values \(5, 6, 7, 8, 9\).</p>
-    </div>
-
-    <div class="step" id="d3">
-      <div class="step-head"><span class="badge">3</span><span class="step-title">Conclude</span></div>
-      <p>Since \(a - b = 9\) is possible, \(a - b \le 6\) is <strong>not</strong> guaranteed.</p>
-      <div class="answer">Statement III is FALSE \( \times \) &nbsp;(counter-example: \(a = 9,\ b = 0\))</div>
-    </div>
-
-    <button class="stepbtn" data-target="D">Next step →</button>
-    <span class="counter" id="cntD">0 / 3</span>
-  </section>
-
-  <!-- ============ SUMMARY ============ -->
-  <section class="card summary">
-    <h2><span class="num"></span>Summary &amp; Final Answer</h2>
-    <ul>
-      <li>\(Q_1 = 30 + a,\quad Q_3 = 60 + b,\quad \text{IQR} = 30 + b - a\)</li>
-      <li>Condition: \(\text{IQR} \le 25 \;\Longrightarrow\; a - b \ge 5\)</li>
-      <li>Statement I: \(5 \le a \le 9\) <span class="verdict yes">TRUE</span></li>
-      <li>Statement II: \(0 \le b \le 4\) <span class="verdict yes">TRUE</span></li>
-      <li>Statement III: \(1 \le a - b \le 6\) <span class="verdict no">FALSE</span> &nbsp;— counter-example \(a=9,\ b=0\) gives \(a-b=9\)</li>
-      <li>Only I and II are always true \(\;\Rightarrow\;\) <strong>Answer: A</strong></li>
-    </ul>
-  </section>
-
-</main>
-
-<footer>
-  HKDSE Mathematics (Compulsory Part) · Paper 2 · 2018 Question 30 — Interactive Solution<br>
-  Built with HTML5 Canvas &amp; MathJax
-</footer>
+</div>
 
 <script>
-/* =========================================================
-   SHARED HELPERS
-   ========================================================= */
-function setupCanvas(cv){
-  const dpr = window.devicePixelRatio || 1;
-  const rect = cv.getBoundingClientRect();
-  const w = rect.width || cv.width;
-  const h = cv.height * (w / cv.width) || cv.height;
-  cv.width = w * dpr;
-  cv.height = h * dpr;
-  cv.style.height = h + 'px';
-  const ctx = cv.getContext('2d');
-  ctx.setTransform(dpr,0,0,dpr,0,0);
-  return {ctx, w, h};
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+const ro = document.getElementById('ro');
+
+const W = cv.width, H = cv.height;
+
+function roundRect(c,x,y,w,h,r){
+  c.beginPath();
+  c.moveTo(x+r,y);
+  c.arcTo(x+w,y,x+w,y+h,r);
+  c.arcTo(x+w,y+h,x,y+h,r);
+  c.arcTo(x,y+h,x,y,r);
+  c.arcTo(x,y,x+w,y,r);
+  c.closePath();
 }
-function roundRect(ctx,x,y,w,h,r){
+
+// rows: [stem, leaves(array of strings), status]
+const rows = [
+  ['2', ['1','2','2','8'], 'fixed'],
+  ['3', ['a','a'], 'a'],
+  ['4', ['0','2','4','5','5','7','8'], 'fixed'],
+  ['5', ['3'], 'fixed'],
+  ['6', ['b','b','9','9'], 'b'],
+  ['7', ['0','8'], 'fixed']
+];
+
+function draw(step){
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = '#fbfcff';
+  ctx.fillRect(0,0,W,H);
+
+  const title = ['Original stem-and-leaf diagram',
+                 'Positions of the 20 data values',
+                 'IQR = Q3 − Q1',
+                 'Statement I: 5 ≤ a ≤ 9',
+                 'Statement II: 0 ≤ b ≤ 4',
+                 'Statement III: 1 ≤ a − b ≤ 6',
+                 'Conclusion: A (I & II only)'][step-1] || '';
+  ctx.fillStyle = '#22437a';
+  ctx.font = 'bold 21px Segoe UI, Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText(title, W/2, 34);
+  ctx.textAlign = 'left';
+
+  const top = 70;
+  const rowH = 78;
+  const stemX = 120, leafX = 230;
+
+  // header
+  ctx.fillStyle = '#22437a';
+  ctx.font = 'bold 19px Segoe UI, Arial';
+  ctx.textAlign = 'right';
+  ctx.fillText('Stem (tens)', stemX + 6, top - 14);
+  ctx.textAlign = 'left';
+  ctx.fillText('Leaf (units)', leafX, top - 14);
+
+  // separator line
+  ctx.strokeStyle = '#b9c6dd';
+  ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.moveTo(x+r,y);
-  ctx.arcTo(x+w,y,x+w,y+h,r);
-  ctx.arcTo(x+w,y+h,x,y+h,r);
-  ctx.arcTo(x,y+h,x,y,r);
-  ctx.arcTo(x,y,x+w,y,r);
-  ctx.closePath();
-}
-function arrow(ctx,x1,y1,x2,y2,color,width){
-  ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = width||2;
-  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
-  const ang = Math.atan2(y2-y1, x2-x1);
-  const s = 7;
-  ctx.beginPath();
-  ctx.moveTo(x2,y2);
-  ctx.lineTo(x2-s*Math.cos(ang-0.4), y2-s*Math.sin(ang-0.4));
-  ctx.lineTo(x2-s*Math.cos(ang+0.4), y2-s*Math.sin(ang+0.4));
-  ctx.closePath(); ctx.fill();
-}
+  ctx.moveTo(leafX - 16, top - 8);
+  ctx.lineTo(leafX - 16, top + rows.length*rowH - 26);
+  ctx.stroke();
 
-/* =========================================================
-   CANVAS A — ordered data / quartile positions
-   ========================================================= */
-(function(){
-  const cv = document.getElementById('cvA');
-  const aS = document.getElementById('aSliderA');
-  const bS = document.getElementById('bSliderA');
-  const aVal = document.getElementById('avalA');
-  const bVal = document.getElementById('bvalA');
-  const q1out = document.getElementById('q1out');
-  const q3out = document.getElementById('q3out');
-  const iqrout = document.getElementById('iqrout');
+  // position index (used in steps 2..7)
+  let pos = 0;
 
-  function data(a,b){
-    return [21,22,22,28, 30+a,30+a, 40,42,44,45,45,47,48, 53, 60+b,60+b, 70,78];
-  }
+  rows.forEach((r, i) => {
+    const y = top + i*rowH;
+    const isA = r[2] === 'a';
+    const isB = r[2] === 'b';
 
-  function draw(){
-    const {ctx,w,h} = setupCanvas(cv);
-    const a = +aS.value, b = +bS.value;
-    aVal.textContent = a; bVal.textContent = b;
-    ctx.clearRect(0,0,w,h);
-
-    const d = data(a,b);
-    // find positions (1-indexed) of Q1 and Q3 values
-    const q1 = 30+a, q3 = 60+b;
-    const rowY = 150;
-    const left = 55, right = w-30;
-    const ymin = 18, ymax = 82;
-    const xOf = v => left + (v-ymin)/(ymax-ymin)*(right-left);
-
-    // axis
-    ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(left, rowY+55); ctx.lineTo(right, rowY+55); ctx.stroke();
-    // ticks
-    ctx.fillStyle = '#64748b'; ctx.font = '11px sans-serif'; ctx.textAlign='center';
-    for(let v=20; v<=80; v+=10){
-      const x = xOf(v);
-      ctx.beginPath(); ctx.moveTo(x,rowY+55); ctx.lineTo(x,rowY+62); ctx.stroke();
-      ctx.fillText(v, x, rowY+76);
+    // row background highlight
+    let bg = null;
+    if (step === 1) bg = isA ? 'rgba(232,86,63,.10)' : (isB ? 'rgba(155,89,182,.10)' : 'rgba(75,123,236,.06)');
+    else if (step >= 2) {
+      if (isA) bg = 'rgba(232,86,63,.16)';
+      else if (isB) bg = 'rgba(155,89,182,.16)';
+      else bg = 'rgba(75,123,236,.05)';
     }
-    ctx.fillText('books read', (left+right)/2, rowY+94);
-
-    // stems coloring
-    function stemColor(v){ return v<30?'#3b82f6': v<40?'#8b5cf6': v<50?'#0ea5e9': v<60?'#14b8a6': v<70?'#f59e0b':'#ef4444'; }
-
-    // dots for each data value
-    const counts = {};
-    d.forEach(v=>{ counts[v]=(counts[v]||0)+1; });
-    const seen = {};
-    d.forEach((v,i)=>{
-      seen[v]=(seen[v]||0)+1;
-      const x = xOf(v);
-      const y = rowY + 20 - (seen[v]-1)*13;
-      ctx.beginPath();
-      ctx.arc(x,y,5.5,0,Math.PI*2);
-      ctx.fillStyle = stemColor(v);
+    if (bg){
+      ctx.fillStyle = bg;
+      roundRect(ctx, 40, y-38, W-80, 66, 10);
       ctx.fill();
-      ctx.strokeStyle = '#fff'; ctx.lineWidth=1.5; ctx.stroke();
-    });
-
-    // highlight Q1 (5th & 6th) and Q3 (15th & 16th)
-    function highlight(idxList, label, color, yOff){
-      const list = idxList.map(i=>d[i-1]);
-      const x1 = Math.min(...list.map(xOf)), x2 = Math.max(...list.map(xOf));
-      const px1 = x1-12, px2 = x2+12;
-      ctx.strokeStyle = color; ctx.lineWidth = 2.5; ctx.setLineDash([6,4]);
-      ctx.beginPath(); ctx.rect(px1, rowY-45, px2-px1, 90); ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.fillStyle = color; ctx.font='bold 13px sans-serif'; ctx.textAlign='center';
-      ctx.fillText(label, (px1+px2)/2, rowY-55);
-    }
-    highlight([5,6], 'Q₁ position (5th & 6th)', '#059669', 0);
-    highlight([15,16], 'Q₃ position (15th & 16th)', '#dc2626', 0);
-
-    // labels for the highlighted points
-    ctx.textAlign='center'; ctx.font='bold 11px sans-serif';
-    ctx.fillStyle='#059669'; ctx.fillText('30+a='+q1, xOf(q1), rowY+110);
-    ctx.fillStyle='#dc2626'; ctx.fillText('60+b='+q3, xOf(q3), rowY+128);
-
-    // header text
-    ctx.fillStyle='#1e3a8a'; ctx.font='bold 15px sans-serif'; ctx.textAlign='left';
-    ctx.fillText('Ordered list of all 20 values (n = 20)', left, 28);
-    ctx.fillStyle='#64748b'; ctx.font='13px sans-serif';
-    ctx.fillText('Q₁ = (5th + 6th)/2 = (30+a + 30+a)/2 = 30+a    |    Q₃ = (15th + 16th)/2 = (60+b + 60+b)/2 = 60+b', left, 50);
-
-    // readouts
-    q1out.textContent = q1;
-    q3out.textContent = q3;
-    const iqr = q3 - q1;
-    iqrout.textContent = iqr + (iqr<=25 ? '  ✓ ≤25' : '  ✗ >25');
-  }
-
-  aS.addEventListener('input', draw);
-  bS.addEventListener('input', draw);
-  window.addEventListener('resize', draw);
-  draw();
-})();
-
-/* =========================================================
-   CANVAS B — feasibility grid for (a,b)
-   ========================================================= */
-(function(){
-  const cv = document.getElementById('cvB');
-  const aS = document.getElementById('aSliderB');
-  const bS = document.getElementById('bSliderB');
-  const aVal = document.getElementById('aValB');
-  const bVal = document.getElementById('bValB');
-  const feasOut = document.getElementById('feasOut');
-  const diffOut = document.getElementById('diffOut');
-
-  function draw(){
-    const {ctx,w,h} = setupCanvas(cv);
-    const aH = +aS.value, bH = +bS.value;
-    aVal.textContent = aH; bVal.textContent = bH;
-    ctx.clearRect(0,0,w,h);
-
-    const gx = 90, gy = 250;          // bottom-left of grid
-    const cellW = Math.min(52, (w-140)/10);
-    const cellH = 22;
-    const labels = '0123456789'.split('');
-
-    // title
-    ctx.fillStyle='#1e3a8a'; ctx.font='bold 15px sans-serif'; ctx.textAlign='left';
-    ctx.fillText('Feasible (a, b) grid — condition a − b ≥ 5', 24, 28);
-    ctx.fillStyle='#64748b'; ctx.font='12.5px sans-serif';
-    ctx.fillText('Grey dashed cells: a − b < 5 (IQR > 25). Solid blue cells: IQR ≤ 25.', 24, 48);
-
-    // axes labels
-    ctx.fillStyle='#334155'; ctx.font='bold 12px sans-serif';
-    ctx.textAlign='center';
-    ctx.fillText('a →', gx + 5*cellW, gy + 78);
-    ctx.save();
-    ctx.translate(30, gy - 5*cellH + 60);
-    ctx.rotate(-Math.PI/2);
-    ctx.fillText('b →', 0, 0);
-    ctx.restore();
-
-    // grid
-    for(let a=0;a<10;a++){
-      const x = gx + a*cellW;
-      // column label
-      ctx.fillStyle='#475569'; ctx.font='bold 12px sans-serif'; ctx.textAlign='center';
-      ctx.fillText(labels[a], x + cellW/2, gy + 30);
-      for(let b=0;b<10;b++){
-        const y = gy - (b+1)*cellH;
-        const feasible = (a - b >= 5);
-        const highlight = (a===aH && b===bH);
-        ctx.beginPath();
-        ctx.rect(x+1.5, y+1.5, cellW-3, cellH-3);
-        if(feasible){
-          ctx.fillStyle = '#3b82f6'; ctx.fill();
-          ctx.strokeStyle = '#1d4ed8'; ctx.lineWidth=1; ctx.stroke();
-        } else {
-          ctx.fillStyle = '#fff7ed'; ctx.fill();
-          ctx.setLineDash([3,3]); ctx.strokeStyle = '#fdba74'; ctx.lineWidth=1; ctx.stroke();
-          ctx.setLineDash([]);
-        }
-        if(highlight){
-          ctx.strokeStyle='#f59e0b'; ctx.lineWidth=3;
-          ctx.strokeRect(x+1.5, y+1.5, cellW-3, cellH-3);
-        }
-      }
-      // row labels on the left for b values
-    }
-    // b row labels
-    ctx.textAlign='right'; ctx.font='bold 12px sans-serif'; ctx.fillStyle='#475569';
-    for(let b=0;b<10;b++){
-      const y = gy - (b+1)*cellH + cellH/2 + 4;
-      ctx.fillText(labels[b], gx-10, y);
     }
 
-    // annotation: a >= 5 boundary
-    ctx.setLineDash([6,5]); ctx.strokeStyle='#059669'; ctx.lineWidth=2.5;
-    const x5 = gx + 5*cellW;
-    ctx.beginPath(); ctx.moveTo(x5, gy - 10*cellH - 4); ctx.lineTo(x5, gy + 4); ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.fillStyle='#047857'; ctx.font='bold 12px sans-serif'; ctx.textAlign='left';
-    ctx.fillText('a ≥ 5 always (Statement I ✓)', x5+6, gy - 10*cellH - 8);
+    // stem
+    ctx.fillStyle = '#22437a';
+    ctx.font = 'bold 30px Georgia, serif';
+    ctx.textAlign = 'right';
+    ctx.fillText(r[0], stemX + 6, y + 6);
 
-    // annotation: b <= 4 boundary
-    ctx.setLineDash([6,5]); ctx.strokeStyle='#dc2626'; ctx.lineWidth=2.5;
-    const yb4 = gy - 5*cellH;
-    ctx.beginPath(); ctx.moveTo(gx-6, yb4); ctx.lineTo(gx + 10*cellW + 6, yb4); ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.fillStyle='#b91c1c'; ctx.font='bold 12px sans-serif'; ctx.textAlign='left';
-    ctx.fillText('b ≤ 4 always (Statement II ✓)', gx + 10*cellW - 190, yb4 - 8);
-
-    // readouts
-    const diff = aH - bH;
-    diffOut.textContent = diff;
-    if(diff >= 5){
-      feasOut.textContent = 'YES (IQR = ' + (30 + bH - aH) + ' ≤ 25)';
-      feasOut.parentElement.classList.add('good');
-    } else {
-      feasOut.textContent = 'NO (IQR = ' + (30 + bH - aH) + ' > 25)';
-      feasOut.parentElement.classList.remove('good');
-    }
-  }
-
-  aS.addEventListener('input', draw);
-  bS.addEventListener('input', draw);
-  window.addEventListener('resize', draw);
-  draw();
-})();
-
-/* =========================================================
-   CANVAS C — b max vs a
-   ========================================================= */
-(function(){
-  const cv = document.getElementById('cvC');
-  const aS = document.getElementById('aSliderC');
-  const aVal = document.getElementById('aValC');
-  const maxBOut = document.getElementById('maxBOut');
-  const bResultOut = document.getElementById('bResultOut');
-
-  function draw(){
-    const {ctx,w,h} = setupCanvas(cv);
-    const aH = +aS.value;
-    aVal.textContent = aH;
-    ctx.clearRect(0,0,w,h);
-
-    const left = 80, right = w-50, top = 60, bottom = h-60;
-    const aMin = 5, aMax = 9;
-
-    // axes
-    ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(left, bottom); ctx.lineTo(right, bottom); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(left, bottom); ctx.lineTo(left, top); ctx.stroke();
-
-    const xOf = a => left + (a - aMin)/(aMax - aMin) * (right - left);
-    const yOf = b => bottom - (b/9) * (bottom - top);
-
-    // y gridlines
-    ctx.fillStyle='#64748b'; ctx.font='11px sans-serif'; ctx.textAlign='right';
-    for(let b=0;b<=9;b++){
-      const y = yOf(b);
-      ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth=1;
-      ctx.beginPath(); ctx.moveTo(left,y); ctx.lineTo(right,y); ctx.stroke();
-      ctx.fillText(b, left-8, y+4);
-    }
-    // x ticks
-    ctx.textAlign='center';
-    for(let a=aMin;a<=aMax;a++){
-      const x = xOf(a);
-      ctx.beginPath(); ctx.moveTo(x,bottom); ctx.lineTo(x,bottom+6); ctx.stroke();
-      ctx.fillStyle='#475569'; ctx.font='bold 12px sans-serif';
-      ctx.fillText(a, x, bottom+22);
-    }
-    ctx.fillStyle='#1e3a8a'; ctx.font='bold 14px sans-serif'; ctx.textAlign='left';
-    ctx.fillText('Maximum allowed b for each a  (b ≤ a − 5)', left, 30);
-    ctx.fillStyle='#64748b'; ctx.font='12px sans-serif';
-    ctx.fillText('a →', right-24, bottom+40);
-    ctx.save(); ctx.translate(34, top+30); ctx.rotate(-Math.PI/2);
-    ctx.fillText('b →', 0, 0); ctx.restore();
-
-    // line b = a - 5
-    ctx.strokeStyle = '#3b82f6'; ctx.lineWidth = 3;
+    // separator tick
+    ctx.strokeStyle = '#8fa4c8';
+    ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(xOf(aMin), yOf(0));
-    ctx.lineTo(xOf(aMax), yOf(4));
+    ctx.moveTo(leafX - 16, y - 24);
+    ctx.lineTo(leafX - 16, y + 16);
     ctx.stroke();
 
-    // feasible region shading (below line, within a in [5,9], b in [0,9])
-    ctx.beginPath();
-    ctx.moveTo(xOf(aMin), bottom);
-    ctx.lineTo(xOf(aMin), yOf(0));
-    ctx.lineTo(xOf(aMax), yOf(4));
-    ctx.lineTo(xOf(aMax), bottom);
-    ctx.closePath();
-    ctx.fillStyle = 'rgba(59,130,246,0.10)';
-    ctx.fill();
+    // leaves
+    ctx.textAlign = 'left';
+    r[1].forEach((lf, j) => {
+      pos++;
+      const lx = leafX + j*66;
+      let col = '#2b3a55';
+      if (lf === 'a') col = '#e8563f';
+      if (lf === 'b') col = '#9b59b6';
+      ctx.fillStyle = col;
+      ctx.font = 'bold 28px Georgia, serif';
+      ctx.fillText(lf, lx, y + 6);
 
-    // dashed line b = 4
-    ctx.setLineDash([6,5]); ctx.strokeStyle='#dc2626'; ctx.lineWidth=2;
-    ctx.beginPath(); ctx.moveTo(left, yOf(4)); ctx.lineTo(right, yOf(4)); ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.fillStyle='#b91c1c'; ctx.font='bold 12px sans-serif';
-    ctx.fillText('b = 4 (absolute maximum)', left+10, yOf(4)-8);
-
-    // integer points on the line
-    for(let a=aMin;a<=aMax;a++){
-      const b = a-5;
-      const x = xOf(a), y = yOf(b);
-      ctx.beginPath(); ctx.arc(x,y,6,0,Math.PI*2);
-      ctx.fillStyle = '#1d4ed8'; ctx.fill();
-      ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
-      ctx.fillStyle='#1e3a8a'; ctx.font='bold 12px sans-serif'; ctx.textAlign='center';
-      ctx.fillText('('+a+','+b+')', x, y-14);
-    }
-
-    // highlight current a
-    const xH = xOf(aH);
-    ctx.strokeStyle='#f59e0b'; ctx.lineWidth=3;
-    ctx.beginPath(); ctx.moveTo(xH, bottom); ctx.lineTo(xH, top); ctx.stroke();
-    ctx.beginPath(); ctx.arc(xH, yOf(aH-5), 10, 0, Math.PI*2);
-    ctx.strokeStyle='#f59e0b'; ctx.lineWidth=3; ctx.stroke();
-
-    maxBOut.textContent = aH - 5;
-    bResultOut.textContent = (aH-5) <= 4 ? 'YES ✓' : 'NO';
-  }
-
-  aS.addEventListener('input', draw);
-  window.addEventListener('resize', draw);
-  draw();
-})();
-
-/* =========================================================
-   CANVAS D — explore (a,b) and a - b
-   ========================================================= */
-(function(){
-  const cv = document.getElementById('cvD');
-  const aS = document.getElementById('aSliderD');
-  const bS = document.getElementById('bSliderD');
-  const aVal = document.getElementById('aValD');
-  const bVal = document.getElementById('bValD');
-  const diffOut = document.getElementById('diffOutD');
-  const thirdOut = document.getElementById('thirdOut');
-  const rangeOut = document.getElementById('rangeOutD');
-
-  function draw(){
-    const {ctx,w,h} = setupCanvas(cv);
-    const aH = +aS.value, bH = +bS.value;
-    aVal.textContent = aH; bVal.textContent = bH;
-    ctx.clearRect(0,0,w,h);
-
-    // ---- number line for a - b from 4 to 10 ----
-    const left = 80, right = w-60, y = 150;
-    const lo = 4, hi = 10;
-    const xOf = v => left + (v-lo)/(hi-lo)*(right-left);
-
-    ctx.strokeStyle = '#334155'; ctx.lineWidth = 2.5;
-    ctx.beginPath(); ctx.moveTo(left-15, y); ctx.lineTo(right+15, y); ctx.stroke();
-
-    // ticks
-    ctx.textAlign='center';
-    for(let v=lo; v<=hi; v++){
-      const x = xOf(v);
-      ctx.beginPath(); ctx.moveTo(x, y-8); ctx.lineTo(x, y+8); ctx.stroke();
-      ctx.fillStyle='#475569'; ctx.font='bold 13px sans-serif';
-      ctx.fillText(v, x, y+28);
-    }
-    ctx.fillStyle='#1e3a8a'; ctx.font='bold 14px sans-serif'; ctx.textAlign='left';
-    ctx.fillText('Possible values of a − b  (given IQR ≤ 25)', left-15, 40);
-    ctx.fillStyle='#64748b'; ctx.font='12.5px sans-serif';
-    ctx.fillText('The IQR condition forces a − b ≥ 5, so values 0–4 are impossible.', left-15, 62);
-
-    // feasible range bracket 5..9
-    ctx.strokeStyle = 'rgba(59,130,246,0.20)';
-    ctx.lineWidth = 26;
-    ctx.beginPath(); ctx.moveTo(xOf(5), y); ctx.lineTo(xOf(9), y); ctx.stroke();
-    ctx.fillStyle='#1d4ed8'; ctx.font='bold 12px sans-serif'; ctx.textAlign='center';
-    ctx.fillText('feasible: a − b ∈ {5,6,7,8,9}', (xOf(5)+xOf(9))/2, y-26);
-
-    // mark statement III claim 1..6 (1..4 impossible)
-    ctx.setLineDash([7,5]); ctx.strokeStyle='#dc2626'; ctx.lineWidth=2.5;
-    ctx.beginPath(); ctx.moveTo(xOf(1), y+55); ctx.lineTo(xOf(6), y+55); ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.fillStyle='#b91c1c'; ctx.font='bold 12px sans-serif'; ctx.textAlign='left';
-    ctx.fillText('Statement III claims 1 ≤ a − b ≤ 6', xOf(1), y+76);
-    ctx.fillText('but a − b = 7, 8, 9 are possible  →  FALSE', xOf(1), y+94);
-
-    // dots for each feasible value
-    [5,6,7,8,9].forEach(v=>{
-      const x = xOf(v);
-      const over = v > 6;
-      ctx.beginPath(); ctx.arc(x, y, 9, 0, Math.PI*2);
-      ctx.fillStyle = over ? '#dc2626' : '#059669';
-      ctx.fill();
-      ctx.strokeStyle='#fff'; ctx.lineWidth=2.5; ctx.stroke();
-    });
-
-    // current marker
-    const cur = aH - bH;
-    if(cur >= lo && cur <= hi){
-      const cx = xOf(cur);
-      ctx.beginPath();
-      ctx.moveTo(cx, y-42); ctx.lineTo(cx-9, y-56); ctx.lineTo(cx+9, y-56);
-      ctx.closePath();
-      ctx.fillStyle = '#f59e0b'; ctx.fill();
-      ctx.fillStyle='#92400e'; ctx.font='bold 13px sans-serif'; ctx.textAlign='center';
-      ctx.fillText('a − b = '+cur, cx, y+52);
-    }
-
-    // bottom mini table: possible (a,b) pairs
-    ctx.textAlign='left';
-    ctx.fillStyle='#1e3a8a'; ctx.font='bold 13px sans-serif';
-    ctx.fillText('Feasible (a, b) pairs with b = a − 5 (smallest a − b) and b = 0 (largest a − b):', left-15, h-70);
-    ctx.fillStyle='#475569'; ctx.font='13px monospace';
-    ctx.fillText('a = 5  →  b ∈ {0}          →  a − b ∈ {5}', left-15, h-46);
-    ctx.fillText('a = 9  →  b ∈ {0,1,2,3,4}  →  a − b ∈ {5,6,7,8,9}', left-15, h-26);
-
-    // readouts
-    diffOut.textContent = cur;
-    thirdOut.textContent = (cur >= 5 && cur <= 25 && cur <= 6) ? 'YES' : 'NO  (' + cur + (cur>6 ? ' > 6' : '') + ')';
-    rangeOut.textContent = '5 to 9';
-
-    // visual state of the input pair
-    const valid = (aH - bH >= 5) && (aH>=5 && aH<=9) && (bH>=0 && bH<=4);
-    // nothing extra needed
-  }
-
-  aS.addEventListener('input', draw);
-  bS.addEventListener('input', draw);
-  window.addEventListener('resize', draw);
-  draw();
-})();
-
-/* =========================================================
-   STEP REVEAL
-   ========================================================= */
-document.querySelectorAll('.stepbtn').forEach(btn=>{
-  const target = btn.dataset.target;
-  const steps = document.querySelectorAll('.step[id^="'+target.toLowerCase()+'"]');
-  const counter = document.getElementById('cnt'+target);
-  let idx = 0;
-
-  btn.addEventListener('click', ()=>{
-    if(idx < steps.length){
-      steps[idx].classList.add('show');
-      idx++;
-      counter.textContent = idx + ' / ' + steps.length;
-      if(idx === steps.length){
-        btn.disabled = true;
-        btn.textContent = 'All steps revealed ✓';
-        btn.classList.remove('stepbtn');
+      // circle the quartile positions in steps 2+
+      if (step >= 2 && (pos === 5 || pos === 15)){
+        ctx.strokeStyle = '#16a085';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(lx + 9, y - 4, 20, 0, Math.PI*2);
+        ctx.stroke();
+        ctx.fillStyle = '#16a085';
+        ctx.font = 'bold 13px Segoe UI, Arial';
+        ctx.fillText(pos === 5 ? 'Q₁ (5th)' : 'Q₃ (15th)', lx - 8, y - 34);
       }
+    });
+  });
+
+  // ---- bottom: quartile / inequality panel ----
+  const py = top + rows.length*rowH + 10;
+
+  ctx.fillStyle = '#eef4ff';
+  roundRect(ctx, 30, py, W-60, 110, 12);
+  ctx.fill();
+  ctx.strokeStyle = '#c2d2ee';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  ctx.textAlign = 'left';
+  ctx.font = 'bold 16px Segoe UI, Arial';
+
+  if (step === 1){
+    ctx.fillStyle = '#33415c';
+    ctx.fillText('Read leaves after ordering by stem.', 48, py + 32);
+    ctx.fillStyle = '#16a085';
+    ctx.fillText('n = 20 → Q₁ = 5th datum, Q₃ = 15th datum', 48, py + 64);
+    ctx.fillStyle = '#8a97ad';
+    ctx.fillText('Positions shown on the next step.', 48, py + 92);
+  } else if (step === 2){
+    ctx.fillStyle = '#e8563f';
+    ctx.font = 'bold 20px Segoe UI, Arial';
+    ctx.fillText('Q₁ = 3a = 30 + a   (5th)', 48, py + 40);
+    ctx.fillStyle = '#9b59b6';
+    ctx.fillText('Q₃ = 6b = 60 + b   (15th)', 48, py + 78);
+  } else if (step === 3){
+    ctx.fillStyle = '#33415c';
+    ctx.font = 'bold 15px Segoe UI, Arial';
+    ctx.fillText('IQR = Q₃ − Q₁ ≤ 25', 48, py + 30);
+    ctx.fillStyle = '#22437a';
+    ctx.font = 'bold 19px Segoe UI, Arial';
+    ctx.fillText('(60 + b) − (30 + a) ≤ 25', 48, py + 60);
+    ctx.fillStyle = '#d0342c';
+    ctx.font = 'bold 20px Segoe UI, Arial';
+    ctx.fillText('⇒  a − b ≥ 5', 48, py + 94);
+  } else if (step === 4){
+    ctx.fillStyle = '#e8563f';
+    ctx.font = 'bold 18px Segoe UI, Arial';
+    ctx.fillText('a − b ≥ 5 & b ≥ 0  ⇒  a ≥ 5', 48, py + 36);
+    ctx.fillStyle = '#1a8f4c';
+    ctx.font = 'bold 20px Segoe UI, Arial';
+    ctx.fillText('I: 5 ≤ a ≤ 9   ✓', 48, py + 74);
+    ctx.fillStyle = '#8a97ad';
+    ctx.font = '14px Segoe UI, Arial';
+    ctx.fillText('(a is a digit, so a ≤ 9 always)', 48, py + 100);
+  } else if (step === 5){
+    ctx.fillStyle = '#9b59b6';
+    ctx.font = 'bold 18px Segoe UI, Arial';
+    ctx.fillText('a − b ≥ 5 & a ≤ 9  ⇒  b ≤ 4', 48, py + 36);
+    ctx.fillStyle = '#1a8f4c';
+    ctx.font = 'bold 20px Segoe UI, Arial';
+    ctx.fillText('II: 0 ≤ b ≤ 4   ✓', 48, py + 74);
+    ctx.fillStyle = '#8a97ad';
+    ctx.font = '14px Segoe UI, Arial';
+    ctx.fillText('(b is a digit, so b ≥ 0 always)', 48, py + 100);
+  } else if (step === 6){
+    ctx.fillStyle = '#d0342c';
+    ctx.font = 'bold 18px Segoe UI, Arial';
+    ctx.fillText('Upper bound? Test a = 9, b = 0 → a − b = 9', 48, py + 34);
+    ctx.fillStyle = '#22437a';
+    ctx.font = 'bold 17px Segoe UI, Arial';
+    ctx.fillText('IQR = 30 + (0 − 9) = 21 ≤ 25  (valid!)', 48, py + 64);
+    ctx.fillStyle = '#d0342c';
+    ctx.font = 'bold 20px Segoe UI, Arial';
+    ctx.fillText('III: 1 ≤ a − b ≤ 6   ✗', 48, py + 96);
+  } else {
+    ctx.fillStyle = '#1a8f4c';
+    ctx.font = 'bold 20px Segoe UI, Arial';
+    ctx.fillText('I ✓   II ✓   III ✗', 48, py + 40);
+    ctx.fillStyle = '#22437a';
+    ctx.font = 'bold 22px Segoe UI, Arial';
+    ctx.fillText('Answer: A', 48, py + 82);
+  }
+
+  // readout
+  const msgs = [
+    'Step 1 — read the given stem-and-leaf diagram; n = 20 → Q₁ at 5th, Q₃ at 15th.',
+    'Step 2 — Q₁ = 30 + a (5th datum), Q₃ = 60 + b (15th datum).',
+    'Step 3 — IQR condition: (60+b) − (30+a) ≤ 25 ⟹ a − b ≥ 5.',
+    'Step 4 — From a − b ≥ 5 and b ≥ 0: a ≥ 5. Since a ≤ 9, 5 ≤ a ≤ 9 ✓.',
+    'Step 5 — From a − b ≥ 5 and a ≤ 9: b ≤ 4. Since b ≥ 0, 0 ≤ b ≤ 4 ✓.',
+    'Step 6 — a = 9, b = 0 gives a − b = 9 and IQR = 21 ≤ 25, so III fails.',
+    'Step 7 — Only I and II must be true ⟹ Option A.'
+  ];
+  ro.textContent = msgs[step-1] || '';
+}
+
+// ---- scroll sync ----
+let current = 1;
+const io = new IntersectionObserver(es=>{
+  es.forEach(e=>{
+    if(e.isIntersecting){
+      current = +e.target.dataset.step;
+      document.querySelectorAll('.step').forEach(s=>s.classList.toggle('active', +s.dataset.step === current));
+      draw(current);
     }
   });
-});
+},{rootMargin:'-25% 0px -55% 0px'});
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
 
-/* Redraw canvases when MathJax finishes (layout may change) */
-if(window.MathJax && MathJax.startup){
-  MathJax.startup.promise = MathJax.startup.promise.then(()=>{
-    window.dispatchEvent(new Event('resize'));
-  });
-}
+draw(1);
+window.MathJax && MathJax.typesetPromise && MathJax.typesetPromise();
 </script>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
-
 </body>
 </html>

@@ -3,1152 +3,409 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HKDSE 2019 Paper 2 Q29 — Box-and-Whisker Diagram</title>
+<title>HKDSE 2019 Paper 2 Q29 — Statistics</title>
 <script>
 window.MathJax = {
-  tex: { inlineMath: [['\\(', '\\)'], ['$', '$']], displayMath: [['\\[', '\\]'], ['$$', '$$']] },
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']]
+  },
   svg: { fontCache: 'global' }
 };
 </script>
-<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
   :root{
+    --ink:#1f2937;
+    --muted:#6b7280;
+    --line:#e5e7eb;
     --blue:#2563eb;
-    --blue-dark:#1e3a8a;
-    --amber:#f59e0b;
-    --amber-light:#fef3c7;
-    --emerald:#059669;
-    --emerald-light:#d1fae5;
-    --slate:#0f172a;
-    --panel:#ffffff;
-    --radius:16px;
+    --teal:#0d9488;
+    --amber:#d97706;
+    --rose:#e11d48;
+    --violet:#7c3aed;
+    --green:#16a34a;
+    --bg:#f8fafc;
   }
   *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
   body{
-    margin:0;
-    font-family:'Segoe UI',system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
-    background:linear-gradient(180deg,#eef2ff 0%,#f8fafc 320px,#f8fafc 100%);
-    color:#1e293b;
-    line-height:1.6;
+    font-family:"Segoe UI",Roboto,-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
+    color:var(--ink);
+    background:var(--bg);
+    line-height:1.55;
+    font-size:15.5px;
   }
-  .wrap{max-width:1000px;margin:0 auto;padding:0 18px 60px;}
+  .wrap{max-width:1200px;margin:0 auto;padding:16px 14px 60px;}
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start;}
+  @media(min-width:900px){.split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}}
+  @media(max-width:640px){body{font-size:14.5px;}.wrap{padding:10px 8px 40px;}}
 
-  /* ---------- Hero ---------- */
-  .hero{
-    background:linear-gradient(120deg,#1e3a8a 0%,#2563eb 55%,#3b82f6 100%);
-    color:#fff;
-    padding:46px 18px 54px;
-    position:relative;
-    overflow:hidden;
-  }
-  .hero::after{
-    content:"";
-    position:absolute;
-    right:-90px;top:-90px;
-    width:320px;height:320px;
-    border-radius:50%;
-    background:radial-gradient(circle,rgba(255,255,255,.18),rgba(255,255,255,0) 70%);
-  }
-  .hero-inner{max-width:1000px;margin:0 auto;position:relative;z-index:2;}
-  .eyebrow{
-    text-transform:uppercase;
-    letter-spacing:.16em;
-    font-size:.72rem;
-    font-weight:700;
-    opacity:.85;
-    margin:0 0 10px;
-  }
-  .hero h1{
-    margin:0 0 6px;
-    font-size:2rem;
-    font-weight:800;
-    letter-spacing:-.01em;
-  }
-  .hero .sub{
-    margin:0 0 20px;
-    font-size:1.05rem;
-    font-weight:500;
-    opacity:.92;
-  }
-  .tags{display:flex;flex-wrap:wrap;gap:8px;}
-  .tag{
-    background:rgba(255,255,255,.16);
-    border:1px solid rgba(255,255,255,.32);
-    padding:5px 13px;
-    border-radius:999px;
-    font-size:.78rem;
-    font-weight:600;
-    backdrop-filter:blur(3px);
-  }
-
-  /* ---------- Cards ---------- */
+  .diagram{position:sticky;top:16px;max-height:calc(100vh - 2rem);overflow-y:auto;}
   .card{
-    background:var(--panel);
-    border-radius:var(--radius);
-    box-shadow:0 4px 20px rgba(15,23,42,.07),0 1px 3px rgba(15,23,42,.06);
-    padding:26px 24px;
-    margin-top:26px;
-    border:1px solid #e2e8f0;
+    background:#fff;border:1px solid var(--line);border-radius:14px;
+    box-shadow:0 1px 3px rgba(0,0,0,.06),0 8px 24px -12px rgba(0,0,0,.12);
+    padding:14px;
   }
-  .card h2{
-    margin:0 0 4px;
-    font-size:1.28rem;
-    font-weight:800;
-    color:var(--blue-dark);
-    display:flex;
-    align-items:center;
-    gap:10px;
-    flex-wrap:wrap;
-  }
-  .part-badge{
-    background:var(--blue);
-    color:#fff;
-    font-size:.78rem;
-    font-weight:800;
-    padding:3px 11px;
-    border-radius:999px;
-    letter-spacing:.03em;
-  }
-  .card .lead{margin:8px 0 16px;color:#475569;font-size:.96rem;}
+  .diagram .card{padding:12px;}
+  h1{font-size:1.15rem;margin:0 0 6px;letter-spacing:.2px;}
+  .tag{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.6px;
+       text-transform:uppercase;color:#fff;background:var(--violet);
+       padding:3px 8px;border-radius:999px;margin-bottom:8px;}
+  .q{font-size:1rem;}
+  .q .opts{margin:8px 0 0;padding-left:2px;}
+  .q .opts span{display:block;margin:3px 0;}
+  .opts b{color:var(--blue);}
 
-  /* ---------- Steps ---------- */
+  canvas{width:100%;height:auto;display:block;border-radius:10px;background:#fff;}
+  .ro{margin:8px 1px 0;font-size:.83rem;color:var(--muted);text-align:center;}
+  .legend{display:flex;flex-wrap:wrap;gap:8px 14px;justify-content:center;margin-top:8px;font-size:.78rem;color:#374151;}
+  .legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px;}
+
   .step{
-    display:none;
-    background:#f8fafc;
-    border:1px solid #e2e8f0;
-    border-left:5px solid var(--blue);
-    border-radius:12px;
-    padding:16px 18px;
-    margin:14px 0;
-    animation:fadeIn .35s ease;
+    border-left:4px solid var(--line);
+    padding:8px 10px 8px 12px;
+    margin:10px 0;
+    border-radius:0 10px 10px 0;
+    background:#fff;
+    transition:background .25s,border-color .25s,box-shadow .25s;
   }
-  .step.show{display:block;}
-  @keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
-  .step-head{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    flex-wrap:wrap;
-    margin-bottom:10px;
-  }
-  .step-num{
-    background:var(--blue-dark);
-    color:#fff;
-    width:26px;height:26px;
-    border-radius:50%;
-    display:flex;align-items:center;justify-content:center;
-    font-size:.8rem;font-weight:800;
-    flex:0 0 auto;
-  }
-  .step-title{font-weight:700;color:#1e293b;font-size:.98rem;}
-  .marks{
-    background:var(--amber-light);
-    color:#92400e;
-    border:1px solid #fcd34d;
-    font-size:.72rem;
-    font-weight:800;
-    padding:2px 9px;
-    border-radius:999px;
-  }
-  .math-line{margin:8px 0;overflow-x:auto;}
-  .hint{
-    background:var(--amber-light);
-    border-left:4px solid var(--amber);
-    border-radius:8px;
-    padding:10px 14px;
-    margin:12px 0 6px;
-    font-size:.92rem;
-    color:#713f12;
-  }
-  .hint b{color:#78350f;}
-  .answer-box{
-    background:var(--emerald-light);
-    border-left:4px solid var(--emerald);
-    border-radius:8px;
-    padding:10px 14px;
-    margin-top:12px;
-    font-size:.95rem;
-    color:#064e3b;
-    font-weight:600;
-  }
-
-  /* ---------- Buttons ---------- */
-  .btn{
-    appearance:none;
-    border:none;
-    background:linear-gradient(120deg,var(--blue),#3b82f6);
-    color:#fff;
-    font-weight:700;
-    font-size:.9rem;
-    padding:11px 22px;
-    border-radius:10px;
-    cursor:pointer;
-    box-shadow:0 3px 10px rgba(37,99,235,.28);
-    transition:transform .12s,box-shadow .12s,opacity .2s;
-  }
-  .btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 16px rgba(37,99,235,.34);}
-  .btn:disabled{background:#94a3b8;cursor:default;box-shadow:none;opacity:.85;}
-  .btn-row{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:12px;
-    margin-top:18px;
-    flex-wrap:wrap;
-  }
-  .counter{
-    font-size:.85rem;
-    font-weight:700;
-    color:#64748b;
-    background:#f1f5f9;
-    padding:6px 14px;
-    border-radius:999px;
-  }
-
-  /* ---------- Canvas area ---------- */
-  .canvas-shell{
-    background:#0f172a;
-    border-radius:14px;
-    padding:12px;
-    margin:14px 0;
-    box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
-  }
-  canvas{
-    display:block;
-    width:100%;
-    height:auto;
-    border-radius:8px;
-    background:#0b1220;
-    touch-action:pan-y;
-  }
-  .controls{
-    display:flex;
-    flex-wrap:wrap;
-    gap:16px 26px;
-    align-items:center;
-    margin-top:14px;
-    background:#f1f5f9;
-    padding:14px 16px;
-    border-radius:12px;
-    border:1px solid #e2e8f0;
-  }
-  .ctrl{display:flex;flex-direction:column;gap:4px;min-width:210px;flex:1 1 210px;}
-  .ctrl label{font-size:.8rem;font-weight:700;color:#334155;display:flex;justify-content:space-between;gap:8px;}
-  .ctrl .val{color:var(--blue);font-weight:800;}
-  input[type=range]{
-    -webkit-appearance:none;
-    appearance:none;
-    width:100%;
-    height:6px;
-    background:#cbd5e1;
-    border-radius:999px;
-    outline:none;
-  }
-  input[type=range]::-webkit-slider-thumb{
-    -webkit-appearance:none;
-    width:18px;height:18px;
-    border-radius:50%;
-    background:var(--blue);
-    border:3px solid #fff;
-    box-shadow:0 1px 5px rgba(0,0,0,.3);
-    cursor:pointer;
-  }
-  input[type=range]::-moz-range-thumb{
-    width:16px;height:16px;border-radius:50%;background:var(--blue);border:3px solid #fff;cursor:pointer;
-  }
-  .chk{display:flex;align-items:center;gap:8px;font-size:.85rem;font-weight:600;color:#334155;cursor:pointer;user-select:none;}
-  .chk input{width:17px;height:17px;accent-color:var(--blue);cursor:pointer;}
-  .readout{
-    display:flex;
-    flex-wrap:wrap;
-    gap:10px;
-    margin-top:12px;
+  .step.active{background:#f0f7ff;border-left-color:var(--blue);box-shadow:0 2px 10px -6px rgba(37,99,235,.55);}
+  .step .stag{
+    display:inline-flex;align-items:center;gap:7px;
+    font-weight:800;color:var(--ink);font-size:.95rem;margin-bottom:4px;
   }
   .chip{
-    background:#e0e7ff;
-    color:#1e3a8a;
-    font-size:.8rem;
-    font-weight:700;
-    padding:6px 13px;
-    border-radius:999px;
-    border:1px solid #c7d2fe;
+    display:inline-flex;align-items:center;justify-content:center;
+    width:22px;height:22px;border-radius:50%;
+    background:var(--blue);color:#fff;font-size:.78rem;font-weight:800;flex:0 0 auto;
   }
-  .chip.green{background:var(--emerald-light);color:#065f46;border-color:#a7f3d0;}
-  .chip.amber{background:var(--amber-light);color:#92400e;border-color:#fde68a;}
-
-  /* ---------- Summary ---------- */
-  .summary{
-    background:linear-gradient(135deg,#0f172a,#1e3a8a);
-    color:#e2e8f0;
-    border-radius:var(--radius);
-    padding:28px 26px;
-    margin-top:28px;
-    box-shadow:0 10px 30px rgba(15,23,42,.28);
+  .step[data-step="1"] .chip{background:var(--blue);}
+  .step[data-step="2"] .chip{background:var(--rose);}
+  .step[data-step="3"] .chip{background:var(--amber);}
+  .step[data-step="4"] .chip{background:var(--green);}
+  .hint{font-size:.83rem;color:var(--muted);margin-top:5px;}
+  .hint b{color:#374151;}
+  .ans{
+    margin-top:14px;padding:11px 13px;border-radius:12px;
+    background:linear-gradient(135deg,#ecfdf5,#e0f2fe);
+    border:1px solid #bbf7d0;font-weight:700;color:#065f46;
   }
-  .summary h2{color:#fff;margin:0 0 14px;font-size:1.3rem;}
-  .summary ul{margin:0;padding-left:20px;}
-  .summary li{margin:9px 0;font-size:.98rem;}
-  .summary b{color:#fbbf24;}
-  .final-pick{
-    display:inline-block;
-    background:var(--emerald);
-    color:#fff;
-    font-weight:800;
-    padding:8px 20px;
-    border-radius:999px;
-    margin-top:16px;
-    font-size:1rem;
-    letter-spacing:.02em;
-  }
-
-  footer{
-    text-align:center;
-    color:#64748b;
-    font-size:.83rem;
-    padding:34px 18px 10px;
-  }
-
-  @media(max-width:560px){
-    .hero h1{font-size:1.5rem;}
-    .card{padding:20px 16px;}
-    .canvas-shell{padding:8px;}
-  }
+  .ans .val{color:var(--green);font-size:1.05rem;}
+  .small{font-size:.85rem;color:var(--muted);}
+  code{background:#f3f4f6;padding:1px 5px;border-radius:5px;font-size:.88em;}
+  .boxed{border:1.5px solid var(--line);border-radius:10px;padding:9px 11px;margin:8px 0;background:#fcfcfd;}
 </style>
 </head>
 <body>
-
-<!-- ============ HERO ============ -->
-<header class="hero">
-  <div class="hero-inner">
-    <p class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</p>
-    <h1>2019 Paper 2 · Question 29</h1>
-    <p class="sub">Statistics — What a box-and-whisker diagram can (and cannot) tell us</p>
-    <div class="tags">
-      <span class="tag">Box-and-Whisker Diagram</span>
-      <span class="tag">Range</span>
-      <span class="tag">Inter-quartile Range</span>
-      <span class="tag">Standard Deviation</span>
-    </div>
-  </div>
-</header>
-
 <div class="wrap">
+  <div class="split">
 
-  <!-- ============ QUESTION CARD ============ -->
-  <section class="card">
-    <h2><span class="part-badge">Question</span> Box-and-Whisker Diagram</h2>
-    <p class="lead">Which of the following can be obtained from <b>any</b> box-and-whisker diagram?</p><figure style="margin:12px 0;text-align:center;"><img src="figures/2019_P2_Q29.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
-    <div class="math-line">
-      \[
-      \begin{array}{ll}
-      \text{I.} & \text{Range}\\[4pt]
-      \text{II.} & \text{Standard deviation}\\[4pt]
-      \text{III.} & \text{Inter-quartile range}
-      \end{array}
-      \]
-    </div>
-    <div class="math-line">
-      \[
-      \begin{array}{ll}
-      \text{A.} & \text{I and II only}\\
-      \text{B.} & \text{I and III only}\\
-      \text{C.} & \text{II and III only}\\
-      \text{D.} & \text{I, II and III}
-      \end{array}
-      \]
-    </div>
-    <div class="hint"><b>Note:</b> This is a multiple-choice question. We must test whether <b>each</b> of the three quantities can always be read off any box-and-whisker diagram.</div>
-  </section>
-
-  <!-- ============ PART I ============ -->
-  <section class="card">
-    <h2><span class="part-badge">Part I</span> Can the Range be obtained?</h2>
-    <p class="lead">The range is \(\text{maximum} - \text{minimum}\). A box-and-whisker diagram marks the maximum and minimum with the two <b>whisker ends</b>.</p>
-
-    <!-- Canvas: anatomy of a box plot -->
-    <div class="canvas-shell">
-      <canvas id="canvasAnatomy" width="920" height="600"></canvas>
-    </div>
-
-    <!-- Canvas: slider-driven box plot -->
-    <div class="canvas-shell">
-      <canvas id="canvasRange" width="920" height="600"></canvas>
-    </div>
-
-    <div class="controls">
-      <div class="ctrl">
-        <label>Minimum <span class="val" id="valMin">1</span></label>
-        <input type="range" id="sldMin" min="0" max="5" step="1" value="1">
+    <!-- ===================== LEFT: DIAGRAM ===================== -->
+    <div class="diagram">
+      <div class="card">
+        <span class="tag">Box-and-Whisker</span>
+        <canvas id="cv" width="760" height="640" aria-label="Box-and-whisker diagram"></canvas>
+        <p class="ro" id="ro">Step 1 — a box-and-whisker diagram shows the five-number summary.</p>
+        <div class="legend">
+          <span><i style="background:#e11d48"></i>Min / Max</span>
+          <span><i style="background:#2563eb"></i>Lower / Upper quartile</span>
+          <span><i style="background:#0d9488"></i>Median</span>
+          <span><i style="background:#d97706"></i>Inter-quartile range</span>
+        </div>
       </div>
-      <div class="ctrl">
-        <label>Maximum <span class="val" id="valMax">14</span></label>
-        <input type="range" id="sldMax" min="8" max="20" step="1" value="14">
+    </div>
+
+    <!-- ===================== RIGHT: QUESTION + SOLUTION ===================== -->
+    <div class="content">
+      <div class="card" style="margin-bottom:12px;">
+        <h1>[2019 MC #29] &nbsp;15. Statistics</h1>
+        <div class="q">
+          <p style="margin:.2rem 0 .5rem;">Which of the following can be obtained from <b>any</b> box-and-whisker diagram?</p>
+          <div class="opts">
+            <span>I.&nbsp; Range</span>
+            <span>II.&nbsp; Standard deviation</span>
+            <span>III.&nbsp; Inter-quartile range</span>
+            <span style="margin-top:6px;"><b>A.</b> I and II only</span>
+            <span><b>B.</b> I and III only</span>
+            <span><b>C.</b> II and III only</span>
+            <span><b>D.</b> I, II and III</span>
+          </div>
+        </div>
       </div>
-      <label class="chk"><input type="checkbox" id="chkRange" checked> Highlight range</label>
-    </div>
 
-    <div class="readout">
-      <span class="chip" id="chipMin">Min = 1</span>
-      <span class="chip" id="chipMax">Max = 14</span>
-      <span class="chip green" id="chipRange">Range = 13</span>
-    </div>
+      <figure style="margin:12px 0;text-align:center;"><img src="figures/2019_P2_Q29.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
 
-    <!-- Steps -->
-    <div class="step" data-part="I">
-      <div class="step-head">
-        <span class="step-num">1</span>
-        <span class="step-title">What the two whisker ends represent</span>
-        
+      <div class="card">
+        <div class="step" data-step="1">
+          <div class="stag"><span class="chip">1</span> What a box-and-whisker diagram shows</div>
+          <p style="margin:.25rem 0;">Every box-and-whisker diagram is drawn from the <b>five-number summary</b>:
+          the minimum value, the lower quartile $Q_1$, the median $Q_2$, the upper quartile $Q_3$
+          and the maximum value.</p>
+          <div class="boxed small">
+            Left whisker end $=$ min &nbsp;|&nbsp; left box edge $=Q_1$ &nbsp;|&nbsp; line $=$ median &nbsp;|&nbsp; right box edge $=Q_3$ &nbsp;|&nbsp; right whisker end $=$ max
+          </div>
+          <p class="hint"><b>Hint:</b> only these five values (and anything computed from them) can be read off.</p>
+        </div>
+
+        <div class="step" data-step="2">
+          <div class="stag"><span class="chip">2</span> Check I — Range</div>
+          <p style="margin:.25rem 0;">The ends of the whiskers give the minimum and the maximum, so</p>
+          <p style="margin:.25rem 0;">$$\text{Range}=\text{max}-\text{min}$$</p>
+          <p style="margin:.25rem 0;">is always obtainable. &nbsp;$\checkmark$</p>
+          <p class="hint"><b>Hint:</b> the total span of the diagram is exactly the range.</p>
+        </div>
+
+        <div class="step" data-step="3">
+          <div class="stag"><span class="chip">3</span> Check III — Inter-quartile range</div>
+          <p style="margin:.25rem 0;">The two ends of the box give $Q_1$ and $Q_3$, so</p>
+          <p style="margin:.25rem 0;">$$\text{IQR}=Q_3-Q_1$$</p>
+          <p style="margin:.25rem 0;">is always obtainable — it is the width of the box. &nbsp;$\checkmark$</p>
+          <p class="hint"><b>Hint:</b> the box length is the inter-quartile range, read directly from the diagram.</p>
+        </div>
+
+        <div class="step" data-step="4">
+          <div class="stag"><span class="chip">4</span> Check II — Standard deviation</div>
+          <p style="margin:.25rem 0;">Consider the data set</p>
+          <p style="margin:.25rem 0;">$$\{-3,\,-3,\,-3,\,-3a,\,0,\,3a,\,3,\,3,\,3\},\qquad 0\le a\le 1.$$</p>
+          <p style="margin:.25rem 0;">Its five-number summary is $0,\,3,\,-3,\,3,\,-3$ — i.e. the <b>same</b> for every $a$ — so the box-and-whisker diagram never changes. But the standard deviation</p>
+          <p style="margin:.25rem 0;">$$\sigma=\sqrt{2(a^{2}+3)}$$</p>
+          <p style="margin:.25rem 0;">increases as $a$ goes from $0$ to $1$. Two different data sets share one diagram yet have different standard deviations.</p>
+          <p style="margin:.25rem 0;">Hence the standard deviation <b>cannot</b> be obtained. &nbsp;$\times$</p>
+          <p class="hint"><b>Hint:</b> the diagram loses the individual data values, so spread measures such as s.d. are not recoverable.</p>
+        </div>
+
+        <div class="ans">
+          Answer: <span class="val">B</span> &nbsp;(I and III only)
+        </div>
       </div>
-      <div class="math-line">Every box-and-whisker diagram has:</div>
-      <div class="math-line">\[ \text{left whisker end} = \text{minimum}, \qquad \text{right whisker end} = \text{maximum} \]</div>
-      <div class="hint"><b>Hint:</b> Move the sliders above and watch the two ends of the diagram move. They <b>always</b> mark the min and the max — no matter how the data are distributed.</div>
     </div>
 
-    <div class="step" data-part="I">
-      <div class="step-head">
-        <span class="step-num">2</span>
-        <span class="step-title">Compute the range</span>
-        
-      </div>
-      <div class="math-line">\[ \text{Range} = \text{Maximum} - \text{Minimum} \]</div>
-      <div class="math-line">With the current slider values, e.g. \(\text{Range} = 14 - 1 = 13\).</div>
-      <div class="answer-box">✓ Yes — the range can always be obtained from any box-and-whisker diagram.</div>
-    </div>
-
-    <div class="btn-row">
-      <span class="counter" id="cnt-I">0 / 2</span>
-      <button class="btn" data-target="I">Next step →</button>
-    </div>
-  </section>
-
-  <!-- ============ PART II ============ -->
-  <section class="card">
-    <h2><span class="part-badge">Part II</span> Can the Standard Deviation be obtained?</h2>
-    <p class="lead">The mean is <b>not</b> marked on a box-and-whisker diagram. Two data sets can share the <b>same</b> box-and-whisker diagram yet have different standard deviations — so the standard deviation cannot always be read off.</p>
-
-    <!-- Canvas: two distributions with same 5-number summary -->
-    <div class="canvas-shell">
-      <canvas id="canvasSD" width="920" height="600"></canvas>
-    </div>
-
-    <div class="controls">
-      <div class="ctrl">
-        <label>Parameter \(a\) <span class="val" id="valA">0.00</span></label>
-        <input type="range" id="sldA" min="0" max="1" step="0.01" value="0">
-      </div>
-      <label class="chk"><input type="checkbox" id="chkDots" checked> Show individual data points</label>
-      <label class="chk"><input type="checkbox" id="chkBox2" checked> Show box-and-whisker diagram</label>
-    </div>
-
-    <div class="readout">
-      <span class="chip" id="chipFive">Five-number summary: −3, −3, 0, 3, 3</span>
-      <span class="chip amber" id="chipSD">s.d. = 2.449</span>
-      <span class="chip" id="chipMean">mean = 0</span>
-    </div>
-
-    <div class="step" data-part="II">
-      <div class="step-head">
-        <span class="step-num">1</span>
-        <span class="step-title">Build two data sets sharing one diagram</span>
-        
-      </div>
-      <div class="math-line">Consider the family of data sets (with \(0 \le a \le 1\)):</div>
-      <div class="math-line">\[ \{-3,\;-3,\;-3,\;-3a,\;0,\;3a,\;3,\;3,\;3\} \]</div>
-      <div class="math-line">Sorting gives the five-number summary:</div>
-      <div class="math-line">For \(0\le a\le 1\): \(-3 \le -3a \le 0 \le 3a \le 3\). So the ordered list is</div>
-      <div class="math-line">\[ -3,\;-3,\;-3,\;-3a,\;0,\;3a,\;3,\;3,\;3 \]</div>
-      <div class="math-line">\[ \Rightarrow\;\min=-3,\; Q_1=-3,\; \text{median}=0,\; Q_3=3,\; \max=3 \]</div>
-    </div>
-
-    <div class="step" data-part="II">
-      <div class="step-head">
-        <span class="step-num">2</span>
-        <span class="step-title">The diagram stays fixed as \(a\) changes</span>
-        
-      </div>
-      <div class="math-line">For <b>every</b> value of \(a \in [0,1]\), the five-number summary is the same:</div>
-      <div class="math-line">\[ \min=-3,\quad Q_1=-3,\quad \text{median}=0,\quad Q_3=3,\quad \max=3 \]</div>
-      <div class="hint"><b>Hint:</b> Drag the \(a\)-slider. The box-and-whisker diagram does <b>not</b> move at all — but the individual points (the dots) spread out.</div>
-    </div>
-
-    <div class="step" data-part="II">
-      <div class="step-head">
-        <span class="step-num">3</span>
-        <span class="step-title">Compute the standard deviation as a function of \(a\)</span>
-        
-      </div>
-      <div class="math-line">Mean: \(\bar{x} = \dfrac{-3-3-3-3a+0+3a+3+3+3}{9} = \dfrac{0}{9} = 0\).</div>
-      <div class="math-line">\[ \sum x^2 = 3(-3)^2 + (-3a)^2 + 0^2 + (3a)^2 + 3(3)^2 = 27 + 9a^2 + 9a^2 + 27 = 54 + 18a^2 \]</div>
-      <div class="math-line">\[ \sigma^2 = \frac{54+18a^2}{9} - 0^2 = 6 + 2a^2 \qquad \Rightarrow \qquad \sigma = \sqrt{2a^2+6} \]</div>
-    </div>
-
-    <div class="step" data-part="II">
-      <div class="step-head">
-        <span class="step-num">4</span>
-        <span class="step-title">Conclusion — s.d. is NOT determined by the diagram</span>
-        
-      </div>
-      <div class="math-line">When \(a = 0\): \(\sigma = \sqrt{6} \approx 2.449\).</div>
-      <div class="math-line">When \(a = 1\): \(\sigma = \sqrt{8} \approx 2.828\).</div>
-      <div class="math-line">The diagram is <b>identical</b> in both cases, but the standard deviations differ.</div>
-      <div class="hint"><b>Key insight:</b> A box-and-whisker diagram only stores the five-number summary — it throws away how the data are spread <i>between</i> the quartiles.</div>
-      <div class="answer-box">✗ No — the standard deviation <b>cannot</b> be obtained from a box-and-whisker diagram in general.</div>
-    </div>
-
-    <div class="btn-row">
-      <span class="counter" id="cnt-II">0 / 4</span>
-      <button class="btn" data-target="II">Next step →</button>
-    </div>
-  </section>
-
-  <!-- ============ PART III ============ -->
-  <section class="card">
-    <h2><span class="part-badge">Part III</span> Can the Inter-quartile Range be obtained?</h2>
-    <p class="lead">The inter-quartile range is \(Q_3 - Q_1\) — and \(Q_1, Q_3\) are exactly the two ends of the <b>box</b>.</p>
-
-    <div class="canvas-shell">
-      <canvas id="canvasIQR" width="920" height="600"></canvas>
-    </div>
-
-    <div class="controls">
-      <div class="ctrl">
-        <label>Lower quartile \(Q_1\) <span class="val" id="valQ1">2</span></label>
-        <input type="range" id="sldQ1" min="0" max="6" step="0.5" value="2">
-      </div>
-      <div class="ctrl">
-        <label>Upper quartile \(Q_3\) <span class="val" id="valQ3">10</span></label>
-        <input type="range" id="sldQ3" min="6" max="16" step="0.5" value="10">
-      </div>
-      <label class="chk"><input type="checkbox" id="chkIQR" checked> Highlight box (the IQR)</label>
-    </div>
-
-    <div class="readout">
-      <span class="chip" id="chipQ1">Q₁ = 2</span>
-      <span class="chip" id="chipQ3">Q₃ = 10</span>
-      <span class="chip green" id="chipIQR">IQR = 8</span>
-    </div>
-
-    <div class="step" data-part="III">
-      <div class="step-head">
-        <span class="step-num">1</span>
-        <span class="step-title">Locate the quartiles on the diagram</span>
-        
-      </div>
-      <div class="math-line">The left edge of the rectangle is \(Q_1\), the right edge is \(Q_3\).</div>
-      <div class="hint"><b>Hint:</b> Move the sliders — the box width <b>is</b> the inter-quartile range. It is directly visible.</div>
-    </div>
-
-    <div class="step" data-part="III">
-      <div class="step-head">
-        <span class="step-num">2</span>
-        <span class="step-title">Compute the inter-quartile range</span>
-        
-      </div>
-      <div class="math-line">\[ \text{IQR} = Q_3 - Q_1 = 10 - 2 = 8 \]</div>
-      <div class="answer-box">✓ Yes — the inter-quartile range can always be obtained from any box-and-whisker diagram.</div>
-    </div>
-
-    <div class="btn-row">
-      <span class="counter" id="cnt-III">0 / 2</span>
-      <button class="btn" data-target="III">Next step →</button>
-    </div>
-  </section>
-
-  <!-- ============ SUMMARY ============ -->
-  <section class="summary">
-    <h2>Summary of Answers</h2>
-    <ul>
-      <li><b>I. Range</b> — ✓ Obtainable. Equal to \(\text{max} - \text{min}\), both endpoints of the whiskers.</li>
-      <li><b>II. Standard deviation</b> — ✗ Not obtainable in general. Two data sets with the same five-number summary can have different \(\sigma\).</li>
-      <li><b>III. Inter-quartile range</b> — ✓ Obtainable. Equal to the width of the box, \(Q_3 - Q_1\).</li>
-      <li>Hence only <b>I and III</b> can be obtained.</li>
-    </ul>
-    <div class="final-pick">Answer: B. I and III only</div>
-  </section>
-
+  </div>
 </div>
 
-<footer>
-  HKDSE Mathematics (Compulsory Part) · Paper 2 · 2019 Q29 &nbsp;|&nbsp; Interactive solution — drag the sliders and toggle the checkboxes to explore.
-</footer>
-
 <script>
-/* =========================================================
-   UTILITIES
-   ========================================================= */
-function fitCanvas(cv){
-  const dpr = window.devicePixelRatio || 1;
-  const cssW = cv.clientWidth || cv.width;
-  const ratio = cv.height / cv.width;
-  const cssH = cssW * ratio;
-  cv.width  = Math.round(cssW * dpr);
-  cv.height = Math.round(cssH * dpr);
+(function(){
+  const cv = document.getElementById('cv');
   const ctx = cv.getContext('2d');
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  return { ctx, W: cssW, H: cssH };
-}
+  const ro = document.getElementById('ro');
 
-function roundRect(ctx,x,y,w,h,r){
-  r = Math.min(r, Math.abs(w)/2, Math.abs(h)/2);
-  ctx.beginPath();
-  ctx.moveTo(x+r,y);
-  ctx.lineTo(x+w-r,y);
-  ctx.quadraticCurveTo(x+w,y,x+w,y+r);
-  ctx.lineTo(x+w,y+h-r);
-  ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
-  ctx.lineTo(x+r,y+h);
-  ctx.quadraticCurveTo(x,y+h,x,y+h-r);
-  ctx.lineTo(x,y+r);
-  ctx.quadraticCurveTo(x,y,x+r,y);
-  ctx.closePath();
-}
+  // Logical drawing surface (scaled to canvas pixels)
+  const W = 380, H = 320;
 
-/* =========================================================
-   1) ANATOMY CANVAS (static, labelled)
-   ========================================================= */
-function drawAnatomy(){
-  const cv = document.getElementById('canvasAnatomy');
-  const { ctx, W, H } = fitCanvas(cv);
-  ctx.clearRect(0,0,W,H);
-
-  // background
-  const bg = ctx.createLinearGradient(0,0,0,H);
-  bg.addColorStop(0,'#0b1220'); bg.addColorStop(1,'#0f172a');
-  ctx.fillStyle = bg; ctx.fillRect(0,0,W,H);
-
-  const padL = 60, padR = 60, padT = 60, padB = 70;
+  // axis in data coordinates: from -5 to 5
+  const dmin = -5, dmax = 5;
+  const padL = 44, padR = 26, padT = 78, padB = 46;
   const plotW = W - padL - padR;
-  const axisY = H - padB;
 
-  // data
-  const min = 10, q1 = 22, med = 34, q3 = 46, max = 58;
-  const xScale = v => padL + (v - 0) / 70 * plotW;
+  const X = v => padL + (v - dmin) / (dmax - dmin) * plotW;
 
-  // grid lines
-  ctx.strokeStyle = 'rgba(148,163,184,0.13)';
-  ctx.lineWidth = 1;
-  for(let v=0; v<=70; v+=10){
-    const x = xScale(v);
-    ctx.beginPath(); ctx.moveTo(x, padT-20); ctx.lineTo(x, axisY); ctx.stroke();
-    ctx.fillStyle = '#64748b';
-    ctx.font = '11px Segoe UI, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText(v, x, axisY + 18);
+  // Sample five-number summary used for the figure
+  const mn = -3.2, q1 = -1.0, med = 0.6, q3 = 2.4, mx = 4.1;
+  const yc = padT + 92;      // centre line of the box
+  const bh = 42;             // box height
+
+  let dpr = window.devicePixelRatio || 1;
+  function fitCanvas(){
+    dpr = window.devicePixelRatio || 1;
+    const rect = cv.getBoundingClientRect();
+    cv.width = Math.round(rect.width * dpr);
+    cv.height = Math.round(rect.width * dpr * (H / W));
+    cv.style.height = (rect.width * (H / W)) + 'px';
   }
 
-  // axis
-  ctx.strokeStyle = '#475569'; ctx.lineWidth = 1.5;
-  ctx.beginPath(); ctx.moveTo(padL-30, axisY); ctx.lineTo(W-padR+30, axisY); ctx.stroke();
-  ctx.fillStyle = '#94a3b8';
-  ctx.font = 'italic 12px Segoe UI, sans-serif';
-  ctx.textAlign = 'right';
-  ctx.fillText('value', W-padR+30, axisY + 38);
-
-  // whisker line
-  const yMid = padT + 90;
-  ctx.strokeStyle = '#60a5fa';
-  ctx.lineWidth = 2.5;
-  ctx.beginPath(); ctx.moveTo(xScale(min), yMid); ctx.lineTo(xScale(q1), yMid); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(xScale(q3), yMid); ctx.lineTo(xScale(max), yMid); ctx.stroke();
-
-  // whisker caps
-  [min,max].forEach(v=>{
+  function arrow(x1,y1,x2,y2){
+    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+    const a = Math.atan2(y2-y1, x2-x1), s = 7;
     ctx.beginPath();
-    ctx.moveTo(xScale(v), yMid-24); ctx.lineTo(xScale(v), yMid+24);
-    ctx.stroke();
-  });
-
-  // box
-  const bh = 70;
-  ctx.fillStyle = 'rgba(37,99,235,0.35)';
-  roundRect(ctx, xScale(q1), yMid-bh/2, xScale(q3)-xScale(q1), bh, 6);
-  ctx.fill();
-  ctx.strokeStyle = '#3b82f6'; ctx.lineWidth = 2.5; ctx.stroke();
-
-  // median line
-  ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 3;
-  ctx.beginPath(); ctx.moveTo(xScale(med), yMid-bh/2); ctx.lineTo(xScale(med), yMid+bh/2); ctx.stroke();
-
-  // labels: 5-number summary
-  const labels = [
-    {v:min, t:'min', c:'#f87171'},
-    {v:q1,  t:'Q₁',  c:'#60a5fa'},
-    {v:med, t:'median', c:'#fbbf24'},
-    {v:q3,  t:'Q₃',  c:'#60a5fa'},
-    {v:max, t:'max', c:'#f87171'}
-  ];
-  labels.forEach((L,i)=>{
-    const x = xScale(L.v);
-    ctx.fillStyle = L.c;
-    ctx.beginPath(); ctx.arc(x, yMid-bh/2-30, 5, 0, Math.PI*2); ctx.fill();
-
-    ctx.font = 'bold 12px Segoe UI, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText(L.t, x, yMid-bh/2-42);
-  });
-
-  // annotations
-  ctx.font = 'bold 13px Segoe UI, sans-serif';
-  ctx.fillStyle = '#93c5fd';
-  ctx.textAlign = 'center';
-  ctx.fillText('whisker', xScale((min+q1)/2), yMid + 8);
-  ctx.fillText('whisker', xScale((q3+max)/2), yMid + 8);
-  ctx.fillStyle = '#a5b4fc';
-  ctx.fillText('box', xScale((q1+q3)/2), yMid + 5);
-
-  // range bracket
-  const bracketY = axisY - 8;
-  ctx.strokeStyle = '#34d399'; ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(xScale(min), yMid+40);
-  ctx.lineTo(xScale(min), bracketY);
-  ctx.lineTo(xScale(max), bracketY);
-  ctx.lineTo(xScale(max), yMid+40);
-  ctx.stroke();
-  ctx.fillStyle = '#34d399';
-  ctx.font = 'bold 12px Segoe UI, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('range = max − min', (xScale(min)+xScale(max))/2, bracketY + 18);
-
-  // IQR bracket
-  const bracketY2 = H - 16;
-  ctx.strokeStyle = '#fbbf24';
-  ctx.beginPath();
-  ctx.moveTo(xScale(q1), yMid+bh/2+8);
-  ctx.lineTo(xScale(q1), bracketY2);
-  ctx.lineTo(xScale(q3), bracketY2);
-  ctx.lineTo(xScale(q3), yMid+bh/2+8);
-  ctx.stroke();
-  ctx.fillStyle = '#fbbf24';
-  ctx.font = 'bold 12px Segoe UI, sans-serif';
-  ctx.fillText('IQR = Q₃ − Q₁', (xScale(q1)+xScale(q3))/2, bracketY2 + 14);
-
-  // title
-  ctx.fillStyle = '#e2e8f0';
-  ctx.font = 'bold 14px Segoe UI, sans-serif';
-  ctx.textAlign = 'left';
-  ctx.fillText('Anatomy of a box-and-whisker diagram', padL-30, 32);
-}
-
-/* =========================================================
-   2) RANGE CANVAS (interactive)
-   ========================================================= */
-function drawRange(){
-  const cv = document.getElementById('canvasRange');
-  const { ctx, W, H } = fitCanvas(cv);
-  ctx.clearRect(0,0,W,H);
-
-  const bg = ctx.createLinearGradient(0,0,0,H);
-  bg.addColorStop(0,'#0b1220'); bg.addColorStop(1,'#0f172a');
-  ctx.fillStyle = bg; ctx.fillRect(0,0,W,H);
-
-  const min = +document.getElementById('sldMin').value;
-  const max = +document.getElementById('sldMax').value;
-  const showRange = document.getElementById('chkRange').checked;
-
-  // update readouts
-  document.getElementById('valMin').textContent = min;
-  document.getElementById('valMax').textContent = max;
-  document.getElementById('chipMin').textContent = 'Min = ' + min;
-  document.getElementById('chipMax').textContent = 'Max = ' + max;
-  document.getElementById('chipRange').textContent = 'Range = ' + (max - min);
-
-  const padL = 55, padR = 55, padT = 55, padB = 60;
-  const plotW = W - padL - padR;
-  const axisY = H - padB;
-  const scaleMax = 22;
-  const xScale = v => padL + v / scaleMax * plotW;
-
-  // grid
-  ctx.strokeStyle = 'rgba(148,163,184,0.13)'; ctx.lineWidth = 1;
-  for(let v=0; v<=scaleMax; v+=2){
-    const x = xScale(v);
-    ctx.beginPath(); ctx.moveTo(x, padT-15); ctx.lineTo(x, axisY); ctx.stroke();
-    ctx.fillStyle = '#64748b'; ctx.font = '11px Segoe UI, sans-serif';
-    ctx.textAlign = 'center'; ctx.fillText(v, x, axisY + 17);
-  }
-  ctx.strokeStyle = '#475569'; ctx.lineWidth = 1.5;
-  ctx.beginPath(); ctx.moveTo(padL-25, axisY); ctx.lineTo(W-padR+25, axisY); ctx.stroke();
-
-  // derive quartiles safely between min and max
-  const span = max - min;
-  const q1 = min + span * 0.3;
-  const med = min + span * 0.55;
-  const q3 = min + span * 0.8;
-
-  const yMid = padT + 85;
-  const bh = 68;
-
-  // range highlight band
-  if(showRange){
-    ctx.fillStyle = 'rgba(52,211,153,0.12)';
-    ctx.fillRect(xScale(min), padT-10, xScale(max)-xScale(min), axisY-padT+10);
+    ctx.moveTo(x2,y2);
+    ctx.lineTo(x2 - s*Math.cos(a-0.4), y2 - s*Math.sin(a-0.4));
+    ctx.lineTo(x2 - s*Math.cos(a+0.4), y2 - s*Math.sin(a+0.4));
+    ctx.closePath();ctx.fill();
   }
 
-  // whiskers
-  ctx.strokeStyle = '#60a5fa'; ctx.lineWidth = 2.5;
-  ctx.beginPath(); ctx.moveTo(xScale(min), yMid); ctx.lineTo(xScale(q1), yMid); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(xScale(q3), yMid); ctx.lineTo(xScale(max), yMid); ctx.stroke();
-  [min,max].forEach(v=>{
-    ctx.beginPath(); ctx.moveTo(xScale(v), yMid-22); ctx.lineTo(xScale(v), yMid+22); ctx.stroke();
-  });
+  function label(text, x, y, colour, size, align, baseline, bold){
+    ctx.fillStyle = colour;
+    ctx.font = (bold?'bold ':'') + (size||12) + 'px "Segoe UI",Arial,sans-serif';
+    ctx.textAlign = align || 'center';
+    ctx.textBaseline = baseline || 'middle';
+    ctx.fillText(text, x, y);
+  }
 
-  // box
-  ctx.fillStyle = 'rgba(37,99,235,0.35)';
-  roundRect(ctx, xScale(q1), yMid-bh/2, xScale(q3)-xScale(q1), bh, 6); ctx.fill();
-  ctx.strokeStyle = '#3b82f6'; ctx.lineWidth = 2.5; ctx.stroke();
-
-  // median
-  ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 3;
-  ctx.beginPath(); ctx.moveTo(xScale(med), yMid-bh/2); ctx.lineTo(xScale(med), yMid+bh/2); ctx.stroke();
-
-  // end labels
-  ctx.font = 'bold 12px Segoe UI, sans-serif'; ctx.textAlign = 'center';
-  ctx.fillStyle = '#f87171';
-  ctx.fillText('min = '+min, xScale(min), yMid-bh/2-30);
-  ctx.fillText('max = '+max, xScale(max), yMid-bh/2-30);
-
-  // range arrow
-  if(showRange){
-    const yA = axisY - 12;
-    ctx.strokeStyle = '#34d399'; ctx.lineWidth = 2.5;
+  function roundRect(x, y, w, h, r){
+    r = Math.min(r, Math.abs(w)/2, Math.abs(h)/2);
     ctx.beginPath();
-    ctx.moveTo(xScale(min), yA); ctx.lineTo(xScale(max), yA); ctx.stroke();
-    // arrow heads
-    ctx.beginPath(); ctx.moveTo(xScale(min), yA); ctx.lineTo(xScale(min)+10, yA-6); ctx.lineTo(xScale(min)+10, yA+6); ctx.closePath(); ctx.fillStyle='#34d399'; ctx.fill();
-    ctx.beginPath(); ctx.moveTo(xScale(max), yA); ctx.lineTo(xScale(max)-10, yA-6); ctx.lineTo(xScale(max)-10, yA+6); ctx.closePath(); ctx.fill();
-
-    ctx.fillStyle = '#34d399';
-    ctx.font = 'bold 15px Segoe UI, sans-serif';
-    ctx.fillText('range = ' + (max-min), (xScale(min)+xScale(max))/2, yA - 14);
+    ctx.moveTo(x+r, y);
+    ctx.arcTo(x+w, y, x+w, y+h, r);
+    ctx.arcTo(x+w, y+h, x, y+h, r);
+    ctx.arcTo(x, y+h, x, y, r);
+    ctx.arcTo(x, y, x+w, y, r);
+    ctx.closePath();
   }
 
-  ctx.fillStyle = '#e2e8f0';
-  ctx.font = 'bold 14px Segoe UI, sans-serif';
-  ctx.textAlign = 'left';
-  ctx.fillText('Range is always the distance between the whisker ends', padL-25, 30);
-}
+  const AXIS = '#94a3b8';
 
-/* =========================================================
-   3) STANDARD DEVIATION CANVAS (interactive with a-slider)
-   ========================================================= */
-function drawSD(){
-  const cv = document.getElementById('canvasSD');
-  const { ctx, W, H } = fitCanvas(cv);
-  ctx.clearRect(0,0,W,H);
-
-  const bg = ctx.createLinearGradient(0,0,0,H);
-  bg.addColorStop(0,'#0b1220'); bg.addColorStop(1,'#0f172a');
-  ctx.fillStyle = bg; ctx.fillRect(0,0,W,H);
-
-  const a = parseFloat(document.getElementById('sldA').value);
-  const showDots = document.getElementById('chkDots').checked;
-  const showBox = document.getElementById('chkBox2').checked;
-
-  document.getElementById('valA').textContent = a.toFixed(2);
-
-  // data set: -3,-3,-3,-3a,0,3a,3,3,3  (sorted for 0<=a<=1: -3,-3,-3,-3a,0,3a,3,3,3)
-  const data = [-3,-3,-3,-3*a,0,3*a,3,3,3];
-
-  const mean = 0;
-  const sq = data.reduce((s,x)=>s+x*x,0);
-  const variance = sq/9 - mean*mean;
-  const sd = Math.sqrt(variance);
-
-  document.getElementById('chipSD').textContent = 's.d. = ' + sd.toFixed(3);
-  document.getElementById('chipFive').textContent = 'Five-number summary: −3, −3, 0, 3, 3';
-
-  const padL = 60, padR = 60, padT = 80, padB = 60;
-  const plotW = W - padL - padR;
-  const axisY = H - padB;
-
-  const scaleMin = -4.2, scaleMax = 4.2;
-  const xScale = v => padL + (v - scaleMin)/(scaleMax - scaleMin) * plotW;
-
-  // grid
-  ctx.strokeStyle = 'rgba(148,163,184,0.12)'; ctx.lineWidth = 1;
-  for(let v=-4; v<=4; v+=1){
-    const x = xScale(v);
-    ctx.beginPath(); ctx.moveTo(x, padT-20); ctx.lineTo(x, axisY); ctx.stroke();
-    ctx.fillStyle = '#64748b'; ctx.font = '11px Segoe UI, sans-serif';
-    ctx.textAlign = 'center'; ctx.fillText(v, x, axisY + 17);
+  function drawAxis(){
+    // number line
+    ctx.strokeStyle = AXIS; ctx.lineWidth = 1.4; ctx.fillStyle = AXIS;
+    arrow(padL-14, yc, W-padR+14, yc);
+    // ticks
+    ctx.lineWidth = 1;
+    for(let v = -5; v <= 5; v++){
+      const x = X(v);
+      ctx.beginPath();
+      ctx.moveTo(x, yc-4);
+      ctx.lineTo(x, yc+4);
+      ctx.stroke();
+    }
+    label('number line', W-padR+8, yc+22, '#94a3b8', 10.5, 'right','middle');
   }
-  // axis with arrow
-  ctx.strokeStyle = '#475569'; ctx.lineWidth = 1.5;
-  ctx.beginPath(); ctx.moveTo(padL-25, axisY); ctx.lineTo(W-padR+25, axisY); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(W-padR+25, axisY); ctx.lineTo(W-padR+15, axisY-5); ctx.lineTo(W-padR+15, axisY+5); ctx.closePath(); ctx.fillStyle='#475569'; ctx.fill();
 
-  // mean marker
-  ctx.strokeStyle = '#fbbf24'; ctx.setLineDash([6,5]); ctx.lineWidth = 2;
-  ctx.beginPath(); ctx.moveTo(xScale(0), padT-25); ctx.lineTo(xScale(0), axisY); ctx.stroke();
-  ctx.setLineDash([]);
-  ctx.fillStyle = '#fbbf24'; ctx.font = 'bold 12px Segoe UI, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('mean = 0', xScale(0), padT - 32);
+  function baseWhisker(){
+    // whisker line + caps
+    ctx.strokeStyle = '#e11d48'; ctx.lineWidth = 2.6;
+    ctx.beginPath(); ctx.moveTo(X(mn), yc); ctx.lineTo(X(q1), yc); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(X(q3), yc); ctx.lineTo(X(mx), yc); ctx.stroke();
+    ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(X(mn), yc-18); ctx.lineTo(X(mn), yc+18); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(X(mx), yc-18); ctx.lineTo(X(mx), yc+18); ctx.stroke();
+  }
 
-  // ---- dot plot (jittered, stacked) ----
-  if(showDots){
-    // count occurrences per value to stack vertically
-    const stacks = {};
-    data.forEach(v=>{
-      const key = (Math.round(v*100)/100).toFixed(2);
-      stacks[key] = (stacks[key] || 0) + 1;
+  function labelFive(){
+    const items = [
+      {v:mn, t:'min', c:'#e11d48', s:-1},
+      {v:q1, t:'Q₁', c:'#2563eb', s:0},
+      {v:med,t:'median', c:'#0d9488', s:1},
+      {v:q3, t:'Q₃', c:'#2563eb', s:1},
+      {v:mx, t:'max', c:'#e11d48', s:1}
+    ];
+    items.forEach(it=>{
+      const x = X(it.v);
+      ctx.strokeStyle = it.c; ctx.globalAlpha = .5; ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(x, yc + 18);
+      ctx.lineTo(x, yc + 30 + (it.s<0?0:0));
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+      label(it.t, x, yc + 40, it.c, 12, 'center','middle', true);
+      label(it.v.toFixed(1), x, yc + 55, it.c, 11, 'center','middle');
     });
-    const baseY = axisY - 22;
-    Object.keys(stacks).forEach(k=>{
-      const v = parseFloat(k);
-      const n = stacks[k];
-      for(let i=0;i<n;i++){
-        const x = xScale(v);
-        const y = baseY - i*16;
-        ctx.beginPath();
-        ctx.arc(x, y, 6, 0, Math.PI*2);
-        ctx.fillStyle = (Math.abs(v) < 1e-9) ? '#fbbf24' : (v < 0 ? '#60a5fa' : '#f472b6');
-        ctx.fill();
-        ctx.strokeStyle = 'rgba(255,255,255,0.55)'; ctx.lineWidth = 1.5; ctx.stroke();
+  }
+
+  function drawRange(){
+    const y = padT + 6;
+    ctx.strokeStyle = '#e11d48'; ctx.fillStyle = '#e11d48'; ctx.lineWidth = 2;
+    arrow(X(mn), y, X(mx), y);
+    arrow(X(mx), y, X(mn), y);
+    label('Range = max − min', (X(mn)+X(mx))/2, y - 12, '#e11d48', 12, 'center','middle', true);
+  }
+
+  function drawIQR(){
+    const y = padT + 178;
+    ctx.strokeStyle = '#d97706'; ctx.fillStyle = '#d97706'; ctx.lineWidth = 2;
+    const y2 = yc + 78;
+    // dashed drop lines
+    ctx.setLineDash([4,4]); ctx.lineWidth = 1.2; ctx.globalAlpha = .8;
+    ctx.beginPath(); ctx.moveTo(X(q1), yc+20); ctx.lineTo(X(q1), y2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(X(q3), yc+20); ctx.lineTo(X(q3), y2); ctx.stroke();
+    ctx.setLineDash([]); ctx.globalAlpha = 1;
+    ctx.lineWidth = 2.2;
+    arrow(X(q1), y2, X(q3), y2);
+    arrow(X(q3), y2, X(q1), y2);
+    label('IQR = Q₃ − Q₁', (X(q1)+X(q3))/2, y2 - 13, '#d97706', 12, 'center','middle', true);
+  }
+
+  function drawSDCross(){
+    // amber "crossed out" panel for standard deviation
+    const x0 = padL - 4, y0 = yc + 96, w = plotW + 8, h = 52;
+    ctx.save();
+    ctx.fillStyle = 'rgba(225,29,72,0.06)';
+    roundRect(x0, y0, w, h, 10); ctx.fill();
+    ctx.strokeStyle = 'rgba(225,29,72,0.45)'; ctx.setLineDash([5,4]); ctx.lineWidth = 1.4;
+    roundRect(x0, y0, w, h, 10); ctx.stroke();
+    ctx.restore();
+    label('Standard deviation:  ✗   not readable', x0 + w/2, y0 + 18, '#e11d48', 12.5, 'center','middle', true);
+    label('(individual values are lost by the diagram)', x0 + w/2, y0 + 36, '#9f1239', 10.5, 'center','middle');
+  }
+
+  function draw(step){
+    fitCanvas();
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,W,H);
+    // background
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0,0,W,H);
+
+    drawAxis();
+
+    // fade elements not related to the current step
+    const showRange = (step >= 2);
+    const showIQR   = (step >= 3);
+    const showSD    = (step >= 4);
+
+    baseWhisker();
+
+    // box (always shown)
+    ctx.fillStyle = 'rgba(37,99,235,0.12)';
+    ctx.strokeStyle = '#2563eb'; ctx.lineWidth = 2.4;
+    roundRect(X(q1), yc-bh/2, X(q3)-X(q1), bh, 5);
+    ctx.fill(); ctx.stroke();
+
+    // median line
+    ctx.strokeStyle = '#0d9488'; ctx.lineWidth = 3.4;
+    ctx.beginPath(); ctx.moveTo(X(med), yc-bh/2); ctx.lineTo(X(med), yc+bh/2); ctx.stroke();
+
+    labelFive();
+
+    if(showRange){
+      ctx.globalAlpha = step === 2 ? 1 : .35;
+      drawRange();
+      ctx.globalAlpha = 1;
+    }
+    if(showIQR){
+      ctx.globalAlpha = step === 3 ? 1 : .35;
+      drawIQR();
+      ctx.globalAlpha = 1;
+    }
+    if(showSD){
+      drawSDCross();
+    }
+
+    ro.textContent = roText(step);
+    applyStepHighlight(step);
+  }
+
+  function roText(step){
+    if(step === 1) return 'Step 1 — a box-and-whisker diagram is built from the five-number summary: min, Q₁, median, Q₃, max.';
+    if(step === 2) return 'Step 2 — Range = max − min can always be read from the two whisker ends. ✓';
+    if(step === 3) return 'Step 3 — IQR = Q₃ − Q₁ is the width of the box, always readable. ✓';
+    return 'Step 4 — Standard deviation depends on every value, not just the five summary values, so it is NOT obtainable. ✗';
+  }
+
+  const steps = Array.from(document.querySelectorAll('.step'));
+  function applyStepHighlight(step){
+    steps.forEach(s=>{
+      s.classList.toggle('active', +s.dataset.step === step);
+    });
+  }
+
+  // ---- scroll sync ----
+  let current = 1;
+  const io = new IntersectionObserver(es=>{
+    es.forEach(e=>{
+      if(e.isIntersecting){
+        current = +e.target.dataset.step;
+        draw(current);
       }
     });
-  }
+  },{rootMargin:'-25% 0px -55% 0px'});
+  steps.forEach(s=>io.observe(s));
 
-  // ---- box-and-whisker diagram (fixed summary: -3,-3,0,3,3) ----
-  if(showBox){
-    const yMid = axisY - 110;
-    const bh = 56;
-    const q1 = -3, med = 0, q3 = 3, mn = -3, mx = 3;
-
-    ctx.strokeStyle = '#34d399'; ctx.lineWidth = 2.5;
-    // left whisker (zero-length since min=q1) draw cap
-    ctx.beginPath(); ctx.moveTo(xScale(mn), yMid-18); ctx.lineTo(xScale(mn), yMid+18); ctx.stroke();
-    // right whisker
-    ctx.beginPath(); ctx.moveTo(xScale(q3), yMid); ctx.lineTo(xScale(mx), yMid); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(xScale(mx), yMid-18); ctx.lineTo(xScale(mx), yMid+18); ctx.stroke();
-
-    // box
-    ctx.fillStyle = 'rgba(52,211,153,0.25)';
-    roundRect(ctx, xScale(q1), yMid-bh/2, xScale(q3)-xScale(q1), bh, 6); ctx.fill();
-    ctx.strokeStyle = '#34d399'; ctx.lineWidth = 2.5; ctx.stroke();
-
-    // median
-    ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.moveTo(xScale(med), yMid-bh/2); ctx.lineTo(xScale(med), yMid+bh/2); ctx.stroke();
-
-    ctx.fillStyle = '#6ee7b7'; ctx.font = 'bold 12px Segoe UI, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('same box-and-whisker diagram for all a', xScale(0), yMid - bh/2 - 14);
-  }
-
-  // title & readouts
-  ctx.fillStyle = '#e2e8f0'; ctx.font = 'bold 14px Segoe UI, sans-serif';
-  ctx.textAlign = 'left';
-  ctx.fillText('Data set: {−3, −3, −3, −3a, 0, 3a, 3, 3, 3}', padL-25, 30);
-
-  ctx.fillStyle = '#94a3b8'; ctx.font = '13px Segoe UI, sans-serif';
-  ctx.fillText('σ = √(2a² + 6)  =  ' + sd.toFixed(3), padL-25, 52);
-}
-
-/* =========================================================
-   4) IQR CANVAS (interactive)
-   ========================================================= */
-function drawIQR(){
-  const cv = document.getElementById('canvasIQR');
-  const { ctx, W, H } = fitCanvas(cv);
-  ctx.clearRect(0,0,W,H);
-
-  const bg = ctx.createLinearGradient(0,0,0,H);
-  bg.addColorStop(0,'#0b1220'); bg.addColorStop(1,'#0f172a');
-  ctx.fillStyle = bg; ctx.fillRect(0,0,W,H);
-
-  let q1 = parseFloat(document.getElementById('sldQ1').value);
-  let q3 = parseFloat(document.getElementById('sldQ3').value);
-  if(q3 <= q1){ q3 = q1 + 0.5; }
-  const showIQR = document.getElementById('chkIQR').checked;
-
-  document.getElementById('valQ1').textContent = q1;
-  document.getElementById('valQ3').textContent = q3;
-  document.getElementById('chipQ1').textContent = 'Q₁ = ' + q1;
-  document.getElementById('chipQ3').textContent = 'Q₃ = ' + q3;
-  document.getElementById('chipIQR').textContent = 'IQR = ' + (q3 - q1).toFixed(1);
-
-  const mn = 0, mx = 18;
-  const med = (q1 + q3) / 2;
-
-  const padL = 55, padR = 55, padT = 70, padB = 60;
-  const plotW = W - padL - padR;
-  const axisY = H - padB;
-  const xScale = v => padL + (v - mn)/(mx - mn) * plotW;
-
-  // grid
-  ctx.strokeStyle = 'rgba(148,163,184,0.12)'; ctx.lineWidth = 1;
-  for(let v=0; v<=18; v+=2){
-    const x = xScale(v);
-    ctx.beginPath(); ctx.moveTo(x, padT-20); ctx.lineTo(x, axisY); ctx.stroke();
-    ctx.fillStyle = '#64748b'; ctx.font = '11px Segoe UI, sans-serif';
-    ctx.textAlign = 'center'; ctx.fillText(v, x, axisY + 17);
-  }
-  ctx.strokeStyle = '#475569'; ctx.lineWidth = 1.5;
-  ctx.beginPath(); ctx.moveTo(padL-25, axisY); ctx.lineTo(W-padR+25, axisY); ctx.stroke();
-
-  const yMid = padT + 80;
-  const bh = 66;
-
-  // IQR highlight
-  if(showIQR){
-    ctx.fillStyle = 'rgba(245,158,11,0.14)';
-    ctx.fillRect(xScale(q1), padT-10, xScale(q3)-xScale(q1), axisY-padT+10);
-  }
-
-  // whiskers
-  ctx.strokeStyle = '#60a5fa'; ctx.lineWidth = 2.5;
-  ctx.beginPath(); ctx.moveTo(xScale(mn), yMid); ctx.lineTo(xScale(q1), yMid); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(xScale(q3), yMid); ctx.lineTo(xScale(mx), yMid); ctx.stroke();
-  [mn,mx].forEach(v=>{
-    ctx.beginPath(); ctx.moveTo(xScale(v), yMid-22); ctx.lineTo(xScale(v), yMid+22); ctx.stroke();
-  });
-
-  // box
-  ctx.fillStyle = showIQR ? 'rgba(245,158,11,0.35)' : 'rgba(37,99,235,0.35)';
-  roundRect(ctx, xScale(q1), yMid-bh/2, xScale(q3)-xScale(q1), bh, 6); ctx.fill();
-  ctx.strokeStyle = showIQR ? '#f59e0b' : '#3b82f6'; ctx.lineWidth = 2.8; ctx.stroke();
-
-  // median
-  ctx.strokeStyle = '#f43f5e'; ctx.lineWidth = 3;
-  ctx.beginPath(); ctx.moveTo(xScale(med), yMid-bh/2); ctx.lineTo(xScale(med), yMid+bh/2); ctx.stroke();
-
-  // Q1/Q3 labels
-  ctx.font = 'bold 12px Segoe UI, sans-serif'; ctx.textAlign = 'center';
-  ctx.fillStyle = '#fbbf24';
-  ctx.fillText('Q₁ = '+q1, xScale(q1), yMid-bh/2-16);
-  ctx.fillText('Q₃ = '+q3, xScale(q3), yMid-bh/2-16);
-
-  // IQR bracket & arrow
-  if(showIQR){
-    const yA = axisY - 10;
-    ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 2.5;
-    ctx.beginPath(); ctx.moveTo(xScale(q1), yA); ctx.lineTo(xScale(q3), yA); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(xScale(q1), yA); ctx.lineTo(xScale(q1)+10, yA-6); ctx.lineTo(xScale(q1)+10, yA+6); ctx.closePath(); ctx.fillStyle='#f59e0b'; ctx.fill();
-    ctx.beginPath(); ctx.moveTo(xScale(q3), yA); ctx.lineTo(xScale(q3)-10, yA-6); ctx.lineTo(xScale(q3)-10, yA+6); ctx.closePath(); ctx.fill();
-    ctx.fillStyle = '#fbbf24';
-    ctx.font = 'bold 15px Segoe UI, sans-serif';
-    ctx.fillText('IQR = ' + (q3-q1).toFixed(1), (xScale(q1)+xScale(q3))/2, yA - 13);
-  }
-
-  ctx.fillStyle = '#e2e8f0'; ctx.font = 'bold 14px Segoe UI, sans-serif';
-  ctx.textAlign = 'left';
-  ctx.fillText('Inter-quartile range = width of the box = Q₃ − Q₁', padL-25, 30);
-}
-
-/* =========================================================
-   STEP REVEAL LOGIC
-   ========================================================= */
-const state = { I:0, II:0, III:0 };
-
-function updatePart(part){
-  const steps = document.querySelectorAll('.step[data-part="'+part+'"]');
-  const total = steps.length;
-  const shown = state[part];
-
-  steps.forEach((s,i)=>{ s.classList.toggle('show', i < shown); });
-
-  const counter = document.getElementById('cnt-'+part);
-  if(counter) counter.textContent = shown + ' / ' + total;
-
-  const btn = document.querySelector('.btn[data-target="'+part+'"]');
-  if(btn){
-    if(shown >= total){
-      btn.disabled = true;
-      btn.textContent = 'All steps revealed ✓';
-    } else {
-      btn.disabled = false;
-      btn.textContent = 'Next step →';
-    }
-  }
-  if(window.MathJax && MathJax.typesetPromise){
-    MathJax.typesetPromise();
-  }
-}
-
-document.querySelectorAll('.btn[data-target]').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    const part = btn.dataset.target;
-    const total = document.querySelectorAll('.step[data-part="'+part+'"]').length;
-    if(state[part] < total){
-      state[part]++;
-      updatePart(part);
-    }
-  });
-});
-
-/* =========================================================
-   EVENT WIRING
-   ========================================================= */
-function bind(id, ev, fn){ const el = document.getElementById(id); if(el) el.addEventListener(ev, fn); }
-
-bind('sldMin','input',drawRange);
-bind('sldMax','input',drawRange);
-bind('chkRange','change',drawRange);
-
-bind('sldA','input',drawSD);
-bind('chkDots','change',drawSD);
-bind('chkBox2','change',drawSD);
-
-bind('sldQ1','input',drawIQR);
-bind('sldQ3','input',drawIQR);
-bind('chkIQR','change',drawIQR);
-
-/* =========================================================
-   INIT
-   ========================================================= */
-function redrawAll(){
-  drawAnatomy();
-  drawRange();
-  drawSD();
-  drawIQR();
-}
-
-window.addEventListener('load', ()=>{
-  redrawAll();
-  ['I','II','III'].forEach(updatePart);
-  if(window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise();
-});
-
-let rTimer;
-window.addEventListener('resize', ()=>{
-  clearTimeout(rTimer);
-  rTimer = setTimeout(redrawAll, 120);
-});
+  window.addEventListener('resize', ()=>draw(current));
+  // initial
+  draw(1);
+  window.addEventListener('load', ()=>{ fitCanvas(); draw(current); });
+})();
 </script>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
-
 </body>
 </html>

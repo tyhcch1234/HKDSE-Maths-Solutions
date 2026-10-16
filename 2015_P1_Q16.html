@@ -1,349 +1,372 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HKDSE Math 2015 Paper 1 Q16 · Probability</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2015 P1 Q16 – Probability</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,Arial,sans-serif;background:#f4f7fb;color:#17223b;}
+  .wrap{max-width:1180px;margin:0 auto;padding:16px 14px 60px;}
+  h1{font-size:1.12rem;margin:0 0 10px;color:#0f2e63;letter-spacing:.2px;}
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start;}
+  @media(min-width:900px){.split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}}
+  .diagram{position:sticky;top:16px;max-height:calc(100vh - 2rem);overflow-y:auto;}
+  @media(max-width:640px){body{font-size:14.5px;}.wrap{padding:10px 8px 40px;}}
 
-  <!-- Tailwind (light utility) + KaTeX -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
-          onload="renderMathInElement(document.body,{delimiters:[{left:'$',right:'$',display:false},{left:'$$',right:'$$',display:true},{left:'\\(',right:'\\)',display:false}]});"></script>
+  .card{background:#fff;border-radius:14px;box-shadow:0 4px 16px rgba(20,40,90,.10);padding:14px 16px;}
+  .diagram .card{padding:12px;}
+  canvas{width:100%;height:auto;display:block;border-radius:10px;background:#fbfdff;}
+  .ro{margin:10px 2px 2px;font-size:.86rem;color:#3a4a68;min-height:2.6em;line-height:1.35;}
+  .ro b{color:#0f2e63;}
 
-  <style>
-    body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
-    .card { transition: all 0.2s; }
-    .card:hover { transform: translateY(-2px); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.08); }
-    .step-content { max-height: 0; overflow: hidden; transition: max-height 0.5s ease, padding 0.3s ease; }
-    .step-content.open { max-height: 600px; padding-top: 0.5rem; }
-    .hint-box { background: #fef9c3; border-left: 4px solid #eab308; }
-    .answer-box { background: #dbeafe; border-left: 4px solid #2563eb; }
-    .katex { font-size: 1.05em; }
-    .bowl { display: inline-block; width: 22px; height: 22px; border-radius: 50%; margin: 2px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-    .slider { -webkit-appearance: none; width: 100%; height: 8px; border-radius: 4px; background: #e2e8f0; outline: none; }
-    .slider::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%; background: #2563eb; cursor: pointer; border: 3px solid white; box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
-    .slider::-moz-range-thumb { width: 22px; height: 22px; border-radius: 50%; background: #2563eb; cursor: pointer; border: 3px solid white; }
-    .combined { background: linear-gradient(135deg, #f0f4ff 0%, #ffffff 100%); }
-  </style>
+  .legend{display:flex;flex-wrap:wrap;gap:10px;margin:8px 2px 4px;font-size:.8rem;color:#3a4a68;}
+  .legend span{display:inline-flex;align-items:center;gap:5px;}
+  .dot{width:12px;height:12px;border-radius:50%;display:inline-block;border:1px solid rgba(0,0,0,.15);}
+
+  .qbox{background:#eef4ff;border-left:5px solid #2f6be0;border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:.95rem;line-height:1.5;}
+  .qbox .tag{font-weight:700;color:#1b4fa8;}
+  h2{font-size:1rem;color:#0f2e63;margin:16px 0 8px;}
+  .step{border-left:4px solid #c9d6ee;padding:8px 12px;margin:12px 0;border-radius:0 8px 8px 0;background:#fafcff;transition:background .3s,border-color .3s;}
+  .step.active{background:#eaf2ff;border-left-color:#2f6be0;}
+  .chip{display:inline-block;background:#2f6be0;color:#fff;font-weight:700;font-size:.78rem;border-radius:20px;padding:2px 10px;margin-right:8px;vertical-align:middle;}
+  .hint{display:block;margin-top:6px;font-size:.84rem;color:#5a6b8c;font-style:italic;}
+  .ans{background:#e9fbef;border:1.5px solid #35b06a;border-radius:10px;padding:10px 14px;margin-top:16px;font-size:1rem;color:#12603a;}
+  .ans b{color:#0d7a45;}
+  .fnote{font-size:.8rem;color:#77869f;margin-top:14px;}
+  mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
+</style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen">
+<body>
+<div class="wrap">
+  <h1>HKDSE 2015 Paper 1 — Question 16 · Probability</h1>
+  <div class="split">
 
-  <!-- ── Header ─────────────────────────────────────────── -->
-  <header class="bg-gradient-to-r from-indigo-600 to-blue-500 text-white px-4 py-6 md:py-8 shadow-lg">
-    <div class="max-w-3xl mx-auto">
-      <p class="text-indigo-200 text-xs md:text-sm font-semibold tracking-wide uppercase mb-1">HKDSE Mathematics (Compulsory Part) · Paper 1</p>
-      <h1 class="text-2xl md:text-3xl font-bold">2015 · Question 16</h1>
-      <div class="flex flex-wrap gap-2 mt-3">
-        <span class="bg-white/20 backdrop-blur px-3 py-1 rounded-full text-xs md:text-sm">Probability</span>
-        <span class="bg-white/20 backdrop-blur px-3 py-1 rounded-full text-xs md:text-sm">Combinations</span>
-        <span class="bg-white/20 backdrop-blur px-3 py-1 rounded-full text-xs md:text-sm">Counting</span>
+    <!-- ================= LEFT: DIAGRAM ================= -->
+    <div class="diagram">
+      <div class="card">
+        <canvas id="cv" width="560" height="620"></canvas>
+        <div class="legend">
+          <span><i class="dot" style="background:#e0372b"></i>Red (5)</span>
+          <span><i class="dot" style="background:#f2c018"></i>Yellow (6)</span>
+          <span><i class="dot" style="background:#ffffff"></i>White (3)</span>
+        </div>
+        <p class="ro" id="ro"></p>
       </div>
     </div>
-  </header>
 
-  <main class="max-w-3xl mx-auto px-4 py-6 md:py-10 space-y-8">
-
-    <!-- ── Question card ─────────────────────────────────── -->
-    <section class="bg-white rounded-2xl shadow-md p-5 md:p-6 card">
-      <h2 class="text-lg font-bold text-indigo-700 mb-3 flex items-center gap-2">
-        <span class="bg-indigo-100 text-indigo-700 rounded-lg w-7 h-7 flex items-center justify-center text-sm font-extrabold">Q</span>
-        The Question
-      </h2>
-
-      <p class="leading-relaxed mb-4 text-slate-700">
-        A box contains <strong>5 red</strong> bowls, <strong>6 yellow</strong> bowls and <strong>3 white</strong> bowls.
-        If <strong>4 bowls</strong> are randomly drawn from the box <strong>at the same time</strong>,
-      </p>
-      <ol class="list-decimal list-inside space-y-1.5 text-slate-700 ml-1">
-        <li>find the probability that <strong>exactly 2 red</strong> bowls are drawn. <span class="text-xs text-slate-400">[2 marks]</span></li>
-        <li>find the probability that <strong>at least 2 red</strong> bowls are drawn. <span class="text-xs text-slate-400">[2 marks]</span></li>
-      </ol>
-
-      <!-- Visual box of bowls -->
-      <div class="mt-5 bg-slate-50 rounded-xl p-4">
-        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">The box · total 14 bowls</p>
-        <div class="flex flex-wrap gap-x-2 gap-y-1">
-          <span class="bowl bg-red-500" title="red"></span><span class="bowl bg-red-500"></span><span class="bowl bg-red-500"></span><span class="bowl bg-red-500"></span><span class="bowl bg-red-500"></span>
-          <span class="bowl bg-yellow-400" title="yellow"></span><span class="bowl bg-yellow-400"></span><span class="bowl bg-yellow-400"></span><span class="bowl bg-yellow-400"></span><span class="bowl bg-yellow-400"></span><span class="bowl bg-yellow-400"></span>
-          <span class="bowl bg-slate-200 border border-slate-300" title="white"></span><span class="bowl bg-slate-200 border border-slate-300"></span><span class="bowl bg-slate-200 border border-slate-300"></span>
+    <!-- ================= RIGHT: QUESTION + SOLUTION ================= -->
+    <div class="right">
+      <div class="card">
+        <div class="qbox">
+          <span class="tag">[2015 #16]</span><br>
+          A box contains 5 red bowls, 6 yellow bowls and 3 white bowls. If 4 bowls are randomly drawn from the box at the same time,<br>
+          (a) find the probability that exactly 2 red bowls are drawn. &nbsp;<b>[2 marks]</b><br>
+          (b) find the probability that at least 2 red bowls are drawn. &nbsp;<b>[2 marks]</b>
         </div>
-        <div class="flex gap-4 mt-2 text-xs text-slate-500">
-          <span class="flex items-center gap-1"><span class="bowl bg-red-500" style="width:12px;height:12px"></span> 5 red</span>
-          <span class="flex items-center gap-1"><span class="bowl bg-yellow-400" style="width:12px;height:12px"></span> 6 yellow</span>
-          <span class="flex items-center gap-1"><span class="bowl bg-slate-200 border border-slate-300" style="width:12px;height:12px"></span> 3 white</span>
+        
+
+        <h2>Total number of outcomes</h2>
+        <div class="step" data-step="0">
+          <span class="chip">Setup</span>
+          Total bowls: $5+6+3=14$. Choosing 4 from 14:
+          $\;C^{14}_4=\dfrac{14!}{4!\,10!}=1001$.<br>
+          All $1001$ outcomes are equally likely.
+          <span class="hint">Hint: “drawn at the same time” ⇒ order does not matter ⇒ use combinations $C^n_r$.</span>
         </div>
+
+        <h2>Part (a) — exactly 2 red</h2>
+        <div class="step" data-step="1">
+          <span class="chip">Step 1</span>
+          Choose the <b>red</b> bowls: 2 red from 5 &nbsp;→&nbsp; $C^{5}_{2}=10$.
+          <span class="hint">Hint: first fix the red part of the selection.</span>
+        </div>
+        <div class="step" data-step="2">
+          <span class="chip">Step 2</span>
+          The other 2 bowls must be <b>non-red</b>: there are $6+3=9$ non-red bowls, so
+          $C^{9}_{2}=36$.
+          <span class="hint">Hint: total bowls − red bowls = non-red bowls.</span>
+        </div>
+        <div class="step" data-step="3">
+          <span class="chip">Step 3</span>
+          Number of favourable outcomes $=C^{5}_{2}C^{9}_{2}=10\times36=360$.<br>
+          Required probability
+          $=\dfrac{C^{5}_{2}C^{9}_{2}}{C^{14}_{4}}=\dfrac{360}{1001}$.
+          <span class="hint">Hint: probability $=\dfrac{\text{favourable}}{\text{total}}$.</span>
+        </div>
+
+        <h2>Part (b) — at least 2 red</h2>
+        <div class="step" data-step="4">
+          <span class="chip">Step 4</span>
+          “At least 2 red” means $2,3$ or $4$ red bowls — split into cases.
+          <span class="hint">Hint: write out the cases explicitly to avoid missing one.</span>
+        </div>
+        <div class="step" data-step="5">
+          <span class="chip">Step 5</span>
+          Case 3 red + 1 non-red: $C^{5}_{3}C^{9}_{1}=10\times9=90$.<br>
+          Case 4 red: $C^{5}_{4}C^{9}_{0}=5\times1=5$.
+          <span class="hint">Hint: $C^{9}_{0}=1$ (choose none).</span>
+        </div>
+        <div class="step" data-step="6">
+          <span class="chip">Step 6</span>
+          Required probability
+          $=\dfrac{360}{1001}+\dfrac{C^{5}_{3}C^{9}_{1}}{C^{14}_{4}}+\dfrac{C^{5}_{4}}{C^{14}_{4}}
+          =\dfrac{360+90+5}{1001}=\dfrac{455}{1001}=\dfrac{5}{11}$.
+          <span class="hint">Hint: $\dfrac{455}{1001}$ reduces by $91$ to give $\dfrac{5}{11}$.</span>
+        </div>
+
+        <div class="ans">
+          <b>Answer:</b><br>
+          (a) $\dfrac{C^{5}_{2}C^{9}_{2}}{C^{14}_{4}}=\dfrac{360}{1001}\approx 0.3596$<br>
+          (b) $\dfrac{360}{1001}+\dfrac{C^{5}_{3}C^{9}_{1}}{C^{14}_{4}}+\dfrac{C^{5}_{4}}{C^{14}_{4}}=\dfrac{5}{11}\approx 0.4545$
+        </div>
+        <p class="fnote">Check: (b) can also be done as $1-P(\text{0 red})-P(\text{1 red})=1-\frac{C^{9}_4+C^{5}_1C^{9}_3}{1001}=1-\frac{126+420}{1001}=\frac{455}{1001}=\frac{5}{11}$. ✓</p>
       </div>
-    </section>
+    </div>
 
-    <!-- ── Guided solution ───────────────────────────────── -->
-    <section class="space-y-4">
-      <h2 class="text-lg font-bold text-indigo-700 flex items-center gap-2">
-        <span class="bg-indigo-100 text-indigo-700 rounded-lg w-7 h-7 flex items-center justify-center text-sm font-extrabold">S</span>
-        Guided Solution
-      </h2>
+  </div>
+</div>
 
-      <!-- Step 1 -->
-      <div class="bg-white rounded-2xl shadow-sm card overflow-hidden">
-        <button onclick="toggleStep('s1')" class="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-slate-50 transition">
-          <span class="flex items-center gap-3">
-            <span class="bg-blue-100 text-blue-700 font-bold text-sm w-7 h-7 rounded-full flex items-center justify-center shrink-0">1</span>
-            <span class="font-semibold text-slate-800">Total number of ways to draw 4 bowls</span>
-          </span>
-          <svg id="chev-s1" class="w-5 h-5 text-slate-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-        </button>
-        <div id="s1" class="step-content px-5 pb-5">
-          <p class="text-slate-600 leading-relaxed mb-2">Since we choose 4 bowls from 14 <em>at the same time</em>, the order does not matter. We use combinations.</p>
-          <div class="hint-box rounded-lg px-4 py-3 text-sm text-slate-700 mb-3">
-            💡 <strong>Hint:</strong> The total number of ways is \( C_4^{14} = \dfrac{14!}{4!(14-4)!} \).
-          </div>
-          <p class="text-slate-700 mb-1">Compute:</p>
-          <p class="text-slate-800 bg-slate-50 rounded-lg px-4 py-3 font-mono text-sm">$$ C_4^{14} = \dfrac{14 \times 13 \times 12 \times 11}{4 \times 3 \times 2 \times 1} = 1001 $$</p>
-          <p class="text-slate-600 text-sm mt-2">So there are <strong>1001</strong> equally likely outcomes in total.</p>
-        </div>
-      </div>
+<script>
+/* ============ DATA ============ */
+const RED = 5, YELLOW = 6, WHITE = 3, TOTAL = 14;
+const COMBOS = { // pre-computed C(n,r)
+  c14_4: 1001,
+  a2: 10*36,       // C5,2 * C9,2
+  b3: 10*9,        // C5,3 * C9,1
+  b4: 5*1          // C5,4 * C9,0
+};
 
-      <!-- Step 2a -->
-      <div class="bg-white rounded-2xl shadow-sm card overflow-hidden">
-        <button onclick="toggleStep('s2')" class="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-slate-50 transition">
-          <span class="flex items-center gap-3">
-            <span class="bg-blue-100 text-blue-700 font-bold text-sm w-7 h-7 rounded-full flex items-center justify-center shrink-0">2</span>
-            <span class="font-semibold text-slate-800">Part (a): exactly 2 red bowls</span>
-          </span>
-          <svg id="chev-s2" class="w-5 h-5 text-slate-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-        </button>
-        <div id="s2" class="step-content px-5 pb-5">
-          <p class="text-slate-600 leading-relaxed mb-2">We need <strong>2 red</strong> bowls and the remaining <strong>2 bowls</strong> must come from the non-red bowls (yellow + white).</p>
-          <div class="hint-box rounded-lg px-4 py-3 text-sm text-slate-700 mb-3">
-            💡 <strong>Hint (multiplication principle):</strong><br>
-            • Choose 2 red from 5 red: \( C_2^5 \)<br>
-            • Choose 2 non-red from (6 + 3) = 9 non-red: \( C_2^9 \)
-          </div>
-          <p class="text-slate-700 mb-2">Number of favourable outcomes:</p>
-          <p class="text-slate-800 bg-slate-50 rounded-lg px-4 py-3 font-mono text-sm">$$ C_2^5 \times C_2^9 = 10 \times 36 = 360 $$</p>
-          <div class="answer-box rounded-lg px-4 py-3 mt-3 text-slate-800">
-            <strong>Probability (a):</strong> \( \dfrac{360}{1001} \approx 0.3596 \)
-          </div>
-        </div>
-      </div>
+/* ============ CANVAS SETUP ============ */
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+const ro = document.getElementById('ro');
+const W = cv.width, H = cv.height;
 
-      <!-- Step 3b -->
-      <div class="bg-white rounded-2xl shadow-sm card overflow-hidden">
-        <button onclick="toggleStep('s3')" class="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-slate-50 transition">
-          <span class="flex items-center gap-3">
-            <span class="bg-blue-100 text-blue-700 font-bold text-sm w-7 h-7 rounded-full flex items-center justify-center shrink-0">3</span>
-            <span class="font-semibold text-slate-800">Part (b): at least 2 red bowls</span>
-          </span>
-          <svg id="chev-s3" class="w-5 h-5 text-slate-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-        </button>
-        <div id="s3" class="step-content px-5 pb-5">
-          <p class="text-slate-600 leading-relaxed mb-2">"At least 2 red" means <strong>2 red</strong> or <strong>3 red</strong> or <strong>4 red</strong>. These are mutually exclusive cases, so we add their probabilities.</p>
-          <div class="hint-box rounded-lg px-4 py-3 text-sm text-slate-700 mb-3">
-            💡 <strong>Hint – three cases:</strong><br>
-            • 2 red: \( C_2^5 \times C_2^9 \)<br>
-            • 3 red: \( C_3^5 \times C_1^9 \)<br>
-            • 4 red: \( C_4^5 \times C_0^9 \) &nbsp;(note \( C_0^9 = 1 \))
-          </div>
-          <p class="text-slate-700 mb-2">Number of favourable outcomes:</p>
-          <p class="text-slate-800 bg-slate-50 rounded-lg px-4 py-3 font-mono text-sm">
-            $$ C_2^5 C_2^9 + C_3^5 C_1^9 + C_4^5 C_0^9 = 360 + 90 + 5 = 455 $$
-          </p>
-          <div class="answer-box rounded-lg px-4 py-3 mt-3 text-slate-800">
-            <strong>Probability (b):</strong> \( \dfrac{455}{1001} = \dfrac{5}{11} \approx 0.4545 \)
-          </div>
-          <p class="text-slate-500 text-xs mt-2">The fraction simplifies: both numbers divide by 91 → \( \frac{455}{1001} = \frac{5}{11} \).</p>
-        </div>
-      </div>
+const C_RED='#e0372b', C_RED_L='#f08a80';
+const C_YEL='#f2c018', C_YEL_L='#f8e08a';
+const C_WHI='#ffffff';
+const C_BLUE='#2f6be0', C_BLUE_L='#cddcfa';
+const C_GREEN='#35b06a', C_GREEN_L='#b6eac9';
+const C_GREY='#77869f';
 
-      <!-- Step 4 – alternative check -->
-      <div class="bg-white rounded-2xl shadow-sm card overflow-hidden">
-        <button onclick="toggleStep('s4')" class="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-slate-50 transition">
-          <span class="flex items-center gap-3">
-            <span class="bg-emerald-100 text-emerald-700 font-bold text-sm w-7 h-7 rounded-full flex items-center justify-center shrink-0">✓</span>
-            <span class="font-semibold text-slate-800">Quick check: complement method</span>
-          </span>
-          <svg id="chev-s4" class="w-5 h-5 text-slate-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-        </button>
-        <div id="s4" class="step-content px-5 pb-5">
-          <p class="text-slate-600 leading-relaxed mb-2">Alternatively, "at least 2 red" is the complement of "0 red or 1 red".</p>
-          <p class="text-slate-800 bg-slate-50 rounded-lg px-4 py-3 font-mono text-sm">
-            $$ 1 - \dfrac{C_0^5 C_4^9 + C_1^5 C_3^9}{C_4^{14}} = 1 - \dfrac{126 + 420}{1001} = 1 - \dfrac{546}{1001} = \dfrac{455}{1001} = \dfrac{5}{11} $$
-          </p>
-          <p class="text-slate-600 text-sm mt-2">Both methods give \( \frac{5}{11} \) — always a good sign! ✅</p>
-        </div>
-      </div>
-    </section>
+function lerpColor(a,b,t){ // a,b as [r,g,b]
+  return `rgb(${Math.round(a[0]+(b[0]-a[0])*t)},${Math.round(a[1]+(b[1]-a[1])*t)},${Math.round(a[2]+(b[2]-a[2])*t)})`;
+}
+const COL = {
+  red:[224,55,43], yel:[242,192,24], whi:[235,240,248]
+};
 
-    <!-- ── Interactive Combination Explorer ─────────────── -->
-    <section class="bg-white rounded-2xl shadow-md p-5 md:p-6 card">
-      <h2 class="text-lg font-bold text-indigo-700 mb-1 flex items-center gap-2">
-        <span class="bg-indigo-100 text-indigo-700 rounded-lg w-7 h-7 flex items-center justify-center text-sm font-extrabold">📊</span>
-        Interactive: Combination Explorer
-      </h2>
-      <p class="text-sm text-slate-500 mb-4">Drag the sliders to see how \( C_r^n \) works, and watch the probabilities change.</p>
+function roundRect(x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <!-- Calculator -->
-        <div class="bg-slate-50 rounded-xl p-4">
-          <p class="text-xs font-semibold text-slate-500 uppercase mb-2">Combination calculator</p>
-          <div class="mb-3">
-            <label class="text-sm font-medium text-slate-700">n (total items): <span id="nVal" class="font-bold text-indigo-600">5</span></label>
-            <input type="range" min="2" max="10" value="5" id="nSlider" class="slider mt-1" oninput="updateCalc()">
-          </div>
-          <div class="mb-3">
-            <label class="text-sm font-medium text-slate-700">r (items chosen): <span id="rVal" class="font-bold text-indigo-600">2</span></label>
-            <input type="range" min="0" max="10" value="2" id="rSlider" class="slider mt-1" oninput="updateCalc()">
-          </div>
-          <div class="bg-white rounded-lg px-4 py-3 text-center border border-slate-200">
-            <p class="text-xs text-slate-400 mb-1">Result</p>
-            <p id="calcResult" class="text-xl font-bold text-indigo-700">C(5,2) = 10</p>
-          </div>
-        </div>
+function bowl(x,y,r,fill,stroke,label,labelColor){
+  ctx.beginPath();
+  ctx.arc(x,y,r,0,Math.PI*2);
+  ctx.fillStyle=fill; ctx.fill();
+  ctx.lineWidth=1.6; ctx.strokeStyle=stroke; ctx.stroke();
+  if(label!==undefined){
+    ctx.fillStyle=labelColor||'#17223b';
+    ctx.font='bold '+Math.round(r*1.0)+'px Segoe UI, Arial';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(label,x,y+0.5);
+  }
+}
 
-        <!-- Probability bars -->
-        <div class="bg-slate-50 rounded-xl p-4">
-          <p class="text-xs font-semibold text-slate-500 uppercase mb-3">Probability distribution (draw 4 balls)</p>
-          <div class="space-y-2">
-            <div>
-              <div class="flex justify-between text-xs text-slate-600 mb-0.5"><span>0 red</span><span id="p0">12.6%</span></div>
-              <div class="h-2 bg-slate-200 rounded-full overflow-hidden"><div class="h-full bg-slate-400 rounded-full" style="width:12.6%"></div></div>
-            </div>
-            <div>
-              <div class="flex justify-between text-xs text-slate-600 mb-0.5"><span>1 red</span><span id="p1">42.0%</span></div>
-              <div class="h-2 bg-slate-200 rounded-full overflow-hidden"><div class="h-full bg-slate-400 rounded-full" style="width:42.0%"></div></div>
-            </div>
-            <div>
-              <div class="flex justify-between text-xs font-semibold text-indigo-700 mb-0.5"><span>2 red ← part (a)</span><span id="p2">36.0%</span></div>
-              <div class="h-2 bg-slate-200 rounded-full overflow-hidden"><div class="h-full bg-indigo-500 rounded-full" style="width:36.0%"></div></div>
-            </div>
-            <div>
-              <div class="flex justify-between text-xs font-semibold text-emerald-700 mb-0.5"><span>3 red ← part (b)</span><span id="p3">9.0%</span></div>
-              <div class="h-2 bg-slate-200 rounded-full overflow-hidden"><div class="h-full bg-emerald-500 rounded-full" style="width:9.0%"></div></div>
-            </div>
-            <div>
-              <div class="flex justify-between text-xs font-semibold text-emerald-700 mb-0.5"><span>4 red ← part (b)</span><span id="p4">0.5%</span></div>
-              <div class="h-2 bg-slate-200 rounded-full overflow-hidden"><div class="h-full bg-emerald-500 rounded-full" style="width:0.5%"></div></div>
-            </div>
-          </div>
-          <p class="text-xs text-slate-500 mt-3 text-center border-t border-slate-200 pt-2">
-            Sum = <span id="sumP" class="font-semibold text-slate-700">100.1%</span> &nbsp;|&nbsp; ≥2 red = <span class="font-semibold text-emerald-700">45.5%</span>
-          </p>
-        </div>
-      </div>
-    </section>
+/* Draw the box of bowls. highlight: 0=none, 1=red group, 2=non-red group, 3=all */
+function drawBox(highlight){
+  const bx=40, by=48, bw=480, bh=250;
+  // box
+  ctx.save();
+  ctx.fillStyle='#eef4ff'; ctx.strokeStyle='#2f6be0'; ctx.lineWidth=2.5;
+  roundRect(bx,by,bw,bh,14); ctx.fill(); ctx.stroke();
+  ctx.restore();
 
-    <!-- ── Key takeaways ──────────────────────────────────── -->
-    <section class="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-2xl p-5 md:p-6 border border-indigo-100">
-      <h2 class="text-lg font-bold text-indigo-700 mb-3">📝 Key Takeaways</h2>
-      <ul class="space-y-2 text-sm text-slate-700">
-        <li class="flex gap-2"><span class="text-indigo-500 font-bold">1.</span> When drawing <em>at the same time</em> (order doesn't matter), use combinations \( C_r^n = \dfrac{n!}{r!(n-r)!} \).</li>
-        <li class="flex gap-2"><span class="text-indigo-500 font-bold">2.</span> <strong>Multiplication principle:</strong> "Choose red AND choose non-red" → multiply the combinations.</li>
-        <li class="flex gap-2"><span class="text-indigo-500 font-bold">3.</span> <strong>Addition principle:</strong> "2 red OR 3 red OR 4 red" (mutually exclusive) → add the probabilities.</li>
-        <li class="flex gap-2"><span class="text-indigo-500 font-bold">4.</span> Always check your answer with the complement: \( P(\text{≥2 red}) = 1 - P(\text{0 or 1 red}) \).</li>
-      </ul>
-    </section>
+  ctx.fillStyle='#0f2e63'; ctx.font='bold 15px Segoe UI, Arial';
+  ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+  ctx.fillText('A box of 14 bowls (choose 4)', bx+14, by-16);
 
-  </main>
+  const r=17, gap=42, startX=bx+42, y1=by+56, rowGap=52;
 
-  <footer class="text-center text-xs text-slate-400 py-8">
-    HKDSE Mathematics (Compulsory Part) · 2015 Paper 1 Question 16 · Interactive Solution
-  </footer>
+  // --- red row ---
+  ctx.save();
+  if(highlight===1){ ctx.shadowColor='rgba(224,55,43,.55)'; ctx.shadowBlur=16; }
+  for(let i=0;i<RED;i++) bowl(startX+i*gap, y1, r, C_RED, '#a52016');
+  ctx.restore();
+  ctx.fillStyle='#a52016'; ctx.font='bold 12.5px Segoe UI, Arial';
+  ctx.textAlign='left'; ctx.fillText('Red × 5', startX+RED*gap+4, y1+5);
 
-  <!-- ── JavaScript ──────────────────────────────────────── -->
-  <script>
-    /* ── Accordion ─────────────────────────────────────── */
-    function toggleStep(id) {
-      const el = document.getElementById(id);
-      const chev = document.getElementById('chev-' + id);
-      el.classList.toggle('open');
-      if (el.classList.contains('open')) {
-        chev.style.transform = 'rotate(180deg)';
-      } else {
-        chev.style.transform = 'rotate(0deg)';
-      }
+  // --- next two rows: yellow & white, with option highlight (non-red group = highlight 2) ---
+  ctx.save();
+  if(highlight===2){ ctx.shadowColor='rgba(53,176,106,.55)'; ctx.shadowBlur=16; }
+  for(let i=0;i<YELLOW;i++) bowl(startX+i*gap - gap*0.5, y1+rowGap, r, C_YEL, '#c99a00');
+  ctx.restore();
+  ctx.fillStyle='#a8860a'; ctx.font='bold 12.5px Segoe UI, Arial';
+  ctx.textAlign='left'; ctx.fillText('Yellow × 6', startX+YELLOW*gap-gap*0.5+4, y1+rowGap+5);
+
+  ctx.save();
+  if(highlight===2){ ctx.shadowColor='rgba(53,176,106,.55)'; ctx.shadowBlur=16; }
+  for(let i=0;i<WHITE;i++) bowl(startX+i*gap + gap*0.6, y1+2*rowGap, r, C_WHI, '#9aa8c0');
+  ctx.restore();
+  ctx.fillStyle='#5a6b8c'; ctx.font='bold 12.5px Segoe UI, Arial';
+  ctx.textAlign='left'; ctx.fillText('White × 3', startX+WHITE*gap+gap*0.6+4, y1+2*rowGap+5);
+
+  ctx.fillStyle='#3a4a68'; ctx.font='13px Segoe UI, Arial';
+  ctx.textAlign='right';
+  ctx.fillText('Total = 14', bx+bw-14, by+bh-14);
+}
+
+/* Draw case cards (how many red in the 4 drawn) */
+function drawCases(highlight){
+  const cards=[
+    {n:2, red:2, non:2, prob:'360/1001', hl:(highlight===3||highlight===1||highlight===2||highlight===0)},
+    {n:3, red:3, non:1, prob:'90/1001',  hl:(highlight===5||highlight===6||highlight===0)},
+    {n:4, red:4, non:0, prob:'5/1001',   hl:(highlight===5||highlight===6||highlight===0)},
+    {n:1, red:1, non:3, prob:'—',        hl:(highlight===4)}
+  ];
+  const top=330, ch=64, gapY=6;
+  ctx.fillStyle='#0f2e63'; ctx.font='bold 14px Segoe UI, Arial';
+  ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+  ctx.fillText('The 4 drawn bowls — by number of red', 40, top-10);
+
+  cards.forEach((c,i)=>{
+    const y=top+i*(ch+gapY);
+    const isHL = c.hl && highlight!==0 ? true : false;
+    ctx.save();
+    if(isHL){ ctx.shadowColor='rgba(47,107,224,.45)'; ctx.shadowBlur=12; }
+    ctx.fillStyle = isHL ? '#eaf2ff' : '#f7f9fd';
+    ctx.strokeStyle = isHL ? '#2f6be0' : '#d5dEef';
+    ctx.lineWidth = isHL ? 2.4 : 1.4;
+    roundRect(40,y,480,ch,10); ctx.fill(); ctx.stroke();
+    ctx.restore();
+
+    // label
+    ctx.fillStyle='#17223b'; ctx.font='bold 13.5px Segoe UI, Arial';
+    ctx.textAlign='left'; ctx.textBaseline='middle';
+    ctx.fillText(c.red+' red + '+(4-c.red)+' non-red', 54, y+ch/2);
+
+    // mini bowls
+    const cy=y+ch/2, r=11, startX=200;
+    for(let k=0;k<4;k++){
+      const isRed = k < c.red;
+      bowl(startX+k*28, cy, r, isRed?C_RED:C_YEL, isRed?'#a52016':'#c99a00');
     }
 
-    /* ── Combination calculator ────────────────────────── */
-    function factorial(n) {
-      if (n < 0) return 0;
-      let r = 1;
-      for (let i = 2; i <= n; i++) r *= i;
-      return r;
-    }
-    function C(n, r) {
-      if (r < 0 || r > n) return 0;
-      return factorial(n) / (factorial(r) * factorial(n - r));
-    }
+    // probability
+    ctx.textAlign='right'; ctx.fillStyle= isHL ? '#1b4fa8' : '#5a6b8c';
+    ctx.font='bold 13.5px Segoe UI, Arial';
+    ctx.fillText(c.prob, 508, cy);
+  });
+}
 
-    function updateCalc() {
-      const n = parseInt(document.getElementById('nSlider').value);
-      const r = parseInt(document.getElementById('rSlider').value);
-      document.getElementById('nVal').textContent = n;
-      document.getElementById('rVal').textContent = r;
-      if (r > n) {
-        document.getElementById('calcResult').textContent = 'C(' + n + ',' + r + ') = 0  (r > n)';
-        return;
-      }
-      const v = C(n, r);
-      document.getElementById('calcResult').textContent = 'C(' + n + ',' + r + ') = ' + (Number.isInteger(v) ? v : v.toFixed(2));
+/* Draw a "fraction bar" visual for the final probabilities */
+function drawResult(highlight){
+  const y=top=>top;
+  const base=330+3*(64+6)+22; // after cards
+  const shown = (highlight>=3);
+  ctx.save();
+  ctx.fillStyle='#0f2e63'; ctx.font='bold 14px Segoe UI, Arial';
+  ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+  ctx.fillText('Probability = favourable / total', 40, base-6);
+  ctx.restore();
+
+  const rows=[
+    {label:'(a) exactly 2 red', num:COMBOS.a2, den:COMBOS.c14_4, col:C_BLUE, colL:C_BLUE_L, val:'0.360', hl: highlight>=3},
+    {label:'(b) at least 2 red', num:COMBOS.a2+COMBOS.b3+COMBOS.b4, den:COMBOS.c14_4, col:C_GREEN, colL:C_GREEN_L, val:'0.455 = 5/11', hl: highlight>=6}
+  ];
+  rows.forEach((rw,i)=>{
+    const y0 = base+ i*72;
+    const isHL = rw.hl;
+    ctx.save();
+    if(isHL){ ctx.shadowColor='rgba(47,107,224,.45)'; ctx.shadowBlur=12; }
+    ctx.fillStyle= isHL ? '#f0f7ff' : '#f7f9fd';
+    ctx.strokeStyle= rw.col; ctx.lineWidth= isHL?2.4:1.4;
+    roundRect(40,y0,480,60,10); ctx.fill(); ctx.stroke();
+    ctx.restore();
+
+    ctx.fillStyle='#17223b'; ctx.font='bold 13px Segoe UI, Arial';
+    ctx.textAlign='left'; ctx.textBaseline='middle';
+    ctx.fillText(rw.label, 54, y0+20);
+
+    // bar
+    const t = rw.num/rw.den;
+    const barX=54, barY=y0+38, barW=300, barH=13;
+    ctx.fillStyle='#e6ecf7'; roundRect(barX,barY,barW,barH,6); ctx.fill();
+    ctx.fillStyle=rw.col; roundRect(barX,barY,Math.max(4,barW*t),barH,6); ctx.fill();
+
+    ctx.fillStyle=rw.col; ctx.font='bold 13.5px Segoe UI, Arial';
+    ctx.textAlign='right';
+    ctx.fillText(rw.num+'/'+rw.den+'  ('+rw.val+')', 508, y0+30);
+  });
+}
+
+/* ============ MAIN DRAW ============ */
+function draw(step){
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#fbfdff'; ctx.fillRect(0,0,W,H);
+
+  let highlightBox = 0;   // 0 none, 1 red group, 2 non-red group, 3 all
+  if(step===1) highlightBox=1;
+  else if(step===2) highlightBox=2;
+  else if(step>=3) highlightBox=3;
+
+  drawBox(highlightBox);
+  drawCases(step);
+  drawResult(step);
+
+  // readout
+  const msgs={
+    0:'<b>Setup:</b> 5 red + 6 yellow + 3 white = 14 bowls. Draw 4 at the same time ⇒ use combinations.',
+    1:'<b>Step 1:</b> Choose 2 red bowls from the 5 red bowls: $C^5_2=10$ (highlighted red group).',
+    2:'<b>Step 2:</b> The other 2 must come from the 9 non-red bowls: $C^9_2=36$ (green glow).',
+    3:'<b>Step 3:</b> Favourable $=10\\times36=360$; total $=C^{14}_4=1001$. So $P(2R)=\\frac{360}{1001}$.',
+    4:'<b>Step 4:</b> At least 2 red = cases of 2 red, 3 red, 4 red (yellow card marks case 1 red, which is excluded).',
+    5:'<b>Step 5:</b> 3 red: $C^5_3C^9_1=90$; 4 red: $C^5_4=5$.',
+    6:'<b>Step 6:</b> Add all cases: $\\frac{360+90+5}{1001}=\\frac{455}{1001}=\\frac{5}{11}$.'
+  };
+  ro.innerHTML = msgs[step] || msgs[0];
+  if(window.MathJax && MathJax.typesetPromise){ MathJax.typesetPromise([ro]); }
+}
+
+/* ============ SCROLL SYNC ============ */
+let current = 0;
+const io = new IntersectionObserver(es=>{
+  es.forEach(e=>{
+    if(e.isIntersecting){
+      current = +e.target.dataset.step;
+      draw(current);
     }
+  });
+},{rootMargin:'-25% 0px -55% 0px'});
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
 
-    /* ── Probability bars (fixed distribution) ─────────── */
-    const probs = [
-      { p: C(0,5) * C(4,9) / C(4,14) },
-      { p: C(1,5) * C(3,9) / C(4,14) },
-      { p: C(2,5) * C(2,9) / C(4,14) },
-      { p: C(3,5) * C(1,9) / C(4,14) },
-      { p: C(4,5) * C(0,9) / C(4,14) },
-    ];
-
-    function renderBars() {
-      const sum = probs.reduce((a, b) => a + b.p, 0);
-      const ids = ['p0', 'p1', 'p2', 'p3', 'p4'];
-      ids.forEach((id, i) => {
-        document.getElementById(id).textContent = (probs[i].p * 100).toFixed(1) + '%';
-      });
-      document.getElementById('sumP').textContent = (sum * 100).toFixed(1) + '%';
+/* active highlight on right pane */
+const io2 = new IntersectionObserver(es=>{
+  es.forEach(e=>{
+    if(e.isIntersecting){
+      document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+      e.target.classList.add('active');
     }
+  });
+},{rootMargin:'-25% 0px -55% 0px'});
+document.querySelectorAll('.step').forEach(s=>io2.observe(s));
 
-    /* ── Init ───────────────────────────────────────────── */
-    document.addEventListener('DOMContentLoaded', () => {
-      renderBars();
-      updateCalc();
-    });
-  </script>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
+/* initial */
+draw(0);
 </script>
-
 </body>
 </html>

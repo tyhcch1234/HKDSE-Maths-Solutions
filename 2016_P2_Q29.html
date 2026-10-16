@@ -1,564 +1,362 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HKDSE 2016 Paper 2 Q29 · Expected Value</title>
-  <!-- MathJax for LaTeX rendering -->
-  <script>
-    window.MathJax = {
-      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
-      svg: { fontCache: 'global' }
-    };
-  </script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    /* Smooth transitions and custom styling */
-    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #f8fafc; }
-    .step-card { transition: all 0.3s ease; }
-    .step-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
-    .step-content.open { max-height: 800px; }
-    .ball-icon { transition: transform 0.2s; }
-    .ball-icon:hover { transform: scale(1.15); }
-    .highlight-box { border-left: 4px solid #3b82f6; }
-    .option-btn.selected { background-color: #dbeafe; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.2); }
-    .progress-bar { transition: width 0.4s ease; }
-    canvas { display: block; }
-    @media (max-width: 640px) {
-      .step-title { font-size: 1rem; }
-    }
-  </style>
-</head>
-<body class="min-h-screen py-6 px-4">
-
-  <div class="max-w-5xl mx-auto">
-
-    <!-- HEADER -->
-    <header class="mb-6">
-      <div class="flex flex-wrap items-center gap-2 mb-2">
-        <span class="bg-blue-600 text-white text-xs font-semibold px-3 py-1 rounded-full">HKDSE Math 2016 Paper 2 Q29</span>
-        <span class="bg-emerald-100 text-emerald-800 text-xs font-medium px-3 py-1 rounded-full">Probability</span>
-        <span class="bg-amber-100 text-amber-800 text-xs font-medium px-3 py-1 rounded-full">Expected Value</span>
-        <span class="bg-purple-100 text-purple-800 text-xs font-medium px-3 py-1 rounded-full">Multiple Choice</span>
-      </div>
-      <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Expected Number of Tokens</h1>
-    </header>
-
-    <!-- QUESTION CARD -->
-    <section class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 md:p-6 mb-6">
-      <figure style="margin:12px 0;text-align:center;"><img src="figures/2016_P2_Q29.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure><h2 class="text-lg font-semibold text-gray-700 mb-3 flex items-center gap-2">
-        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-        Question
-      </h2>
-      <p class="text-gray-700 leading-relaxed mb-4">
-        A bag contains <strong class="text-red-600">1 red ball</strong>, <strong class="text-amber-600">3 yellow balls</strong> and <strong class="text-gray-600">6 white balls</strong>. In a lucky draw, a ball is randomly drawn from the bag and a certain number of tokens will be got according to the following table:
-      </p>
-
-      <!-- Table -->
-      <div class="overflow-x-auto mb-4">
-        <table class="min-w-full text-sm border border-gray-200 rounded-lg overflow-hidden">
-          <thead class="bg-gray-100">
-            <tr>
-              <th class="px-4 py-2 text-left font-semibold text-gray-700 border-b border-r">Colour of the ball drawn</th>
-              <th class="px-4 py-2 text-center font-semibold text-red-600 border-b border-r">Red</th>
-              <th class="px-4 py-2 text-center font-semibold text-amber-600 border-b border-r">Yellow</th>
-              <th class="px-4 py-2 text-center font-semibold text-gray-600 border-b">White</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="px-4 py-2 font-medium text-gray-700 border-r">Number of tokens got</td>
-              <td class="px-4 py-2 text-center font-bold text-red-600 border-r">90</td>
-              <td class="px-4 py-2 text-center font-bold text-amber-600 border-r">20</td>
-              <td class="px-4 py-2 text-center font-bold text-gray-600">10</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <p class="text-gray-700 font-medium mb-3">Find the expected number of tokens got in the lucky draw.</p>
-      <div class="grid grid-cols-2 gap-2 md:grid-cols-4" id="optionsContainer">
-        <div class="option-btn border-2 border-gray-200 rounded-xl p-3 text-center cursor-pointer hover:border-blue-300 transition-all" data-value="A">
-          <span class="block text-xs text-gray-500">A</span>
-          <span class="font-bold text-gray-800">10</span>
-        </div>
-        <div class="option-btn border-2 border-gray-200 rounded-xl p-3 text-center cursor-pointer hover:border-blue-300 transition-all" data-value="B">
-          <span class="block text-xs text-gray-500">B</span>
-          <span class="font-bold text-gray-800">21</span>
-        </div>
-        <div class="option-btn border-2 border-gray-200 rounded-xl p-3 text-center cursor-pointer hover:border-blue-300 transition-all" data-value="C">
-          <span class="block text-xs text-gray-500">C</span>
-          <span class="font-bold text-gray-800">40</span>
-        </div>
-        <div class="option-btn border-2 border-gray-200 rounded-xl p-3 text-center cursor-pointer hover:border-blue-300 transition-all" data-value="D">
-          <span class="block text-xs text-gray-500">D</span>
-          <span class="font-bold text-gray-800">61</span>
-        </div>
-      </div>
-      <div id="answerFeedback" class="mt-3 text-sm font-medium hidden"></div>
-    </section>
-
-    <!-- CONCEPT HINT -->
-    <section class="bg-blue-50 rounded-2xl border border-blue-100 p-4 md:p-5 mb-6">
-      <h3 class="font-semibold text-blue-800 flex items-center gap-2 mb-2">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        Key Concept: Expected Value
-      </h3>
-      <p class="text-blue-900 text-sm leading-relaxed">
-        The <strong>expected value</strong> (weighted average) is calculated by multiplying each outcome by its probability and summing the results:
-        \[ E[X] = \sum ( \text{value} \times P(\text{value}) ) \]
-        Here, the "value" is the number of tokens, and the probability comes from the proportion of balls of each colour.
-      </p>
-    </section>
-
-    <!-- STEP BY STEP SOLUTION -->
-    <section class="mb-6">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-lg font-semibold text-gray-700 flex items-center gap-2">
-          <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-          Step-by-Step Solution
-        </h2>
-        <div class="flex gap-2">
-          <button id="expandAllBtn" class="text-xs bg-white border border-gray-300 text-gray-600 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition">Expand All</button>
-          <button id="collapseAllBtn" class="text-xs bg-white border border-gray-300 text-gray-600 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition">Collapse All</button>
-        </div>
-      </div>
-
-      <!-- Progress bar -->
-      <div class="w-full bg-gray-200 rounded-full h-2 mb-4">
-        <div id="progressBar" class="bg-blue-600 h-2 rounded-full progress-bar" style="width: 0%"></div>
-      </div>
-
-      <div id="stepsContainer" class="space-y-3">
-        <!-- Step 1 -->
-        <div class="step-card bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden" data-step="1">
-          <button class="step-header w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 transition-colors">
-            <div class="flex items-center gap-3">
-              <span class="w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-sm font-bold shrink-0">1</span>
-              <span class="step-title font-semibold text-gray-800">Total number of balls in the bag</span>
-            </div>
-            <svg class="w-5 h-5 text-gray-400 transform transition-transform step-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-          </button>
-          <div class="step-content px-4 pb-4">
-            <div class="pl-11 pr-2">
-              <p class="text-gray-700 mb-2">Add up all the balls to find the denominator for the probabilities:</p>
-              <div class="bg-gray-50 rounded-lg p-3 font-mono text-sm text-gray-800">
-                Total balls = \(1 + 3 + 6 = 10\)
-              </div>
-              <div class="mt-3 flex gap-1 flex-wrap">
-                <span class="ball-icon inline-block w-6 h-6 rounded-full bg-red-500 border-2 border-white shadow" title="Red"></span>
-                <span class="ball-icon inline-block w-6 h-6 rounded-full bg-amber-400 border-2 border-white shadow" title="Yellow"></span>
-                <span class="ball-icon inline-block w-6 h-6 rounded-full bg-amber-400 border-2 border-white shadow" title="Yellow"></span>
-                <span class="ball-icon inline-block w-6 h-6 rounded-full bg-amber-400 border-2 border-white shadow" title="Yellow"></span>
-                <span class="ball-icon inline-block w-6 h-6 rounded-full bg-gray-200 border-2 border-white shadow" title="White"></span>
-                <span class="ball-icon inline-block w-6 h-6 rounded-full bg-gray-200 border-2 border-white shadow" title="White"></span>
-                <span class="ball-icon inline-block w-6 h-6 rounded-full bg-gray-200 border-2 border-white shadow" title="White"></span>
-                <span class="ball-icon inline-block w-6 h-6 rounded-full bg-gray-200 border-2 border-white shadow" title="White"></span>
-                <span class="ball-icon inline-block w-6 h-6 rounded-full bg-gray-200 border-2 border-white shadow" title="White"></span>
-                <span class="ball-icon inline-block w-6 h-6 rounded-full bg-gray-200 border-2 border-white shadow" title="White"></span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Step 2 -->
-        <div class="step-card bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden" data-step="2">
-          <button class="step-header w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 transition-colors">
-            <div class="flex items-center gap-3">
-              <span class="w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-sm font-bold shrink-0">2</span>
-              <span class="step-title font-semibold text-gray-800">Find the probability of each colour</span>
-            </div>
-            <svg class="w-5 h-5 text-gray-400 transform transition-transform step-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-          </button>
-          <div class="step-content px-4 pb-4">
-            <div class="pl-11 pr-2">
-              <p class="text-gray-700 mb-3">The probability of drawing a colour is the number of that colour divided by the total (10).</p>
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div class="bg-red-50 rounded-lg p-3 text-center border border-red-100">
-                  <span class="block text-xs font-semibold text-red-600 uppercase tracking-wide mb-1">Red</span>
-                  <span class="text-lg font-bold text-red-700">\( \frac{1}{10} \)</span>
-                </div>
-                <div class="bg-amber-50 rounded-lg p-3 text-center border border-amber-100">
-                  <span class="block text-xs font-semibold text-amber-600 uppercase tracking-wide mb-1">Yellow</span>
-                  <span class="text-lg font-bold text-amber-700">\( \frac{3}{10} \)</span>
-                </div>
-                <div class="bg-gray-50 rounded-lg p-3 text-center border border-gray-200">
-                  <span class="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1">White</span>
-                  <span class="text-lg font-bold text-gray-700">\( \frac{6}{10} \)</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Step 3 -->
-        <div class="step-card bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden" data-step="3">
-          <button class="step-header w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 transition-colors">
-            <div class="flex items-center gap-3">
-              <span class="w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-sm font-bold shrink-0">3</span>
-              <span class="step-title font-semibold text-gray-800">Apply the expected value formula</span>
-            </div>
-            <svg class="w-5 h-5 text-gray-400 transform transition-transform step-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-          </button>
-          <div class="step-content px-4 pb-4">
-            <div class="pl-11 pr-2">
-              <p class="text-gray-700 mb-2">Multiply each token value by its probability, then add them up:</p>
-              <div class="bg-gray-50 rounded-lg p-3 overflow-x-auto">
-                <p class="font-mono text-sm md:text-base text-gray-800 whitespace-nowrap">
-                  \( E = 90 \times P(\text{Red}) + 20 \times P(\text{Yellow}) + 10 \times P(\text{White}) \)
-                </p>
-              </div>
-              <div class="mt-2 text-xs text-gray-500 bg-yellow-50 border border-yellow-200 rounded-lg p-2">
-                <strong>Hint:</strong> \(P(\text{Red}) = \frac{1}{10}\), \(P(\text{Yellow}) = \frac{3}{10}\), \(P(\text{White}) = \frac{6}{10}\).
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Step 4 -->
-        <div class="step-card bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden" data-step="4">
-          <button class="step-header w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 transition-colors">
-            <div class="flex items-center gap-3">
-              <span class="w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-sm font-bold shrink-0">4</span>
-              <span class="step-title font-semibold text-gray-800">Substitute and compute</span>
-            </div>
-            <svg class="w-5 h-5 text-gray-400 transform transition-transform step-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-          </button>
-          <div class="step-content px-4 pb-4">
-            <div class="pl-11 pr-2">
-              <div class="bg-gray-50 rounded-lg p-3 overflow-x-auto space-y-1">
-                <p class="font-mono text-sm md:text-base text-gray-800">
-                  \( E = 90 \times \frac{1}{10} + 20 \times \frac{3}{10} + 10 \times \frac{6}{10} \)
-                </p>
-                <p class="font-mono text-sm md:text-base text-gray-800">
-                  \( E = 9 + 6 + 6 \)
-                </p>
-                <p class="font-mono text-base md:text-lg font-bold text-blue-700">
-                  \( E = 21 \)
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Step 5: Final answer -->
-        <div class="step-card bg-green-50 rounded-xl shadow-sm border border-green-200 overflow-hidden" data-step="5">
-          <button class="step-header w-full flex items-center justify-between p-4 text-left hover:bg-green-100 transition-colors">
-            <div class="flex items-center gap-3">
-              <span class="w-8 h-8 rounded-full bg-green-200 text-green-800 flex items-center justify-center text-sm font-bold shrink-0"></span>
-              <span class="step-title font-semibold text-green-900">Conclusion</span>
-            </div>
-            <svg class="w-5 h-5 text-green-500 transform transition-transform step-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-          </button>
-          <div class="step-content px-4 pb-4">
-            <div class="pl-11 pr-2">
-              <p class="text-green-900 font-medium mb-2">The expected number of tokens is <strong class="text-2xl">21</strong>.</p>
-              <p class="text-green-800 text-sm">Therefore, the correct option is <strong>B</strong>.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- INTERACTIVE SIMULATOR -->
-    <section class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 md:p-6 mb-6">
-      <h2 class="text-lg font-semibold text-gray-700 mb-3 flex items-center gap-2">
-        <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        Interactive: Simulate the Lucky Draw
-      </h2>
-      <p class="text-gray-600 text-sm mb-4">Click "Draw a ball" to simulate one draw. The running average will approach the expected value (21) as you draw more times.</p>
-
-      <div class="flex flex-col md:flex-row gap-4 items-center mb-4">
-        <button id="drawBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl shadow transition flex items-center gap-2">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-          Draw a ball
-        </button>
-        <button id="resetSimBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-3 rounded-xl shadow transition">Reset</button>
-        <div class="flex items-center gap-2 text-sm text-gray-600">
-          <span>Draws:</span>
-          <span id="drawCount" class="font-bold text-gray-800">0</span>
-          <span class="text-gray-300">|</span>
-          <span>Avg tokens:</span>
-          <span id="avgTokens" class="font-bold text-blue-600">—</span>
-        </div>
-      </div>
-
-      <!-- Visual feedback of last draw -->
-      <div class="flex items-center gap-3 mb-4 min-h-[40px]">
-        <div id="lastBall" class="w-10 h-10 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400 text-xs">?</div>
-        <div id="lastResult" class="text-sm text-gray-600">Draw a ball to see the result.</div>
-      </div>
-
-      <!-- Chart -->
-      <div class="bg-gray-50 rounded-xl p-3">
-        <canvas id="simChart" width="600" height="600" class="w-full h-auto max-h-[180px]"></canvas>
-      </div>
-    </section>
-
-    <!-- FOOTER -->
-    <footer class="text-center text-xs text-gray-400 py-4">
-      HKDSE Math 2016 Paper 2 Q29 · Interactive Solution
-    </footer>
-
-  </div>
-
-  <!-- JAVASCRIPT -->
-  <script>
-    (function() {
-      // ---------- Accordion Logic ----------
-      const stepHeaders = document.querySelectorAll('.step-header');
-      const stepContents = document.querySelectorAll('.step-content');
-      const progressBar = document.getElementById('progressBar');
-      const totalSteps = stepContents.length;
-      const expandAllBtn = document.getElementById('expandAllBtn');
-      const collapseAllBtn = document.getElementById('collapseAllBtn');
-
-      function updateProgress() {
-        const openCount = document.querySelectorAll('.step-content.open').length;
-        progressBar.style.width = ((openCount / totalSteps) * 100) + '%';
-      }
-
-      stepHeaders.forEach((header) => {
-        header.addEventListener('click', () => {
-          const content = header.nextElementSibling;
-          const arrow = header.querySelector('.step-arrow');
-          content.classList.toggle('open');
-          if (content.classList.contains('open')) {
-            arrow.style.transform = 'rotate(180deg)';
-          } else {
-            arrow.style.transform = 'rotate(0deg)';
-          }
-          updateProgress();
-        });
-      });
-
-      expandAllBtn.addEventListener('click', () => {
-        stepContents.forEach((content, index) => {
-          content.classList.add('open');
-          const arrow = stepHeaders[index].querySelector('.step-arrow');
-          if (arrow) arrow.style.transform = 'rotate(180deg)';
-        });
-        updateProgress();
-      });
-
-      collapseAllBtn.addEventListener('click', () => {
-        stepContents.forEach((content, index) => {
-          content.classList.remove('open');
-          const arrow = stepHeaders[index].querySelector('.step-arrow');
-          if (arrow) arrow.style.transform = 'rotate(0deg)';
-        });
-        updateProgress();
-      });
-
-      // Open first step by default
-      if (stepContents.length > 0) {
-        stepContents[0].classList.add('open');
-        const firstArrow = stepHeaders[0].querySelector('.step-arrow');
-        if (firstArrow) firstArrow.style.transform = 'rotate(180deg)';
-      }
-      updateProgress();
-
-      // ---------- Option Selection ----------
-      const optionBtns = document.querySelectorAll('.option-btn');
-      const feedbackDiv = document.getElementById('answerFeedback');
-      optionBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-          optionBtns.forEach(b => b.classList.remove('selected', 'border-blue-500'));
-          btn.classList.add('selected', 'border-blue-500');
-          const value = btn.dataset.value;
-          if (value === 'B') {
-            feedbackDiv.textContent = '✅ Correct! 21 is the expected number of tokens.';
-            feedbackDiv.className = 'mt-3 text-sm font-medium text-green-700 bg-green-50 p-2 rounded-lg block';
-          } else {
-            feedbackDiv.textContent = '❌ Not quite. Try again or follow the steps below.';
-            feedbackDiv.className = 'mt-3 text-sm font-medium text-red-700 bg-red-50 p-2 rounded-lg block';
-          }
-        });
-      });
-
-      // ---------- Simulation ----------
-      const drawBtn = document.getElementById('drawBtn');
-      const resetSimBtn = document.getElementById('resetSimBtn');
-      const drawCountSpan = document.getElementById('drawCount');
-      const avgTokensSpan = document.getElementById('avgTokens');
-      const lastBallDiv = document.getElementById('lastBall');
-      const lastResultDiv = document.getElementById('lastResult');
-
-      let totalDraws = 0;
-      let totalTokens = 0;
-      let history = []; // array of token values
-      const maxHistory = 50; // for chart display
-
-      const canvas = document.getElementById('simChart');
-      const ctx = canvas.getContext('2d');
-
-      function drawChart() {
-        if (!canvas) return;
-        const w = canvas.width;
-        const h = canvas.height;
-        ctx.clearRect(0, 0, w, h);
-
-        // Background
-        ctx.fillStyle = '#f8fafc';
-        ctx.fillRect(0, 0, w, h);
-
-        // Grid lines
-        ctx.strokeStyle = '#e2e8f0';
-        ctx.lineWidth = 1;
-        for (let i = 0; i <= 4; i++) {
-          const y = (h / 4) * i;
-          ctx.beginPath();
-          ctx.moveTo(0, y);
-          ctx.lineTo(w, y);
-          ctx.stroke();
-        }
-
-        // Expected value line at 21 (y-scale: 0 to 100 tokens)
-        const maxVal = 100;
-        const expectedY = h - (21 / maxVal) * h;
-        ctx.strokeStyle = '#ef4444';
-        ctx.lineWidth = 2;
-        ctx.setLineDash([6, 4]);
-        ctx.beginPath();
-        ctx.moveTo(0, expectedY);
-        ctx.lineTo(w, expectedY);
-        ctx.stroke();
-        ctx.setLineDash([]);
-        ctx.fillStyle = '#ef4444';
-        ctx.font = 'bold 11px Inter, sans-serif';
-        ctx.fillText('Expected: 21', 8, expectedY - 5);
-
-        // Draw running average
-        if (history.length > 0) {
-          const points = history.slice(-maxHistory);
-          const stepX = w / Math.max(maxHistory - 1, 1);
-          ctx.strokeStyle = '#2563eb';
-          ctx.lineWidth = 2;
-          ctx.beginPath();
-          points.forEach((val, i) => {
-            const x = i * stepX;
-            const y = h - (val / maxVal) * h;
-            if (i === 0) ctx.moveTo(x, y);
-            else ctx.lineTo(x, y);
-          });
-          ctx.stroke();
-
-          // Latest point
-          const lastX = (points.length - 1) * stepX;
-          const lastY = h - (points[points.length - 1] / maxVal) * h;
-          ctx.fillStyle = '#2563eb';
-          ctx.beginPath();
-          ctx.arc(lastX, lastY, 4, 0, Math.PI * 2);
-          ctx.fill();
-        }
-
-        // Axis labels
-        ctx.fillStyle = '#94a3b8';
-        ctx.font = '10px Inter, sans-serif';
-        ctx.fillText('100', 4, 12);
-        ctx.fillText('0', 4, h - 4);
-      }
-
-      function updateSimDisplay() {
-        drawCountSpan.textContent = totalDraws;
-        if (totalDraws > 0) {
-          const avg = totalTokens / totalDraws;
-          avgTokensSpan.textContent = avg.toFixed(2);
-          // push running average to history
-          history.push(avg);
-          if (history.length > 500) history.shift();
-        } else {
-          avgTokensSpan.textContent = '—';
-          history = [];
-        }
-        drawChart();
-      }
-
-      drawBtn.addEventListener('click', () => {
-        // Random draw: 1 red (90), 3 yellow (20), 6 white (10)
-        const r = Math.random();
-        let ballColour, tokens, colourClass, textColour;
-        if (r < 0.1) {
-          ballColour = 'Red';
-          tokens = 90;
-          colourClass = 'bg-red-500';
-          textColour = 'text-red-600';
-        } else if (r < 0.4) {
-          ballColour = 'Yellow';
-          tokens = 20;
-          colourClass = 'bg-amber-400';
-          textColour = 'text-amber-600';
-        } else {
-          ballColour = 'White';
-          tokens = 10;
-          colourClass = 'bg-gray-200';
-          textColour = 'text-gray-600';
-        }
-
-        totalDraws++;
-        totalTokens += tokens;
-
-        // Update visual ball
-        lastBallDiv.className = 'w-10 h-10 rounded-full border-2 border-white shadow flex items-center justify-center text-white text-xs font-bold ' + colourClass;
-        lastBallDiv.textContent = ballColour[0];
-        lastResultDiv.innerHTML = 'Drew <span class="font-bold ' + textColour + '">' + ballColour + '</span> → ' + tokens + ' tokens';
-
-        updateSimDisplay();
-      });
-
-      resetSimBtn.addEventListener('click', () => {
-        totalDraws = 0;
-        totalTokens = 0;
-        history = [];
-        lastBallDiv.className = 'w-10 h-10 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400 text-xs';
-        lastBallDiv.textContent = '?';
-        lastResultDiv.textContent = 'Draw a ball to see the result.';
-        updateSimDisplay();
-      });
-
-      // Initial chart
-      drawChart();
-
-      // Re-draw chart on resize for responsiveness
-      window.addEventListener('resize', () => {
-        drawChart();
-      });
-
-    })();
-  </script>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2016 P2 Q29 — Expected Tokens</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$','$$'], ['\\[','\\]']] },
+  svg: { fontCache: 'global' }
+};
 </script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+       background:#f4f7fb;color:#1f2937;font-size:16px;line-height:1.55;}
+  .wrap{max-width:1180px;margin:0 auto;padding:16px 14px 60px;}
+  h1{font-size:1.15rem;margin:0 0 4px;color:#0f172a;}
+  .sub{font-size:.8rem;color:#64748b;margin-bottom:12px;letter-spacing:.03em;text-transform:uppercase;}
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start;}
+  @media(min-width:900px){.split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}}
+  .diagram{position:sticky;top:16px;max-height:calc(100vh - 2rem);overflow-y:auto;}
+  @media(max-width:640px){body{font-size:14.5px;}.wrap{padding:10px 8px 40px;}}
 
+  .card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:14px 16px;
+        box-shadow:0 2px 10px rgba(15,23,42,.05);}
+  .diagram .card{padding:12px;}
+  canvas{width:100%;height:auto;display:block;border-radius:10px;background:#ffffff;}
+  .ro{font-size:.86rem;color:#334155;margin:10px 2px 0;min-height:2.6em;}
+  .ro b{color:#0f172a;}
+
+  .qtag{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.06em;
+        background:#e0e7ff;color:#3730a3;padding:3px 9px;border-radius:999px;margin-bottom:8px;}
+  .qtext{font-size:.98rem;}
+  .qtext p{margin:.45em 0;}
+
+  .step{border-left:4px solid #cbd5e1;background:#fbfdff;border-radius:0 10px 10px 0;
+        padding:10px 12px 10px 14px;margin:12px 0;transition:background .25s,border-color .25s,transform .2s;}
+  .step h3{margin:0 0 6px;font-size:.9rem;display:flex;align-items:center;gap:8px;color:#0f172a;}
+  .chip{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;
+        border-radius:50%;font-size:.75rem;font-weight:700;color:#fff;background:#64748b;flex:0 0 auto;}
+  .step p{margin:.35em 0;}
+  .hint{font-size:.82rem;color:#64748b;font-style:italic;}
+  .step.active{background:#eff6ff;border-left-color:#2563eb;transform:translateX(2px);}
+  .step.active .chip{background:#2563eb;}
+  .step[data-step="1"].active{border-left-color:#ef4444;} .step[data-step="1"].active .chip{background:#ef4444;}
+  .step[data-step="2"].active{border-left-color:#f59e0b;} .step[data-step="2"].active .chip{background:#f59e0b;}
+  .step[data-step="3"].active{border-left-color:#10b981;} .step[data-step="3"].active .chip{background:#10b981;}
+  .step[data-step="4"].active{border-left-color:#8b5cf6;} .step[data-step="4"].active .chip{background:#8b5cf6;}
+
+  table.dt{border-collapse:collapse;margin:8px 0;font-size:.86rem;width:100%;max-width:340px;}
+  table.dt th,table.dt td{border:1px solid #cbd5e1;padding:5px 8px;text-align:center;}
+  table.dt th{background:#f1f5f9;font-weight:600;}
+  table.dt th.rd{background:#fee2e2;color:#991b1b;}
+  table.dt th.yl{background:#fef3c7;color:#92400e;}
+  table.dt th.wh{background:#e2e8f0;color:#334155;}
+
+  .ans{margin-top:14px;background:#ecfdf5;border:1px solid #6ee7b7;border-radius:12px;
+       padding:12px 14px;font-weight:700;color:#065f46;font-size:1.02rem;}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;font-size:.78rem;color:#475569;margin-top:8px;}
+  .legend span{display:flex;align-items:center;gap:5px;}
+  .swatch{width:12px;height:12px;border-radius:3px;display:inline-block;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>HKDSE Mathematics 2016 · Paper 2 · Q29</h1>
+  <div class="sub">Topic 14 · Probability · Expected Value</div>
+
+  <div class="split">
+    <!-- ================= LEFT: DIAGRAM ================= -->
+    <div class="diagram">
+      <div class="card">
+        <canvas id="cv" width="900" height="1180"></canvas>
+        <p class="ro" id="ro">Step 1 — The bag has 1 red, 3 yellow and 6 white balls (10 balls in total).</p>
+        <div class="legend">
+          <span><i class="swatch" style="background:#dc2626"></i>Red ×1 → 90 tokens</span>
+          <span><i class="swatch" style="background:#f59e0b"></i>Yellow ×3 → 20 tokens</span>
+          <span><i class="swatch" style="background:#94a3b8"></i>White ×6 → 10 tokens</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= RIGHT: QUESTION + SOLUTION ================= -->
+    <div class="pane">
+      <div class="card">
+        <span class="qtag">[2016MC#29]</span>
+        <div class="qtext">
+          <p>A bag contains 1 red ball, 3 yellow balls and 6 white balls. In a lucky draw, a ball is
+             randomly drawn from the bag and a certain number of tokens will be got according to the
+             following table:</p>
+          <table class="dt">
+            <tr><th>Colour of the ball drawn</th><th class="rd">Red</th><th class="yl">Yellow</th><th class="wh">White</th></tr>
+            <tr><td>Number of tokens got</td><td>90</td><td>20</td><td>10</td></tr>
+          </table>
+          <p>Find the expected number of tokens got in the lucky draw.</p>
+          <p>A. 10 &nbsp;&nbsp; B. 21 &nbsp;&nbsp; C. 40 &nbsp;&nbsp; D. 61</p>
+        </div>
+      </div>
+
+      <figure style="margin:12px 0;text-align:center;"><img src="figures/2016_P2_Q29.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
+
+      <div class="step" data-step="1">
+        <h3><span class="chip">1</span>Count the balls — find each probability</h3>
+        <p>Total number of balls $= 1 + 3 + 6 = 10$.</p>
+        <p>$$P(\text{red})=\frac{1}{10},\quad P(\text{yellow})=\frac{3}{10},\quad P(\text{white})=\frac{6}{10}$$</p>
+        <p class="hint">Hint: the denominator is always the TOTAL number of balls, not just one colour.</p>
+      </div>
+
+      <div class="step" data-step="2">
+        <h3><span class="chip">2</span>Pair each outcome with its tokens</h3>
+        <p>Red → 90 tokens, Yellow → 20 tokens, White → 10 tokens.</p>
+        <p class="hint">Hint: this table gives the "value" $x$ for each outcome of the random variable.</p>
+      </div>
+
+      <div class="step" data-step="3">
+        <h3><span class="chip">3</span>Apply the expected-value formula</h3>
+        <p>$$E(X)=\sum x\cdot P(x)$$</p>
+        <p>$$E(X)=90\times\frac{1}{10}+20\times\frac{3}{10}+10\times\frac{6}{10}$$</p>
+        <p class="hint">Hint: multiply each token value by its own probability, then add the three products.</p>
+      </div>
+
+      <div class="step" data-step="4">
+        <h3><span class="chip">4</span>Evaluate</h3>
+        <p>$$E(X)=9+6+6=21$$</p>
+        <p class="hint">Hint: a quick sanity check — the answer must lie between 10 and 90.</p>
+      </div>
+
+      <div class="ans">Answer: B &nbsp;(21 tokens)</div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  const ro = document.getElementById('ro');
+
+  // ---------- colours ----------
+  const RED='#dc2626', YEL='#f59e0b', WHT='#94a3b8', INK='#0f172a', MUT='#64748b',
+        BLUE='#2563eb', GREEN='#10b981', PURP='#8b5cf6';
+
+  function rr(x,y,w,h,r){
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);
+    ctx.arcTo(x+w,y,x+w,y+h,r);
+    ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r);
+    ctx.arcTo(x,y,x+w,y,r);
+    ctx.closePath();
+  }
+  function roundRect(x,y,w,h,r,fill,stroke,lw){
+    rr(x,y,w,h,r);
+    if(fill){ctx.fillStyle=fill;ctx.fill();}
+    if(stroke){ctx.lineWidth=lw||1.5;ctx.strokeStyle=stroke;ctx.stroke();}
+  }
+  function arrow(x1,y1,x2,y2,col,lw){
+    ctx.strokeStyle=col;ctx.lineWidth=lw||2.5;
+    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+    const a=Math.atan2(y2-y1,x2-x1),s=10;
+    ctx.fillStyle=col;
+    ctx.beginPath();
+    ctx.moveTo(x2,y2);
+    ctx.lineTo(x2-s*Math.cos(a-0.4),y2-s*Math.sin(a-0.4));
+    ctx.lineTo(x2-s*Math.cos(a+0.4),y2-s*Math.sin(a+0.4));
+    ctx.closePath();ctx.fill();
+  }
+  function title(txt,col){
+    ctx.fillStyle=col||INK;
+    ctx.font='bold 26px -apple-system,Segoe UI,Roboto,Arial,sans-serif';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(txt,450,42);
+  }
+  function ball(x,y,r,col,label){
+    ctx.beginPath();ctx.arc(x,y,r,0,2*Math.PI);
+    ctx.fillStyle=col;ctx.fill();
+    ctx.lineWidth=3;ctx.strokeStyle='#ffffff';ctx.stroke();
+    ctx.beginPath();ctx.arc(x-r*0.32,y-r*0.34,r*0.26,0,2*Math.PI);
+    ctx.fillStyle='rgba(255,255,255,0.55)';ctx.fill();
+  }
+  function label(txt,x,y,col,size,align,weight){
+    ctx.fillStyle=col;ctx.font=(weight||'bold')+' '+(size||18)+'px -apple-system,Segoe UI,Roboto,Arial,sans-serif';
+    ctx.textAlign=align||'center';ctx.textBaseline='middle';
+    ctx.fillText(txt,x,y);
+  }
+
+  // ---------- BAG (steps 1-4 all show the bag, with focus shifting) ----------
+  function drawBag(highlight){
+    // bag outline
+    const bx=120, by=90, bw=250, bh=250;
+    ctx.save();
+    roundRect(bx,by,bw,bh,22,'#f8fafc',highlight?'#2563eb':'#cbd5e1',3);
+    // bag "opening" flaps
+    ctx.beginPath();
+    ctx.moveTo(bx+30,by); ctx.quadraticCurveTo(bx+bw/2,by-38,bx+bw-30,by);
+    ctx.strokeStyle='#94a3b8';ctx.lineWidth=3;ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(bx+30,by); ctx.quadraticCurveTo(bx+bw/2,by+22,bx+bw-30,by);
+    ctx.strokeStyle='#cbd5e1';ctx.lineWidth=2;ctx.stroke();
+
+    // one red
+    ball(bx+70,by+70,20,RED);
+    // three yellow
+    ball(bx+140,by+62,20,YEL);
+    ball(bx+190,by+100,20,YEL);
+    ball(bx+95,by+135,20,YEL);
+    // six white
+    ball(bx+170,by+160,20,WHT);
+    ball(bx+110,by+200,20,WHT);
+    ball(bx+195,by+210,20,WHT);
+    ball(bx+65,by+205,18,WHT);
+    ball(bx+230,by+165,18,WHT);
+    ball(bx+150,by+225,17,WHT);
+    ctx.restore();
+
+    label('Bag: 10 balls',bx+bw/2,by+bh+34,highlight?BLUE:MUT,17);
+
+    // counts callout
+    const cx=395;
+    roundRect(cx,110,420,150,16,'#ffffff','#e2e8f0',2);
+    ctx.beginPath();
+    ctx.arc(cx,185,7,0,2*Math.PI);ctx.fillStyle=RED;ctx.fill();
+    label('Red  × 1',cx+22,185,INK,19,'left','600');
+    ctx.beginPath();ctx.arc(cx,220,7,0,2*Math.PI);ctx.fillStyle=YEL;ctx.fill();
+    label('Yellow × 3',cx+22,220,INK,19,'left','600');
+    ctx.beginPath();ctx.arc(cx,255,7,0,2*Math.PI);ctx.fillStyle=WHT;ctx.fill();
+    label('White × 6',cx+22,255,INK,19,'left','600');
+    label('Total = 10',cx+400,185,MUT,17,'right','700');
+  }
+
+  // ---------- TREE (probability stage) ----------
+  function drawTree(){
+    const cx0=140, cy0=420;
+    const x1=430, x2=790;
+    const rows=[
+      {y:cy0-80, col:RED,  name:'Red',    p:'1/10', tok:'90'},
+      {y:cy0+20, col:YEL,  name:'Yellow', p:'3/10', tok:'20'},
+      {y:cy0+120,col:WHT,  name:'White',  p:'6/10', tok:'10'}
+    ];
+    label('Draw',cx0-10,cy0+20,MUT,17,'center','700');
+
+    rows.forEach(function(r,i){
+      const my=(cy0+20+r.y)/2;
+      ctx.strokeStyle=r.col;ctx.lineWidth=3;
+      ctx.beginPath();
+      ctx.moveTo(cx0+30,cy0+20);
+      ctx.bezierCurveTo(cx0+180,cy0+20, x1-120,r.y, x1-14,r.y);
+      ctx.stroke();
+
+      // probability label
+      label(r.p, (cx0+30+x1-14)/2, my-16, r.col, 20,'center','700');
+
+      // outcome node
+      ctx.beginPath();ctx.arc(x1,r.y,14,0,2*Math.PI);ctx.fillStyle=r.col;ctx.fill();
+      ctx.lineWidth=3;ctx.strokeStyle='#fff';ctx.stroke();
+      label(r.name, x1+30, r.y, INK, 19,'left','700');
+
+      // arrow to token value
+      arrow(x1+150, r.y, x2-120, r.y, r.col, 2.5);
+      roundRect(x2-105, r.y-24, 150, 48, 10, r.col+'22', r.col, 2);
+      label(r.tok+' tokens', x2-30, r.y, r.col, 20,'center','700');
+    });
+  }
+
+  // ---------- FORMULA / COMPUTATION ----------
+  function formulaBox(show){
+    const x=110, y=690, w=680, h=150;
+    roundRect(x,y,w,h,16, show? '#eff6ff':'#ffffff', show? BLUE:'#e2e8f0', 2);
+    label('E(X) = Σ x · P(x)', x+w/2, y+40, show?BLUE:INK, 26);
+    label('= 90 × 1/10  +  20 × 3/10  +  10 × 6/10',
+          x+w/2, y+95, INK, 22,'center','600');
+    if(show){
+      label('= 9 + 6 + 6  = 21', x+w/2, y+130, GREEN, 22,'center','700');
+    }
+  }
+
+  // ---------- BAR CHART: x·P(x) contributions ----------
+  function drawBars(active){
+    const baseY=1120, zeroY=1120;
+    const bars=[
+      {v:9,  col:RED,  lab:'90·(1/10) = 9'},
+      {v:6,  col:YEL,  lab:'20·(3/10) = 6'},
+      {v:6,  col:WHT,  lab:'10·(6/10) = 6'}
+    ];
+    const x0=180, bw=110, gap=90, scale=11; // 9 -> 99px
+    label('Contributions to the expectation', 450, 900, INK, 20,'center','700');
+
+    // axis
+    ctx.strokeStyle='#cbd5e1';ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(120,zeroY);ctx.lineTo(800,zeroY);ctx.stroke();
+
+    bars.forEach(function(b,i){
+      const bx=x0+i*(bw+gap);
+      const h=b.v*scale;
+      const hot = active && active===(i+1);
+      roundRect(bx, zeroY-h, bw, h, 8, b.col, hot?INK:'#ffffff', hot?3:1.5);
+      label(''+b.v, bx+bw/2, zeroY-h-22, b.col, 22);
+      label(b.lab, bx+bw/2, zeroY+28, hot?INK:MUT, 15,'center','600');
+    });
+
+    // total line
+    ctx.setLineDash([7,6]);
+    ctx.strokeStyle=PURP;ctx.lineWidth=2.5;
+    ctx.beginPath();ctx.moveTo(120, zeroY-21*scale/3);ctx.lineTo(800, zeroY-21*scale/3);ctx.stroke();
+    ctx.setLineDash([]);
+    label('sum = 21', 760, zeroY-21*scale/3-18, PURP, 18,'right','700');
+  }
+
+  // ---------- MAIN DRAW ----------
+  let current = 1;
+  function draw(step){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    ctx.fillStyle='#ffffff';ctx.fillRect(0,0,cv.width,cv.height);
+
+    if(step===1){
+      title('Step 1 — The bag of 10 balls', INK);
+      drawBag(true);
+      formulaBox(false);
+      ro.innerHTML='<b>Step 1:</b> 1 red + 3 yellow + 6 white = <b>10 balls</b>. '+
+                   'So P(red)=1/10, P(yellow)=3/10, P(white)=6/10.';
+    } else if(step===2){
+      title('Step 2 — Match each colour with its tokens', INK);
+      drawBag(false);
+      drawTree();
+      ro.innerHTML='<b>Step 2:</b> Tree diagram — each colour branches to its token value: '+
+                   'Red→90, Yellow→20, White→10.';
+    } else if(step===3){
+      title('Step 3 — Expected value formula', BLUE);
+      drawTree();
+      formulaBox(true);
+      ro.innerHTML='<b>Step 3:</b> E(X)=Σ x·P(x) = 90(1/10)+20(3/10)+10(6/10) = 9+6+6.';
+    } else {
+      title('Step 4 — Total = 21 tokens', GREEN);
+      formulaBox(true);
+      drawBars(0);
+      ro.innerHTML='<b>Step 4:</b> 9 + 6 + 6 = <b>21</b> tokens. Answer: <b>B</b>.';
+    }
+  }
+
+  // ---------- SCROLL SYNC ----------
+  const io = new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(e.isIntersecting){
+        current = +e.target.dataset.step;
+        document.querySelectorAll('.step').forEach(function(s){
+          s.classList.toggle('active', +s.dataset.step === current);
+        });
+        draw(current);
+      }
+    });
+  },{rootMargin:'-25% 0px -55% 0px', threshold:0.01});
+
+  document.querySelectorAll('.step').forEach(function(s){ io.observe(s); });
+
+  document.querySelector('.step[data-step="1"]').classList.add('active');
+  draw(1);
+})();
+</script>
 </body>
 </html>

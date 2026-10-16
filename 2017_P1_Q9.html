@@ -3,439 +3,316 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>2017 Paper 1 Q09 — Estimation, Approximation and Error</title>
-<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<title>HKDSE 2017 P1 Q9 — Estimation & Error</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$'], ['\\(','\\)']], displayMath: [['$$','$$'], ['\\[','\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
-/* ==========================================================================
-   HKDSE Mathematics (Compulsory Part) — Unified Design System
-   Canonical source of truth. This exact block is inlined into every
-   question page, index.html and DSE_Maths_By_Topic.html so that all
-   deliverables share one visual identity.
-   ========================================================================== */
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,sans-serif;background:#f4f7fb;color:#1e2a38;line-height:1.55;}
+  .wrap{max-width:1280px;margin:0 auto;padding:18px 16px 60px;}
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start;}
+  @media(min-width:900px){.split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}}
+  @media(max-width:640px){body{font-size:14.5px;}.wrap{padding:10px 8px 40px;}}
 
-:root {
-  /* Palette */
-  --slate-900: #1e293b;   /* Primary / header surface */
-  --slate-800: #334155;
-  --slate-600: #475569;
-  --slate-400: #94a3b8;
-  --slate-200: #e2e8f0;
-  --slate-100: #f1f5f9;
-  --slate-50:  #f8fafc;
-  --indigo:    #3b82f6;   /* Primary accent */
-  --indigo-600:#2563eb;
-  --amber-bg:  #fef3c7;   /* Hints / concepts */
-  --amber-bd:  #f59e0b;
-  --emerald-bg:#d1fae5;   /* Final answers */
-  --emerald-bd:#10b981;
-  --badge-bg:  #dbeafe;   /* Badges / marks */
-  --badge-fg:  #1e40af;
+  .diagram{position:sticky;top:16px;max-height:calc(100vh - 2rem);overflow-y:auto;
+    background:#fff;border-radius:14px;box-shadow:0 4px 18px rgba(30,50,80,.10);
+    padding:12px 12px 8px;border:1px solid #e2e9f3;}
+  .diagram h3{margin:2px 0 8px;font-size:15px;color:#26446b;letter-spacing:.4px;}
+  canvas{width:100%;height:auto;display:block;border-radius:10px;background:#fbfdff;}
+  .ro{margin:8px 2px 2px;font-size:13px;color:#33475f;background:#eef4fc;border-left:4px solid #4a86e8;
+      padding:6px 9px;border-radius:6px;min-height:38px;}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;font-size:12.5px;color:#3a4a5d;}
+  .legend span{display:flex;align-items:center;gap:5px;}
+  .dot{width:12px;height:12px;border-radius:3px;display:inline-block;}
 
-  /* Shape & depth */
-  --radius: 12px;
-  --radius-sm: 8px;
-  --pad-card: 1.5rem;
-  --shadow-sm: 0 1px 2px rgba(15, 23, 42, .06), 0 1px 3px rgba(15, 23, 42, .08);
-  --shadow-md: 0 4px 12px rgba(15, 23, 42, .08), 0 2px 4px rgba(15, 23, 42, .04);
-
-  /* Type */
-  --font-body: "Source Serif 4", "Noto Serif TC", Georgia, "Times New Roman", serif;
-  --font-ui: "Inter Tight", "Noto Sans TC", "Segoe UI", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
-  --lh-tight: 1.25;
-  --lh-body: 1.7;
-}
-
-* { box-sizing: border-box; }
-
-html { -webkit-text-size-adjust: 100%; }
-
-body {
-  margin: 0;
-  background: var(--slate-50);
-  background-image:
-    radial-gradient(circle at 12% -10%, rgba(59, 130, 246, .10), transparent 45%),
-    radial-gradient(circle at 95% 0%, rgba(30, 41, 59, .08), transparent 40%);
-  background-attachment: fixed;
-  color: var(--slate-900);
-  font-family: var(--font-body);
-  font-size: 17px;
-  line-height: var(--lh-body);
-}
-
-/* ---------- Layout shells ------------------------------------------------ */
-
-.container {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 1.5rem 1.25rem 3rem;
-}
-
-.split {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 1.5rem 1.25rem 3rem;
-  display: grid;
-  grid-template-columns: minmax(0, 42%) minmax(0, 58%);
-  gap: 1.5rem;
-  align-items: start;
-}
-
-.split__aside {
-  position: sticky;
-  top: 1rem;
-  max-height: calc(100vh - 2rem);
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
-
-.split__main {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
-
-/* ---------- Hero header -------------------------------------------------- */
-
-.hero {
-  background: linear-gradient(135deg, var(--slate-900) 0%, #27364f 55%, #1d4ed8 160%);
-  color: #fff;
-  border-radius: var(--radius);
-  padding: 2rem var(--pad-card);
-  box-shadow: var(--shadow-md);
-  margin-bottom: 1.5rem;
-}
-
-.hero__eyebrow {
-  font-family: var(--font-ui);
-  font-size: .75rem;
-  font-weight: 600;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  color: #93c5fd;
-  margin: 0 0 .5rem;
-}
-
-.hero__title {
-  font-family: var(--font-ui);
-  font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.1rem);
-  line-height: var(--lh-tight);
-  font-weight: 700;
-  margin: 0 0 .5rem;
-}
-
-.hero__subtitle {
-  margin: 0;
-  color: #cbd5e1;
-  font-size: .95rem;
-}
-
-.hero__meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: .5rem;
-  margin-top: 1rem;
-}
-
-/* ---------- Cards -------------------------------------------------------- */
-
-.card {
-  background: #fff;
-  border: 1px solid var(--slate-200);
-  border-radius: var(--radius);
-  padding: var(--pad-card);
-  box-shadow: var(--shadow-sm);
-}
-
-.card + .card { margin-top: 0; }
-
-.card__title {
-  font-family: var(--font-ui);
-  font-size: 1.05rem;
-  font-weight: 700;
-  margin: 0 0 1rem;
-  padding-bottom: .6rem;
-  border-bottom: 2px solid var(--slate-100);
-  display: flex;
-  align-items: center;
-  gap: .6rem;
-  flex-wrap: wrap;
-}
-
-/* ---------- Step cards --------------------------------------------------- */
-
-.step {
-  border-left: 4px solid var(--indigo);
-  background: #fff;
-  border-radius: var(--radius);
-  padding: var(--pad-card);
-  box-shadow: var(--shadow-sm);
-}
-
-.step__head {
-  display: flex;
-  align-items: center;
-  gap: .6rem;
-  flex-wrap: wrap;
-  margin-bottom: .85rem;
-  font-family: var(--font-ui);
-  font-weight: 600;
-}
-
-/* ---------- Callouts ----------------------------------------------------- */
-
-.hint,
-.answer,
-.note {
-  border-radius: var(--radius-sm);
-  padding: 1rem 1.15rem;
-  margin: 1rem 0;
-}
-
-.hint {
-  background: var(--amber-bg);
-  border-left: 4px solid var(--amber-bd);
-}
-
-.answer {
-  background: var(--emerald-bg);
-  border-left: 4px solid var(--emerald-bd);
-}
-
-.note {
-  background: var(--slate-100);
-  border-left: 4px solid var(--slate-400);
-}
-
-.hint__label,
-.answer__label {
-  font-family: var(--font-ui);
-  font-size: .72rem;
-  font-weight: 700;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  display: block;
-  margin-bottom: .35rem;
-}
-
-.hint__label   { color: #92400e; }
-.answer__label { color: #065f46; }
-
-/* ---------- Badges ------------------------------------------------------- */
-
-.badge {
-  display: inline-block;
-  font-family: var(--font-ui);
-  font-size: .72rem;
-  font-weight: 700;
-  letter-spacing: .04em;
-  padding: .2rem .55rem;
-  border-radius: 999px;
-  background: var(--badge-bg);
-  color: var(--badge-fg);
-  white-space: nowrap;
-}
-
-.badge--mark  { background: var(--badge-bg); color: var(--badge-fg); }
-.badge--topic { background: var(--slate-100); color: var(--slate-600); }
-.badge--hard  { background: #fee2e2; color: #991b1b; }
-.badge--rate  { background: #ecfdf5; color: #047857; }
-
-/* ---------- Option list (Paper 2) --------------------------------------- */
-
-.options {
-  list-style: none;
-  margin: .5rem 0 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-  gap: .5rem;
-}
-
-.options li {
-  background: var(--slate-100);
-  border: 1px solid var(--slate-200);
-  border-radius: var(--radius-sm);
-  padding: .6rem .85rem;
-}
-
-.option-key {
-  font-family: var(--font-ui);
-  font-weight: 700;
-  color: var(--slate-600);
-  margin-right: .35rem;
-}
-
-/* ---------- Figures ----------------------------------------------------- */
-
-.figure {
-  background: #fff;
-  border: 1px solid var(--slate-200);
-  border-radius: var(--radius);
-  padding: .75rem;
-  text-align: center;
-}
-
-.figure img,
-.question-img {
-  max-width: 100%;
-  height: auto;
-  border-radius: var(--radius-sm);
-  display: block;
-  margin: 0 auto;
-}
-
-.figure figcaption {
-  font-family: var(--font-ui);
-  font-size: .78rem;
-  color: var(--slate-600);
-  margin-top: .5rem;
-}
-
-.figure svg { max-width: 100%; height: auto; }
-
-/* ---------- Tables ------------------------------------------------------- */
-
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: .95rem;
-}
-
-.table th,
-.table td {
-  border: 1px solid var(--slate-200);
-  padding: .5rem .65rem;
-  text-align: left;
-}
-
-.table th {
-  background: var(--slate-100);
-  font-family: var(--font-ui);
-  font-weight: 600;
-}
-
-/* ---------- Index pages -------------------------------------------------- */
-
-.index-section { margin-bottom: 1.5rem; }
-
-.index-table td:first-child { white-space: nowrap; }
-
-a { color: var(--indigo-600); }
-
-a.qlink {
-  font-family: var(--font-mono);
-  font-weight: 600;
-  text-decoration: none;
-  border-bottom: 1px solid transparent;
-}
-
-a.qlink:hover { border-bottom-color: currentColor; }
-
-/* ---------- Footer ------------------------------------------------------- */
-
-.footer {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 1.5rem 1.25rem 2.5rem;
-  text-align: center;
-  font-family: var(--font-ui);
-  font-size: .8rem;
-  color: var(--slate-600);
-}
-
-/* ---------- MathJax tweaks ---------------------------------------------- */
-
-mjx-container[display="true"] { margin: .75rem 0 !important; }
-
-/* ---------- Responsive -------------------------------------------------- */
-
-@media (max-width: 900px) {
-  .split { grid-template-columns: minmax(0, 1fr); }
-  .split__aside {
-    position: static;
-    max-height: none;
-    overflow-y: visible;
-  }
-}
-
-@media (max-width: 480px) {
-  body { font-size: 16px; }
-  :root { --pad-card: 1.15rem; }
-  .hero { padding: 1.5rem 1.15rem; }
-}
-
-
-/* ---- solution page extras ---- */
-.hero__title .qstar { color:#fbbf24; }
-.qcard__body { font-size: 1.02rem; }
-.qcard__body .part { border-left: 4px solid var(--indigo); background: var(--slate-50);
-  padding: .7rem 1rem; margin: .7rem 0; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
-.qcard__body .part b { color: var(--indigo-600); font-family: var(--font-ui); }
-.marks-inline { font-family: var(--font-ui); font-size: .75rem; font-weight: 700;
-  color: var(--badge-fg); background: var(--badge-bg); padding: .1rem .5rem; border-radius: 999px; margin-left: .4rem; }
-.options { list-style:none; margin:.75rem 0 0; padding:0; display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:.55rem; }
-.options li { background:var(--slate-50); border:1px solid var(--slate-200);
-  border-radius:var(--radius-sm); padding:.6rem .9rem; }
-.opt-key { font-family:var(--font-ui); font-weight:700; color:var(--slate-600); margin-right:.4rem; }
-.step { border:1px solid var(--slate-200); border-left:4px solid var(--indigo);
-  border-radius:var(--radius); padding:var(--pad-card); box-shadow:var(--shadow-sm); }
-.step + .step { margin-top:1rem; }
-.step__head { display:flex; align-items:center; gap:.6rem; flex-wrap:wrap; margin-bottom:.75rem;
-  font-family:var(--font-ui); font-weight:700; }
-.step__num { background:var(--indigo); color:#fff; border-radius:8px; min-width:1.9rem;
-  text-align:center; padding:.15rem .4rem; font-size:.85rem; }
-.math { margin:.65rem 0; overflow-x:auto; overflow-y:hidden; padding-bottom:2px; }
-.distractor { background:#fff; border:1px solid var(--slate-200); border-radius:var(--radius-sm);
-  padding:.75rem .95rem; margin:.5rem 0; }
-.distractor .opt-tag { font-family:var(--font-ui); font-weight:800; display:inline-block;
-  min-width:1.6rem; color:var(--slate-600); }
-.distractor.correct { background:var(--emerald-bg); border-color:var(--emerald-bd); }
-.distractor.correct .opt-tag { color:#065f46; }
-.distractor.wrong .opt-tag { color:#991b1b; }
-.distractor.wrong { background:#fef2f2; border-color:#fecaca; }
-.figure svg { max-width:100%; height:auto; }
-.step p { margin:.55em 0; }
-
+  .panel{background:#fff;border-radius:14px;box-shadow:0 4px 18px rgba(30,50,80,.10);
+    padding:16px 18px;border:1px solid #e2e9f3;}
+  h1{font-size:18px;margin:0 0 4px;color:#183a63;}
+  .qnum{display:inline-block;background:#183a63;color:#fff;font-size:12px;font-weight:700;
+    padding:2px 9px;border-radius:20px;margin-bottom:8px;letter-spacing:.5px;}
+  .qtext{background:#f0f6ff;border:1px dashed #9bbdf0;border-radius:10px;padding:12px 14px;margin-bottom:14px;}
+  .qtext p{margin:6px 0;}
+  .step{border-left:5px solid #cfd9e6;padding:8px 0 8px 13px;margin:12px 0;border-radius:0 8px 8px 0;
+    transition:background .3s,border-color .3s;}
+  .step.active{border-left-color:#4a86e8;background:#f2f8ff;}
+  .tag{display:inline-block;background:#e8f0fe;color:#1c4f9c;font-weight:700;font-size:12.5px;
+    padding:1px 8px;border-radius:6px;margin-right:7px;}
+  .step.active .tag{background:#4a86e8;color:#fff;}
+  .hint{font-size:13px;color:#5d6f84;font-style:italic;margin-top:5px;
+    border-top:1px dotted #d4dfec;padding-top:5px;}
+  .ans{background:#e9f8ee;border:1px solid #9bd8b0;border-radius:10px;padding:10px 14px;margin-top:16px;font-weight:600;}
+  .ans b{color:#1c7c3f;}
+  .hl{background:#fff3c4;padding:0 3px;border-radius:3px;}
+  .marks{float:right;color:#8a9bb0;font-size:12.5px;font-weight:600;}
 </style>
 </head>
 <body>
-<div class="container"><header class="hero"><p class="hero__eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 1</p><h1 class="hero__title">2017 Paper 1 · Question 9<span class="qstar"></span></h1><p class="hero__subtitle">Estimation, Approximation and Error</p><div class="hero__meta"><span class="badge badge--topic">Estimation, Approximation and Error</span><span class="badge badge--rate">Passing rate 62%</span><span class="badge badge--mark">5 marks</span></div></header><section class="card"><h2 class="card__title">Question</h2><div class="qcard__body"><p>A bottle is termed <i>standard</i> if its capacity is measured as \(200\) mL correct to the nearest \(10\) mL.</p><p class="part"><b>(a)</b> Find the least possible capacity of a <i>standard</i> bottle. <span class="marks-inline">2 marks</span></p><p class="part"><b>(b)</b> Someone claims that the total capacity of 120 <i>standard</i> bottles can be measured as \(23.3\) L correct to the nearest \(0.1\) L. Do you agree? Explain your answer. <span class="marks-inline">3 marks</span></p></div></section><section class="card"><h2 class="card__title">Solution</h2><div class="qcard__body"><div class="step"><div class="step__head"><span class="step__num">a</span>(a) Least possible capacity</div><div class="hint"><b>Maximum absolute error</b> = \(\frac{10}{2}=5\) mL.</div><div class="math">\[200-5=195\ \text{mL}\]</div><p><span class="badge badge--mark">1M</span> finding the error.<span class="badge badge--mark">1A</span> correct least capacity.</p></div><div class="step"><div class="step__head"><span class="step__num">b</span>(b) Total capacity of 120 bottles</div><div class="math">\[(195)(120)=23\,400\ \text{mL}=23.4\ \text{L}\]</div><p><span class="badge badge--mark">1M</span> computing the least total capacity.<span class="badge badge--mark">1A</span> correct total.</p><p>Since \(23.4\ \text{L}&gt;23.35\ \text{L}\) (the upper bound for \(23.3\) L), the claim is <b>disagreed</b>.</p><p><span class="badge badge--mark">1A</span> correct conclusion.</p></div></div></section><section class="card"><h2 class="card__title">Answer</h2><div class="qcard__body"><div class="answer"><span class="answer__label">Answer</span>(a) \(195\) mL · (b) disagree</div></div></section></div><footer class="footer">HKDSE Mathematics (Compulsory Part) · 2017 Paper 1 Q09 · <a href="index.html">Index by year</a> · <a href="DSE_Maths_By_Topic.html">Index by topic</a></footer>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
+<div class="wrap">
+  <div class="split">
 
+    <!-- ============ LEFT PANE ============ -->
+    <div class="diagram">
+      <h3>Interactive Figure</h3>
+      <canvas id="cv" width="620" height="720"></canvas>
+      <p class="ro" id="ro">Scroll the solution to highlight each step.</p>
+      <div class="legend">
+        <span><i class="dot" style="background:#4a86e8"></i>nominal 200 mL</span>
+        <span><i class="dot" style="background:#e8663c"></i>error ±5 mL</span>
+        <span><i class="dot" style="background:#2ea44f"></i>range of capacity</span>
+        <span><i class="dot" style="background:#8b5cf6"></i>total of 120</span>
+      </div>
+    </div>
+
+    <!-- ============ RIGHT PANE ============ -->
+    <div class="panel">
+      <span class="qnum">HKDSE 2017 Paper 1 · Q9</span>
+      <h1>Estimation, Approximation &amp; Error <span class="marks">[5 marks]</span></h1>
+
+      <div class="qtext">
+        <p>A bottle is termed <b>standard</b> if its capacity is measured as $200\text{ mL}$ correct to the nearest $10\text{ mL}$.</p>
+        <p><b>(a)</b> Find the least possible capacity of a standard bottle.</p>
+        <p><b>(b)</b> Someone claims that the total capacity of $120$ standard bottles can be measured as $23.3\text{ L}$ correct to the nearest $0.1\text{ L}$. Do you agree? Explain your answer.</p>
+      </div>
+
+      
+
+      <div class="step" data-step="1">
+        <span class="tag">Step 1</span><b>Interpret “correct to the nearest 10 mL”.</b><br>
+        Measuring $200\text{ mL}$ correct to the nearest $10\text{ mL}$ means the true capacity $C$ lies in the interval
+        $$195\text{ mL} \le C < 205\text{ mL}.$$
+        So the maximum absolute error is $\dfrac{10}{2} = 5\text{ mL}$.
+        <div class="hint">Hint: maximum absolute error = $\frac{1}{2}\times$ scale unit of the rounding.</div>
+      </div>
+
+      <div class="step" data-step="2">
+        <span class="tag">Step 2</span><b>(a) Least possible capacity.</b><br>
+        The smallest capacity is the lower end of the interval:
+        $$200 - 5 = 195\text{ mL}.$$
+        <div class="hint">Hint: subtract the maximum absolute error from the nominal value.</div>
+      </div>
+
+      <div class="step" data-step="3">
+        <span class="tag">Step 3</span><b>(b) Least possible total of 120 bottles.</b><br>
+        Each standard bottle holds at least $195\text{ mL}$, therefore
+        $$195 \times 120 = 23\,400\text{ mL}.$$
+        <div class="hint">Hint: the smallest total comes from using the smallest possible capacity for every bottle.</div>
+      </div>
+
+      <div class="step" data-step="4">
+        <span class="tag">Step 4</span><b>Convert to litres.</b><br>
+        $$23\,400\text{ mL} = 23.4\text{ L}.$$
+        <div class="hint">Hint: $1\text{ L} = 1000\text{ mL}$.</div>
+      </div>
+
+      <div class="step" data-step="5">
+        <span class="tag">Step 5</span><b>Compare with the claimed measurement.</b><br>
+        A value measured as $23.3\text{ L}$ correct to the nearest $0.1\text{ L}$ lies in
+        $$23.25\text{ L} \le V < 23.35\text{ L}.$$
+        But the true total is <strong>at least</strong> $23.4\text{ L} > 23.35\text{ L}$, which is outside this interval.
+        <div class="hint">Hint: the claimed reading is too small to be possible.</div>
+      </div>
+
+      <div class="step" data-step="6">
+        <span class="tag">Step 6</span><b>Conclusion.</b><br>
+        Since the minimum possible total $23.4\text{ L}$ already exceeds the upper limit $23.35\text{ L}$ of the claimed reading, the claim is <strong>disagreed</strong>.
+        <div class="hint">Hint: state clearly “disagree” with the supporting inequality.</div>
+      </div>
+
+      <div class="ans">
+        Answer: (a) $195\text{ mL}$ &nbsp;·&nbsp; (b) <b>Disagree</b> — the least possible total is $23.4\text{ L} > 23.35\text{ L}$.
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ================= CANVAS DRAWING ================= */
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+const ro = document.getElementById('ro');
+
+const W = cv.width, H = cv.height;
+
+// palette
+const BLUE='#4a86e8', ORANGE='#e8663c', GREEN='#2ea44f', PURPLE='#8b5cf6',
+      GREY='#8a9bb0', DARK='#1e2a38', LIGHT='#dbe7f6';
+
+function roundRect(x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+
+function clear(){ ctx.clearRect(0,0,W,H); ctx.fillStyle='#fbfdff'; ctx.fillRect(0,0,W,H); }
+
+/* ---- drawing helpers ---- */
+function title(t){
+  ctx.fillStyle=DARK; ctx.font='bold 18px Segoe UI, sans-serif';
+  ctx.textAlign='left'; ctx.fillText(t,26,34);
+}
+
+/* number line for part (a) */
+function drawNumberLine(active){
+  const y=140, x0=60, x1=W-60;
+  // scale: 190 -> 210 mL mapped
+  const map = v => x0 + (v-190)/(210-190)*(x1-x0);
+
+  ctx.strokeStyle=GREY; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(x0,y); ctx.lineTo(x1,y); ctx.stroke();
+  // arrow
+  ctx.beginPath(); ctx.moveTo(x1,y); ctx.lineTo(x1-10,y-6); ctx.lineTo(x1-10,y+6); ctx.closePath();
+  ctx.fillStyle=GREY; ctx.fill();
+
+  // ticks
+  ctx.font='12px Segoe UI, sans-serif'; ctx.textAlign='center'; ctx.fillStyle='#5d6f84';
+  for(let v=190; v<=210; v+=5){
+    const x=map(v);
+    ctx.strokeStyle=LIGHT; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(x,y-6); ctx.lineTo(x,y+6); ctx.stroke();
+    ctx.fillText(v, x, y+24);
+  }
+
+  // highlighted interval 195 - 205
+  const hi = (active>=1);
+  const a=map(195), b=map(205);
+  ctx.fillStyle = hi ? 'rgba(46,164,79,0.22)' : 'rgba(220,230,245,0.55)';
+  ctx.fillRect(a, y-16, b-a, 32);
+  ctx.strokeStyle = hi ? GREEN : LIGHT;
+  ctx.lineWidth = hi?2.5:1.5;
+  ctx.strokeRect(a, y-16, b-a, 32);
+
+  // nominal 200
+  const xm=map(200);
+  ctx.strokeStyle=BLUE; ctx.lineWidth=2.5;
+  ctx.beginPath(); ctx.moveTo(xm,y-30); ctx.lineTo(xm,y+30); ctx.stroke();
+  ctx.fillStyle=BLUE; ctx.font='bold 13px Segoe UI, sans-serif';
+  ctx.fillText('200', xm, y-38);
+
+  // error brackets 195-200 and 200-205
+  if(active>=1){
+    ctx.strokeStyle=ORANGE; ctx.lineWidth=2.5;
+    // left bracket 200 -> 195
+    ctx.beginPath(); ctx.moveTo(xm,y-52); ctx.lineTo(a,y-52); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(a,y-58); ctx.lineTo(a,y-46); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(xm,y-58); ctx.lineTo(xm,y-46); ctx.stroke();
+    // right bracket 200 -> 205
+    ctx.beginPath(); ctx.moveTo(xm,y-52); ctx.lineTo(b,y-52); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(b,y-58); ctx.lineTo(b,y-46); ctx.stroke();
+    ctx.fillStyle=ORANGE; ctx.font='bold 13px Segoe UI, sans-serif';
+    ctx.fillText('5', (a+xm)/2, y-60);
+    ctx.fillText('5', (xm+b)/2, y-60);
+  }
+
+  // endpoint labels
+  if(active>=2){
+    ctx.fillStyle=GREEN; ctx.font='bold 14px Segoe UI, sans-serif';
+    ctx.fillText('195', a, y+46);
+    ctx.beginPath(); ctx.arc(a,y,5,0,7); ctx.fill();
+  }
+}
+
+/* bottle drawing */
+function drawBottles(active, count){
+  const baseY = 300, perRow=10, bw=34, bh=56, gapx=20, gapy=14;
+  const startX = 55;
+
+  for(let i=0;i<count;i++){
+    const col=i%perRow, row=Math.floor(i/perRow);
+    const x = startX + col*(bw+gapx);
+    const y = baseY + row*(bh+gapy);
+    const filled = (active>=3);
+
+    // body
+    ctx.fillStyle = filled ? 'rgba(46,164,79,0.20)' : 'rgba(74,134,232,0.16)';
+    roundRect(x,y,bw,bh,7); ctx.fill();
+    ctx.strokeStyle = filled ? GREEN : BLUE; ctx.lineWidth=1.8; ctx.stroke();
+
+    // neck
+    ctx.fillStyle = filled ? 'rgba(46,164,79,0.20)' : 'rgba(74,134,232,0.16)';
+    roundRect(x+bw/2-6, y-11, 12, 12, 3); ctx.fill();
+    ctx.strokeStyle = filled ? GREEN : BLUE; ctx.lineWidth=1.5; ctx.stroke();
+
+    // liquid level line
+    ctx.strokeStyle = filled ? GREEN : BLUE;
+    ctx.globalAlpha=.6;
+    ctx.beginPath(); ctx.moveTo(x+5, y+bh-18); ctx.lineTo(x+bw-5, y+bh-18); ctx.stroke();
+    ctx.globalAlpha=1;
+  }
+
+  // caption
+  ctx.fillStyle=DARK; ctx.font='bold 14px Segoe UI, sans-serif'; ctx.textAlign='left';
+  ctx.fillText('120 standard bottles in total (showing 40)', 55, baseY-40);
+
+  if(active>=3){
+    ctx.fillStyle=GREEN; ctx.font='bold 14px Segoe UI, sans-serif';
+    ctx.fillText('each ≥ 195 mL', 55, baseY-20);
+  }
+}
+
+/* total summary bar */
+function drawTotal(active){
+  const y = 570, x=55, w=W-110, h=44;
+  // bar
+  ctx.fillStyle = active>=4 ? 'rgba(139,92,246,0.20)' : 'rgba(210,222,238,0.5)';
+  roundRect(x,y,w,h,10); ctx.fill();
+  ctx.strokeStyle = active>=4 ? PURPLE : LIGHT; ctx.lineWidth=2; ctx.stroke();
+
+  ctx.textAlign='center';
+  ctx.fillStyle = active>=4 ? PURPLE : GREY;
+  ctx.font='bold 17px Segoe UI, sans-serif';
+  if(active>=3) ctx.fillText('195 × 120 = 23 400 mL = 23.4 L', x+w/2, y+28);
+  else ctx.fillText('total = 120 × capacity', x+w/2, y+28);
+
+  if(active>=5){
+    ctx.fillStyle=ORANGE; ctx.font='bold 14px Segoe UI, sans-serif';
+    ctx.fillText('claimed range: 23.25 L ≤ V < 23.35 L', x+w/2, y+62);
+    ctx.fillStyle=GREEN;
+    ctx.fillText('23.4 L > 23.35 L  →  claim fails', x+w/2, y+84);
+  }
+}
+
+function draw(step){
+  clear();
+  title('Standard bottle: 200 mL correct to nearest 10 mL');
+  drawNumberLine(step);
+  drawBottles(step, 40);
+  drawTotal(step);
+
+  const texts = {
+    1:'Step 1 · 200 mL correct to nearest 10 mL → max absolute error = 5 mL, so 195 ≤ capacity < 205 mL.',
+    2:'Step 2 (a) · Least possible capacity = 200 − 5 = 195 mL.',
+    3:'Step 3 (b) · 120 bottles, each at least 195 mL → least total = 195 × 120 = 23 400 mL.',
+    4:'Step 4 · Convert: 23 400 mL = 23.4 L.',
+    5:'Step 5 · 23.3 L correct to 0.1 L means 23.25 L ≤ V < 23.35 L, but the least total is 23.4 L.',
+    6:'Step 6 · 23.4 L > 23.35 L → the claim is impossible → disagree.'
+  };
+  ro.textContent = texts[step] || 'Scroll the solution to highlight each step.';
+}
+
+/* ================= SCROLL SYNC ================= */
+let current = 1;
+const io = new IntersectionObserver(es=>{
+  es.forEach(e=>{
+    if(e.isIntersecting){
+      current = +e.target.dataset.step;
+      document.querySelectorAll('.step').forEach(s=>s.classList.toggle('active', +s.dataset.step===current));
+      draw(current);
+    }
+  });
+},{rootMargin:'-25% 0px -55% 0px'});
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
+
+draw(1);
+</script>
 </body>
 </html>

@@ -3,858 +3,540 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HKDSE 2014 Paper 2 Q28 · Statistics</title>
+<title>HKDSE 2014 Paper 2 Q28 — Weighted Mean of Heights</title>
+<style>
+  :root{
+    --bg:#f5f7fb;
+    --card:#ffffff;
+    --ink:#1f2937;
+    --muted:#6b7280;
+    --line:#e5e7eb;
+    --teacher:#e11d48;
+    --student:#2563eb;
+    --combined:#059669;
+    --amber:#f59e0b;
+    --violet:#7c3aed;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.55;
+    font-size:16px;
+  }
+  .wrap{
+    max-width:1240px;
+    margin:0 auto;
+    padding:16px 14px 60px;
+  }
+  .split{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    gap:12px;
+    align-items:start;
+  }
+  @media(min-width:900px){
+    .split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}
+  }
+  @media(max-width:640px){
+    body{font-size:14.5px;}
+    .wrap{padding:10px 8px 40px;}
+  }
+
+  /* ---------- Left pane ---------- */
+  .diagram{
+    position:sticky;
+    top:16px;
+    max-height:calc(100vh - 2rem);
+    overflow-y:auto;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:12px;
+    box-shadow:0 4px 14px rgba(15,23,42,.06);
+  }
+  .diagram h2{
+    margin:2px 0 8px;
+    font-size:1rem;
+    color:var(--violet);
+    letter-spacing:.02em;
+  }
+  canvas{width:100%;height:auto;display:block;border-radius:10px;background:#fbfdff;}
+  .ro{
+    margin:10px 2px 2px;
+    font-size:.86rem;
+    color:var(--muted);
+    background:#f8fafc;
+    border:1px dashed var(--line);
+    border-radius:8px;
+    padding:7px 10px;
+  }
+  .legend{
+    display:flex;flex-wrap:wrap;gap:8px 14px;
+    margin:8px 2px 0;font-size:.82rem;color:var(--muted);
+  }
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .dot{width:12px;height:12px;border-radius:50%;display:inline-block;}
+
+  /* ---------- Right pane ---------- */
+  .panel{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:16px 18px 20px;
+    box-shadow:0 4px 14px rgba(15,23,42,.06);
+  }
+  .qtag{
+    display:inline-block;
+    background:var(--violet);
+    color:#fff;
+    font-size:.74rem;
+    font-weight:700;
+    letter-spacing:.06em;
+    padding:3px 9px;
+    border-radius:999px;
+    margin-bottom:8px;
+  }
+  .qtext{
+    font-size:1.02rem;
+    background:#f8fafc;
+    border-left:4px solid var(--violet);
+    border-radius:8px;
+    padding:10px 12px;
+  }
+  .opts{
+    list-style:none;padding:0;margin:10px 0 0;
+    display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 14px;
+    font-size:.98rem;
+  }
+  .opts li{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:4px 10px;
+  }
+  .opts li b{color:var(--violet);}
+  h3.sec{
+    margin:20px 0 8px;
+    font-size:1.02rem;
+    color:var(--combined);
+    border-bottom:2px solid #d1fae5;
+    padding-bottom:4px;
+  }
+  .step{
+    position:relative;
+    background:#f9fafb;
+    border:1px solid var(--line);
+    border-left:4px solid var(--student);
+    border-radius:10px;
+    padding:10px 12px 10px 14px;
+    margin:10px 0;
+    transition:box-shadow .25s, border-color .25s, background .25s;
+  }
+  .step.active{
+    background:#eef4ff;
+    border-left-color:var(--amber);
+    box-shadow:0 0 0 3px rgba(245,158,11,.18);
+  }
+  .tag{
+    display:inline-block;
+    font-weight:700;
+    color:#fff;
+    background:var(--student);
+    font-size:.74rem;
+    letter-spacing:.04em;
+    padding:2px 8px;
+    border-radius:999px;
+    margin-bottom:5px;
+  }
+  .step.active .tag{background:var(--amber);}
+  .step p{margin:4px 0;}
+  .hint{
+    margin-top:6px !important;
+    font-size:.86rem;
+    color:var(--muted);
+    font-style:italic;
+  }
+  .ans{
+    margin-top:14px;
+    background:#ecfdf5;
+    border:1px solid #a7f3d0;
+    border-left:5px solid var(--combined);
+    border-radius:10px;
+    padding:10px 14px;
+    font-weight:700;
+    color:#065f46;
+  }
+</style>
+
 <script>
   window.MathJax = {
-    tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['\\[', '\\]']] },
+    tex: {
+      inlineMath: [['$','$'], ['\\(','\\)']],
+      displayMath: [['$$','$$'], ['\\[','\\]']]
+    },
     svg: { fontCache: 'global' }
   };
 </script>
-<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    background: #f1f5f9;
-    color: #1e293b;
-    line-height: 1.6;
-    padding-bottom: 40px;
-  }
-  /* ---------- Hero ---------- */
-  .hero {
-    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #3b82f6 100%);
-    color: #fff;
-    padding: 48px 24px 56px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
-  .hero::after {
-    content: '';
-    position: absolute;
-    bottom: -1px; left: 0; right: 0;
-    height: 40px;
-    background: #f1f5f9;
-    clip-path: ellipse(75% 100% at 50% 100%);
-  }
-  .hero .eyebrow {
-    font-size: 0.8rem;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    opacity: 0.85;
-    font-weight: 600;
-  }
-  .hero h1 {
-    font-size: clamp(1.6rem, 4vw, 2.4rem);
-    margin: 8px 0 6px;
-    font-weight: 800;
-  }
-  .hero .subtitle {
-    font-size: 1rem;
-    opacity: 0.92;
-    font-weight: 400;
-  }
-  .tags {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 8px;
-    margin-top: 18px;
-    position: relative;
-    z-index: 2;
-  }
-  .tag {
-    background: rgba(255,255,255,0.18);
-    border: 1px solid rgba(255,255,255,0.35);
-    padding: 4px 14px;
-    border-radius: 999px;
-    font-size: 0.78rem;
-    font-weight: 600;
-    letter-spacing: 0.3px;
-  }
-  /* ---------- Cards ---------- */
-  .container {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 0 18px;
-  }
-  .card {
-    background: #fff;
-    border-radius: 18px;
-    box-shadow: 0 4px 18px rgba(30,58,138,0.08), 0 1px 3px rgba(0,0,0,0.05);
-    padding: 28px 26px;
-    margin-top: 26px;
-  }
-  .card h2 {
-    font-size: 1.25rem;
-    color: #1e3a8a;
-    margin-bottom: 14px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .card h2 .icon {
-    background: #dbeafe;
-    color: #1e40af;
-    width: 34px; height: 34px;
-    border-radius: 10px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1rem;
-    flex-shrink: 0;
-  }
-  .question-text {
-    font-size: 1.02rem;
-    background: #f8fafc;
-    border-left: 4px solid #2563eb;
-    padding: 16px 18px;
-    border-radius: 0 10px 10px 0;
-  }
-  .choices {
-    list-style: none;
-    margin-top: 14px;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 8px;
-  }
-  .choices li {
-    background: #fff;
-    border: 2px solid #e2e8f0;
-    border-radius: 10px;
-    padding: 8px 16px;
-    font-weight: 600;
-    color: #334155;
-  }
-  .choices li.correct {
-    border-color: #10b981;
-    background: #ecfdf5;
-    color: #065f46;
-  }
-  /* ---------- Canvas ---------- */
-  .canvas-wrap {
-    background: #0f172a;
-    border-radius: 14px;
-    padding: 12px;
-    margin: 16px 0;
-  }
-  canvas {
-    width: 100%;
-    display: block;
-    border-radius: 8px;
-    background: #0f172a;
-  }
-  .controls {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 14px;
-    align-items: center;
-    margin-top: 14px;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 12px 16px;
-    font-size: 0.9rem;
-  }
-  .control-group {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex: 1 1 260px;
-  }
-  .control-group label { font-weight: 600; color: #334155; white-space: nowrap; }
-  input[type=range] {
-    flex: 1;
-    accent-color: #2563eb;
-    cursor: pointer;
-  }
-  .readout {
-    font-family: 'Courier New', monospace;
-    font-weight: 700;
-    color: #1d4ed8;
-    background: #e0e7ff;
-    padding: 2px 8px;
-    border-radius: 6px;
-    font-size: 0.85rem;
-    min-width: 60px;
-    text-align: center;
-  }
-  /* ---------- Steps ---------- */
-  .step {
-    display: none;
-    border-left: 4px solid #2563eb;
-    background: #f8fafc;
-    padding: 16px 18px;
-    border-radius: 0 12px 12px 0;
-    margin-top: 16px;
-    animation: fadeIn 0.4s ease;
-  }
-  .step.show { display: block; }
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .step-head {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
-  }
-  .step-badge {
-    background: #2563eb;
-    color: #fff;
-    font-weight: 700;
-    font-size: 0.78rem;
-    padding: 3px 12px;
-    border-radius: 999px;
-  }
-  .marks-badge {
-    background: #f59e0b;
-    color: #fff;
-    font-weight: 700;
-    font-size: 0.72rem;
-    padding: 2px 10px;
-    border-radius: 999px;
-  }
-  .hint {
-    background: #fefce8;
-    border: 1px solid #fde047;
-    border-left: 4px solid #eab308;
-    padding: 10px 14px;
-    border-radius: 0 8px 8px 0;
-    margin-top: 12px;
-    font-size: 0.92rem;
-    color: #713f12;
-  }
-  .hint strong { color: #a16207; }
-  .answer-box {
-    background: #ecfdf5;
-    border: 1px solid #6ee7b7;
-    border-left: 4px solid #10b981;
-    padding: 10px 14px;
-    border-radius: 0 8px 8px 0;
-    margin-top: 12px;
-    font-weight: 600;
-    color: #065f46;
-  }
-  .btn {
-    background: linear-gradient(135deg, #2563eb, #3b82f6);
-    color: #fff;
-    border: none;
-    padding: 10px 22px;
-    border-radius: 999px;
-    font-weight: 700;
-    font-size: 0.92rem;
-    cursor: pointer;
-    box-shadow: 0 3px 10px rgba(37,99,235,0.3);
-    transition: all 0.2s;
-    margin-top: 16px;
-  }
-  .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(37,99,235,0.4); }
-  .btn:disabled {
-    background: #cbd5e1;
-    box-shadow: none;
-    cursor: not-allowed;
-    color: #475569;
-  }
-  .counter {
-    font-size: 0.82rem;
-    color: #64748b;
-    margin-left: 12px;
-    font-weight: 600;
-  }
-  /* ---------- Summary ---------- */
-  .summary-card {
-    background: linear-gradient(135deg, #0f172a, #1e293b);
-    color: #e2e8f0;
-    border-radius: 18px;
-    padding: 28px 26px;
-    margin-top: 26px;
-    box-shadow: 0 8px 24px rgba(15,23,42,0.3);
-  }
-  .summary-card h2 {
-    color: #93c5fd;
-    font-size: 1.25rem;
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .summary-card ul {
-    list-style: none;
-  }
-  .summary-card li {
-    padding: 10px 0;
-    border-bottom: 1px solid #334155;
-    display: flex;
-    gap: 10px;
-    align-items: flex-start;
-  }
-  .summary-card li:last-child { border-bottom: none; }
-  .summary-card li::before {
-    content: '✓';
-    color: #34d399;
-    font-weight: 800;
-    flex-shrink: 0;
-  }
-  .summary-card .val {
-    color: #fbbf24;
-    font-weight: 700;
-  }
-  footer {
-    text-align: center;
-    color: #94a3b8;
-    font-size: 0.8rem;
-    margin-top: 36px;
-    padding: 0 18px;
-  }
-  @media (max-width: 560px) {
-    .card { padding: 20px 16px; }
-    .hero { padding: 36px 16px 46px; }
-    .controls { flex-direction: column; align-items: stretch; }
-  }
-</style>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 </head>
 <body>
+<div class="wrap">
+  <div class="split">
 
-<!-- ============ HERO ============ -->
-<header class="hero">
-  <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</div>
-  <h1>2014 Paper 2 · Question 28</h1>
-  <div class="subtitle">Statistics — Weighted Mean / Combined Mean</div>
-  <div class="tags">
-    <span class="tag">Combined Mean</span>
-    <span class="tag">Weighted Average</span>
-    <span class="tag">Sum of Values</span>
-    <span class="tag">Multiple Choice</span>
+    <!-- ============ LEFT: DIAGRAM ============ -->
+    <div class="diagram">
+      <h2>Interactive figure — weighted mean of heights</h2>
+      <canvas id="cv" width="620" height="560"></canvas>
+      <div class="legend">
+        <span><i class="dot" style="background:#e11d48"></i>Teachers (25)</span>
+        <span><i class="dot" style="background:#2563eb"></i>Students (140)</span>
+        <span><i class="dot" style="background:#059669"></i>Combined (165)</span>
+        <span><i class="dot" style="background:#f59e0b"></i>Highlight</span>
+      </div>
+      <p class="ro" id="ro">Step 1 — Given data.</p>
+    </div>
+
+    <!-- ============ RIGHT: QUESTION + SOLUTION ============ -->
+    <div class="panel">
+      <span class="qtag">HKDSE 2014 · Paper 2 · Q28</span>
+
+      <div class="qtext">
+        The mean height of $25$ teachers and $140$ students is $150$ cm. If the mean height of the students is $145$ cm, then the mean height of the teachers is
+        <ul class="opts">
+          <li><b>A.</b> $151$ cm</li>
+          <li><b>B.</b> $155$ cm</li>
+          <li><b>C.</b> $176$ cm</li>
+          <li><b>D.</b> $178$ cm</li>
+        </ul>
+      </div>
+
+      <figure style="margin:12px 0;text-align:center;"><img src="figures/2014_P2_Q28.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
+
+      <h3 class="sec">Step-by-step solution</h3>
+
+      <div class="step" data-step="1">
+        <span class="tag">Step 1</span>
+        <p>Identify the two groups and the combined group:</p>
+        <p>Teachers: $n_T = 25$, mean $= x$ (unknown).</p>
+        <p>Students: $n_S = 140$, mean $= 145$ cm.</p>
+        <p>Combined: $n = 25+140 = 165$, mean $= 150$ cm.</p>
+        <p class="hint">Hint: the combined mean is a <em>weighted</em> mean — each group contributes in proportion to its size.</p>
+      </div>
+
+      <div class="step" data-step="2">
+        <span class="tag">Step 2</span>
+        <p>Write the total-sum equation. Since mean $=\dfrac{\text{sum}}{n}$, we have $\text{sum} = \text{mean}\times n$:</p>
+        <p>\[ \underbrace{25x}_{\text{teachers' total}} + \underbrace{145\times 140}_{\text{students' total}} = \underbrace{150\times(25+140)}_{\text{combined total}} \]</p>
+        <p class="hint">Hint: conserved quantity — the total of all heights equals the sum of the two group totals.</p>
+      </div>
+
+      <div class="step" data-step="3">
+        <span class="tag">Step 3</span>
+        <p>Evaluate the two known products:</p>
+        <p>\[ 145\times 140 = 20300, \qquad 150\times 165 = 24750 \]</p>
+        <p>The equation becomes:</p>
+        <p>\[ 25x + 20300 = 24750 \]</p>
+        <p class="hint">Hint: $150\times(25+140)=150\times165$; compute carefully, no calculator needed.</p>
+      </div>
+
+      <div class="step" data-step="4">
+        <span class="tag">Step 4</span>
+        <p>Solve for $x$:</p>
+        <p>\[ 25x = 24750 - 20300 = 4450 \]</p>
+        <p>\[ x = \frac{4450}{25} = 178 \]</p>
+        <p class="hint">Hint: $4450 \div 25 = 178$ (since $178\times 25 = 4450$).</p>
+      </div>
+
+      <div class="step" data-step="5">
+        <span class="tag">Step 5</span>
+        <p>Sanity check: the combined mean $150$ lies <em>between</em> $145$ and $178$, and since students (140) far outnumber teachers (25), the combined mean should be much closer to $145$ than to $178$.</p>
+        <p>$150$ is only $5$ above $145$, so a relatively high teacher mean is expected. ✔</p>
+        <p>Therefore the mean height of the teachers is $178$ cm.</p>
+        <p class="hint">Hint: always check that the combined mean lies between the two group means.</p>
+      </div>
+
+      <div class="ans">Answer: D &nbsp;·&nbsp; $178$ cm</div>
+    </div>
+
   </div>
-</header>
-
-<main class="container">
-
-  <!-- ============ QUESTION ============ -->
-  <section class="card">
-    <h2><span class="icon">Q</span> The Question</h2>
-    <div class="question-text">
-      The mean height of \(25\) teachers and \(140\) students is \(150\text{ cm}\). If the mean height of the students is \(145\text{ cm}\), then the mean height of the teachers is
-    </div>
-    <ul class="choices">
-      <li>A. \(151\text{ cm}\)</li>
-      <li>B. \(155\text{ cm}\)</li>
-      <li>C. \(176\text{ cm}\)</li>
-      <li class="">D. \(178\text{ cm}\)</li>
-    </ul<figure style="margin:12px 0;text-align:center;"><img src="figures/2014_P2_Q28.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>>
-  </section>
-
-  <!-- ============ PART (a) ============ -->
-  <section class="card">
-    <h2><span class="icon">a</span> Part (a) — Set up the unknown</h2>
-
-    <p style="margin-bottom:8px;color:#475569;">Let \(x\) cm be the mean height of the teachers. Drag the slider below to explore how the teachers' mean must adjust so that the overall mean stays at \(150\text{ cm}\).</p>
-
-    <div class="canvas-wrap">
-      <canvas id="canvasA" width="820" height="600"></canvas>
-    </div>
-    <div class="controls">
-      <div class="control-group">
-        <label for="sliderX">Teachers' mean \(x\):</label>
-        <input type="range" id="sliderX" min="140" max="200" step="0.5" value="160">
-        <span class="readout" id="readoutX">160</span>
-      </div>
-      <div class="control-group" style="flex:1 1 200px;">
-        <strong style="color:#334155;">Overall mean</strong>
-        <span class="readout" id="readoutOverall" style="background:#d1fae5;color:#065f46;">—</span>
-      </div>
-    </div>
-
-    <button class="btn" data-target="a">Next step →</button>
-    <span class="counter" id="counter-a">0 / 2</span>
-
-    <div class="step" data-step="a">
-      <div class="step-head">
-        <span class="step-badge">Step 1</span>
-        
-      </div>
-      <p>Let \(x\) cm be the mean height of the teachers.</p>
-      <div class="hint">
-        <strong>Hint:</strong> Whenever a "combined mean" is involved, the key idea is that the <em>total sum</em> = (mean) × (number of people).
-      </div>
-    </div>
-
-    <div class="step" data-step="a">
-      <div class="step-head">
-        <span class="step-badge">Step 2</span>
-        
-      </div>
-      <p>Total height of teachers \(= 25x\).</p>
-      <p>Total height of students \(= 140 \times 145 = 20300\).</p>
-      <p>Total height of all \(165\) people \(= 150 \times 165 = 24750\).</p>
-      <div class="answer-box">
-        Total sum equation: \(25x + 20300 = 24750\)
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ PART (b) ============ -->
-  <section class="card">
-    <h2><span class="icon">b</span> Part (b) — Solve for the teachers' mean</h2>
-
-    <p style="margin-bottom:8px;color:#475569;">The bar chart shows the "total height" contributed by each group. When the two bars match the overall bar, the correct \(x\) is found.</p>
-
-    <div class="canvas-wrap">
-      <canvas id="canvasB" width="820" height="600"></canvas>
-    </div>
-    <div class="controls">
-      <div class="control-group">
-        <label for="sliderX2">Try \(x =\)</label>
-        <input type="range" id="sliderX2" min="140" max="200" step="0.5" value="160">
-        <span class="readout" id="readoutX2">160</span>
-      </div>
-      <div class="control-group" style="flex:1 1 220px;">
-        <label>LHS − RHS:</label>
-        <span class="readout" id="readoutDiff" style="background:#fee2e2;color:#991b1b;">—</span>
-      </div>
-    </div>
-
-    <button class="btn" data-target="b">Next step →</button>
-    <span class="counter" id="counter-b">0 / 3</span>
-
-    <div class="step" data-step="b">
-      <div class="step-head">
-        <span class="step-badge">Step 1</span>
-        
-      </div>
-      <p>Form the weighted-mean equation (sum of heights is conserved):</p>
-      \[ x\cdot 25 + 145\cdot 140 = 150\cdot(25+140) \]
-      <div class="hint">
-        <strong>Hint:</strong> This is exactly the "combined mean" formula:
-        \[ \bar{x}_{\text{combined}} = \frac{n_1\bar{x}_1 + n_2\bar{x}_2}{n_1+n_2} \]
-        Multiply both sides by \(n_1+n_2\) to clear the fraction.
-      </div>
-    </div>
-
-    <div class="step" data-step="b">
-      <div class="step-head">
-        <span class="step-badge">Step 2</span>
-        
-      </div>
-      <p>Simplify each side:</p>
-      \[ 25x + 20300 = 150 \times 165 \]
-      \[ 25x + 20300 = 24750 \]
-      <div class="hint">
-        <strong>Hint:</strong> Be careful with the arithmetic \(150 \times 165 = 24750\) — split it as \(150\times100 + 150\times65 = 15000 + 9750\).
-      </div>
-    </div>
-
-    <div class="step" data-step="b">
-      <div class="step-head">
-        <span class="step-badge">Step 3</span>
-        
-      </div>
-      <p>Solve for \(x\):</p>
-      \[ 25x = 24750 - 20300 = 4450 \]
-      \[ x = \frac{4450}{25} = 178 \]
-      <div class="answer-box">
-        The mean height of the teachers is \(178\text{ cm}\). &nbsp; Answer: <strong>D</strong>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ SUMMARY ============ -->
-  <section class="summary-card">
-    <h2>📋 Summary — Answer at a Glance</h2>
-    <ul>
-      <li><span>Let \(x\) = mean height of teachers. Total height of teachers \(= 25x\).</span></li>
-      <li><span>Total height of students \(= 140 \times 145 = 20300\).</span></li>
-      <li><span>Overall total \(= 150 \times (25+140) = 150 \times 165 = 24750\).</span></li>
-      <li><span>Solve \(25x + 20300 = 24750 \;\Rightarrow\; 25x = 4450\).</span></li>
-      <li><span><strong>Teachers' mean height</strong> \(= \dfrac{4450}{25} = \mathbf{178\text{ cm}}\) → <span class="val">Option D</span></span></li>
-    </ul>
-  </section>
-
-  <footer>
-    HKDSE Mathematics (Compulsory Part) · Paper 2 · 2014 Q28 &nbsp;·&nbsp; Interactive Solution
-  </footer>
-</main>
+</div>
 
 <script>
-/* ============================================================
-   STEP REVEAL LOGIC
-   ============================================================ */
-document.querySelectorAll('.btn[data-target]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const target = btn.dataset.target;
-    const steps = document.querySelectorAll(`.step[data-step="${target}"]`);
-    const counter = document.getElementById('counter-' + target);
-    const total = steps.length;
-    const shown = document.querySelectorAll(`.step[data-step="${target}"].show`).length;
+(function(){
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  const ro = document.getElementById('ro');
 
-    if (shown < total) {
-      steps[shown].classList.add('show');
-      counter.textContent = (shown + 1) + ' / ' + total;
-      if (shown + 1 === total) {
-        btn.disabled = true;
-        btn.textContent = 'All steps revealed ✓';
-      }
+  // ---- logical coordinate system (uniform scale) ----
+  const W = 620, H = 560;
+  const PAD = { l: 62, r: 22, t: 34, b: 96 };
+  const plotW = W - PAD.l - PAD.r;
+  const plotH = H - PAD.t - PAD.b;
+
+  // data
+  const TEACH_N = 25, STUD_N = 140, TOTAL_N = 165;
+  const STUD_MEAN = 145, COMB_MEAN = 150, T_MEAN = 178;
+
+  // value axis from 130 to 190
+  const VMIN = 130, VMAX = 190;
+  const yOf = v => PAD.t + (VMAX - v) / (VMAX - VMIN) * plotH;
+
+  // bar layout
+  const bars = [
+    { key:'T', label:'Teachers', n:TEACH_N, mean: T_MEAN,   color:'#e11d48', light:'#fecdd3' },
+    { key:'S', label:'Students', n:STUD_N, mean: STUD_MEAN, color:'#2563eb', light:'#bfdbfe' },
+    { key:'C', label:'Combined', n:TOTAL_N, mean: COMB_MEAN, color:'#059669', light:'#a7f3d0' }
+  ];
+  const gap = 26;
+  const barW = (plotW - gap * (bars.length + 1)) / bars.length;
+  bars.forEach((b, i) => { b.x = PAD.l + gap + i * (barW + gap); });
+
+  const baseY = yOf(VMIN);   // baseline = 130 cm
+
+  function roundRect(x, y, w, h, r){
+    r = Math.min(r, Math.abs(w)/2, Math.abs(h)/2);
+    ctx.beginPath();
+    ctx.moveTo(x+r, y);
+    ctx.lineTo(x+w-r, y);
+    ctx.quadraticCurveTo(x+w, y, x+w, y+r);
+    ctx.lineTo(x+w, y+h-r);
+    ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+    ctx.lineTo(x+r, y+h);
+    ctx.quadraticCurveTo(x, y+h, x, y+h-r);
+    ctx.lineTo(x, y+r);
+    ctx.quadraticCurveTo(x, y, x+r, y);
+    ctx.closePath();
+  }
+
+  function arrow(x1,y1,x2,y2,color){
+    ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+    const a = Math.atan2(y2-y1, x2-x1);
+    ctx.beginPath();
+    ctx.moveTo(x2,y2);
+    ctx.lineTo(x2-9*Math.cos(a-0.4), y2-9*Math.sin(a-0.4));
+    ctx.lineTo(x2-9*Math.cos(a+0.4), y2-9*Math.sin(a+0.4));
+    ctx.closePath(); ctx.fill();
+  }
+
+  function draw(step){
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle = '#fbfdff';
+    ctx.fillRect(0,0,W,H);
+
+    // ---------- grid ----------
+    ctx.font = '11px "Segoe UI", sans-serif';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    for(let v = VMIN; v <= VMAX; v += 10){
+      const y = yOf(v);
+      ctx.strokeStyle = (v === vMinEq()) ? '#cbd5e1' : '#eef2f7';
+      ctx.lineWidth = (v % 20 === 0) ? 1.2 : 1;
+      ctx.beginPath(); ctx.moveTo(PAD.l, y); ctx.lineTo(W - PAD.r, y); ctx.stroke();
+      ctx.fillStyle = '#94a3b8';
+      ctx.fillText(v, PAD.l - 8, y);
     }
-  });
-});
+    function vMinEq(){ return VMIN; }
 
-/* ============================================================
-   CANVAS A — Visualising the weighted mean
-   ============================================================ */
-const cvA = document.getElementById('canvasA');
-const ctxA = cvA.getContext('2d');
-const sliderA = document.getElementById('sliderX');
-const readoutA = document.getElementById('readoutX');
-const readoutOverall = document.getElementById('readoutOverall');
+    // axis
+    ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1.6;
+    ctx.beginPath(); ctx.moveTo(PAD.l, PAD.t); ctx.lineTo(PAD.l, baseY); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(PAD.l, baseY); ctx.lineTo(W - PAD.r, baseY); ctx.stroke();
 
-const W = 820, H = 420;
-const PAD_L = 70, PAD_R = 40, PAD_T = 40, PAD_B = 60; // plot padding
+    ctx.save();
+    ctx.translate(16, PAD.t + plotH/2);
+    ctx.rotate(-Math.PI/2);
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#475569'; ctx.font = '600 12px "Segoe UI", sans-serif';
+    ctx.fillText('Height (cm)', 0, 0);
+    ctx.restore();
 
-function drawCanvasA() {
-  const x = parseFloat(sliderA.value);
-  const nT = 25, nS = 140;
-  const meanS = 145, meanAll = 150;
-  const overall = (nT * x + nS * meanS) / (nT + nS);
+    // baseline note
+    ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+    ctx.fillStyle = '#94a3b8'; ctx.font = '11px "Segoe UI", sans-serif';
+    ctx.fillText('baseline = 130 cm', PAD.l + 4, baseY - 15);
 
-  ctxA.clearRect(0, 0, W, H);
-  ctxA.fillStyle = '#0f172a';
-  ctxA.fillRect(0, 0, W, H);
+    // ---------- highlight target per step ----------
+    // 1: all three groups (given data)
+    // 2: equation / weighted structure -> teachers + students + combined
+    // 3: students & combined numeric products
+    // 4: teachers unknown solved -> teachers bar full
+    // 5: check -> combined between
+    const hl = {
+      1: {T:true, S:true, C:true},
+      2: {T:true, S:true, C:true},
+      3: {T:false, S:true, C:true},
+      4: {T:true, S:false, C:false},
+      5: {T:true, S:true, C:true}
+    }[step] || {T:false,S:false,C:false};
 
-  // --- plot area ---
-  const plotW = W - PAD_L - PAD_R;
-  const plotH = H - PAD_T - PAD_B;
+    // ---------- bars ----------
+    bars.forEach(b => {
+      const top = yOf(b.mean);
+      const h = baseY - top;
+      const active = hl[b.key];
 
-  // y-range for heights: 130 to 210
-  const yMin = 130, yMax = 210;
-  const yToPix = v => PAD_T + plotH - (v - yMin) / (yMax - yMin) * plotH;
+      // shadow / glow
+      if(active){
+        ctx.save();
+        ctx.shadowColor = 'rgba(245,158,11,.55)';
+        ctx.shadowBlur = 16;
+        ctx.fillStyle = b.light;
+        roundRect(b.x, top, barW, h, 8);
+        ctx.fill();
+        ctx.restore();
+      }
 
-  // --- horizontal grid lines & y labels ---
-  ctxA.strokeStyle = 'rgba(148,163,184,0.15)';
-  ctxA.lineWidth = 1;
-  ctxA.font = '11px monospace';
-  ctxA.fillStyle = '#94a3b8';
-  ctxA.textAlign = 'right';
-  for (let v = 130; v <= 210; v += 10) {
-    const py = yToPix(v);
-    ctxA.beginPath();
-    ctxA.moveTo(PAD_L, py);
-    ctxA.lineTo(W - PAD_R, py);
-    ctxA.stroke();
-    ctxA.fillText(v + ' cm', PAD_L - 10, py + 4);
+      // bar body (gradient)
+      const g = ctx.createLinearGradient(0, top, 0, baseY);
+      if(b.key === 'T'){
+        g.addColorStop(0, active ? '#f59e0b' : '#e11d48');
+        g.addColorStop(1, active ? '#fbbf24' : '#fb7185');
+      } else if(b.key === 'S'){
+        g.addColorStop(0, active ? '#f59e0b' : '#2563eb');
+        g.addColorStop(1, active ? '#fcd34d' : '#60a5fa');
+      } else {
+        g.addColorStop(0, active ? '#f59e0b' : '#059669');
+        g.addColorStop(1, active ? '#fcd34d' : '#34d399');
+      }
+      ctx.fillStyle = g;
+      roundRect(b.x, top, barW, h, 8);
+      ctx.fill();
+
+      ctx.strokeStyle = active ? '#b45309' : 'rgba(15,23,42,.18)';
+      ctx.lineWidth = active ? 2.2 : 1;
+      roundRect(b.x, top, barW, h, 8);
+      ctx.stroke();
+
+      // mean marker line
+      ctx.strokeStyle = active ? '#7c2d12' : '#1e293b';
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(b.x - 6, top); ctx.lineTo(b.x + barW + 6, top); ctx.stroke();
+
+      // mean value text
+      ctx.fillStyle = '#1e293b';
+      ctx.font = '700 14px "Segoe UI", sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+      ctx.fillText(b.mean.toFixed(0) + ' cm', b.x + barW/2, top - 7);
+
+      // label under axis
+      ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+      ctx.fillStyle = '#475569';
+      ctx.font = '600 12.5px "Segoe UI", sans-serif';
+      ctx.fillText(b.label, b.x + barW/2, baseY + 8);
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '11.5px "Segoe UI", sans-serif';
+      ctx.fillText('n = ' + b.n, b.x + barW/2, baseY + 24);
+    });
+
+    // ---------- step-specific annotations ----------
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+
+    if(step === 1){
+      ctx.fillStyle = '#7c3aed';
+      ctx.font = '600 12px "Segoe UI", sans-serif';
+      ctx.fillText('Given: 25 teachers, 140 students, combined mean 150 cm, students 145 cm', W/2, 16);
+    }
+
+    if(step === 2){
+      // annotation showing weighted-mean balance between teacher bar top and student bar top
+      const tTop = yOf(T_MEAN), sTop = yOf(STUD_MEAN), cTop = yOf(COMB_MEAN);
+      const cX = bars[2].x + barW/2;
+      const tX = bars[0].x + barW/2;
+      const sX = bars[1].x + barW/2;
+
+      // dotted guides from combined mean
+      ctx.save();
+      ctx.setLineDash([5,4]);
+      ctx.strokeStyle = '#059669'; ctx.lineWidth = 1.6;
+      ctx.beginPath(); ctx.moveTo(PAD.l, cTop); ctx.lineTo(cX, cTop); ctx.stroke();
+      ctx.restore();
+
+      // arrow teachers -> combined
+      arrow(tX + barW/2 + 2, (tTop + cTop)/2, cX - barW/2 - 2, (tTop + cTop)/2, '#e11d48');
+      // arrow students -> combined
+      arrow(sX + barW/2 + 2, (sTop + cTop)/2 + 14, cX - barW/2 - 2, (sTop + cTop)/2 + 14, '#2563eb');
+
+      ctx.fillStyle = '#e11d48'; ctx.font = '700 11.5px "Segoe UI", sans-serif';
+      ctx.fillText('25x', (tX + cX)/2, (tTop + cTop)/2 - 13);
+      ctx.fillStyle = '#2563eb';
+      ctx.fillText('145×140', (sX + cX)/2, (sTop + cTop)/2 + 28);
+      ctx.fillStyle = '#059669';
+      ctx.fillText('150×165', cX + 12, cTop - 16);
+    }
+
+    if(step === 3){
+      ctx.fillStyle = '#2563eb';
+      ctx.font = '700 12px "Segoe UI", sans-serif';
+      ctx.fillText('145 × 140 = 20 300', bars[1].x + barW/2, baseY - 8);
+      ctx.fillStyle = '#059669';
+      ctx.fillText('150 × 165 = 24 750', bars[2].x + barW/2, baseY - 8);
+      ctx.fillStyle = '#7c3aed';
+      ctx.font = '600 12px "Segoe UI", sans-serif';
+      ctx.fillText('Total of all heights = 24 750 cm', W/2, 16);
+    }
+
+    if(step === 4){
+      ctx.fillStyle = '#e11d48';
+      ctx.font = '700 13px "Segoe UI", sans-serif';
+      ctx.fillText('25x = 24 750 − 20 300', W/2, 16);
+      ctx.fillStyle = '#b45309';
+      ctx.font = '800 15px "Segoe UI", sans-serif';
+      ctx.fillText('x = 4450 ÷ 25 = 178 cm', bars[0].x + barW/2, yOf(T_MEAN) - 28);
+    }
+
+    if(step === 5){
+      const sTop = yOf(STUD_MEAN), cTop = yOf(COMB_MEAN), tTop = yOf(T_MEAN);
+      ctx.save();
+      ctx.setLineDash([5,4]);
+      ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 1.6;
+      ctx.beginPath(); ctx.moveTo(PAD.l, sTop); ctx.lineTo(W - PAD.r, sTop); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(PAD.l, tTop); ctx.lineTo(W - PAD.r, tTop); ctx.stroke();
+      ctx.restore();
+      ctx.fillStyle = '#7c3aed';
+      ctx.font = '600 12px "Segoe UI", sans-serif';
+      ctx.fillText('145 ≤ 150 ≤ 178  ✔  combined mean lies between the two means', W/2, 16);
+    }
+
+    // ---------- title ----------
+    ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+    ctx.fillStyle = '#0f172a';
+    ctx.font = '700 13px "Segoe UI", sans-serif';
+    ctx.fillText('Mean heights of the three groups', PAD.l, 6);
   }
 
-  // baseline
-  ctxA.strokeStyle = '#475569';
-  ctxA.lineWidth = 2;
-  ctxA.beginPath();
-  ctxA.moveTo(PAD_L, PAD_T);
-  ctxA.lineTo(PAD_L, PAD_T + plotH);
-  ctxA.lineTo(W - PAD_R, PAD_T + plotH);
-  ctxA.stroke();
-
-  // --- three bars: students | teachers | overall ---
-  const barW = 110;
-  const groupGap = plotW / 3;
-  const studentsX = PAD_L + groupGap * 0.5 - barW / 2;
-  const teachersX = PAD_L + groupGap * 1.5 - barW / 2;
-  const overallX  = PAD_L + groupGap * 2.5 - barW / 2;
-  const baseY = PAD_T + plotH;
-
-  // Students bar (fixed)
-  ctxA.fillStyle = '#3b82f6';
-  const sTop = yToPix(meanS);
-  ctxA.beginPath();
-  ctxA.roundRect(studentsX, sTop, barW, baseY - sTop, 6);
-  ctxA.fill();
-  ctxA.fillStyle = '#bfdbfe';
-  ctxA.font = 'bold 13px sans-serif';
-  ctxA.textAlign = 'center';
-  ctxA.fillText('Students', studentsX + barW / 2, baseY + 20);
-  ctxA.fillStyle = '#dbeafe';
-  ctxA.font = 'bold 12px monospace';
-  ctxA.fillText(meanS + ' cm', studentsX + barW / 2, sTop - 8);
-  ctxA.fillStyle = '#93c5fd';
-  ctxA.font = '11px sans-serif';
-  ctxA.fillText('n = ' + nS, studentsX + barW / 2, baseY + 36);
-
-  // Teachers bar (variable)
-  const tTop = yToPix(x);
-  ctxA.fillStyle = '#f59e0b';
-  ctxA.beginPath();
-  ctxA.roundRect(teachersX, tTop, barW, baseY - tTop, 6);
-  ctxA.fill();
-  ctxA.fillStyle = '#fcd34d';
-  ctxA.font = 'bold 13px sans-serif';
-  ctxA.fillText('Teachers', teachersX + barW / 2, baseY + 20);
-  ctxA.fillStyle = '#fef3c7';
-  ctxA.font = 'bold 12px monospace';
-  ctxA.fillText(x.toFixed(1) + ' cm', teachersX + barW / 2, tTop - 8);
-  ctxA.fillStyle = '#fbbf24';
-  ctxA.font = '11px sans-serif';
-  ctxA.fillText('n = ' + nT, teachersX + barW / 2, baseY + 36);
-
-  // Overall bar (computed)
-  const oTop = yToPix(overall);
-  ctxA.fillStyle = '#10b981';
-  ctxA.beginPath();
-  ctxA.roundRect(overallX, oTop, barW, baseY - oTop, 6);
-  ctxA.fill();
-  ctxA.fillStyle = '#6ee7b7';
-  ctxA.font = 'bold 13px sans-serif';
-  ctxA.fillText('Overall', overallX + barW / 2, baseY + 20);
-  ctxA.fillStyle = '#d1fae5';
-  ctxA.font = 'bold 12px monospace';
-  ctxA.fillText(overall.toFixed(1) + ' cm', overallX + barW / 2, oTop - 8);
-  ctxA.fillStyle = '#34d399';
-  ctxA.font = '11px sans-serif';
-  ctxA.fillText('n = ' + (nS + nT), overallX + barW / 2, baseY + 36);
-
-  // --- dashed target line at 150 ---
-  ctxA.setLineDash([6, 5]);
-  ctxA.strokeStyle = '#f87171';
-  ctxA.lineWidth = 2;
-  const targetY = yToPix(150);
-  ctxA.beginPath();
-  ctxA.moveTo(PAD_L, targetY);
-  ctxA.lineTo(W - PAD_R, targetY);
-  ctxA.stroke();
-  ctxA.setLineDash([]);
-  ctxA.fillStyle = '#f87171';
-  ctxA.font = 'bold 12px sans-serif';
-  ctxA.textAlign = 'left';
-  ctxA.fillText('target overall = 150 cm', PAD_L + 6, targetY - 8);
-
-  // Title
-  ctxA.fillStyle = '#e2e8f0';
-  ctxA.font = 'bold 14px sans-serif';
-  ctxA.textAlign = 'left';
-  ctxA.fillText('Mean heights of the groups (drag slider to change teachers\' mean)', PAD_L, 24);
-
-  // --- readouts ---
-  readoutA.textContent = x.toFixed(1);
-  readoutOverall.textContent = overall.toFixed(2) + ' cm';
-  if (Math.abs(overall - 150) < 0.05) {
-    readoutOverall.style.background = '#d1fae5';
-    readoutOverall.style.color = '#065f46';
-  } else {
-    readoutOverall.style.background = '#fee2e2';
-    readoutOverall.style.color = '#991b1b';
-  }
-}
-
-/* ============================================================
-   CANVAS B — Conservation of total sum (bar comparison)
-   ============================================================ */
-const cvB = document.getElementById('canvasB');
-const ctxB = cvB.getContext('2d');
-const sliderB = document.getElementById('sliderX2');
-const readoutB = document.getElementById('readoutX2');
-const readoutDiff = document.getElementById('readoutDiff');
-
-function drawCanvasB() {
-  const x = parseFloat(sliderB.value);
-  const nT = 25, nS = 140;
-  const meanS = 145, meanAll = 150;
-
-  const sumTeachers = nT * x;           // 25x
-  const sumStudents = nS * meanS;       // 20300
-  const sumOverall  = meanAll * (nT + nS); // 24750
-  const lhs = sumTeachers + sumStudents;
-  const diff = lhs - sumOverall;
-
-  ctxB.clearRect(0, 0, W, H);
-  ctxB.fillStyle = '#0f172a';
-  ctxB.fillRect(0, 0, W, H);
-
-  const plotW = W - PAD_L - PAD_R;
-  const plotH = H - PAD_T - PAD_B;
-  const baseY = PAD_T + plotH;
-
-  // x-range of "total sum": 15000 to 40000
-  const vMin = 15000, vMax = 40000;
-  const yToPix = v => PAD_T + plotH - (v - vMin) / (vMax - vMin) * plotH;
-
-  // grid
-  ctxB.strokeStyle = 'rgba(148,163,184,0.15)';
-  ctxB.lineWidth = 1;
-  ctxB.font = '11px monospace';
-  ctxB.textAlign = 'right';
-  ctxB.fillStyle = '#94a3b8';
-  for (let v = 15000; v <= 40000; v += 5000) {
-    const py = yToPix(v);
-    ctxB.beginPath();
-    ctxB.moveTo(PAD_L, py);
-    ctxB.lineTo(W - PAD_R, py);
-    ctxB.stroke();
-    ctxB.fillText((v / 1000) + 'k', PAD_L - 10, py + 4);
-  }
-  // baseline
-  ctxB.strokeStyle = '#475569';
-  ctxB.lineWidth = 2;
-  ctxB.beginPath();
-  ctxB.moveTo(PAD_L, PAD_T);
-  ctxB.lineTo(PAD_L, baseY);
-  ctxB.lineTo(W - PAD_R, baseY);
-  ctxB.stroke();
-
-  const barW = 130;
-  const groupGap = plotW / 3;
-  const x1 = PAD_L + groupGap * 0.5 - barW / 2;
-  const x2 = PAD_L + groupGap * 1.5 - barW / 2;
-  const x3 = PAD_L + groupGap * 2.5 - barW / 2;
-
-  // Bar 1: students total (fixed)
-  let top = yToPix(sumStudents);
-  ctxB.fillStyle = '#3b82f6';
-  ctxB.beginPath();
-  ctxB.roundRect(x1, top, barW, baseY - top, 6);
-  ctxB.fill();
-  ctxB.fillStyle = '#bfdbfe';
-  ctxB.font = 'bold 13px sans-serif';
-  ctxB.textAlign = 'center';
-  ctxB.fillText('Students', x1 + barW / 2, baseY + 22);
-  ctxB.fillStyle = '#dbeafe';
-  ctxB.font = 'bold 12px monospace';
-  ctxB.fillText(sumStudents + '', x1 + barW / 2, top - 8);
-  ctxB.fillStyle = '#93c5fd';
-  ctxB.font = '11px sans-serif';
-  ctxB.fillText('140 × 145', x1 + barW / 2, baseY + 40);
-
-  // Bar 2: teachers total (variable)
-  top = yToPix(sumTeachers);
-  ctxB.fillStyle = '#f59e0b';
-  ctxB.beginPath();
-  ctxB.roundRect(x2, top, barW, baseY - top, 6);
-  ctxB.fill();
-  ctxB.fillStyle = '#fcd34d';
-  ctxB.font = 'bold 13px sans-serif';
-  ctxB.fillText('Teachers', x2 + barW / 2, baseY + 22);
-  ctxB.fillStyle = '#fef3c7';
-  ctxB.font = 'bold 12px monospace';
-  ctxB.fillText(sumTeachers.toFixed(0) + '', x2 + barW / 2, top - 8);
-  ctxB.fillStyle = '#fbbf24';
-  ctxB.font = '11px sans-serif';
-  ctxB.fillText('25 × ' + x.toFixed(1), x2 + barW / 2, baseY + 40);
-
-  // Bar 3: overall total (fixed target)
-  top = yToPix(sumOverall);
-  ctxB.fillStyle = '#10b981';
-  ctxB.beginPath();
-  ctxB.roundRect(x3, top, barW, baseY - top, 6);
-  ctxB.fill();
-  ctxB.fillStyle = '#6ee7b7';
-  ctxB.font = 'bold 13px sans-serif';
-  ctxB.fillText('Overall target', x3 + barW / 2, baseY + 22);
-  ctxB.fillStyle = '#d1fae5';
-  ctxB.font = 'bold 12px monospace';
-  ctxB.fillText(sumOverall + '', x3 + barW / 2, top - 8);
-  ctxB.fillStyle = '#34d399';
-  ctxB.font = '11px sans-serif';
-  ctxB.fillText('150 × 165', x3 + barW / 2, baseY + 40);
-
-  // dashed target line on overall
-  ctxB.setLineDash([6, 5]);
-  ctxB.strokeStyle = '#f87171';
-  ctxB.lineWidth = 2;
-  const targetY = yToPix(sumOverall);
-  ctxB.beginPath();
-  ctxB.moveTo(PAD_L, targetY);
-  ctxB.lineTo(W - PAD_R, targetY);
-  ctxB.stroke();
-  ctxB.setLineDash([]);
-
-  // Title
-  ctxB.fillStyle = '#e2e8f0';
-  ctxB.font = 'bold 14px sans-serif';
-  ctxB.textAlign = 'left';
-  ctxB.fillText('Total heights: teachers + students must equal overall total', PAD_L, 24);
-
-  // correct marker when diff ≈ 0
-  if (Math.abs(diff) < 0.5) {
-    ctxB.fillStyle = '#34d399';
-    ctxB.font = 'bold 15px sans-serif';
-    ctxB.textAlign = 'center';
-    ctxB.fillText('✓ Sums match — x = 178', W / 2, PAD_T + 18);
-  }
-
-  // readouts
-  readoutB.textContent = x.toFixed(1);
-  readoutDiff.textContent = (diff >= 0 ? '+' : '') + diff.toFixed(1);
-  if (Math.abs(diff) < 0.5) {
-    readoutDiff.style.background = '#d1fae5';
-    readoutDiff.style.color = '#065f46';
-  } else {
-    readoutDiff.style.background = '#fee2e2';
-    readoutDiff.style.color = '#991b1b';
-  }
-}
-
-/* ============================================================
-   roundRect polyfill for older browsers
-   ============================================================ */
-if (!CanvasRenderingContext2D.prototype.roundRect) {
-  CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
-    if (w < 2 * r) r = w / 2;
-    if (h < 2 * r) r = h / 2;
-    this.moveTo(x + r, y);
-    this.arcTo(x + w, y, x + w, y + h, r);
-    this.arcTo(x + w, y + h, x, y + h, r);
-    this.arcTo(x, y + h, x, y, r);
-    this.arcTo(x, y, x + w, y, r);
-    this.closePath();
-    return this;
+  // ---- readouts per step ----
+  const readouts = {
+    1: 'Step 1 — Given: teachers n = 25 (mean unknown x), students n = 140 (mean 145 cm), combined n = 165 (mean 150 cm).',
+    2: 'Step 2 — Weighted-mean equation:  25x + 145×140 = 150×(25+140).',
+    3: 'Step 3 — Evaluate products:  145×140 = 20 300  and  150×165 = 24 750, so 25x + 20 300 = 24 750.',
+    4: 'Step 4 — Solve:  25x = 4 450  ⟹  x = 178 cm.',
+    5: 'Step 5 — Check: 145 ≤ 150 ≤ 178 ✔.  Answer: D (178 cm).'
   };
-}
 
-/* ============================================================
-   EVENT LISTENERS
-   ============================================================ */
-sliderA.addEventListener('input', drawCanvasA);
-sliderB.addEventListener('input', drawCanvasB);
+  // ---- scroll sync ----
+  let current = 1;
+  const io = new IntersectionObserver(es => {
+    es.forEach(e => {
+      if(e.isIntersecting){
+        current = +e.target.dataset.step;
+        draw(current);
+        ro.textContent = readouts[current] || readouts[1];
+        document.querySelectorAll('.step').forEach(s => {
+          s.classList.toggle('active', +s.dataset.step === current);
+        });
+      }
+    });
+  }, { rootMargin: '-25% 0px -55% 0px' });
 
-/* initial draws */
-drawCanvasA();
-drawCanvasB();
+  document.querySelectorAll('.step').forEach(s => io.observe(s));
+  document.querySelectorAll('.step')[0].classList.add('active');
 
-/* redraw on resize to keep crisp */
-window.addEventListener('resize', () => {
-  drawCanvasA();
-  drawCanvasB();
-});
+  draw(1);
+})();
 </script>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
-
 </body>
 </html>

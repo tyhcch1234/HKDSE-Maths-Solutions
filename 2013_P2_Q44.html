@@ -3,432 +3,299 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HKDSE Math 2013 Paper 2 Q44 – Permutations &amp; Counting</title>
-<!-- Tailwind CSS -->
-<script src="https://cdn.tailwindcss.com"></script>
-<!-- MathJax -->
+<title>HKDSE 2013 Paper 2 Q44 — Permutations</title>
 <script>
-  window.MathJax = {
-    tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['\\[', '\\]']] },
-    svg: { fontCache: 'global' }
-  };
+window.MathJax = {
+  tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
+  svg: { fontCache: 'global' }
+};
 </script>
-<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
-  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
-  .step-card { transition: all 0.35s ease; }
-  .step-content { max-height: 0; overflow: hidden; transition: max-height 0.45s ease, padding 0.3s ease; }
-  .step-content.open { max-height: 1200px; }
-  .digit-box {
-    width: 2.4rem; height: 2.8rem; display: flex; align-items: center; justify-content: center;
-    font-weight: 700; font-size: 1.1rem; border-radius: 0.5rem; transition: all 0.25s;
+  :root{
+    --bg:#0f172a; --card:#ffffff; --ink:#0f172a; --muted:#5b6b84;
+    --blue:#2563eb; --green:#16a34a; --orange:#f59e0b; --red:#dc2626; --purple:#7c3aed;
   }
-  .digit-static { background: #e0e7ff; color: #3730a3; border: 2px solid #a5b4fc; }
-  .digit-perm  { background: #fef3c7; color: #92400e; border: 2px solid #fcd34d; cursor: pointer; user-select: none; }
-  .digit-perm:hover { background: #fde68a; transform: scale(1.1); }
-  .digit-perm.assigned { background: #bbf7d0; color: #166534; border-color: #4ade80; }
-  .glow { box-shadow: 0 0 0 4px rgba(99,102,241,0.25); }
-  @media (max-width: 640px) {
-    .digit-box { width: 2rem; height: 2.4rem; font-size: 0.95rem; }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    background:linear-gradient(180deg,#eef2f9 0%,#e3e9f5 100%);
+    color:var(--ink); font-size:16px; line-height:1.55;
   }
+  .wrap{max-width:1180px;margin:0 auto;padding:16px 14px 60px;}
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start;}
+  @media(min-width:900px){.split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}}
+  @media(max-width:640px){body{font-size:14.5px;}.wrap{padding:10px 8px 40px;}}
+
+  .panel{background:var(--card);border-radius:14px;box-shadow:0 6px 20px rgba(15,23,42,.10);padding:14px;}
+  .diagram{position:sticky;top:16px;max-height:calc(100vh - 2rem);overflow-y:auto;}
+  canvas{width:100%;height:auto;display:block;border-radius:10px;}
+  .ro{font-size:.85rem;color:var(--muted);margin:.5rem 0 0;text-align:center;}
+
+  h1{font-size:1.05rem;margin:.1rem 0 .6rem;color:var(--blue);letter-spacing:.2px;}
+  .q{background:#f8fafc;border-left:5px solid var(--blue);border-radius:8px;padding:10px 12px;margin-bottom:12px;}
+  .q b{color:var(--blue);}
+  .choices{list-style:none;padding:0;margin:.6rem 0 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:6px;}
+  .choices li{background:#eef4ff;border:1px solid #c7dbff;border-radius:8px;padding:5px 10px;font-weight:600;color:#1e3a8a;}
+
+  .step{border-left:5px solid var(--green);background:#f7fdf9;border-radius:8px;padding:9px 12px;margin:10px 0;transition:background .3s,border-color .3s,transform .3s;}
+  .step.active{background:#e8f7ee;border-left-color:var(--orange);transform:translateX(3px);}
+  .tag{display:inline-block;font-weight:700;color:#fff;background:var(--green);border-radius:6px;padding:1px 9px;font-size:.82rem;margin-right:8px;}
+  .step.active .tag{background:var(--orange);}
+  .hint{display:block;font-size:.83rem;color:var(--muted);margin-top:5px;font-style:italic;}
+  .ans{margin-top:14px;background:#fff7ed;border:2px solid var(--orange);border-radius:10px;padding:10px 14px;font-weight:700;color:#9a3412;}
+  .chip{display:inline-block;width:22px;height:22px;line-height:22px;text-align:center;border-radius:50%;background:var(--purple);color:#fff;font-size:.75rem;font-weight:700;margin-right:6px;}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;font-size:.8rem;color:var(--muted);margin-top:.5rem;justify-content:center;}
+  .legend span{display:inline-flex;align-items:center;gap:5px;}
+  .dot{width:11px;height:11px;border-radius:3px;display:inline-block;}
 </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen" data-correct="C">
+<body>
+<div class="wrap">
+  <div class="split">
 
-<!-- ================= HEADER ================= -->
-<header class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg">
-  <div class="max-w-4xl mx-auto px-4 py-6 sm:py-8">
-    <p class="text-indigo-200 text-sm font-semibold tracking-wide">HKDSE Mathematics (Compulsory Part) · Paper 2</p><figure style="margin:12px 0;text-align:center;"><img src="figures/2013_P2_Q44.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
-    <h1 class="text-2xl sm:text-3xl font-bold mt-1">2013 Paper 2 — Question 44</h1>
-    <div class="flex flex-wrap gap-2 mt-4">
-      <span class="bg-white/20 rounded-full px-3 py-1 text-xs sm:text-sm font-medium">Permutations</span>
-      <span class="bg-white/20 rounded-full px-3 py-1 text-xs sm:text-sm font-medium">Counting Principle</span>
-      <span class="bg-white/20 rounded-full px-3 py-1 text-xs sm:text-sm font-medium">Factorial</span>
-      <span class="bg-white/20 rounded-full px-3 py-1 text-xs sm:text-sm font-medium">Probability / Counting</span>
+    <!-- ================= LEFT: DIAGRAM ================= -->
+    <div class="panel diagram">
+      <h1>Interactive Diagram</h1>
+      <canvas id="cv" width="620" height="620"></canvas>
+      <p class="ro" id="ro">Step 1 — Identify the two independent blocks.</p>
+      <div class="legend">
+        <span><i class="dot" style="background:#2563eb"></i>First 3 digits</span>
+        <span><i class="dot" style="background:#16a34a"></i>Last 5 digits</span>
+        <span><i class="dot" style="background:#f59e0b"></i>Multiplication</span>
+      </div>
     </div>
+
+    <!-- ================= RIGHT: QUESTION + SOLUTION ================= -->
+    <div class="panel">
+      <h1>HKDSE 2013 Paper 2 · Q44 · Probability</h1>
+
+      <div class="q">
+        <b>[2013MC#44]</b><br>
+        If the first three digits and the last five digits of an eight-digit phone number are formed by a permutation of $5,6,9$ and a permutation of $2,3,4,7,8$ respectively, how many different eight-digit phone numbers can be formed?
+        <ul class="choices">
+          <li>A. 15</li>
+          <li>B. 126</li>
+          <li>C. 720</li>
+          <li>D. 40 320</li>
+        </ul>
+      </div>
+
+      <figure style="margin:12px 0;text-align:center;"><img src="figures/2013_P2_Q44.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
+
+      <div class="step" data-step="1">
+        <span class="tag">Step 1</span><b>Split the number into two blocks.</b><br>
+        The 8-digit number is split into the <b>first 3 digits</b> (from $\{5,6,9\}$) and the <b>last 5 digits</b> (from $\{2,3,4,7,8\}$).
+        <span class="hint">Hint: the two blocks use completely different digit sets, so they are independent.</span>
+      </div>
+
+      <div class="step" data-step="2">
+        <span class="tag">Step 2</span><b>Arrange the first 3 digits.</b><br>
+        A permutation of the 3 digits $5,6,9$:
+        \[ 3! = 3 \times 2 \times 1 = 6 \]
+        <span class="hint">Hint: order matters for phone digits — use permutations, not combinations.</span>
+      </div>
+
+      <div class="step" data-step="3">
+        <span class="tag">Step 3</span><b>Arrange the last 5 digits.</b><br>
+        A permutation of the 5 digits $2,3,4,7,8$:
+        \[ 5! = 5 \times 4 \times 3 \times 2 \times 1 = 120 \]
+        <span class="hint">Hint: all 5 digits are used exactly once.</span>
+      </div>
+
+      <div class="step" data-step="4">
+        <span class="tag">Step 4</span><b>Apply the multiplication rule.</b><br>
+        Since the two blocks are independent, multiply the numbers of arrangements:
+        \[ 3! \times 5! = 6 \times 120 = 720 \]
+        <span class="hint">Hint: independent choices ⇒ multiply.</span>
+      </div>
+
+      <div class="ans">Answer: C &nbsp;·&nbsp; $3! \times 5! = 720$ different eight-digit phone numbers.</div>
+    </div>
+
   </div>
-</header>
-
-<main class="max-w-4xl mx-auto px-4 py-8 space-y-8">
-
-  <!-- ================= QUESTION OVERVIEW ================= -->
-  <section class="bg-white rounded-2xl shadow-md border border-slate-200 p-5 sm:p-8">
-    <h2 class="text-lg sm:text-xl font-bold text-indigo-700 flex items-center gap-2">
-      <span class="inline-block w-1.5 h-6 bg-indigo-500 rounded-full"></span>
-      The Question
-    </h2>
-    <p class="mt-4 leading-relaxed text-slate-700 text-base sm:text-lg">
-      If the <strong class="text-indigo-700">first three digits</strong> and the
-      <strong class="text-purple-700">last five digits</strong> of an eight-digit phone number
-      are formed by a permutation of <strong>5, 6, 9</strong> and a permutation of
-      <strong>2, 3, 4, 7, 8</strong> respectively, how many different eight-digit
-      phone numbers can be formed?
-    </p>
-
-    <!-- Options -->
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6">
-      <button class="option-btn bg-slate-100 hover:bg-indigo-100 border-2 border-slate-200 hover:border-indigo-400 rounded-xl py-3 font-bold text-slate-700 transition"
-              data-opt="A">A. 15</button>
-      <button class="option-btn bg-slate-100 hover:bg-indigo-100 border-2 border-slate-200 hover:border-indigo-400 rounded-xl py-3 font-bold text-slate-700 transition"
-              data-opt="B">B. 126</button>
-      <button class="option-btn bg-slate-100 hover:bg-indigo-100 border-2 border-slate-200 hover:border-indigo-400 rounded-xl py-3 font-bold text-slate-700 transition"
-              data-opt="C">C. 720</button>
-      <button class="option-btn bg-slate-100 hover:bg-indigo-100 border-2 border-slate-200 hover:border-indigo-400 rounded-xl py-3 font-bold text-slate-700 transition"
-              data-opt="D">D. 40 320</button>
-    </div>
-    <div id="option-feedback" class="mt-4 hidden rounded-xl px-4 py-3 text-sm font-medium"></div>
-  </section>
-
-  <!-- ================= VISUALISATION ================= -->
-  <section class="bg-white rounded-2xl shadow-md border border-slate-200 p-5 sm:p-8">
-    <h2 class="text-lg sm:text-xl font-bold text-indigo-700 flex items-center gap-2">
-      <span class="inline-block w-1.5 h-6 bg-indigo-500 rounded-full"></span>
-      Interactive Visualiser — Build a Phone Number
-    </h2>
-    <p class="mt-2 text-slate-600 text-sm sm:text-base">
-      Drag the sliders to choose <em>which</em> permutation of the first block and the second block
-      is used. The digits update in real time.
-    </p>
-
-    <!-- Phone display -->
-    <div class="mt-6 flex flex-wrap justify-center gap-1 sm:gap-2">
-      <!-- first block -->
-      <div class="flex gap-1 sm:gap-2 p-2 rounded-xl bg-indigo-50 border-2 border-indigo-200">
-        <div class="digit-box digit-static" id="f0">5</div>
-        <div class="digit-box digit-static" id="f1">6</div>
-        <div class="digit-box digit-static" id="f2">9</div>
-      </div>
-      <div class="flex items-center px-1 text-slate-400 font-bold hidden sm:flex">|</div>
-      <!-- second block -->
-      <div class="flex gap-1 sm:gap-2 p-2 rounded-xl bg-purple-50 border-2 border-purple-200">
-        <div class="digit-box digit-static" id="s0">2</div>
-        <div class="digit-box digit-static" id="s1">3</div>
-        <div class="digit-box digit-static" id="s2">4</div>
-        <div class="digit-box digit-static" id="s3">7</div>
-        <div class="digit-box digit-static" id="s4">8</div>
-      </div>
-    </div>
-
-    <!-- Sliders -->
-    <div class="mt-6 space-y-5">
-      <div>
-        <label class="block text-sm font-semibold text-slate-700 mb-1">
-          Permutation index for <span class="text-indigo-700">first three digits</span> —
-          <span id="p1-label" class="font-mono text-indigo-600">1 / 6</span>
-        </label>
-        <input type="range" id="p1-slider" min="0" max="5" value="0" step="1"
-               class="w-full h-2 accent-indigo-600 cursor-pointer">
-      </div>
-      <div>
-        <label class="block text-sm font-semibold text-slate-700 mb-1">
-          Permutation index for <span class="text-purple-700">last five digits</span> —
-          <span id="p2-label" class="font-mono text-purple-600">1 / 120</span>
-        </label>
-        <input type="range" id="p2-slider" min="0" max="119" value="0" step="1"
-               class="w-full h-2 accent-purple-600 cursor-pointer">
-      </div>
-    </div>
-
-    <!-- Counters -->
-    <div class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3 text-center">
-      <div class="bg-indigo-50 rounded-xl p-3 border border-indigo-200">
-        <p class="text-xs text-indigo-500 font-semibold uppercase">First-block ways</p>
-        <p class="text-2xl font-extrabold text-indigo-700" id="count-first">3! = 6</p>
-      </div>
-      <div class="bg-purple-50 rounded-xl p-3 border border-purple-200">
-        <p class="text-xs text-purple-500 font-semibold uppercase">Second-block ways</p>
-        <p class="text-2xl font-extrabold text-purple-700" id="count-second">5! = 120</p>
-      </div>
-      <div class="bg-green-50 rounded-xl p-3 border border-green-200">
-        <p class="text-xs text-green-600 font-semibold uppercase">Total numbers</p>
-        <p class="text-2xl font-extrabold text-green-700" id="count-total">720</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ================= STEP-BY-STEP SOLUTION ================= -->
-  <section class="space-y-4">
-    <h2 class="text-lg sm:text-xl font-bold text-indigo-700 flex items-center gap-2">
-      <span class="inline-block w-1.5 h-6 bg-indigo-500 rounded-full"></span>
-      Step-by-Step Guided Solution
-    </h2>
-
-    <!-- STEP 1 -->
-    <div class="step-card bg-white rounded-2xl shadow border border-slate-200 overflow-hidden">
-      <button class="step-toggle w-full flex items-center justify-between px-5 py-4 text-left hover:bg-slate-50 transition">
-        <span class="flex items-center gap-3">
-          <span class="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-sm">1</span>
-          <span class="font-semibold text-slate-800">Understand what is fixed and what varies</span>
-        </span>
-        <span class="text-indigo-500 text-xl font-bold step-arrow transition-transform duration-300">+</span>
-      </button>
-      <div class="step-content px-5 pb-0">
-        <div class="pb-5 text-slate-700 leading-relaxed space-y-3">
-          <p>
-            An <strong>eight-digit phone number</strong> is split into two independent blocks:
-          </p>
-          <ul class="list-disc list-inside space-y-1 ml-2">
-            <li>Positions 1–3 are <em>some permutation</em> of the digits \(\{5, 6, 9\}\).</li>
-            <li>Positions 4–8 are <em>some permutation</em> of the digits \(\{2, 3, 4, 7, 8\}\).</li>
-          </ul>
-          <p>
-            No digit is repeated inside a block, and no digit crosses from one block to the other —
-            so we can count each block separately and multiply.
-          </p>
-          <div class="bg-amber-50 border-l-4 border-amber-400 rounded-r-lg p-3 text-sm">
-            <strong>💡 Hint:</strong> When a task splits into stages, the
-            <em>Multiplication Principle</em> says:
-            \[ \text{Total} = (\text{ways for stage 1}) \times (\text{ways for stage 2}). \]
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- STEP 2 -->
-    <div class="step-card bg-white rounded-2xl shadow border border-slate-200 overflow-hidden">
-      <button class="step-toggle w-full flex items-center justify-between px-5 py-4 text-left hover:bg-slate-50 transition">
-        <span class="flex items-center gap-3">
-          <span class="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-sm">2</span>
-          <span class="font-semibold text-slate-800">Count the arrangements of the first three digits</span>
-        </span>
-        <span class="text-indigo-500 text-xl font-bold step-arrow transition-transform duration-300">+</span>
-      </button>
-      <div class="step-content px-5 pb-0">
-        <div class="pb-5 text-slate-700 leading-relaxed space-y-3">
-          <p>We have 3 distinct digits: \(5, 6, 9\). We want to fill 3 positions.</p>
-          <p>Using the <strong>factorial</strong> for permutations of \(n\) distinct objects:</p>
-          \[ P(n,n) = n! = n \times (n-1) \times \dots \times 1. \]
-          <p>So the number of ways to arrange the first block is:</p>
-          \[ 3! = 3 \times 2 \times 1 = 6. \]
-          <div class="bg-amber-50 border-l-4 border-amber-400 rounded-r-lg p-3 text-sm">
-            <strong>💡 Hint:</strong> \(3!\) counts every possible ordering of three distinct items.
-            For example: \(569,\ 596,\ 659,\ 695,\ 956,\ 965\).
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- STEP 3 -->
-    <div class="step-card bg-white rounded-2xl shadow border border-slate-200 overflow-hidden">
-      <button class="step-toggle w-full flex items-center justify-between px-5 py-4 text-left hover:bg-slate-50 transition">
-        <span class="flex items-center gap-3">
-          <span class="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-sm">3</span>
-          <span class="font-semibold text-slate-800">Count the arrangements of the last five digits</span>
-        </span>
-        <span class="text-indigo-500 text-xl font-bold step-arrow transition-transform duration-300">+</span>
-      </button>
-      <div class="step-content px-5 pb-0">
-        <div class="pb-5 text-slate-700 leading-relaxed space-y-3">
-          <p>We have 5 distinct digits: \(2, 3, 4, 7, 8\). We want to fill 5 positions.</p>
-          <p>Again using the factorial:</p>
-          \[ 5! = 5 \times 4 \times 3 \times 2 \times 1 = 120. \]
-          <div class="bg-amber-50 border-l-4 border-amber-400 rounded-r-lg p-3 text-sm">
-            <strong>💡 Hint:</strong> \(5! = 120\) counts every possible ordering of five distinct items.
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- STEP 4 -->
-    <div class="step-card bg-white rounded-2xl shadow border border-slate-200 overflow-hidden">
-      <button class="step-toggle w-full flex items-center justify-between px-5 py-4 text-left hover:bg-slate-50 transition">
-        <span class="flex items-center gap-3">
-          <span class="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-sm">4</span>
-          <span class="font-semibold text-slate-800">Combine the two independent choices</span>
-        </span>
-        <span class="text-indigo-500 text-xl font-bold step-arrow transition-transform duration-300">+</span>
-      </button>
-      <div class="step-content px-5 pb-0">
-        <div class="pb-5 text-slate-700 leading-relaxed space-y-3">
-          <p>
-            Because the first block and the second block do not share any digits, choosing
-            an arrangement for the first block does not restrict the second block.
-          </p>
-          <p>Therefore, by the <strong>Multiplication Principle</strong>:</p>
-          \[ \text{Total} = 3! \times 5! = 6 \times 120 = 720. \]
-          <div class="mt-4 bg-green-50 border-2 border-green-300 rounded-xl p-4 text-center">
-            <p class="text-sm text-green-700 font-semibold">Answer</p>
-            <p class="text-3xl font-extrabold text-green-700 mt-1">C. 720</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ================= KEY TAKEAWAYS ================= -->
-  <section class="bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl shadow-lg p-6 sm:p-8 text-white">
-    <h2 class="text-lg sm:text-xl font-bold flex items-center gap-2">
-      <span class="text-2xl">🔑</span> Key Takeaways
-    </h2>
-    <ul class="mt-4 space-y-3 text-sm sm:text-base text-indigo-100">
-      <li class="flex gap-3">
-        <span class="flex-shrink-0 w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-xs font-bold">1</span>
-        <span>If \(n\) distinct objects must fill \(n\) positions, the number of permutations is \(n!\).</span>
-      </li>
-      <li class="flex gap-3">
-        <span class="flex-shrink-0 w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-xs font-bold">2</span>
-        <span>When stages are independent, multiply the number of choices: \(3! \times 5! = 720\).</span>
-      </li>
-      <li class="flex gap-3">
-        <span class="flex-shrink-0 w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-xs font-bold">3</span>
-        <span>Watch out for false distractors: \(3! + 5! = 126\) and \(5! \times 336 = 40320\) — check what each answer represents!</span>
-      </li>
-    </ul>
-  </section>
-
-  <!-- ================= RESET ================= -->
-  <div class="text-center pb-10">
-    <button id="reset-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold px-6 py-3 rounded-xl transition">
-      ↺ Reset page
-    </button>
-  </div>
-</main>
+</div>
 
 <script>
-/* ---------- Accordion ---------- */
-document.querySelectorAll('.step-toggle').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const content = btn.nextElementSibling;
-    const arrow = btn.querySelector('.step-arrow');
-    const isOpen = content.classList.contains('open');
-    if (isOpen) {
-      content.classList.remove('open');
-      arrow.style.transform = 'rotate(0deg)';
-    } else {
-      content.classList.add('open');
-      arrow.style.transform = 'rotate(45deg)';
-    }
-  });
-});
+(function(){
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  const ro = document.getElementById('ro');
+  let current = 1;
 
-/* ---------- Permutation Generators ---------- */
-function permutations(arr) {
-  if (arr.length <= 1) return [arr.slice()];
-  const result = [];
-  for (let i = 0; i < arr.length; i++) {
-    const rest = arr.slice(0, i).concat(arr.slice(i + 1));
-    const sub = permutations(rest);
-    for (const p of sub) result.push([arr[i], ...p]);
+  // helper
+  function rr(x,y,w,h,r){
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);
+    ctx.arcTo(x+w,y,x+w,y+h,r);
+    ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r);
+    ctx.arcTo(x,y,x+w,y,r);
+    ctx.closePath();
   }
-  return result;
-}
 
-const perm1 = permutations([5, 6, 9]);       // 6 permutations
-const perm2 = permutations([2, 3, 4, 7, 8]); // 120 permutations
+  function digitBox(x,y,w,h,digit,color,active){
+    ctx.save();
+    ctx.shadowColor = active? color : 'rgba(15,23,42,.12)';
+    ctx.shadowBlur = active? 14 : 6;
+    ctx.shadowOffsetY = active? 4 : 2;
+    ctx.fillStyle = active? color : '#ffffff';
+    rr(x,y,w,h,10); ctx.fill();
+    ctx.shadowColor='transparent';
+    ctx.lineWidth = active? 3 : 2;
+    ctx.strokeStyle = color;
+    rr(x,y,w,h,10); ctx.stroke();
+    ctx.fillStyle = active? '#ffffff' : '#0f172a';
+    ctx.font = 'bold 34px "Segoe UI", Arial';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(digit, x+w/2, y+h/2+1);
+    ctx.restore();
+  }
 
-/* ---------- Visualiser ---------- */
-const p1Slider = document.getElementById('p1-slider');
-const p2Slider = document.getElementById('p2-slider');
-const p1Label  = document.getElementById('p1-label');
-const p2Label  = document.getElementById('p2-label');
+  function arrowH(x1,x2,y,color,label){
+    ctx.save();
+    ctx.strokeStyle=color; ctx.lineWidth=3; ctx.fillStyle=color;
+    ctx.beginPath(); ctx.moveTo(x1,y); ctx.lineTo(x2,y); ctx.stroke();
+    // head
+    ctx.beginPath(); ctx.moveTo(x2+12,y); ctx.lineTo(x2-2,y-8); ctx.lineTo(x2-2,y+8); ctx.closePath(); ctx.fill();
+    // label
+    ctx.font='bold 22px "Segoe UI", Arial'; ctx.textAlign='center'; ctx.textBaseline='bottom';
+    ctx.fillText(label,(x1+x2)/2, y-12);
+    ctx.restore();
+  }
 
-function updateVisualiser() {
-  const i1 = parseInt(p1Slider.value, 10);
-  const i2 = parseInt(p2Slider.value, 10);
+  function draw(step){
+    const W = cv.width, H = cv.height;
+    ctx.clearRect(0,0,W,H);
 
-  // first block
-  perm1[i1].forEach((d, idx) => {
-    const el = document.getElementById('f' + idx);
-    el.textContent = d;
-    el.classList.add('glow');
-    setTimeout(() => el.classList.remove('glow'), 300);
-  });
+    // background
+    const g = ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,'#f8fafc'); g.addColorStop(1,'#eef2f9');
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
 
-  // second block
-  perm2[i2].forEach((d, idx) => {
-    const el = document.getElementById('s' + idx);
-    el.textContent = d;
-    el.classList.add('glow');
-    setTimeout(() => el.classList.remove('glow'), 300);
-  });
+    // Title
+    ctx.fillStyle = '#0f172a';
+    ctx.font = 'bold 22px "Segoe UI", Arial';
+    ctx.textAlign='center'; ctx.textBaseline='top';
+    ctx.fillText('8-Digit Phone Number', W/2, 22);
+    ctx.font = '16px "Segoe UI", Arial';
+    ctx.fillStyle = '#5b6b84';
+    ctx.fillText('Block 1: 3 digits   |   Block 2: 5 digits', W/2, 52);
 
-  p1Label.textContent = (i1 + 1) + ' / 6';
-  p2Label.textContent = (i2 + 1) + ' / 120';
-}
-
-p1Slider.addEventListener('input', updateVisualiser);
-p2Slider.addEventListener('input', updateVisualiser);
-updateVisualiser();
-
-/* ---------- Option checking ---------- */
-const correct = 'C';
-document.querySelectorAll('.option-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const chosen = btn.dataset.opt;
-    const fb = document.getElementById('option-feedback');
-    fb.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800');
-
-    // reset styles
-    document.querySelectorAll('.option-btn').forEach(b => {
-      b.classList.remove('bg-green-200', 'border-green-500', 'bg-red-200', 'border-red-500');
-      b.classList.add('bg-slate-100', 'border-slate-200');
+    // ---- Block 1: first three digits ----
+    const b1y = 110;
+    const b1x = 60;
+    const bw = 100, bh = 100, gap = 14;
+    const firstDigits = ['5','6','9'];
+    const c1 = '#2563eb';
+    ctx.font='bold 17px "Segoe UI", Arial'; ctx.fillStyle=c1; ctx.textAlign='left';
+    ctx.fillText('First 3 digits — from {5, 6, 9}', b1x, b1y-30);
+    firstDigits.forEach((d,i)=>{
+      digitBox(b1x + i*(bw+gap), b1y, bw, bh, d, c1, step===1 || step===2);
     });
 
-    if (chosen === correct) {
-      fb.textContent = '✅ Correct! The total number of phone numbers is 720.';
-      fb.classList.add('bg-green-100', 'text-green-800');
-      btn.classList.remove('bg-slate-100', 'border-slate-200');
-      btn.classList.add('bg-green-200', 'border-green-500');
-    } else {
-      fb.textContent = '❌ Not quite. Think about whether the two blocks are independent, and whether you should add or multiply.';
-      fb.classList.add('bg-red-100', 'text-red-800');
-      btn.classList.remove('bg-slate-100', 'border-slate-200');
-      btn.classList.add('bg-red-200', 'border-red-500');
+    // ---- Block 2: last five digits ----
+    const b2y = b1y + bh + 120;
+    const lastDigits = ['2','3','4','7','8'];
+    const c2 = '#16a34a';
+    ctx.font='bold 17px "Segoe UI", Arial'; ctx.fillStyle=c2; ctx.textAlign='left';
+    ctx.fillText('Last 5 digits — from {2, 3, 4, 7, 8}', b1x, b2y-30);
+    const bw2 = 90, gap2 = 10;
+    lastDigits.forEach((d,i)=>{
+      digitBox(b1x + i*(bw2+gap2), b2y, bw2, bh, d, c2, step===1 || step===3);
+    });
+
+    // ---- permutation labels under each block ----
+    const c2x = b1x;
+    ctx.textAlign='center'; ctx.textBaseline='top';
+    ctx.font='bold 18px "Segoe UI", Arial';
+
+    // Block1 label
+    const b1cx = b1x + (3*bw + 2*gap)/2;
+    ctx.fillStyle = (step===2)?'#f59e0b':'#2563eb';
+    ctx.fillText('3! = 6 orders', b1cx, b1y + bh + 16);
+    if(step===2){
+      ctx.strokeStyle='#f59e0b'; ctx.lineWidth=2; ctx.setLineDash([6,5]);
+      rr(b1x-6,b1y-6,3*bw+2*gap+12,bh+12,14); ctx.stroke(); ctx.setLineDash([]);
     }
-    fb.classList.remove('hidden');
-  });
-});
 
-/* ---------- Reset ---------- */
-document.getElementById('reset-btn').addEventListener('click', () => {
-  p1Slider.value = 0;
-  p2Slider.value = 0;
-  updateVisualiser();
-  document.querySelectorAll('.step-content').forEach(c => c.classList.remove('open'));
-  document.querySelectorAll('.step-arrow').forEach(a => a.style.transform = 'rotate(0deg)');
-  document.querySelectorAll('.option-btn').forEach(b => {
-    b.classList.remove('bg-green-200', 'border-green-500', 'bg-red-200', 'border-red-500');
-    b.classList.add('bg-slate-100', 'border-slate-200');
-  });
-  const fb = document.getElementById('option-feedback');
-  fb.classList.add('hidden');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-});
+    // Block2 label
+    const b2cx = b1x + (5*bw2 + 4*gap2)/2;
+    ctx.fillStyle = (step===3)?'#f59e0b':'#16a34a';
+    ctx.fillText('5! = 120 orders', b2cx, b2y + bh + 16);
+    if(step===3){
+      ctx.strokeStyle='#f59e0b'; ctx.lineWidth=2; ctx.setLineDash([6,5]);
+      rr(b1x-6,b2y-6,5*bw2+4*gap2+12,bh+12,14); ctx.stroke(); ctx.setLineDash([]);
+    }
 
-/* ---------- Open first step by default ---------- */
-document.querySelector('.step-toggle').click();
+    // ---- multiplication (step 4) ----
+    if(step===4){
+      // big × between blocks
+      ctx.save();
+      ctx.fillStyle='#f59e0b';
+      ctx.font='bold 64px "Segoe UI", Arial';
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText('×', W/2, (b1y+bh + b2y)/2 - 6);
+      ctx.restore();
+
+      // result box
+      const rw=430, rh=80;
+      const rx=(W-rw)/2, ry=H-120;
+      ctx.save();
+      ctx.shadowColor='rgba(245,158,11,.6)'; ctx.shadowBlur=16;
+      ctx.fillStyle='#fff7ed';
+      rr(rx,ry,rw,rh,14); ctx.fill();
+      ctx.shadowColor='transparent';
+      ctx.lineWidth=3; ctx.strokeStyle='#f59e0b';
+      rr(rx,ry,rw,rh,14); ctx.stroke();
+      ctx.fillStyle='#9a3412';
+      ctx.font='bold 26px "Segoe UI", Arial';
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText('3! × 5! = 6 × 120 = 720', W/2, ry+rh/2);
+      ctx.restore();
+    }else{
+      // faint result preview
+      ctx.save();
+      ctx.fillStyle='#cbd5e1';
+      ctx.font='bold 22px "Segoe UI", Arial';
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText('? ? ?', W/2, H-80);
+      ctx.restore();
+    }
+
+    // readout
+    const msgs = {
+      1:'Step 1 — Identify the two independent blocks.',
+      2:'Step 2 — Arrange the first 3 digits: 3! = 6.',
+      3:'Step 3 — Arrange the last 5 digits: 5! = 120.',
+      4:'Step 4 — Multiply: 3! × 5! = 720.'
+    };
+    ro.textContent = msgs[step] || msgs[1];
+  }
+
+  draw(1);
+
+  // scroll-sync
+  const io = new IntersectionObserver(es=>{
+    es.forEach(e=>{
+      if(e.isIntersecting){
+        current = +e.target.dataset.step;
+        document.querySelectorAll('.step').forEach(s=>{
+          s.classList.toggle('active', +s.dataset.step === current);
+        });
+        draw(current);
+      }
+    });
+  },{rootMargin:'-25% 0px -55% 0px'});
+
+  document.querySelectorAll('.step').forEach(s=>io.observe(s));
+  // initial active
+  document.querySelector('.step[data-step="1"]').classList.add('active');
+
+  // redraw on resize for crisp canvas
+  window.addEventListener('resize', ()=>draw(current));
+})();
 </script>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
-
 </body>
 </html>

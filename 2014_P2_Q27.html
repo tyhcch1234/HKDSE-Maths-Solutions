@@ -1,360 +1,557 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HKDSE 2014 P2 Q27 · Probability</title>
-  <!-- Tailwind CSS (lightweight, utility-first) -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- MathJax for beautiful LaTeX rendering -->
-  <script>
-    MathJax = {
-      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
-      svg: { fontCache: 'global' }
-    };
-  </script>
-  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-  <style>
-    /* Custom smooth transitions and subtle design touches */
-    body {
-      background: linear-gradient(145deg, #f8fafc 0%, #eef2f6 100%);
-      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-    }
-    .card-shadow {
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04), 0 2px 6px rgba(0, 0, 0, 0.02);
-    }
-    .step-card {
-      transition: all 0.2s ease;
-    }
-    .step-card:hover {
-      border-color: #6366f1;
-    }
-    .ball-yellow {
-      background-color: #facc15;
-      box-shadow: 0 2px 6px rgba(250, 204, 21, 0.5);
-    }
-    .ball-black {
-      background-color: #1e293b;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-    }
-    .ball-dot {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      display: inline-block;
-      transition: transform 0.15s ease;
-      flex-shrink: 0;
-    }
-    .ball-dot:hover {
-      transform: scale(1.15);
-    }
-    .slider-accent {
-      accent-color: #4f46e5;
-    }
-    .badge-tag {
-      @apply text-xs font-medium px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2014 P2 Q27 — Probability</title>
+<style>
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:#f4f7fb;
+    color:#1c2733;
+    line-height:1.55;
+  }
+  .wrap{
+    max-width:1180px;
+    margin:0 auto;
+    padding:16px 14px 60px;
+  }
+  .split{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    gap:12px;
+    align-items:start;
+  }
+  @media(min-width:900px){
+    .split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}
+  }
+  .diagram{
+    position:sticky;
+    top:16px;
+    max-height:calc(100vh - 2rem);
+    overflow-y:auto;
+    background:#ffffff;
+    border-radius:14px;
+    padding:12px;
+    box-shadow:0 4px 18px rgba(20,45,80,.10);
+  }
+  @media(max-width:640px){
+    body{font-size:14.5px;}
+    .wrap{padding:10px 8px 40px;}
+  }
+  canvas{
+    width:100%;
+    height:auto;
+    display:block;
+    border-radius:10px;
+    background:#fbfdff;
+  }
+  .ro{
+    margin:10px 4px 2px;
+    font-size:13.5px;
+    color:#3c4a5a;
+    background:#eef4fb;
+    border-left:4px solid #2f7fd1;
+    padding:6px 10px;
+    border-radius:6px;
+  }
+  h1{
+    font-size:19px;
+    margin:4px 0 10px;
+    color:#123d63;
+  }
+  .qbox{
+    background:#ffffff;
+    border-radius:14px;
+    padding:14px 16px;
+    box-shadow:0 4px 18px rgba(20,45,80,.10);
+    margin-bottom:14px;
+  }
+  .qbox .tag{
+    display:inline-block;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:.5px;
+    color:#fff;
+    background:#2f7fd1;
+    padding:2px 9px;
+    border-radius:20px;
+    margin-bottom:8px;
+  }
+  .step{
+    background:#ffffff;
+    border-radius:12px;
+    padding:12px 14px 12px 16px;
+    margin-bottom:12px;
+    box-shadow:0 3px 12px rgba(20,45,80,.08);
+    border-left:5px solid #cfe0f2;
+    transition:border-color .25s, transform .25s;
+  }
+  .step.active{
+    border-left-color:#e8890c;
+    transform:translateX(2px);
+  }
+  .step .chip{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:24px;height:24px;
+    border-radius:50%;
+    background:#2f7fd1;
+    color:#fff;
+    font-size:13px;
+    font-weight:700;
+    margin-right:8px;
+  }
+  .step.active .chip{background:#e8890c;}
+  .step b.stepname{color:#123d63;}
+  .hint{
+    margin-top:8px;
+    font-size:13.5px;
+    color:#54637a;
+    background:#f4f8fd;
+    border-radius:8px;
+    padding:6px 10px;
+  }
+  .hint::before{content:"💡 ";}
+  .answer{
+    background:linear-gradient(135deg,#e9f7ef,#d7f0e3);
+    border:2px solid #34a06a;
+    border-radius:12px;
+    padding:12px 16px;
+    font-size:17px;
+    font-weight:700;
+    color:#15603e;
+    margin-top:6px;
+  }
+  .opts{
+    margin:6px 0 0;
+    padding-left:20px;
+  }
+  .opts li{margin:2px 0;}
+  .legend{
+    display:flex;
+    gap:14px;
+    flex-wrap:wrap;
+    font-size:13px;
+    margin:8px 4px 0;
+    color:#3c4a5a;
+  }
+  .legend span{display:inline-flex;align-items:center;gap:5px;}
+  .dot{width:12px;height:12px;border-radius:50%;display:inline-block;}
+</style>
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']]
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 </head>
-<body class="min-h-screen flex items-start justify-center p-4 md:p-8">
-  <main class="w-full max-w-3xl">
+<body>
+<div class="wrap">
+  <div class="split">
 
-    <!-- ===== HEADER / TITLE ===== -->
-    <div class="mb-6">
-      <p class="text-sm font-semibold text-indigo-600 tracking-wide">HKDSE Math 2014 Paper 2 · Q27</p><figure style="margin:12px 0;text-align:center;"><img src="figures/2014_P2_Q27.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
-      <h1 class="text-2xl md:text-3xl font-bold text-slate-800 mt-1">Probability · Solving for <span class="text-indigo-600">m</span></h1>
-      <div class="flex flex-wrap gap-2 mt-3">
-        <span class="text-xs font-medium px-3 py-1 rounded-full bg-indigo-100 text-indigo-800">Probability</span>
-        <span class="text-xs font-medium px-3 py-1 rounded-full bg-emerald-100 text-emerald-800">Algebra</span>
-        <span class="text-xs font-medium px-3 py-1 rounded-full bg-amber-100 text-amber-800">Quadratic Equation</span>
+    <!-- LEFT PANE : DIAGRAM -->
+    <div class="diagram">
+      <canvas id="cv" width="620" height="520"></canvas>
+      <div class="legend">
+        <span><i class="dot" style="background:#f2c027;"></i>Yellow balls ($m$)</span>
+        <span><i class="dot" style="background:#2b2b2b;"></i>Black balls (20)</span>
+      </div>
+      <p class="ro" id="ro">Step 1 — The box holds $m$ yellow balls and 20 black balls.</p>
+    </div>
+
+    <!-- RIGHT PANE : QUESTION + SOLUTION -->
+    <div class="content">
+      <h1>HKDSE 2014 Paper 2 — Q27</h1>
+
+      <div class="qbox">
+        <span class="tag">QUESTION</span>
+        <p style="margin-top:4px;">
+          A box contains $m$ yellow balls and 20 black balls. If a ball is randomly drawn from the box,
+          then the probability of drawing a yellow ball is $\dfrac{1}{m}$. Find the value of $m$.
+        </p>
+        <ol class="opts" type="A">
+          <li>4</li>
+          <li>5</li>
+          <li>15</li>
+          <li>25</li>
+        </ol>
+      </div>
+
+      <figure style="margin:12px 0;text-align:center;"><img src="figures/2014_P2_Q27.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
+
+      <div class="step" data-step="1">
+        <span class="chip">1</span><b class="stepname">Set up the total number of balls.</b>
+        <p>
+          Number of yellow balls $= m$<br>
+          Number of black balls $= 20$<br>
+          Total number of balls in the box $= m + 20$
+        </p>
+        <div class="hint">Always write the total first — probability is the favourable count divided by the total count.</div>
+      </div>
+
+      <div class="step" data-step="2">
+        <span class="chip">2</span><b class="stepname">Write the probability of a yellow ball.</b>
+        <p>
+          $P(\text{yellow}) = \dfrac{\text{number of yellow balls}}{\text{total number of balls}}$
+          $= \dfrac{m}{m+20}$
+        </p>
+        <div class="hint">This must equal the given value $\dfrac{1}{m}$.</div>
+      </div>
+
+      <div class="step" data-step="3">
+        <span class="chip">3</span><b class="stepname">Form and simplify the equation.</b>
+        <p>
+          $\dfrac{m}{m+20} = \dfrac{1}{m}$
+        </p>
+        <p>
+          Cross-multiply: $m \times m = 1 \times (m+20)$
+        </p>
+        <p>
+          $m^{2} = m + 20$
+        </p>
+        <div class="hint">Cross-multiplication is allowed since $m \neq 0$ and $m + 20 \neq 0$.</div>
+      </div>
+
+      <div class="step" data-step="4">
+        <span class="chip">4</span><b class="stepname">Solve the quadratic equation.</b>
+        <p>
+          $m^{2} - m - 20 = 0$
+        </p>
+        <p>
+          $(m - 5)(m + 4) = 0$
+        </p>
+        <p>
+          $m = 5$ &nbsp; or &nbsp; $m = -4$
+        </p>
+        <div class="hint">Factorise by finding two numbers multiplying to $-20$ and adding to $-1$.</div>
+      </div>
+
+      <div class="step" data-step="5">
+        <span class="chip">5</span><b class="stepname">Reject the invalid root.</b>
+        <p>
+          Since $m$ is the number of yellow balls, $m$ must be a positive integer.
+        </p>
+        <p>
+          So $m = -4$ is rejected, leaving $m = 5$.
+        </p>
+        <p>
+          <em>Check:</em> $P(\text{yellow}) = \dfrac{5}{5+20} = \dfrac{5}{25} = \dfrac{1}{5}$ ✓
+        </p>
+        <div class="hint">A count of balls can never be negative — always check that the root is physically reasonable.</div>
+      </div>
+
+      <div class="answer">
+        Answer: B &nbsp;( $m = 5$ )
       </div>
     </div>
 
-    <!-- ===== QUESTION CARD ===== -->
-    <section class="bg-white rounded-2xl p-5 md:p-6 card-shadow border border-slate-200/60 mb-8">
-      <h2 class="text-lg font-semibold text-slate-700 mb-3 flex items-center gap-2">
-        <span class="w-7 h-7 rounded-full bg-indigo-500 text-white text-sm flex items-center justify-center font-bold">Q</span>
-        Question
-      </h2>
-      <p class="text-slate-700 leading-relaxed">
-        A box contains <span class="font-semibold text-indigo-600">m</span> yellow balls and <span class="font-semibold text-slate-800">20</span> black balls.
-        If a ball is randomly drawn from the box, then the probability of drawing a yellow ball is
-        <span class="inline-block mx-1 align-middle">
-          <span class="text-base font-semibold text-indigo-600">\(\dfrac{1}{m}\)</span>
-        </span>.
-        Find the value of <span class="font-semibold text-indigo-600">m</span>.
-      </p>
-      <div class="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div class="bg-slate-50 border border-slate-200 rounded-xl py-2 text-center text-sm font-medium text-slate-700">A. 4</div>
-        <div class="bg-slate-50 border border-slate-200 rounded-xl py-2 text-center text-sm font-medium text-slate-700">B. 5</div>
-        <div class="bg-slate-50 border border-slate-200 rounded-xl py-2 text-center text-sm font-medium text-slate-700">C. 15</div>
-        <div class="bg-slate-50 border border-slate-200 rounded-xl py-2 text-center text-sm font-medium text-slate-700">D. 25</div>
-      </div>
-    </section>
+  </div>
+</div>
 
-    <!-- ===== VISUAL: BALLS IN BOX ===== -->
-    <section class="bg-white rounded-2xl p-5 md:p-6 card-shadow border border-slate-200/60 mb-8">
-      <h2 class="text-lg font-semibold text-slate-700 mb-4 flex items-center gap-2">
-        <span class="w-7 h-7 rounded-full bg-emerald-500 text-white text-sm flex items-center justify-center font-bold">👀</span>
-        Visualise the box
-      </h2>
-      <p class="text-sm text-slate-500 mb-3">Number of yellow balls <span class="font-mono font-semibold text-indigo-600">m</span> can be changed with the slider.</p>
+<script>
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  const ro = document.getElementById('ro');
 
-      <!-- Slider for interactive m -->
-      <div class="flex items-center gap-4 mb-5">
-        <input type="range" id="mSlider" min="1" max="30" value="10" step="1"
-               class="w-full h-2 rounded-lg bg-slate-200 appearance-none cursor-pointer slider-accent">
-        <span class="text-sm font-semibold text-slate-700 bg-slate-100 px-3 py-1 rounded-lg shrink-0">
-          m = <span id="mValue">10</span>
-        </span>
-      </div>
+  const W = cv.width, H = cv.height;
 
-      <!-- Ball display area -->
-      <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 min-h-[96px] flex flex-wrap gap-2 items-center justify-start" id="ballContainer">
-        <!-- balls will be injected by JS -->
-      </div>
+  // Colours
+  const YELLOW = '#f2c027';
+  const YELLOW_D = '#c79c10';
+  const BLACK = '#2b2b2b';
+  const BLACK_L = '#555';
+  const BLUE = '#2f7fd1';
+  const ORANGE = '#e8890c';
+  const GREEN = '#34a06a';
+  const GREY = '#8fa2b8';
 
-      <!-- Live probability display -->
-      <div class="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
-        <div class="flex items-center gap-2">
-          <span class="text-slate-500">Total balls:</span>
-          <span class="font-semibold text-slate-800" id="totalBalls">30</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="text-slate-500">P(yellow) =</span>
-          <span class="font-semibold text-indigo-600" id="probDisplay">\(\frac{10}{30} = 0.333\)</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="text-slate-500">Target \(\frac{1}{m}\):</span>
-          <span class="font-semibold text-amber-600" id="targetDisplay">\(\frac{1}{10} = 0.100\)</span>
-        </div>
-      </div>
-    </section>
+  // ---------- Helpers ----------
+  function roundRect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
 
-    <!-- ===== STEP-BY-STEP SOLUTION ===== -->
-    <section class="mb-8">
-      <h2 class="text-lg font-semibold text-slate-700 mb-4 flex items-center gap-2">
-        <span class="w-7 h-7 rounded-full bg-amber-500 text-white text-sm flex items-center justify-center font-bold">📝</span>
-        Step-by-step Solution
-      </h2>
+  function ball(cx, cy, r, colour, dark, label) {
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    const g = ctx.createRadialGradient(cx - r * 0.35, cy - r * 0.35, r * 0.15, cx, cy, r);
+    g.addColorStop(0, '#ffffff');
+    g.addColorStop(0.35, colour);
+    g.addColorStop(1, dark);
+    ctx.fillStyle = g;
+    ctx.fill();
+    ctx.lineWidth = 1.2;
+    ctx.strokeStyle = 'rgba(0,0,0,.18)';
+    ctx.stroke();
+    if (label) {
+      ctx.fillStyle = (colour === YELLOW) ? '#5a4400' : '#ffffff';
+      ctx.font = 'bold 11px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(label, cx, cy);
+    }
+  }
 
-      <!-- Step 1 -->
-      <div class="step-card bg-white border border-slate-200 rounded-2xl p-5 mb-4 card-shadow">
-        <div class="flex items-start gap-3">
-          <span class="bg-indigo-100 text-indigo-700 text-sm font-bold w-7 h-7 rounded-full flex items-center justify-center shrink-0">1</span>
-          <div>
-            <h3 class="font-semibold text-slate-800">Set up the probability equation</h3>
-            <p class="text-slate-600 text-sm mt-1">Probability of drawing a yellow ball = (number of yellow balls) / (total number of balls).</p>
-            <div class="mt-2 bg-slate-50 rounded-lg p-3 text-center text-base">
-              \[
-                \frac{m}{m + 20} = \frac{1}{m}
-              \]
-            </div>
-            <details class="mt-3 text-sm text-indigo-700 cursor-pointer">
-              <summary class="font-medium hover:underline">💡 Hint</summary>
-              <p class="mt-2 text-slate-600">Total balls = \(m\) yellow + \(20\) black = \(m + 20\).<br>The probability is given as \(\frac{1}{m}\).</p>
-            </details>
-          </div>
-        </div>
-      </div>
+  function title(text, colour) {
+    ctx.fillStyle = colour || '#123d63';
+    ctx.font = 'bold 16px sans-serif';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText(text, 24, 32);
+  }
 
-      <!-- Step 2 -->
-      <div class="step-card bg-white border border-slate-200 rounded-2xl p-5 mb-4 card-shadow">
-        <div class="flex items-start gap-3">
-          <span class="bg-indigo-100 text-indigo-700 text-sm font-bold w-7 h-7 rounded-full flex items-center justify-center shrink-0">2</span>
-          <div>
-            <h3 class="font-semibold text-slate-800">Cross-multiply</h3>
-            <p class="text-slate-600 text-sm mt-1">Multiply both sides by \(m(m + 20)\) (valid since \(m > 0\) and \(m + 20 > 0\)).</p>
-            <div class="mt-2 bg-slate-50 rounded-lg p-3 text-center text-base">
-              \[
-                m \cdot m = 1 \cdot (m + 20)
-              \]
-              \[
-                m^2 = m + 20
-              \]
-            </div>
-            <details class="mt-3 text-sm text-indigo-700 cursor-pointer">
-              <summary class="font-medium hover:underline">💡 Hint</summary>
-              <p class="mt-2 text-slate-600">Cross-multiplication: if \(\frac{a}{b} = \frac{c}{d}\) then \(a \cdot d = b \cdot c\).</p>
-            </details>
-          </div>
-        </div>
-      </div>
+  // ---------- Main draw ----------
+  let current = 1;
 
-      <!-- Step 3 -->
-      <div class="step-card bg-white border border-slate-200 rounded-2xl p-5 mb-4 card-shadow">
-        <div class="flex items-start gap-3">
-          <span class="bg-indigo-100 text-indigo-700 text-sm font-bold w-7 h-7 rounded-full flex items-center justify-center shrink-0">3</span>
-          <div>
-            <h3 class="font-semibold text-slate-800">Rearrange into a quadratic equation</h3>
-            <div class="mt-2 bg-slate-50 rounded-lg p-3 text-center text-base">
-              \[
-                m^2 - m - 20 = 0
-              \]
-            </div>
-            <details class="mt-3 text-sm text-indigo-700 cursor-pointer">
-              <summary class="font-medium hover:underline">💡 Hint</summary>
-              <p class="mt-2 text-slate-600">Subtract \(m + 20\) from both sides.</p>
-            </details>
-          </div>
-        </div>
-      </div>
+  function draw(step) {
+    ctx.clearRect(0, 0, W, H);
 
-      <!-- Step 4 -->
-      <div class="step-card bg-white border border-slate-200 rounded-2xl p-5 mb-4 card-shadow">
-        <div class="flex items-start gap-3">
-          <span class="bg-indigo-100 text-indigo-700 text-sm font-bold w-7 h-7 rounded-full flex items-center justify-center shrink-0">4</span>
-          <div>
-            <h3 class="font-semibold text-slate-800">Factorise</h3>
-            <div class="mt-2 bg-slate-50 rounded-lg p-3 text-center text-base">
-              \[
-                (m - 5)(m + 4) = 0
-              \]
-            </div>
-            <p class="text-slate-600 text-sm mt-2">So \(m = 5\) or \(m = -4\).</p>
-            <details class="mt-3 text-sm text-indigo-700 cursor-pointer">
-              <summary class="font-medium hover:underline">💡 Hint</summary>
-              <p class="mt-2 text-slate-600">Find two numbers that multiply to \(-20\) and add to \(-1\): they are \(-5\) and \(+4\).</p>
-            </details>
-          </div>
-        </div>
-      </div>
+    // ================= STEP 1 : box + balls =================
+    // Box
+    const bx = 40, by = 60, bw = W - 80, bh = 250;
+    ctx.save();
+    ctx.shadowColor = 'rgba(30,60,100,.15)';
+    ctx.shadowBlur = 10;
+    ctx.shadowOffsetY = 4;
+    roundRect(bx, by, bw, bh, 14);
+    ctx.fillStyle = '#ffffff';
+    ctx.fill();
+    ctx.restore();
 
-      <!-- Step 5 -->
-      <div class="step-card bg-white border border-slate-200 rounded-2xl p-5 mb-4 card-shadow">
-        <div class="flex items-start gap-3">
-          <span class="bg-indigo-100 text-indigo-700 text-sm font-bold w-7 h-7 rounded-full flex items-center justify-center shrink-0">5</span>
-          <div>
-            <h3 class="font-semibold text-slate-800">Reject the invalid value</h3>
-            <p class="text-slate-600 text-sm mt-1">Since \(m\) represents the number of balls, it must be a <strong>positive integer</strong>.</p>
-            <p class="text-slate-600 text-sm mt-1">Therefore \(m = -4\) is rejected.</p>
-            <div class="mt-2 bg-emerald-50 border border-emerald-200 rounded-lg p-3 text-center text-base font-semibold text-emerald-800">
-              \[
-                m = 5
-              \]
-            </div>
-            <p class="text-xs text-slate-400 mt-2">✓ Correct answer: B. 5</p>
-          </div>
-        </div>
-      </div>
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = (step === 1) ? ORANGE : BLUE;
+    roundRect(bx, by, bw, bh, 14);
+    ctx.stroke();
 
-      <!-- Verification -->
-      <div class="mt-6 bg-indigo-50 border border-indigo-100 rounded-2xl p-5">
-        <h3 class="font-semibold text-indigo-800 flex items-center gap-2">✅ Check your answer</h3>
-        <p class="text-sm text-indigo-700 mt-2">
-          If \(m = 5\), number of yellow balls = 5, black balls = 20, total = 25.<br>
-          Probability = \(\frac{5}{25} = \frac{1}{5}\). This matches \(\frac{1}{m} = \frac{1}{5}\).</p>
-      </div>
-    </section>
+    // lid line
+    ctx.beginPath();
+    ctx.moveTo(bx, by + 34);
+    ctx.lineTo(bx + bw, by + 34);
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#d7e3f0';
+    ctx.stroke();
 
-    <!-- ===== FOOTER ===== -->
-    <footer class="text-center text-xs text-slate-400 py-6">
-      Interactive solution · HKDSE Math 2014 Paper 2 Q27
-    </footer>
-  </main>
+    ctx.fillStyle = '#123d63';
+    ctx.font = 'bold 14px sans-serif';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('BOX', bx + 14, by + 18);
+    ctx.fillStyle = '#7a8a9c';
+    ctx.font = '13px sans-serif';
+    ctx.fillText('total = m + 20', bx + bw - 118, by + 18);
 
-  <!-- ===== JAVASCRIPT ===== -->
-  <script>
-    (function() {
-      const slider = document.getElementById('mSlider');
-      const mValueSpan = document.getElementById('mValue');
-      const ballContainer = document.getElementById('ballContainer');
-      const totalBallsSpan = document.getElementById('totalBalls');
-      const probDisplay = document.getElementById('probDisplay');
-      const targetDisplay = document.getElementById('targetDisplay');
+    // Yellow balls (represent m = 5 for the illustration)
+    const mShow = 5;
+    const yellowPositions = [];
+    const baseY = by + 110;
+    const spacing = (bw - 120) / (mShow - 1);
+    for (let i = 0; i < mShow; i++) {
+      const cx = bx + 60 + i * spacing;
+      yellowPositions.push({x: cx, y: baseY});
+    }
 
-      const BLACK_BALLS = 20;
-
-      function renderBalls(m) {
-        // Clear container
-        ballContainer.innerHTML = '';
-
-        // Add m yellow balls
-        for (let i = 0; i < m; i++) {
-          const ball = document.createElement('span');
-          ball.className = 'ball-dot ball-yellow';
-          ball.title = 'Yellow ball';
-          ballContainer.appendChild(ball);
-        }
-
-        // Add 20 black balls (always 20)
-        for (let i = 0; i < BLACK_BALLS; i++) {
-          const ball = document.createElement('span');
-          ball.className = 'ball-dot ball-black';
-          ball.title = 'Black ball';
-          ballContainer.appendChild(ball);
-        }
-
-        // Update total
-        const total = m + BLACK_BALLS;
-        totalBallsSpan.textContent = total;
-
-        // Update probability display – use plain text fraction for simplicity (with MathJax in span)
-        // But since we want rendering, we'll set innerHTML with inline LaTeX and then ask MathJax to typeset.
-        const probFraction = `\\(\\frac{${m}}{${total}}\\)`;
-        const decimalProb = (m / total).toFixed(4);
-        probDisplay.innerHTML = `${probFraction} \\(= ${decimalProb}\\)`;
-
-        // Update target (1/m)
-        const targetFraction = `\\(\\frac{1}{${m}}\\)`;
-        const targetDecimal = (1 / m).toFixed(4);
-        targetDisplay.innerHTML = `${targetFraction} \\(= ${targetDecimal}\\)`;
-
-        // Re-render MathJax if available
-        if (window.MathJax && MathJax.typesetPromise) {
-          MathJax.typesetPromise([probDisplay, targetDisplay]).catch((err) => console.warn('MathJax error:', err));
-        }
+    // Black balls: two rows
+    const blackPositions = [];
+    const bRows = [baseY + 90, baseY + 145];
+    const perRow = 10;
+    bRows.forEach((yy, ri) => {
+      const sp = (bw - 130) / (perRow - 1);
+      for (let i = 0; i < perRow; i++) {
+        blackPositions.push({x: bx + 65 + i * sp, y: yy + ri * 0});
       }
+    });
 
-      // Initial render
-      renderBalls(parseInt(slider.value, 10));
+    // Draw black balls first (behind)
+    blackPositions.forEach(p => {
+      let r = 13, col = BLACK, dark = '#000';
+      if (step === 2) { r = 14; }
+      ball(p.x, p.y, r, col, dark);
+    });
 
-      // Slider event
-      slider.addEventListener('input', function() {
-        const m = parseInt(this.value, 10);
-        mValueSpan.textContent = m;
-        renderBalls(m);
-      });
+    // Draw yellow balls
+    yellowPositions.forEach((p, i) => {
+      let r = 15, col = YELLOW, dark = YELLOW_D;
+      if (step === 2) { r = 17; }
+      ball(p.x, p.y, r, col, dark, `y${i + 1}`);
+    });
 
-      // Also re-render MathJax after page load (for static content)
-      window.addEventListener('load', function() {
-        if (window.MathJax && MathJax.typesetPromise) {
-          MathJax.typesetPromise().catch((err) => console.warn('MathJax typeset error:', err));
-        }
-      });
-    })();
-  </script>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
+    // Labels inside box
+    ctx.font = 'bold 14px sans-serif';
+    ctx.fillStyle = YELLOW_D;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(`m yellow`, bx + 20, baseY - 45);
+    ctx.fillStyle = '#222';
+    ctx.fillText(`20 black`, bx + 150, baseY - 45);
+
+    // ================= STEP 2 : probability fraction =================
+    if (step >= 2) {
+      // arrow / equation panel below the box
+      const px = 40, py = by + bh + 22, pw = W - 80, ph = 54;
+      roundRect(px, py, pw, ph, 12);
+      ctx.fillStyle = (step === 2) ? '#fff4e2' : '#f2f7fd';
+      ctx.fill();
+      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = (step === 2) ? ORANGE : '#cfe0f2';
+      roundRect(px, py, pw, ph, 12);
+      ctx.stroke();
+
+      ctx.fillStyle = '#123d63';
+      ctx.font = 'bold 15px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('P(yellow) =', px + 78, py + ph / 2);
+
+      // Fraction: m / (m + 20)
+      const fx = px + 250;
+      ctx.font = 'bold 19px sans-serif';
+      ctx.fillStyle = YELLOW_D;
+      ctx.fillText('m', fx, py + ph / 2 - 12);
+      ctx.fillStyle = BLUE;
+      ctx.fillText('m + 20', fx, py + ph / 2 + 15);
+      ctx.beginPath();
+      ctx.moveTo(fx - 42, py + ph / 2 + 1);
+      ctx.lineTo(fx + 42, py + ph / 2 + 1);
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = '#123d63';
+      ctx.stroke();
+
+      // equals 1/m
+      ctx.font = 'bold 15px sans-serif';
+      ctx.fillStyle = '#123d63';
+      ctx.fillText('=', px + 360, py + ph / 2);
+      ctx.font = 'bold 19px sans-serif';
+      ctx.fillStyle = ORANGE;
+      ctx.fillText('1', px + 405, py + ph / 2 - 12);
+      ctx.fillStyle = '#123d63';
+      ctx.fillText('m', px + 405, py + ph / 2 + 15);
+      ctx.beginPath();
+      ctx.moveTo(px + 405 - 10, py + ph / 2 + 1);
+      ctx.lineTo(px + 405 + 10, py + ph / 2 + 1);
+      ctx.strokeStyle = '#123d63';
+      ctx.stroke();
+    }
+
+    // ================= STEP 3 : cross-multiply =================
+    if (step >= 3) {
+      const px = 40, py = by + bh + 88, pw = W - 80, ph = 50;
+      roundRect(px, py, pw, ph, 12);
+      ctx.fillStyle = (step === 3) ? '#fff4e2' : '#f2f7fd';
+      ctx.fill();
+      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = (step === 3) ? ORANGE : '#cfe0f2';
+      roundRect(px, py, pw, ph, 12);
+      ctx.stroke();
+
+      ctx.fillStyle = '#123d63';
+      ctx.font = 'bold 17px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('m \u00D7 m  =  1 \u00D7 (m + 20)', px + pw / 2, py + ph / 2 - 9);
+
+      ctx.fillStyle = (step === 3) ? ORANGE : '#2f7fd1';
+      ctx.font = 'bold 17px sans-serif';
+      ctx.fillText('m\u00B2 = m + 20', px + pw / 2, py + ph / 2 + 14);
+    }
+
+    // ================= STEP 4 : quadratic =================
+    if (step >= 4) {
+      const px = 40, py = by + bh + 150, pw = W - 80, ph = 52;
+      roundRect(px, py, pw, ph, 12);
+      ctx.fillStyle = (step === 4) ? '#fff4e2' : '#f2f7fd';
+      ctx.fill();
+      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = (step === 4) ? ORANGE : '#cfe0f2';
+      roundRect(px, py, pw, ph, 12);
+      ctx.stroke();
+
+      ctx.fillStyle = '#123d63';
+      ctx.font = 'bold 16px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('m\u00B2 \u2212 m \u2212 20 = 0', px + pw * 0.22, py + ph / 2 - 8);
+      ctx.fillText('(m \u2212 5)(m + 4) = 0', px + pw * 0.70, py + ph / 2 - 8);
+
+      ctx.fillStyle = GREEN;
+      ctx.font = 'bold 16px sans-serif';
+      ctx.fillText('m = 5', px + pw * 0.30, py + ph / 2 + 14);
+      ctx.fillStyle = '#b23b3b';
+      ctx.fillText('or  m = \u22124', px + pw * 0.70, py + ph / 2 + 14);
+    }
+
+    // ================= STEP 5 : reject negative root =================
+    if (step >= 5) {
+      const px = 40, py = by + bh + 214, pw = W - 80, ph = 46;
+      roundRect(px, py, pw, ph, 12);
+      ctx.fillStyle = (step === 5) ? '#e9f7ef' : '#f2f7fd';
+      ctx.fill();
+      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = (step === 5) ? GREEN : '#cfe0f2';
+      roundRect(px, py, pw, ph, 12);
+      ctx.stroke();
+
+      ctx.fillStyle = '#15603e';
+      ctx.font = 'bold 15px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('m must be positive \u2192 reject m = \u22124', px + pw / 2 - 85, py + ph / 2);
+      ctx.fillStyle = GREEN;
+      ctx.font = 'bold 17px sans-serif';
+      ctx.fillText('m = 5', px + pw / 2 + 175, py + ph / 2);
+    }
+
+    // Footer
+    ctx.fillStyle = '#8fa2b8';
+    ctx.font = '13px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText('Illustration uses m = 5 (5 yellow + 20 black = 25 balls)', W / 2, H - 14);
+
+    // Sync readout
+    const texts = {
+      1: 'Step 1 — The box holds $m$ yellow balls and 20 black balls. Total $= m + 20$.',
+      2: 'Step 2 — $P(\\text{yellow}) = \\dfrac{m}{m+20}$, and this equals $\\dfrac{1}{m}$.',
+      3: 'Step 3 — Cross-multiply: $m\\times m = 1 \\times (m+20)$, so $m^{2} = m + 20$.',
+      4: 'Step 4 — Rearranging: $m^{2} - m - 20 = 0 \\Rightarrow (m-5)(m+4)=0$, giving $m = 5$ or $m = -4$.',
+      5: 'Step 5 — Reject the negative root: $m = 5$ (check: $\\frac{5}{25} = \\frac{1}{5}$).'
+    };
+    ro.innerHTML = texts[step] || texts[1];
+    if (window.MathJax && MathJax.typesetPromise) {
+      MathJax.typesetPromise([ro]);
+    }
+  }
+
+  // Initial draw
+  draw(1);
+
+  // ---------- Scroll sync ----------
+  const io = new IntersectionObserver(es => {
+    es.forEach(e => {
+      if (e.isIntersecting) {
+        current = +e.target.dataset.step;
+        draw(current);
+        document.querySelectorAll('.step').forEach(s => {
+          s.classList.toggle('active', +s.dataset.step === current);
+        });
+      }
+    });
+  }, { rootMargin: '-25% 0px -55% 0px' });
+
+  document.querySelectorAll('.step').forEach(s => io.observe(s));
+  document.querySelector('.step[data-step="1"]').classList.add('active');
 </script>
-
 </body>
 </html>

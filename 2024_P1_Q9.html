@@ -3,752 +3,377 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HKDSE Math 2024 P1 Q9 — Statistics</title>
+<title>HKDSE 2024 Paper 1 Q9 — Statistics</title>
+<style>
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Segoe UI',system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+    background:#f4f7fb;
+    color:#1f2a3a;
+    line-height:1.55;
+  }
+  .wrap{padding:14px 12px 48px;max-width:1250px;margin:0 auto;}
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start;}
+  @media(min-width:900px){.split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}}
+  .diagram{position:sticky;top:16px;max-height:calc(100vh - 2rem);overflow-y:auto;}
+  @media(max-width:640px){body{font-size:14.5px;}.wrap{padding:10px 8px 40px;}}
+
+  /* ---- panels ---- */
+  .panel{
+    background:#ffffff;
+    border:1px solid #dbe4f0;
+    border-radius:14px;
+    padding:14px 16px;
+    box-shadow:0 2px 10px rgba(30,60,110,.06);
+  }
+  .panel h2{
+    margin:0 0 10px;
+    font-size:1.05rem;
+    letter-spacing:.02em;
+    color:#0b3d7a;
+    border-left:5px solid #1e88e5;
+    padding-left:9px;
+  }
+  /* ---- canvas ---- */
+  #cv{width:100%;height:auto;display:block;border-radius:10px;background:#fbfdff;}
+  .ro{
+    margin:8px 0 0;font-size:.83rem;color:#44566d;
+    background:#eef4fc;border-radius:8px;padding:7px 10px;text-align:center;
+  }
+  .legend{display:flex;flex-wrap:wrap;gap:10px;margin:9px 0 0;font-size:.8rem;color:#33475f;}
+  .legend span{display:flex;align-items:center;gap:5px;}
+  .dot{width:12px;height:12px;border-radius:3px;display:inline-block;}
+
+  /* ---- question text ---- */
+  .qtext{font-size:.95rem;}
+  .qtext table{border-collapse:collapse;margin:10px 0;font-size:.9rem;}
+  .qtext th,.qtext td{border:1px solid #9db4d0;padding:4px 10px;text-align:center;}
+  .qtext th{background:#e6eefb;color:#0b3d7a;}
+  .qtext td.lbl{background:#f6f9fe;font-weight:600;}
+
+  /* ---- steps ---- */
+  .step{
+    border:1px solid #e0e8f4;border-left:5px solid #90a4c4;
+    border-radius:10px;padding:10px 12px;margin:12px 0;
+    background:#fdfeff;transition:.25s;
+  }
+  .step.active{border-left-color:#e53935;background:#fff8f7;box-shadow:0 3px 12px rgba(229,57,53,.10);}
+  .step .tag{
+    display:inline-block;background:#1e88e5;color:#fff;font-weight:700;
+    border-radius:6px;padding:1px 9px;font-size:.78rem;margin-right:8px;letter-spacing:.03em;
+  }
+  .step.active .tag{background:#e53935;}
+  .step .hint{font-size:.82rem;color:#6b7b91;margin-top:6px;font-style:italic;}
+  .step .work{margin-top:6px;}
+  .ans{
+    margin-top:16px;border-radius:12px;padding:11px 15px;
+    background:linear-gradient(90deg,#e3f2e7,#eef9f2);border:1px solid #a5d6b5;
+    font-weight:700;color:#14663a;
+  }
+  .ans .tag{background:#14663a;}
+  /* marker chips */
+  .chip{display:inline-block;background:#fff3cd;border:1px solid #e8c45c;
+    color:#8a5a00;font-size:.72rem;font-weight:700;border-radius:5px;padding:0 6px;margin-left:6px;}
+  .hl{color:#e53935;font-weight:700;}
+  .blue{color:#1565c0;font-weight:700;}
+  .green{color:#2e7d32;font-weight:700;}
+</style>
 <script>
   window.MathJax = {
-    tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['\\[', '\\]']] },
+    tex: {
+      inlineMath: [['$','$'], ['\\(','\\)']],
+      displayMath: [['$$','$$'], ['\\[','\\]']]
+    },
     svg: { fontCache: 'global' }
   };
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
-<style>
-  :root{
-    --blue:#2563eb; --blue-dark:#1e3a8a; --amber:#f59e0b; --amber-bg:#fffbeb;
-    --emerald:#059669; --emerald-bg:#ecfdf5; --slate:#0f172a; --grey:#64748b;
-  }
-  *{box-sizing:border-box;}
-  body{
-    margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    background:#f1f5f9; color:#1e293b; line-height:1.55;
-  }
-  .wrap{max-width:980px; margin:0 auto; padding:0 16px 60px;}
-
-  /* HERO */
-  .hero{
-    background:linear-gradient(135deg,#1e3a8a 0%,#2563eb 45%,#0ea5e9 100%);
-    color:#fff; padding:44px 16px 52px; text-align:center;
-    border-radius:0 0 28px 28px; box-shadow:0 10px 30px rgba(30,58,138,.35);
-  }
-  .hero .eyebrow{font-size:.82rem; letter-spacing:.16em; text-transform:uppercase; opacity:.85; font-weight:600;}
-  .hero h1{font-size:clamp(1.6rem,4.5vw,2.5rem); margin:8px 0 6px; font-weight:800;}
-  .hero .sub{font-size:1.02rem; opacity:.95;}
-  .pills{margin-top:16px; display:flex; flex-wrap:wrap; gap:8px; justify-content:center;}
-  .pill{
-    background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35);
-    padding:5px 14px; border-radius:999px; font-size:.82rem; font-weight:600;
-  }
-
-  /* CARDS */
-  .card{
-    background:#fff; border-radius:18px; padding:24px 24px 26px; margin-top:26px;
-    box-shadow:0 4px 18px rgba(15,23,42,.07); border:1px solid #e2e8f0;
-  }
-  .card h2{
-    font-size:1.22rem; margin:0 0 14px; color:var(--blue-dark);
-    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
-  }
-  .card h2 .badge{
-    background:var(--blue); color:#fff; font-size:.75rem; padding:3px 10px;
-    border-radius:999px; font-weight:700; letter-spacing:.04em;
-  }
-  .qtext{font-size:1.02rem;}
-  .marks{color:var(--grey); font-weight:600; font-size:.9rem;}
-
-  /* QUESTION TABLE */
-  table.dist{border-collapse:collapse; margin:14px auto; font-size:.95rem;}
-  table.dist td, table.dist th{
-    border:1px solid #94a3b8; padding:8px 14px; text-align:center;
-  }
-  table.dist th{background:#eff6ff; color:var(--blue-dark); font-weight:700;}
-
-  /* CANVAS */
-  .canvas-box{
-    background:#f8fafc; border:1px solid #e2e8f0; border-radius:14px;
-    padding:12px; margin:16px 0; text-align:center;
-  }
-  canvas{max-width:100%; height:auto; border-radius:10px; background:#fff;}
-  .readouts{
-    display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:12px;
-  }
-  .ro{
-    background:#eff6ff; border:1px solid #bfdbfe; color:var(--blue-dark);
-    border-radius:10px; padding:6px 12px; font-size:.85rem; font-weight:600;
-  }
-  .ro.g{background:var(--emerald-bg); border-color:#a7f3d0; color:#065f46;}
-  .ro.a{background:var(--amber-bg); border-color:#fde68a; color:#92400e;}
-
-  .controls{
-    display:flex; flex-wrap:wrap; gap:14px; justify-content:center; align-items:center;
-    margin-top:12px;
-  }
-  .ctrl{display:flex; align-items:center; gap:8px; font-size:.88rem; font-weight:600; color:#334155;}
-  input[type=range]{width:150px; accent-color:var(--blue);}
-  .swatch{width:13px;height:13px;border-radius:3px;display:inline-block;}
-
-  /* STEPS */
-  .step{
-    display:none; border-left:4px solid var(--blue); background:#f8fafc;
-    border-radius:0 12px 12px 0; padding:14px 16px; margin-top:14px;
-  }
-  .step.show{display:block; animation:fade .35s ease;}
-  @keyframes fade{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
-  .step-head{display:flex; align-items:center; gap:10px; margin-bottom:8px; flex-wrap:wrap;}
-  .step-num{
-    background:var(--blue-dark); color:#fff; width:26px;height:26px; border-radius:50%;
-    display:flex;align-items:center;justify-content:center; font-size:.82rem; font-weight:700;
-  }
-  .step-title{font-weight:700; color:#1e293b;}
-  .mbadge{
-    background:var(--amber); color:#fff; font-size:.72rem; font-weight:800;
-    padding:2px 9px; border-radius:999px; letter-spacing:.03em;
-  }
-  .hint{
-    background:var(--amber-bg); border-left:4px solid var(--amber); color:#78350f;
-    border-radius:0 8px 8px 0; padding:9px 12px; margin-top:10px; font-size:.92rem;
-  }
-  .hint b{color:#92400e;}
-  .answer{
-    background:var(--emerald-bg); border-left:4px solid var(--emerald); color:#064e3b;
-    border-radius:0 8px 8px 0; padding:9px 12px; margin-top:10px; font-size:.95rem; font-weight:600;
-  }
-  .btnrow{display:flex; align-items:center; gap:14px; margin-top:16px; flex-wrap:wrap;}
-  button.next{
-    background:var(--blue); color:#fff; border:none; padding:11px 22px; border-radius:10px;
-    font-size:.95rem; font-weight:700; cursor:pointer; transition:.2s; box-shadow:0 3px 10px rgba(37,99,235,.3);
-  }
-  button.next:hover:not(:disabled){background:var(--blue-dark); transform:translateY(-1px);}
-  button.next:disabled{background:#cbd5e1; cursor:not-allowed; box-shadow:none;}
-  .counter{font-size:.88rem; color:var(--grey); font-weight:600;}
-  button.reset{
-    background:#fff; color:var(--blue); border:2px solid var(--blue); padding:9px 18px;
-    border-radius:10px; font-weight:700; cursor:pointer;
-  }
-  button.reset:hover{background:#eff6ff;}
-
-  /* SUMMARY */
-  .summary{
-    background:linear-gradient(135deg,#0f172a,#1e293b); color:#e2e8f0;
-    border-radius:18px; padding:26px; margin-top:26px; box-shadow:0 8px 24px rgba(15,23,42,.35);
-  }
-  .summary h2{color:#7dd3fc; margin-top:0;}
-  .summary ul{margin:0; padding-left:0; list-style:none;}
-  .summary li{
-    padding:9px 0 9px 6px; border-bottom:1px solid rgba(255,255,255,.12); font-size:1rem;
-  }
-  .summary li:last-child{border-bottom:none;}
-  .summary .k{color:#fbbf24; font-weight:800;}
-
-  footer{text-align:center; color:var(--grey); font-size:.84rem; padding:30px 16px 10px;}
-</style>
 </head>
 <body>
-
-<!-- ============ HERO ============ -->
-<header class="hero">
-  <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 1</div>
-  <h1>2024 Paper 1 · Question 9</h1>
-  <div class="sub">Statistics — Finding an unknown frequency, mean, mode &amp; median</div>
-  <div class="pills">
-    <span class="pill">Frequency Distribution</span>
-    <span class="pill">Probability Condition</span>
-    <span class="pill">Mean</span>
-    <span class="pill">Mode</span>
-    <span class="pill">Median</span>
-  </div>
-</header>
-
 <div class="wrap">
+  <div class="split">
 
-<!-- ============ QUESTION ============ -->
-<section class="card">
-  <h2><span class="badge">QUESTION</span> The Distribution of Keys Owned</h2>
-  <div class="qtext">
-    <p>The table below shows the distribution of the numbers of keys owned by a group of housewives.</p>
-
-    <table class="dist">
-      <tr>
-        <th>Number of keys</th>
-        <td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td>
-      </tr>
-      <tr>
-        <th>Number of housewives</th>
-        <td>10</td><td>9</td><td>4</td><td>3</td><td>4</td><td>\(k\)</td>
-      </tr>
-    </table>
-
-    <p>If a housewife is randomly selected from the group, then the probability that she owns more than 6 keys is \(\dfrac{5}{18}\).</p>
-
-    <p><b>(a)</b> Find \(k\).</p>
-    <p><b>(b)</b> Write down the mean, the mode and the median of the distribution.</p>
-    <p class="marks" style="text-align:right;">(5 marks)</p>
-  </div>
-</section>
-
-<!-- ============ PART (a) ============ -->
-<section class="card">
-  <h2><span class="badge">PART (a)</span> Find \(k\)</h2>
-
-  <div class="canvas-box">
-    <canvas id="cvA" width="900" height="600"></canvas>
-    <div class="controls">
-      <div class="ctrl">
-        <span class="swatch" style="background:#2563eb"></span> \(k\) =
-        <input type="range" id="kSlider" min="0" max="20" step="1" value="6">
-        <b id="kVal" style="color:#2563eb">6</b>
+    <!-- ================= LEFT PANE ================= -->
+    <div class="diagram panel">
+      <h2>Interactive Bar Chart</h2>
+      <canvas id="cv" width="640" height="560"></canvas>
+      <p class="ro" id="ro">Drag the slider or scroll the solution to explore the distribution.</p>
+      <div class="legend">
+        <span><i class="dot" style="background:#1e88e5"></i>Housewives</span>
+        <span><i class="dot" style="background:#e53935"></i>Highlighted keys</span>
+        <span><i class="dot" style="background:#43a047"></i>Total / Mean</span>
       </div>
-      <div class="ctrl">
-        <input type="checkbox" id="showTarget" checked>
-        <label for="showTarget">Show target 5/18</label>
+      <div style="margin-top:10px;font-size:.85rem;color:#33475f;">
+        <label for="kslider"><b>Value of $k$</b> (housewives owning 8 keys): <span id="kval">6</span></label><br>
+        <input id="kslider" type="range" min="1" max="20" value="6" style="width:100%;margin-top:4px;">
       </div>
     </div>
-    <div class="readouts">
-      <span class="ro">Total number of housewives \(N = \) <b id="roN">36</b></span>
-      <span class="ro">Number owning &gt; 6 keys = <b id="roBig">10</b></span>
-      <span class="ro a">P(&gt;6 keys) = <b id="roP">0.2778</b></span>
-      <span class="ro g" id="roCheck">≠ 5/18</span>
+
+    <!-- ================= RIGHT PANE ================= -->
+    <div class="panel">
+      <h2>[2024 #9] &nbsp;15. Statistics</h2>
+
+      <div class="qtext">
+        <p><b>9.</b> The table below shows the distribution of the numbers of keys owned by a group of housewives.</p>
+        <table>
+          <tr><th>Number of keys</th><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td></tr>
+          <tr><td class="lbl">Number of housewives</td><td>10</td><td>9</td><td>4</td><td>3</td><td>4</td><td>$k$</td></tr>
+        </table>
+        <p>If a housewife is randomly selected from the group, then the probability that she owns more than 6 keys is $\dfrac{5}{18}$.</p>
+        <p><b>(a)</b> Find $k$.<br>
+           <b>(b)</b> Write down the mean, the mode and the median of the distribution. &nbsp;&nbsp;<span style="float:right;">(5 marks)</span></p>
+      </div>
+
+      
+
+      <div class="step" data-step="1">
+        <span class="tag">STEP 1</span><b>Set up the probability condition.</b>
+        <div class="work">
+          &ldquo;More than 6 keys&rdquo; means $7$ or $8$ keys.<br>
+          Number who own more than 6 keys $= 4 + k$.<br>
+          Total number of housewives $= 10+9+4+3+4+k = 30+k$.
+        </div>
+        <div class="hint">Hint: find the favourable cases and the total cases first.</div>
+      </div>
+
+      <div class="step" data-step="2">
+        <span class="tag">STEP 2</span><b>Form and solve the equation.</b>
+        <div class="work">
+          $$\frac{4+k}{30+k}=\frac{5}{18}$$
+          $$18(4+k)=5(30+k)$$
+          $$72+18k=150+5k$$
+          $$13k=78 \quad\Rightarrow\quad k=6$$
+        </div>
+        <div class="hint">Hint: cross-multiply, then collect like terms.</div>
+      </div>
+
+      <div class="step" data-step="3">
+        <span class="tag">STEP 3 (b)</span><b>Find the mean.</b>
+        <div class="work">
+          Total keys:
+          $$3(10)+4(9)+5(4)+6(3)+7(4)+8(6)=30+36+20+18+28+48=180$$
+          Total housewives $= 30+6 = 36$.
+          $$\text{Mean}=\frac{180}{36}=5$$
+        </div>
+        <div class="hint">Hint: mean $=\dfrac{\sum f x}{\sum f}$.</div>
+      </div>
+
+      <div class="step" data-step="4">
+        <span class="tag">STEP 4 (b)</span><b>Find the mode.</b>
+        <div class="work">
+          Frequencies: $10,\;9,\;4,\;3,\;4,\;6$.<br>
+          The largest frequency is $10$, which corresponds to $3$ keys.
+          $$\text{Mode}=3$$
+        </div>
+        <div class="hint">Hint: the mode is the data value with the highest frequency.</div>
+      </div>
+
+      <div class="step" data-step="5">
+        <span class="tag">STEP 5 (b)</span><b>Find the median.</b>
+        <div class="work">
+          There are $36$ housewives (even), so the median is the average of the $18$th and $19$th values.<br>
+          Cumulative frequencies: $10,\;19,\;23,\;26,\;30,\;36$.<br>
+          The $18$th and $19$th values both fall in the group with $4$ keys (cf. $10&lt;18,19\le 19$).
+          $$\text{Median}=4$$
+        </div>
+        <div class="hint">Hint: locate the middle position using cumulative frequencies.</div>
+      </div>
+
+      <div class="ans">
+        <span class="tag">ANSWER</span>
+        (a) $k=6$<br>
+        (b) Mean $=5$, &nbsp; Mode $=3$, &nbsp; Median $=4$
+      </div>
     </div>
+
   </div>
-
-  <div class="step" data-step="a1">
-    <div class="step-head">
-      <div class="step-num">1</div>
-      <div class="step-title">Translate the probability condition</div>
-      <span class="mbadge">1M</span>
-    </div>
-    <p>"Owns <b>more than 6</b> keys" means \(7\) or \(8\) keys.</p>
-    \[
-      P(\text{more than }6) = \frac{\text{(No. with 7)} + \text{(No. with 8)}}{\text{Total}}
-    \]
-    <p>Total number of housewives:</p>
-    \[
-      N = 10+9+4+3+4+k = 30+k
-    \]
-    <p>Number owning more than 6 keys: \(4 + k\).</p>
-    <div class="hint"><b>Hint:</b> The total must include the unknown \(k\), otherwise the fractions won't match.</div>
-  </div>
-
-  <div class="step" data-step="a2">
-    <div class="step-head">
-      <div class="step-num">2</div>
-      <div class="step-title">Set up the equation given \(P = \frac{5}{18}\)</div>
-      <span class="mbadge">1M</span>
-    </div>
-    \[
-      \frac{4+k}{10+9+4+3+4+k} = \frac{5}{18}
-    \]
-    \[
-      \frac{4+k}{30+k} = \frac{5}{18}
-    \]
-    <div class="hint"><b>Hint:</b> A single fraction equals a single fraction — cross-multiply to clear it.</div>
-  </div>
-
-  <div class="step" data-step="a3">
-    <div class="step-head">
-      <div class="step-num">3</div>
-      <div class="step-title">Solve for \(k\)</div>
-      <span class="mbadge">1A</span>
-    </div>
-    \[
-      18(4+k) = 5(30+k)
-    \]
-    \[
-      72 + 18k = 150 + 5k
-    \]
-    \[
-      13k = 78
-    \]
-    \[
-      k = 6
-    \]
-    <div class="answer">\(k = 6\), so there are \(8\) housewives owning \(8\) keys, and \(N = 36\) in total.</div>
-    <div class="hint"><b>Check:</b> \(\dfrac{4+6}{36} = \dfrac{10}{36} = \dfrac{5}{18}\) ✓</div>
-  </div>
-
-  <div class="btnrow">
-    <button class="next" data-target="a">Next step →</button>
-    <span class="counter" id="cnt-a">0 / 3</span>
-    <button class="reset" data-target="a">Reset</button>
-  </div>
-</section>
-
-<!-- ============ PART (b) ============ -->
-<section class="card">
-  <h2><span class="badge">PART (b)</span> Mean, Mode and Median</h2>
-
-  <div class="canvas-box">
-    <canvas id="cvB" width="900" height="600"></canvas>
-    <div class="controls">
-      <div class="ctrl"><input type="checkbox" id="showMean" checked><label for="showMean">Show mean line</label></div>
-      <div class="ctrl"><input type="checkbox" id="showMedian" checked><label for="showMedian">Show median line</label></div>
-      <div class="ctrl"><input type="checkbox" id="showCum"><label for="showCum">Show cumulative curve</label></div>
-    </div>
-    <div class="readouts">
-      <span class="ro">Mean = <b id="roMean">5</b></span>
-      <span class="ro a">Mode = <b id="roMode">3</b></span>
-      <span class="ro g">Median = <b id="roMedian">4</b></span>
-      <span class="ro">Mean key-count sum = <b id="roSum">180</b></span>
-    </div>
-  </div>
-
-  <div class="step" data-step="b1">
-    <div class="step-head">
-      <div class="step-num">1</div>
-      <div class="step-title">Mean (using the frequency table)</div>
-      <span class="mbadge">1A</span>
-    </div>
-    <p>With \(k=6\), the full frequency table is \(10,\ 9,\ 4,\ 3,\ 4,\ 6\) for keys \(3,4,5,6,7,8\).</p>
-    \[
-      \text{Mean} = \frac{\sum (\text{keys}\times\text{frequency})}{\sum \text{frequency}}
-    \]
-    \[
-      = \frac{3(10)+4(9)+5(4)+6(3)+7(4)+8(6)}{36}
-    \]
-    \[
-      = \frac{30+36+20+18+28+48}{36} = \frac{180}{36} = 5
-    \]
-    <div class="answer">Mean \(= 5\)</div>
-    <div class="hint"><b>Tip:</b> Use the symmetric structure — the counts \(10,9,4,3,4,6\) produce a mean exactly at the mid-value \(5\).</div>
-  </div>
-
-  <div class="step" data-step="b2">
-    <div class="step-head">
-      <div class="step-num">2</div>
-      <div class="step-title">Mode</div>
-      <span class="mbadge">1A</span>
-    </div>
-    <p>The mode is the value with the largest frequency.</p>
-    <table class="dist" style="font-size:.9rem;">
-      <tr><th>Keys</th><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td></tr>
-      <tr><th>Frequency</th><td style="background:#fef3c7;font-weight:800;">10</td><td>9</td><td>4</td><td>3</td><td>4</td><td>6</td></tr>
-    </table>
-    <p>The largest frequency is \(10\), which corresponds to \(3\) keys.</p>
-    <div class="answer">Mode \(= 3\)</div>
-    <div class="hint"><b>Hint:</b> Mode = the data value that appears most often (highest bar), not the highest frequency itself.</div>
-  </div>
-
-  <div class="step" data-step="b3">
-    <div class="step-head">
-      <div class="step-num">3</div>
-      <div class="step-title">Median (locate the \(\frac{36}{2}=18\)th position)</div>
-      <span class="mbadge">1A</span>
-    </div>
-    <p>There are \(36\) data values (even), so the median is the average of the \(18\)th and \(19\)th values in order.</p>
-    <p>Build cumulative frequencies:</p>
-    \[
-      \underbrace{10}_{3},\quad \underbrace{10+9=19}_{4},\quad \underbrace{19+4=23}_{5},\ \dots
-    \]
-    <ul style="font-size:.95rem;">
-      <li>Keys \(3\): positions \(1\) to \(10\)</li>
-      <li>Keys \(4\): positions \(11\) to \(19\)</li>
-    </ul>
-    <p>Both the \(18\)th and \(19\)th values lie in the "keys \(4\)" group.</p>
-    \[
-      \text{Median} = \frac{4+4}{2} = 4
-    \]
-    <div class="answer">Median \(= 4\)</div>
-    <div class="hint"><b>Hint:</b> Cumulative frequency \(19\) first reaches/passes \(18\) at key value \(4\) — that pins the median down instantly.</div>
-  </div>
-
-  <div class="btnrow">
-    <button class="next" data-target="b">Next step →</button>
-    <span class="counter" id="cnt-b">0 / 3</span>
-    <button class="reset" data-target="b">Reset</button>
-  </div>
-</section>
-
-<!-- ============ SUMMARY ============ -->
-<section class="summary">
-  <h2>📌 Final Answers at a Glance</h2>
-  <ul>
-    <li><span class="k">(a)</span> \(k = 6\) &nbsp;(total housewives \(N = 36\))</li>
-    <li><span class="k">(b)</span> Mean \(= 5\)</li>
-    <li><span class="k">(b)</span> Mode \(= 3\)</li>
-    <li><span class="k">(b)</span> Median \(= 4\)</li>
-  </ul>
-</section>
-
-<footer>HKDSE Mathematics (Compulsory Part) · 2024 Paper 1 Q9 · Interactive Solution</footer>
 </div>
 
 <script>
-/* =========================================================
-   STEP-BY-STEP REVEAL
-   ========================================================= */
-document.querySelectorAll('.card').forEach(card => {
-  const target = card.querySelector('.next') ? card.querySelector('.next').dataset.target : null;
-  if(!target) return;
-  const steps = card.querySelectorAll('.step');
-  const btn = card.querySelector('.next');
-  const counter = card.querySelector('.counter');
-  let shown = 0;
+/* ============ DIAGRAM ============ */
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+const ro = document.getElementById('ro');
+const slider = document.getElementById('kslider');
+const kval = document.getElementById('kval');
 
-  function update(){
-    counter.textContent = shown + ' / ' + steps.length;
-    if(shown >= steps.length){
-      btn.disabled = true;
-      btn.textContent = 'All steps revealed ✓';
-    } else {
-      btn.disabled = false;
-      btn.textContent = 'Next step →';
-    }
+const keys = [3,4,5,6,7,8];
+let freq = [10,9,4,3,4,6];
+let currentStep = 1;
+
+function draw(step){
+  currentStep = step;
+  const k = +slider.value;
+  freq = [10,9,4,3,4,k];
+
+  const W = cv.width, H = cv.height;
+  ctx.clearRect(0,0,W,H);
+
+  /* --- layout --- */
+  const padL = 62, padR = 26, padT = 62, padB = 68;
+  const plotW = W - padL - padR;
+  const plotH = H - padT - padB;
+
+  const maxF = Math.max(...freq, 11) + 1.5;
+  const barW = plotW / keys.length;
+
+  /* --- background --- */
+  ctx.fillStyle = '#fbfdff';
+  ctx.fillRect(0,0,W,H);
+
+  /* --- grid + axes --- */
+  ctx.strokeStyle = '#dbe4f0';
+  ctx.lineWidth = 1;
+  const yTicks = 5;
+  ctx.font = '13px Segoe UI, sans-serif';
+  ctx.fillStyle = '#5a6b82';
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'middle';
+  for(let i=0;i<=yTicks;i++){
+    const val = maxF * i / yTicks;
+    const y = padT + plotH - (val/maxF)*plotH;
+    ctx.beginPath();
+    ctx.moveTo(padL, y);
+    ctx.lineTo(padL + plotW, y);
+    ctx.stroke();
+    ctx.fillText(Math.round(val), padL - 10, y);
   }
-  btn.addEventListener('click', () => {
-    if(shown < steps.length){
-      steps[shown].classList.add('show');
-      shown++;
-      if(window.MathJax && MathJax.typesetPromise){ MathJax.typesetPromise([steps[shown-1]]); }
-      update();
+
+  /* axes */
+  ctx.strokeStyle = '#8aa2c0';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(padL, padT);
+  ctx.lineTo(padL, padT + plotH);
+  ctx.lineTo(padL + plotW, padT + plotH);
+  ctx.stroke();
+
+  /* axis labels */
+  ctx.save();
+  ctx.translate(16, padT + plotH/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#33475f';
+  ctx.font = 'bold 13px Segoe UI, sans-serif';
+  ctx.fillText('Number of housewives', 0, 0);
+  ctx.restore();
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  ctx.fillStyle = '#33475f';
+  ctx.font = 'bold 13px Segoe UI, sans-serif';
+  ctx.fillText('Number of keys', padL + plotW/2, padT + plotH + 34);
+
+  /* --- bars --- */
+  const colours = ['#42a5f5','#5c6bc0','#26a69a','#ffa726','#ab47bc','#1e88e5'];
+  const hlColour = '#e53935';
+
+  for(let i=0;i<keys.length;i++){
+    const f = freq[i];
+    const x = padL + i*barW + barW*0.16;
+    const w = barW*0.68;
+    const h = (f/maxF)*plotH;
+    const y = padT + plotH - h;
+
+    /* highlight logic per step */
+    let highlight = false;
+    if(step === 1 && keys[i] >= 7) highlight = true;      // more than 6 keys
+    if(step === 2 && keys[i] === 8) highlight = true;      // k
+    if(step === 4 && keys[i] === 3) highlight = true;      // mode
+    if(step === 5 && keys[i] === 4) highlight = true;      // median
+    if(step === 3) highlight = false;
+
+    ctx.fillStyle = highlight ? hlColour : colours[i];
+    ctx.beginPath();
+    roundRect(ctx, x, y, w, h, 5);
+    ctx.fill();
+
+    /* value on top */
+    ctx.fillStyle = '#25313f';
+    ctx.font = 'bold 13px Segoe UI, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    ctx.fillText(f, x + w/2, y - 4);
+
+    /* key label below */
+    ctx.fillStyle = highlight ? hlColour : '#33475f';
+    ctx.font = (highlight ? 'bold ' : '') + '13px Segoe UI, sans-serif';
+    ctx.textBaseline = 'top';
+    ctx.fillText(keys[i], x + w/2, padT + plotH + 8);
+  }
+
+  /* --- total / mean banner --- */
+  const totalH = freq.reduce((a,b)=>a+b,0);
+  const totalKeys = keys.reduce((a,k,i)=>a + k*freq[i], 0);
+  const mean = (totalKeys/totalH);
+
+  ctx.fillStyle = '#e8f5e9';
+  roundRect(ctx, padL + plotW - 165, padT + 8, 165, 52, 8);
+  ctx.fill();
+  ctx.strokeStyle = '#a5d6b5';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#14663a';
+  ctx.font = 'bold 12.5px Segoe UI, sans-serif';
+  ctx.fillText('Total housewives = ' + totalH, padL + plotW - 153, padT + 24);
+  ctx.fillText('Mean = ' + (Math.round(mean*100)/100), padL + plotW - 153, padT + 46);
+
+  /* --- top title --- */
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  ctx.fillStyle = '#0b3d7a';
+  ctx.font = 'bold 15px Segoe UI, sans-serif';
+  ctx.fillText('Keys owned by housewives', padL, 14);
+
+  /* readout */
+  const stepNames = {
+    1:'Step 1: Prob(>6 keys) = (4+k)/' + totalH + ' = 5/18 → solve for k',
+    2:'Step 2: k = 6 → the 8-key bar is set',
+    3:'Step 3 (b): Mean = ' + totalKeys + ' / ' + totalH + ' = ' + (Math.round(mean*100)/100),
+    4:'Step 4 (b): Mode = 3 (highest frequency 10)',
+    5:'Step 5 (b): Median = 4 (18th & 19th values)'
+  };
+  ro.textContent = stepNames[step] || 'Explore the distribution.';
+}
+
+function roundRect(ctx,x,y,w,h,r){
+  r = Math.min(r, w/2, h/2);
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+
+/* ============ CONTROLS ============ */
+slider.addEventListener('input', ()=>{
+  kval.textContent = slider.value;
+  draw(currentStep);
+});
+kval.textContent = slider.value;
+
+/* ============ SCROLL SYNC ============ */
+const io = new IntersectionObserver(es=>{
+  es.forEach(e=>{
+    if(e.isIntersecting){
+      const s = +e.target.dataset.step;
+      document.querySelectorAll('.step').forEach(el=>el.classList.toggle('active', +el.dataset.step === s));
+      draw(s);
     }
   });
-  const reset = card.querySelector('.reset');
-  if(reset){
-    reset.addEventListener('click', () => {
-      steps.forEach(s => s.classList.remove('show'));
-      shown = 0;
-      update();
-    });
-  }
-  update();
-});
+},{rootMargin:'-25% 0px -55% 0px'});
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
 
-/* =========================================================
-   CANVAS A — Probability bar chart with slider for k
-   ========================================================= */
-(function(){
-  const cv = document.getElementById('cvA');
-  const ctx = cv.getContext('2d');
-  const W = cv.width, H = cv.height;
-  const kSlider = document.getElementById('kSlider');
-  const kVal = document.getElementById('kVal');
-  const roN = document.getElementById('roN');
-  const roBig = document.getElementById('roBig');
-  const roP = document.getElementById('roP');
-  const roCheck = document.getElementById('roCheck');
-  const showTarget = document.getElementById('showTarget');
-
-  const labels = [3,4,5,6,7,8];
-  const base   = [10,9,4,3,4,0];
-
-  function draw(){
-    const k = parseInt(kSlider.value,10);
-    kVal.textContent = k;
-    const freqs = base.slice(); freqs[5] = k;
-    const N = freqs.reduce((a,b)=>a+b,0);
-    const big = freqs[4] + freqs[5];
-    const p = N>0 ? big/N : 0;
-
-    roN.textContent = N;
-    roBig.textContent = big;
-    roP.textContent = (N>0 ? p.toFixed(4) : '—');
-    const target = 5/18;
-    const match = Math.abs(p - target) < 1e-9;
-    roCheck.textContent = match ? '✓ Exactly 5/18 — correct k!' : '≠ 5/18';
-    roCheck.style.background = match ? '#ecfdf5' : '#fff1f2';
-    roCheck.style.borderColor = match ? '#a7f3d0' : '#fecdd3';
-    roCheck.style.color = match ? '#065f46' : '#9f1239';
-
-    ctx.clearRect(0,0,W,H);
-
-    // ---- layout ----
-    const padL = 70, padR = 40, padT = 50, padB = 70;
-    const plotW = W - padL - padR;
-    const plotH = H - padT - padB;
-    const maxF = Math.max(12, ...freqs) + 2;
-    const x0 = padL, y0 = padT + plotH;
-
-    const bw = plotW / labels.length;
-    const barW = bw * 0.56;
-
-    // title
-    ctx.fillStyle = '#1e3a8a';
-    ctx.font = 'bold 17px system-ui,sans-serif';
-    ctx.textAlign = 'left';
-    ctx.fillText('Frequency of each key-count  (k = ' + k + ')', padL - 50, 28);
-
-    // grid lines
-    ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1;
-    ctx.font = '12px system-ui,sans-serif';
-    ctx.fillStyle = '#94a3b8';
-    for(let f=0; f<=maxF; f+=2){
-      const y = y0 - (f/maxF)*plotH;
-      ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(x0+plotW, y); ctx.stroke();
-      ctx.textAlign='right'; ctx.fillText(f, x0-10, y+4);
-    }
-
-    // axes
-    ctx.strokeStyle = '#334155'; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(x0,y0); ctx.lineTo(x0+plotW,y0); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(x0,padT); ctx.lineTo(x0,y0); ctx.stroke();
-    ctx.save();
-    ctx.translate(20, padT+plotH/2); ctx.rotate(-Math.PI/2);
-    ctx.textAlign='center'; ctx.fillStyle='#475569'; ctx.font='13px system-ui,sans-serif';
-    ctx.fillText('Frequency', 0, 0);
-    ctx.restore();
-
-    // bars
-    labels.forEach((lb, i) => {
-      const f = freqs[i];
-      const cx = x0 + bw*i + bw/2;
-      const bh = (f/maxF)*plotH;
-      const by = y0 - bh;
-
-      let fill;
-      if(lb > 6) fill = (showTarget.checked && match) ? '#16a34a' : '#f59e0b';
-      else fill = '#60a5fa';
-      if(lb === 8 && k>0) fill = (showTarget.checked && match) ? '#16a34a' : '#fbbf24';
-
-      ctx.fillStyle = fill;
-      ctx.beginPath();
-      const r = 6;
-      ctx.moveTo(cx-barW/2, y0);
-      ctx.lineTo(cx-barW/2, by+r);
-      ctx.quadraticCurveTo(cx-barW/2, by, cx-barW/2+r, by);
-      ctx.lineTo(cx+barW/2-r, by);
-      ctx.quadraticCurveTo(cx+barW/2, by, cx+barW/2, by+r);
-      ctx.lineTo(cx+barW/2, y0);
-      ctx.closePath(); ctx.fill();
-
-      // value
-      ctx.fillStyle='#1e293b'; ctx.font='bold 13px system-ui,sans-serif';
-      ctx.textAlign='center'; ctx.fillText(f, cx, by-7);
-
-      // x label
-      ctx.fillStyle='#334155'; ctx.font='bold 14px system-ui,sans-serif';
-      ctx.fillText(lb, cx, y0+22);
-    });
-
-    ctx.fillStyle='#475569'; ctx.font='13px system-ui,sans-serif';
-    ctx.textAlign='center';
-    ctx.fillText('Number of keys', x0+plotW/2, y0+52);
-
-    // highlight >6 region bracket
-    const startX = x0 + bw*4;
-    const endX   = x0 + bw*5 + bw;
-    ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 2.5;
-    ctx.beginPath();
-    ctx.moveTo(startX+6, padT-6);
-    ctx.lineTo(endX-6, padT-6);
-    ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(startX+6, padT-6); ctx.lineTo(startX+6, padT); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(endX-6, padT-6); ctx.lineTo(endX-6, padT); ctx.stroke();
-    ctx.fillStyle='#b45309'; ctx.font='bold 13px system-ui,sans-serif';
-    ctx.textAlign='center';
-    ctx.fillText('"more than 6 keys": 4 + k', (startX+endX)/2, padT-14);
-
-    // probability readout on canvas
-    ctx.fillStyle='#fff'; ctx.strokeStyle='#cbd5e1'; ctx.lineWidth=1;
-    const bx=W-260, by=padT+6, bwd=230, bht=46;
-    ctx.beginPath(); ctx.roundRect(bx,by,bwd,bht,10); ctx.fill(); ctx.stroke();
-    ctx.fillStyle='#0f172a'; ctx.font='bold 14px system-ui,sans-serif';
-    ctx.textAlign='left';
-    ctx.fillText('P(>6) = ' + big + '/' + N + ' = ' + (N>0?p.toFixed(4):'-'), bx+14, by+22);
-    ctx.font='13px system-ui,sans-serif';
-    ctx.fillStyle = match ? '#059669' : '#dc2626';
-    ctx.fillText(match ? 'matches 5/18 = 0.2778 ✓' : 'target 5/18 = 0.2778', bx+14, by+39);
-  }
-
-  kSlider.addEventListener('input', draw);
-  showTarget.addEventListener('change', draw);
-  draw();
-})();
-
-/* =========================================================
-   CANVAS B — Bar chart + mean/median lines + cumulative curve
-   ========================================================= */
-(function(){
-  const cv = document.getElementById('cvB');
-  const ctx = cv.getContext('2d');
-  const W = cv.width, H = cv.height;
-  const showMean = document.getElementById('showMean');
-  const showMedian = document.getElementById('showMedian');
-  const showCum = document.getElementById('showCum');
-
-  const labels = [3,4,5,6,7,8];
-  const freqs  = [10,9,4,3,4,6];
-  const N = freqs.reduce((a,b)=>a+b,0);           // 36
-  const totalKeys = labels.reduce((s,v,i)=>s+v*freqs[i],0); // 180
-  const mean = totalKeys / N;                      // 5
-
-  // cumulative
-  const cum = [];
-  let run = 0;
-  freqs.forEach(f => { run += f; cum.push(run); });
-
-  function draw(){
-    ctx.clearRect(0,0,W,H);
-    const padL = 70, padR = 40, padT = 50, padB = 70;
-    const plotW = W - padL - padR;
-    const plotH = H - padT - padB;
-    const maxF = 12;
-    const x0 = padL, y0 = padT + plotH;
-    const bw = plotW / labels.length;
-    const barW = bw*0.56;
-
-    // title
-    ctx.fillStyle='#1e3a8a'; ctx.font='bold 17px system-ui,sans-serif';
-    ctx.textAlign='left';
-    ctx.fillText('Distribution (k = 6) · total N = 36 · mean = 5', padL-50, 28);
-
-    // grid
-    ctx.strokeStyle='#e2e8f0'; ctx.lineWidth=1;
-    ctx.font='12px system-ui,sans-serif'; ctx.fillStyle='#94a3b8';
-    for(let f=0;f<=maxF;f+=2){
-      const y = y0 - (f/maxF)*plotH;
-      ctx.beginPath(); ctx.moveTo(x0,y); ctx.lineTo(x0+plotW,y); ctx.stroke();
-      ctx.textAlign='right'; ctx.fillText(f, x0-10, y+4);
-    }
-    // axes
-    ctx.strokeStyle='#334155'; ctx.lineWidth=2;
-    ctx.beginPath(); ctx.moveTo(x0,y0); ctx.lineTo(x0+plotW,y0); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(x0,padT); ctx.lineTo(x0,y0); ctx.stroke();
-
-    // bars
-    labels.forEach((lb,i)=>{
-      const f = freqs[i];
-      const cx = x0 + bw*i + bw/2;
-      const bh = (f/maxF)*plotH;
-      const by = y0 - bh;
-      const isMode = f === Math.max(...freqs);
-      ctx.fillStyle = isMode ? '#f59e0b' : '#60a5fa';
-      ctx.beginPath();
-      const r=6;
-      ctx.moveTo(cx-barW/2, y0);
-      ctx.lineTo(cx-barW/2, by+r);
-      ctx.quadraticCurveTo(cx-barW/2, by, cx-barW/2+r, by);
-      ctx.lineTo(cx+barW/2-r, by);
-      ctx.quadraticCurveTo(cx+barW/2, by, cx+barW/2, by+r);
-      ctx.lineTo(cx+barW/2, y0);
-      ctx.closePath(); ctx.fill();
-
-      ctx.fillStyle='#1e293b'; ctx.font='bold 13px system-ui,sans-serif';
-      ctx.textAlign='center'; ctx.fillText(f, cx, by-7);
-      ctx.fillStyle='#334155'; ctx.font='bold 14px system-ui,sans-serif';
-      ctx.fillText(lb, cx, y0+22);
-    });
-    ctx.fillStyle='#475569'; ctx.font='13px system-ui,sans-serif';
-    ctx.textAlign='center';
-    ctx.fillText('Number of keys', x0+plotW/2, y0+52);
-
-    // function: data value -> x position (continuous)
-    const xOf = v => x0 + (plotW/labels.length) * (v - 2.5);
-
-    // ---- mean line ----
-    if(showMean.checked){
-      const mx = xOf(5);
-      ctx.strokeStyle='#2563eb'; ctx.lineWidth=2.5; ctx.setLineDash([8,5]);
-      ctx.beginPath(); ctx.moveTo(mx, padT-8); ctx.lineTo(mx, y0); ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.fillStyle='#2563eb'; ctx.font='bold 13px system-ui,sans-serif';
-      ctx.textAlign='center';
-      ctx.beginPath(); ctx.roundRect(mx-52, padT-30, 104, 22, 8); ctx.fill();
-      ctx.fillStyle='#fff'; ctx.fillText('Mean = 5', mx, padT-14);
-    }
-
-    // ---- median line (between 4 and 4) -> at value 4 ----
-    if(showMedian.checked){
-      const dx = xOf(4);
-      ctx.strokeStyle='#059669'; ctx.lineWidth=2.5; ctx.setLineDash([4,4]);
-      ctx.beginPath(); ctx.moveTo(dx, padT+2); ctx.lineTo(dx, y0); ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.fillStyle='#059669';
-      ctx.beginPath(); ctx.roundRect(dx-52, padT+8, 104, 22, 8); ctx.fill();
-      ctx.fillStyle='#fff'; ctx.font='bold 13px system-ui,sans-serif'; ctx.textAlign='center';
-      ctx.fillText('Median = 4', dx, padT+24);
-    }
-
-    // ---- cumulative curve ----
-    if(showCum.checked){
-      const cumMax = N;
-      const cyOf = v => y0 - (v/cumMax)*plotH;
-      const pts = [];
-      labels.forEach((lb,i)=>{
-        pts.push([xOf(lb), cyOf(cum[i])]);
-      });
-      ctx.strokeStyle='#db2777'; ctx.lineWidth=2.5;
-      ctx.beginPath();
-      pts.forEach((p,idx)=>{
-        if(idx===0) ctx.moveTo(p[0],p[1]);
-        else ctx.lineTo(p[0],p[1]);
-      });
-      ctx.stroke();
-      pts.forEach(p=>{
-        ctx.fillStyle='#db2777';
-        ctx.beginPath(); ctx.arc(p[0],p[1],4.5,0,Math.PI*2); ctx.fill();
-      });
-      // label cum values
-      ctx.fillStyle='#9d174d'; ctx.font='11px system-ui,sans-serif'; ctx.textAlign='center';
-      labels.forEach((lb,i)=>{
-        const px = xOf(lb), py = cyOf(cum[i]);
-        ctx.fillText(cum[i], px, py-9);
-      });
-      // median position marker on cum curve
-      ctx.fillStyle='#db2777'; ctx.font='bold 12px system-ui,sans-serif';
-      ctx.textAlign='left';
-      ctx.fillText('cumulative frequency (max 36)', x0+8, padT+16);
-    }
-
-    // ---- legend ----
-    const ly = H-20;
-    ctx.font='12.5px system-ui,sans-serif'; ctx.textAlign='left';
-    ctx.fillStyle='#60a5fa'; ctx.fillRect(padL, ly-10, 14, 12);
-    ctx.fillStyle='#334155'; ctx.fillText('frequency', padL+20, ly);
-    ctx.fillStyle='#f59e0b'; ctx.fillRect(padL+110, ly-10, 14, 12);
-    ctx.fillStyle='#334155'; ctx.fillText('mode bar (10)', padL+130, ly);
-    ctx.fillStyle='#db2777'; ctx.fillRect(padL+270, ly-10, 14, 12);
-    ctx.fillStyle='#334155'; ctx.fillText('cumulative', padL+290, ly);
-  }
-
-  showMean.addEventListener('change', draw);
-  showMedian.addEventListener('change', draw);
-  showCum.addEventListener('change', draw);
-  draw();
-
-  // polyfill roundRect for older browsers
-  if(!CanvasRenderingContext2D.prototype.roundRect){
-    CanvasRenderingContext2D.prototype.roundRect = function(x,y,w,h,r){
-      this.beginPath();
-      this.moveTo(x+r,y);
-      this.arcTo(x+w,y,x+w,y+h,r);
-      this.arcTo(x+w,y+h,x,y+h,r);
-      this.arcTo(x,y+h,x,y,r);
-      this.arcTo(x,y,x+w,y,r);
-      this.closePath();
-      return this;
-    };
-  }
-})();
+/* initial draw */
+draw(1);
+document.querySelector('.step[data-step="1"]').classList.add('active');
 </script>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
-
 </body>
 </html>

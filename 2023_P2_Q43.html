@@ -1,474 +1,521 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>HKDSE Math 2023 Paper 2 Q43 — Probability</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2023 Paper 2 Q43 — Probability</title>
 <script>
-  window.MathJax = {
-    tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
-    svg: { fontCache: 'global' }
-  };
+window.MathJax = {
+  tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+  svg: { fontCache: 'global' },
+  startup: { typeset: true }
+};
 </script>
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
-  * { box-sizing: border-box; }
+  *, *::before, *::after { box-sizing: border-box; }
   body {
     margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-family: "Segoe UI", "Helvetica Neue", Arial, "Noto Sans", sans-serif;
     background: #f4f7fb;
-    color: #1f2937;
-    line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
+    color: #1c2331;
+    line-height: 1.55;
   }
-  header {
-    background: linear-gradient(135deg, #2563eb, #4f46e5);
-    color: #fff;
-    padding: 22px 18px 18px;
-    text-align: center;
+  .wrap {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 16px 14px 50px;
   }
-  header h1 { margin: 0 0 4px; font-size: 1.25rem; letter-spacing: .2px; }
-  header p { margin: 0; font-size: .85rem; opacity: .9; }
-  .wrap { max-width: 880px; margin: 0 auto; padding: 18px 14px 60px; }
-  .card {
-    background: #fff;
-    border-radius: 16px;
-    padding: 18px 16px;
-    margin-bottom: 16px;
-    box-shadow: 0 4px 14px rgba(30, 64, 175, .08);
-    border: 1px solid #e5eaf3;
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 12px;
+    align-items: start;
   }
-  .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
-  .tag {
-    background: #e0e7ff; color: #3730a3;
-    font-size: .72rem; font-weight: 600;
-    padding: 4px 10px; border-radius: 999px;
+  @media (min-width: 900px) {
+    .split { grid-template-columns: minmax(0, 46%) minmax(0, 54%); gap: 18px; }
   }
-  .question-text { font-size: 1rem; margin: 6px 0 0; }
-  .options { list-style: none; padding: 0; margin: 12px 0 0; display: grid; grid-template-columns: 1fr; gap: 8px; }
-  @media (min-width: 480px) { .options { grid-template-columns: 1fr 1fr; } }
-  .options li {
-    background: #f8fafc; border: 1px solid #e2e8f0;
-    border-radius: 10px; padding: 10px 12px; font-size: .95rem;
+  @media (max-width: 640px) {
+    body { font-size: 14.5px; }
+    .wrap { padding: 10px 8px 40px; }
   }
-  .options li.correct { background: #dcfce7; border-color: #86efac; font-weight: 600; }
-  .options li .key { font-weight: 700; color: #2563eb; margin-right: 6px; }
-  .options li.correct .key { color: #15803d; }
 
-  h2.section-title {
-    font-size: 1.05rem; margin: 0 0 10px;
-    display: flex; align-items: center; gap: 8px;
+  /* ---------- LEFT: diagram ---------- */
+  .diagram {
+    position: sticky;
+    top: 16px;
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+    background: #ffffff;
+    border: 1px solid #dce4f0;
+    border-radius: 14px;
+    padding: 12px;
+    box-shadow: 0 4px 14px rgba(30, 55, 100, 0.07);
   }
-  h2.section-title .dot {
-    width: 10px; height: 10px; border-radius: 50%;
-    background: #4f46e5; display: inline-block;
+  .diagram h2 {
+    margin: 2px 0 8px;
+    font-size: 15px;
+    letter-spacing: 0.3px;
+    color: #2b3a55;
+    text-transform: uppercase;
+  }
+  canvas {
+    width: 100%;
+    height: auto;
+    display: block;
+    background: #fbfdff;
+    border-radius: 10px;
+  }
+  .ro {
+    margin: 8px 0 2px;
+    font-size: 13.5px;
+    color: #44506a;
+    background: #eef4ff;
+    border-left: 4px solid #4f7cf7;
+    border-radius: 6px;
+    padding: 7px 10px;
+  }
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 16px;
+    margin-top: 8px;
+    font-size: 12.5px;
+    color: #44506a;
+  }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .swatch { width: 13px; height: 13px; border-radius: 3px; display: inline-block; }
+
+  /* ---------- RIGHT: question + solution ---------- */
+  .panel {
+    background: #ffffff;
+    border: 1px solid #dce4f0;
+    border-radius: 14px;
+    padding: 16px 18px;
+    box-shadow: 0 4px 14px rgba(30, 55, 100, 0.07);
+  }
+  .qtag {
+    display: inline-block;
+    background: #2b3a55;
+    color: #fff;
+    font-size: 12.5px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    border-radius: 999px;
+    padding: 3px 12px;
+    margin-bottom: 10px;
+  }
+  .qtext { font-size: 15.5px; }
+  .options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 8px;
+    margin: 12px 0 4px;
+  }
+  .opt {
+    background: #f4f7fb;
+    border: 1px solid #dce4f0;
+    border-radius: 9px;
+    padding: 7px 10px;
+    font-size: 14px;
+  }
+  .opt.ans {
+    background: #e6f8ef;
+    border-color: #3bb273;
+    color: #14663f;
+    font-weight: 700;
+  }
+  h3 {
+    margin: 22px 0 10px;
+    font-size: 16px;
+    color: #2b3a55;
+    border-bottom: 2px solid #eef1f7;
+    padding-bottom: 6px;
   }
   .step {
-    border: 1px solid #e5eaf3; border-radius: 14px;
-    background: #fdfdff; margin-bottom: 10px; overflow: hidden;
-    transition: box-shadow .2s;
+    background: #fbfcfe;
+    border: 1px solid #e5eaf3;
+    border-left: 5px solid #4f7cf7;
+    border-radius: 10px;
+    padding: 11px 13px;
+    margin: 11px 0;
+    transition: box-shadow 0.25s ease, border-color 0.25s ease, transform 0.2s ease;
   }
-  .step.open { box-shadow: 0 3px 12px rgba(79,70,229,.13); }
-  .step-head {
-    display: flex; align-items: center; gap: 10px;
-    padding: 12px 14px; cursor: pointer;
-    background: #f8faff;
-    font-weight: 600; font-size: .95rem;
-    user-select: none;
+  .step:hover { box-shadow: 0 4px 12px rgba(40, 70, 130, 0.1); }
+  .step.active {
+    border-left-color: #f2994a;
+    box-shadow: 0 0 0 3px rgba(242, 153, 74, 0.18);
+    transform: translateX(2px);
   }
-  .step-head .num {
-    flex: 0 0 26px; height: 26px; border-radius: 50%;
-    background: #4f46e5; color: #fff;
-    display: flex; align-items: center; justify-content: center;
-    font-size: .8rem; font-weight: 700;
+  .step .tag {
+    display: inline-block;
+    background: #4f7cf7;
+    color: #fff;
+    font-weight: 700;
+    font-size: 12.5px;
+    border-radius: 999px;
+    padding: 2px 10px;
+    margin-right: 8px;
   }
-  .step-head .arrow { margin-left: auto; transition: transform .25s; color: #6b7280; }
-  .step.open .step-head .arrow { transform: rotate(180deg); }
-  .step-body {
-    display: none; padding: 4px 14px 14px 14px;
-    font-size: .93rem; color: #374151;
-    animation: fadeIn .3s ease;
+  .step.active .tag { background: #f2994a; }
+  .step .hint {
+    display: block;
+    margin-top: 7px;
+    font-size: 13px;
+    color: #56627a;
+    background: #eef4ff;
+    border-radius: 7px;
+    padding: 6px 9px;
   }
-  .step.open .step-body { display: block; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px);} to { opacity: 1; transform: none;} }
-
-  .hint {
-    margin-top: 10px; background: #fffbeb; border-left: 4px solid #f59e0b;
-    border-radius: 8px; padding: 10px 12px; font-size: .85rem; color: #78350f;
+  .answer {
+    margin-top: 20px;
+    background: #e6f8ef;
+    border: 1px solid #3bb273;
+    border-radius: 11px;
+    padding: 12px 15px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #14663f;
   }
-  .hint strong { color: #b45309; }
-  .formula-box {
-    background: #eef2ff; border-radius: 10px; padding: 12px 14px;
-    margin: 10px 0; text-align: center; font-size: .95rem;
-  }
-  .btn {
-    display: inline-block; border: none; cursor: pointer;
-    background: #2563eb; color: #fff;
-    padding: 10px 18px; border-radius: 10px;
-    font-size: .92rem; font-weight: 600;
-    transition: background .2s, transform .1s;
-  }
-  .btn:hover { background: #1d4ed8; }
-  .btn:active { transform: scale(.97); }
-  .btn.ghost { background: #e2e8f0; color: #1e293b; }
-  .btn.ghost:hover { background: #cbd5e1; }
-  .nav { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
-
-  /* Interactive simulation */
-  .sim-note { font-size: .85rem; color: #4b5563; margin-bottom: 10px; }
-  .slider-row { display: flex; align-items: center; gap: 12px; margin: 14px 0; flex-wrap: wrap; }
-  .slider-row label { font-size: .88rem; font-weight: 600; min-width: 96px; }
-  input[type=range] { -webkit-appearance: none; flex: 1 1 180px; height: 6px; border-radius: 6px; background: #dbeafe; outline: none; }
-  input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%;
-    background: #2563eb; cursor: pointer; border: 3px solid #fff;
-    box-shadow: 0 1px 5px rgba(0,0,0,.25);
-  }
-  input[type=range]::-moz-range-thumb {
-    width: 20px; height: 20px; border-radius: 50%;
-    background: #2563eb; cursor: pointer; border: 3px solid #fff;
-  }
-  .p-val { font-weight: 700; color: #1d4ed8; min-width: 58px; text-align: right; font-variant-numeric: tabular-nums; }
-
-  .bars { display: flex; align-items: flex-end; gap: 10px; height: 170px; margin: 16px 0 6px; padding: 0 4px; }
-  .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; }
-  .bar {
-    width: 78%; max-width: 54px; border-radius: 8px 8px 0 0;
-    background: linear-gradient(180deg, #60a5fa, #2563eb);
-    transition: height .35s cubic-bezier(.4,0,.2,1);
-    position: relative;
-  }
-  .bar.highlight { background: linear-gradient(180deg, #34d399, #059669); }
-  .bar-label { font-size: .78rem; color: #4b5563; margin-top: 6px; font-weight: 600; }
-  .bar-pct { font-size: .74rem; color: #1e3a8a; font-weight: 700; margin-bottom: 3px; font-variant-numeric: tabular-nums; }
-
-  .result-panel {
-    background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 12px;
-    padding: 14px; margin-top: 14px; text-align: center;
-  }
-  .result-panel .big {
-    font-size: 1.6rem; font-weight: 800; color: #047857;
-    font-variant-numeric: tabular-nums;
-  }
-  .result-panel .sub { font-size: .82rem; color: #065f46; }
-
-  details.final {
-    background: #fff; border: 1px dashed #c7d2fe; border-radius: 12px;
-    padding: 10px 14px; margin-top: 6px;
-  }
-  details.final summary { cursor: pointer; font-weight: 700; color: #3730a3; }
-  details.final[open] summary { margin-bottom: 8px; }
-
-  footer { text-align: center; font-size: .75rem; color: #94a3b8; padding: 10px 0 30px; }
+  .frac { display: inline-block; vertical-align: middle; text-align: center; }
+  .frac .n { display: block; border-bottom: 1.4px solid currentColor; padding: 0 3px; }
+  .frac .d { display: block; padding: 0 3px; }
 </style>
 </head>
 <body>
-
-<header>
-  <h1>HKDSE Math 2023 Paper 2 &mdash; Q43</h1>
-  <p>Topic 14 &middot; Probability</p>
-</header>
-
 <div class="wrap">
+  <div class="split">
 
-  <!-- QUESTION -->
-  <section class="card">
-    <div class="tags">
-      <span class="tag">Probability</span>
-      <span class="tag">Complementary Events</span>
-      <span class="tag">Binomial Setting</span>
-      <span class="tag">Independent Trials</span>
+    <!-- ================= LEFT: INTERACTIVE DIAGRAM ================= -->
+    <div class="diagram">
+      <h2>Tree Diagram — 4 Dart Throws</h2>
+      <canvas id="cv" width="640" height="620"></canvas>
+      <p class="ro" id="readout">Step 1: p(hit) = 0.6, p(miss) = 0.4 for every throw.</p>
+      <div class="legend">
+        <span><i class="swatch" style="background:#4f7cf7"></i>Hit (H)</span>
+        <span><i class="swatch" style="background:#e8734a"></i>Miss (M)</span>
+        <span><i class="swatch" style="background:#3bb273"></i>At least 2 hits (answer path)</span>
+      </div>
     </div>
-    <h2 class="section-title"><span class="dot"></span>Question</h2>
-    <p class="question-text">
-      When a boy throws a dart, the probability that he hits the target is $0.6$.
-      If this boy throws the dart $4$ times, find the probability that he hits the
-      target <strong>at least 2 times</strong>.
-    </p>
-    <ul class="options">
-      <li><span class="key">A.</span> 0.5248</li>
-      <li><span class="key">B.</span> 0.7056</li>
-      <li class=""><span class="key">C.</span> 0.8208</li>
-      <li><span class="key">D.</span> 0.8464</li>
-    </ul<figure style="margin:12px 0;text-align:center;"><img src="figures/2023_P2_Q43.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>>
-  </section>
 
-  <!-- STEP-BY-STEP -->
-  <section class="card">
-    <h2 class="section-title"><span class="dot"></span>Step-by-Step Guided Solution</h2>
-    <p class="sim-note">Tap each step to reveal the reasoning. Try to predict the next line before opening it!</p>
+    <!-- ================= RIGHT: QUESTION + SOLUTION ================= -->
+    <div class="panel">
+      <span class="qtag">HKDSE 2023 Paper 2 Q43</span>
 
-    <!-- Step 1 -->
-    <div class="step" data-step="1">
-      <div class="step-head"><span class="num">1</span> Set up the probability model
-        <span class="arrow">&#9660;</span></div>
-      <div class="step-body">
-        <p>Each throw is an <strong>independent</strong> trial with only two outcomes:
-        hit (H) or miss (M).</p>
-        <div class="formula-box">
-          $p = P(\text{hit}) = 0.6 \qquad q = P(\text{miss}) = 1 - 0.6 = 0.4$
+      <div class="qtext">
+        <p>When a boy throws a dart, the probability that he hits the target is $0.6$.
+        If this boy throws the dart $4$ times, find the probability that he hits the
+        target at least $2$ times.</p>
+
+        <div class="options">
+          <div class="opt">A. $0.5248$</div>
+          <div class="opt">B. $0.7056$</div>
+          <div class="opt ans">C. $0.8208$</div>
+          <div class="opt">D. $0.8464$</div>
         </div>
-        <p>The number of hits $X$ in $4$ throws follows a binomial distribution
-        $X \sim B(4,\ 0.6)$.</p>
-        <div class="hint"><strong>Hint:</strong> Since the throws are independent,
-        the probability of one specific sequence (e.g. H M H M) is found by
-        <em>multiplying</em> the probabilities of each throw.</div>
       </div>
-    </div>
 
-    <!-- Step 2 -->
-    <div class="step" data-step="2">
-      <div class="step-head"><span class="num">2</span> Recognise "at least 2" is many cases
-        <span class="arrow">&#9660;</span></div>
-      <div class="step-body">
-        <p>"At least 2 times" means $X \ge 2$, i.e. the possible cases are
-        $X = 2,\ 3,\ 4$.</p>
-        <div class="hint"><strong>Hint:</strong> Adding three separate cases is long
-        and error-prone. Look for a shortcut &mdash; the <em>complement</em>!</div>
+      <figure style="margin:12px 0;text-align:center;"><img src="figures/2023_P2_Q43.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
+
+      <h3>Step-by-step Solution</h3>
+
+      <div class="step" data-step="1">
+        <span class="tag">Step 1</span><strong>Identify the model — binomial, $n=4$, $p=0.6$</strong>
+        <p>Each throw is an independent trial with two outcomes:
+        hit (H, probability $p = 0.6$) or miss (M, probability $q = 1 - 0.6 = 0.4$).
+        There are $n = 4$ throws.</p>
+        <span class="hint">Hint: fixed number of independent throws, constant hit probability ⇒ use the binomial distribution / complementary counting.</span>
       </div>
-    </div>
 
-    <!-- Step 3 -->
-    <div class="step" data-step="3">
-      <div class="step-head"><span class="num">3</span> Use the complement rule
-        <span class="arrow">&#9660;</span></div>
-      <div class="step-body">
-        <p>Every outcome is either "at least 2 hits" or its complement
-        "fewer than 2 hits". Fewer than 2 means $X = 0$ or $X = 1$.</p>
-        <div class="formula-box">
-          $P(X \ge 2) = 1 - P(X = 0) - P(X = 1)$
-        </div>
-        <div class="hint"><strong>Hint:</strong> For any event $E$, $P(E) = 1 - P(E')$.
-        Choosing the complement here reduces the work to only <strong>two</strong> cases.</div>
+      <div class="step" data-step="2">
+        <span class="tag">Step 2</span><strong>Use the complement</strong>
+        <p>"At least $2$ hits" is the complement of "at most $1$ hit", i.e. exactly $0$ hits or exactly $1$ hit.</p>
+        <p>$$\text{required } P = 1 - P(\text{0 hits}) - P(\text{1 hit})$$</p>
+        <span class="hint">Hint: $P(\text{at least }2) = 1 - P(\text{0 or 1 hit})$. This avoids adding eight separate cases.</span>
       </div>
-    </div>
 
-    <!-- Step 4 -->
-    <div class="step" data-step="4">
-      <div class="step-head"><span class="num">4</span> Compute $P(X = 0)$ — all misses
-        <span class="arrow">&#9660;</span></div>
-      <div class="step-body">
-        <p>All 4 throws must be misses:</p>
-        <div class="formula-box">
-          $P(X = 0) = (0.4)^4 = 0.0256$
-        </div>
-        <div class="hint"><strong>Hint:</strong> There is only one arrangement (M M M M),
-        so no multiplication by a binomial coefficient is needed.</div>
+      <div class="step" data-step="3">
+        <span class="tag">Step 3</span><strong>Probability of exactly $0$ hits</strong>
+        <p>All four throws must miss:</p>
+        <p>$$P(\text{0 hits}) = (0.4)^4 = (1-0.6)^4 = 0.0256$$</p>
+        <span class="hint">Hint: multiply the miss probability $0.4$ four times — one path M–M–M–M in the tree.</span>
       </div>
-    </div>
 
-    <!-- Step 5 -->
-    <div class="step" data-step="5">
-      <div class="step-head"><span class="num">5</span> Compute $P(X = 1)$ — exactly one hit
-        <span class="arrow">&#9660;</span></div>
-      <div class="step-body">
-        <p>The single hit can occur on the 1st, 2nd, 3rd <em>or</em> 4th throw, giving
-        <strong>4 equally likely arrangements</strong>, each with probability $(0.6)(0.4)^3$:</p>
-        <div class="formula-box">
-          $P(X = 1) = 4 \times (0.6)(0.4)^3 = 4 \times 0.0384 = 0.1536$
-        </div>
-        <div class="hint"><strong>Hint (Binomial formula):</strong>
-          $P(X = k) = C^{n}_{k} p^k (1-p)^{n-k}$ with $n = 4$, $p = 0.6$.
-          Here $k = 1$, so $C^{4}_{1} = 4$.</div>
+      <div class="step" data-step="4">
+        <span class="tag">Step 4</span><strong>Probability of exactly $1$ hit</strong>
+        <p>The hit can occur on any one of the $4$ throws. Each such sequence has probability
+        $(0.6)(0.4)^3$, and there are $4$ of them, so</p>
+        <p>$$\binom{4}{1}(0.6)(0.4)^3 = 4 \times 0.6 \times 0.064 = 0.1536$$</p>
+        <span class="hint">Hint: in the tree, exactly $4$ paths show precisely one orange (Miss-free) branch — H–M–M–M, M–H–M–M, M–M–H–M, M–M–M–H.</span>
       </div>
-    </div>
 
-    <!-- Step 6 -->
-    <div class="step" data-step="6">
-      <div class="step-head"><span class="num">6</span> Combine and obtain the answer
-        <span class="arrow">&#9660;</span></div>
-      <div class="step-body">
-        <div class="formula-box">
-          $P(X \ge 2) = 1 - 0.0256 - 0.1536 = 1 - 0.1792 = \mathbf{0.8208}$
-        </div>
-        <p>The answer is <strong>C. 0.8208</strong>.</p>
-        <div class="hint"><strong>Hint:</strong> Always check your final value lies between
-        $0$ and $1$, and that it is larger than the probability of a single case
-        (here $0.6$ for one hit) &mdash; a good sanity check.</div>
+      <div class="step" data-step="5">
+        <span class="tag">Step 5</span><strong>Subtract from $1$</strong>
+        <p>$$
+        \begin{aligned}
+        P(\text{at least 2 hits}) &= 1 - (0.4)^4 - 4(0.6)(0.4)^3 \\[4pt]
+        &= 1 - 0.0256 - 0.1536 \\[4pt]
+        &= 1 - 0.1792 \\[4pt]
+        &= 0.8208
+        \end{aligned}
+        $$</p>
+        <span class="hint">Hint: $0.0256 + 0.1536 = 0.1792$, so the answer is $1 - 0.1792$.</span>
       </div>
+
+      <div class="step" data-step="6">
+        <span class="tag">Step 6</span><strong>Check with the binomial formula</strong>
+        <p>Directly summing $k=2,3,4$:</p>
+        <p>$$\sum_{k=2}^{4}\binom{4}{k}(0.6)^k(0.4)^{4-k}
+        = 0.3456 + 0.3456 + 0.1296 = 0.8208 \;\checkmark$$</p>
+        <span class="hint">Hint: both routes agree, confirming option C.</span>
+      </div>
+
+      <div class="answer">Answer: $0.8208$ &nbsp; ⟶ &nbsp; Option <strong>C</strong></div>
     </div>
 
-    <div class="nav">
-      <button class="btn" id="nextBtn">Next Step</button>
-      <button class="btn ghost" id="resetBtn">Reset</button>
-    </div>
-  </section>
-
-  <!-- VISUAL DEMO -->
-  <section class="card">
-    <h2 class="section-title"><span class="dot"></span>Visual Demo: Distribution of Hits</h2>
-    <p class="sim-note">
-      Change the hit probability $p$. The bars show $P(X = k)$ for $k = 0,1,2,3,4$ throws.
-      The green bars are the cases counted in "at least 2 hits", and the red bars are the
-      complement we subtract.
-    </p>
-
-    <div class="slider-row">
-      <label for="pSlider">Hit prob $p$</label>
-      <input type="range" id="pSlider" min="0" max="1" step="0.01" value="0.6">
-      <span class="p-val" id="pVal">0.60</span>
-    </div>
-
-    <div class="bars" id="bars"></div>
-
-    <div class="result-panel">
-      <div class="sub">$P(X \ge 2) = 1 - P(X=0) - P(X=1)$</div>
-      <div class="big" id="atLeast2">0.8208</div>
-      <div class="sub" id="complement">$P(X = 0) + P(X = 1) = 0.1792$</div>
-    </div>
-
-    <details class="final">
-      <summary>Show the full textbook working</summary>
-      <p>
-        The required probability
-        $= P(\text{hits at least 2 times})$<br>
-        $= 1 - P(\text{hits 0 times}) - P(\text{hits 1 time})$<br>
-        $= 1 - P(\text{no darts hit}) - \big[\,P(\text{only 1st dart hits}) + P(\text{only 2nd dart hits})$<br>
-        $\quad + P(\text{only 3rd dart hits}) + P(\text{only 4th dart hits})\,\big]$<br>
-        $= 1 - (1-0.6)^4 - \big[(0.6)(1-0.6)^3 + (1-0.6)(0.6)(1-0.6)^2$<br>
-        $\quad + (1-0.6)^2(0.6)(1-0.6) + (1-0.6)^3(0.6)\big]$<br>
-        $= 0.8208$
-      </p>
-    </details>
-  </section>
-
-  <footer>HKDSE Mathematics (Compulsory Part) — Paper 2 Question Bank &middot; Interactive Solution</footer>
+  </div>
 </div>
 
 <script>
-  /* ===== Accordion Steps ===== */
-  const steps = Array.from(document.querySelectorAll('.step'));
+/* ===================== CANVAS TREE DIAGRAM ===================== */
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+const readout = document.getElementById('readout');
 
-  function openStep(i) {
-    if (i < 0 || i >= steps.length) return;
-    steps[i].classList.add('open');
-    steps[i].scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }
-  function firstClosedIndex() {
-    return steps.findIndex(s => !s.classList.contains('open'));
-  }
+const W = cv.width, H = cv.height;
 
-  steps.forEach((s, i) => {
-    s.querySelector('.step-head').addEventListener('click', () => {
-      s.classList.toggle('open');
-    });
+// Layout: 4 throw levels, each level splits into H / M
+const levelX = [70, 210, 350, 490, 615];
+const topY = 70;
+const bottomY = H - 60;
+const stepY = (bottomY - topY) / 8;   // 8 leaf rows at the deepest level
+
+const COL_H = '#4f7cf7';
+const COL_M = '#e8734a';
+const COL_GOOD = '#3bb273';
+const COL_DIM = '#c9d3e4';
+const COL_TEXT = '#2b3a55';
+
+// Build all 16 paths: each is array of 'H'/'M'
+function buildPaths() {
+  const paths = [];
+  for (let i = 0; i < 16; i++) {
+    const p = [];
+    for (let b = 3; b >= 0; b--) p.push((i >> b) & 1 ? 'M' : 'H');
+    paths.push(p);
+  }
+  return paths;
+}
+const paths = buildPaths();
+
+function nodeY(level, index) {
+  // level 0: single root; level L: 2^L nodes
+  const count = Math.pow(2, level);
+  const span = (bottomY - topY);
+  const slot = span / count;
+  return topY + slot * index + slot / 2;
+}
+
+function draw(step) {
+  ctx.clearRect(0, 0, W, H);
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
+
+  // Which paths to highlight green (at least 2 hits) for steps >= 5, or count for step 4
+  const goodPaths = new Set();
+  paths.forEach((p, idx) => {
+    const hits = p.filter(c => c === 'H').length;
+    if (step >= 5 && hits >= 2) goodPaths.add(idx);
+    if (step === 6 && hits >= 2) goodPaths.add(idx);
   });
 
-  document.getElementById('nextBtn').addEventListener('click', () => {
-    const i = firstClosedIndex();
-    if (i === -1) {
-      steps.forEach(s => s.classList.remove('open'));
+  // ---------- edges ----------
+  for (let lvl = 0; lvl < 4; lvl++) {
+    const fromCount = Math.pow(2, lvl);
+    for (let i = 0; i < fromCount; i++) {
+      const x0 = levelX[lvl];
+      const y0 = nodeY(lvl, i);
+      for (let branch = 0; branch < 2; branch++) {
+        const childIndex = i * 2 + branch;
+        const x1 = levelX[lvl + 1];
+        const y1 = nodeY(lvl + 1, childIndex);
+        // determine the full path this edge belongs to
+        const pathIndexBase = childIndex * Math.pow(2, 3 - lvl);
+        const pathIdx = pathIndexBase; // representative (any path through this edge)
+        const isGood = goodPaths.has(pathIdx) &&
+                       paths[pathIdx].filter(c => c === 'H').length >= 2;
+        const isHitEdge = (branch === 0);
+        ctx.beginPath();
+        ctx.moveTo(x0, y0);
+        ctx.lineTo(x1, y1);
+        if (isGood && step >= 5) {
+          ctx.strokeStyle = COL_GOOD;
+          ctx.lineWidth = 3.2;
+        } else {
+          ctx.strokeStyle = isHitEdge ? 'rgba(79,124,247,0.55)' : 'rgba(232,115,74,0.55)';
+          ctx.lineWidth = 1.7;
+        }
+        ctx.stroke();
+      }
+    }
+  }
+
+  // ---------- nodes ----------
+  for (let lvl = 0; lvl <= 4; lvl++) {
+    const count = Math.pow(2, lvl);
+    for (let i = 0; i < count; i++) {
+      const x = levelX[lvl];
+      const y = nodeY(lvl, i);
+      const r = lvl === 0 ? 7 : (lvl === 4 ? 5 : 5.5);
+
+      // is this node on a "good" path (>=2 hits among completed throws)?
+      let good = false;
+      if (step >= 5) {
+        // find a representative full path ending at this node
+        const leafBase = i * Math.pow(2, 4 - lvl);
+        const p = paths[Math.min(leafBase, 15)];
+        good = p.filter(c => c === 'H').length >= 2;
+      }
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fillStyle = (good && lvl === 4) ? COL_GOOD : '#ffffff';
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = (good && lvl === 4) ? COL_GOOD : '#8fa3c4';
+      ctx.stroke();
+    }
+  }
+
+  // ---------- labels on first split ----------
+  ctx.font = 'bold 13px "Segoe UI", Arial';
+  ctx.fillStyle = COL_H;
+  ctx.fillText('H  0.6', levelX[0] + 60, nodeY(1, 0) - 8);
+  ctx.fillStyle = COL_M;
+  ctx.fillText('M  0.4', levelX[0] + 60, nodeY(1, 1) + 16);
+
+  // ---------- throw labels ----------
+  ctx.font = '12.5px "Segoe UI", Arial';
+  ctx.fillStyle = '#6b7a95';
+  for (let lvl = 0; lvl < 4; lvl++) {
+    const cx = (levelX[lvl] + levelX[lvl + 1]) / 2;
+    ctx.textAlign = 'center';
+    ctx.fillText('Throw ' + (lvl + 1), cx, H - 22);
+  }
+  ctx.textAlign = 'left';
+
+  // ---------- root label ----------
+  ctx.font = 'bold 13px "Segoe UI", Arial';
+  ctx.fillStyle = COL_TEXT;
+  ctx.fillText('Start', levelX[0] - 44, nodeY(0, 0) + 5);
+
+  // ---------- leaf outcome hints ----------
+  ctx.font = '11px "Courier New", monospace';
+  paths.forEach((p, idx) => {
+    const y = nodeY(4, idx);
+    const hits = p.filter(c => c === 'H').length;
+    const x = levelX[4] + 10;
+    if (step >= 5 && hits >= 2) {
+      ctx.fillStyle = COL_GOOD;
+      ctx.font = 'bold 11px "Courier New", monospace';
+    } else if (hits <= 1) {
+      ctx.fillStyle = hits === 0 ? '#e8734a' : '#c05a2e';
+      ctx.font = '11px "Courier New", monospace';
     } else {
-      openStep(i);
+      ctx.fillStyle = '#6b7a95';
+      ctx.font = '11px "Courier New", monospace';
     }
+    ctx.fillText(p.join(' '), x, y + 4);
   });
 
-  document.getElementById('resetBtn').addEventListener('click', () => {
-    steps.forEach(s => s.classList.remove('open'));
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  // ---------- highlight annotations per step ----------
+  ctx.textAlign = 'left';
+
+  if (step === 1) {
+    drawBadge(12, 12, 'Given:  p(hit) = 0.6   p(miss) = 0.4', COL_H);
+  }
+  if (step === 2) {
+    drawBadge(12, 12, 'Use complement:  1 − P(0 hits) − P(1 hit)', '#8e44ad');
+  }
+  if (step === 3) {
+    drawBadge(12, 12, 'P(0 hits):  M–M–M–M = (0.4)⁴ = 0.0256', COL_M);
+    highlightLeafSet(paths.map((p,i)=>p.every(c=>c==='M')?i:-1).filter(i=>i>=0), COL_M);
+  }
+  if (step === 4) {
+    drawBadge(12, 12, 'P(1 hit):  4 paths × (0.6)(0.4)³ = 0.1536', '#b8860b');
+    const oneHit = paths.map((p,i)=>p.filter(c=>c==='H').length===1 ? i : -1).filter(i=>i>=0);
+    highlightLeafSet(oneHit, '#b8860b');
+  }
+  if (step >= 5) {
+    const good = paths.map((p,i)=>p.filter(c=>c==='H').length>=2 ? i : -1).filter(i=>i>=0);
+    highlightLeafSet(good, COL_GOOD);
+    drawBadge(12, 12, 'Green paths:  hits ≥ 2  ⇒  1 − 0.1792 = 0.8208', COL_GOOD);
+  }
+
+  // ---------- readout text ----------
+  const msgs = {
+    1: 'Step 1: A single throw hits with p = 0.6 and misses with q = 0.4.',
+    2: 'Step 2: Count the complement — 0 hits or exactly 1 hit in 4 throws.',
+    3: 'Step 3: Exactly 0 hits = the single path M–M–M–M, probability (0.4)⁴ = 0.0256.',
+    4: 'Step 4: Exactly 1 hit = 4 paths, each with probability (0.6)(0.4)³; total 0.1536.',
+    5: 'Step 5: 1 − 0.0256 − 0.1536 = 0.8208. All green paths are the required event.',
+    6: 'Step 6: Binomial check gives the same total 0.8208.'
+  };
+  readout.textContent = msgs[step] || msgs[1];
+}
+
+function drawBadge(x, y, text, colour) {
+  ctx.font = 'bold 12.5px "Segoe UI", Arial';
+  const pad = 8;
+  const w = ctx.measureText(text).width + pad * 2;
+  const h = 24;
+  ctx.fillStyle = colour;
+  roundRect(x, y, w, h, 7);
+  ctx.fill();
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText(text, x + pad, y + 16.5);
+}
+
+function highlightLeafSet(indices, colour) {
+  ctx.lineWidth = 2.4;
+  ctx.strokeStyle = colour;
+  indices.forEach(i => {
+    const x = levelX[4];
+    const y = nodeY(4, i);
+    ctx.beginPath();
+    ctx.arc(x, y, 8.5, 0, Math.PI * 2);
+    ctx.stroke();
   });
+}
 
-  /* ===== Interactive Binomial Bar Chart ===== */
-  const slider = document.getElementById('pSlider');
-  const pVal   = document.getElementById('pVal');
-  const barsEl = document.getElementById('bars');
-  const atLeast2El = document.getElementById('atLeast2');
-  const complementEl = document.getElementById('complement');
+function roundRect(x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
 
-  function binom(n, k) {
-    let r = 1;
-    for (let i = 1; i <= k; i++) r = r * (n - k + i) / i;
-    return r;
-  }
-  function pdf(n, k, p) {
-    return binom(n, k) * Math.pow(p, k) * Math.pow(1 - p, n - k);
-  }
+/* ===================== SCROLL-SYNC ===================== */
+let current = 1;
+const steps = document.querySelectorAll('.step');
 
-  function render() {
-    const p = parseFloat(slider.value);
-    pVal.textContent = p.toFixed(2);
-
-    const n = 4;
-    const probs = [];
-    for (let k = 0; k <= n; k++) probs.push(pdf(n, k, p));
-    const maxP = Math.max(...probs, 0.0001);
-
-    barsEl.innerHTML = '';
-    probs.forEach((pr, k) => {
-      const col = document.createElement('div');
-      col.className = 'bar-col';
-
-      const pct = document.createElement('div');
-      pct.className = 'bar-pct';
-      pct.textContent = pr.toFixed(4);
-      col.appendChild(pct);
-
-      const bar = document.createElement('div');
-      bar.className = 'bar' + (k >= 2 ? ' highlight' : '');
-      const h = Math.max((pr / maxP) * 130, 2); // px height
-      bar.style.height = h + 'px';
-      bar.style.background = k >= 2
-        ? 'linear-gradient(180deg,#34d399,#059669)'
-        : 'linear-gradient(180deg,#fda4af,#e11d48)';
-      col.appendChild(bar);
-
-      const lab = document.createElement('div');
-      lab.className = 'bar-label';
-      lab.textContent = 'X=' + k;
-      col.appendChild(lab);
-
-      barsEl.appendChild(col);
-    });
-
-    const p0 = probs[0], p1 = probs[1];
-    const ans = 1 - p0 - p1;
-    atLeast2El.textContent = ans.toFixed(4);
-    complementEl.innerHTML =
-      '$P(X = 0) + P(X = 1) = ' + p0.toFixed(4) + ' + ' + p1.toFixed(4) +
-      ' = ' + (p0 + p1).toFixed(4) + '$';
-    if (window.MathJax && MathJax.typesetPromise) {
-      MathJax.typesetPromise([complementEl]);
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      current = +e.target.dataset.step;
+      steps.forEach(s => s.classList.toggle('active', s === e.target));
+      draw(current);
     }
-  }
+  });
+}, { rootMargin: '-25% 0px -55% 0px' });
 
-  slider.addEventListener('input', render);
+steps.forEach(s => io.observe(s));
 
-  /* Initial state: open step 1 and draw chart */
-  openStep(0);
-  render();
+// initial draw
+steps.forEach(s => s.classList.toggle('active', s.dataset.step === '1'));
+draw(1);
 </script>
-
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
-
 </body>
 </html>

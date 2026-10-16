@@ -1,789 +1,382 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>HKDSE 2013 Paper 2 Q28 — Statistics</title>
-<script>
-MathJax = {
-  tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['\\[','\\]']] },
-  svg: { fontCache: 'global' }
-};
-</script>
-<script>
-window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] }, svg:{fontCache:'global'} };
-</script>
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2013 Paper 2 Q28 — Scatter Diagram</title>
 <style>
   :root{
-    --blue:#1d4ed8;
-    --blue-light:#3b82f6;
-    --amber:#b45309;
-    --amber-bg:#fef3c7;
-    --amber-border:#fcd34d;
-    --emerald:#047857;
-    --emerald-bg:#d1fae5;
-    --emerald-border:#6ee7b7;
-    --ink:#0f172a;
-    --muted:#64748b;
-    --card:#ffffff;
-    --bg:#f1f5f9;
+    --bg:#0f172a; --card:#1e293b; --ink:#e2e8f0; --muted:#94a3b8;
+    --accent:#38bdf8; --green:#34d399; --amber:#fbbf24; --red:#f87171; --purple:#c084fc;
   }
-  *{box-sizing:border-box}
+  *{box-sizing:border-box;}
   body{
-    margin:0;
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-    background:var(--bg);
-    color:var(--ink);
-    line-height:1.6;
-    -webkit-font-smoothing:antialiased;
+    margin:0; background:linear-gradient(160deg,#0b1220,#111c31 60%,#0b1220);
+    color:var(--ink); font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    font-size:16px; line-height:1.55;
   }
-  .wrap{max-width:960px;margin:0 auto;padding:0 16px 48px}
+  .wrap{padding:16px 14px 60px; max-width:1500px; margin:0 auto;}
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start;}
+  @media(min-width:900px){.split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}}
+  @media(max-width:640px){body{font-size:14.5px;}.wrap{padding:10px 8px 40px;}}
 
-  /* ---------- Hero ---------- */
-  .hero{
-    background:linear-gradient(135deg,#1e3a8a 0%,#2563eb 45%,#0891b2 100%);
-    color:#fff;
-    padding:38px 16px 46px;
-    border-radius:0 0 28px 28px;
-    box-shadow:0 10px 30px rgba(30,58,138,0.25);
-    position:relative;
-    overflow:hidden;
+  .diagram{position:sticky;top:16px;max-height:calc(100vh - 2rem);overflow-y:auto;}
+  .panel{
+    background:var(--card); border:1px solid #334155; border-radius:14px;
+    padding:14px; box-shadow:0 8px 24px rgba(0,0,0,.35);
   }
-  .hero::after{
-    content:"";
-    position:absolute;right:-70px;top:-70px;width:260px;height:260px;
-    background:radial-gradient(circle,rgba(255,255,255,0.22),transparent 68%);
-    border-radius:50%;
-  }
-  .hero-inner{max-width:960px;margin:0 auto;position:relative;z-index:1}
-  .eyebrow{
-    font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;
-    font-weight:700;opacity:.85;margin-bottom:6px;
-  }
-  .hero h1{font-size:clamp(1.35rem,3.6vw,2rem);margin:.1em 0 .25em;font-weight:800;letter-spacing:-.02em}
-  .hero .sub{font-size:.98rem;opacity:.94;margin:0}
-  .pills{margin-top:16px;display:flex;flex-wrap:wrap;gap:8px}
-  .pill{
-    background:rgba(255,255,255,0.18);
-    border:1px solid rgba(255,255,255,0.35);
-    padding:4px 12px;border-radius:999px;font-size:.76rem;font-weight:600;
-    backdrop-filter:blur(4px);
-  }
+  .panel h2{margin:0 0 10px; font-size:1.05rem; letter-spacing:.02em; color:var(--accent);}
+  canvas{width:100%; height:auto; display:block; border-radius:10px; background:#0b1220;}
+  .ro{margin:10px 0 0; font-size:.9rem; color:var(--muted); display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap;}
+  .ro b{color:var(--ink);}
 
-  /* ---------- Cards ---------- */
-  .card{
-    background:var(--card);
-    border-radius:18px;
-    box-shadow:0 4px 14px rgba(15,23,42,0.07);
-    padding:22px 22px 24px;
-    margin-top:22px;
-    border:1px solid rgba(15,23,42,0.05);
-  }
-  .card h2{
-    font-size:1.08rem;margin:0 0 14px;font-weight:800;color:var(--blue);
-    display:flex;align-items:center;gap:9px;
-  }
-  .card h2 .num{
-    background:var(--blue);color:#fff;width:26px;height:26px;border-radius:8px;
-    display:inline-flex;align-items:center;justify-content:center;font-size:.85rem;
-    flex:0 0 auto;
-  }
-  .qtext{font-size:.97rem}
-  .qtext ol{padding-left:22px;margin:.5em 0}
-  .qtext li{margin:.35em 0}
-  .marks{
-    background:#e0e7ff;color:#3730a3;font-size:.72rem;font-weight:700;
-    padding:2px 8px;border-radius:999px;margin-left:6px;white-space:nowrap;
-  }
+  .qhead{font-size:1.02rem; font-weight:700; color:var(--amber); margin-bottom:6px;}
+  .qtext{background:#0b1220; border-left:3px solid var(--accent); border-radius:8px; padding:10px 12px; margin-bottom:14px;}
 
-  /* ---------- Steps ---------- */
   .step{
-    display:none;
-    border-left:4px solid var(--blue-light);
-    background:#f8fafc;
-    border-radius:0 12px 12px 0;
-    padding:14px 16px;
-    margin-top:14px;
-    animation:fade .35s ease;
+    border-left:4px solid #334155; background:#0b1220; border-radius:10px;
+    padding:10px 12px; margin:12px 0; transition:.25s;
   }
-  .step.shown{display:block}
-  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-  .step-head{display:flex;align-items:center;gap:9px;margin-bottom:8px;flex-wrap:wrap}
-  .badge-num{
-    background:var(--blue);color:#fff;font-size:.72rem;font-weight:800;
-    padding:3px 9px;border-radius:999px;
+  .step.active{border-left-color:var(--green); box-shadow:0 0 0 1px rgba(52,211,153,.35), 0 6px 18px rgba(0,0,0,.4);}
+  .tag{
+    display:inline-flex; align-items:center; gap:7px; font-weight:700; color:var(--accent);
+    margin-bottom:5px;
   }
-  .badge-m{
-    background:#ede9fe;color:#5b21b6;font-size:.7rem;font-weight:800;
-    padding:3px 9px;border-radius:999px;border:1px solid #ddd6fe;
+  .chip{
+    display:inline-grid; place-items:center; width:22px; height:22px; border-radius:50%;
+    background:var(--accent); color:#08131f; font-size:.8rem; font-weight:800;
   }
-  .hint{
-    background:var(--amber-bg);border:1px solid var(--amber-border);
-    border-left:4px solid #f59e0b;border-radius:8px;
-    padding:9px 12px;margin:10px 0;font-size:.9rem;color:#78350f;
+  .step.active .chip{background:var(--green);}
+  .hint{color:var(--muted); font-size:.9rem; margin-top:6px;}
+  .ok{color:var(--green); font-weight:700;}
+  .no{color:var(--red); font-weight:700;}
+  code{background:#0b1220; padding:1px 5px; border-radius:5px; color:var(--purple);}
+  .answer{
+    margin-top:16px; padding:12px 14px; border-radius:12px; font-weight:800; font-size:1.05rem;
+    background:linear-gradient(90deg,rgba(52,211,153,.18),rgba(56,189,248,.12));
+    border:1px solid rgba(52,211,153,.6); color:#d1fae5;
   }
-  .hint b{color:var(--amber)}
-  .answerbox{
-    background:var(--emerald-bg);border:1px solid var(--emerald-border);
-    border-left:4px solid var(--emerald);border-radius:8px;
-    padding:10px 13px;margin-top:10px;font-size:.94rem;color:#064e3b;font-weight:600;
-  }
-
-  /* ---------- Buttons / controls ---------- */
-  .btnrow{display:flex;align-items:center;gap:14px;margin-top:16px;flex-wrap:wrap}
-  button.next{
-    background:linear-gradient(135deg,var(--blue),var(--blue-light));
-    color:#fff;border:none;border-radius:11px;
-    padding:11px 22px;font-size:.92rem;font-weight:700;cursor:pointer;
-    box-shadow:0 4px 12px rgba(37,99,235,0.32);
-    transition:transform .15s, box-shadow .15s, opacity .2s;
-  }
-  button.next:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 7px 18px rgba(37,99,235,0.4)}
-  button.next:disabled{
-    background:#cbd5e1;box-shadow:none;cursor:not-allowed;color:#475569;
-  }
-  .counter{font-size:.85rem;color:var(--muted);font-weight:600}
-  .reset{
-    background:#fff;color:var(--blue);border:1.5px solid #bfdbfe;
-    border-radius:11px;padding:9px 16px;font-size:.85rem;font-weight:700;cursor:pointer;
-  }
-  .reset:hover{background:#eff6ff}
-
-  /* ---------- Canvas area ---------- */
-  .canvas-wrap{
-    position:relative;background:#fff;border:1px solid #e2e8f0;border-radius:14px;
-    padding:10px;margin:6px 0 4px;
-  }
-  canvas{width:100%;height:auto;display:block;border-radius:10px;touch-action:manipulation}
-  .ctrl{
-    display:flex;flex-wrap:wrap;gap:16px;align-items:center;
-    margin-top:12px;padding:12px 14px;background:#f1f5f9;border-radius:12px;
-    font-size:.85rem;
-  }
-  .ctrl label{display:flex;align-items:center;gap:8px;font-weight:600;color:#334155}
-  input[type=range]{
-    -webkit-appearance:none;appearance:none;height:6px;border-radius:6px;
-    background:linear-gradient(90deg,#93c5fd,#2563eb);outline:none;width:140px;
-  }
-  input[type=range]::-webkit-slider-thumb{
-    -webkit-appearance:none;appearance:none;width:18px;height:18px;border-radius:50%;
-    background:#fff;border:3px solid var(--blue);cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.2);
-  }
-  input[type=range]::-moz-range-thumb{
-    width:18px;height:18px;border-radius:50%;background:#fff;border:3px solid var(--blue);cursor:pointer;
-  }
-  input[type=checkbox]{width:17px;height:17px;accent-color:var(--blue);cursor:pointer}
-  .readout{
-    display:inline-flex;gap:6px;align-items:center;background:#0f172a;color:#a7f3d0;
-    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.78rem;
-    padding:4px 10px;border-radius:8px;
-  }
-  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:.79rem;color:#475569;margin-top:8px}
-  .legend span{display:flex;align-items:center;gap:6px}
-  .dot{width:11px;height:11px;border-radius:3px;display:inline-block}
-
-  ul.plain{padding-left:20px;margin:.3em 0}
-  ul.plain li{margin:.3em 0}
-  .opts{margin:.6em 0 0;padding-left:0;list-style:none}
-  .opts li{padding:6px 10px;border-radius:8px;margin:.25em 0;background:#f8fafc;border:1px solid #e2e8f0;font-size:.93rem}
-  .opts li.correct{background:#ecfdf5;border-color:#6ee7b7}
-
-  /* ---------- Summary ---------- */
-  .summary{
-    background:linear-gradient(135deg,#0f172a,#1e293b);
-    color:#e2e8f0;border-radius:18px;padding:22px;margin-top:22px;
-    box-shadow:0 8px 24px rgba(15,23,42,0.28);
-  }
-  .summary h2{color:#7dd3fc;font-size:1.08rem;margin:0 0 12px;font-weight:800}
-  .summary ul{padding-left:20px;margin:0}
-  .summary li{margin:.45em 0}
-  .summary b{color:#fcd34d}
-
-  footer{
-    text-align:center;color:var(--muted);font-size:.8rem;
-    padding:26px 16px 10px;
-  }
+  .legend{display:flex; gap:14px; flex-wrap:wrap; margin-top:10px; font-size:.85rem; color:var(--muted);}
+  .legend i{display:inline-block; width:12px; height:12px; border-radius:3px; margin-right:5px; vertical-align:middle;}
+  ul.opt{margin:8px 0 0 0; padding-left:18px;}
+  ul.opt li{margin:3px 0;}
 </style>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$','$'], ['\\(','\\)']], displayMath: [['$$','$$'], ['\\[','\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 </head>
 <body>
-
-<!-- ================= HERO ================= -->
-<header class="hero">
-  <div class="hero-inner">
-    <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</div>
-    <h1>2013 Paper 2 · Question 28 <span style="opacity:.7;font-weight:600">[2013MC#28]</span></h1>
-    <p class="sub">Statistics — Interpreting a Scatter Diagram</p>
-    <div class="pills">
-      <span class="pill">Scatter Diagram</span>
-      <span class="pill">Correlation</span>
-      <span class="pill">Direct / Inverse Variation</span>
-      <span class="pill">Multiple-Choice</span>
-    </div>
-  </div>
-</header>
-
 <div class="wrap">
+  <div class="split">
 
-  <!-- ================= QUESTION ================= -->
-  <section class="card qtext">
-    <h2><span class="num">Q</span>The Question</h2>
-    <p>The scatter diagram below shows the relation between \(x\) and \(y\). Which of the following may represent the relation between \(x\) and \(y\)?</p>
-
-    <div class="canvas-wrap">
-      <canvas id="qCanvas" width="620" height="600"></canvas>
-      <div class="legend">
-        <span><i class="dot" style="background:#1d4ed8"></i>Data points (×)</span>
-        <span><i class="dot" style="background:#94a3b8"></i>Axes</span>
+    <!-- ================= LEFT: DIAGRAM ================= -->
+    <div class="diagram">
+      <div class="panel">
+        <h2>Scatter Diagram (interactive view)</h2>
+        <canvas id="cv" width="620" height="620"></canvas>
+        <p class="ro">
+          <span id="msg">Drag the points? No — just scroll the solution ↓</span>
+          <span>Trend: <b id="trend">—</b></span>
+        </p>
+        <div class="legend">
+          <span><i style="background:#38bdf8"></i>Data points</span>
+          <span><i style="background:#fbbf24"></i>Axes</span>
+          <span><i style="background:#34d399"></i>Trend line (step 3)</span>
+          <span><i style="background:#f87171"></i>Rejected options</span>
+        </div>
       </div>
     </div>
 
-    <ul class="opts">
-      <li class=""><b>A.</b> \(y\) increases when \(x\) increases.</li>
-      <li><b>B.</b> \(y\) decreases when \(x\) increases.</li>
-      <li><b>C.</b> \(y\) varies inversely as \(x^{2}\).</li>
-      <li><b>D.</b> \(y\) varies directly as \(x^{3}\).</li>
-    </ul>
-    <p style="font-size:.85rem;color:var(--muted);margin-top:10px">(Multiple-choice — no marks breakdown, 1 correct answer.)</p><figure style="margin:12px 0;text-align:center;"><img src="figures/2013_P2_Q28.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
-  </section>
+    <!-- ================= RIGHT: QUESTION & SOLUTION ================= -->
+    <div class="panel">
+      <div class="qhead">[HKDSE 2013 Paper 2 — Q28] &nbsp;·&nbsp; Topic 15: Statistics</div>
+      <div class="qtext">
+        The scatter diagram below shows the relation between $x$ and $y$.
+        Which of the following <em>may</em> represent the relation between $x$ and $y$?
+        <ul class="opt">
+          <li>A. $y$ increases when $x$ increases.</li>
+          <li>B. $y$ decreases when $x$ increases.</li>
+          <li>C. $y$ varies inversely as $x^{2}$.</li>
+          <li>D. $y$ varies directly as $x^{3}$.</li>
+        </ul>
+      </div>
 
-  <!-- ================= PART: OBSERVE THE TREND ================= -->
-  <section class="card">
-    <h2><span class="num">1</span>Step-by-step: Reading the trend from the scatter diagram</h2>
+      <figure style="margin:12px 0;text-align:center;"><img src="figures/2013_P2_Q28.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
 
-    <p style="font-size:.94rem;margin-top:0">Move the <b>slider</b> to slide an <b>eyeball trend line</b> across the cloud of points. Tick the boxes to reveal reference curves for each option. Watch the <b>readout</b> update live.</p>
+      <div class="step" data-step="1">
+        <div class="tag"><span class="chip">1</span>Read the given diagram</div>
+        The points are plotted with $x$ along the horizontal axis and $y$ along the vertical axis.
+        Looking at the cloud of points, we see the smallest $x$ values sit at the <b>bottom-left</b>,
+        and the largest $x$ values sit at the <b>top-right</b>.
+        <div class="hint">Hint: ask "as I move right, do I move up or down?" — here it is <em>up</em>.</div>
+      </div>
 
-    <div class="canvas-wrap">
-      <canvas id="trendCanvas" width="620" height="600"></canvas>
+      <div class="step" data-step="2">
+        <div class="tag"><span class="chip">2</span>Identify the direction of the relationship</div>
+        Since the points rise from left to right, this is a <b>positive association</b>:
+        \[ x \uparrow \;\Longrightarrow\; y \uparrow \]
+        So $y$ <b>increases</b> when $x$ increases.
+        <div class="hint">Hint: A positive correlation means the two variables move in the same direction.</div>
+      </div>
+
+      <div class="step" data-step="3">
+        <div class="tag"><span class="chip">3</span>Draw a line of best fit</div>
+        Sketch an upward-sloping line through the middle of the points — the gradient is clearly positive.
+        A positive gradient means $y$ grows with $x$, matching the description in option A.
+        <div class="hint">Hint: The best-fit line here is straight-ish, so a simple "increases / decreases" statement fits best.</div>
+      </div>
+
+      <div class="step" data-step="4">
+        <div class="tag"><span class="chip">4</span>Test option B</div>
+        <b>B</b>: $y$ decreases when $x$ increases would need a downward-sloping cloud.
+        Our points slope <em>upward</em>, so B is <span class="no">✗ wrong</span>.
+        <div class="hint">Hint: "decreases" = negative correlation = points fall left→right.</div>
+      </div>
+
+      <div class="step" data-step="5">
+        <div class="tag"><span class="chip">5</span>Test option C</div>
+        <b>C</b>: $y$ varies inversely as $x^{2}$ means $y = \dfrac{k}{x^{2}}$ ($k>0$).
+        As $x$ increases, $y$ would <em>decrease</em> — a falling curve.
+        This contradicts the upward trend, so C is <span class="no">✗ wrong</span>.
+        <div class="hint">Hint: Inverse variation always gives a decreasing relationship for positive $x$.</div>
+      </div>
+
+      <div class="step" data-step="6">
+        <div class="tag"><span class="chip">6</span>Test option D</div>
+        <b>D</b>: $y$ varies directly as $x^{3}$ means $y = kx^{3}$.
+        For $x$ increasing (positive side), $y$ does increase — but $x^{3}$ grows very <em>rapidly</em>,
+        producing a sharply curving, almost vertical tail. The points here lie roughly along a
+        straight band, so D is not the best description — it is <span class="no">✗ not chosen</span>.
+        <div class="hint">Hint: With $y \propto x^{3}$, a small increase in $x$ causes a huge jump in $y$; the scatter does not show that.</div>
+      </div>
+
+      <div class="step" data-step="7">
+        <div class="tag"><span class="chip">7</span>Conclusion</div>
+        Only option A correctly describes what the scatter diagram shows:
+        <span class="ok">$y$ increases when $x$ increases</span>.
+        <div class="hint">Hint: The key word in the question is "may" — choose the simplest statement consistent with the points.</div>
+      </div>
+
+      <div class="answer">Answer: A &nbsp;—&nbsp; $y$ increases when $x$ increases.</div>
     </div>
 
-    <div class="ctrl">
-      <label for="sliderGrade">Trend-line slope: <input type="range" id="sliderGrade" min="-200" max="200" value="150" step="5"></label>
-      <label><input type="checkbox" id="showA"> Show A-model (increasing line)</label>
-      <label><input type="checkbox" id="showB"> Show B-model (decreasing line)</label>
-      <label><input type="checkbox" id="showC"> Show C-model (\(y \propto x^{-2}\))</label>
-      <label><input type="checkbox" id="showD"> Show D-model (\(y \propto x^{3}\))</label>
-    </div>
-    <div style="margin-top:10px">
-      <span class="readout" id="readoutTrend">slope ≈ +1.50 &nbsp;|&nbsp; fit: POSITIVE</span>
-    </div>
-
-    <div class="step" id="s1-1">
-      <div class="step-head"><span class="badge-num">Step 1</span></div>
-      <p>Start from the <b>left</b> of the scatter diagram and move to the <b>right</b>. As \(x\) (the horizontal coordinate) increases, the plotted points climb steadily upwards.</p>
-      <div class="hint"><b>Hint:</b> In a scatter diagram, always read the trend from <i>left to right</i> along the horizontal axis — that is exactly "as \(x\) increases".</div>
-    </div>
-
-    <div class="step" id="s1-2">
-      <div class="step-head"><span class="badge-num">Step 2</span></div>
-      <p>Because the points rise from bottom-left to top-right, the overall trend is a <b>positive association</b>: bigger \(x\) comes with bigger \(y\). In symbols,</p>
-      \[ \text{as } x \uparrow,\quad y \uparrow \]
-      <div class="hint"><b>Hint:</b> The cloud of points is roughly a long, tilted "cigar" pointing up to the right — that tilt is the whole answer.</div>
-    </div>
-
-    <div class="step" id="s1-3">
-      <div class="step-head"><span class="badge-num">Step 3</span></div>
-      <p>Now check each option against that observation:</p>
-      <ul class="plain">
-        <li><b>A.</b> \(y\) increases when \(x\) increases — ✔ matches the upward trend.</li>
-        <li><b>B.</b> \(y\) decreases when \(x\) increases — ✘ the points clearly do <i>not</i> fall.</li>
-        <li><b>C.</b> \(y\) varies inversely as \(x^{2}\), i.e. \(y \propto \dfrac{1}{x^{2}}\) — ✘ for positive \(x\) this <i>decreases</i> as \(x\) increases.</li>
-        <li><b>D.</b> \(y\) varies directly as \(x^{3}\), i.e. \(y \propto x^{3}\) — ✘ the cubic must curve steeply upwards; the points lie roughly along a straight band, and for negative \(x\) a cubic would give <i>negative</i> \(y\), which never happens here.</li>
-      </ul>
-      <div class="hint"><b>Hint:</b> Options C and D are <i>curved</i> relations. The plotted points form an approximately <b>straight</b> rising band, so the simplest descriptor is "\(y\) increases when \(x\) increases".</div>
-      <div class="answerbox">Answer: <b>A</b> — \(y\) increases when \(x\) increases.</div>
-    </div>
-
-    <div class="btnrow">
-      <button class="next" id="btn1" onclick="nextStep('g1')">Next step →</button>
-      <span class="counter" id="cnt1">0 / 3</span>
-      <button class="reset" onclick="resetGroup('g1')">Reset</button>
-    </div>
-  </section>
-
-  <!-- ================= PART: WHY NOT C AND D ================= -->
-  <section class="card">
-    <h2><span class="num">2</span>Why C and D fail — visual comparison</h2>
-    <p style="font-size:.94rem;margin-top:0">The scatter shows an almost <b>straight</b>, rising trend. Use the slider to change the <b>shape</b> of the proposed model and see how far it drifts from the data points.</p>
-
-    <div class="canvas-wrap">
-      <canvas id="modelCanvas" width="620" height="600"></canvas>
-    </div>
-
-    <div class="ctrl">
-      <label for="sliderPow">Model: \(y = k\,x^{\,p}\) &nbsp; \(p=\) <b id="pVal">1.0</b>
-        <input type="range" id="sliderPow" min="-3" max="3" value="1" step="0.1"></label>
-      <label><input type="checkbox" id="showResid"> Show vertical deviations</label>
-    </div>
-    <div style="margin-top:10px">
-      <span class="readout" id="readoutModel">p = +1.0 &nbsp;|&nbsp; straight, rising → fits well</span>
-    </div>
-
-    <div class="step" id="s2-1">
-      <div class="step-head"><span class="badge-num">Step 1</span></div>
-      <p>Option C says \(y \propto x^{-2}\). For \(x>0\), that curve falls steeply and hugs the axes — it cannot rise to the top-right as the data does.</p>
-      <div class="hint"><b>Hint:</b> Set \(p=-2\) on the slider: the curve immediately plunges downwards and never matches the point cloud.</div>
-    </div>
-
-    <div class="step" id="s2-2">
-      <div class="step-head"><span class="badge-num">Step 2</span></div>
-      <p>Option D says \(y \propto x^{3}\). The cubic rises far too steeply and has an S-shape; the middle of the data would have to bend sharply, which it does not.</p>
-      <div class="hint"><b>Hint:</b> Set \(p=3\) on the slider: the curve shoots up almost vertically and completely misses the points.</div>
-    </div>
-
-    <div class="btnrow">
-      <button class="next" id="btn2" onclick="nextStep('g2')">Next step →</button>
-      <span class="counter" id="cnt2">0 / 2</span>
-      <button class="reset" onclick="resetGroup('g2')">Reset</button>
-    </div>
-  </section>
-
-  <!-- ================= SUMMARY ================= -->
-  <section class="summary">
-    <h2>Summary of the Answer</h2>
-    <ul>
-      <li><b>Given:</b> A scatter diagram of \(y\) against \(x\) whose points run from bottom-left to top-right.</li>
-      <li><b>Observation:</b> As \(x\) increases, \(y\) tends to increase — a <b>positive association</b>.</li>
-      <li><b>Correct option:</b> <b>A</b> — \(y\) increases when \(x\) increases.</li>
-      <li><b>Why B is wrong:</b> The points do not fall; \(y\) does <i>not</i> decrease as \(x\) increases.</li>
-      <li><b>Why C is wrong:</b> \(y \propto x^{-2}\) means \(y\) <i>decreases</i> as \(x\) increases (for positive \(x\)).</li>
-      <li><b>Why D is wrong:</b> A direct cube relation \(y \propto x^{3}\) is far too steeply curved and would give downward-moving points on one side — inconsistent with the straight, rising band shown.</li>
-    </ul>
-  </section>
-
+  </div>
 </div>
 
-<footer>
-  HKDSE Mathematics (Compulsory Part) · Paper 2 · 2013 Q28 · Statistics — Scatter Diagram &amp; Correlation<br>
-  Interactive worked solution · All diagrams drawn with the HTML5 Canvas API
-</footer>
-
 <script>
-/* ============================================================
-   Shared helpers
-   ============================================================ */
-function toX(x, ox, scale, origin){ return origin.x + x*scale; }
-function toY(y, oy, scale, origin){ return origin.y - y*scale; }
-
-/* Synthetic data-set roughly matching the original scatter diagram.
-   x in [ ~2 , ~11 ], y in [ ~2 , ~12 ], positive, roughly linear. */
-const DATA = [
-  [2.1,2.2],[2.6,2.9],[3.0,3.1],[3.2,3.8],[3.6,3.6],[3.8,4.2],[4.1,4.5],
-  [4.4,4.9],[4.6,5.1],[4.9,5.4],[5.2,5.6],[5.4,5.2],[5.7,6.1],[5.9,6.4],
-  [6.2,6.6],[6.5,6.3],[6.7,7.1],[7.0,7.4],[7.3,7.9],[7.6,7.6],[7.9,8.4],
-  [8.2,8.7],[8.5,9.1],[8.8,8.8],[9.1,9.4],[9.4,9.9],[9.7,10.3],[10.1,10.2],
-  [10.4,10.9],[10.8,11.3]
-];
-
-/* ============================================================
-   1) Top question diagram (static, clean)
-   ============================================================ */
-(function drawQuestion(){
-  const cv = document.getElementById('qCanvas');
-  if(!cv) return;
+(function(){
+  const cv = document.getElementById('cv');
   const ctx = cv.getContext('2d');
+  const msg = document.getElementById('msg');
+  const trendEl = document.getElementById('trend');
   const W = cv.width, H = cv.height;
-  ctx.clearRect(0,0,W,H);
 
-  const pad = 52;
-  const ox = pad, oy = H - pad;
-  const maxX = 12, maxY = 13;
-  const sx = (W - pad - 70) / maxX;
-  const sy = (H - pad - 50) / maxY;
-  const s  = Math.min(sx, sy);
+  // Original-style point cloud (roughly matching the exam figure)
+  // coordinates in "data units"
+  const pts = [
+    [2.2,2.1],[2.6,2.3],[2.9,2.7],
+    [3.3,2.6],[3.5,3.0],[3.7,3.2],[3.9,3.1],
+    [4.2,3.3],[4.4,3.4],[4.5,3.7],[4.7,3.6],
+    [5.0,3.9],[5.2,4.0],[5.3,4.3],[5.5,4.1],
+    [5.7,4.4],[5.9,4.5],[6.0,4.7],[6.2,4.6],
+    [6.4,4.9],[6.6,4.8],[6.8,5.0],
+    [7.1,5.3],[7.3,5.1],[7.4,5.4],[7.6,5.5],[7.8,5.3],
+    [8.1,5.7],[8.3,5.6],[8.5,5.8],[8.7,5.9],[8.9,6.1]
+  ];
 
-  // background
-  ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,W,H);
+  // plot area
+  const padL = 70, padR = 45, padT = 40, padB = 60;
+  const x0 = padL, x1 = W - padR, y0 = H - padB, y1 = padT;
 
-  // grid
-  ctx.strokeStyle = '#eef2f7'; ctx.lineWidth = 1;
-  for(let x=0;x<=maxX;x++){
-    ctx.beginPath();
-    ctx.moveTo(toX(x,s,ox), toY(0,s,oy));
-    ctx.lineTo(toX(x,s,ox), toY(maxY,s,oy));
-    ctx.stroke();
-  }
-  for(let y=0;y<=maxY;y++){
-    ctx.beginPath();
-    ctx.moveTo(toX(0,s,ox), toY(y,s,oy));
-    ctx.lineTo(toX(maxX,s,ox), toY(y,s,oy));
-    ctx.stroke();
-  }
+  const xmin = 0, xmax = 10, ymin = 0, ymax = 7.5;
+  const sx = v => x0 + (v - xmin) * (x1 - x0) / (xmax - xmin);
+  const sy = v => y0 - (v - ymin) * (y0 - y1) / (ymax - ymin);
 
-  // axes
-  ctx.strokeStyle = '#475569'; ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(toX(0,s,ox), toY(0,s,oy));
-  ctx.lineTo(toX(maxX+0.3,s,ox), toY(0,s,oy));
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(toX(0,s,ox), toY(0,s,oy));
-  ctx.lineTo(toX(0,s,ox), toY(maxY+0.2,s,oy));
-  ctx.stroke();
-
-  // arrows
-  function arrow(x1,y1,x2,y2){
-    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
-    const ang = Math.atan2(y2-y1, x2-x1);
-    ctx.beginPath();
-    ctx.moveTo(x2,y2);
-    ctx.lineTo(x2 - 11*Math.cos(ang-0.4), y2 - 11*Math.sin(ang-0.4));
-    ctx.lineTo(x2 - 11*Math.cos(ang+0.4), y2 - 11*Math.sin(ang+0.4));
-    ctx.closePath(); ctx.fillStyle='#475569'; ctx.fill();
-  }
-  arrow(toX(maxX,s,ox), toY(0,s,oy), toX(maxX+0.35,s,ox), toY(0,s,oy));
-  arrow(toX(0,s,ox), toY(maxY,s,oy), toX(0,s,ox), toY(maxY+0.25,s,oy));
-
-  // labels
-  ctx.fillStyle = '#0f172a';
-  ctx.font = 'italic bold 17px Georgia, serif';
-  ctx.fillText('x', toX(maxX+0.45,s,ox)-2, toY(0,s,oy)+6);
-  ctx.fillText('y', toX(0,s,ox)-18, toY(maxY+0.30,s,oy)+4);
-  ctx.font = 'italic bold 15px Georgia, serif';
-  ctx.fillText('O', toX(0,s,ox)-16, toY(0,s,oy)+18);
-
-  // data points as "x" marks
-  ctx.strokeStyle = '#1d4ed8'; ctx.lineWidth = 2.4; ctx.lineCap='round';
-  const r = 5;
-  DATA.forEach(([x,y])=>{
-    const px = toX(x,s,ox), py = toY(y,s,oy);
-    ctx.beginPath(); ctx.moveTo(px-r,py-r); ctx.lineTo(px+r,py+r); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(px+r,py-r); ctx.lineTo(px-r,py+r); ctx.stroke();
-  });
-
-  // caption
-  ctx.fillStyle = '#64748b'; ctx.font = '13px system-ui, sans-serif';
-  ctx.fillText('Scatter diagram of y against x', 16, 24);
-})();
-
-/* ============================================================
-   2) Trend-line interactive canvas
-   ============================================================ */
-const T = {
-  cv: null, ctx: null, W: 620, H: 400,
-  ox: 0, oy: 0, s: 1, maxX: 12, maxY: 13
-};
-
-function trendSetup(){
-  const cv = document.getElementById('trendCanvas');
-  if(!cv) return;
-  T.cv = cv;
-  T.ctx = cv.getContext('2d');
-  T.W = cv.width; T.H = cv.height;
-  const pad = 56;
-  T.ox = pad; T.oy = T.H - pad;
-  const sx = (T.W - pad - 76) / T.maxX;
-  const sy = (T.H - pad - 54) / T.maxY;
-  T.s = Math.min(sx, sy);
-  drawTrend();
-}
-
-function drawTrend(){
-  const ctx = T.ctx;
-  const W=T.W, H=T.H, s=T.s, ox=T.ox, oy=T.oy, maxX=T.maxX, maxY=T.maxY;
-  ctx.clearRect(0,0,W,H);
-  ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,W,H);
-
-  // grid
-  ctx.strokeStyle='#eef2f7'; ctx.lineWidth=1;
-  for(let x=0;x<=maxX;x++){ ctx.beginPath(); ctx.moveTo(toX(x,s,ox),toY(0,s,oy)); ctx.lineTo(toX(x,s,ox),toY(maxY,s,oy)); ctx.stroke(); }
-  for(let y=0;y<=maxY;y++){ ctx.beginPath(); ctx.moveTo(toX(0,s,ox),toY(y,s,oy)); ctx.lineTo(toX(maxX,s,ox),toY(y,s,oy)); ctx.stroke(); }
-
-  // axes
-  ctx.strokeStyle='#475569'; ctx.lineWidth=2;
-  ctx.beginPath(); ctx.moveTo(toX(0,s,ox),toY(maxY,s,oy)); ctx.lineTo(toX(0,s,ox),toY(0,s,oy)); ctx.lineTo(toX(maxX,s,ox),toY(0,s,oy)); ctx.stroke();
-  ctx.fillStyle='#0f172a';
-  ctx.font='italic bold 17px Georgia, serif';
-  ctx.fillText('x', toX(maxX,s,ox)+6, toY(0,s,oy)+2);
-  ctx.fillText('y', toX(0,s,ox)-19, toY(maxY,s,oy)-4);
-  ctx.font='italic bold 15px Georgia, serif';
-  ctx.fillText('O', toX(0,s,ox)-15, toY(0,s,oy)+17);
-
-  // ---- optional model curves ----
-  const showA = document.getElementById('showA').checked;
-  const showB = document.getElementById('showB').checked;
-  const showC = document.getElementById('showC').checked;
-  const showD = document.getElementById('showD').checked;
-
-  function curve(fn, color, dash, lw){
-    ctx.save();
-    ctx.strokeStyle=color; ctx.lineWidth=lw||2.2; ctx.setLineDash(dash||[]);
-    ctx.beginPath();
-    let started=false;
-    for(let px=0; px<=maxX; px+=0.05){
-      const yv = fn(px);
-      if(!isFinite(yv) || yv<0 || yv>maxY+1){ started=false; continue; }
-      const X = toX(px,s,ox), Y = toY(yv,s,oy);
-      if(!started){ ctx.moveTo(X,Y); started=true; } else ctx.lineTo(X,Y);
+  function axes(){
+    ctx.clearRect(0,0,W,H);
+    // background grid
+    ctx.strokeStyle = 'rgba(148,163,184,0.12)';
+    ctx.lineWidth = 1;
+    for(let i=0;i<=10;i++){
+      ctx.beginPath(); ctx.moveTo(sx(i), sy(0)); ctx.lineTo(sx(i), sy(ymax)); ctx.stroke();
     }
-    ctx.stroke(); ctx.restore();
+    for(let j=0;j<=7;j++){
+      ctx.beginPath(); ctx.moveTo(sx(0), sy(j)); ctx.lineTo(sx(xmax), sy(j)); ctx.stroke();
+    }
+    // axes
+    ctx.lineWidth = 3; ctx.strokeStyle = '#fbbf24';
+    // y-axis
+    ctx.beginPath(); ctx.moveTo(sx(0), sy(0)); ctx.lineTo(sx(0), sy(ymax)); ctx.stroke();
+    // x-axis
+    ctx.beginPath(); ctx.moveTo(sx(0), sy(0)); ctx.lineTo(sx(xmax), sy(0)); ctx.stroke();
+    // arrow heads
+    ctx.fillStyle = '#fbbf24';
+    ctx.beginPath(); ctx.moveTo(sx(0), sy(ymax)-2); ctx.lineTo(sx(0)-8, sy(ymax)+16); ctx.lineTo(sx(0)+8, sy(ymax)+16); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(sx(xmax)+2, sy(0)); ctx.lineTo(sx(xmax)-16, sy(0)-8); ctx.lineTo(sx(xmax)-16, sy(0)+8); ctx.closePath(); ctx.fill();
+    // labels
+    ctx.fillStyle = '#e2e8f0'; ctx.font = 'bold 22px Segoe UI, sans-serif';
+    ctx.fillText('y', sx(0)+10, sy(ymax)+6);
+    ctx.fillText('x', sx(xmax)+4, sy(0)+28);
+    ctx.font = '18px Segoe UI, sans-serif';
+    ctx.fillStyle = '#94a3b8';
+    ctx.fillText('O', sx(0)-22, sy(0)+24);
   }
 
-  if(showA) curve(x=>1.05*x, '#16a34a', [], 2.4);
-  if(showB) curve(x=>13 - 1.0*x, '#dc2626', [7,5], 2.2);
-  if(showC) curve(x=> (x<=0.4? maxY+2 : 3.0/(x*x) ), '#7c3aed', [7,5], 2.2);
-  if(showD) curve(x=> 0.008*x*x*x, '#ea580c', [7,5], 2.2);
-
-  // ---- eyeball trend line from slider ----
-  const slope = parseFloat(document.getElementById('sliderGrade').value)/100; // -2 .. 2
-  const intercept = 1.0;
-  // draw as long segment
-  const x1=0.5, y1=Math.max(0,intercept+slope*x1);
-  const x2=11.6, y2=intercept+slope*x2;
-  ctx.save();
-  ctx.strokeStyle='#2563eb'; ctx.lineWidth=3.2; ctx.setLineDash([9,6]); ctx.lineCap='round';
-  ctx.beginPath();
-  ctx.moveTo(toX(x1,s,ox), toY(Math.min(y1,maxY),s,oy));
-  ctx.lineTo(toX(x2,s,ox), toY(Math.min(Math.max(y2,0),maxY),s,oy));
-  ctx.stroke();
-  ctx.restore();
-
-  // slope annotation
-  ctx.fillStyle='#2563eb'; ctx.font='bold 13px system-ui, sans-serif';
-  ctx.fillText('trend line: slope ≈ ' + (slope>=0?'+':'') + slope.toFixed(2),
-               toX(0.6,s,ox), toY(maxY-0.35,s,oy));
-
-  // ---- data points ----
-  ctx.strokeStyle='#1d4ed8'; ctx.lineWidth=2.4; ctx.lineCap='round';
-  const r=5;
-  DATA.forEach(([x,y])=>{
-    const px=toX(x,s,ox), py=toY(y,s,oy);
-    ctx.beginPath(); ctx.moveTo(px-r,py-r); ctx.lineTo(px+r,py+r); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(px+r,py-r); ctx.lineTo(px-r,py+r); ctx.stroke();
-  });
-
-  // ---- readout ----
-  const dir = slope > 0.25 ? 'POSITIVE (y rises)' :
-              slope < -0.25 ? 'NEGATIVE (y falls)' : 'FLAT (no clear trend)';
-  const ro = document.getElementById('readoutTrend');
-  if(ro) ro.textContent = 'slope ≈ ' + (slope>=0?'+':'') + slope.toFixed(2) + '  |  trend: ' + dir;
-
-  // verdict banner
-  let verdict = '';
-  if(slope > 0.25) verdict = '✔ Matches option A:  y increases when x increases.';
-  else if(slope < -0.25) verdict = '✘ This would match option B, but the points really rise.';
-  else verdict = '— Slide further to see the real upward trend.';
-  ctx.fillStyle = (slope>0.25) ? '#047857' : (slope<-0.25 ? '#b91c1c' : '#64748b');
-  ctx.font='bold 13.5px system-ui, sans-serif';
-  ctx.fillText(verdict, 16, 24);
-}
-
-/* ============================================================
-   3) Model-shape comparison canvas:  y = k x^p
-   ============================================================ */
-const M = { cv:null, ctx:null, W:620, H:400, ox:0, oy:0, s:1, maxX:12, maxY:13 };
-
-function modelSetup(){
-  const cv = document.getElementById('modelCanvas');
-  if(!cv) return;
-  M.cv = cv; M.ctx = cv.getContext('2d');
-  M.W = cv.width; M.H = cv.height;
-  const pad = 56;
-  M.ox = pad; M.oy = M.H - pad;
-  const sx = (M.W - pad - 76)/M.maxX;
-  const sy = (M.H - pad - 54)/M.maxY;
-  M.s = Math.min(sx, sy);
-  drawModel();
-}
-
-function drawModel(){
-  const ctx=M.ctx, W=M.W, H=M.H, s=M.s, ox=M.ox, oy=M.oy, maxX=M.maxX, maxY=M.maxY;
-  ctx.clearRect(0,0,W,H);
-  ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,W,H);
-
-  // grid
-  ctx.strokeStyle='#eef2f7'; ctx.lineWidth=1;
-  for(let x=0;x<=maxX;x++){ ctx.beginPath(); ctx.moveTo(toX(x,s,ox),toY(0,s,oy)); ctx.lineTo(toX(x,s,ox),toY(maxY,s,oy)); ctx.stroke(); }
-  for(let y=0;y<=maxY;y++){ ctx.beginPath(); ctx.moveTo(toX(0,s,ox),toY(y,s,oy)); ctx.lineTo(toX(maxX,s,ox),toY(y,s,oy)); ctx.stroke(); }
-
-  // axes
-  ctx.strokeStyle='#475569'; ctx.lineWidth=2;
-  ctx.beginPath(); ctx.moveTo(toX(0,s,ox),toY(maxY,s,oy)); ctx.lineTo(toX(0,s,ox),toY(0,s,oy)); ctx.lineTo(toX(maxX,s,ox),toY(0,s,oy)); ctx.stroke();
-  ctx.fillStyle='#0f172a'; ctx.font='italic bold 17px Georgia, serif';
-  ctx.fillText('x', toX(maxX,s,ox)+6, toY(0,s,oy)+2);
-  ctx.fillText('y', toX(0,s,ox)-19, toY(maxY,s,oy)-4);
-  ctx.font='italic bold 15px Georgia, serif';
-  ctx.fillText('O', toX(0,s,ox)-15, toY(0,s,oy)+17);
-
-  // fitted straight reference (least-squares-ish through data)
-  const n = DATA.length;
-  let sxv=0, syv=0, sxy=0, sxx=0;
-  DATA.forEach(([x,y])=>{ sxv+=x; syv+=y; sxy+=x*y; sxx+=x*x; });
-  const mFit = (n*sxy - sxv*syv)/(n*sxx - sxv*sxv);
-  const cFit = (syv - mFit*sxv)/n;
-
-  ctx.save();
-  ctx.strokeStyle='#94a3b8'; ctx.lineWidth=2; ctx.setLineDash([5,5]);
-  ctx.beginPath();
-  ctx.moveTo(toX(0,s,ox), toY(cFit,s,oy));
-  ctx.lineTo(toX(maxX,s,ox), toY(cFit+mFit*maxX,s,oy));
-  ctx.stroke();
-  ctx.restore();
-  ctx.fillStyle='#94a3b8'; ctx.font='12px system-ui, sans-serif';
-  ctx.fillText('best straight fit (reference)', toX(7.2,s,ox), toY(cFit+mFit*7.2,s,oy)-8);
-
-  // model curve y = k x^p, k chosen to pass through centroid of data
-  const p = parseFloat(document.getElementById('sliderPow').value);
-  const mx = sxv/n, my = syv/n;
-  let k;
-  if(Math.abs(p) < 0.05 || p < 0) k = 1; // handle later
-  k = my / Math.pow(mx, p);
-  if(!isFinite(k) || k<=0) k = 1;
-
-  const showResid = document.getElementById('showResid').checked;
-
-  // residuals
-  if(showResid){
-    ctx.save();
-    ctx.strokeStyle='rgba(220,38,38,0.45)'; ctx.lineWidth=1.4;
-    DATA.forEach(([x,y])=>{
-      const ym = k*Math.pow(x,p);
-      if(isFinite(ym)){
+  function drawPoints(color, glow){
+    pts.forEach(p=>{
+      const px = sx(p[0]), py = sy(p[1]);
+      if(glow){
         ctx.beginPath();
-        ctx.moveTo(toX(x,s,ox), toY(y,s,oy));
-        ctx.lineTo(toX(x,s,ox), toY(ym,s,oy));
-        ctx.stroke();
+        ctx.arc(px,py,10,0,Math.PI*2);
+        ctx.fillStyle = 'rgba(56,189,248,0.16)';
+        ctx.fill();
+      }
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2.6;
+      ctx.beginPath();
+      ctx.moveTo(px-6,py-6); ctx.lineTo(px+6,py+6);
+      ctx.moveTo(px+6,py-6); ctx.lineTo(px-6,py+6);
+      ctx.stroke();
+    });
+  }
+
+  function trendLine(color, dashed){
+    // simple least-squares-ish line through the cloud
+    const a = 0.62, b = 0.75; // data-space slope/intercept approximations
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 3.5;
+    ctx.setLineDash(dashed ? [10,8] : []);
+    ctx.beginPath();
+    ctx.moveTo(sx(1.8), sy(a*1.8 + b));
+    ctx.lineTo(sx(9.4), sy(a*9.4 + b));
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  function drawArrow(px, py, dx, dy, color){
+    ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.moveTo(px,py); ctx.lineTo(px+dx,py+dy); ctx.stroke();
+    const ang = Math.atan2(dy,dx);
+    ctx.beginPath();
+    ctx.moveTo(px+dx, py+dy);
+    ctx.lineTo(px+dx-16*Math.cos(ang-0.4), py+dy-16*Math.sin(ang-0.4));
+    ctx.lineTo(px+dx-16*Math.cos(ang+0.4), py+dy-16*Math.sin(ang+0.4));
+    ctx.closePath(); ctx.fill();
+  }
+
+  function text(lines, x, y, color, size){
+    ctx.fillStyle = color;
+    ctx.font = 'bold ' + (size||18) + 'px Segoe UI, sans-serif';
+    lines.forEach((t,i)=> ctx.fillText(t, x, y + i*(size?size*1.35:24)));
+  }
+
+  function draw(step){
+    axes();
+    drawPoints('#38bdf8', step>=1);
+    trendEl.textContent = '—';
+
+    if(step===1 || step===2 || step===0){
+      // highlight the two ends
+      ctx.strokeStyle = 'rgba(56,189,248,0.9)'; ctx.lineWidth = 2;
+      const p1 = pts[0], p2 = pts[pts.length-1];
+      ctx.beginPath(); ctx.arc(sx(p1[0]), sy(p1[1]), 18, 0, Math.PI*2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(sx(p2[0]), sy(p2[1]), 18, 0, Math.PI*2); ctx.stroke();
+      if(step===1){
+        text(['bottom-left'], sx(1.2), sy(1.2), '#38bdf8', 17);
+        text(['top-right'], sx(8.0), sy(6.9), '#38bdf8', 17);
+        msg.textContent = 'Step 1: points run from bottom-left to top-right.';
+      }
+      if(step===2){
+        drawArrow(sx(4.0), sy(2.0), 150, -90, '#34d399');
+        text(['x ↑ , y ↑'], sx(5.2), sy(1.5), '#34d399', 18);
+        msg.textContent = 'Step 2: x increases → y increases (positive association).';
+        trendEl.textContent = 'Positive ↑';
+      }
+    }
+
+    if(step===3){
+      trendLine('#34d399', false);
+      text(['line of best fit (positive gradient)'], sx(1.4), sy(6.6), '#34d399', 16);
+      msg.textContent = 'Step 3: best-fit line slopes upward → positive gradient.';
+      trendEl.textContent = 'Positive ↑';
+    }
+
+    if(step===4){
+      trendLine('#f87171', true);
+      ctx.save();
+      ctx.translate(sx(2.2), sy(6.4));
+      text(['B ✗  (would slope DOWN)'], 0, 0, '#f87171', 17);
+      ctx.restore();
+      msg.textContent = 'Step 4: B needs a downward trend — not our diagram.';
+    }
+
+    if(step===5){
+      // draw curve y = k/x^2 for positive x
+      ctx.strokeStyle = '#f87171'; ctx.lineWidth = 3.5;
+      ctx.beginPath();
+      let first = true;
+      for(let xv=1.0; xv<=9.5; xv+=0.1){
+        const yv = 4.0/(xv*xv);
+        if(yv<0 || yv>ymax) continue;
+        const px = sx(xv), py = sy(yv);
+        if(first){ ctx.moveTo(px,py); first=false; } else ctx.lineTo(px,py);
+      }
+      ctx.stroke();
+      text(['C ✗  y = k/x²  (decreasing)'], sx(3.2), sy(6.4), '#f87171', 17);
+      msg.textContent = 'Step 5: C would be a falling curve — not matching.';
+    }
+
+    if(step===6){
+      // draw curve y = kx^3
+      ctx.strokeStyle = '#f87171'; ctx.lineWidth = 3.5;
+      ctx.beginPath();
+      let first = true;
+      for(let xv=0; xv<=2.1; xv+=0.02){
+        const yv = 0.85*xv*xv*xv;
+        if(yv>ymax) break;
+        const px = sx(xv), py = sy(yv);
+        if(first){ ctx.moveTo(px,py); first=false; } else ctx.lineTo(px,py);
+      }
+      ctx.stroke();
+      text(['D ✗  y = kx³  (too steep)'], sx(3.4), sy(6.4), '#f87171', 17);
+      msg.textContent = 'Step 6: D would curve up too quickly — not a straight band.';
+    }
+
+    if(step===7){
+      trendLine('#34d399', false);
+      ctx.strokeStyle = '#34d399'; ctx.lineWidth = 2;
+      const p1 = pts[0], p2 = pts[pts.length-1];
+      ctx.beginPath(); ctx.arc(sx(p1[0]), sy(p1[1]), 18, 0, Math.PI*2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(sx(p2[0]), sy(p2[1]), 18, 0, Math.PI*2); ctx.stroke();
+      text(['A ✓  y increases when x increases'], sx(1.0), sy(6.7), '#34d399', 18);
+      msg.textContent = 'Step 7: conclusion — the answer is A.';
+      trendEl.textContent = 'Positive ↑';
+    }
+  }
+
+  let current = 0;
+  const io = new IntersectionObserver(es=>{
+    es.forEach(e=>{
+      if(e.isIntersecting){
+        const n = +e.target.dataset.step;
+        if(n!==current){
+          current = n;
+          document.querySelectorAll('.step').forEach(s=>s.classList.toggle('active', +s.dataset.step===n));
+          draw(n);
+        }
       }
     });
-    ctx.restore();
-  }
+  },{rootMargin:'-25% 0px -55% 0px'});
+  document.querySelectorAll('.step').forEach(s=>io.observe(s));
 
-  // model curve
-  ctx.save();
-  ctx.strokeStyle='#e11d48'; ctx.lineWidth=2.8; ctx.lineCap='round';
-  ctx.beginPath();
-  let started=false;
-  for(let px=0.35; px<=maxX; px+=0.04){
-    const yv = k*Math.pow(px,p);
-    if(!isFinite(yv) || yv<0 || yv>maxY+2){ started=false; continue; }
-    const X=toX(px,s,ox), Y=toY(yv,s,oy);
-    if(!started){ ctx.moveTo(X,Y); started=true; } else ctx.lineTo(X,Y);
-  }
-  ctx.stroke();
-  ctx.restore();
-
-  // data points
-  ctx.strokeStyle='#1d4ed8'; ctx.lineWidth=2.4; ctx.lineCap='round';
-  const r=5;
-  DATA.forEach(([x,y])=>{
-    const px=toX(x,s,ox), py=toY(y,s,oy);
-    ctx.beginPath(); ctx.moveTo(px-r,py-r); ctx.lineTo(px+r,py+r); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(px+r,py-r); ctx.lineTo(px-r,py+r); ctx.stroke();
-  });
-
-  // readout
-  document.getElementById('pVal').textContent = p.toFixed(1);
-  let msg, col;
-  if(Math.abs(p-1) < 0.25){ msg='p ≈ +1  → straight, rising.  FITS the data ✔ (Option A)'; col='#047857'; }
-  else if(p < 0){ msg='p < 0  → the curve FALLS as x increases.  Does NOT fit ✘ (Option C)'; col='#b91c1c'; }
-  else if(p > 1.5){ msg='p ≫ 1  → the curve bends far too steeply.  Does NOT fit ✘ (Option D)'; col='#ea580c'; }
-  else { msg='p = '+p.toFixed(1)+'  → moderate curvature; drift away from points.'; col='#64748b'; }
-  ctx.fillStyle = col;
-  ctx.font='bold 13.5px system-ui, sans-serif';
-  ctx.fillText(msg, 16, 24);
-
-  const ro = document.getElementById('readoutModel');
-  if(ro){
-    ro.textContent = 'p = ' + (p>=0?'+':'') + p.toFixed(1) + '   |   ' +
-      (Math.abs(p-1)<0.25 ? 'straight, rising → fits well'
-        : p<0 ? 'decaying curve → wrong direction'
-        : 'over-steep curve → wrong shape');
-  }
-}
-
-/* ============================================================
-   Step-by-step reveal engine
-   ============================================================ */
-const groups = {
-  g1: { steps:['s1-1','s1-2','s1-3'], btn:'btn1', cnt:'cnt1', i:0 },
-  g2: { steps:['s2-1','s2-2'], btn:'btn2', cnt:'cnt2', i:0 }
-};
-
-function nextStep(gid){
-  const g = groups[gid];
-  if(g.i < g.steps.length){
-    const el = document.getElementById(g.steps[g.i]);
-    if(el) el.classList.add('shown');
-    g.i++;
-    updateGroupUI(gid);
-  }
-}
-function resetGroup(gid){
-  const g = groups[gid];
-  g.steps.forEach(id=>{ const el=document.getElementById(id); if(el) el.classList.remove('shown'); });
-  g.i = 0;
-  updateGroupUI(gid);
-}
-function updateGroupUI(gid){
-  const g = groups[gid];
-  const btn = document.getElementById(g.btn);
-  const cnt = document.getElementById(g.cnt);
-  cnt.textContent = g.i + ' / ' + g.steps.length;
-  if(g.i >= g.steps.length){
-    btn.disabled = true;
-    btn.textContent = 'All steps revealed ✓';
-  } else {
-    btn.disabled = false;
-    btn.textContent = 'Next step →';
-  }
-}
-
-/* ============================================================
-   Wire-up
-   ============================================================ */
-window.addEventListener('load', function(){
-  trendSetup();
-  modelSetup();
-
-  const sg = document.getElementById('sliderGrade');
-  if(sg) sg.addEventListener('input', drawTrend);
-
-  ['showA','showB','showC','showD'].forEach(id=>{
-    const el = document.getElementById(id);
-    if(el) el.addEventListener('change', drawTrend);
-  });
-
-  const sp = document.getElementById('sliderPow');
-  if(sp) sp.addEventListener('input', drawModel);
-
-  const sr = document.getElementById('showResid');
-  if(sr) sr.addEventListener('change', drawModel);
-
-  updateGroupUI('g1');
-  updateGroupUI('g2');
-});
+  // initial
+  draw(0);
+  document.querySelector('.step[data-step="1"]').classList.add('active');
+})();
 </script>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
-
 </body>
 </html>

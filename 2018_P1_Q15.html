@@ -1,372 +1,460 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HKDSE 2018 P1 Q15 · Permutation · Interactive</title>
-  <!-- MathJax for beautiful math -->
-  <script>
-    MathJax = {
-      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
-      svg: { fontCache: 'global' }
-    };
-  </script>
-  <script>
-window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] }, svg:{fontCache:'global'} };
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2018 P1 Q15 — Permutations</title>
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$','$'], ['\\(','\\)']], displayMath: [['$$','$$'], ['\\[','\\]']] },
+    svg: { fontCache: 'global' }
+  };
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    /* smooth transitions and custom tweaks */
-    .step-content {
-      transition: max-height 0.3s ease-out, opacity 0.25s ease-in;
-      overflow: hidden;
-    }
-    .hint-badge {
-      background: #fef9c3;
-      color: #854d0e;
-      border-radius: 9999px;
-      font-size: 0.75rem;
-      padding: 0.15rem 0.75rem;
-      font-weight: 500;
-    }
-    .digit-box {
-      width: 48px; height: 56px;
-      display: flex; align-items: center; justify-content: center;
-      border-radius: 10px;
-      font-weight: 600;
-      font-size: 1.25rem;
-      background: #f8fafc;
-      border: 2px solid #cbd5e1;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-    }
-    .digit-box.fixed {
-      background: #dbeafe;
-      border-color: #3b82f6;
-      color: #1e3a8a;
-    }
-    .digit-box.odd {
-      background: #fce7f3;
-      border-color: #ec4899;
-      color: #831843;
-    }
-    .digit-box.remaining {
-      background: #f1f5f9;
-      border-color: #94a3b8;
-      color: #334155;
-    }
-  </style>
-</head>
-<body class="bg-slate-50 font-sans antialiased text-slate-800">
+<style>
+  *{box-sizing:border-box;}
+  body{
+    margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:#f4f6fb;color:#1b2333;font-size:16px;line-height:1.55;
+  }
+  .wrap{max-width:1200px;margin:0 auto;padding:16px 14px 48px;}
+  header.top{margin-bottom:12px;}
+  header.top .tag{
+    display:inline-block;background:#e8edff;color:#2a4bd7;font-weight:700;
+    font-size:12.5px;letter-spacing:.04em;padding:4px 10px;border-radius:999px;
+    border:1px solid #cdd8ff;
+  }
+  header.top h1{font-size:19px;margin:8px 0 0;font-weight:800;}
+  header.top p.sub{margin:4px 0 0;font-size:13.5px;color:#5b6580;}
 
-  <!-- Header / Title -->
-  <header class="bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
-    <div class="max-w-3xl mx-auto px-4 py-4 sm:py-5">
-      <div class="flex flex-wrap items-center gap-2">
-        <span class="text-sm font-semibold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">HKDSE Math 2018 Paper 1</span>
-        <span class="text-sm font-semibold text-slate-600 bg-slate-100 px-3 py-1 rounded-full">Q15</span>
-        <span class="text-sm font-semibold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full">Probability & Permutation</span>
-      </div>
-      <h1 class="text-2xl sm:text-3xl font-bold mt-2 text-slate-900">Phone Number Permutations</h1>
-    </div>
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start;}
+  @media(min-width:900px){.split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}}
+  .diagram{position:sticky;top:16px;max-height:calc(100vh - 2rem);overflow-y:auto;}
+
+  .card{
+    background:#fff;border:1px solid #dfe4f0;border-radius:14px;
+    padding:14px;box-shadow:0 6px 18px rgba(30,45,90,.06);
+  }
+  .diagram .card{padding:12px;}
+  .diagram h2,.q h2{font-size:14px;text-transform:uppercase;letter-spacing:.05em;color:#5b6580;margin:0 0 10px;font-weight:800;}
+  canvas{width:100%;height:auto;display:block;border-radius:10px;background:#fbfcff;}
+  .ro{font-size:13px;color:#455070;margin:10px 0 0;background:#f1f4fd;border:1px dashed #c8d2f0;border-radius:9px;padding:8px 10px;}
+  .ro b{color:#213a8f;}
+
+  .legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;font-size:12.5px;}
+  .legend span{display:inline-flex;align-items:center;gap:6px;color:#3b4666;}
+  .dot{width:11px;height:11px;border-radius:3px;display:inline-block;}
+
+  /* Right pane */
+  .q .qtext{font-size:15.5px;}
+  .qtext ol{padding-left:22px;margin:8px 0 0;}
+  .qtext li{margin:6px 0;}
+  .marks{font-size:13px;color:#7a5a00;background:#fff6d9;border:1px solid #f0dda1;border-radius:8px;padding:2px 7px;font-weight:700;white-space:nowrap;}
+  .part{font-weight:800;color:#213a8f;}
+
+  .step{
+    background:#fff;border:1px solid #e2e7f3;border-left:5px solid #4a6cf7;
+    border-radius:12px;padding:11px 13px;margin:12px 0;
+    box-shadow:0 4px 12px rgba(30,45,90,.05);
+    transition:border-color .25s,box-shadow .25s,transform .25s;
+  }
+  .step[data-step="2"]{border-left-color:#12a05c;}
+  .step[data-step="3"]{border-left-color:#e07a00;}
+  .step[data-step="4"]{border-left-color:#b53ec4;}
+  .step[data-step="5"]{border-left-color:#d63354;}
+  .step.active{box-shadow:0 0 0 3px rgba(74,108,247,.18),0 6px 16px rgba(30,45,90,.08);transform:translateY(-1px);}
+  .steptag{
+    display:inline-flex;align-items:center;gap:8px;font-weight:800;font-size:13px;
+    text-transform:uppercase;letter-spacing:.04em;color:#213a8f;margin-bottom:6px;
+  }
+  .chip{
+    display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;
+    border-radius:50%;background:#4a6cf7;color:#fff;font-size:12.5px;font-weight:800;
+  }
+  .step[data-step="2"] .chip{background:#12a05c;}
+  .step[data-step="3"] .chip{background:#e07a00;}
+  .step[data-step="4"] .chip{background:#b53ec4;}
+  .step[data-step="5"] .chip{background:#d63354;}
+  .hint{
+    font-size:13px;color:#5b6580;background:#f6f8ff;border-radius:8px;
+    padding:6px 9px;margin-top:8px;border:1px dashed #d5ddf5;
+  }
+  .ans{
+    margin-top:16px;background:linear-gradient(135deg,#eafaf1,#e6f0ff);
+    border:1.5px solid #9fe0bc;border-radius:12px;padding:12px 14px;
+  }
+  .ans .lbl{font-size:12.5px;text-transform:uppercase;letter-spacing:.06em;color:#0d7a44;font-weight:800;}
+  .ans p{margin:5px 0 0;font-weight:700;font-size:16px;}
+  .formula{background:#fbfcff;border:1px solid #e4e8f5;border-radius:8px;padding:8px 10px;margin:8px 0;overflow-x:auto;}
+
+  @media(max-width:640px){
+    body{font-size:14.5px;}
+    .wrap{padding:10px 8px 40px;}
+    .diagram .card{padding:9px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <span class="tag">HKDSE 2018 · Paper 1 · Q15 · Topic 14 Probability</span>
+    <h1>Eight-digit phone numbers from a set of digits</h1>
+    <p class="sub">Scroll the solution — the diagram on the left updates with each step.</p>
   </header>
 
-  <main class="max-w-3xl mx-auto px-4 py-6 space-y-8 pb-20">
-
-    <!-- Question Statement -->
-    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6">
-      <h2 class="text-lg font-semibold flex items-center gap-2 mb-3">
-        <span class="w-2 h-6 bg-indigo-500 rounded-full inline-block"></span> Question
-      </h2>
-      <p class="text-slate-700 leading-relaxed">
-        An eight-digit phone number is formed by a permutation of <strong class="font-semibold text-indigo-700">2, 3, 4, 5, 6, 7, 8 and 9</strong>.
-      </p>
-      <div class="mt-4 space-y-2 ml-1">
-        <p class="text-slate-700">
-          <span class="font-semibold text-indigo-600">(a)</span> How many different eight-digit phone numbers can be formed? <span class="text-sm text-slate-400 font-mono">[1 mark]</span>
-        </p>
-        <p class="text-slate-700">
-          <span class="font-semibold text-indigo-600">(b)</span> If the first digit and the last digit of an eight-digit number are odd numbers, how many different eight-digit phone numbers can be formed? <span class="text-sm text-slate-400 font-mono">[2 marks]</span>
-        </p>
-      </div>
-      <!-- Concept tags -->
-      <div class="mt-5 flex flex-wrap gap-2">
-        <span class="text-xs bg-indigo-50 text-indigo-600 border border-indigo-100 rounded-full px-3 py-1">Permutation</span>
-        <span class="text-xs bg-indigo-50 text-indigo-600 border border-indigo-100 rounded-full px-3 py-1">nPr notation</span>
-        <span class="text-xs bg-indigo-50 text-indigo-600 border border-indigo-100 rounded-full px-3 py-1">Counting principle</span>
-        <span class="text-xs bg-indigo-50 text-indigo-600 border border-indigo-100 rounded-full px-3 py-1">Odd digits</span>
+  <div class="split">
+    <!-- LEFT PANE -->
+    <section class="diagram">
+      <div class="card">
+        <h2>Interactive Figure</h2>
+        <canvas id="cv" width="560" height="640"></canvas>
+        <p class="ro" id="readout">Step 1 — Eight positions, digits {2, 3, 4, 5, 6, 7, 8, 9}.</p>
+        <div class="legend">
+          <span><i class="dot" style="background:#4a6cf7"></i>Position / digit</span>
+          <span><i class="dot" style="background:#12a05c"></i>All 8 digits used</span>
+          <span><i class="dot" style="background:#e07a00"></i>Odd digits {3,5,7,9}</span>
+          <span><i class="dot" style="background:#b53ec4"></i>Even digits {2,4,6,8}</span>
+          <span><i class="dot" style="background:#d63354"></i>Fixed end positions</span>
+        </div>
       </div>
     </section>
 
-    <!-- Visual Helper: digit slots (interactive for part b) -->
-    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6">
-      <h3 class="text-md font-semibold text-slate-700 mb-4 flex items-center gap-2">
-        <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
-        Visualise the 8-digit positions
-      </h3>
+    <!-- RIGHT PANE -->
+    <section class="q">
+      <div class="card">
+        <h2>Question</h2>
+        <div class="qtext">
+          <p>An eight-digit phone number is formed by a permutation of $2,\ 3,\ 4,\ 5,\ 6,\ 7,\ 8$ and $9$.</p>
+          <ol type="a">
+            <li>How many different eight-digit phone numbers can be formed? <span class="marks">1 mark</span></li>
+            <li>If the first digit and the last digit of an eight-digit number are odd numbers, how many different eight-digit phone numbers can be formed? <span class="marks">2 marks</span></li>
+          </ol>
+        </div>
+      </div>
+
       
-      <!-- Part (a) visual: all digits free -->
-      <div class="mb-6">
-        <p class="text-sm text-slate-500 mb-2 font-medium">Part (a) — all 8 positions are open to any of the 8 digits</p>
-        <div class="flex flex-wrap gap-2 justify-center sm:justify-start">
-          <div class="digit-box remaining">?</div>
-          <div class="digit-box remaining">?</div>
-          <div class="digit-box remaining">?</div>
-          <div class="digit-box remaining">?</div>
-          <div class="digit-box remaining">?</div>
-          <div class="digit-box remaining">?</div>
-          <div class="digit-box remaining">?</div>
-          <div class="digit-box remaining">?</div>
-        </div>
+
+      <div class="step" data-step="1">
+        <div class="steptag"><span class="chip">1</span>Part (a) — Understand the set-up</div>
+        <p>There are $8$ distinct digits:</p>
+        <div class="formula">$\{2,\ 3,\ 4,\ 5,\ 6,\ 7,\ 8,\ 9\}$</div>
+        <p>Every phone number is an arrangement that uses <b>all eight</b> digits, once each — so it is a permutation of $8$ distinct objects into $8$ positions.</p>
+        <div class="hint">Hint: no repetition is allowed, and order matters, so use permutations $P_8^8$.</div>
       </div>
 
-      <!-- Part (b) visual: first & last must be odd -->
-      <div>
-        <p class="text-sm text-slate-500 mb-2 font-medium">
-          Part (b) — first & last digits must be odd 
-          <span class="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full ml-1">4 odd digits available: 3,5,7,9</span>
-        </p>
-        <div class="flex flex-wrap gap-2 justify-center sm:justify-start">
-          <div class="digit-box odd">odd</div>
-          <div class="digit-box remaining">?</div>
-          <div class="digit-box remaining">?</div>
-          <div class="digit-box remaining">?</div>
-          <div class="digit-box remaining">?</div>
-          <div class="digit-box remaining">?</div>
-          <div class="digit-box remaining">?</div>
-          <div class="digit-box odd">odd</div>
-        </div>
-        <p class="text-xs text-slate-400 mt-2 italic">Positions 1 and 8 require an odd digit → choose from {3,5,7,9}</p>
-      </div>
-    </section>
-
-    <!-- Step-by-Step Solutions -->
-    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-      <div class="px-5 sm:px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center gap-2">
-        <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-        <h2 class="text-lg font-semibold text-slate-800">Step-by-step Solution</h2>
+      <div class="step" data-step="2">
+        <div class="steptag"><span class="chip">2</span>Part (a) — Count the arrangements</div>
+        <p>Number of arrangements $=8!$ (equivalently $P_8^8$):</p>
+        <div class="formula">$P_8^8 = 8! = 8\times7\times6\times5\times4\times3\times2\times1 = 40\,320$</div>
+        <p>Each arrangement is a different eight-digit phone number.</p>
+        <div class="hint">Hint: multiply the choices position by position: $8\cdot7\cdot6\cdot5\cdot4\cdot3\cdot2\cdot1$.</div>
       </div>
 
-      <!-- Step 1: Part (a) -->
-      <div class="border-b border-slate-100">
-        <button class="step-toggle w-full flex items-center justify-between px-5 sm:px-6 py-4 text-left hover:bg-slate-50 transition-colors" data-target="step1">
-          <div class="flex items-center gap-3">
-            <span class="w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 text-sm font-bold flex items-center justify-center">a</span>
-            <span class="font-semibold text-slate-800">Part (a) — total permutations</span>
-          </div>
-          <svg class="w-5 h-5 text-slate-400 chevron transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
-        </button>
-        <div id="step1" class="step-content px-5 sm:px-6 max-h-0 opacity-0">
-          <div class="pb-5 space-y-3">
-            <p class="text-slate-700">We need to arrange all <strong>8 distinct digits</strong> (2,3,4,5,6,7,8,9) into 8 positions.</p>
-            <p class="text-slate-700">The number of ways is the number of permutations of 8 objects taken all at a time:</p>
-            <div class="bg-slate-50 p-4 rounded-xl text-center my-2 math-block">
-              \[
-              P_8^8 = 8! = 8 \times 7 \times 6 \times 5 \times 4 \times 3 \times 2 \times 1
-              \]
-            </div>
-            <div class="flex items-center gap-2 text-sm text-slate-500">
-              <span class="hint-badge">Hint</span>
-              <span>Any permutation of all 8 digits forms a valid 8-digit number (since 0 is not included).</span>
-            </div>
-            <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 mt-2">
-              <p class="font-mono text-emerald-800 font-semibold">= 40 320</p>
-            </div>
-          </div>
-        </div>
+      <div class="step" data-step="3">
+        <div class="steptag"><span class="chip">3</span>Part (b) — Identify the odd digits</div>
+        <p>The odd digits in the set are:</p>
+        <div class="formula">$\{3,\ 5,\ 7,\ 9\}$ — that is $4$ odd digits.</div>
+        <p>The first digit and the last digit must each be chosen from these $4$ odd digits, and they must be different digits.</p>
+        <div class="hint">Hint: the two end positions are special; handle them before the interior.</div>
       </div>
 
-      <!-- Step 2: Part (b) - choose odd digits for ends -->
-      <div class="border-b border-slate-100">
-        <button class="step-toggle w-full flex items-center justify-between px-5 sm:px-6 py-4 text-left hover:bg-slate-50 transition-colors" data-target="step2">
-          <div class="flex items-center gap-3">
-            <span class="w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 text-sm font-bold flex items-center justify-center">b1</span>
-            <span class="font-semibold text-slate-800">Part (b) — choose digits for the first & last positions</span>
-          </div>
-          <svg class="w-5 h-5 text-slate-400 chevron transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
-        </button>
-        <div id="step2" class="step-content px-5 sm:px-6 max-h-0 opacity-0">
-          <div class="pb-5 space-y-3">
-            <p class="text-slate-700">Odd digits available from the set: <strong>3, 5, 7, 9</strong> — a total of 4 odd digits.</p>
-            <p class="text-slate-700">The first and last positions must each be filled with an odd digit, and they must be <em>different</em> digits (since each digit is used once).</p>
-            <p class="text-slate-700">Number of ways to arrange two distinct odd digits in the two end positions:</p>
-            <div class="bg-slate-50 p-4 rounded-xl text-center my-2">
-              \[
-              P_2^4 = 4 \times 3 = 12
-              \]
-            </div>
-            <div class="flex items-center gap-2 text-sm text-slate-500">
-              <span class="hint-badge">Hint</span>
-              <span>\(P_2^4\) means: choose and order 2 items out of 4 distinct items (first, last).</span>
-            </div>
-          </div>
-        </div>
+      <div class="step" data-step="4">
+        <div class="steptag"><span class="chip">4</span>Part (b) — Choose the two end digits</div>
+        <p>Choose and arrange an odd digit for the 1st and the 8th position:</p>
+        <div class="formula">$P_2^{4}=\dfrac{4!}{(4-2)!}=\dfrac{4!}{2!}=12$</div>
+        <p>Multiplication principle: $4$ choices for the first digit $\times\ 3$ choices for the last digit $=12$.</p>
+        <div class="hint">Hint: after fixing the ends, $2$ digits are used up, leaving $6$ digits.</div>
       </div>
 
-      <!-- Step 3: Part (b) - arrange remaining digits -->
-      <div class="border-b border-slate-100">
-        <button class="step-toggle w-full flex items-center justify-between px-5 sm:px-6 py-4 text-left hover:bg-slate-50 transition-colors" data-target="step3">
-          <div class="flex items-center gap-3">
-            <span class="w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 text-sm font-bold flex items-center justify-center">b2</span>
-            <span class="font-semibold text-slate-800">Part (b) — arrange the remaining 6 digits</span>
-          </div>
-          <svg class="w-5 h-5 text-slate-400 chevron transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
-        </button>
-        <div id="step3" class="step-content px-5 sm:px-6 max-h-0 opacity-0">
-          <div class="pb-5 space-y-3">
-            <p class="text-slate-700">After placing two odd digits at the ends, <strong>6 digits remain</strong> (including the 2 odd digits not used and the 4 even digits, but all are distinct).</p>
-            <p class="text-slate-700">These 6 digits can be arranged in the 6 remaining positions in:</p>
-            <div class="bg-slate-50 p-4 rounded-xl text-center my-2">
-              \[
-              P_6^6 = 6! = 720 \text{ ways}
-              \]
-            </div>
-          </div>
-        </div>
+      <div class="step" data-step="5">
+        <div class="steptag"><span class="chip">5</span>Part (b) — Fill the six middle positions</div>
+        <p>The remaining $6$ digits (some odd, some even) are arranged in the $6$ middle positions:</p>
+        <div class="formula">$P_6^{6}=6!=720$</div>
+        <p>By the multiplication principle:</p>
+        <div class="formula">$\bigl(P_2^{4}\bigr)\bigl(P_6^{6}\bigr)=12\times720=8\,640$</div>
+        <div class="hint">Hint: independent choices multiply: (ways to arrange the ends) × (ways to arrange the middle).</div>
       </div>
 
-      <!-- Step 4: Multiplication and final answer -->
-      <div>
-        <button class="step-toggle w-full flex items-center justify-between px-5 sm:px-6 py-4 text-left hover:bg-slate-50 transition-colors" data-target="step4">
-          <div class="flex items-center gap-3">
-            <span class="w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 text-sm font-bold flex items-center justify-center">b3</span>
-            <span class="font-semibold text-slate-800">Part (b) — combine & final answer</span>
-          </div>
-          <svg class="w-5 h-5 text-slate-400 chevron transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
-        </button>
-        <div id="step4" class="step-content px-5 sm:px-6 max-h-0 opacity-0">
-          <div class="pb-5 space-y-3">
-            <p class="text-slate-700">By the multiplication principle, total number of phone numbers:</p>
-            <div class="bg-slate-50 p-4 rounded-xl text-center my-2">
-              \[
-              \begin{aligned}
-              \text{Required number} &= P_2^4 \times P_6^6 \\
-              &= 12 \times 720 \\
-              &= 8\,640
-              \end{aligned}
-              \]
-            </div>
-            <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 mt-2">
-              <p class="font-mono text-emerald-800 font-semibold">= 8 640</p>
-            </div>
-            <p class="text-xs text-slate-400 mt-2">Marks: 1M (method for \(P_2^4\) or \(P_6^6\)), 1A (accuracy)</p>
-          </div>
-        </div>
+      <div class="ans">
+        <div class="lbl">Answer</div>
+        <p>(a) $P_8^8 = 8! = 40\,320$</p>
+        <p>(b) $\bigl(P_2^{4}\bigr)\bigl(P_6^{6}\bigr) = 12\times720 = 8\,640$</p>
       </div>
     </section>
+  </div>
+</div>
 
-    <!-- Summary Card -->
-    <section class="bg-gradient-to-br from-indigo-50 to-emerald-50 rounded-2xl border border-indigo-100 p-5 sm:p-6">
-      <h3 class="font-semibold text-slate-800 flex items-center gap-2 mb-3">
-        <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        Key Takeaways
-      </h3>
-      <ul class="space-y-2 text-slate-700 text-sm list-disc list-inside">
-        <li>When all objects are used, the number of arrangements is \(n!\) or \(P_n^n\).</li>
-        <li>For restricted positions, break the task into stages: first place the restricted items, then arrange the rest.</li>
-        <li>Use the multiplication principle: multiply the number of ways for each stage.</li>
-        <li>Be careful to distinguish between “odd numbers” (1,3,5,7,9) – here only 3,5,7,9 are available.</li>
-      </ul>
-    </section>
+<script>
+(function(){
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  const ro = document.getElementById('readout');
 
-  </main>
+  // High-DPI setup
+  function setupHiDPI(){
+    const ratio = window.devicePixelRatio || 1;
+    const w = cv.clientWidth || 560;
+    const h = Math.round(w * 1.14);
+    cv.width = w * ratio;
+    cv.height = h * ratio;
+    cv.style.height = h + 'px';
+    ctx.setTransform(ratio,0,0,ratio,0,0);
+  }
 
-  <!-- Footer -->
-  <footer class="text-center text-xs text-slate-400 py-6">
-    HKDSE 2018 Paper 1 Q15 · Interactive solution for learning
-  </footer>
+  const W = () => cv.width / (window.devicePixelRatio||1);
+  const H = () => cv.height / (window.devicePixelRatio||1);
 
-  <script>
-    // Accordion toggle functionality
-    document.querySelectorAll('.step-toggle').forEach(button => {
-      button.addEventListener('click', () => {
-        const targetId = button.getAttribute('data-target');
-        const target = document.getElementById(targetId);
-        const chevron = button.querySelector('.chevron');
-        const allContents = document.querySelectorAll('.step-content');
-        const allButtons = document.querySelectorAll('.step-toggle');
+  const digits = [2,3,4,5,6,7,8,9];
+  const odd = [3,5,7,9];
+  const even = [2,4,6,8];
 
-        // If target is already open, close it
-        if (target.style.maxHeight && target.style.maxHeight !== '0px' && target.style.maxHeight !== '0') {
-          target.style.maxHeight = '0';
-          target.style.opacity = '0';
-          if (chevron) chevron.style.transform = 'rotate(0deg)';
-          return;
+  // colours
+  const C = {
+    blue:'#4a6cf7', green:'#12a05c', orange:'#e07a00',
+    purple:'#b53ec4', red:'#d63354', line:'#c9d2e8',
+    text:'#1b2333', muted:'#7883a0', bg:'#fbfcff'
+  };
+
+  function roundRect(c,x,y,w,h,r){
+    c.beginPath();
+    c.moveTo(x+r,y);
+    c.arcTo(x+w,y,x+w,y+h,r);
+    c.arcTo(x+w,y+h,x,y+h,r);
+    c.arcTo(x,y+h,x,y,r);
+    c.arcTo(x,y,x+w,y,r);
+    c.closePath();
+  }
+
+  function draw(step){
+    setupHiDPI();
+    const w = W(), h = H();
+    ctx.clearRect(0,0,w,h);
+
+    // background panel
+    ctx.fillStyle = C.bg;
+    roundRect(ctx, 0,0,w,h,12);
+    ctx.fill();
+
+    // Title
+    ctx.fillStyle = C.muted;
+    ctx.font = '700 12px system-ui, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('PERMUTATION OF 8 DIGITS', 16, 24);
+
+    // ---- Top: the digit pool ----
+    const poolY = 44;
+    const poolH = 52;
+    const padX = 18;
+    const cellGap = 6;
+    const cellW = (w - padX*2 - cellGap*7)/8;
+    ctx.fillStyle = C.muted;
+    ctx.font = '600 11px system-ui, sans-serif';
+    ctx.fillText('Available digits (all distinct)', padX, poolY - 6);
+
+    for (let i=0;i<8;i++){
+      const x = padX + i*(cellW+cellGap);
+      const d = digits[i];
+      const isOdd = d%2===1;
+      let base = isOdd ? C.orange : C.purple;
+      let used = false;
+
+      if (step===3 || step===4){
+        // highlight odd digits
+        if (!isOdd){ used = true; }
+      }
+      if (step===5){
+        used = false;
+      }
+
+      ctx.save();
+      if (used){ ctx.globalAlpha = 0.25; }
+      ctx.fillStyle = base;
+      roundRect(ctx, x, poolY, cellW, poolH, 9);
+      ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.font = '700 ' + Math.round(poolH*0.46) + 'px system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(String(d), x+cellW/2, poolY+poolH/2+1);
+      ctx.restore();
+    }
+
+    // ---- Middle: the 8 position row ----
+    const rowY = poolY + poolH + 46;
+    const rowH = 58;
+    ctx.fillStyle = C.muted;
+    ctx.font = '600 11px system-ui, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText('Eight positions of the phone number', padX, rowY - 8);
+
+    const posW = (w - padX*2 - cellGap*7)/8;
+
+    for (let i=0;i<8;i++){
+      const x = padX + i*(posW+cellGap);
+      let fill = '#eef1fa', stroke = C.line, txt = '#8a93ab', label = digits[i] !== undefined ? String(digits[i]) : '?';
+      let alpha = 0.65;
+
+      if (step===1){
+        // part (a): all positions free
+        fill = '#e7ecff'; stroke = C.blue; txt = C.blue; alpha = 1;
+      } else if (step===2){
+        // all filled - permutation complete
+        fill = C.green; stroke = C.green; txt = '#fff'; alpha = 1;
+      } else if (step===3 || step===4){
+        if (i===0 || i===7){
+          fill = C.red; stroke = C.red; txt = '#fff'; alpha = 1;
+        } else {
+          fill = '#f0f2f9'; stroke = C.line; txt = '#a9b1c6'; alpha = 0.6;
         }
-
-        // Close all others
-        allContents.forEach(content => {
-          content.style.maxHeight = '0';
-          content.style.opacity = '0';
-        });
-        allButtons.forEach(btn => {
-          const ch = btn.querySelector('.chevron');
-          if (ch) ch.style.transform = 'rotate(0deg)';
-        });
-
-        // Open the clicked one
-        target.style.maxHeight = target.scrollHeight + 'px';
-        target.style.opacity = '1';
-        if (chevron) chevron.style.transform = 'rotate(180deg)';
-      });
-    });
-
-    // Initialize: open first step on page load for better UX
-    window.addEventListener('load', () => {
-      const firstButton = document.querySelector('.step-toggle');
-      if (firstButton) {
-        const targetId = firstButton.getAttribute('data-target');
-        const target = document.getElementById(targetId);
-        if (target) {
-          target.style.maxHeight = target.scrollHeight + 'px';
-          target.style.opacity = '1';
-          const chevron = firstButton.querySelector('.chevron');
-          if (chevron) chevron.style.transform = 'rotate(180deg)';
+      } else if (step===5){
+        if (i===0 || i===7){
+          fill = C.red; stroke = C.red; txt = '#fff'; alpha = 1;
+        } else {
+          fill = C.purple; stroke = C.purple; txt = '#fff'; alpha = 1;
         }
       }
-    });
 
-    // Recalculate max-height on window resize for open accordion
-    window.addEventListener('resize', () => {
-      document.querySelectorAll('.step-content').forEach(content => {
-        if (content.style.maxHeight && content.style.maxHeight !== '0px' && content.style.maxHeight !== '0') {
-          content.style.maxHeight = content.scrollHeight + 'px';
-        }
-      });
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = fill;
+      roundRect(ctx, x, rowY, posW, rowH, 9);
+      ctx.fill();
+      ctx.lineWidth = 1.6;
+      ctx.strokeStyle = stroke;
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.fillStyle = txt;
+      ctx.font = '700 16px system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      let showTxt = '';
+      if (step===2) showTxt = '';
+      else if ((step===3||step===4||step===5) && (i===0||i===7)) showTxt = '';
+      else showTxt = '';
+      // leave empty; will draw labels separately
+      ctx.restore && ctx.restore();
+
+      // position label below
+      ctx.fillStyle = C.muted;
+      ctx.font = '600 10.5px system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'alphabetic';
+      ctx.fillText('pos ' + (i+1), x + posW/2, rowY + rowH + 16);
+    }
+
+    // small markers for special end positions
+    if (step>=3){
+      ctx.fillStyle = C.red;
+      ctx.font = '700 10.5px system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('1st', padX + posW/2, rowY - 22);
+      ctx.fillText('8th', padX + 7*(posW+cellGap) + posW/2, rowY - 22);
+    }
+
+    // ---- Bottom: explanation box ----
+    const boxY = rowY + rowH + 34;
+    const boxH = h - boxY - 14;
+    ctx.fillStyle = '#ffffff';
+    roundRect(ctx, padX, boxY, w - padX*2, boxH, 12);
+    ctx.fill();
+    ctx.lineWidth = 1.4;
+    ctx.strokeStyle = C.line;
+    ctx.stroke();
+
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+
+    let title = '', lines = [];
+    if (step===1){
+      title = 'Step 1 · The set-up';
+      lines = [
+        'Digits:  {2, 3, 4, 5, 6, 7, 8, 9}   →   8 distinct digits',
+        'Each phone number uses all 8 digits exactly once.',
+        'So it is a permutation of 8 objects into 8 positions.'
+      ];
+    } else if (step===2){
+      title = 'Step 2 · Part (a) — arrange all 8 digits';
+      lines = [
+        'P(8,8) = 8! = 8×7×6×5×4×3×2×1',
+        '        = 40 320',
+        'Answer (a) = 40 320'
+      ];
+    } else if (step===3){
+      title = 'Step 3 · Part (b) — odd digits';
+      lines = [
+        'Odd digits available:  {3, 5, 7, 9}   →   4 odd digits',
+        'The 1st and 8th positions must be odd, and different.',
+        'Handle the two ends first, then the middle.'
+      ];
+    } else if (step===4){
+      title = 'Step 4 · Part (b) — the two end digits';
+      lines = [
+        'Ways to arrange 2 odd digits in the 1st and 8th:',
+        'P(4,2) = 4 × 3 = 12',
+        'That uses up 2 of the 8 digits, leaving 6 digits.'
+      ];
+    } else if (step===5){
+      title = 'Step 5 · Part (b) — finish and multiply';
+      lines = [
+        'Arrange the remaining 6 digits in the 6 middle positions:',
+        'P(6,6) = 6! = 720',
+        'Total = P(4,2) × P(6,6) = 12 × 720 = 8 640',
+        'Answer (b) = 8 640'
+      ];
+    }
+
+    // title strip
+    const stripCol = [C.blue, C.green, C.orange, C.purple, C.red][Math.min(step,5)-1] || C.blue;
+    ctx.fillStyle = stripCol;
+    roundRect(ctx, padX, boxY, w - padX*2, 26, 12);
+    ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.font = '700 12.5px system-ui, sans-serif';
+    ctx.fillText(title, padX + 12, boxY + 17);
+
+    ctx.fillStyle = C.text;
+    ctx.font = '600 12.5px system-ui, sans-serif';
+    for (let i=0;i<lines.length;i++){
+      ctx.fillText(lines[i], padX + 14, boxY + 50 + i*20);
+    }
+
+    // readout
+    const msgs = {
+      1:'Step 1 — 8 distinct digits; all 8 positions free.',
+      2:'Step 2 — Part (a): P(8,8) = 8! = 40 320.',
+      3:'Step 3 — Odd digits {3,5,7,9}; the ends must be odd.',
+      4:'Step 4 — Choose the two end digits: P(4,2) = 12.',
+      5:'Step 5 — Middle digits: 6! = 720, total = 12 × 720 = 8 640.'
+    };
+    ro.innerHTML = msgs[step] || msgs[1];
+  }
+
+  // IntersectionObserver scroll-sync
+  let current = 1;
+  const io = new IntersectionObserver(es=>{
+    es.forEach(e=>{
+      if (e.isIntersecting){
+        current = +e.target.dataset.step;
+        document.querySelectorAll('.step').forEach(s=>s.classList.toggle('active', +s.dataset.step===current));
+        draw(current);
+      }
     });
-  </script>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
+  }, {rootMargin:'-25% 0px -55% 0px'});
+
+  document.querySelectorAll('.step').forEach(s=>io.observe(s));
+
+  window.addEventListener('resize', ()=>draw(current));
+
+  // initial
+  window.addEventListener('load', ()=>{
+    draw(1);
+    document.querySelectorAll('.step').forEach(s=>s.classList.toggle('active', +s.dataset.step===1));
+  });
+  draw(1);
+})();
 </script>
-
 </body>
 </html>

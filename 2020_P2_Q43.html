@@ -3,504 +3,327 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HKDSE Math 2020 Paper 2 Q43 – Interactive Solution</title>
-<script src="https://cdn.tailwindcss.com"></script>
+<title>HKDSE 2020 Paper 2 Q43 — Probability</title>
 <script>
-  window.MathJax = {
-    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
-    svg: { fontCache: 'global' }
-  };
+window.MathJax = {
+  tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+  svg: { fontCache: 'global' }
+};
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
-  body {
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-    min-height: 100vh;
-    margin: 0;
-    padding: 0;
+  :root{
+    --ink:#1a2233; --muted:#5a6885; --line:#d8e0ee; --bg:#f4f7fc; --card:#ffffff;
+    --c1:#e63946; --c2:#1d6fb8; --c3:#e08c00; --c4:#2a9d8f; --c5:#7b4bb7;
   }
-  .card {
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(8px);
-    border-radius: 1rem;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-    border: 1px solid rgba(255,255,255,0.8);
-  }
-  .step-btn {
-    transition: all 0.3s ease;
-  }
-  .step-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(37, 99, 235, 0.3);
-  }
-  .step-content {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.5s ease, opacity 0.4s ease;
-    opacity: 0;
-  }
-  .step-content.open {
-    max-height: 600px;
-    opacity: 1;
-  }
-  .tag {
-    display: inline-block;
-    padding: 0.25rem 0.75rem;
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-  }
-  .highlight {
-    background: linear-gradient(120deg, #fde68a 0%, #fde68a 40%, transparent 40%);
-    padding: 0 2px;
-  }
-  .fraction {
-    display: inline-flex;
-    flex-direction: column;
-    align-items: center;
-    vertical-align: middle;
-    margin: 0 4px;
-    line-height: 1.2;
-  }
-  .fraction .numerator {
-    border-bottom: 2px solid #1e293b;
-    padding: 0 4px;
-  }
-  .fraction .denominator {
-    padding: 0 4px;
-  }
-  .pulse {
-    animation: pulse 1.5s infinite;
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
-  }
-  input[type="range"] {
-    -webkit-appearance: none;
-    appearance: none;
-    height: 8px;
-    border-radius: 4px;
-    background: #e2e8f0;
-    outline: none;
-  }
-  input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    background: #3b82f6;
-    cursor: pointer;
-    box-shadow: 0 2px 6px rgba(59,130,246,0.4);
-    transition: transform 0.2s;
-  }
-  input[type="range"]::-webkit-slider-thumb:hover {
-    transform: scale(1.15);
-  }
-  .bar-segment {
-    transition: width 0.6s ease, background-color 0.4s ease;
-  }
-  .option-card {
-    transition: all 0.2s;
-  }
-  .option-card:hover {
-    border-color: #3b82f6;
-    background-color: #eff6ff;
-  }
-  .option-card.selected {
-    border-color: #3b82f6;
-    background-color: #dbeafe;
-    box-shadow: 0 0 0 3px rgba(59,130,246,0.3);
-  }
-  .option-card.correct {
-    border-color: #22c55e;
-    background-color: #f0fdf4;
-  }
-  .option-card.wrong {
-    border-color: #ef4444;
-    background-color: #fef2f2;
-  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    font-size:16px;line-height:1.55;}
+  .wrap{padding:16px 14px 60px;max-width:1280px;margin:0 auto;}
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start;}
+  @media(min-width:900px){.split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}}
+  @media(max-width:640px){body{font-size:14.5px;}.wrap{padding:10px 8px 40px;}}
+
+  .diagram{position:sticky;top:16px;max-height:calc(100vh - 2rem);overflow-y:auto;}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    box-shadow:0 6px 18px rgba(26,34,51,.07);padding:14px;}
+  .panel h2{margin:0 0 8px;font-size:1.02rem;letter-spacing:.02em;color:var(--muted);
+    text-transform:uppercase;font-weight:700;}
+  canvas{width:100%;height:auto;display:block;border-radius:10px;background:#fff;}
+  .ro{margin:10px 2px 0;font-size:.9rem;color:var(--muted);}
+  .ro b{color:var(--ink);}
+
+  .qtag{display:inline-block;background:#eef3fb;border:1px solid var(--line);color:var(--c2);
+    font-weight:700;font-size:.8rem;letter-spacing:.05em;padding:3px 10px;border-radius:999px;margin-bottom:8px;}
+  .qtext{margin:6px 0 14px;}
+  .step{border-left:4px solid var(--c2);background:#f8fbff;border-radius:0 10px 10px 0;
+    padding:10px 12px;margin:10px 0;transition:background .25s,border-color .25s,transform .25s;}
+  .step .tag{display:inline-flex;align-items:center;gap:7px;font-weight:800;color:var(--ink);margin-bottom:4px;}
+  .chip{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;
+    border-radius:50%;background:var(--c2);color:#fff;font-size:.82rem;font-weight:800;}
+  .hint{font-size:.9rem;color:var(--muted);font-style:italic;margin-top:4px;}
+  .step.hot{background:#fff7e8;border-left-color:var(--c3);transform:translateX(3px);}
+  .step.hot .chip{background:var(--c3);}
+  .answer{margin-top:14px;padding:12px 14px;border-radius:12px;font-weight:700;
+    background:#eaf7f1;border:1px solid #bde3d3;color:#12503c;}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;font-size:.84rem;color:var(--muted);}
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .sw{width:13px;height:13px;border-radius:3px;display:inline-block;}
+  mjx-container{overflow-x:auto;overflow-y:hidden;}
 </style>
 </head>
-<body class="p-4 md:p-8 flex items-start justify-center">
-<div class="max-w-4xl w-full space-y-6">
+<body>
+<div class="wrap">
+  <div class="split">
 
-  <!-- Header -->
-  <header class="card p-6 md:p-8">
-    <div class="flex flex-wrap items-center gap-3 mb-3">
-      <span class="tag bg-blue-100 text-blue-800">HKDSE Math 2020 Paper 2</span>
-      <span class="tag bg-amber-100 text-amber-800">Q43</span>
-      <span class="tag bg-purple-100 text-purple-800">Probability</span>
-      <span class="tag bg-emerald-100 text-emerald-800">Combinations</span>
-    </div>
-    <h1 class="text-2xl md:text-3xl font-bold text-slate-800">Probability of Choosing Books</h1>
-    <p class="text-slate-500 mt-1 text-sm">Interactive step-by-step solution • HKDSE 2020 MC #43</p><figure style="margin:12px 0;text-align:center;"><img src="figures/2020_P2_Q43.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
-  </header>
-
-  <!-- Question Body -->
-  <div class="card p-6 md:p-8">
-    <h2 class="text-lg font-semibold text-slate-700 mb-3 flex items-center gap-2">
-      <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-      Question
-    </h2>
-    <p class="text-slate-700 leading-relaxed text-base md:text-lg">
-      There are <strong>8 Chinese books</strong> and <strong>7 English books</strong> in a box. If <strong>5 books</strong> are randomly chosen from the box at the same time, find the probability that <strong>at most 3 Chinese books</strong> are chosen.
-    </p>
-    <div class="grid grid-cols-2 gap-3 mt-5">
-      <div class="option-card border-2 border-slate-200 rounded-xl p-4 text-center cursor-pointer" data-opt="A" onclick="selectOption('A')">
-        <span class="text-xs font-bold text-slate-400">A</span>
-        <div class="text-lg font-semibold text-slate-700 mt-1"><span class="fraction"><span class="numerator">2</span><span class="denominator">11</span></span></div>
-      </div>
-      <div class="option-card border-2 border-slate-200 rounded-xl p-4 text-center cursor-pointer" data-opt="B" onclick="selectOption('B')">
-        <span class="text-xs font-bold text-slate-400">B</span>
-        <div class="text-lg font-semibold text-slate-700 mt-1"><span class="fraction"><span class="numerator">9</span><span class="denominator">11</span></span></div>
-      </div>
-      <div class="option-card border-2 border-slate-200 rounded-xl p-4 text-center cursor-pointer" data-opt="C" onclick="selectOption('C')">
-        <span class="text-xs font-bold text-slate-400">C</span>
-        <div class="text-lg font-semibold text-slate-700 mt-1"><span class="fraction"><span class="numerator">61</span><span class="denominator">143</span></span></div>
-      </div>
-      <div class="option-card border-2 border-slate-200 rounded-xl p-4 text-center cursor-pointer" data-opt="D" onclick="selectOption('D')">
-        <span class="text-xs font-bold text-slate-400">D</span>
-        <div class="text-lg font-semibold text-slate-700 mt-1"><span class="fraction"><span class="numerator">82</span><span class="denominator">143</span></span></div>
+    <!-- ================= LEFT: DIAGRAM ================= -->
+    <div class="diagram panel">
+      <h2>Interactive Diagram</h2>
+      <canvas id="cv" width="760" height="620"></canvas>
+      <p class="ro" id="ro">Step 1 — the box: 8 Chinese books (red) and 7 English books (blue).</p>
+      <div class="legend">
+        <span><i class="sw" style="background:#e63946"></i>Chinese (8)</span>
+        <span><i class="sw" style="background:#1d6fb8"></i>English (7)</span>
+        <span><i class="sw" style="background:#2a9d8f"></i>Chosen 5</span>
+        <span><i class="sw" style="background:#e08c00"></i>Highlighted case</span>
       </div>
     </div>
-    <p id="optionFeedback" class="text-center text-sm font-medium mt-3 h-5"></p>
+
+    <!-- ================= RIGHT: QUESTION + SOLUTION ================= -->
+    <div class="panel">
+      <span class="qtag">HKDSE 2020 Paper 2 · Q43 · Probability</span>
+
+      <div class="qtext">
+        <p>There are $8$ Chinese books and $7$ English books in a box. If $5$ books are randomly chosen from the box at the same time, find the probability that <b>at most 3 Chinese books</b> are chosen.</p>
+        <p style="margin-top:6px;">
+          A. $\dfrac{2}{11}$ &nbsp;&nbsp;&nbsp;
+          B. $\dfrac{9}{11}$ &nbsp;&nbsp;&nbsp;
+          C. $\dfrac{61}{143}$ &nbsp;&nbsp;&nbsp;
+          D. $\dfrac{82}{143}$
+        </p>
+      </div>
+      <figure style="margin:12px 0;text-align:center;"><img src="figures/2020_P2_Q43.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
+
+      <div class="step" data-step="1">
+        <div class="tag"><span class="chip">1</span>Count the total number of ways</div>
+        <p>Total books $=8+7=15$. Choosing $5$ from $15$:</p>
+        <p>$$C_5^{15}=\binom{15}{5}=\frac{15!}{5!\,10!}=3003$$</p>
+        <p class="hint">Hint: Denote $C_r^n=\binom{n}{r}=\dfrac{n!}{r!\,(n-r)!}$.</p>
+      </div>
+
+      <div class="step" data-step="2">
+        <div class="tag"><span class="chip">2</span>Choose the easy complement</div>
+        <p>"At most $3$ Chinese" means $0,1,2$ or $3$ Chinese books. Instead of adding $4$ cases, use the complement:</p>
+        <p>$$P(\le 3\text{ C})=1-P(4\text{ C})-P(5\text{ C})$$</p>
+        <p class="hint">Hint: Only $4$ or $5$ Chinese books fail the condition — just two cases.</p>
+      </div>
+
+      <div class="step" data-step="3">
+        <div class="tag"><span class="chip">3</span>Case: 4 Chinese + 1 English</div>
+        <p>Choose $4$ from the $8$ Chinese and $1$ from the $7$ English:</p>
+        <p>$$P(4\text{ C})=\frac{C_4^{8}\cdot C_1^{7}}{C_5^{15}}=\frac{70\times 7}{3003}=\frac{490}{3003}=\frac{70}{429}$$</p>
+        <p class="hint">Hint: $C_4^{8}=70$, $C_1^{7}=7$.</p>
+      </div>
+
+      <div class="step" data-step="4">
+        <div class="tag"><span class="chip">4</span>Case: 5 Chinese books</div>
+        <p>Choose all $5$ from the $8$ Chinese (no English chosen):</p>
+        <p>$$P(5\text{ C})=\frac{C_5^{8}}{C_5^{15}}=\frac{56}{3003}=\frac{8}{429}$$</p>
+        <p class="hint">Hint: $C_5^{8}=56$.</p>
+      </div>
+
+      <div class="step" data-step="5">
+        <div class="tag"><span class="chip">5</span>Subtract from 1</div>
+        <p>$$P(\le 3\text{ C})=1-\frac{70}{429}-\frac{8}{429}
+          =1-\frac{78}{429}
+          =\frac{429-78}{429}
+          =\frac{351}{429}=\frac{9}{11}$$</p>
+        <p class="hint">Hint: Simplify $\frac{351}{429}$ by dividing numerator and denominator by $39$.</p>
+      </div>
+
+      <div class="answer">Answer: B &nbsp;—&nbsp; $\dfrac{9}{11}$</div>
+    </div>
+
   </div>
-
-  <!-- Step-by-Step Solution -->
-  <div class="card p-6 md:p-8">
-    <h2 class="text-lg font-semibold text-slate-700 mb-4 flex items-center gap-2">
-      <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-      Step-by-Step Solution
-    </h2>
-
-    <!-- Step 1 -->
-    <div class="mb-4 border border-slate-200 rounded-xl overflow-hidden">
-      <button class="step-btn w-full flex items-center justify-between p-4 bg-slate-50 hover:bg-slate-100 text-left" onclick="toggleStep(1)">
-        <span class="font-semibold text-slate-700 text-sm md:text-base">
-          <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold mr-2">1</span>
-          Understand the total number of ways
-        </span>
-        <svg class="w-5 h-5 text-slate-400 transform transition-transform" id="icon-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-      </button>
-      <div id="step-1" class="step-content px-4 md:px-6 pb-4 pt-2 bg-white">
-        <p class="text-slate-600 text-sm leading-relaxed mb-2">Total books = 8 C + 7 E = <strong>15 books</strong>.</p>
-        <p class="text-slate-600 text-sm leading-relaxed mb-2">We choose 5 books. The total number of ways to choose any 5 books from 15 is:</p>
-        <div class="bg-blue-50 rounded-lg p-3 text-center text-lg font-semibold text-blue-800 my-3">
-          \( C_5^{15} = C^{15}_{5} = 3003 \)
-        </div>
-        <div class="bg-amber-50 border-l-4 border-amber-400 p-3 rounded-r-lg mt-2">
-          <p class="text-xs text-amber-800"><strong>Hint:</strong> Combination formula \( C_r^n = C^{n}_{r} = \frac{n!}{r!(n-r)!} \) counts groups where order does not matter.</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Step 2 -->
-    <div class="mb-4 border border-slate-200 rounded-xl overflow-hidden">
-      <button class="step-btn w-full flex items-center justify-between p-4 bg-slate-50 hover:bg-slate-100 text-left" onclick="toggleStep(2)">
-        <span class="font-semibold text-slate-700 text-sm md:text-base">
-          <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold mr-2">2</span>
-          Use complement: "at most 3" = 1 − P(4 or 5 Chinese)
-        </span>
-        <svg class="w-5 h-5 text-slate-400 transform transition-transform" id="icon-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-      </button>
-      <div id="step-2" class="step-content px-4 md:px-6 pb-4 pt-2 bg-white">
-        <p class="text-slate-600 text-sm leading-relaxed mb-2">"At most 3 Chinese books" means 0, 1, 2, or 3 Chinese books.</p>
-        <p class="text-slate-600 text-sm leading-relaxed mb-2">The <em>complement</em> is easier: 4 or 5 Chinese books (i.e., more than 3).</p>
-        <div class="bg-blue-50 rounded-lg p-3 text-center text-base font-semibold text-blue-800 my-3">
-          \( P(\text{at most 3 C}) = 1 - P(4\text{ C}) - P(5\text{ C}) \)
-        </div>
-        <div class="bg-amber-50 border-l-4 border-amber-400 p-3 rounded-r-lg mt-2">
-          <p class="text-xs text-amber-800"><strong>Hint:</strong> Since the maximum Chinese books is 8, but we only choose 5, the only impossible-to-ignore cases are exactly 4 or exactly 5 Chinese books.</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Step 3 -->
-    <div class="mb-4 border border-slate-200 rounded-xl overflow-hidden">
-      <button class="step-btn w-full flex items-center justify-between p-4 bg-slate-50 hover:bg-slate-100 text-left" onclick="toggleStep(3)">
-        <span class="font-semibold text-slate-700 text-sm md:text-base">
-          <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold mr-2">3</span>
-          Calculate P(4 Chinese books)
-        </span>
-        <svg class="w-5 h-5 text-slate-400 transform transition-transform" id="icon-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-      </button>
-      <div id="step-3" class="step-content px-4 md:px-6 pb-4 pt-2 bg-white">
-        <p class="text-slate-600 text-sm leading-relaxed mb-2">To get exactly 4 Chinese books, we choose:</p>
-        <ul class="list-disc list-inside text-sm text-slate-600 space-y-1 ml-2 mb-3">
-          <li>4 Chinese from 8: \( C_4^8 \)</li>
-          <li>1 English from 7: \( C_1^7 \)</li>
-        </ul>
-        <div class="bg-blue-50 rounded-lg p-3 text-center my-3">
-          <p class="text-sm text-slate-600 mb-1">Number of favourable outcomes:</p>
-          <p class="text-lg font-semibold text-blue-800">\( C_4^8 \cdot C_1^7 = 70 \cdot 7 = 490 \)</p>
-        </div>
-        <div class="bg-blue-50 rounded-lg p-3 text-center my-3">
-          <p class="text-sm text-slate-600 mb-1">Probability:</p>
-          <p class="text-lg font-semibold text-blue-800">\( P(4\text{ C}) = \frac{C_4^8 \cdot C_1^7}{C_5^{15}} = \frac{490}{3003} = \frac{70}{429} \)</p>
-        </div>
-        <div class="bg-amber-50 border-l-4 border-amber-400 p-3 rounded-r-lg mt-2">
-          <p class="text-xs text-amber-800"><strong>Hint:</strong> Simplify \( \frac{490}{3003} \) by dividing numerator and denominator by 7.</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Step 4 -->
-    <div class="mb-4 border border-slate-200 rounded-xl overflow-hidden">
-      <button class="step-btn w-full flex items-center justify-between p-4 bg-slate-50 hover:bg-slate-100 text-left" onclick="toggleStep(4)">
-        <span class="font-semibold text-slate-700 text-sm md:text-base">
-          <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold mr-2">4</span>
-          Calculate P(5 Chinese books)
-        </span>
-        <svg class="w-5 h-5 text-slate-400 transform transition-transform" id="icon-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-      </button>
-      <div id="step-4" class="step-content px-4 md:px-6 pb-4 pt-2 bg-white">
-        <p class="text-slate-600 text-sm leading-relaxed mb-2">To get exactly 5 Chinese books, we choose:</p>
-        <ul class="list-disc list-inside text-sm text-slate-600 space-y-1 ml-2 mb-3">
-          <li>5 Chinese from 8: \( C_5^8 \)</li>
-          <li>0 English from 7: \( C_0^7 = 1 \)</li>
-        </ul>
-        <div class="bg-blue-50 rounded-lg p-3 text-center my-3">
-          <p class="text-sm text-slate-600 mb-1">Number of favourable outcomes:</p>
-          <p class="text-lg font-semibold text-blue-800">\( C_5^8 \cdot C_0^7 = 56 \cdot 1 = 56 \)</p>
-        </div>
-        <div class="bg-blue-50 rounded-lg p-3 text-center my-3">
-          <p class="text-sm text-slate-600 mb-1">Probability:</p>
-          <p class="text-lg font-semibold text-blue-800">\( P(5\text{ C}) = \frac{C_5^8}{C_5^{15}} = \frac{56}{3003} = \frac{8}{429} \)</p>
-        </div>
-        <div class="bg-amber-50 border-l-4 border-amber-400 p-3 rounded-r-lg mt-2">
-          <p class="text-xs text-amber-800"><strong>Hint:</strong> Simplify \( \frac{56}{3003} \) by dividing by 7.</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Step 5 -->
-    <div class="mb-4 border border-slate-200 rounded-xl overflow-hidden">
-      <button class="step-btn w-full flex items-center justify-between p-4 bg-slate-50 hover:bg-slate-100 text-left" onclick="toggleStep(5)">
-        <span class="font-semibold text-slate-700 text-sm md:text-base">
-          <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold mr-2">5</span>
-          Combine and simplify
-        </span>
-        <svg class="w-5 h-5 text-slate-400 transform transition-transform" id="icon-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-      </button>
-      <div id="step-5" class="step-content px-4 md:px-6 pb-4 pt-2 bg-white">
-        <div class="bg-blue-50 rounded-lg p-3 text-center my-3">
-          <p class="text-sm text-slate-600 mb-1">Required probability:</p>
-          <p class="text-lg font-semibold text-blue-800">\( P(\le 3\text{ C}) = 1 - \frac{70}{429} - \frac{8}{429} \)</p>
-          <p class="text-lg font-semibold text-blue-800 mt-2">\( = 1 - \frac{78}{429} = \frac{429 - 78}{429} = \frac{351}{429} \)</p>
-        </div>
-        <p class="text-slate-600 text-sm leading-relaxed mb-2">Simplify \( \frac{351}{429} \): divide both by 39.</p>
-        <div class="bg-blue-50 rounded-lg p-3 text-center my-3">
-          <p class="text-lg font-semibold text-blue-800">\( = \frac{9}{11} \)</p>
-        </div>
-        <div class="bg-green-50 border-l-4 border-green-400 p-3 rounded-r-lg mt-3">
-          <p class="text-xs text-green-800"><strong>Answer: B</strong> \(\displaystyle \frac{9}{11}\)</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Visualizer -->
-  <div class="card p-6 md:p-8">
-    <h2 class="text-lg font-semibold text-slate-700 mb-4 flex items-center gap-2">
-      <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/></svg>
-      Visualise the Probability
-    </h2>
-    <p class="text-sm text-slate-500 mb-6">Drag the slider to see the probability distribution for choosing \( k \) Chinese books among 5 books.</p>
-
-    <!-- Slider control -->
-    <div class="flex items-center gap-4 mb-6">
-      <span class="text-sm font-medium text-slate-600 min-w-[100px]">Chinese books: <strong id="kValue" class="text-blue-700 text-lg">3</strong></span>
-      <input type="range" id="kSlider" min="0" max="5" value="3" step="1" class="flex-1">
-      <span class="text-xs text-slate-400 min-w-[60px]">0 → 5</span>
-    </div>
-
-    <!-- Bar chart -->
-    <div class="space-y-3" id="chartContainer">
-      <!-- Generated by JS -->
-    </div>
-
-    <div class="mt-6 bg-slate-50 rounded-xl p-4 grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-      <div>
-        <p class="text-xs text-slate-500">Total ways \( C_5^{15} \)</p>
-        <p class="text-lg font-bold text-slate-700">3003</p>
-      </div>
-      <div>
-        <p class="text-xs text-slate-500">P(≤ 3 Chinese)</p>
-        <p class="text-lg font-bold text-green-700">\( \frac{9}{11} \approx 0.8182 \)</p>
-      </div>
-      <div>
-        <p class="text-xs text-slate-500">P(> 3 Chinese)</p>
-        <p class="text-lg font-bold text-red-500">\( \frac{2}{11} \approx 0.1818 \)</p>
-      </div>
-    </div>
-
-    <div class="mt-4 flex items-center justify-center gap-3 text-xs text-slate-500">
-      <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-green-400 inline-block"></span> Counted in "at most 3"</span>
-      <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-red-400 inline-block"></span> Complement (4 or 5)</span>
-    </div>
-  </div>
-
-  <!-- Footer -->
-  <footer class="text-center text-xs text-slate-400 pb-6">
-    HKDSE Mathematics 2020 Paper 2 Q43 • Interactive Solution • All notation follows HK convention \( C_r^n \)
-  </footer>
-
 </div>
 
 <script>
-  // ── Step toggle ──
-  const openSteps = new Set();
+/* ================== CANVAS DIAGRAM ================== */
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+const ro = document.getElementById('ro');
+const W = cv.width, H = cv.height;
 
-  function toggleStep(n) {
-    const el = document.getElementById('step-' + n);
-    const icon = document.getElementById('icon-' + n);
-    if (openSteps.has(n)) {
-      el.classList.remove('open');
-      icon.style.transform = 'rotate(0deg)';
-      openSteps.delete(n);
-    } else {
-      el.classList.add('open');
-      icon.style.transform = 'rotate(180deg)';
-      openSteps.add(n);
-    }
+const RED = '#e63946', BLUE = '#1d6fb8', TEAL = '#2a9d8f', ORANGE = '#e08c00',
+      PURPLE = '#7b4bb7', GREY = '#8a97ad';
+
+/* Layout: 8 red books in a 4x2 grid (left), 7 blue books (right) */
+function drawBooks(highlightMap, labelFn){
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = '#fff'; ctx.fillRect(0,0,W,H);
+
+  /* ---- Title of box ---- */
+  ctx.fillStyle = '#1a2233';
+  ctx.font = 'bold 22px "Segoe UI",sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('Box: 15 books', 40, 40);
+
+  ctx.font = '15px "Segoe UI",sans-serif';
+  ctx.fillStyle = GREY;
+  ctx.fillText('8 Chinese  +  7 English   →   choose 5', 40, 64);
+
+  /* ---- Box outline ---- */
+  ctx.strokeStyle = '#c7d4e8'; ctx.lineWidth = 2;
+  roundRect(28, 80, W-56, 190, 16); ctx.stroke();
+
+  const bw = 60, bh = 62;      // book size
+  const gapx = 14, gapy = 16;
+  const startX = 58, startY = 108;
+
+  /* Chinese books (8) : 4 columns x 2 rows */
+  for (let i=0;i<8;i++){
+    const r = Math.floor(i/4), c = i%4;
+    const x = startX + c*(bw+gapx);
+    const y = startY + r*(bh+gapy);
+    const hl = highlightMap && highlightMap.chinese.includes(i);
+    book(x, y, bw, bh, RED, 'C'+(i+1), hl, hl?ORANGE:null);
   }
 
-  // ── Option selection ──
-  let selectedOpt = null;
-  function selectOption(opt) {
-    const cards = document.querySelectorAll('.option-card');
-    const feedback = document.getElementById('optionFeedback');
-    cards.forEach(c => {
-      c.classList.remove('selected', 'correct', 'wrong');
-    });
-    const card = document.querySelector(`.option-card[data-opt="${opt}"]`);
-    if (selectedOpt === opt) {
-      // Deselect
-      selectedOpt = null;
-      feedback.textContent = '';
-      return;
-    }
-    selectedOpt = opt;
-    card.classList.add('selected');
-
-    if (opt === 'B') {
-      card.classList.add('correct');
-      feedback.textContent = '✓ Correct! The probability is 9/11.';
-      feedback.className = 'text-center text-sm font-medium mt-3 h-5 text-green-600';
-    } else {
-      card.classList.add('wrong');
-      feedback.textContent = '✗ Not quite. Try again or explore the steps.';
-      feedback.className = 'text-center text-sm font-medium mt-3 h-5 text-red-500';
-    }
+  /* English books (7) : 4 columns x 2 rows, starting further right */
+  const ex0 = startX + 4*(bw+gapx) + 34;
+  for (let i=0;i<7;i++){
+    const r = Math.floor(i/4), c = i%4;
+    const x = ex0 + c*(bw+gapx);
+    const y = startY + r*(bh+gapy);
+    const hl = highlightMap && highlightMap.english.includes(i);
+    book(x, y, bw, bh, BLUE, 'E'+(i+1), hl, hl?ORANGE:null);
   }
 
-  // ── Combination helper ──
-  function comb(n, r) {
-    if (r < 0 || r > n) return 0;
-    let result = 1;
-    for (let i = 1; i <= r; i++) {
-      result = result * (n - r + i) / i;
-    }
-    return Math.round(result);
-  }
+  /* Category heading */
+  ctx.font = 'bold 14px "Segoe UI",sans-serif';
+  ctx.fillStyle = RED; ctx.textAlign='center';
+  ctx.fillText('Chinese books', startX + 2*(bw+gapx) - gapx/2, 100);
+  ctx.fillStyle = BLUE;
+  ctx.fillText('English books', ex0 + 1.5*(bw+gapx), 100);
 
-  // ── Chart data ──
-  const totalWays = comb(15, 5); // 3003
-  const data = [];
-  for (let k = 0; k <= 5; k++) {
-    const ways = comb(8, k) * comb(7, 5 - k);
-    data.push({ k, ways, prob: ways / totalWays });
-  }
+  /* ---- Bottom: info / formula panel ---- */
+  ctx.textAlign='left';
+  if (labelFn) labelFn();
+}
 
-  const maxProb = Math.max(...data.map(d => d.prob));
+function book(x,y,w,h,color,label,highlight,ring){
+  ctx.save();
+  ctx.fillStyle = color;
+  if (ring){ ctx.shadowColor = ring; ctx.shadowBlur = 14; }
+  roundRect(x,y,w,h,8); ctx.fill();
+  ctx.restore();
 
-  // ── Render chart ──
-  function renderChart(highlightK) {
-    const container = document.getElementById('chartContainer');
-    container.innerHTML = '';
-    data.forEach(d => {
-      const pct = (d.prob / maxProb) * 100;
-      const isHighlighted = d.k <= 3;
-      const isSelected = d.k === highlightK;
-      const barColor = isHighlighted
-        ? (isSelected ? 'bg-green-500' : 'bg-green-400')
-        : (isSelected ? 'bg-red-500' : 'bg-red-300');
+  /* spine line */
+  ctx.strokeStyle = 'rgba(255,255,255,.55)'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(x+10,y+6); ctx.lineTo(x+10,y+h-6); ctx.stroke();
 
-      const row = document.createElement('div');
-      row.className = 'flex items-center gap-3';
-      row.innerHTML = `
-        <span class="text-xs font-mono font-semibold text-slate-500 w-14 text-right">${d.k} C</span>
-        <div class="flex-1 bg-slate-100 rounded-full h-7 relative overflow-hidden ${isSelected ? 'ring-2 ring-blue-400' : ''}">
-          <div class="bar-segment absolute left-0 top-0 h-full rounded-full ${barColor}" style="width: ${pct}%"></div>
-          <span class="absolute inset-0 flex items-center justify-center text-xs font-bold text-white drop-shadow-sm">
-            ${d.ways} ways (${(d.prob * 100).toFixed(1)}%)
-          </span>
-        </div>
-      `;
-      container.appendChild(row);
-    });
-  }
+  /* label */
+  ctx.fillStyle='#fff';
+  ctx.font='bold 15px "Segoe UI",sans-serif';
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(label, x+w/2+5, y+h/2);
+  ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+}
 
-  // ── Slider ──
-  const slider = document.getElementById('kSlider');
-  const kValue = document.getElementById('kValue');
+function roundRect(x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
 
-  slider.addEventListener('input', function() {
-    const k = parseInt(this.value);
-    kValue.textContent = k;
-    renderChart(k);
+/* helper to draw a fraction-ish info line */
+function infoBox(lines, accent){
+  const x=28, y=292, w=W-56, h=H-292-24;
+  ctx.fillStyle='#f8fbff';
+  ctx.strokeStyle = accent || '#d8e0ee';
+  ctx.lineWidth=2;
+  roundRect(x,y,w,h,16); ctx.fill(); ctx.stroke();
+
+  ctx.textAlign='left';
+  let ty = y+38;
+  lines.forEach((L,i)=>{
+    ctx.fillStyle = L.color || '#1a2233';
+    ctx.font = (L.bold?'bold ':'')+(L.size||17)+'px "Segoe UI",sans-serif';
+    if (L.math){ ctx.font = (L.bold?'bold ':'')+(L.size||20)+'px "Cambria Math","Times New Roman",serif'; }
+    ctx.fillText(L.t, x+22, ty);
+    ty += L.gap || 30;
   });
+}
 
-  // ── Formula display for the slider ──
-  function updateFormulaDisplay(k) {
-    kValue.textContent = k;
+/* ================== STEP DRAWINGS ================== */
+const NONE = {chinese:[], english:[]};
+
+function draw(step){
+  if (step<=1){
+    drawBooks(NONE, ()=>{
+      infoBox([
+        {t:'Total books = 8 + 7 = 15', bold:true, size:19},
+        {t:'Total ways to choose any 5 books:', color:'#5a6885', size:16, gap:32},
+        {t:'C(15, 5) = 3003', bold:true, size:22, math:true, color:'#2a9d8f', gap:34},
+        {t:'Every 5-book set is equally likely.', color:'#5a6885', size:15}
+      ], '#2a9d8f');
+    });
+    ro.innerHTML = 'Step 1 — the box holds <b>8 Chinese</b> (red) and <b>7 English</b> (blue) books; 5 are drawn at random, giving <b>C(15,5) = 3003</b> outcomes.';
   }
 
-  // ── Initial render ──
-  renderChart(3);
-  // Open first step by default
-  toggleStep(1);
-
-  // ── MathJax re-render if needed ──
-  if (window.MathJax && window.MathJax.typesetPromise) {
-    window.MathJax.typesetPromise();
+  else if (step===2){
+    drawBooks(NONE, ()=>{
+      infoBox([
+        {t:'"At most 3 Chinese"  =  0, 1, 2 or 3 C', bold:true, size:18, color:'#e08c00'},
+        {t:'Use the complement — only 2 bad cases:', color:'#5a6885', size:16, gap:32},
+        {t:'P(≤3 C) = 1 − P(4 C) − P(5 C)', bold:true, size:21, math:true, color:'#1d6fb8', gap:34},
+        {t:'4 C  →  4 red + 1 blue', color:'#e63946', size:16, gap:26},
+        {t:'5 C  →  5 red + 0 blue', color:'#e63946', size:16}
+      ], '#e08c00');
+    });
+    ro.innerHTML = 'Step 2 — rather than adding four cases, subtract the two failing cases: <b>4 Chinese</b> and <b>5 Chinese</b>.';
   }
-</script>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
+
+  else if (step===3){
+    /* highlight any 4 red + 1 blue */
+    drawBooks({chinese:[0,1,2,3], english:[0]}, ()=>{
+      infoBox([
+        {t:'Case 4 Chinese + 1 English', bold:true, size:19, color:'#e63946'},
+        {t:'Ways = C(8,4) × C(7,1) = 70 × 7 = 490', size:19, math:true, gap:34},
+        {t:'P(4 C) = 490 / 3003 = 70 / 429', bold:true, size:21, math:true, color:'#2a9d8f'}
+      ], '#e63946');
+    });
+    ro.innerHTML = 'Step 3 — the 3 highlighted red books (plus one more) represent a <b>4 Chinese + 1 English</b> selection: $C_4^8 C_1^7 = 490$ ways.';
+  }
+
+  else if (step===4){
+    /* highlight 5 red */
+    drawBooks({chinese:[0,1,2,3,4], english:[]}, ()=>{
+      infoBox([
+        {t:'Case 5 Chinese + 0 English', bold:true, size:19, color:'#7b4bb7'},
+        {t:'Ways = C(8,5) = 56', size:19, math:true, gap:34},
+        {t:'P(5 C) = 56 / 3003 = 8 / 429', bold:true, size:21, math:true, color:'#2a9d8f'}
+      ], '#7b4bb7');
+    });
+    ro.innerHTML = 'Step 4 — choosing all five from the Chinese books: $C_5^8 = 56$ ways, so $P(5\\text{C}) = 8/429$.';
+  }
+
+  else {
+    drawBooks(NONE, ()=>{
+      infoBox([
+        {t:'P(≤3 C) = 1 − 70/429 − 8/429', bold:true, size:21, math:true, gap:36},
+        {t:'= 1 − 78/429 = 351/429', size:20, math:true, color:'#5a6885', gap:36},
+        {t:'= 9/11  =  0.818…', bold:true, size:26, math:true, color:'#e08c00'}
+      ], '#2a9d8f');
+    });
+    ro.innerHTML = 'Step 5 — the complement gives the answer <b>9/11</b> (option B).';
+  }
+}
+
+/* ================== SCROLL SYNC ================== */
+let current = 1;
+const io = new IntersectionObserver(es=>{
+  es.forEach(e=>{
+    if(e.isIntersecting){
+      current = +e.target.dataset.step;
+      draw(current);
+      document.querySelectorAll('.step').forEach(s=>s.classList.toggle('hot', +s.dataset.step===current));
+    }
+  });
+},{rootMargin:'-25% 0px -55% 0px', threshold:0});
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
+
+/* initial paint */
+document.addEventListener('DOMContentLoaded', ()=>{
+  draw(1);
+  document.querySelector('.step[data-step="1"]').classList.add('hot');
 });
+if (document.readyState !== 'loading'){ draw(1); document.querySelector('.step[data-step="1"]').classList.add('hot'); }
 </script>
-
 </body>
 </html>

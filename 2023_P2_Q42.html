@@ -1,390 +1,594 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HKDSE 2023 Paper 2 Q42 – Committee Selection</title>
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- MathJax for LaTeX rendering -->
-  <script>
-    MathJax = {
-      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
-      svg: { fontCache: 'global' }
-    };
-  </script>
-  <script>
-window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] }, svg:{fontCache:'global'} };
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2023 P2 Q42 — Probability</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$','$$'], ['\\[','\\]']] },
+  svg: { fontCache: 'global' }
+};
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
-  <style>
-    body {
-      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      background: #f8fafc;
-    }
-    .step-card {
-      transition: all 0.3s ease;
-    }
-    .step-card:hover {
-      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-    }
-    .highlight {
-      background: #dbeafe;
-      border-radius: 6px;
-      padding: 0 4px;
-    }
-    .teacher-grid {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 10px;
-      justify-items: center;
-    }
-    @media (max-width: 480px) {
-      .teacher-grid {
-        grid-template-columns: repeat(5, 1fr);
-        gap: 6px;
-      }
-    }
-    .teacher-dot {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 600;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      user-select: none;
-      border: 2px solid transparent;
-    }
-    .teacher-dot.chair {
-      background: #f59e0b;
-      color: #fff;
-      border-color: #d97706;
-      transform: scale(1.1);
-    }
-    .teacher-dot.member {
-      background: #3b82f6;
-      color: #fff;
-      border-color: #2563eb;
-      transform: scale(1.05);
-    }
-    .teacher-dot.normal {
-      background: #e2e8f0;
-      color: #475569;
-    }
-    .teacher-dot.normal:hover {
-      background: #cbd5e1;
-      transform: scale(1.08);
-    }
-    .teacher-dot.disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-    .badge {
-      display: inline-block;
-      padding: 4px 12px;
-      border-radius: 9999px;
-      font-size: 13px;
-      font-weight: 600;
-    }
-    @media (max-width: 640px) {
-      .teacher-dot {
-        width: 36px;
-        height: 36px;
-        font-size: 12px;
-      }
-    }
-  </style>
+<style>
+  :root{
+    --bg:#f4f7fb;
+    --card:#ffffff;
+    --ink:#1e2a38;
+    --muted:#5b6b7c;
+    --blue:#2563eb;
+    --green:#16a34a;
+    --orange:#ea580c;
+    --purple:#7c3aed;
+    --red:#dc2626;
+    --line:#dbe3ec;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    font-size:16px;
+    line-height:1.55;
+  }
+  .wrap{padding:16px 14px 48px;max-width:1400px;margin:0 auto;}
+  .title{
+    font-size:1.15rem;
+    font-weight:700;
+    color:var(--blue);
+    margin:0 0 4px;
+    letter-spacing:.02em;
+  }
+  .subtitle{color:var(--muted);font-size:.85rem;margin:0 0 14px;}
+  .split{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    gap:12px;
+    align-items:start;
+  }
+  @media(min-width:900px){
+    .split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}
+  }
+  @media(max-width:640px){
+    body{font-size:14.5px;}
+    .wrap{padding:10px 8px 40px;}
+  }
+
+  /* ---------- LEFT PANE ---------- */
+  .diagram{
+    position:sticky;
+    top:16px;
+    max-height:calc(100vh - 2rem);
+    overflow-y:auto;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:14px 14px 18px;
+    box-shadow:0 4px 16px rgba(30,42,56,.06);
+  }
+  .diagram h2{
+    margin:0 0 8px;
+    font-size:.95rem;
+    color:var(--muted);
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+  }
+  canvas{width:100%;height:auto;display:block;border-radius:10px;background:#fff;}
+  .ro{
+    margin:10px 0 0;
+    font-size:.85rem;
+    color:var(--muted);
+    background:#f8fafc;
+    border:1px dashed var(--line);
+    border-radius:8px;
+    padding:8px 10px;
+  }
+  .legend{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0 0;font-size:.8rem;color:var(--muted);}
+  .legend span{display:inline-flex;align-items:center;gap:5px;}
+  .dot{width:11px;height:11px;border-radius:50%;display:inline-block;}
+
+  /* ---------- RIGHT PANE ---------- */
+  .content{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:16px 18px 26px;
+    box-shadow:0 4px 16px rgba(30,42,56,.06);
+  }
+  .tag{
+    display:inline-block;
+    background:#eef4ff;
+    color:var(--blue);
+    border:1px solid #c7dbff;
+    border-radius:999px;
+    font-size:.75rem;
+    font-weight:700;
+    padding:3px 10px;
+    margin-bottom:10px;
+    letter-spacing:.04em;
+  }
+  .q{
+    background:#f8fbff;
+    border-left:4px solid var(--blue);
+    border-radius:0 10px 10px 0;
+    padding:12px 14px;
+    margin:0 0 16px;
+  }
+  .q p{margin:0;}
+
+  .choices{
+    list-style:none;
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:6px 16px;
+    padding:0;
+    margin:12px 0 0;
+    font-variant-numeric:tabular-nums;
+  }
+  .choices li{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:6px 10px;
+    font-size:.95rem;
+  }
+  .choices li b{color:var(--blue);margin-right:6px;}
+  .choices li.correct{
+    border-color:#9ee6b4;
+    background:#f1fdf5;
+  }
+  .choices li.correct b{color:var(--green);}
+
+  .step{
+    position:relative;
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:12px 14px 12px 54px;
+    margin:0 0 12px;
+    background:#fff;
+    transition:box-shadow .25s, border-color .25s, transform .25s;
+  }
+  .step.active{
+    border-color:var(--blue);
+    box-shadow:0 0 0 3px rgba(37,99,235,.12);
+  }
+  .step .chip{
+    position:absolute;
+    left:12px;
+    top:12px;
+    width:30px;height:30px;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-weight:700;font-size:.9rem;
+    color:#fff;
+    background:var(--blue);
+    box-shadow:0 2px 6px rgba(37,99,235,.35);
+  }
+  .step .st{
+    font-weight:700;
+    color:var(--ink);
+    display:block;
+    margin-bottom:4px;
+  }
+  .hint{
+    margin-top:8px;
+    font-size:.86rem;
+    color:var(--muted);
+    background:#f8fafc;
+    border-radius:8px;
+    padding:6px 10px;
+    border-left:3px solid var(--orange);
+  }
+  .ans{
+    margin-top:16px;
+    padding:12px 16px;
+    background:linear-gradient(90deg,#eef4ff,#f1fdf5);
+    border:1px solid #c7dbff;
+    border-radius:12px;
+    font-weight:700;
+    font-size:1.05rem;
+    color:var(--green);
+  }
+  mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
+  .small{font-size:.9rem;color:var(--muted);}
+</style>
 </head>
-<body class="min-h-screen py-6 px-4 sm:px-6 lg:px-8">
-  <div class="max-w-4xl mx-auto">
+<body>
+<div class="wrap">
+  <p class="title">HKDSE 2023 · Paper 2 · Q42</p>
+  <p class="subtitle">Topic 14 · Probability / Permutation &amp; Combination</p>
 
-    <!-- Header -->
-    <header class="text-center mb-8">
-      <h1 class="text-2xl sm:text-3xl font-bold text-slate-800">HKDSE Math 2023 Paper 2 Q42</h1>
-      <p class="text-slate-500 mt-1 text-sm sm:text-base">Topic: Probability &amp; Combinations</p>
-    </header>
+  <div class="split">
 
-    <!-- Question Card -->
-    <section class="bg-white rounded-2xl shadow-md p-6 sm:p-8 mb-8 border border-slate-100">
-      <div class="flex items-start justify-between flex-wrap gap-4 mb-4">
-        <h2 class="text-lg sm:text-xl font-semibold text-slate-800">Question</h2>
-        <span class="bg-amber-100 text-amber-800 badge">14. Probability</span>
+    <!-- ================= LEFT: DIAGRAM ================= -->
+    <div class="diagram">
+      <h2>Interactive figure</h2>
+      <canvas id="cv" width="620" height="640"></canvas>
+      <div class="legend">
+        <span><i class="dot" style="background:#2563eb"></i>Chairperson</span>
+        <span><i class="dot" style="background:#16a34a"></i>Members (chosen)</span>
+        <span><i class="dot" style="background:#cbd5e1"></i>Not selected</span>
+        <span><i class="dot" style="background:#ea580c"></i>Step highlight</span>
       </div>
-      <p class="text-slate-700 text-base sm:text-lg leading-relaxed">
-        There are <strong>15 teachers</strong> in a group. If <strong>5 teachers</strong> are selected from the group to form a committee consisting of <strong>1 chairperson and 4 members</strong>, how many different committees can be formed?
-      </p><figure style="margin:12px 0;text-align:center;"><img src="figures/2023_P2_Q42.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6">
-        <div class="bg-slate-50 rounded-lg p-3 text-center border border-slate-200">
-          <span class="font-bold text-slate-600">A.</span> <span class="text-slate-800">3 003</span>
-        </div>
-        <div class="bg-slate-50 rounded-lg p-3 text-center border border-slate-200">
-          <span class="font-bold text-slate-600">B.</span> <span class="text-slate-800">15 015</span>
-        </div>
-        <div class="bg-slate-50 rounded-lg p-3 text-center border border-slate-200">
-          <span class="font-bold text-slate-600">C.</span> <span class="text-slate-800">20 475</span>
-        </div>
-        <div class="bg-slate-50 rounded-lg p-3 text-center border border-slate-200">
-          <span class="font-bold text-slate-600">D.</span> <span class="text-slate-800">360 360</span>
-        </div>
-      </div>
-      <!-- Concept tags -->
-      <div class="mt-6 flex flex-wrap gap-2">
-        <span class="bg-blue-100 text-blue-800 badge">Combinations</span>
-        <span class="bg-blue-100 text-blue-800 badge">Counting</span>
-        <span class="bg-blue-100 text-blue-800 badge">Chairperson vs Members</span>
-        <span class="bg-blue-100 text-blue-800 badge">Distinct Roles</span>
-      </div>
-    </section>
+      <p class="ro" id="readout">Step 1 · 15 teachers available — we must form a committee of 1 chairperson + 4 members.</p>
+    </div>
 
-    <!-- Solution Steps -->
-    <section class="mb-10">
-      <h2 class="text-xl font-bold text-slate-800 mb-4">Step-by-Step Solution</h2>
-      <div class="space-y-4">
+    <!-- ================= RIGHT: CONTENT ================= -->
+    <div class="content">
+      <span class="tag">2023MC#42</span>
 
-        <!-- Step 1 -->
-        <div class="step-card bg-white rounded-xl shadow-sm border border-slate-200 p-5">
-          <div class="flex items-center gap-3">
-            <span class="bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">1</span>
-            <h3 class="font-semibold text-slate-800 text-base">Understand the task</h3>
-          </div>
-          <div class="mt-3 pl-11 text-slate-600 text-sm sm:text-base">
-            <p>We need to form a committee of <strong>5 people</strong> from <strong>15 teachers</strong>. One of the 5 is the <strong>chairperson</strong>, and the remaining 4 are <strong>members</strong>.</p>
-          </div>
-        </div>
-
-        <!-- Step 2 -->
-        <div class="step-card bg-white rounded-xl shadow-sm border border-slate-200 p-5">
-          <div class="flex items-center gap-3">
-            <span class="bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">2</span>
-            <h3 class="font-semibold text-slate-800 text-base">Method 1: Choose chairperson first</h3>
-          </div>
-          <div class="mt-3 pl-11 text-slate-600 text-sm sm:text-base space-y-2">
-            <p>1. Choose 1 chairperson from 15 teachers: \(C^{15}_{1}\) ways.</p>
-            <p>2. Then choose 4 members from the remaining 14 teachers: \(C^{14}_{4}\) ways.</p>
-            <p class="bg-blue-50 p-3 rounded-lg mt-2">
-              <strong>Hint:</strong> Multiplication principle: \(C^{15}_{1} \times C^{14}_{4}\)
-            </p>
-          </div>
-        </div>
-
-        <!-- Step 3 -->
-        <div class="step-card bg-white rounded-xl shadow-sm border border-slate-200 p-5">
-          <div class="flex items-center gap-3">
-            <span class="bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">3</span>
-            <h3 class="font-semibold text-slate-800 text-base">Compute Method 1</h3>
-          </div>
-          <div class="mt-3 pl-11 text-slate-600 text-sm sm:text-base">
-            <p>\(C^{15}_{1} = 15\)</p>
-            <p>\(C^{14}_{4} = \frac{14 \times 13 \times 12 \times 11}{4 \times 3 \times 2 \times 1} = 1001\)</p>
-            <p class="mt-2">Total: \(15 \times 1001 = 15015\)</p>
-          </div>
-        </div>
-
-        <!-- Step 4 -->
-        <div class="step-card bg-white rounded-xl shadow-sm border border-slate-200 p-5">
-          <div class="flex items-center gap-3">
-            <span class="bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">4</span>
-            <h3 class="font-semibold text-slate-800 text-base">Method 2: Choose 5 first, then chairperson</h3>
-          </div>
-          <div class="mt-3 pl-11 text-slate-600 text-sm sm:text-base space-y-2">
-            <p>1. Choose any 5 teachers from 15: \(C^{15}_{5}\) ways.</p>
-            <p>2. From these 5, choose 1 as chairperson: \(C^{5}_{1}\) ways.</p>
-            <p class="bg-blue-50 p-3 rounded-lg mt-2">
-              <strong>Hint:</strong> \(C^{15}_{5} \times C^{5}_{1}\)
-            </p>
-          </div>
-        </div>
-
-        <!-- Step 5 -->
-        <div class="step-card bg-white rounded-xl shadow-sm border border-slate-200 p-5">
-          <div class="flex items-center gap-3">
-            <span class="bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">5</span>
-            <h3 class="font-semibold text-slate-800 text-base">Compute Method 2 &amp; Verify</h3>
-          </div>
-          <div class="mt-3 pl-11 text-slate-600 text-sm sm:text-base">
-            <p>\(C^{15}_{5} = 3003\), \(C^{5}_{1} = 5\)</p>
-            <p>Total: \(3003 \times 5 = 15015\)</p>
-            <p class="mt-2 text-green-700 font-semibold">Both methods give the same answer: 15 015</p>
-            <p class="mt-2">Therefore, the correct option is <strong>B.</strong></p>
-          </div>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- Interactive Visualizer -->
-    <section class="bg-white rounded-2xl shadow-md p-6 sm:p-8 mb-8 border border-slate-100">
-      <h2 class="text-xl font-bold text-slate-800 mb-2">Interactive Simulator</h2>
-      <p class="text-slate-500 text-sm mb-6">Click on a teacher to assign roles. One chairperson (gold) and four members (blue).</p>
-
-      <div class="teacher-grid mb-6" id="teacherGrid"></div>
-
-      <div class="flex flex-wrap items-center gap-4 justify-between">
-        <div class="flex items-center gap-4">
-          <div class="flex items-center gap-2">
-            <span class="w-4 h-4 rounded-full bg-amber-500 inline-block"></span>
-            <span class="text-sm text-slate-600">Chairperson</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="w-4 h-4 rounded-full bg-blue-500 inline-block"></span>
-            <span class="text-sm text-slate-600">Member</span>
-          </div>
-        </div>
-        <div class="flex gap-3">
-          <button id="resetBtn" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-sm font-medium transition">Reset</button>
-          <button id="randomBtn" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition">Random Committee</button>
-        </div>
+      <div class="q">
+        <p>There are 15 teachers in a group. If 5 teachers are selected from the group to form a committee consisting of 1 chairperson and 4 members, how many different committees can be formed?</p>
+        <ul class="choices">
+          <li><b>A.</b> 3 003</li>
+          <li class="correct"><b>B.</b> 15 015</li>
+          <li><b>C.</b> 20 475</li>
+          <li><b>D.</b> 360 360</li>
+        </ul>
       </div>
 
-      <div class="mt-6 bg-slate-50 rounded-xl p-4 border border-slate-200">
-        <p class="text-slate-700 text-sm">
-          Current selection: <span id="statusText" class="font-semibold text-blue-700">No chairperson, No members</span>
-        </p>
-        <p class="text-slate-500 text-xs mt-1">Total committees possible: \(C^{15}_{1} \times C^{14}_{4} = 15\,015\)</p>
-      </div>
-    </section>
+      <figure style="margin:12px 0;text-align:center;"><img src="figures/2023_P2_Q42.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
 
-    <!-- Footer -->
-    <footer class="text-center text-slate-400 text-xs mt-10 pb-4">
-      HKDSE Math 2023 Paper 2 Q42 · Interactive Solution
-    </footer>
+      <div class="step" data-step="1">
+        <span class="chip">1</span>
+        <span class="st">Understand the task</span>
+        We choose <strong>5 teachers</strong> out of <strong>15</strong>, and the committee has distinct posts:
+        <strong>1 chairperson</strong> and <strong>4 members</strong>.
+        <div class="hint">Hint: posts are different — the chairperson is not interchangeable with a member.</div>
+      </div>
+
+      <div class="step" data-step="2">
+        <span class="chip">2</span>
+        <span class="st">Method 1 — choose chairperson first</span>
+        Choose 1 chairperson from the 15 teachers, then choose 4 members from the remaining 14:
+        \[ C_1^{15}\times C_4^{14}=15\times 1001=15015 \]
+        <div class="hint">Hint: after fixing the chairperson, only 14 teachers remain for the member slots.</div>
+      </div>
+
+      <div class="step" data-step="3">
+        <span class="chip">3</span>
+        <span class="st">Method 2 — choose the whole committee first</span>
+        Choose any 5 teachers from 15 first, then choose 1 of these 5 to be chairperson:
+        \[ C_5^{15}\times C_1^{5}=3003\times 5=15015 \]
+        <div class="hint">Hint: both methods must give the same answer — a good check!</div>
+      </div>
+
+      <div class="step" data-step="4">
+        <span class="chip">4</span>
+        <span class="st">Why 360 360 is a trap</span>
+        If we treat all 5 posts as ordered, we would get
+        \[ P_5^{15}=\frac{15!}{10!}=360360 \]
+        but here only the chairperson is distinguished; the other 4 positions are identical member slots.
+        \[ \frac{360360}{4!}=15015 \]
+        <div class="hint">Hint: divide out the overcounting of the 4 interchangeable members.</div>
+      </div>
+
+      <div class="step" data-step="5">
+        <span class="chip">5</span>
+        <span class="st">Conclusion</span>
+        Both valid methods give \(15015\), which matches option <strong>B</strong>.
+        <div class="hint">Hint: always ask — are the positions distinct? If not, divide by the factorial of the identical slots.</div>
+      </div>
+
+      <div class="ans">Answer: 15 015 (Option B)</div>
+    </div>
 
   </div>
+</div>
 
-  <script>
-    // Create 15 teachers
-    const TOTAL = 15;
-    const MEMBERS_NEEDED = 4;
-    let chairIndex = null;
-    let memberIndices = [];
+<script>
+(function(){
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  const ro = document.getElementById('readout');
+  let current = 1;
 
-    const grid = document.getElementById('teacherGrid');
-    const statusText = document.getElementById('statusText');
+  const COL = {
+    chair:'#2563eb',
+    member:'#16a34a',
+    idle:'#cbd5e1',
+    idleText:'#94a3b8',
+    hi:'#ea580c',
+    ink:'#1e2a38',
+    muted:'#5b6b7c',
+    card:'#f8fafc'
+  };
 
-    // Build teacher dots
-    for (let i = 0; i < TOTAL; i++) {
-      const dot = document.createElement('div');
-      dot.className = 'teacher-dot normal';
-      dot.dataset.index = i;
-      dot.textContent = i + 1;
-      dot.addEventListener('click', () => handleTeacherClick(i));
-      grid.appendChild(dot);
+  // W,H in canvas coordinate space
+  const W = cv.width, H = cv.height;
+
+  // ---------- geometry: 15 teacher dots in a 5x3 grid ----------
+  const cols = 5, rows = 3;
+  const padX = 70, padY = 70;
+  const gapX = (W - 2*padX) / (cols - 1);
+  const gapY = 118;
+  const dotR = 17;
+
+  function teacherPos(i){
+    const c = i % cols;
+    const r = Math.floor(i / cols);
+    return { x: padX + c*gapX, y: padY + r*gapY };
+  }
+
+  // helper
+  function roundRect(x,y,w,h,r){
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);
+    ctx.arcTo(x+w,y,x+w,y+h,r);
+    ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r);
+    ctx.arcTo(x,y,x+w,y,r);
+    ctx.closePath();
+  }
+
+  function drawPerson(x, y, color, label, isChair, active){
+    // halo
+    if(active){
+      ctx.beginPath();
+      ctx.arc(x, y, dotR + 9, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(234,88,12,0.18)';
+      ctx.fill();
+    }
+    // head
+    ctx.beginPath();
+    ctx.arc(x, y, dotR, 0, Math.PI*2);
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#ffffff';
+    ctx.stroke();
+
+    // face detail
+    ctx.beginPath();
+    ctx.arc(x, y-4, dotR*0.55, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(255,255,255,0.28)';
+    ctx.fill();
+
+    // number label inside
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 15px "Segoe UI",Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(String(label), x, y+1);
+
+    // crown marker for chair
+    if(isChair){
+      ctx.beginPath();
+      ctx.moveTo(x-10, y-dotR-6);
+      ctx.lineTo(x-5,  y-dotR-16);
+      ctx.lineTo(x,    y-dotR-7);
+      ctx.lineTo(x+5,  y-dotR-16);
+      ctx.lineTo(x+10, y-dotR-6);
+      ctx.closePath();
+      ctx.fillStyle = '#f59e0b';
+      ctx.fill();
+      ctx.strokeStyle = '#b45309';
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+    }
+  }
+
+  function drawCommitteeBox(step){
+    const bx = 36, by = 452, bw = W - 72, bh = 160;
+    ctx.save();
+    roundRect(bx, by, bw, bh, 16);
+    ctx.fillStyle = step >= 2 ? '#f1fdf5' : '#f8fafc';
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = step >= 2 ? '#9ee6b4' : '#dbe3ec';
+    ctx.setLineDash(step >= 2 ? [] : [6,6]);
+    ctx.stroke();
+    ctx.restore();
+
+    ctx.fillStyle = COL.muted;
+    ctx.font = 'bold 15px "Segoe UI",Arial';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText('COMMITTEE', bx + 18, by + 26);
+
+    // Chair slot
+    const cX = bx + 90, cY = by + 96;
+    ctx.beginPath();
+    ctx.arc(cX, cY, 34, 0, Math.PI*2);
+    ctx.fillStyle = step >= 1 ? COL.chair : '#e2e8f0';
+    ctx.fill();
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = '#ffffff';
+    ctx.stroke();
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 14px "Segoe UI",Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('Chair', cX, cY);
+    ctx.font = 'bold 11px "Segoe UI",Arial';
+    ctx.fillText('1', cX, cY+16);
+
+    // plus sign
+    ctx.fillStyle = COL.muted;
+    ctx.font = 'bold 26px "Segoe UI",Arial';
+    ctx.fillText('+', bx + 150, cY);
+
+    // Member slots
+    for(let k=0;k<4;k++){
+      const mx = bx + 215 + k*78;
+      const my = cY;
+      ctx.beginPath();
+      ctx.arc(mx, my, 28, 0, Math.PI*2);
+      ctx.fillStyle = step >= 2 ? COL.member : '#e2e8f0';
+      ctx.fill();
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = '#ffffff';
+      ctx.stroke();
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 13px "Segoe UI",Arial';
+      ctx.fillText('M'+(k+1), mx, my);
     }
 
-    function handleTeacherClick(index) {
-      // If already chair -> deselect chair
-      if (chairIndex === index) {
-        chairIndex = null;
-        render();
-        return;
-      }
-      // If already member -> remove from members
-      if (memberIndices.includes(index)) {
-        memberIndices = memberIndices.filter(i => i !== index);
-        render();
-        return;
-      }
-      // If no chair yet, assign as chair
-      if (chairIndex === null) {
-        chairIndex = index;
-        render();
-        return;
-      }
-      // If chair exists and member count < 4, assign as member
-      if (memberIndices.length < MEMBERS_NEEDED) {
-        memberIndices.push(index);
-        render();
-        return;
-      }
-      // Otherwise, replace the last member? Or just ignore. We'll ignore.
+    // formula text
+    ctx.textAlign = 'left';
+    ctx.fillStyle = COL.ink;
+    ctx.font = 'bold 16px "Segoe UI",Arial';
+    if(step === 2){
+      ctx.fillText('C(15,1) × C(14,4) = 15 × 1001 = 15015', bx + 18, by + bh - 14);
+    } else if(step === 3){
+      ctx.fillText('C(15,5) × C(5,1) = 3003 × 5 = 15015', bx + 18, by + bh - 14);
+    } else if(step >= 4){
+      ctx.fillText('P(15,5) / 4! = 360360 / 24 = 15015', bx + 18, by + bh - 14);
+    } else {
+      ctx.fillText('Select 5 teachers: 1 chairperson + 4 members', bx + 18, by + bh - 14);
     }
+  }
 
-    function render() {
-      const dots = document.querySelectorAll('.teacher-dot');
-      dots.forEach((dot, i) => {
-        dot.className = 'teacher-dot';
-        if (i === chairIndex) {
-          dot.classList.add('chair');
-        } else if (memberIndices.includes(i)) {
-          dot.classList.add('member');
-        } else {
-          dot.classList.add('normal');
-        }
+  function drawStepChips(step){
+    const labels = ['Choose\nchair','Pick 4\nmembers','Whole\ncommittee','Divide\nby 4!'];
+    const n = labels.length;
+    const w = 132, h = 58, gap = 12;
+    const totalW = n*w + (n-1)*gap;
+    let x0 = (W - totalW)/2;
+    const y0 = 618 - h;
+
+    for(let i=0;i<n;i++){
+      const x = x0 + i*(w+gap);
+      const on = (i+1) <= Math.min(step, 4);
+      const active = (i+1) === Math.min(step,4);
+      roundRect(x, y0, w, h, 12);
+      ctx.fillStyle = on ? (active ? 'rgba(234,88,12,0.12)' : '#eef4ff') : '#f1f5f9';
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = on ? (active ? COL.hi : '#c7dbff') : '#e2e8f0';
+      ctx.stroke();
+
+      ctx.fillStyle = on ? (active ? COL.hi : COL.chair) : '#94a3b8';
+      ctx.font = 'bold 12px "Segoe UI",Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      const lines = labels[i].split('\n');
+      lines.forEach((ln, li)=>{
+        ctx.fillText(ln, x + w/2, y0 + h/2 + (li===0?-8:8));
       });
+    }
+  }
 
-      // Update status text
-      let text = '';
-      if (chairIndex === null && memberIndices.length === 0) {
-        text = 'No chairperson, No members';
-      } else {
-        const chairNum = chairIndex !== null ? chairIndex + 1 : '—';
-        const memberNums = memberIndices.map(i => i + 1).join(', ');
-        text = `Chairperson: ${chairNum} | Members: ${memberNums || '—'}`;
-      }
-      statusText.textContent = text;
+  function draw(step){
+    ctx.clearRect(0,0,W,H);
+
+    // background grid
+    ctx.save();
+    ctx.strokeStyle = '#eef2f7';
+    ctx.lineWidth = 1;
+    for(let x=0;x<W;x+=40){
+      ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke();
+    }
+    for(let y=0;y<H;y+=40){
+      ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();
+    }
+    ctx.restore();
+
+    // heading
+    ctx.fillStyle = COL.ink;
+    ctx.font = 'bold 19px "Segoe UI",Arial';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText('15 teachers', padX - 30, 38);
+    ctx.fillStyle = COL.muted;
+    ctx.font = '14px "Segoe UI",Arial';
+    ctx.fillText('5 × 3 group', padX - 30, 58);
+
+    // how many teachers become chair / member by step
+    let chairIdx = 0;                 // teacher #1 is chair from step 1
+    let memberIdx = [1,2,3,4];        // teachers #2..#5 become members from step 2
+    let showChair = step >= 1;
+    let showMembers = step >= 2;
+
+    // step 1: highlight the chosen chairperson with an orange ring
+    // step 3+: highlight a 5-block of selected teachers
+    const selected5 = [0,1,2,3,4];
+
+    // draw connecting lines from chosen teachers to committee box
+    if(showChair){
+      const p = teacherPos(chairIdx);
+      ctx.save();
+      ctx.strokeStyle = step === 1 ? COL.hi : COL.chair;
+      ctx.lineWidth = step === 1 ? 3.5 : 2.5;
+      ctx.setLineDash([7,6]);
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y + dotR + 6);
+      ctx.lineTo(100, 470);
+      ctx.stroke();
+      ctx.restore();
+    }
+    if(showMembers){
+      memberIdx.forEach((idx, k)=>{
+        const p = teacherPos(idx);
+        ctx.save();
+        ctx.strokeStyle = step === 2 ? COL.hi : COL.member;
+        ctx.lineWidth = step === 2 ? 2.6 : 1.8;
+        ctx.setLineDash([6,6]);
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y + dotR + 6);
+        ctx.lineTo(215 + k*78, 470);
+        ctx.stroke();
+        ctx.restore();
+      });
     }
 
-    // Reset
-    document.getElementById('resetBtn').addEventListener('click', () => {
-      chairIndex = null;
-      memberIndices = [];
-      render();
-    });
-
-    // Random committee
-    document.getElementById('randomBtn').addEventListener('click', () => {
-      // Pick random chairperson
-      const allIndices = Array.from({ length: TOTAL }, (_, i) => i);
-      // Shuffle
-      for (let i = allIndices.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [allIndices[i], allIndices[j]] = [allIndices[j], allIndices[i]];
+    // draw teachers
+    for(let i=0;i<15;i++){
+      const p = teacherPos(i);
+      const isChair = showChair && i === chairIdx;
+      const isMember = showMembers && memberIdx.includes(i);
+      let color = COL.idle;
+      if(step >= 3 && selected5.includes(i)){
+        color = isChair ? COL.chair : COL.member;
       }
-      chairIndex = allIndices[0];
-      // Pick 4 members from remaining
-      memberIndices = allIndices.slice(1, 1 + MEMBERS_NEEDED);
-      render();
+      if(isChair) color = COL.chair;
+      else if(isMember) color = COL.member;
+
+      const active = (step === 1 && i === chairIdx) ||
+                     (step === 2 && memberIdx.includes(i)) ||
+                     ((step === 3) && selected5.includes(i));
+      drawPerson(p.x, p.y, color, i+1, isChair, active);
+    }
+
+    // committee box
+    drawCommitteeBox(step);
+
+    // step chips
+    drawStepChips(step);
+
+    // readout text
+    const texts = {
+      1: 'Step 1 · 15 teachers available — we must form a committee of 1 chairperson + 4 members.',
+      2: 'Step 2 · Choose the chairperson first: C(15,1) = 15 ways. Then 14 teachers remain.',
+      3: 'Step 3 · Choose 4 members from the remaining 14: C(14,4) = 1001. Total = 15 × 1001 = 15015.',
+      4: 'Step 4 · Alternative view: C(15,5) × C(5,1) = 3003 × 5 = 15015.',
+      5: 'Step 5 · If 5 posts were all distinct: P(15,5)=360360; divide by 4! gives 15015. Answer B.'
+    };
+    ro.textContent = texts[step] || texts[1];
+  }
+
+  // ---------- scroll sync ----------
+  const io = new IntersectionObserver(es=>{
+    es.forEach(e=>{
+      if(e.isIntersecting){
+        current = +e.target.dataset.step;
+        document.querySelectorAll('.step').forEach(s=>s.classList.toggle('active', +s.dataset.step === current));
+        draw(current);
+      }
     });
+  }, {rootMargin:'-25% 0px -55% 0px'});
 
-    // Initial render
-    render();
-  </script>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
+  document.querySelectorAll('.step').forEach(s=>io.observe(s));
+
+  draw(1);
+  document.querySelector('.step[data-step="1"]').classList.add('active');
+
+  // redraw on resize (keeps canvas crisp if displayed larger)
+  window.addEventListener('resize', ()=>draw(current));
+})();
 </script>
-
 </body>
 </html>

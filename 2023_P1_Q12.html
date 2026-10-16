@@ -3,385 +3,396 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HKDSE 2023 P1 Q12 · Coordinate Geometry</title>
+<title>HKDSE 2023 P1 Q12 — Rate, Ratio and Variations</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$','$$'], ['\\[','\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
+  :root{
+    --ink:#1a2333; --muted:#5b6b82; --line:#dfe6ef; --bg:#f5f8fc;
+    --c1:#2563eb; --c2:#e11d48; --c3:#0d9488; --c4:#d97706; --c5:#7c3aed;
+  }
   *{box-sizing:border-box;}
   body{
-    margin:0;padding:16px;
-    font-family:"Segoe UI",system-ui,-apple-system,sans-serif;
-    background:linear-gradient(135deg,#eef4ff 0%,#f7fbff 50%,#fef6ff 100%);
-    color:#1e293b;
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    font-size:16px; line-height:1.55;
   }
-  h1{
-    font-size:1.15rem;margin:0 0 14px;text-align:center;
-    color:#1e3a8a;letter-spacing:.5px;
-  }
+  .wrap{max-width:1280px; margin:0 auto; padding:18px 16px 60px;}
+  h1{font-size:1.15rem; margin:0 0 4px; letter-spacing:.2px;}
+  .sub{color:var(--muted); font-size:.85rem; margin:0 0 14px;}
   .split{
     display:grid;
     grid-template-columns:minmax(0,1fr) minmax(0,1fr);
-    gap:12px;align-items:start;
+    gap:12px; align-items:start;
   }
   @media(min-width:900px){
-    .split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}
+    .split{grid-template-columns:minmax(0,46%) minmax(0,54%); gap:18px;}
   }
-  .panel{
-    background:#fff;border-radius:18px;padding:14px;
-    box-shadow:0 6px 22px rgba(30,64,175,.10);
-    border:1px solid #dbe7ff;
+  @media(max-width:640px){
+    body{font-size:14.5px;}
+    .wrap{padding:10px 8px 40px;}
   }
   .diagram{
-    position:sticky;top:16px;
+    position:sticky; top:16px;
     max-height:calc(100vh - 2rem);
     overflow-y:auto;
+    background:#fff; border:1px solid var(--line); border-radius:14px;
+    padding:12px 12px 8px;
+    box-shadow:0 6px 20px rgba(26,35,51,.06);
   }
-  canvas{width:100%;height:auto;display:block;border-radius:12px;background:#fbfdff;}
-  h2{font-size:.95rem;margin:0 0 8px;color:#1e40af;}
-  .qtext{font-size:.86rem;line-height:1.55;margin-bottom:10px;}
-  .qtext .tag{
-    display:inline-block;background:#1e40af;color:#fff;font-size:.68rem;
-    padding:2px 8px;border-radius:999px;margin-bottom:6px;font-weight:700;
+  .diagram h2{font-size:.82rem; text-transform:uppercase; letter-spacing:.9px; color:var(--muted); margin:2px 0 8px;}
+  canvas{width:100%; height:auto; display:block; border-radius:10px; background:#fbfdff;}
+  .ro{
+    font-size:.8rem; color:var(--muted); text-align:center; margin:8px 2px 4px;
+    background:#f0f5fb; border-radius:8px; padding:6px 8px;
   }
+  .legend{display:flex; flex-wrap:wrap; gap:10px; font-size:.76rem; color:var(--muted); margin:6px 2px 2px;}
+  .legend span{display:inline-flex; align-items:center; gap:5px;}
+  .dot{width:11px; height:11px; border-radius:50%; display:inline-block;}
+  .qbox{
+    background:#fff; border:1px solid var(--line); border-left:5px solid var(--c1);
+    border-radius:12px; padding:12px 14px; margin-bottom:14px;
+    box-shadow:0 6px 20px rgba(26,35,51,.05);
+  }
+  .qbox .tag{
+    display:inline-block; background:#e8effd; color:var(--c1);
+    font-size:.72rem; font-weight:700; letter-spacing:.6px; padding:2px 8px; border-radius:999px; margin-bottom:6px;
+  }
+  .marks{float:right; color:var(--muted); font-size:.8rem; font-weight:600;}
   .step{
-    border-left:4px solid #c7d2fe;background:#f8faff;
-    border-radius:10px;padding:9px 11px;margin:9px 0;
-    font-size:.82rem;line-height:1.55;transition:.25s;
+    background:#fff; border:1px solid var(--line); border-radius:12px;
+    padding:11px 13px; margin-bottom:11px;
+    box-shadow:0 4px 14px rgba(26,35,51,.04);
+    transition:border-color .25s, box-shadow .25s, transform .25s;
   }
   .step.active{
-    border-left-color:#f59e0b;background:#fffbeb;
-    box-shadow:0 4px 14px rgba(245,158,11,.18);
+    border-color:var(--c1); box-shadow:0 0 0 3px rgba(37,99,235,.14), 0 8px 22px rgba(37,99,235,.10);
   }
-  .step .stag{
-    display:block;font-weight:700;color:#1e40af;font-size:.74rem;
-    letter-spacing:.4px;margin-bottom:4px;text-transform:uppercase;
+  .step .st{
+    display:flex; align-items:center; gap:8px; font-weight:700; margin-bottom:6px; font-size:.92rem;
   }
-  .step.active .stag{color:#b45309;}
-  .ansbox{
-    background:linear-gradient(135deg,#ecfdf5,#d1fae5);
-    border:1.5px solid #10b981;border-radius:10px;
-    padding:9px 11px;font-size:.85rem;font-weight:600;color:#065f46;
-    margin-top:10px;
+  .chip{
+    width:23px; height:23px; flex:0 0 23px; border-radius:50%;
+    background:var(--c1); color:#fff; display:grid; place-items:center;
+    font-size:.76rem; font-weight:800;
   }
-  .hint{
-    background:#fef3c7;border-radius:8px;padding:7px 10px;
-    font-size:.76rem;color:#92400e;margin:7px 0;border-left:3px solid #f59e0b;
+  .step[data-step="2"] .chip{background:var(--c3);}
+  .step[data-step="3"] .chip{background:var(--c4);}
+  .step[data-step="4"] .chip{background:var(--c2);}
+  .step[data-step="5"] .chip{background:var(--c5);}
+  .hint{font-size:.82rem; color:var(--muted); margin-top:7px; border-top:1px dashed var(--line); padding-top:6px;}
+  .ans{
+    background:linear-gradient(135deg,#eaf3ff,#f6fbff);
+    border:1px solid #bcd6f7; border-radius:12px; padding:11px 14px; font-weight:700; color:#123a72;
   }
-  .legend{
-    display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;
-    font-size:.68rem;color:#334155;
-  }
-  .legend span{display:flex;align-items:center;gap:4px;}
-  .swatch{width:12px;height:12px;border-radius:3px;display:inline-block;}
-  mjx-container{font-size:.95em !important;}
-  @media(max-width:520px){
-    body{padding:9px;}
-    .panel{padding:9px;border-radius:13px;}
-    h1{font-size:.95rem;}
-    .qtext{font-size:.76rem;}
-    .step{font-size:.72rem;padding:7px 8px;}
-    .ansbox{font-size:.76rem;}
-  }
+  .ans .chip{background:#123a72;}
+  .mono{font-family:ui-monospace,Consolas,monospace;}
 </style>
 </head>
 <body>
+<div class="wrap">
+  <h1>HKDSE 2023 · Paper 1 · Question 12</h1>
+  <p class="sub">Topic 2 — Rate, Ratio and Variations (partial variation with $x^2$, then coordinate geometry on the graph)</p>
 
-<h1>HKDSE 2023 · Paper 1 · Question 12 — Coordinate Geometry</h1>
+  <div class="split">
 
-<div class="split">
-  <!-- ================= LEFT : DIAGRAM ================= -->
-  <section class="panel diagram">
-    <h2>Interactive Figure</h2>
-    <canvas id="cv" width="700" height="760"></canvas>
-    <div class="legend">
-      <span><i class="swatch" style="background:#2563eb"></i>Parabola y = f(x)</span>
-      <span><i class="swatch" style="background:#dc2626"></i>Circle C</span>
-      <span><i class="swatch" style="background:#16a34a"></i>UV (diameter)</span>
-      <span><i class="swatch" style="background:#9333ea"></i>U, V, W points</span>
-      <span><i class="swatch" style="background:#f59e0b"></i>Right angle at W</span>
+    <!-- ================= LEFT: DIAGRAM ================= -->
+    <div class="diagram">
+      <h2>Interactive figure</h2>
+      <canvas id="cv" width="900" height="1000"></canvas>
+      <p class="ro" id="ro">Step 1 · Given data on the graph</p>
+      <div class="legend">
+        <span><i class="dot" style="background:#2563eb"></i> Points on $y=f(x)$</span>
+        <span><i class="dot" style="background:#0d9488"></i> Line through $U,V,W$</span>
+        <span><i class="dot" style="background:#e11d48"></i> Circle $C$</span>
+        <span><i class="dot" style="background:#d97706"></i> Image points $G,H,P$</span>
+      </div>
     </div>
-  </section>
 
-  <!-- ================= RIGHT : QUESTION + SOLUTION ================= -->
-  <section class="panel">
-    <h2>Question</h2>
-    <div class="qtext">
-      <span class="tag">2023 #12</span><br>
-      It is given that \(f(x)\) is partly constant and partly varies as \(x^2\). Suppose that \(f(10)=62\) and \(f(15)=122\).
-      <br><br>
-      <b>(a)</b> Find \(f(5)\). <i>[3 marks]</i><br>
-      <b>(b)</b> Suppose that \(U(0,u)\) and \(V(5,v)\) are points lying on the graph of \(y=f(x)\). The horizontal line passing through \(V\) cuts the \(y\)-axis at the point \(W\). Denote the circle which passes through \(U\), \(V\) and \(W\) by \(C\). Express the circumference of \(C\) in terms of \(\pi\). <i>[4 marks]</i>
+    <!-- ================= RIGHT: QUESTION + SOLUTION ================= -->
+    <div class="qbox">
+      <span class="tag">Question 12</span>
+      <p>It is given that $f(x)$ is partly constant and partly varies as $x^2$. Suppose that $f(10)=62$ and $f(15)=122$.</p>
+      <p><b>(a)</b> Find $f(5)$. <span class="marks">[3 marks]</span></p>
+      <p><b>(b)</b> Suppose that $U(0,u)$ and $V(5,v)$ are points lying on the graph of $y=f(x)$. The horizontal line passing through $V$ cuts the $y$-axis at the point $W$. Denote the circle which passes through $U$, $V$ and $W$ by $C$. Express the circumference of $C$ in terms of $\pi$. <span class="marks">[4 marks]</span></p>
     </div>
+
     
 
-    <h2 style="margin-top:14px;">Step-by-step Solution</h2>
+    <div>
+      <div class="step" data-step="1">
+        <div class="st"><span class="chip">1</span> Set up the partial variation</div>
+        <p>“Partly constant and partly varies as $x^2$” means</p>
+        $$f(x) = a + b x^2$$
+        <p>where $a,b$ are constants.</p>
+        <div class="hint">Hint: two unknown constants ⇒ two pieces of given data are enough to find them.</div>
+      </div>
 
-    <div class="step" data-step="1">
-      <span class="stag">Step 1 · Set up the function</span>
-      Since \(f\) is partly constant and partly varies as \(x^2\):
-      \[ f(x)=p x^2+q \]
-      where \(p\) and \(q\) are non-zero constants.
-      <div class="hint">Use the two given data points to build two equations.</div>
-      \[ f(10)=100p+q=62 \]
-      \[ f(15)=225p+q=122 \]
+      <div class="step" data-step="2">
+        <div class="st"><span class="chip">2</span> Solve for $a$ and $b$ (part a)</div>
+        <p>Using $f(10)=62$ and $f(15)=122$:</p>
+        $$a + 100b = 62 \qquad (1)$$
+        $$a + 225b = 122 \qquad (2)$$
+        <p>$(2)-(1)$: $\;125b = 60 \Rightarrow b = \dfrac{60}{125} = 0.48$.</p>
+        <p>Substitute into $(1)$: $a + 100(0.48)=62 \Rightarrow a = 62-48 = 14$.</p>
+        $$f(x) = 14 + 0.48x^2$$
+        <p>Hence $f(5) = 14 + 0.48(25) = 14 + 12 = 26$.</p>
+        <div class="hint">Answer for (a): $f(5)=26$ (1M for method, 1A for $a$, 1A for $b$, 1A for $f(5)$).</div>
+      </div>
+
+      <div class="step" data-step="3">
+        <div class="st"><span class="chip">3</span> Coordinates of $U$, $V$ and $W$ (part b)</div>
+        <p>$U(0,u)$ with $u=f(0)=14 \Rightarrow U(0,14)$.</p>
+        <p>$V(5,v)$ with $v=f(5)=26 \Rightarrow V(5,26)$.</p>
+        <p>$W$ is on the $y$-axis on the same horizontal line as $V$, so $W(0,26)$.</p>
+        <div class="hint">Hint: “horizontal line through $V$ cuts the $y$-axis” ⇒ $W$ has the same $y$-coordinate as $V$.</div>
+      </div>
+
+      <div class="step" data-step="4">
+        <div class="st"><span class="chip">4</span> Find the centre and radius of circle $C$</div>
+        <p>Since $U,W$ lie on the $y$-axis, the perpendicular bisector of $UW$ is $y=\dfrac{14+26}{2}=20$.</p>
+        <p>Let the centre be $O_c(x_c,20)$. Using $OU = OV$:</p>
+        $$x_c^2 + (20-14)^2 = (x_c-5)^2 + (20-26)^2$$
+        $$x_c^2 + 36 = x_c^2 -10x_c + 25 + 36 \Rightarrow 10x_c = 25 \Rightarrow x_c = 2.5$$
+        <p>So $O_c(2.5,\,20)$ and</p>
+        $$r^2 = 2.5^2 + 6^2 = 6.25 + 36 = 42.25 \Rightarrow r = 6.5$$
+        <div class="hint">Hint: the centre lies on the perpendicular bisector of $UW$ because $|OU|=|OW|$.</div>
+      </div>
+
+      <div class="step" data-step="5">
+        <div class="st"><span class="chip">5</span> Circumference of $C$</div>
+        $$C_{\text{circumference}} = 2\pi r = 2\pi(6.5) = 13\pi$$
+        <div class="hint">Answer for (b): $13\pi$.</div>
+      </div>
+
+      <div class="ans">
+        <div class="st"><span class="chip">✓</span> Answers</div>
+        <p>(a) $f(x)=14+0.48x^2$, so $f(5)=26$.</p>
+        <p>(b) The circumference of $C$ is $13\pi$.</p>
+      </div>
     </div>
 
-    <div class="step" data-step="2">
-      <span class="stag">Step 2 · Solve for p and q</span>
-      Subtract the two equations:
-      \[ 125p = 60 \;\Rightarrow\; p=\frac{12}{25} \]
-      Substitute back:
-      \[ 100\left(\tfrac{12}{25}\right)+q=62 \;\Rightarrow\; q=14 \]
-      Hence
-      \[ f(x)=\frac{12}{25}x^2+14 \]
-    </div>
-
-    <div class="step" data-step="3">
-      <span class="stag">Step 3 · Find f(5)</span>
-      \[ f(5)=\frac{12}{25}(25)+14 = 12+14 = 26 \]
-      <div class="ansbox">(a) \(f(5)=26\)</div>
-    </div>
-
-    <div class="step" data-step="4">
-      <span class="stag">Step 4 · Locate U, V and W</span>
-      \(U(0,u)\) lies on the graph, so:
-      \[ u=f(0)=14 \]
-      \(V(5,v)\) lies on the graph, so:
-      \[ v=f(5)=26 \]
-      The horizontal line through \(V\) meets the \(y\)-axis at \(W\), so \(W=(0,26)\).
-      <div class="hint">So \(UW = 26-14 = 12\) and \(VW = 5\).</div>
-    </div>
-
-    <div class="step" data-step="5">
-      <span class="stag">Step 5 · Angle UWV is 90°</span>
-      \(U\) and \(W\) both lie on the \(y\)-axis (vertical segment \(UW\)).
-      \(V\) and \(W\) lie on a horizontal line (segment \(VW\)).
-      Hence
-      \[ \angle UWV = 90^\circ \]
-      By the converse of the angle in a semicircle, \(UV\) is a <b>diameter</b> of circle \(C\).
-    </div>
-
-    <div class="step" data-step="6">
-      <span class="stag">Step 6 · Circumference of C</span>
-      \[ UV = \sqrt{UW^2+VW^2} = \sqrt{12^2+5^2}=\sqrt{169}=13 \]
-      Radius \(=\dfrac{UV}{2}=\dfrac{13}{2}\)
-      \[ \text{Circumference} = \pi \cdot UV = \pi\sqrt{12^2+5^2}=13\pi \]
-      <div class="ansbox">(b) The circumference of \(C\) is \(13\pi\).</div>
-    </div>
-  </section>
+  </div>
 </div>
 
 <script>
-/* ---------- canvas setup ---------- */
-const cv = document.getElementById('cv');
-const ctx = cv.getContext('2d');
-const W = cv.width, H = cv.height;
-
-/* world -> screen : origin near (110, 640), 1 unit = 22 px */
-const SX = 22, SY = 22;
-const OX = 120, OY = 620;
-function px(x){ return OX + x*SX; }
-function py(y){ return OY - y*SY; }
-
-/* data */
+/* ===================== DATA ===================== */
+const FUNC = x => 14 + 0.48 * x * x;
 const U = {x:0, y:14};
 const V = {x:5, y:26};
-const Wp = {x:0, y:26};
-const f = x => (12/25)*x*x + 14;
+const W = {x:0, y:26};
+const CTR = {x:2.5, y:20};
+const R = 6.5;
 
-let mode = 1;
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+const RO = document.getElementById('ro');
 
-/* ---------- helpers ---------- */
-function dot(p, color, label, dx, dy, r){
-  ctx.beginPath();
-  ctx.arc(px(p.x), py(p.y), r||6, 0, Math.PI*2);
-  ctx.fillStyle = color;
-  ctx.fill();
-  ctx.strokeStyle = '#fff';
-  ctx.lineWidth = 2;
-  ctx.stroke();
-  if(label){
-    ctx.fillStyle = color;
-    ctx.font = 'bold 17px Segoe UI, sans-serif';
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(label, px(p.x)+(dx||10), py(p.y)+(dy||0));
-  }
-}
-function seg(a, b, color, w, dash){
-  ctx.save();
-  ctx.setLineDash(dash||[]);
-  ctx.beginPath();
-  ctx.moveTo(px(a.x), py(a.y));
-  ctx.lineTo(px(b.x), py(b.y));
-  ctx.strokeStyle = color;
-  ctx.lineWidth = w||2.5;
-  ctx.stroke();
-  ctx.restore();
-}
-function text(s, x, y, color, size, align){
-  ctx.fillStyle = color;
-  ctx.font = 'bold '+(size||14)+'px Segoe UI, sans-serif';
-  ctx.textAlign = align||'left';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(s, x, y);
-}
+/* Geometry → pixels (all steps use a fixed, uniform window, orientation as in the question) */
+const XMIN=-8, XMAX=14, YMIN=-4, YMAX=40;
+const PADL=78, PADR=28, PADT=24, PADB=64;
+const Wc = cv.width, Hc = cv.height;
+function sx(x){ return PADL + (x-XMIN)/(XMAX-XMIN)*(Wc-PADL-PADR); }
+function sy(y){ return Hc-PADB - (y-YMIN)/(YMAX-YMIN)*(Hc-PADT-PADB); }
 
-/* ---------- main draw ---------- */
-function draw(){
-  ctx.clearRect(0,0,W,H);
+/* ===================== DRAW HELPERS ===================== */
+function grid(){
+  ctx.clearRect(0,0,Wc,Hc);
+  ctx.fillStyle='#fbfdff'; ctx.fillRect(0,0,Wc,Hc);
+
+  /* light grid every 2 units */
+  ctx.strokeStyle='#e8eef7'; ctx.lineWidth=1;
+  for(let x=Math.ceil(XMIN); x<=XMAX; x+=2){ ctx.beginPath(); ctx.moveTo(sx(x),sy(YMIN)); ctx.lineTo(sx(x),sy(YMAX)); ctx.stroke(); }
+  for(let y=Math.ceil(YMIN); y<=YMAX; y+=2){ ctx.beginPath(); ctx.moveTo(sx(XMIN),sy(y)); ctx.lineTo(sx(XMAX),sy(y)); ctx.stroke(); }
 
   /* axes */
-  ctx.beginPath();
-  ctx.moveTo(px(-1.2), py(0));
-  ctx.lineTo(px(12.5), py(0));
-  ctx.moveTo(px(0), py(-2));
-  ctx.lineTo(px(0), py(33));
-  ctx.strokeStyle = '#94a3b8';
-  ctx.lineWidth = 1.6;
-  ctx.stroke();
-  /* arrow heads */
-  ctx.beginPath();
-  ctx.moveTo(px(12.5)-9, py(0)-5); ctx.lineTo(px(12.5), py(0)); ctx.lineTo(px(12.5)-9, py(0)+5);
-  ctx.moveTo(px(0)-5, py(33)+9); ctx.lineTo(px(0), py(33)); ctx.lineTo(px(0)+5, py(33)+9);
-  ctx.fillStyle = '#94a3b8';
-  ctx.fill();
-  text('x', px(12.6), py(0)+18, '#64748b', 14);
+  ctx.strokeStyle='#94a3b8'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(sx(XMIN),sy(0)); ctx.lineTo(sx(XMAX),sy(0)); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(sx(0),sy(YMIN)); ctx.lineTo(sx(0),sy(YMAX)); ctx.stroke();
 
-  /* parabola  y = f(x) */
-  ctx.beginPath();
-  for(let i=0;i<=220;i++){
-    const x = -0.6 + (9.6)*i/220;
-    const y = f(x);
-    if(y < -3 || y > 40) continue;
-    const X = px(x), Y = py(y);
-    if(i===0) ctx.moveTo(X,Y); else ctx.lineTo(X,Y);
+  /* ticks + labels */
+  ctx.fillStyle='#64748b'; ctx.font='16px system-ui'; ctx.textAlign='center'; ctx.textBaseline='top';
+  for(let x=Math.ceil(XMIN/5)*5; x<=XMAX; x+=5){
+    if(x===0) continue;
+    ctx.beginPath(); ctx.moveTo(sx(x),sy(0)-5); ctx.lineTo(sx(x),sy(0)+5); ctx.stroke();
+    ctx.fillText(x, sx(x), sy(0)+9);
   }
-  ctx.strokeStyle = mode>=1 ? '#2563eb' : '#bfdbfe';
-  ctx.lineWidth = mode>=1 ? 3.4 : 2.2;
-  ctx.stroke();
-  text('y = f(x)', px(8.9), py(31), '#2563eb', 15);
+  ctx.textAlign='right'; ctx.textBaseline='middle';
+  for(let y=Math.ceil(YMIN/10)*10; y<=YMAX; y+=10){
+    if(y===0) continue;
+    ctx.beginPath(); ctx.moveTo(sx(0)-5,sy(y)); ctx.lineTo(sx(0)+5,sy(y)); ctx.stroke();
+    ctx.fillText(y, sx(0)-9, sy(y));
+  }
+  ctx.fillStyle='#334155'; ctx.font='italic 18px system-ui';
+  ctx.textAlign='left'; ctx.textBaseline='bottom'; ctx.fillText('x', sx(XMAX)-6, sy(0)-8);
+  ctx.textAlign='left'; ctx.textBaseline='top'; ctx.fillText('y', sx(0)+8, sy(YMAX)+4);
+  ctx.fillStyle='#94a3b8'; ctx.font='15px system-ui';
+  ctx.textAlign='right'; ctx.textBaseline='top'; ctx.fillText('O', sx(0)-6, sy(0)+8);
 
-  /* faint grid ticks on y axis */
-  [14,26].forEach(v=>{
-    ctx.beginPath();
-    ctx.moveTo(px(0)-5, py(v));
-    ctx.lineTo(px(0)+5, py(v));
-    ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 1.5; ctx.stroke();
-    text(v, px(0)-12, py(v), '#64748b', 12, 'right');
-  });
-
-  /* ---------- step 4-5 : points, triangle, right angle ---------- */
-  if(mode>=4){
-    /* horizontal line through V (to W) */
-    seg(Wp, {x:7.5,y:26}, '#f59e0b', 2, [7,5]);
-    /* radius arrow from V to the right edge showing horizontal */
-    text('horizontal line', px(5.4), py(26)-14, '#b45309', 13);
-  }
-
-  if(mode>=4){
-    /* triangle U,W,V */
-    seg(U, Wp, '#16a34a', 3);
-    seg(Wp, V, '#16a34a', 3);
-  }
-  if(mode>=5){
-    seg(U, V, '#dc2626', 3);
-    /* right-angle square at W */
-    const s = 16;
-    ctx.beginPath();
-    ctx.moveTo(px(0)+s, py(14));
-    ctx.lineTo(px(0)+s, py(14)-s);
-    ctx.lineTo(px(0), py(14)-s);
-    ctx.strokeStyle = '#f59e0b';
-    ctx.lineWidth = 2.2;
-    ctx.stroke();
-  }
-
-  /* ---------- step 6 : circle with diameter UV ---------- */
-  if(mode>=6){
-    const cx = (U.x+V.x)/2, cy = (U.y+V.y)/2;
-    const r = 13/2;
-    ctx.beginPath();
-    ctx.arc(px(cx), py(cy), r*SX, 0, Math.PI*2);
-    ctx.strokeStyle = '#dc2626';
-    ctx.lineWidth = 2.8;
-    ctx.setLineDash([]);
-    ctx.stroke();
-    ctx.fillStyle = 'rgba(220,38,38,0.06)';
-    ctx.fill();
-    /* centre */
-    ctx.beginPath();
-    ctx.arc(px(cx), py(cy), 5, 0, Math.PI*2);
-    ctx.fillStyle = '#9333ea';
-    ctx.fill();
-    text('O', px(cx)+9, py(cy)-12, '#9333ea', 14);
-    /* radius marker */
-    seg({x:cx,y:cy}, V, '#9333ea', 1.6, [4,4]);
-    text('r = 6.5', px(cx)+10, py(cy)+8, '#7e22ce', 12);
-  }
-
-  /* ---------- points ---------- */
-  if(mode>=4){
-    dot(U, '#9333ea', 'U(0,14)', 12, 12);
-    dot(V, '#9333ea', 'V(5,26)', 12, -12);
-    dot(Wp, '#f59e0b', 'W(0,26)', -12, -12);
-  }
-  if(mode<4){
-    /* step 1-3 : show the curve with the three working data points */
-    dot({x:10,y:62}, '#2563eb', '(10,62)', 12, -12, 5);
-    dot({x:15,y:122}, '#2563eb', '(15,122)', -14, -14, 5);
-    dot({x:5,y:26}, '#2563eb', '(5,26)', 12, -12, 5);
-  }
-
-  /* ---------- side annotations ---------- */
-  if(mode>=4){
-    text('12', px(0)-22, (py(14)+py(26))/2, '#16a34a', 15, 'right');
-    text('5', (px(0)+px(5))/2, py(26)-16, '#16a34a', 15, 'center');
-  }
-  if(mode>=5){
-    text('13', (px(0)+px(5))/2 - 26, (py(14)+py(26))/2 - 8, '#dc2626', 15);
-  }
-  if(mode>=6){
-    text('C : x² + y² − 5x − 40y + 364 = 0', px(0)-10, py(-1.4), '#dc2626', 12.5);
-  }
-
-  /* mode caption */
-  const caps = {
-    1:'f(x) = p x² + q  — form of the function',
-    2:'Solving:  p = 12/25 ,  q = 14',
-    3:'f(x) = (12/25)x² + 14  →  f(5) = 26',
-    4:'U(0,14) , V(5,26) , W(0,26)',
-    5:'∠UWV = 90°  ⇒  UV is a diameter of C',
-    6:'UV = 13  ⇒  circumference = 13π'
-  };
-  ctx.fillStyle = '#f1f5ff';
-  ctx.beginPath();
-  ctx.roundRect ? ctx.roundRect(8, 8, W-16, 34, 10) : ctx.rect(8,8,W-16,34);
-  ctx.fill();
-  text(caps[mode], W/2, 26, '#1e40af', 15, 'center');
+  /* grid labels */
+  ctx.save();
+  ctx.translate(20, Hc/2); ctx.rotate(-Math.PI/2);
+  ctx.fillStyle='#94a3b8'; ctx.font='14px system-ui'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.restore();
 }
-ctx.roundRect = ctx.roundRect || null;
 
-/* ---------- intersection observer for scroll sync ---------- */
-const steps = Array.from(document.querySelectorAll('.step'));
-const obs = new IntersectionObserver((es)=>{
+function polyline(pts, col, w, dash){
+  ctx.save();
+  ctx.strokeStyle=col; ctx.lineWidth=w; ctx.lineJoin='round';
+  if(dash) ctx.setLineDash(dash);
+  ctx.beginPath();
+  pts.forEach((p,i)=>{ const X=sx(p.x), Y=sy(p.y); i? ctx.lineTo(X,Y): ctx.moveTo(X,Y); });
+  ctx.stroke(); ctx.restore();
+}
+
+function curve(fn, col, w){
+  ctx.save(); ctx.strokeStyle=col; ctx.lineWidth=w; ctx.beginPath();
+  let first=true;
+  for(let x=XMIN; x<=XMAX; x+=0.08){
+    const y=fn(x); if(y<YMIN-40||y>YMAX+40) {first=true; continue;}
+    const X=sx(x), Y=sy(y);
+    if(first){ ctx.moveTo(X,Y); first=false; } else ctx.lineTo(X,Y);
+  }
+  ctx.stroke(); ctx.restore();
+}
+
+function dot(p, col, r, label, lx, ly){
+  ctx.beginPath(); ctx.arc(sx(p.x), sy(p.y), r, 0, 2*Math.PI);
+  ctx.fillStyle=col; ctx.fill();
+  ctx.strokeStyle='#fff'; ctx.lineWidth=2.5; ctx.stroke();
+  if(label){
+    ctx.fillStyle=col; ctx.font='bold 19px system-ui';
+    ctx.textAlign= lx===undefined? 'left':'left'; ctx.textBaseline= ly===undefined? 'bottom':'middle';
+    ctx.fillText(label, sx(p.x)+(lx===undefined?10:lx), sy(p.y)+(ly===undefined?-10:ly));
+  }
+}
+
+function guideDashed(p){
+  ctx.save(); ctx.setLineDash([7,6]); ctx.strokeStyle='#c7d2e0'; ctx.lineWidth=1.8;
+  ctx.beginPath(); ctx.moveTo(sx(p.x),sy(p.y)); ctx.lineTo(sx(0),sy(p.y)); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(sx(p.x),sy(p.y)); ctx.lineTo(sx(p.x),sy(0)); ctx.stroke();
+  ctx.restore();
+}
+
+/* ===================== MAIN DRAW ===================== */
+let current = 1;
+function draw(step){
+  current = step;
+  grid();
+
+  /* The parabola is always visible (the graph of y=f(x)) */
+  curve(FUNC, '#93c5fd', 5);
+
+  if(step===1){
+    RO.textContent = 'Step 1 · f(x) = a + bx²  passes through (10,62) and (15,122)';
+    /* mark given points out of the window range: show (10,62) with vertical guide only if inside */
+    /* Show the two given conditions as chips on the curve */
+    ctx.fillStyle='#1d4ed8'; ctx.font='bold 17px system-ui'; ctx.textAlign='left'; ctx.textBaseline='middle';
+    ctx.fillText('given: f(10) = 62,  f(15) = 122', sx(-7), sy(37));
+    ctx.fillStyle='#5b6b82'; ctx.font='15px system-ui';
+    ctx.fillText('f is partly constant, partly ∝ x²', sx(-7), sy(33));
+    ctx.fillText('⇒ f(x) = a + b x²', sx(-7), sy(29));
+    /* small highlight dots at x=10,15 scaled: draw markers along x-axis */
+    guideDashed({x:10,y:0}); guideDashed({x:15,y:0});
+    dot({x:10,y:0},'#1d4ed8',6,'x=10',-18,-14);
+    dot({x:15,y:0},'#1d4ed8',6,'x=15',-18,-14);
+  }
+
+  if(step===2){
+    RO.textContent = 'Step 2 · a = 14, b = 0.48  ⇒  f(x) = 14 + 0.48x²,  f(5) = 26';
+    curve(FUNC, '#2563eb', 4.4);
+    /* show f(5)=26 */
+    guideDashed(V);
+    dot(U,'#1d4ed8',7,'U(0,14)',12,-8);
+    dot({x:5,y:26},'#2563eb',9,'V(5,26)',12,-10);
+    ctx.fillStyle='#1d4ed8'; ctx.font='bold 17px system-ui'; ctx.textAlign='left'; ctx.textBaseline='middle';
+    ctx.fillText('b = 0.48,  a = 14', sx(-7), sy(36));
+    ctx.fillStyle='#0d9488'; ctx.font='bold 18px system-ui';
+    ctx.fillText('f(5) = 14 + 0.48(25) = 26', sx(-7), sy(31));
+  }
+
+  if(step===3){
+    RO.textContent = 'Step 3 · U(0,14), V(5,26), W(0,26)';
+    curve(FUNC, '#2563eb', 4.4);
+    /* horizontal line through V */
+    polyline([{x:-2,y:26},{x:9,y:26}], '#0d9488', 2.4, [9,7]);
+    guideDashed(V);
+    dot(U,'#0d9488',7,'U(0,14)',12,-8);
+    dot(V,'#0d9488',9,'V(5,26)',12,-12);
+    dot(W,'#0d9488',7,'W(0,26)',12,-8);
+    /* right angle at W between VW and the y-axis */
+    ctx.save(); ctx.setLineDash([]); ctx.strokeStyle='#0d9488'; ctx.lineWidth=2;
+    ctx.strokeRect(sx(0), sy(26), 22, 22);
+    ctx.restore();
+  }
+
+  if(step===4){
+    RO.textContent = 'Step 4 · Centre O_c(2.5, 20), radius r = 6.5';
+    curve(FUNC, '#93c5fd', 3);
+    /* circle */
+    ctx.save();
+    ctx.beginPath(); ctx.arc(sx(CTR.x), sy(CTR.y), (sx(R)-sx(0)), 0, 2*Math.PI);
+    ctx.strokeStyle='#e11d48'; ctx.lineWidth=2.6; ctx.stroke();
+    ctx.fillStyle='rgba(225,29,72,.06)'; ctx.fill();
+    ctx.restore();
+    /* centre + radii */
+    dot(CTR,'#e11d48',7,'O_c(2.5,20)',12,-6);
+    polyline([CTR,U],'#f59e0b',2.2); polyline([CTR,V],'#f59e0b',2.2); polyline([CTR,W],'#f59e0b',2.2);
+    dot(U,'#0d9488',6,'U',12,-8); dot(V,'#0d9488',7,'V',12,-10); dot(W,'#0d9488',6,'W',12,-8);
+    /* perpendicular bisector of UW */
+    polyline([{x:-2,y:20},{x:9,y:20}], '#7c3aed', 2, [6,6]);
+    ctx.fillStyle='#7c3aed'; ctx.font='bold 16px system-ui'; ctx.textAlign='left'; ctx.textBaseline='middle';
+    ctx.fillText('y = 20', sx(8.4)-2, sy(20)-14);
+    ctx.fillStyle='#e11d48'; ctx.font='bold 17px system-ui';
+    ctx.fillText('r = 6.5', sx(CTR.x)+16, sy(CTR.y)+16);
+  }
+
+  if(step===5){
+    RO.textContent = 'Step 5 · Circumference = 2πr = 2π(6.5) = 13π';
+    curve(FUNC, '#cbd5e1', 2.5);
+    ctx.save();
+    ctx.beginPath(); ctx.arc(sx(CTR.x), sy(CTR.y), (sx(R)-sx(0)), 0, 2*Math.PI);
+    ctx.strokeStyle='#e11d48'; ctx.lineWidth=3.2; ctx.stroke();
+    ctx.fillStyle='rgba(225,29,72,.10)'; ctx.fill();
+    ctx.restore();
+    dot(CTR,'#e11d48',6,null);
+    polyline([CTR,{x:CTR.x+R,y:CTR.y}],'#e11d48',3);
+    dot({x:CTR.x+R,y:CTR.y},'#e11d48',6,null);
+    ctx.fillStyle='#e11d48'; ctx.font='bold 19px system-ui'; ctx.textAlign='left'; ctx.textBaseline='middle';
+    ctx.fillText('r', sx(CTR.x)+18, sy(CTR.y)-12);
+    ctx.fillStyle='#123a72'; ctx.font='bold 24px system-ui';
+    ctx.textAlign='center'; ctx.textBaseline='top';
+    ctx.fillText('Circumference = 2π(6.5) = 13π', sx(3.5), sy(-2)+10);
+  }
+}
+
+/* ===================== SCROLL SYNC ===================== */
+const io = new IntersectionObserver(es=>{
   es.forEach(e=>{
     if(e.isIntersecting){
-      const m = +e.target.dataset.step;
-      mode = m;
-      steps.forEach(st=>st.classList.toggle('active', st===e.target));
-      draw();
+      current = +e.target.dataset.step;
+      document.querySelectorAll('.step').forEach(s=>s.classList.toggle('active', s===e.target));
+      draw(current);
     }
   });
-},{rootMargin:'-15% 0px -55% 0px', threshold:0});
-steps.forEach(st=>obs.observe(st));
+},{rootMargin:'-25% 0px -55% 0px'});
+
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
 
 /* initial */
-steps[0] && steps[0].classList.add('active');
-draw();
-window.addEventListener('resize', draw);
+draw(1);
+document.querySelector('.step[data-step="1"]').classList.add('active');
 
-/* MathJax re-typeset safety */
-window.addEventListener('load', ()=>{ if(window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise(); });
+/* redraw after MathJax typesets (layout height may change) */
+if(window.MathJax && window.MathJax.startup){
+  MathJax.startup.promise.then(()=>draw(current));
+}
+window.addEventListener('resize', ()=>draw(current));
 </script>
 </body>
 </html>

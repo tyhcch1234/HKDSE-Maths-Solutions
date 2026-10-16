@@ -3,677 +3,401 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HKDSE 2021 Paper 2 Q30 — Mean of Integers</title>
+<title>HKDSE 2021 Paper 2 Q30 — Statistics</title>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <script>
 window.MathJax = {
-  tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['\\[','\\]']] },
+  tex: {
+    inlineMath: [['$','$'],['\\(','\\)']],
+    displayMath: [['$$','$$'],['\\[','\\]']]
+  },
   svg: { fontCache: 'global' }
 };
 </script>
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
 <style>
-  :root{
-    --blue:#1d4ed8; --blue-light:#3b82f6; --blue-soft:#dbeafe;
-    --amber:#f59e0b; --amber-soft:#fef3c7;
-    --emerald:#059669; --emerald-soft:#d1fae5;
-    --dark:#0f172a; --slate:#334155; --muted:#64748b;
-    --card:#ffffff; --bg:#f1f5f9;
-    --radius:16px;
-  }
   *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
   body{
-    margin:0; background:var(--bg); color:var(--slate);
-    font-family:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
-    line-height:1.65;
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    background:#f4f7fb;
+    color:#1e2733;
+    line-height:1.55;
   }
-  .wrap{max-width:960px; margin:0 auto; padding:0 16px 60px;}
+  .wrap{padding:16px 14px 60px;max-width:1400px;margin:0 auto;}
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start;}
+  @media(min-width:900px){.split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}}
 
-  /* HERO */
-  .hero{
-    background:linear-gradient(135deg,#0f172a 0%,#1d4ed8 55%,#3b82f6 100%);
-    color:#fff; padding:38px 16px 34px; text-align:center;
-    box-shadow:0 8px 24px rgba(15,23,42,.25);
+  .diagram{
+    position:sticky;top:16px;
+    max-height:calc(100vh - 2rem);
+    overflow-y:auto;
+    background:#ffffff;
+    border:1px solid #dbe4ef;
+    border-radius:14px;
+    padding:12px 12px 16px;
+    box-shadow:0 4px 18px rgba(38,70,120,.08);
   }
-  .hero .eyebrow{
-    font-size:.78rem; letter-spacing:.18em; text-transform:uppercase;
-    color:#bfdbfe; font-weight:600;
-  }
-  .hero h1{
-    margin:.35rem 0 .2rem; font-size:1.9rem; font-weight:800; letter-spacing:.01em;
-  }
-  .hero .sub{ color:#e0e7ff; font-size:1rem; margin-bottom:1rem;}
-  .pills{display:flex; flex-wrap:wrap; gap:8px; justify-content:center;}
-  .pill{
-    background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35);
-    border-radius:999px; padding:4px 14px; font-size:.8rem; font-weight:600;
-    color:#fff; backdrop-filter:blur(4px);
-  }
+  @media(max-width:640px){body{font-size:14.5px;}.wrap{padding:10px 8px 40px;}}
 
-  /* CARDS */
-  .card{
-    background:var(--card); border-radius:var(--radius); padding:22px 22px 20px;
-    margin-top:22px; box-shadow:0 4px 14px rgba(15,23,42,.08);
-    border:1px solid #e2e8f0;
+  .pane-title{
+    font-size:.82rem;font-weight:700;letter-spacing:.08em;
+    text-transform:uppercase;color:#6b7c93;margin:0 0 8px;
   }
-  .card h2{
-    margin:0 0 10px; font-size:1.2rem; color:var(--dark); font-weight:800;
-    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  canvas{width:100%;height:auto;display:block;border-radius:10px;background:#fbfdff;}
+  .ro{
+    margin:8px 2px 0;font-size:.86rem;color:#3c4a5e;
+    background:#eef4ff;border-left:4px solid #4a7dff;
+    padding:6px 10px;border-radius:6px;font-variant-numeric:tabular-nums;
   }
-  .card h2 .num{
-    background:var(--blue-soft); color:var(--blue); font-size:.85rem;
-    border-radius:8px; padding:2px 10px; font-weight:800;
-  }
-  .qtext{font-size:1.05rem;}
-  .marks{
-    background:var(--amber-soft); color:#92400e; font-size:.75rem; font-weight:800;
-    border-radius:8px; padding:2px 9px; white-space:nowrap;
-  }
-  .options{list-style:none; padding:0; margin:12px 0 0; display:grid; gap:8px;}
-  .options li{
-    background:#f8fafc; border:1px solid #e2e8f0; border-left:5px solid var(--blue-light);
-    border-radius:10px; padding:8px 14px; font-size:1.02rem; font-weight:600;
-    color:var(--dark);
-  }
-  .options li.correct{
-    border-left-color:var(--emerald); background:var(--emerald-soft);
-  }
-  .options li.correct::after{content:" ✓ correct"; color:var(--emerald); font-size:.78rem; font-weight:800;}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;font-size:.8rem;}
+  .legend span{display:inline-flex;align-items:center;gap:6px;color:#40506a;}
+  .sw{width:14px;height:14px;border-radius:4px;display:inline-block;}
 
-  /* CANVAS */
-  .canvas-box{
-    background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px;
-    padding:10px; margin-top:14px;
+  .qcard{
+    background:#ffffff;border:1px solid #dbe4ef;border-radius:14px;
+    padding:16px 18px;box-shadow:0 4px 18px rgba(38,70,120,.08);margin-bottom:14px;
   }
-  canvas{width:100%; display:block; border-radius:8px; background:#fff;}
+  .qcard h1{font-size:1.02rem;margin:0 0 10px;color:#1f3a68;}
+  .qcard .stem{font-size:1.02rem;}
+  .choices{list-style:none;padding:0;margin:12px 0 0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 14px;}
+  .choices li{background:#f3f7ff;border:1px solid #dce7fb;border-radius:8px;padding:6px 10px;font-weight:600;color:#2a3f63;}
+  .choices li b{color:#e0761b;margin-right:6px;}
 
-  /* CONTROLS */
-  .controls{
-    display:flex; flex-wrap:wrap; gap:16px; align-items:center; margin-top:14px;
-    background:#f8fafc; border:1px dashed #cbd5e1; border-radius:12px; padding:12px 14px;
-  }
-  .ctrl{display:flex; flex-direction:column; gap:4px; min-width:180px; flex:1;}
-  .ctrl label{font-size:.82rem; font-weight:700; color:var(--slate);}
-  .ctrl input[type=range]{width:100%; accent-color:var(--blue);}
-  .ctrl .val{font-size:.82rem; color:var(--blue); font-weight:800;}
-  .ctrl.checkbox{flex-direction:row; align-items:center; min-width:auto; gap:8px;}
-  .ctrl.checkbox input{width:18px; height:18px; accent-color:var(--emerald);}
-  .ctrl.checkbox label{margin:0;}
-
-  /* READOUT */
-  .readout{
-    display:flex; flex-wrap:wrap; gap:10px; margin-top:12px;
-  }
-  .chip{
-    background:var(--blue-soft); color:#1e3a8a; border-radius:999px;
-    padding:5px 14px; font-size:.83rem; font-weight:700;
-  }
-  .chip.green{background:var(--emerald-soft); color:#065f46;}
-  .chip.amber{background:var(--amber-soft); color:#92400e;}
-
-  /* STEPS */
   .step{
-    display:none; margin-top:16px; padding:14px 16px; border-radius:12px;
-    background:#f8fafc; border:1px solid #e2e8f0; border-left:5px solid var(--blue);
-    animation:fade .35s ease;
+    background:#ffffff;border:1px solid #dbe4ef;border-left:6px solid #4a7dff;
+    border-radius:12px;padding:12px 14px;margin-bottom:12px;
+    box-shadow:0 2px 10px rgba(38,70,120,.06);
+    transition:box-shadow .25s, transform .25s;
   }
-  .step.show{display:block;}
-  @keyframes fade{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
-  .step-head{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:8px;}
-  .badge{
-    background:var(--blue); color:#fff; border-radius:999px; font-size:.78rem;
-    font-weight:800; padding:3px 12px;
+  .step:hover{box-shadow:0 6px 20px rgba(38,70,120,.13);}
+  .step .tag{
+    display:inline-block;font-size:.74rem;font-weight:800;letter-spacing:.06em;
+    text-transform:uppercase;color:#fff;background:#4a7dff;
+    border-radius:999px;padding:2px 10px;margin-right:8px;
   }
-  .hint{
-    background:var(--amber-soft); border-left:4px solid var(--amber);
-    border-radius:8px; padding:9px 13px; margin-top:10px; font-size:.92rem;
-    color:#78350f;
+  .step.s2{border-left-color:#e0761b;}
+  .step.s2 .tag{background:#e0761b;}
+  .step.s3{border-left-color:#12a37a;}
+  .step.s3 .tag{background:#12a37a;}
+  .step.s4{border-left-color:#9b51e0;}
+  .step.s4 .tag{background:#9b51e0;}
+  .step p{margin:6px 0 0;}
+  .hint{font-size:.85rem;color:#5b6b82;background:#f5f8fd;border-radius:8px;padding:6px 10px;margin-top:8px;}
+  .ans{
+    background:linear-gradient(135deg,#12a37a,#0f8a67);color:#fff;
+    border-radius:12px;padding:14px 16px;font-size:1.06rem;font-weight:700;
+    box-shadow:0 6px 20px rgba(18,163,122,.28);
   }
-  .hint strong{color:#92400e;}
-  .answer{
-    background:var(--emerald-soft); border-left:4px solid var(--emerald);
-    border-radius:8px; padding:9px 13px; margin-top:10px; font-size:.96rem;
-    color:#064e3b; font-weight:600;
-  }
-  .answer strong{color:#065f46;}
-
-  /* BUTTON */
-  .btnrow{display:flex; align-items:center; gap:14px; margin-top:16px; flex-wrap:wrap;}
-  button.next{
-    background:linear-gradient(135deg,var(--blue),var(--blue-light));
-    color:#fff; border:none; border-radius:999px; padding:10px 22px;
-    font-size:.95rem; font-weight:800; cursor:pointer; box-shadow:0 4px 12px rgba(29,78,216,.3);
-    transition:transform .15s, box-shadow .15s, opacity .2s;
-  }
-  button.next:hover:not(:disabled){transform:translateY(-2px); box-shadow:0 7px 18px rgba(29,78,216,.4);}
-  button.next:disabled{
-    background:#cbd5e1; color:#64748b; cursor:not-allowed;
-    box-shadow:none; opacity:.85;
-  }
-  .counter{font-size:.85rem; font-weight:700; color:var(--muted);}
-
-  /* SUMMARY */
-  .summary{
-    background:linear-gradient(135deg,#0f172a,#1e293b); color:#e2e8f0;
-    border-radius:var(--radius); padding:24px; margin-top:24px;
-    box-shadow:0 8px 24px rgba(15,23,42,.25);
-  }
-  .summary h2{color:#fff; font-size:1.2rem; margin:0 0 12px; font-weight:800;}
-  .summary ul{margin:0; padding-left:20px;}
-  .summary li{margin-bottom:8px; font-size:1rem;}
-  .summary .key{color:#fbbf24; font-weight:800;}
-
-  footer{
-    text-align:center; color:var(--muted); font-size:.82rem;
-    margin-top:34px; padding-top:16px; border-top:1px solid #e2e8f0;
-  }
-
-  @media (max-width:600px){
-    .hero h1{font-size:1.45rem;}
-    .card{padding:16px 14px;}
-    .ctrl{min-width:120px;}
-  }
+  .ans span{background:#fff;color:#0f6e53;border-radius:8px;padding:2px 10px;margin-left:6px;}
+  .mj{font-size:1.02rem;}
 </style>
 </head>
 <body>
-
-<!-- HERO -->
-<header class="hero">
-  <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</div>
-  <h1>2021 Paper 2 · Question 30</h1>
-  <div class="sub">Statistics — Combined Mean of Two Groups</div>
-  <div class="pills">
-    <span class="pill">Mean</span>
-    <span class="pill">Sum of Data</span>
-    <span class="pill">Two Groups</span>
-    <span class="pill">MC</span>
-  </div>
-</header>
-
 <div class="wrap">
+  <div class="split">
 
-  <!-- QUESTION -->
-  <section class="card">
-    <h2><span class="num">Question</span> Full Statement </h2>
-    <div class="qtext">
-      <p>The mean of \(70\) integers is \(32\). If the mean of \(30\) of these \(70\) integers is \(24\), then the mean of the remaining \(40\) integers is</p>
-      <ul class="options">
-        <li>A. \(38\)</li>
-        <li>B. \(40\)</li>
-        <li>C. \(43\)</li>
-        <li>D. \(74\)</li>
-      </ul<figure style="margin:12px 0;text-align:center;"><img src="figures/2021_P2_Q30.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>>
-    </div>
-  </section>
-
-  <!-- PART A -->
-  <section class="card">
-    <h2><span class="num">Part (a)</span> Model the Two Groups <span class="marks">Setup</span></h2>
-
-    <p>We split the 70 integers into two groups: a <strong>Group 1</strong> of 30 integers (mean 24) and a <strong>Group 2</strong> of 40 integers (mean \(x\), unknown). The overall mean of all 70 is 32.</p>
-
-    <div class="canvas-box">
-      <canvas id="cv1" width="880" height="600"></canvas>
-    </div>
-
-    <div class="controls">
-      <div class="ctrl">
-        <label for="s1">Group&nbsp;2 mean \(x\) = <span class="val" id="v1">40</span></label>
-        <input type="range" id="s1" min="20" max="50" step="1" value="40">
-      </div>
-      <div class="ctrl checkbox">
-        <input type="checkbox" id="c1" checked>
-        <label for="c1">Show overall mean line</label>
+    <!-- ================= LEFT PANE : DIAGRAM ================= -->
+    <div class="diagram">
+      <p class="pane-title">Interactive Figure</p>
+      <canvas id="cv" width="620" height="720"></canvas>
+      <p class="ro" id="ro">Step 1 — the 70 integers are split into two groups: 30 and 40.</p>
+      <div class="legend">
+        <span><i class="sw" style="background:#4a7dff"></i>Group of 30 integers</span>
+        <span><i class="sw" style="background:#12a37a"></i>Group of 40 integers</span>
+        <span><i class="sw" style="background:#e0761b"></i>Total sum</span>
+        <span><i class="sw" style="background:#9b51e0"></i>Unknown mean $x$</span>
       </div>
     </div>
 
-    <div class="readout">
-      <span class="chip">Sum of Group 1 = \(30 \times 24 = 720\)</span>
-      <span class="chip amber" id="r1a">Sum of Group 2 = \(40 \times 40 = 1600\)</span>
-      <span class="chip green" id="r1b">Combined mean = \((720+1600)/70 = 33.1\)</span>
+    <!-- ================= RIGHT PANE : QUESTION ================= -->
+    <div>
+      <div class="qcard">
+        <h1>[2021 MC #30] &nbsp;·&nbsp; 15. Statistics</h1>
+        <p class="stem">
+          The mean of $70$ integers is $32$. If the mean of $30$ of these $70$ integers is $24$,
+          then the mean of the remaining $40$ integers is
+        </p>
+        <ul class="choices">
+          <li><b>A.</b> $38$</li>
+          <li><b>B.</b> $40$</li>
+          <li><b>C.</b> $43$</li>
+          <li><b>D.</b> $74$</li>
+        </ul>
+      </div>
+
+      <figure style="margin:12px 0;text-align:center;"><img src="figures/2021_P2_Q30.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
+
+      <!-- ---------- STEP 1 ---------- -->
+      <div class="step s1" data-step="1">
+        <span class="tag">Step 1</span><b>Translate the given information.</b>
+        <p class="mj">
+          Total number of integers $=70$, overall mean $=32$.<br>
+          Group A: $30$ integers with mean $24$. &nbsp; Group B: the remaining $40$ integers, mean $=x$ (unknown).
+        </p>
+        <div class="hint">Hint: rearrange the mean formula — $\text{sum} = \text{mean} \times \text{number of items}$.</div>
+      </div>
+
+      <!-- ---------- STEP 2 ---------- -->
+      <div class="step s2" data-step="2">
+        <span class="tag">Step 2</span><b>Find the total sum of all 70 integers.</b>
+        <p class="mj">
+          $\text{Total sum} = 32 \times 70 = 2240$
+        </p>
+        <div class="hint">Hint: the overall mean tells you the "weighted" total directly.</div>
+      </div>
+
+      <!-- ---------- STEP 3 ---------- -->
+      <div class="step s3" data-step="3">
+        <span class="tag">Step 3</span><b>Find the sum of the 30 integers.</b>
+        <p class="mj">
+          $\text{Sum of 30 integers} = 24 \times 30 = 720$
+        </p>
+        <div class="hint">Hint: the remaining sum is the difference of the two sums above.</div>
+      </div>
+
+      <!-- ---------- STEP 4 ---------- -->
+      <div class="step s4" data-step="4">
+        <span class="tag">Step 4</span><b>Set up and solve the equation for $x$.</b>
+        <p class="mj">
+          $$24 \times 30 + x \times 40 = 32 \times 70$$
+          $$720 + 40x = 2240$$
+          $$40x = 1520$$
+          $$x = 38$$
+        </p>
+        <div class="hint">Hint: this is the official method — write one equation combining the two groups.</div>
+      </div>
+
+      <div class="ans">Answer: x = 38 &nbsp;(Option A) <span>A</span></div>
     </div>
 
-    <div class="hint" style="margin-top:14px;">
-      <strong>Hint:</strong> Move the slider. Notice the combined mean only equals \(32\) when the slider reaches a specific value — that value is the answer.
-    </div>
-  </section>
-
-  <!-- PART B -->
-  <section class="card">
-    <h2><span class="num">Part (b)</span> Set Up and Solve the Equation </h2>
-
-    <p>Let \(x\) be the mean of the remaining 40 integers. Use <em>total sum</em> = sum of Group 1 + sum of Group 2.</p>
-
-    <div class="step" id="b1">
-      <div class="step-head">
-        <span class="badge">Step 1</span>
-        
-        <span style="font-weight:700;color:var(--dark);">Total sum of all 70 integers</span>
-      </div>
-      <div>
-        \[\text{Total sum}=70\times 32 = 2240.\]
-      </div>
-      <div class="hint"><strong>Hint:</strong> \(\text{Sum} = \text{mean} \times \text{number of items}\). Always start by converting every mean into a sum.</div>
-    </div>
-
-    <div class="step" id="b2">
-      <div class="step-head">
-        <span class="badge">Step 2</span>
-        
-        <span style="font-weight:700;color:var(--dark);">Sum of the group of 30</span>
-      </div>
-      <div>
-        \[\text{Sum of 30 integers}=30\times 24 = 720.\]
-      </div>
-      <div class="hint"><strong>Hint:</strong> This group contributes \(720\) to the total.</div>
-    </div>
-
-    <div class="step" id="b3">
-      <div class="step-head">
-        <span class="badge">Step 3</span>
-        
-        <span style="font-weight:700;color:var(--dark);">Form the equation for the remaining 40</span>
-      </div>
-      <div>
-        Let \(x\) be the mean of the remaining \(40\) integers. Their sum is \(40x\), so
-        \[
-        30\times 24 + 40x = 70\times 32
-        \]
-        \[
-        720 + 40x = 2240
-        \]
-      </div>
-      <div class="hint"><strong>Hint:</strong> Group 1 sum + Group 2 sum = overall sum. That single equation contains all the information given.</div>
-    </div>
-
-    <div class="step" id="b4">
-      <div class="step-head">
-        <span class="badge">Step 4</span>
-        
-        <span style="font-weight:700;color:var(--dark);">Solve for \(x\)</span>
-      </div>
-      <div>
-        \[
-        40x = 2240 - 720 = 1520
-        \]
-        \[
-        x = \frac{1520}{40} = 38
-        \]
-      </div>
-      <div class="answer"><strong>Answer:</strong> The mean of the remaining 40 integers is \(x = 38\). So the correct option is <strong>A</strong>.</div>
-    </div>
-
-    <div class="btnrow">
-      <button class="next" id="btnB">Next step →</button>
-      <span class="counter" id="cntB">0 / 4</span>
-    </div>
-  </section>
-
-  <!-- PART C (visual check) -->
-  <section class="card">
-    <h2><span class="num">Part (c)</span> Visual Check with a Balance Diagram <span class="marks">Concept</span></h2>
-
-    <p>We can picture the combined mean as the balancing point between the two group means. For the combined mean to be \(32\), the group means must sit on opposite sides of 32: \(24 < 32\) and \(x > 32\).</p>
-
-    <div class="canvas-box">
-      <canvas id="cv2" width="880" height="600"></canvas>
-    </div>
-
-    <div class="controls">
-      <div class="ctrl checkbox">
-        <input type="checkbox" id="c2a" checked>
-        <label for="c2a">Show Group 1 (30 integers, mean 24)</label>
-      </div>
-      <div class="ctrl checkbox">
-        <input type="checkbox" id="c2b" checked>
-        <label for="c2b">Show Group 2 (40 integers, mean 38)</label>
-      </div>
-      <div class="ctrl checkbox">
-        <input type="checkbox" id="c2c" checked>
-        <label for="c2c">Show combined mean 32</label>
-      </div>
-    </div>
-
-    <div class="readout">
-      <span class="chip">Distance from 32 to 24 = \(8\)</span>
-      <span class="chip amber">Weighted pull: \(30 \times 8 = 240\)</span>
-      <span class="chip green">Distance from 32 to 38 = \(6\); \(40 \times 6 = 240\)</span>
-    </div>
-
-    <div class="hint" style="margin-top:14px;">
-      <strong>Hint:</strong> The two groups "pull" the mean in proportion to their sizes. Because Group 2 is larger (40 vs 30), its mean \(38\) is <em>closer</em> to \(32\) than \(24\) is.
-    </div>
-  </section>
-
-  <!-- SUMMARY -->
-  <section class="summary">
-    <h2>Answers at a Glance</h2>
-    <ul>
-      <li>Total sum of 70 integers: \(70 \times 32 = <span class="key">2240</span>\)</li>
-      <li>Sum of the 30 integers: \(30 \times 24 = <span class="key">720</span>\)</li>
-      <li>Equation: \(720 + 40x = 2240\)</li>
-      <li>Remaining sum: \(2240 - 720 = 1520\)</li>
-      <li>Required mean: \(x = \dfrac{1520}{40} = <span class="key">38</span>\)</li>
-      <li>Correct option: <span class="key">A</span></li>
-    </ul>
-  </section>
-
-  <footer>
-    HKDSE Mathematics (Compulsory Part) · 2021 Paper 2 Q30 · Interactive Solution<br>
-    Built with HTML5 Canvas + MathJax
-  </footer>
+  </div>
 </div>
 
 <script>
-/* ============================================================
-   STEP REVEAL LOGIC
-   ============================================================ */
 (function(){
-  const stepsB = ['b1','b2','b3','b4'];
-  let idxB = 0;
-  const btn = document.getElementById('btnB');
-  const cnt = document.getElementById('cntB');
-  btn.addEventListener('click', function(){
-    if(idxB < stepsB.length){
-      document.getElementById(stepsB[idxB]).classList.add('show');
-      idxB++;
-      cnt.textContent = idxB + ' / ' + stepsB.length;
-      if(idxB === stepsB.length){
-        btn.disabled = true;
-        btn.textContent = 'All steps revealed ✓';
-      }
-    }
-  });
-})();
-
-/* ============================================================
-   CANVAS 1 — Two-bar / combined mean visualizer
-   ============================================================ */
-(function(){
-  const cv = document.getElementById('cv1');
+  const cv  = document.getElementById('cv');
   const ctx = cv.getContext('2d');
-  const slider = document.getElementById('s1');
-  const v1 = document.getElementById('v1');
-  const r1a = document.getElementById('r1a');
-  const r1b = document.getElementById('r1b');
-  const chk = document.getElementById('c1');
-
-  const W = cv.width, H = cv.height;
-  const padL = 70, padR = 40, padT = 50, padB = 70;
-  const plotW = W - padL - padR;
-  const plotH = H - padT - padB;
-
-  const yMin = 0, yMax = 50;
-
-  function yPos(v){
-    return padT + plotH * (1 - (v - yMin) / (yMax - yMin));
-  }
-  function xPos(i, n, bw){
-    const slot = plotW / n;
-    return padL + slot * i + slot/2;
-  }
-
-  function draw(){
-    const g2mean = parseFloat(slider.value);
-    v1.textContent = g2mean;
-
-    const sum1 = 30 * 24;          // 720
-    const sum2 = 40 * g2mean;      // variable
-    const combined = (sum1 + sum2) / 70;
-
-    r1a.textContent = 'Sum of Group 2 = 40 × ' + g2mean + ' = ' + sum2;
-    r1b.textContent = 'Combined mean = (' + sum1 + ' + ' + sum2 + ')/70 = ' + combined.toFixed(2);
-
-    ctx.clearRect(0,0,W,H);
-    ctx.fillStyle = '#fff'; ctx.fillRect(0,0,W,H);
-
-    // Title
-    ctx.fillStyle = '#0f172a';
-    ctx.font = 'bold 17px Segoe UI, sans-serif';
-    ctx.textAlign = 'left';
-    ctx.fillText('Group Means vs Combined Mean', padL, 30);
-
-    // Grid
-    ctx.strokeStyle = '#e2e8f0';
-    ctx.lineWidth = 1;
-    ctx.fillStyle = '#94a3b8';
-    ctx.font = '12px Segoe UI, sans-serif';
-    ctx.textAlign = 'right';
-    for(let v = yMin; v <= yMax; v += 5){
-      const y = yPos(v);
-      ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(W - padR, y); ctx.stroke();
-      ctx.fillText(v, padL - 10, y + 4);
-    }
-    // Axes
-    ctx.strokeStyle = '#475569'; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(padL, padT); ctx.lineTo(padL, padT + plotH); ctx.lineTo(W - padR, padT + plotH); ctx.stroke();
-    ctx.textAlign = 'left';
-
-    // Bars: Group1, Group2, Combined
-    const barW = 90;
-    const positions = [0.5, 1.5, 2.5];
-    const values = [24, g2mean, combined];
-    const labels = ['Group 1\n30 integers','Group 2\n40 integers','Combined\n70 integers'];
-    const colors = ['#3b82f6', '#f59e0b', '#059669'];
-
-    const totalSlots = 3.5;
-    const slotW = plotW / totalSlots;
-
-    for(let i=0;i<3;i++){
-      const cx = padL + slotW * positions[i];
-      const barH = plotH * (values[i] - yMin) / (yMax - yMin);
-      const y = padT + plotH - barH;
-      const grad = ctx.createLinearGradient(0, y, 0, y + barH);
-      grad.addColorStop(0, colors[i]);
-      grad.addColorStop(1, colors[i] + '80');
-      ctx.fillStyle = grad;
-      ctx.beginPath();
-      ctx.roundRect(cx - barW/2, y, barW, barH, 8);
-      ctx.fill();
-
-      // Value label
-      ctx.fillStyle = '#0f172a';
-      ctx.font = 'bold 15px Segoe UI, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText(values[i].toFixed(1), cx, y - 8);
-
-      // Name label
-      ctx.fillStyle = '#475569';
-      ctx.font = '12px Segoe UI, sans-serif';
-      const parts = labels[i].split('\n');
-      parts.forEach((p, k)=>{
-        ctx.fillText(p, cx, padT + plotH + 20 + k*15);
-      });
-    }
-
-    // Combined mean line
-    if(chk.checked){
-      const y = yPos(32);
-      ctx.strokeStyle = '#ef4444';
-      ctx.lineWidth = 2;
-      ctx.setLineDash([8,6]);
-      ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(W - padR, y); ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.fillStyle = '#ef4444';
-      ctx.font = 'bold 13px Segoe UI, sans-serif';
-      ctx.textAlign = 'left';
-      ctx.fillText('Overall mean = 32', W - padR - 160, y - 8);
-
-      // Highlight when slider gives 38 -> combined 32
-      if(Math.abs(combined - 32) < 0.05){
-        ctx.fillStyle = '#059669';
-        ctx.font = 'bold 15px Segoe UI, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText('✓ Combined mean = 32 when x = 38', W/2, H - 12);
-      }
-    }
-
-    ctx.textAlign = 'left';
-  }
-
-  slider.addEventListener('input', draw);
-  chk.addEventListener('change', draw);
-  draw();
-})();
-
-/* ============================================================
-   CANVAS 2 — Balance / lever diagram
-   ============================================================ */
-(function(){
-  const cv = document.getElementById('cv2');
-  const ctx = cv.getContext('2d');
-  const cA = document.getElementById('c2a');
-  const cB = document.getElementById('c2b');
-  const cC = document.getElementById('c2c');
+  const ro  = document.getElementById('ro');
 
   const W = cv.width, H = cv.height;
 
-  function draw(){
-    ctx.clearRect(0,0,W,H);
-    ctx.fillStyle = '#fff'; ctx.fillRect(0,0,W,H);
-
-    // Title
-    ctx.fillStyle = '#0f172a';
-    ctx.font = 'bold 17px Segoe UI, sans-serif';
-    ctx.textAlign = 'left';
-    ctx.fillText('Weighted Balance Around the Combined Mean', 40, 32);
-
-    // Number line: values 20..44
-    const minV = 20, maxV = 44;
-    const padL = 70, padR = 70;
-    const axisY = 200;
-    const xOf = v => padL + (v - minV) / (maxV - minV) * (W - padL - padR);
-
-    // Axis line
-    ctx.strokeStyle = '#334155'; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(padL, axisY); ctx.lineTo(W - padR, axisY); ctx.stroke();
-
-    // Ticks
-    ctx.fillStyle = '#64748b';
-    ctx.font = '12px Segoe UI, sans-serif';
-    ctx.textAlign = 'center';
-    for(let v = minV; v <= maxV; v += 2){
-      const x = xOf(v);
-      ctx.beginPath(); ctx.moveTo(x, axisY - 6); ctx.lineTo(x, axisY + 6); ctx.stroke();
-      ctx.fillText(v, x, axisY + 24);
-    }
-
-    // Combined mean 32
-    if(cC.checked){
-      const x = xOf(32);
-      ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 2.5;
-      ctx.setLineDash([7,5]);
-      ctx.beginPath(); ctx.moveTo(x, 60); ctx.lineTo(x, axisY - 10); ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.fillStyle = '#ef4444';
-      ctx.beginPath(); ctx.arc(x, axisY, 7, 0, Math.PI*2); ctx.fill();
-      ctx.font = 'bold 13px Segoe UI, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('Combined mean = 32', x, axisY + 46);
-    }
-
-    // Group 1: mean 24, weight 30
-    if(cA.checked){
-      const x = xOf(24);
-      ctx.fillStyle = '#3b82f6';
-      ctx.beginPath(); ctx.arc(x, axisY, 9, 0, Math.PI*2); ctx.fill();
-      ctx.font = 'bold 13px Segoe UI, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('Group 1', x, axisY - 40);
-      ctx.font = '12px Segoe UI, sans-serif';
-      ctx.fillText('30 items, mean 24', x, axisY - 24);
-      // Arrow from 24 to 32, thickness by weight
-      ctx.strokeStyle = '#3b82f6'; ctx.lineWidth = 5;
-      ctx.beginPath(); ctx.moveTo(x, axisY - 10); ctx.lineTo(xOf(32) - 12, axisY - 10); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(xOf(32) - 12, axisY - 10); 
-      ctx.lineTo(xOf(32) - 22, axisY - 15); ctx.lineTo(xOf(32) - 22, axisY - 5);
-      ctx.closePath(); ctx.fillStyle = '#3b82f6'; ctx.fill();
-      ctx.fillStyle = '#1e40af'; ctx.font = 'bold 12px Segoe UI, sans-serif';
-      ctx.fillText('pull = 240', (x + xOf(32))/2, axisY - 25);
-      ctx.textAlign = 'center';
-    }
-
-    // Group 2: mean 38, weight 40
-    if(cB.checked){
-      const x = xOf(38);
-      ctx.fillStyle = '#f59e0b';
-      ctx.beginPath(); ctx.arc(x, axisY, 9, 0, Math.PI*2); ctx.fill();
-      ctx.font = 'bold 13px Segoe UI, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('Group 2', x, axisY + 72);
-      ctx.font = '12px Segoe UI, sans-serif';
-      ctx.fillText('40 items, mean 38', x, axisY + 88);
-      // Arrow from 38 to 32
-      ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 5;
-      ctx.beginPath(); ctx.moveTo(x, axisY + 10); ctx.lineTo(xOf(32) + 12, axisY + 10); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(xOf(32) + 12, axisY + 10);
-      ctx.lineTo(xOf(32) + 22, axisY + 5); ctx.lineTo(xOf(32) + 22, axisY + 15);
-      ctx.closePath(); ctx.fillStyle = '#f59e0b'; ctx.fill();
-      ctx.fillStyle = '#92400e'; ctx.font = 'bold 12px Segoe UI, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('pull = 240', (x + xOf(32))/2, axisY + 30);
-      ctx.textAlign = 'center';
-    }
-
-    // Caption
-    ctx.fillStyle = '#475569';
-    ctx.font = '13px Segoe UI, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('Both groups pull with equal strength, so the beam balances at 32.', W/2, H - 14);
-    ctx.textAlign = 'left';
-  }
-
-  cA.addEventListener('change', draw);
-  cB.addEventListener('change', draw);
-  cC.addEventListener('change', draw);
-  draw();
-})();
-
-/* roundRect polyfill for older browsers */
-if(!CanvasRenderingContext2D.prototype.roundRect){
-  CanvasRenderingContext2D.prototype.roundRect = function(x,y,w,h,r){
-    if(w<2*r) r=w/2; if(h<2*r) r=h/2;
-    this.beginPath();
-    this.moveTo(x+r,y);
-    this.arcTo(x+w,y,x+w,y+h,r);
-    this.arcTo(x+w,y+h,x,y+h,r);
-    this.arcTo(x,y+h,x,y,r);
-    this.arcTo(x,y,x+w,y,r);
-    this.closePath();
-    return this;
+  // ---- palette ----
+  const C = {
+    A:      '#4a7dff',
+    Asoft:  '#dbe6ff',
+    B:      '#12a37a',
+    Bsoft:  '#d6f3ea',
+    total:  '#e0761b',
+    totSoft:'#ffe8d1',
+    unk:    '#9b51e0',
+    unkSoft:'#ecdcff',
+    ink:    '#243043',
+    grid:   '#e3ebf6',
+    muted:  '#7b8ba3'
   };
-}
-</script>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
 
+  function roundRect(x,y,w,h,r){
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);
+    ctx.arcTo(x+w,y,x+w,y+h,r);
+    ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r);
+    ctx.arcTo(x,y,x+w,y,r);
+    ctx.closePath();
+  }
+
+  function label(txt,x,y,color,size,weight,align){
+    ctx.fillStyle = color || C.ink;
+    ctx.font = (weight||'600')+' '+(size||14)+'px "Segoe UI",system-ui,Arial,sans-serif';
+    ctx.textAlign = align || 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(txt,x,y);
+  }
+
+  function arrow(x1,y1,x2,y2,color,lw){
+    ctx.strokeStyle=color; ctx.lineWidth=lw||2;
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+    const a=Math.atan2(y2-y1,x2-x1), s=8;
+    ctx.beginPath();
+    ctx.moveTo(x2,y2);
+    ctx.lineTo(x2-s*Math.cos(a-0.4), y2-s*Math.sin(a-0.4));
+    ctx.lineTo(x2-s*Math.cos(a+0.4), y2-s*Math.sin(a+0.4));
+    ctx.closePath(); ctx.fillStyle=color; ctx.fill();
+  }
+
+  /* =========================================================
+     MAIN DRAW
+     step = 1..4  (which solution step is currently highlighted)
+     ========================================================= */
+  function draw(step){
+    step = step || 1;
+    ctx.clearRect(0,0,W,H);
+
+    // soft background
+    ctx.fillStyle = '#fbfdff';
+    ctx.fillRect(0,0,W,H);
+
+    /* ---------- Title ---------- */
+    label('Mean of 70 integers = 32', W/2, 32, C.ink, 20, '800', 'center');
+    label('30 of them have mean 24  →  find the mean of the other 40', W/2, 58, C.muted, 13, '600', 'center');
+
+    /* ---------- Big rounded container representing "70 integers" ---------- */
+    const bx = 40, by = 90, bw = W-80, bh = 150;
+    ctx.save();
+    ctx.shadowColor = 'rgba(38,70,120,.12)';
+    ctx.shadowBlur = 14; ctx.shadowOffsetY = 5;
+    roundRect(bx,by,bw,bh,16);
+    const gAll = ctx.createLinearGradient(bx,by,bx,by+bh);
+    gAll.addColorStop(0,'#ffffff'); gAll.addColorStop(1,'#f3f7ff');
+    ctx.fillStyle = gAll; ctx.fill();
+    ctx.restore();
+    ctx.lineWidth = 2.5;
+    ctx.strokeStyle = (step>=2) ? C.total : '#c9d8ef';
+    roundRect(bx,by,bw,bh,16); ctx.stroke();
+    label('ALL 70 INTEGERS', bx+bw/2, by+24, (step>=2)?C.total:C.muted, 14, '800', 'center');
+
+    // highlight total-sum pill inside
+    if(step>=2){
+      ctx.save();
+      ctx.globalAlpha = 1;
+      roundRect(bx+bw/2-120, by+bh-46, 240, 34, 10);
+      ctx.fillStyle = C.totSoft; ctx.fill();
+      ctx.strokeStyle = C.total; ctx.lineWidth=2; ctx.stroke();
+      ctx.restore();
+      label('Total sum = 32 × 70 = 2240', bx+bw/2, by+bh-29, C.total, 16, '800', 'center');
+    }else{
+      label('Total sum = mean × 70 = ?', bx+bw/2, by+bh-29, C.muted, 14, '600', 'center');
+    }
+
+    /* ---------- Split into two sub-boxes ---------- */
+    const gap = 18;
+    const innerX = bx+18, innerW = bw-36;
+    const boxW = (innerW-gap)/2;
+    const sy = by+bh+28, sh = 190;
+
+    // --- box A : 30 integers (blue) ---
+    const ax = innerX, ay = sy;
+    ctx.save();
+    ctx.shadowColor='rgba(38,70,120,.10)'; ctx.shadowBlur=10; ctx.shadowOffsetY=4;
+    roundRect(ax,ay,boxW,sh,14);
+    ctx.fillStyle = (step>=3)?'#eaf1ff':'#f6f9ff'; ctx.fill();
+    ctx.restore();
+    ctx.lineWidth = (step>=3)?3:2;
+    ctx.strokeStyle = (step>=3)?C.A:'#c9d8ef';
+    roundRect(ax,ay,boxW,sh,14); ctx.stroke();
+    label('GROUP A', ax+16, ay+26, C.A, 14, '800');
+    label('30 integers', ax+16, ay+48, C.muted, 13, '600');
+    // mean badge
+    ctx.fillStyle = C.A; roundRect(ax+16, ay+66, 110, 30, 8); ctx.fill();
+    label('mean = 24', ax+71, ay+81, '#fff', 15, '800', 'center');
+    // sum result appears at step 3
+    if(step>=3){
+      roundRect(ax+16, ay+108, boxW-32, 40, 10);
+      ctx.fillStyle = C.Asoft; ctx.fill();
+      ctx.strokeStyle = C.A; ctx.lineWidth=1.8; ctx.stroke();
+      label('Sum = 24 × 30 = 720', ax+boxW/2, ay+128, C.A, 16, '800', 'center');
+    }else{
+      label('Sum = 24 × 30 = ?', ax+boxW/2, ay+128, C.muted, 14, '600', 'center');
+    }
+
+    // --- box B : 40 integers (green / purple unknown) ---
+    const bxx = innerX+boxW+gap, byy = sy;
+    ctx.save();
+    ctx.shadowColor='rgba(38,70,120,.10)'; ctx.shadowBlur=10; ctx.shadowOffsetY=4;
+    roundRect(bxx,byy,boxW,sh,14);
+    ctx.fillStyle = (step>=4)?'#f2ecff':'#f6fbf9'; ctx.fill();
+    ctx.restore();
+    ctx.lineWidth = (step>=4)?3:2;
+    ctx.strokeStyle = (step>=4)?C.unk:C.B;
+    roundRect(bxx,byy,boxW,sh,14); ctx.stroke();
+    label('GROUP B (remaining)', bxx+16, byy+26, (step>=4)?C.unk:C.B, 14, '800');
+    label('40 integers', bxx+16, byy+48, C.muted, 13, '600');
+    // unknown mean badge
+    const badgeCol = (step>=4)?C.unk:C.B;
+    ctx.fillStyle = badgeCol; roundRect(bxx+16, byy+66, 120, 30, 8); ctx.fill();
+    label((step>=4)?'mean = x = 38':'mean = x', bxx+76, byy+81, '#fff', 15, '800', 'center');
+    // sum expression
+    roundRect(bxx+16, byy+108, boxW-32, 40, 10);
+    ctx.fillStyle = (step>=4)?C.unkSoft:C.Bsoft; ctx.fill();
+    ctx.strokeStyle = badgeCol; ctx.lineWidth=1.8; ctx.stroke();
+    label((step>=4)?'Sum = 38 × 40 = 1520':'Sum = x × 40', bxx+boxW/2, byy+128, badgeCol, 16, '800', 'center');
+
+    /* ---------- connecting braces / arrows ---------- */
+    // from total box to each group
+    ctx.strokeStyle = '#b9c9e2'; ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(ax+boxW/2, by+bh+2); ctx.lineTo(ax+boxW/2, sy-2);
+    ctx.moveTo(bxx+boxW/2, by+bh+2); ctx.lineTo(bxx+boxW/2, sy-2);
+    ctx.stroke();
+
+    /* ---------- EQUATION PANEL ---------- */
+    const ey = sy + sh + 34, eh = 120;
+    ctx.save();
+    ctx.shadowColor='rgba(38,70,120,.12)'; ctx.shadowBlur=14; ctx.shadowOffsetY=5;
+    roundRect(bx, ey, bw, eh, 16);
+    ctx.fillStyle = '#ffffff'; ctx.fill();
+    ctx.restore();
+    ctx.lineWidth = 2.5; ctx.strokeStyle = (step>=4)?C.unk:'#c9d8ef';
+    roundRect(bx, ey, bw, eh, 16); ctx.stroke();
+    label('EQUATION  (Sum of both groups = total sum)', bx+bw/2, ey+24, (step>=4)?C.unk:C.muted, 13, '800', 'center');
+
+    // equation text drawn with rects for colour
+    const eyy = ey+62;
+    if(step>=4){
+      // 24×30 + 40x = 32×70
+      label('24 × 30', bx+70, eyy, C.A, 20, '800');
+      label('+',      bx+158, eyy, C.ink, 20, '800');
+      label('40 x',   bx+192, eyy, C.unk, 20, '800');
+      label('=',      bx+262, eyy, C.ink, 20, '800');
+      label('32 × 70', bx+296, eyy, C.total, 20, '800');
+
+      label('720', bx+70, eyy+36, C.A, 17, '700');
+      label('+ 40x = 2240', bx+192, eyy+36, C.ink, 17, '700');
+      label('40x = 1520', bx+bw/2, eyy+70, C.ink, 18, '800', 'center');
+      label('x = 38', bx+bw-70, eyy+70-4, C.unk, 24, '900', 'center');
+
+      // highlight bubble for the final answer
+      ctx.beginPath();
+      ctx.arc(bx+bw-70, eyy+66, 40, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(155,81,224,.12)'; ctx.fill();
+      ctx.lineWidth = 2.5; ctx.strokeStyle = C.unk; ctx.stroke();
+    } else {
+      label('Sum of A  +  Sum of B  =  Total sum', bx+bw/2, eyy+6, C.muted, 17, '700', 'center');
+      label('(24 × 30) + (x × 40) = (32 × 70)', bx+bw/2, eyy+40, '#9fb1c9', 15, '600', 'center');
+      label('solve for x …', bx+bw/2, eyy+74, '#c3cfdf', 14, '600', 'center');
+    }
+
+    /* ---------- footer note ---------- */
+    label('Answer: x = 38  →  Option A', W/2, ey+eh+34, C.B, 18, '800', 'center');
+
+    /* ---------- readout ---------- */
+    const msgs = {
+      1: 'Step 1 — Split the 70 integers into 30 (mean 24) and the remaining 40 (mean x).',
+      2: 'Step 2 — Total sum = 32 × 70 = 2240 (highlighted in orange).',
+      3: 'Step 3 — Sum of the 30 integers = 24 × 30 = 720 (blue).',
+      4: 'Step 4 — 720 + 40x = 2240  ⟹  40x = 1520  ⟹  x = 38 = 38 (Option A).'
+    };
+    ro.textContent = msgs[step] || msgs[1];
+  }
+
+  // initial paint
+  draw(1);
+
+  // ---------- scroll sync ----------
+  let current = 1;
+  const io = new IntersectionObserver(es=>{
+    es.forEach(e=>{
+      if(e.isIntersecting){
+        current = +e.target.dataset.step;
+        draw(current);
+      }
+    });
+  },{rootMargin:'-25% 0px -55% 0px'});
+  document.querySelectorAll('.step').forEach(s=>io.observe(s));
+
+  // redraw on resize (keep crisp)
+  window.addEventListener('resize',()=>{ draw(current); });
+})();
+</script>
 </body>
 </html>

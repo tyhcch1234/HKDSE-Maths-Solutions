@@ -2,440 +2,417 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>2023 Paper 2 Q07 — Estimation, Approximation and Error</title>
-<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HKDSE 2023 Paper 2 Q7 — Significant Figures &amp; Range of Values</title>
+<script>window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},svg:{fontCache:'global'}};</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
-/* ==========================================================================
-   HKDSE Mathematics (Compulsory Part) — Unified Design System
-   Canonical source of truth. This exact block is inlined into every
-   question page, index.html and DSE_Maths_By_Topic.html so that all
-   deliverables share one visual identity.
-   ========================================================================== */
+  *{box-sizing:border-box;}
+  body{margin:0;background:#f4f7fb;color:#1f2937;font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;font-size:16px;line-height:1.55;}
+  .wrap{max-width:1180px;margin:0 auto;padding:16px 14px 60px;}
+  h1{font-size:1.15rem;margin:0 0 2px;color:#0f172a;letter-spacing:.2px;}
+  .sub{font-size:.82rem;color:#64748b;margin:0 0 14px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;}
 
-:root {
-  /* Palette */
-  --slate-900: #1e293b;   /* Primary / header surface */
-  --slate-800: #334155;
-  --slate-600: #475569;
-  --slate-400: #94a3b8;
-  --slate-200: #e2e8f0;
-  --slate-100: #f1f5f9;
-  --slate-50:  #f8fafc;
-  --indigo:    #3b82f6;   /* Primary accent */
-  --indigo-600:#2563eb;
-  --amber-bg:  #fef3c7;   /* Hints / concepts */
-  --amber-bd:  #f59e0b;
-  --emerald-bg:#d1fae5;   /* Final answers */
-  --emerald-bd:#10b981;
-  --badge-bg:  #dbeafe;   /* Badges / marks */
-  --badge-fg:  #1e40af;
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start;}
+  @media(min-width:900px){.split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}}
+  .diagram{position:sticky;top:16px;max-height:calc(100vh - 2rem);overflow-y:auto;}
+  @media(max-width:640px){body{font-size:14.5px;}.wrap{padding:10px 8px 40px;}}
 
-  /* Shape & depth */
-  --radius: 12px;
-  --radius-sm: 8px;
-  --pad-card: 1.5rem;
-  --shadow-sm: 0 1px 2px rgba(15, 23, 42, .06), 0 1px 3px rgba(15, 23, 42, .08);
-  --shadow-md: 0 4px 12px rgba(15, 23, 42, .08), 0 2px 4px rgba(15, 23, 42, .04);
+  .card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;box-shadow:0 4px 16px rgba(15,23,42,.06);padding:14px;}
+  .diagram .card{padding:12px;}
+  canvas{width:100%;height:auto;display:block;border-radius:10px;background:#fbfdff;touch-action:none;}
 
-  /* Type */
-  --font-body: "Source Serif 4", "Noto Serif TC", Georgia, "Times New Roman", serif;
-  --font-ui: "Inter Tight", "Noto Sans TC", "Segoe UI", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
-  --lh-tight: 1.25;
-  --lh-body: 1.7;
-}
+  .step-tag{display:inline-flex;align-items:center;gap:8px;font-weight:700;color:#0f172a;margin-bottom:4px;}
+  .chip{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;color:#fff;font-size:.82rem;font-weight:800;flex:0 0 auto;box-shadow:0 2px 6px rgba(15,23,42,.18);}
+  .c1{background:#2563eb;} .c2{background:#db2777;} .c3{background:#ea580c;} .c4{background:#16a34a;} .c5{background:#7c3aed;}
 
-* { box-sizing: border-box; }
+  .q{background:linear-gradient(180deg,#eff6ff,#ffffff);border:1px solid #bfdbfe;border-radius:14px;padding:14px 14px 10px;box-shadow:0 4px 16px rgba(37,99,235,.08);}
+  .q h2{margin:0 0 8px;font-size:1rem;color:#1d4ed8;letter-spacing:.3px;}
+  .q p{margin:6px 0;}
+  .opts{margin:10px 0 2px;padding:0;list-style:none;display:grid;gap:6px;}
+  .opts li{background:#fff;border:1px solid #e2e8f0;border-radius:9px;padding:6px 10px;font-size:.95rem;}
+  .opts li b{color:#1d4ed8;margin-right:6px;}
 
-html { -webkit-text-size-adjust: 100%; }
-
-body {
-  margin: 0;
-  background: var(--slate-50);
-  background-image:
-    radial-gradient(circle at 12% -10%, rgba(59, 130, 246, .10), transparent 45%),
-    radial-gradient(circle at 95% 0%, rgba(30, 41, 59, .08), transparent 40%);
-  background-attachment: fixed;
-  color: var(--slate-900);
-  font-family: var(--font-body);
-  font-size: 17px;
-  line-height: var(--lh-body);
-}
-
-/* ---------- Layout shells ------------------------------------------------ */
-
-.container {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 1.5rem 1.25rem 3rem;
-}
-
-.split {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 1.5rem 1.25rem 3rem;
-  display: grid;
-  grid-template-columns: minmax(0, 42%) minmax(0, 58%);
-  gap: 1.5rem;
-  align-items: start;
-}
-
-.split__aside {
-  position: sticky;
-  top: 1rem;
-  max-height: calc(100vh - 2rem);
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
-
-.split__main {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
-
-/* ---------- Hero header -------------------------------------------------- */
-
-.hero {
-  background: linear-gradient(135deg, var(--slate-900) 0%, #27364f 55%, #1d4ed8 160%);
-  color: #fff;
-  border-radius: var(--radius);
-  padding: 2rem var(--pad-card);
-  box-shadow: var(--shadow-md);
-  margin-bottom: 1.5rem;
-}
-
-.hero__eyebrow {
-  font-family: var(--font-ui);
-  font-size: .75rem;
-  font-weight: 600;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  color: #93c5fd;
-  margin: 0 0 .5rem;
-}
-
-.hero__title {
-  font-family: var(--font-ui);
-  font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.1rem);
-  line-height: var(--lh-tight);
-  font-weight: 700;
-  margin: 0 0 .5rem;
-}
-
-.hero__subtitle {
-  margin: 0;
-  color: #cbd5e1;
-  font-size: .95rem;
-}
-
-.hero__meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: .5rem;
-  margin-top: 1rem;
-}
-
-/* ---------- Cards -------------------------------------------------------- */
-
-.card {
-  background: #fff;
-  border: 1px solid var(--slate-200);
-  border-radius: var(--radius);
-  padding: var(--pad-card);
-  box-shadow: var(--shadow-sm);
-}
-
-.card + .card { margin-top: 0; }
-
-.card__title {
-  font-family: var(--font-ui);
-  font-size: 1.05rem;
-  font-weight: 700;
-  margin: 0 0 1rem;
-  padding-bottom: .6rem;
-  border-bottom: 2px solid var(--slate-100);
-  display: flex;
-  align-items: center;
-  gap: .6rem;
-  flex-wrap: wrap;
-}
-
-/* ---------- Step cards --------------------------------------------------- */
-
-.step {
-  border-left: 4px solid var(--indigo);
-  background: #fff;
-  border-radius: var(--radius);
-  padding: var(--pad-card);
-  box-shadow: var(--shadow-sm);
-}
-
-.step__head {
-  display: flex;
-  align-items: center;
-  gap: .6rem;
-  flex-wrap: wrap;
-  margin-bottom: .85rem;
-  font-family: var(--font-ui);
-  font-weight: 600;
-}
-
-/* ---------- Callouts ----------------------------------------------------- */
-
-.hint,
-.answer,
-.note {
-  border-radius: var(--radius-sm);
-  padding: 1rem 1.15rem;
-  margin: 1rem 0;
-}
-
-.hint {
-  background: var(--amber-bg);
-  border-left: 4px solid var(--amber-bd);
-}
-
-.answer {
-  background: var(--emerald-bg);
-  border-left: 4px solid var(--emerald-bd);
-}
-
-.note {
-  background: var(--slate-100);
-  border-left: 4px solid var(--slate-400);
-}
-
-.hint__label,
-.answer__label {
-  font-family: var(--font-ui);
-  font-size: .72rem;
-  font-weight: 700;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  display: block;
-  margin-bottom: .35rem;
-}
-
-.hint__label   { color: #92400e; }
-.answer__label { color: #065f46; }
-
-/* ---------- Badges ------------------------------------------------------- */
-
-.badge {
-  display: inline-block;
-  font-family: var(--font-ui);
-  font-size: .72rem;
-  font-weight: 700;
-  letter-spacing: .04em;
-  padding: .2rem .55rem;
-  border-radius: 999px;
-  background: var(--badge-bg);
-  color: var(--badge-fg);
-  white-space: nowrap;
-}
-
-.badge--mark  { background: var(--badge-bg); color: var(--badge-fg); }
-.badge--topic { background: var(--slate-100); color: var(--slate-600); }
-.badge--hard  { background: #fee2e2; color: #991b1b; }
-.badge--rate  { background: #ecfdf5; color: #047857; }
-
-/* ---------- Option list (Paper 2) --------------------------------------- */
-
-.options {
-  list-style: none;
-  margin: .5rem 0 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-  gap: .5rem;
-}
-
-.options li {
-  background: var(--slate-100);
-  border: 1px solid var(--slate-200);
-  border-radius: var(--radius-sm);
-  padding: .6rem .85rem;
-}
-
-.option-key {
-  font-family: var(--font-ui);
-  font-weight: 700;
-  color: var(--slate-600);
-  margin-right: .35rem;
-}
-
-/* ---------- Figures ----------------------------------------------------- */
-
-.figure {
-  background: #fff;
-  border: 1px solid var(--slate-200);
-  border-radius: var(--radius);
-  padding: .75rem;
-  text-align: center;
-}
-
-.figure img,
-.question-img {
-  max-width: 100%;
-  height: auto;
-  border-radius: var(--radius-sm);
-  display: block;
-  margin: 0 auto;
-}
-
-.figure figcaption {
-  font-family: var(--font-ui);
-  font-size: .78rem;
-  color: var(--slate-600);
-  margin-top: .5rem;
-}
-
-.figure svg { max-width: 100%; height: auto; }
-
-/* ---------- Tables ------------------------------------------------------- */
-
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: .95rem;
-}
-
-.table th,
-.table td {
-  border: 1px solid var(--slate-200);
-  padding: .5rem .65rem;
-  text-align: left;
-}
-
-.table th {
-  background: var(--slate-100);
-  font-family: var(--font-ui);
-  font-weight: 600;
-}
-
-/* ---------- Index pages -------------------------------------------------- */
-
-.index-section { margin-bottom: 1.5rem; }
-
-.index-table td:first-child { white-space: nowrap; }
-
-a { color: var(--indigo-600); }
-
-a.qlink {
-  font-family: var(--font-mono);
-  font-weight: 600;
-  text-decoration: none;
-  border-bottom: 1px solid transparent;
-}
-
-a.qlink:hover { border-bottom-color: currentColor; }
-
-/* ---------- Footer ------------------------------------------------------- */
-
-.footer {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 1.5rem 1.25rem 2.5rem;
-  text-align: center;
-  font-family: var(--font-ui);
-  font-size: .8rem;
-  color: var(--slate-600);
-}
-
-/* ---------- MathJax tweaks ---------------------------------------------- */
-
-mjx-container[display="true"] { margin: .75rem 0 !important; }
-
-/* ---------- Responsive -------------------------------------------------- */
-
-@media (max-width: 900px) {
-  .split { grid-template-columns: minmax(0, 1fr); }
-  .split__aside {
-    position: static;
-    max-height: none;
-    overflow-y: visible;
-  }
-}
-
-@media (max-width: 480px) {
-  body { font-size: 16px; }
-  :root { --pad-card: 1.15rem; }
-  .hero { padding: 1.5rem 1.15rem; }
-}
-
-
-/* ---- solution page extras ---- */
-.hero__title .qstar { color:#fbbf24; }
-.qcard__body { font-size: 1.02rem; }
-.qcard__body .part { border-left: 4px solid var(--indigo); background: var(--slate-50);
-  padding: .7rem 1rem; margin: .7rem 0; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
-.qcard__body .part b { color: var(--indigo-600); font-family: var(--font-ui); }
-.marks-inline { font-family: var(--font-ui); font-size: .75rem; font-weight: 700;
-  color: var(--badge-fg); background: var(--badge-bg); padding: .1rem .5rem; border-radius: 999px; margin-left: .4rem; }
-.options { list-style:none; margin:.75rem 0 0; padding:0; display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:.55rem; }
-.options li { background:var(--slate-50); border:1px solid var(--slate-200);
-  border-radius:var(--radius-sm); padding:.6rem .9rem; }
-.opt-key { font-family:var(--font-ui); font-weight:700; color:var(--slate-600); margin-right:.4rem; }
-.step { border:1px solid var(--slate-200); border-left:4px solid var(--indigo);
-  border-radius:var(--radius); padding:var(--pad-card); box-shadow:var(--shadow-sm); }
-.step + .step { margin-top:1rem; }
-.step__head { display:flex; align-items:center; gap:.6rem; flex-wrap:wrap; margin-bottom:.75rem;
-  font-family:var(--font-ui); font-weight:700; }
-.step__num { background:var(--indigo); color:#fff; border-radius:8px; min-width:1.9rem;
-  text-align:center; padding:.15rem .4rem; font-size:.85rem; }
-.math { margin:.65rem 0; overflow-x:auto; overflow-y:hidden; padding-bottom:2px; }
-.distractor { background:#fff; border:1px solid var(--slate-200); border-radius:var(--radius-sm);
-  padding:.75rem .95rem; margin:.5rem 0; }
-.distractor .opt-tag { font-family:var(--font-ui); font-weight:800; display:inline-block;
-  min-width:1.6rem; color:var(--slate-600); }
-.distractor.correct { background:var(--emerald-bg); border-color:var(--emerald-bd); }
-.distractor.correct .opt-tag { color:#065f46; }
-.distractor.wrong .opt-tag { color:#991b1b; }
-.distractor.wrong { background:#fef2f2; border-color:#fecaca; }
-.figure svg { max-width:100%; height:auto; }
-.step p { margin:.55em 0; }
-
+  .step{margin:12px 0 0;padding:12px 12px 10px;background:#fff;border:1px solid #e2e8f0;border-left:5px solid #cbd5e1;border-radius:12px;transition:border-color .25s,box-shadow .25s,transform .25s;box-shadow:0 2px 8px rgba(15,23,42,.04);}
+  .step.active{border-left-color:#2563eb;box-shadow:0 8px 22px rgba(37,99,235,.14);transform:translateY(-1px);}
+  .step[data-step="2"].active{border-left-color:#db2777;} .step[data-step="3"].active{border-left-color:#ea580c;}
+  .step[data-step="4"].active{border-left-color:#16a34a;} .step[data-step="5"].active{border-left-color:#7c3aed;}
+  .math{margin:6px 0 2px;}
+  .hint{font-size:.85rem;color:#64748b;margin-top:6px;border-top:1px dashed #e2e8f0;padding-top:6px;}
+  .hint b{color:#475569;}
+  .ans{margin-top:16px;padding:12px 14px;border-radius:12px;background:linear-gradient(135deg,#dcfce7,#f0fdf4);border:1px solid #86efac;font-weight:700;color:#14532d;}
+  .ro{font-size:.86rem;color:#475569;background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:7px 10px;margin:10px 0 0;text-align:center;}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;font-size:.8rem;color:#475569;margin:8px 0 0;justify-content:center;}
+  .legend span{display:inline-flex;align-items:center;gap:5px;}
+  .sw{width:12px;height:12px;border-radius:3px;display:inline-block;}
+  .kbd{font-family:ui-monospace,Menlo,Consolas,monospace;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:6px;padding:0 5px;font-size:.85em;}
 </style>
 </head>
 <body>
-<div class="container"><header class="hero"><p class="hero__eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</p><h1 class="hero__title">2023 Paper 2 · Question 7<span class="qstar"></span></h1><p class="hero__subtitle">Estimation, Approximation and Error</p><div class="hero__meta"><span class="badge badge--topic">Estimation, Approximation and Error</span><span class="badge badge--rate">Passing rate 82%</span></div></header><section class="card"><h2 class="card__title">Question</h2><div class="qcard__body"><p>If \(y=73.8\) (correct to 3 significant figures), find the range of values of \(y\).</p><ul class="options"><li><span class="opt-key">A.</span>\(73.7\le y&lt;73.9\)</li><li><span class="opt-key">B.</span>\(73.7&lt;y\le73.9\)</li><li><span class="opt-key">C.</span>\(73.75\le y&lt;73.85\)</li><li><span class="opt-key">D.</span>\(73.75&lt;y\le73.85\)</li></ul><figure style="margin:12px 0;text-align:center;"><img src="figures/2023_P2_Q7.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure></div></section><section class="card"><h2 class="card__title">Solution</h2><div class="qcard__body"><div class="step"><div class="step__head"><span class="step__num">1</span>3rd sig fig is the tenths place</div><div class="math">\[73.8-\tfrac{0.1}{2}\le y&lt;73.8+\tfrac{0.1}{2} \quad\Rightarrow\quad 73.75\le y&lt;73.85\]</div><div class="answer"><span class="answer__label">Answer</span>\(\;\mathbf{C}.\;\;\(73.75\le y&lt;73.85\)\)</div></div><div class="step"><div class="step__head"><span class="step__num">◆</span>Distractor analysis</div><div class="distractor correct"><span class="opt-tag">A</span>uses \(\pm0.1\) (wrong precision).</div><div class="distractor correct"><span class="opt-tag">B</span>wrong precision and endpoint.</div><div class="distractor correct"><span class="opt-tag">C</span>correct.</div><div class="distractor correct"><span class="opt-tag">D</span>wrong endpoint.</div></div></div></section><section class="card"><h2 class="card__title">Answer</h2><div class="qcard__body"><div class="answer"><span class="answer__label">Answer</span>\(\mathbf{C.}\) \(73.75\le y&lt;73.85\)</div></div></section></div><footer class="footer">HKDSE Mathematics (Compulsory Part) · 2023 Paper 2 Q07 · <a href="index.html">Index by year</a> · <a href="DSE_Maths_By_Topic.html">Index by topic</a></footer>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
+<div class="wrap">
+  <h1>HKDSE 2023 · Paper 2 · Question 7</h1>
+  <p class="sub">Estimation, Approximation &amp; Error — Numbers Correct to Significant Figures</p>
 
+  <div class="split">
+
+    <!-- ============ LEFT PANE : DIAGRAM ============ -->
+    <div class="diagram">
+      <div class="card">
+        <canvas id="cv" width="900" height="1100" aria-label="Number line showing the range of values of y"></canvas>
+        <p class="ro" id="ro">Scroll the solution steps → the diagram highlights each idea.</p>
+        <div class="legend">
+          <span><i class="sw" style="background:#94a3b8"></i>number line</span>
+          <span><i class="sw" style="background:#2563eb"></i>given value 73.8</span>
+          <span><i class="sw" style="background:#16a34a"></i>acceptable interval</span>
+          <span><i class="sw" style="background:#dc2626"></i>excluded endpoints</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ RIGHT PANE : QUESTION + SOLUTION ============ -->
+    <div>
+      <div class="q">
+        <h2>Question</h2>
+        <p>If $y=73.8$ (correct to 3 significant figures), find the range of values of $y$.</p>
+        <ul class="opts">
+          <li><b>A.</b>&nbsp; $73.75 \le y < 73.8$</li>
+          <li><b>B.</b>&nbsp; $73.75 < y \le 73.8$</li>
+          <li><b>C.</b>&nbsp; $73.75 \le y < 73.85$</li>
+          <li><b>D.</b>&nbsp; $73.8 \le y < 73.85$</li>
+        </ul>
+      </div>
+
+      <figure style="margin:12px 0;text-align:center;"><img src="figures/2023_P2_Q7.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
+
+      <div class="step" data-step="1">
+        <div class="step-tag"><span class="chip c1">1</span> Identify the place of the 3rd significant figure</div>
+        <p class="math">$73.8$ has significant figures <b>7</b>, <b>3</b>, <b>8</b>. The 3rd significant figure <b>$8$</b> sits at the <b>tenths place</b> (i.e. worth $0.1$).</p>
+        <div class="hint"><b>Hint:</b> The rounding unit = the place value of the last significant figure. Here the unit is $0.1$.</div>
+      </div>
+
+      <div class="step" data-step="2">
+        <div class="step-tag"><span class="chip c2">2</span> Find the "half-unit" error bound</div>
+        <p class="math">Maximum error $= \dfrac{0.1}{2} = 0.05$.</p>
+        <p class="math">A number rounds to $73.8$ if it lies within $0.05$ of $73.8$.</p>
+        <div class="hint"><b>Hint:</b> Correct to the nearest $0.1$ means an error strictly less than half of $0.1$.</div>
+      </div>
+
+      <div class="step" data-step="3">
+        <div class="step-tag"><span class="chip c3">3</span> Build the interval</div>
+        <p class="math">$$73.8-0.05 \;\le\; y \;<\; 73.8+0.05$$</p>
+        <p class="math">$$73.75 \;\le\; y \;<\; 73.85$$</p>
+        <div class="hint"><b>Hint:</b> The lower end <b>is included</b> (since $73.75$ rounds up to $73.8$); the upper end <b>is excluded</b> (since $73.85$ rounds up to $73.9$, not $73.8$).</div>
+      </div>
+
+      <div class="step" data-step="4">
+        <div class="step-tag"><span class="chip c4">4</span> Check the endpoints on the number line</div>
+        <p class="math">$73.75 \to 73.8$ &nbsp;✔ (included, solid dot)</p>
+        <p class="math">$73.8499\ldots \to 73.8$ &nbsp;✔ (inside)</p>
+        <p class="math">$73.85 \to 73.9$ &nbsp;✘ (excluded, open circle)</p>
+        <div class="hint"><b>Hint:</b> A solid dot means the value is included; a hollow circle means it is not.</div>
+      </div>
+
+      <div class="step" data-step="5">
+        <div class="step-tag"><span class="chip c5">5</span> Match the option</div>
+        <p class="math">The range $73.75 \le y < 73.85$ matches <b>option C</b>.</p>
+        <p class="math">Note that options A and B cut off at $73.8$, which wrongly excludes values such as $73.82$ that also round to $73.8$.</p>
+        <div class="hint"><b>Hint:</b> The interval must be symmetric about $73.8$ with width exactly $0.1$.</div>
+      </div>
+
+      <div class="ans">Answer: &nbsp; C &nbsp;— &nbsp; $73.75 \le y < 73.85$</div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function(){
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  const ro  = document.getElementById('ro');
+
+  const W = cv.width, H = cv.height;
+
+  // -------- mapping for the number line --------
+  const xMin = 73.60, xMax = 74.00;
+  const padL = 70, padR = 70;
+  const lineY = 300;                       // main number line y (canvas coords)
+  const px = v => padL + (v - xMin)/(xMax - xMin) * (W - padL - padR);
+
+  const COL = {
+    axis:'#94a3b8', tick:'#64748b', txt:'#334155',
+    blue:'#2563eb', green:'#16a34a', red:'#dc2626',
+    purple:'#7c3aed', orange:'#ea580c', pink:'#db2777',
+    faint:'#e2e8f0'
+  };
+
+  function arrow(x1,y1,x2,y2,color,w){
+    ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineWidth=w||2;
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+    const a=Math.atan2(y2-y1,x2-x1), s=9;
+    ctx.beginPath();
+    ctx.moveTo(x2,y2);
+    ctx.lineTo(x2-s*Math.cos(a-0.4), y2-s*Math.sin(a-0.4));
+    ctx.lineTo(x2-s*Math.cos(a+0.4), y2-s*Math.sin(a+0.4));
+    ctx.closePath(); ctx.fill();
+  }
+
+  function dot(x,y,r,fill,stroke){
+    ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
+    ctx.fillStyle=fill; ctx.fill();
+    if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=2.5;ctx.stroke();}
+  }
+
+  function label(text,x,y,color,size,align,bold){
+    ctx.fillStyle=color||COL.txt;
+    ctx.font=(bold?'700 ':'')+(size||20)+'px "Segoe UI",system-ui,Arial,sans-serif';
+    ctx.textAlign=align||'center'; ctx.textBaseline='middle';
+    ctx.fillText(text,x,y);
+  }
+
+  function roundRect(x,y,w,h,r,fill,stroke,lw){
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);
+    ctx.arcTo(x+w,y,x+w,y+h,r);
+    ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r);
+    ctx.arcTo(x,y,x+w,y,r);
+    ctx.closePath();
+    if(fill){ctx.fillStyle=fill;ctx.fill();}
+    if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lw||1.5;ctx.stroke();}
+  }
+
+  // ---------------------------------------------------------
+  //  Title band that changes with the active step
+  // ---------------------------------------------------------
+  const TITLES = {
+    0:["Correct to 3 significant figures", "y = 73.8", "#2563eb"],
+    1:["Step 1 — the 3rd s.f. (8) is at the tenths place", "3rd s.f. → 0.1 place", "#2563eb"],
+    2:["Step 2 — half-unit error 0.1 ÷ 2 = 0.05", "max error = 0.05", "#db2777"],
+    3:["Step 3 — interval: 73.8 − 0.05 ≤ y < 73.8 + 0.05", "73.75 ≤ y < 73.85", "#ea580c"],
+    4:["Step 4 — endpoint check", "73.75 included · 73.85 excluded", "#16a34a"],
+    5:["Step 5 — match the option", "Answer: C", "#7c3aed"]
+  };
+  const READ = {
+    0:"y = 73.8 (correct to 3 s.f.) — where can the true value lie?",
+    1:"The 3rd significant figure of 73.8 is 8, sitting in the tenths place.",
+    2:"Rounding unit 0.1 ⇒ maximum error 0.1 ÷ 2 = 0.05.",
+    3:"Lower bound 73.8−0.05 = 73.75 (included); upper bound 73.8+0.05 = 73.85 (excluded).",
+    4:"73.75 → 73.8 ✔ ; 73.85 → 73.9 ✘ — solid dot at 73.75, open circle at 73.85.",
+    5:"Range 73.75 ≤ y < 73.85 — this is option C."
+  };
+
+  function draw(step){
+    step = step || 0;
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle="#fbfdff"; ctx.fillRect(0,0,W,H);
+
+    // ---------- title card ----------
+    const t = TITLES[step] || TITLES[0];
+    roundRect(30,26,W-60,86,16,'#ffffff','#dbeafe',2);
+    ctx.fillStyle=t[2]; ctx.fillRect(30,26,10,86);
+    label(t[0], 58, 58, '#0f172a', 21, 'left', true);
+    label(t[1], 58, 90, t[2], 24, 'left', true);
+
+    // ================= NUMBER LINE =================
+    // background band for the number line region
+    roundRect(30, 150, W-60, 300, 16, '#ffffff', '#e2e8f0', 1.5);
+
+    // axis
+    arrow(padL-34, lineY, W-padR+34, lineY, COL.axis, 3);
+
+    // ---- highlight the whole y-interval 73.75 .. 73.85 (green band) ----
+    const xA = px(73.75), xB = px(73.85);
+    if(step>=3){
+      // soft green region
+      const g = ctx.createLinearGradient(xA,0,xB,0);
+      g.addColorStop(0,'rgba(22,163,74,.28)');
+      g.addColorStop(1,'rgba(22,163,74,.14)');
+      ctx.fillStyle=g;
+      ctx.fillRect(xA, lineY-62, xB-xA, 62);
+      // bracket under
+      ctx.strokeStyle=COL.green; ctx.lineWidth=3;
+      ctx.beginPath();
+      ctx.moveTo(xA,lineY+34); ctx.lineTo(xB,lineY+34); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(xA,lineY+34); ctx.lineTo(xA,lineY+22); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(xB,lineY+34); ctx.lineTo(xB,lineY+22); ctx.stroke();
+      label("width = 0.10", (xA+xB)/2, lineY+62, COL.green, 18, 'center', true);
+    }
+
+    // ---- the ±0.05 error band around 73.8 ----
+    const xc = px(73.8);
+    if(step>=2){
+      ctx.setLineDash([7,7]);
+      ctx.strokeStyle=COL.pink; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.moveTo(px(73.75), lineY-96); ctx.lineTo(px(73.75), lineY+16); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(px(73.85), lineY-96); ctx.lineTo(px(73.85), lineY+16); ctx.stroke();
+      ctx.setLineDash([]);
+      // double arrow showing 0.05 each side
+      arrow(xc-6, lineY-96, px(73.75)+6, lineY-96, COL.pink, 2);
+      arrow(xc, lineY-96, px(73.85), lineY-96, COL.pink, 2);
+      label("0.05", (px(73.75)+xc)/2, lineY-116, COL.pink, 17, 'center', true);
+      label("0.05", (xc+px(73.85))/2, lineY-116, COL.pink, 17, 'center', true);
+    }
+
+    // ---- ticks & numeric labels every 0.05 ----
+    for(let v=73.60; v<=74.0001; v+=0.05){
+      const x = px(v);
+      const isMajor = Math.abs(v*10 - Math.round(v*10)) < 1e-6; // 0.1 grid
+      const big = Math.abs(v*100 - Math.round(v*100/10)*10) < 1e-6; // multiples of 0.1
+      ctx.strokeStyle = big ? COL.tick : '#cbd5e1';
+      ctx.lineWidth  = big ? 2 : 1.2;
+      ctx.beginPath(); ctx.moveTo(x, lineY); ctx.lineTo(x, lineY + (big?16:9)); ctx.stroke();
+
+      if(big){
+        label(v.toFixed(1), x, lineY+38, '#475569', 18, 'center', true);
+      } else {
+        // label key non-multiples only selectively to avoid clutter
+        if(step>=3 && (Math.abs(v-73.75)<1e-6 || Math.abs(v-73.85)<1e-6)){
+          label(v.toFixed(2), x, lineY+38, COL.green, 18, 'center', true);
+        }
+      }
+    }
+    // extra fine label for 73.75 / 73.85 always when relevant
+    if(step>=3){
+      label("73.75", px(73.75), lineY+64, COL.green, 19, 'center', true);
+      label("73.85", px(73.85), lineY+64, COL.green, 19, 'center', true);
+    }
+
+    // ---- center marker 73.8 ----
+    const showCenter = true;
+    if(showCenter){
+      ctx.strokeStyle=COL.blue; ctx.lineWidth=3;
+      ctx.beginPath(); ctx.moveTo(xc, lineY-6); ctx.lineTo(xc, lineY+16); ctx.stroke();
+      dot(xc, lineY, 8, COL.blue, '#ffffff');
+      label("73.8", xc, lineY-30, COL.blue, 22, 'center', true);
+    }
+
+    // ---- step-specific endpoint marks ----
+    if(step>=1){
+      // show the 3rd s.f. digit "8" in a chip above 73.8
+      roundRect(xc-24, lineY-92, 48, 40, 9, 'rgba(37,99,235,.12)', COL.blue, 2);
+      label("8", xc, lineY-71, COL.blue, 22, 'center', true);
+      label("3rd s.f. · tenths place", xc, lineY-108, COL.blue, 16, 'center', true);
+    }
+
+    if(step>=4){
+      // solid dot at 73.75 (included)
+      dot(px(73.75), lineY, 10, COL.green, '#ffffff');
+      label("included", px(73.75), lineY-70, COL.green, 17, 'center', true);
+      // open circle at 73.85 (excluded)
+      dot(px(73.85), lineY, 10, '#ffffff', COL.red);
+      label("excluded", px(73.85), lineY-70, COL.red, 17, 'center', true);
+      // small cross near 73.85 x-axis
+      // Show rounded examples
+      label("73.75 → 73.8", px(73.75), lineY+96, '#16a34a', 17, 'center', true);
+      label("73.85 → 73.9", px(73.85), lineY+96, '#dc2626', 17, 'center', true);
+    } else if(step>=3){
+      dot(px(73.75), lineY, 9, COL.green, '#ffffff');
+      dot(px(73.85), lineY, 9, '#ffffff', COL.green);
+    }
+
+    // ================= LOWER PANEL: zoomed interval diagram =================
+    const by = 560;                 // block top
+    roundRect(30, by, W-60, 500, 16, '#ffffff', '#e2e8f0', 1.5);
+    label("Zoomed view of the acceptable interval", W/2, by+34, '#0f172a', 21, 'center', true);
+
+    // big interval bar
+    const bx0 = 90, bx1 = W-90, bw = bx1-bx0;
+    const barY = by+130, barH = 78;
+
+    // gradient bar
+    const bg = ctx.createLinearGradient(bx0,0,bx1,0);
+    bg.addColorStop(0,'#22c55e'); bg.addColorStop(.5,'#4ade80'); bg.addColorStop(1,'#86efac');
+    ctx.fillStyle = (step>=3) ? bg : '#e5e7eb';
+    roundRect(bx0, barY, bw, barH, 12, ctx.fillStyle, '#cbd5e1', 1.5);
+
+    // numeric captions on the bar
+    label("73.75", bx0+6, barY+barH/2, '#ffffff', 24, 'left', true);
+    label("73.85", bx1-6, barY+barH/2, '#ffffff', 24, 'right', true);
+
+    // endpoint markers on the bar
+    if(step>=4 || step>=3){
+      dot(bx0, barY+barH+24, 11, COL.green, '#ffffff');   // included
+      dot(bx1, barY+barH+24, 11, '#ffffff', COL.red);      // excluded
+    } else {
+      dot(bx0, barY+barH+24, 11, '#94a3b8', '#ffffff');
+      dot(bx1, barY+barH+24, 11, '#94a3b8', '#ffffff');
+    }
+    label("≤ (included)", bx0+4, barY-26, step>=4?COL.green:'#94a3b8', 18, 'left', true);
+    label("< (excluded)", bx1-4, barY-26, step>=4?COL.red:'#94a3b8', 18, 'right', true);
+
+    // center marker 73.8
+    const cxm = (bx0+bx1)/2;
+    ctx.setLineDash([6,6]);
+    ctx.strokeStyle=COL.blue; ctx.lineWidth=2.5;
+    ctx.beginPath(); ctx.moveTo(cxm, barY-14); ctx.lineTo(cxm, barY+barH+14); ctx.stroke();
+    ctx.setLineDash([]);
+    label("73.8", cxm, barY-34, COL.blue, 22, 'center', true);
+
+    // ---- lower-left: computation card ----
+    const cy0 = by+250;
+    roundRect(60, cy0, W/2-90, 210, 14, '#f8fafc', '#e2e8f0', 1.5);
+    label("Rounding unit", W/4+15, cy0+34, '#64748b', 17, 'center', true);
+    label("0.1", W/4+15, cy0+72, COL.blue, 30, 'center', true);
+    label("Max error = 0.1 ÷ 2", W/4+15, cy0+118, '#64748b', 17, 'center', true);
+    label("= 0.05", W/4+15, cy0+158, COL.pink, 30, 'center', true);
+
+    // ---- lower-right: interval card ----
+    roundRect(W/2+30, cy0, W/2-90, 210, 14, '#f0fdf4', '#bbf7d0', 1.5);
+    label("Lower bound:", W/2+60, cy0+42, '#16a34a', 17, 'left', true);
+    label("73.8 − 0.05 = 73.75", W/2+60, cy0+76, '#16a34a', 22, 'left', true);
+    label("Upper bound:", W/2+60, cy0+126, '#16a34a', 17, 'left', true);
+    label("73.8 + 0.05 = 73.85", W/2+60, cy0+160, '#16a34a', 22, 'left', true);
+
+    // ================= BOTTOM: answer strip =================
+    const ay = by+480;
+    if(step>=5 || step===0){
+      roundRect(30, ay, W-60, 0, 0, 'rgba(0,0,0,0)');
+    }
+
+    // highlight band for active step
+    if(step>=1){
+      // small step chips column on the right of the number-line panel
+      const chips = [
+        {n:1,l:"3rd s.f. at tenths",c:COL.blue},
+        {n:2,l:"error = 0.05",c:COL.pink},
+        {n:3,l:"73.75 ≤ y < 73.85",c:COL.orange},
+        {n:4,l:"73.75 ✔ / 73.85 ✘",c:COL.green},
+        {n:5,l:"Answer C",c:COL.purple}
+      ];
+      let yy = 500;
+      chips.forEach(c=>{
+        const on = (c.n===step);
+        roundRect(40, yy, W-80, 34, 9, on ? c.c : '#f1f5f9', on ? c.c : '#e2e8f0', 1.5);
+        label("Step "+c.n+" — "+c.l, 60, yy+17, on ? '#ffffff' : '#64748b', 17, 'left', on);
+        yy += 40;
+      });
+    }
+
+    ro.textContent = READ[step] || READ[0];
+  }
+
+  // -------- scroll sync --------
+  let current = 0;
+  const io = new IntersectionObserver(es=>{
+    es.forEach(e=>{
+      if(e.isIntersecting){
+        current = +e.target.dataset.step;
+        document.querySelectorAll('.step').forEach(s=>s.classList.toggle('active', +s.dataset.step===current));
+        draw(current);
+      }
+    });
+  },{rootMargin:'-25% 0px -55% 0px'});
+  document.querySelectorAll('.step').forEach(s=>io.observe(s));
+
+  // initial render
+  draw(0);
+  // highlight step 1 as active by default
+  document.querySelector('.step[data-step="1"]').classList.add('active');
+
+  // redraw on resize for crisp scaling (canvas uses CSS width)
+  window.addEventListener('resize', ()=>draw(current));
+})();
+</script>
 </body>
 </html>

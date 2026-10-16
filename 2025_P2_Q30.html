@@ -1,933 +1,575 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HKDSE Math 2025 Paper 2 Q30 — Statistics</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HKDSE 2025 Paper 2 Q30 — Statistics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1f2937;
+    --muted:#6b7280;
+    --blue:#2563eb;
+    --green:#059669;
+    --amber:#d97706;
+    --rose:#e11d48;
+    --violet:#7c3aed;
+    --cyan:#0891b2;
+    --bg:#f8fafc;
+    --card:#ffffff;
+    --line:#e5e7eb;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+    color:var(--ink);
+    background:var(--bg);
+    font-size:15.5px;
+    line-height:1.55;
+  }
+  .wrap{max-width:1220px;margin:0 auto;padding:16px 14px 60px;}
+  .split{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    gap:12px;
+    align-items:start;
+  }
+  @media(min-width:900px){
+    .split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}
+  }
+
+  /* ---------- LEFT ---------- */
+  .diagram{
+    position:sticky;top:16px;
+    max-height:calc(100vh - 2rem);
+    overflow-y:auto;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:12px;
+    box-shadow:0 6px 20px rgba(15,23,42,.06);
+  }
+  .diagram h3{
+    margin:2px 0 8px;
+    font-size:14px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--muted);
+    font-weight:700;
+  }
+  canvas{width:100%;height:auto;display:block;border-radius:12px;background:#ffffff;}
+  .ro{
+    margin:8px 2px 2px;
+    font-size:13px;
+    color:var(--muted);
+    min-height:18px;
+  }
+  .legend{
+    display:flex;flex-wrap:wrap;gap:10px 16px;
+    margin-top:10px;font-size:12.5px;color:#374151;
+  }
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .swatch{width:12px;height:12px;border-radius:3px;display:inline-block;}
+
+  /* ---------- RIGHT ---------- */
+  .panel{min-width:0;}
+  .qcard{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:16px 18px;
+    box-shadow:0 6px 20px rgba(15,23,42,.06);
+    margin-bottom:14px;
+  }
+  .qtag{
+    display:inline-block;
+    font-size:12px;font-weight:700;letter-spacing:.05em;
+    color:#fff;background:linear-gradient(135deg,#2563eb,#7c3aed);
+    padding:3px 10px;border-radius:999px;margin-bottom:10px;
+  }
+  .qtext{font-size:15.5px;}
+  .data-row{
+    display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 4px;
+  }
+  .chip{
+    min-width:40px;text-align:center;
+    padding:5px 10px;border-radius:10px;
+    border:2px solid;
+    font-weight:700;font-size:15px;
+  }
+  .c-unk{border-color:var(--violet);color:var(--violet);background:#f5f3ff;}
+  .c-num{border-color:var(--cyan);color:var(--cyan);background:#ecfeff;}
+
+  .opts{margin-top:12px;display:grid;gap:6px;}
+  .opt{
+    display:flex;gap:10px;align-items:flex-start;
+    padding:7px 10px;border-radius:10px;border:1px solid var(--line);
+    background:#fbfdff;font-weight:600;font-size:14.5px;
+  }
+  .opt b{color:var(--blue);}
+
+  .steps{margin-top:4px;}
+  .step{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-left:5px solid var(--blue);
+    border-radius:14px;
+    padding:14px 16px;
+    margin-bottom:12px;
+    box-shadow:0 4px 14px rgba(15,23,42,.05);
+    transition:box-shadow .25s, transform .25s, border-color .25s;
+  }
+  .step:hover{box-shadow:0 8px 22px rgba(15,23,42,.10);}
+  .steptag{
+    display:inline-flex;align-items:center;gap:8px;
+    font-weight:700;font-size:13px;letter-spacing:.04em;
+    text-transform:uppercase;color:var(--blue);
+    margin-bottom:6px;
+  }
+  .num{
+    width:22px;height:22px;border-radius:50%;
+    background:var(--blue);color:#fff;
+    display:inline-flex;align-items:center;justify-content:center;
+    font-size:12.5px;font-weight:700;
+  }
+  .step[data-step="1"]{border-left-color:var(--rose);}
+  .step[data-step="1"] .steptag{color:var(--rose);}
+  .step[data-step="1"] .num{background:var(--rose);}
+  .step[data-step="2"]{border-left-color:var(--amber);}
+  .step[data-step="2"] .steptag{color:var(--amber);}
+  .step[data-step="2"] .num{background:var(--amber);}
+  .step[data-step="3"]{border-left-color:var(--green);}
+  .step[data-step="3"] .steptag{color:var(--green);}
+  .step[data-step="3"] .num{background:var(--green);}
+  .step[data-step="4"]{border-left-color:var(--violet);}
+  .step[data-step="4"] .steptag{color:var(--violet);}
+  .step[data-step="4"] .num{background:var(--violet);}
+  .step[data-step="5"]{border-left-color:var(--cyan);}
+  .step[data-step="5"] .steptag{color:var(--cyan);}
+  .step[data-step="5"] .num{background:var(--cyan);}
+
+  .hint{
+    margin-top:7px;font-size:13.5px;color:var(--muted);
+    background:#f8fafc;border-radius:8px;padding:6px 10px;
+  }
+  .verdict{
+    margin-top:7px;font-weight:700;font-size:14px;
+  }
+  .ok{color:var(--green);}
+  .no{color:var(--rose);}
+
+  .answer{
+    background:linear-gradient(135deg,#ecfdf5,#eff6ff);
+    border:2px solid var(--green);
+    border-radius:14px;
+    padding:14px 18px;
+    margin-top:6px;
+  }
+  .answer .lbl{
+    font-size:12px;font-weight:700;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--green);
+  }
+  .answer .val{font-size:20px;font-weight:700;color:#065f46;margin-top:2px;}
+
+  @media(max-width:640px){
+    body{font-size:14.5px;}
+    .wrap{padding:10px 8px 40px;}
+    .qcard{padding:13px 13px;}
+    .step{padding:12px 12px;}
+  }
+</style>
 <script>
   window.MathJax = {
-    tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['\\[', '\\]']] },
+    tex: {
+      inlineMath: [['$','$'], ['\\(','\\)']],
+      displayMath: [['$$','$$'], ['\\[','\\]']]
+    },
     svg: { fontCache: 'global' }
   };
 </script>
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
-<style>
-  :root{
-    --blue:#1d4ed8;
-    --blue-dark:#172554;
-    --blue-light:#dbeafe;
-    --amber:#f59e0b;
-    --amber-light:#fef3c7;
-    --emerald:#059669;
-    --emerald-light:#d1fae5;
-    --ink:#0f172a;
-    --muted:#64748b;
-    --card:#ffffff;
-    --bg:#f1f5f9;
-  }
-  *{box-sizing:border-box;}
-  body{
-    margin:0;
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-    background:var(--bg);
-    color:var(--ink);
-    line-height:1.55;
-    -webkit-font-smoothing:antialiased;
-  }
-  .wrap{max-width:900px;margin:0 auto;padding:0 14px 60px;}
-
-  /* HERO */
-  header.hero{
-    background:linear-gradient(135deg,#1e3a8a 0%,#1d4ed8 45%,#0e7490 100%);
-    color:#fff;
-    padding:34px 20px 30px;
-    text-align:center;
-    position:relative;
-    overflow:hidden;
-  }
-  header.hero::after{
-    content:"";
-    position:absolute;inset:0;
-    background:radial-gradient(circle at 80% 10%, rgba(255,255,255,.16), transparent 55%);
-    pointer-events:none;
-  }
-  .eyebrow{
-    font-size:12px;letter-spacing:.16em;text-transform:uppercase;
-    opacity:.85;font-weight:600;margin:0 0 8px;
-  }
-  .pnum{
-    font-size:clamp(22px,5vw,32px);font-weight:800;margin:0 0 6px;letter-spacing:.01em;
-  }
-  .subtitle{font-size:clamp(13px,2.6vw,16px);opacity:.92;margin:0 0 18px;font-weight:500;}
-  .pills{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;position:relative;z-index:1;}
-  .pill{
-    background:rgba(255,255,255,.18);
-    border:1px solid rgba(255,255,255,.35);
-    padding:5px 13px;border-radius:999px;
-    font-size:12px;font-weight:600;letter-spacing:.02em;
-    backdrop-filter:blur(4px);
-  }
-
-  /* CARDS */
-  .card{
-    background:var(--card);
-    border-radius:18px;
-    box-shadow:0 1px 3px rgba(15,23,42,.06),0 8px 26px -12px rgba(15,23,42,.18);
-    padding:22px 20px;
-    margin-top:22px;
-    border:1px solid rgba(15,23,42,.05);
-  }
-  .card h2{
-    margin:0 0 14px;
-    font-size:clamp(17px,3.4vw,20px);
-    color:var(--blue-dark);
-    display:flex;align-items:center;gap:9px;
-  }
-  .card h2 .dot{
-    width:10px;height:10px;border-radius:50%;
-    background:var(--amber);flex:none;box-shadow:0 0 0 4px var(--amber-light);
-  }
-  .qtext{font-size:15.5px;}
-  .qtext ol.roman{margin:10px 0 10px 6px;padding-left:20px;}
-  .qtext ol.roman li{margin:3px 0;}
-  .choices{
-    display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-    gap:8px;margin-top:14px;
-  }
-  .choice{
-    border:1.5px solid #e2e8f0;border-radius:11px;
-    padding:8px 12px;font-size:14px;font-weight:600;color:#334155;background:#f8fafc;
-  }
-  .choice.correct{
-    border-color:var(--emerald);background:var(--emerald-light);color:#065f46;
-  }
-  .marks{
-    display:inline-block;background:var(--blue-light);color:var(--blue-dark);
-    font-size:11.5px;font-weight:700;border-radius:6px;padding:2px 8px;margin-left:8px;
-    vertical-align:middle;
-  }
-
-  /* CANVAS */
-  .canvas-box{
-    margin:16px 0 4px;
-    background:#f8fafc;
-    border:1px solid #e2e8f0;
-    border-radius:14px;
-    padding:12px;
-  }
-  canvas{width:100%;display:block;border-radius:10px;background:#fff;}
-  .controls{
-    display:flex;flex-wrap:wrap;gap:14px;align-items:center;
-    margin-top:12px;font-size:13px;color:#334155;
-  }
-  .ctrl{display:flex;align-items:center;gap:8px;}
-  input[type=range]{width:150px;accent-color:var(--blue);}
-  .val{font-weight:700;color:var(--blue-dark);font-variant-numeric:tabular-nums;
-    background:#eef2ff;border-radius:6px;padding:1px 7px;min-width:38px;text-align:center;}
-  .readout{
-    display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;
-  }
-  .ro{
-    background:#fff;border:1px solid #e2e8f0;border-radius:10px;
-    padding:6px 12px;font-size:12.5px;color:#475569;
-  }
-  .ro b{color:var(--blue-dark);font-variant-numeric:tabular-nums;}
-
-  /* STEPS */
-  .step{
-    display:none;
-    border-left:4px solid var(--blue);
-    background:linear-gradient(90deg,#f8fbff,#ffffff 60%);
-    border-radius:0 12px 12px 0;
-    padding:14px 16px;
-    margin:12px 0;
-    animation:fade .35s ease;
-  }
-  .step.show{display:block;}
-  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
-  .step-head{
-    display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:8px;
-  }
-  .badge{
-    background:var(--blue);color:#fff;font-size:11.5px;font-weight:800;
-    border-radius:999px;padding:3px 10px;letter-spacing:.03em;
-  }
-  .markbadge{
-    background:var(--amber-light);color:#92400e;font-size:11px;font-weight:800;
-    border-radius:999px;padding:3px 10px;border:1px solid #fcd34d;
-  }
-  .step-body{font-size:15px;}
-  .hint{
-    background:var(--amber-light);
-    border-left:4px solid var(--amber);
-    border-radius:0 10px 10px 0;
-    padding:9px 13px;margin-top:10px;font-size:13.5px;color:#78350f;
-  }
-  .hint b{color:#92400e;}
-  .answer{
-    background:var(--emerald-light);
-    border-left:4px solid var(--emerald);
-    border-radius:0 10px 10px 0;
-    padding:9px 13px;margin-top:10px;font-size:14px;color:#065f46;font-weight:600;
-  }
-  .btnrow{display:flex;align-items:center;gap:14px;margin-top:16px;flex-wrap:wrap;}
-  button.next{
-    background:linear-gradient(135deg,var(--blue),#0e7490);
-    color:#fff;border:none;border-radius:11px;
-    padding:11px 20px;font-size:14.5px;font-weight:700;cursor:pointer;
-    box-shadow:0 6px 16px -6px rgba(29,78,216,.6);
-    transition:transform .12s ease,box-shadow .12s ease,opacity .2s;
-  }
-  button.next:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 10px 22px -8px rgba(29,78,216,.7);}
-  button.next:disabled{opacity:.5;cursor:default;box-shadow:none;background:#94a3b8;}
-  .counter{font-size:13px;color:var(--muted);font-weight:600;}
-
-  /* SUMMARY */
-  .card.dark{
-    background:linear-gradient(140deg,#0f172a,#1e293b);
-    color:#e2e8f0;border:1px solid #1e293b;
-  }
-  .card.dark h2{color:#fbbf24;}
-  .card.dark h2 .dot{background:#fbbf24;box-shadow:0 0 0 4px rgba(251,191,36,.2);}
-  .card.dark ul{margin:0;padding-left:20px;}
-  .card.dark li{margin:8px 0;font-size:15px;}
-  .card.dark li b{color:#fbbf24;}
-
-  footer{
-    text-align:center;color:var(--muted);font-size:12.5px;
-    padding:28px 16px 10px;
-  }
-  @media(max-width:520px){
-    .card{padding:18px 15px;}
-    input[type=range]{width:120px;}
-  }
-</style>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 </head>
 <body>
-
-<header class="hero">
-  <p class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</p>
-  <h1 class="pnum">2025 Paper 2 · Question 30</h1>
-  <p class="subtitle">Statistics — Mode, Median, Mean &amp; Range of a Data Set</p>
-  <div class="pills">
-    <span class="pill">Mean</span>
-    <span class="pill">Median</span>
-    <span class="pill">Mode</span>
-    <span class="pill">Range</span>
-    <span class="pill">Ordered Data</span>
-  </div>
-</header>
-
 <div class="wrap">
+  <div class="split">
 
-  <!-- QUESTION -->
-  <section class="card">
-    <h2><span class="dot"></span>Question <span class="marks">Multiple Choice</span></h2>
-    <div class="qtext">
-      <p>Consider the following data:</p>
-      <p style="font-size:17px;text-align:center;letter-spacing:.05em;">\[ \alpha \quad \beta \quad -4 \quad -3 \quad 1 \quad 1 \quad 1 \quad 4 \]</p>
-      <p>Denote the mode and the median of the above data by \(s\) and \(t\) respectively. If the mean and the range of the above data are \(0\) and \(10\) respectively, which of the following are true?</p>
-      <ol class="roman" type="I">
-        <li>\(s = 1\)</li>
-        <li>\(t = -1\)</li>
-        <li>\(\alpha + \beta = 0\)</li>
-      </ol>
-      <div class="choices">
-        <div class="choice">A. I and II only</div>
-        <div class="choice">B. I and III only</div>
-        <div class="choice">C. II and III only</div>
-        <div class="choice">D. I, II and III</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PART (a) -->
-  <section class="card">
-    <h2><span class="dot"></span>Part (a) — Find the mean condition &amp; prove \(\alpha+\beta=0\)</h2>
-
-    <div class="canvas-box">
-      <canvas id="cvMean" height="600"></canvas>
-      <div class="controls">
-        <div class="ctrl">
-          <label for="sb">Set \(\beta\):</label>
-          <input type="range" id="sb" min="-6" max="6" step="1" value="-5">
-          <span class="val" id="sbVal">-5</span>
-        </div>
-        <div class="ctrl">
-          <label style="cursor:pointer;">
-            <input type="checkbox" id="showMean" checked> show mean line
-          </label>
-        </div>
-      </div>
-      <div class="readout">
-        <div class="ro">Sum of the 6 fixed numbers: <b>-4-3+1+1+1+4 = 0</b></div>
-        <div class="ro">\(\alpha = -\beta\) → <b id="roA">5</b></div>
-        <div class="ro">Total sum: <b id="roSum">0</b></div>
-        <div class="ro">Mean = <b id="roMean">0</b></div>
+    <!-- ================= LEFT : DIAGRAM ================= -->
+    <div class="diagram">
+      <h3>Dot Plot of the Data</h3>
+      <canvas id="cv" width="640" height="470"></canvas>
+      <p class="ro" id="ro">Step 1: the raw data set with the two unknown values $\alpha$ and $\beta$.</p>
+      <div class="legend">
+        <span><i class="swatch" style="background:#7c3aed"></i>unknowns α, β</span>
+        <span><i class="swatch" style="background:#0891b2"></i>known values</span>
+        <span><i class="swatch" style="background:#e11d48"></i>mode (appears most)</span>
+        <span><i class="swatch" style="background:#d97706"></i>median position</span>
+        <span><i class="swatch" style="background:#059669"></i>range 10</span>
       </div>
     </div>
 
-    <div class="step" id="a1">
-      <div class="step-head"><span class="badge">Step 1</span></div>
-      <div class="step-body">
-        The data set has \(8\) values. Write the mean condition:
-        \[ \frac{\alpha+\beta+(-4)+(-3)+1+1+1+4}{8} = 0 \]
-      </div>
-      <div class="hint"><b>Hint:</b> The "mean is \(0\)" means the <em>sum</em> equals \(0\times 8 = 0\).</div>
-    </div>
+    <!-- ================= RIGHT : QUESTION + SOLUTION ================= -->
+    <div class="panel">
 
-    <div class="step" id="a2">
-      <div class="step-head"><span class="badge">Step 2</span></div>
-      <div class="step-body">
-        Compute the known part: \(-4-3+1+1+1+4 = 0\). So
-        \[ \frac{\alpha+\beta}{8} = 0 \quad\Longrightarrow\quad \alpha+\beta = 0 \]
-      </div>
-      <div class="answer">\(\alpha + \beta = 0\) — statement <b>III is true</b>.</div>
-      <div class="hint"><b>Hint:</b> The six fixed values already sum to zero, so all the "mean = 0" burden falls on \(\alpha\) and \(\beta\).</div>
-    </div>
-
-    <div class="btnrow">
-      <button class="next" data-target="a1,a2" data-idx="0">Next step →</button>
-      <span class="counter" id="c-a">0 / 2</span>
-    </div>
-  </section>
-
-  <!-- PART (b) -->
-  <section class="card">
-    <h2><span class="dot"></span>Part (b) — Use the range to find \(\alpha\) and \(\beta\)</h2>
-
-    <div class="canvas-box">
-      <canvas id="cvRange" height="600"></canvas>
-      <div class="controls">
-        <div class="ctrl">
-          <label for="sRange">Set the range \(R\):</label>
-          <input type="range" id="sRange" min="4" max="14" step="1" value="10">
-          <span class="val" id="sRangeVal">10</span>
-        </div>
-        <div class="ctrl">
-          <label style="cursor:pointer;">
-            <input type="checkbox" id="showSpan" checked> show range span
-          </label>
+      <div class="qcard">
+        <span class="qtag">HKDSE 2025 · Paper 2 · Q30</span>
+        <div class="qtext">
+          <p style="margin:0 0 6px;">Consider the following data:</p>
+          <div class="data-row">
+            <span class="chip c-unk">α</span>
+            <span class="chip c-unk">β</span>
+            <span class="chip c-num">−4</span>
+            <span class="chip c-num">−3</span>
+            <span class="chip c-num">1</span>
+            <span class="chip c-num">1</span>
+            <span class="chip c-num">1</span>
+            <span class="chip c-num">4</span>
+          </div>
+          <p style="margin:10px 0 0;">
+            Denote the mode and the median of the above data by $s$ and $t$ respectively.
+            If the mean and the range of the above data are $0$ and $10$ respectively,
+            which of the following are true?
+          </p>
+          <div class="opts">
+            <div class="opt"><b>I.</b><span>$s = 1$</span></div>
+            <div class="opt"><b>II.</b><span>$t = -1$</span></div>
+            <div class="opt"><b>III.</b><span>$\alpha + \beta = 0$</span></div>
+          </div>
+          <div class="opts" style="margin-top:12px;">
+            <div class="opt"><b>A.</b><span>I and II only</span></div>
+            <div class="opt"><b>B.</b><span>I and III only</span></div>
+            <div class="opt"><b>C.</b><span>II and III only</span></div>
+            <div class="opt"><b>D.</b><span>I, II and III</span></div>
+          </div>
         </div>
       </div>
-      <div class="readout">
-        <div class="ro">Smallest fixed value: <b>-4</b></div>
-        <div class="ro">Largest fixed value: <b>4</b></div>
-        <div class="ro">Range so far: <b>4 - (-4) = 8</b></div>
-        <div class="ro" id="roNeed">Need range 10 → extend by <b>2</b> → \(\{5,\,-5\}\)</div>
-      </div>
-    </div>
 
-    <div class="step" id="b1">
-      <div class="step-head"><span class="badge">Step 1</span></div>
-      <div class="step-body">
-        The fixed values span from \(-4\) to \(4\): a range of \(4-(-4)=8\).
-        Since the given range is \(10 > 8\), the pair \(\{\alpha,\beta\}\) must supply the extreme values.
-      </div>
-      <div class="hint"><b>Hint:</b> Range \(=\) largest \(-\) smallest. With \(\alpha=-\beta\), one of them is positive and one is negative.</div>
-    </div>
+      
 
-    <div class="step" id="b2">
-      <div class="step-head"><span class="badge">Step 2</span></div>
-      <div class="step-body">
-        Let the positive one be \(x>0\), so the other is \(-x\). Range:
-        \[ x - (-x) = 2x = 10 \quad\Longrightarrow\quad x = 5 \]
-        Hence \(\{\alpha,\beta\} = \{5,\,-5\}\).
-      </div>
-      <div class="answer">\(\alpha\) and \(\beta\) must be \(5\) and \(-5\) (in some order).</div>
-      <div class="hint"><b>Hint:</b> Watch out — this is a "must be" conclusion, so we cannot yet decide which is \(\alpha\) and which is \(\beta\).</div>
-    </div>
+      <div class="steps">
 
-    <div class="btnrow">
-      <button class="next" data-target="b1,b2" data-idx="0">Next step →</button>
-      <span class="counter" id="c-b">0 / 2</span>
-    </div>
-  </section>
-
-  <!-- PART (c) -->
-  <section class="card">
-    <h2><span class="dot"></span>Part (c) — Test statements I and II (mode &amp; median)</h2>
-
-    <div class="canvas-box">
-      <canvas id="cvData" height="600"></canvas>
-      <div class="controls">
-        <div class="ctrl">
-          <label for="sOrder">Arrange the 8 numbers:</label>
-          <input type="range" id="sOrder" min="0" max="1" step="1" value="1">
-          <span class="val" id="sOrderVal">ordered</span>
+        <div class="step" data-step="1">
+          <div class="steptag"><span class="num">1</span>Use the mean to relate $\alpha$ and $\beta$</div>
+          <p style="margin:0;">There are $8$ data values. Mean $= 0$:</p>
+          <p style="margin:6px 0;">
+            $$\frac{\alpha+\beta+(-4)+(-3)+1+1+1+4}{8}=0$$
+          </p>
+          <p style="margin:6px 0;">
+            $$\alpha+\beta-4-3+1+1+1+4=0 \;\Rightarrow\; \alpha+\beta-3+1+1+1+4=0$$
+          </p>
+          <p style="margin:6px 0;">
+            $$\alpha+\beta =0$$
+          </p>
+          <div class="verdict ok">✔ Statement III is true.</div>
+          <div class="hint">Add the numbers part: $-4-3+1+1+1+4 = 0$, so the unknowns must also cancel out.</div>
         </div>
-        <div class="ctrl">
-          <label style="cursor:pointer;">
-            <input type="checkbox" id="showMed" checked> highlight median pair
-          </label>
+
+        <div class="step" data-step="2">
+          <div class="steptag"><span class="num">2</span>Use the range to find $\alpha,\beta$</div>
+          <p style="margin:0;">Range $= \text{largest} - \text{smallest} = 10$.</p>
+          <p style="margin:6px 0;">The known values run from $-4$ to $4$. Since $\alpha+\beta=0$, the pair is $(k,-k)$. For the range to be $10$, the largest must be $5$ and the smallest $-5$:</p>
+          <p style="margin:6px 0;">$$\{\alpha,\beta\}=\{5,\,-5\}$$</p>
+          <p style="margin:6px 0;">Also $\alpha \neq \beta$ because a range of $10$ needs two different extreme values.</p>
+          <div class="hint">Check: $\max-\min = 5-(-5)=10$ ✔ and $5+(-5)=0$ ✔</div>
         </div>
+
+        <div class="step" data-step="3">
+          <div class="steptag"><span class="num">3</span>Find the mode $s$</div>
+          <p style="margin:0;">The full data set is</p>
+          <p style="margin:6px 0;">$$5,\;-5,\;-4,\;-3,\;1,\;1,\;1,\;4$$</p>
+          <p style="margin:6px 0;">The value $1$ appears three times; no other value appears more than once.</p>
+          <p style="margin:6px 0;">$$\therefore s = 1$$</p>
+          <div class="verdict ok">✔ Statement I is true.</div>
+          <div class="hint">Mode = the value with the highest frequency.</div>
+        </div>
+
+        <div class="step" data-step="4">
+          <div class="steptag"><span class="num">4</span>Find the median $t$</div>
+          <p style="margin:0;">Arrange in ascending order:</p>
+          <p style="margin:6px 0;">$$-5,\;-4,\;-3,\;1,\;1,\;1,\;4,\;5$$</p>
+          <p style="margin:6px 0;">With $n=8$ (even), the median is the average of the $4$th and $5$th values:</p>
+          <p style="margin:6px 0;">$$t = \frac{1+1}{2}=1$$</p>
+          <div class="verdict no">✘ Statement II says $t=-1$, so II is <u>not</u> true.</div>
+          <div class="hint">Middle two values are both $1$, hence the median is $1$, not $-1$.</div>
+        </div>
+
+        <div class="step" data-step="5">
+          <div class="steptag"><span class="num">5</span>Conclude which statements hold</div>
+          <p style="margin:0;">I. $s=1$ — <b>true</b></p>
+          <p style="margin:4px 0;">II. $t=-1$ — <b>false</b></p>
+          <p style="margin:4px 0;">III. $\alpha+\beta=0$ — <b>true</b></p>
+          <p style="margin:8px 0 0;">Only I and III are true $\Rightarrow$ option <b>B</b>.</p>
+          <div class="hint">Always re-read the question: it asks which statements are true, not which value is the median.</div>
+        </div>
+
       </div>
-      <div class="readout">
-        <div class="ro">Mode (most frequent): <b>1 appears 3 times</b> → \(s=1\)</div>
-        <div class="ro">Median (4th &amp; 5th values): <b>1 and 1</b></div>
-        <div class="ro">Median \(t = \frac{1+1}{2} = \) <b>1</b></div>
+
+      <div class="answer">
+        <div class="lbl">Answer</div>
+        <div class="val">B &nbsp;·&nbsp; I and III only</div>
       </div>
+
     </div>
-
-    <div class="step" id="c1">
-      <div class="step-head"><span class="badge">Step 1</span></div>
-      <div class="step-body">
-        With \(\{\alpha,\beta\}=\{5,-5\}\), the data are
-        \[ 5,\; -5,\; -4,\; -3,\; 1,\; 1,\; 1,\; 4. \]
-        The value \(1\) occurs <b>three times</b>; every other value occurs once. Hence the mode is
-        \[ s = 1 \]
-      </div>
-      <div class="answer">Statement <b>I is true</b>.</div>
-      <div class="hint"><b>Hint:</b> The mode is simply the most frequent value — here the repeated \(1\)'s dominate.</div>
-    </div>
-
-    <div class="step" id="c2">
-      <div class="step-head"><span class="badge">Step 2</span></div>
-      <div class="step-body">
-        Rearrange in ascending order:
-        \[ -5,\; -4,\; -3,\; \underbrace{1,\; 1}_{\text{4th, 5th}},\; 1,\; 4,\; 5 \]
-        With \(8\) values (even), the median is the average of the 4th and 5th values.
-      </div>
-      <div class="hint"><b>Hint:</b> For \(n=8\), the median sits between positions \(n/2=4\) and \(n/2+1=5\).</div>
-    </div>
-
-    <div class="step" id="c3">
-      <div class="step-head"><span class="badge">Step 3</span></div>
-      <div class="step-body">
-        \[ t = \frac{1+1}{2} = 1 \neq -1 \]
-      </div>
-      <div class="answer">Statement <b>II is NOT true</b>.</div>
-      <div class="hint"><b>Hint:</b> A common trap is assuming the median equals the mean (\(0\)) or thinking it must be negative. Always order and average the middle pair carefully.</div>
-    </div>
-
-    <div class="btnrow">
-      <button class="next" data-target="c1,c2,c3" data-idx="0">Next step →</button>
-      <span class="counter" id="c-c">0 / 3</span>
-    </div>
-  </section>
-
-  <!-- SUMMARY -->
-  <section class="card dark">
-    <h2><span class="dot"></span>Summary of Answers</h2>
-    <ul>
-      <li><b>Mean condition:</b> \(\alpha+\beta = 0\) → <b>III is true</b>.</li>
-      <li><b>Range condition:</b> \(\alpha\) and \(\beta\) must be \(5\) and \(-5\).</li>
-      <li><b>Mode:</b> \(s = 1\) (since \(1\) appears 3 times) → <b>I is true</b>.</li>
-      <li><b>Median:</b> \(t = \dfrac{1+1}{2} = 1 \neq -1\) → <b>II is false</b>.</li>
-      <li><b>Conclusion:</b> Only I and III are true → <b>Answer: B</b>.</li>
-    </ul>
-  </section>
-
-  <footer>
-    HKDSE Mathematics (Compulsory Part) · Paper 2 · 2025 Q30 — Interactive Solution<br>
-    Use the sliders to explore how the mean and range pin down \(\alpha\) and \(\beta\).
-  </footer>
+  </div>
 </div>
 
 <script>
-/* ============================================================
-   STEP-BY-STEP REVEAL
-   ============================================================ */
-document.querySelectorAll('button.next').forEach(function(btn){
-  const targets = btn.dataset.target.split(',');
-  const counterId = 'c-' + targets[0].charAt(0);
-  const counter = document.getElementById(counterId);
-  let idx = 0;
-  btn.addEventListener('click', function(){
-    if (idx < targets.length){
-      document.getElementById(targets[idx]).classList.add('show');
-      idx++;
-      counter.textContent = idx + ' / ' + targets.length;
-      if (idx === targets.length){
-        btn.disabled = true;
-        btn.textContent = 'All steps revealed ✓';
-      }
-    }
-  });
-});
-
-/* ============================================================
-   CANVAS 1 : MEAN CONDITION
-   ============================================================ */
 (function(){
-  const cv = document.getElementById('cvMean');
+  const cv = document.getElementById('cv');
   const ctx = cv.getContext('2d');
-  const sb = document.getElementById('sb');
-  const sbVal = document.getElementById('sbVal');
-  const showMean = document.getElementById('showMean');
-  const roA = document.getElementById('roA');
-  const roSum = document.getElementById('roSum');
-  const roMean = document.getElementById('roMean');
+  const ro = document.getElementById('ro');
 
-  const fixed = [-4,-3,1,1,1,4];
+  // -------- data --------
+  const alpha = 5, beta = -5;
+  const fullData = [5, -5, -4, -3, 1, 1, 1, 4];
 
-  function draw(){
-    const W = cv.width = cv.clientWidth * devicePixelRatio;
-    const H = cv.height = 300 * devicePixelRatio;
-    ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
-    const w = cv.clientWidth, h = 300;
+  // -------- layout constants --------
+  const W = cv.width, H = cv.height;
+  const padL = 60, padR = 40, padT = 70, padB = 80;
+  const axisY = H - padB;                 // x-axis position
+  const minV = -6, maxV = 6;
+  const plotW = W - padL - padR;
+  const xOf = v => padL + (v - minV) / (maxV - minV) * plotW;
+  const baseY = axisY - 28;               // baseline for stacking dots
 
-    ctx.clearRect(0,0,w,h);
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0,0,w,h);
+  // colours
+  const C = {
+    unknown: '#7c3aed',
+    known:   '#0891b2',
+    mode:    '#e11d48',
+    median:  '#d97706',
+    range:   '#059669',
+    axis:    '#6b7280',
+    grid:    '#eef2f7',
+    text:    '#1f2937'
+  };
 
-    const beta = parseInt(sb.value,10);
-    const alpha = -beta;
-    sbVal.textContent = beta;
+  // group data by value (order matters for dot stacking)
+  function buildStacks(){
+    const m = new Map();
+    fullData.forEach(v => { m.set(v, (m.get(v)||0)+1); });
+    return m;
+  }
+  const stacks = buildStacks();
 
-    const data = [alpha, beta].concat(fixed);
-    const sum = data.reduce((a,b)=>a+b,0);
-    const mean = sum / data.length;
-
-    roA.textContent = alpha;
-    roSum.textContent = sum;
-    roMean.textContent = mean.toFixed(2);
-
-    // axis mapping
-    const padL = 44, padR = 20, padT = 40, padB = 34;
-    const minV = -8, maxV = 8;
-    const x = v => padL + (v - minV)/(maxV-minV) * (w - padL - padR);
-    const yZero = 170;
-
-    // grid lines (vertical every 2 units)
-    ctx.strokeStyle = '#eef2f7';
-    ctx.lineWidth = 1;
-    for (let v = minV; v <= maxV; v += 2){
-      ctx.beginPath();
-      ctx.moveTo(x(v), padT);
-      ctx.lineTo(x(v), h - padB);
-      ctx.stroke();
-    }
-    // horizontal grid
-    for (let g = 0; g < 3; g++){
-      const yy = padT + (h - padT - padB)*g/2;
-      ctx.beginPath(); ctx.moveTo(padL, yy); ctx.lineTo(w-padR, yy); ctx.stroke();
-    }
-
-    // number line
-    ctx.strokeStyle = '#334155';
-    ctx.lineWidth = 1.6;
+  function roundRect(x, y, w, h, r){
     ctx.beginPath();
-    ctx.moveTo(padL - 6, yZero);
-    ctx.lineTo(w - padR + 6, yZero);
-    ctx.stroke();
-
-    // ticks & labels
-    ctx.fillStyle = '#64748b';
-    ctx.font = '11px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'top';
-    for (let v = minV; v <= maxV; v += 2){
-      ctx.strokeStyle = '#cbd5e1';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(x(v), yZero - 4);
-      ctx.lineTo(x(v), yZero + 4);
-      ctx.stroke();
-      ctx.fillText(v, x(v), yZero + 8);
-    }
-
-    // draw data points as dots (jittered so overlaps visible)
-    const counts = {};
-    data.forEach(v => { counts[v] = (counts[v]||0)+1; });
-    const used = {};
-    const colors = ['#dc2626','#dc2626','#94a3b8','#94a3b8','#0ea5e9','#0ea5e9','#0ea5e9','#94a3b8'];
-
-    data.forEach((v,i) => {
-      used[v] = (used[v]||0);
-      const level = used[v];
-      used[v]++;
-      const cx = x(v);
-      const cy = yZero - 34 - level*17;
-      const r = 7;
-
-      // connecting stalk
-      ctx.strokeStyle = '#e2e8f0';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(cx, yZero);
-      ctx.lineTo(cx, cy + r);
-      ctx.stroke();
-
-      ctx.beginPath();
-      ctx.arc(cx, cy, r, 0, Math.PI*2);
-      ctx.fillStyle = (i < 2) ? '#dc2626' : '#0ea5e9';
-      ctx.fill();
-      ctx.strokeStyle = '#fff';
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
-
-      if (i < 2){
-        ctx.fillStyle = '#7f1d1d';
-        ctx.font = 'bold 12px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'bottom';
-        ctx.fillText(i===0 ? 'α='+alpha : 'β='+beta, cx, cy - 9);
-      }
-    });
-
-    // mean line
-    if (showMean.checked){
-      ctx.strokeStyle = '#059669';
-      ctx.lineWidth = 2;
-      ctx.setLineDash([6,5]);
-      ctx.beginPath();
-      ctx.moveTo(x(mean), padT);
-      ctx.lineTo(x(mean), h - padB);
-      ctx.stroke();
-      ctx.setLineDash([]);
-
-      ctx.fillStyle = '#059669';
-      ctx.font = 'bold 12px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'top';
-      ctx.fillText('mean = ' + mean.toFixed(2), x(mean), padT - 18);
-    }
-
-    // title
-    ctx.fillStyle = '#1e293b';
-    ctx.font = 'bold 13px sans-serif';
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'top';
-    ctx.fillText('Data values on the number line  (fixed numbers in blue, α, β in red)', padL, 12);
+    ctx.moveTo(x+r, y);
+    ctx.arcTo(x+w, y, x+w, y+h, r);
+    ctx.arcTo(x+w, y+h, x, y+h, r);
+    ctx.arcTo(x, y+h, x, y, r);
+    ctx.arcTo(x, y, x+w, y, r);
+    ctx.closePath();
   }
 
-  sb.addEventListener('input', draw);
-  showMean.addEventListener('change', draw);
-  window.addEventListener('resize', draw);
-  draw();
-})();
-
-/* ============================================================
-   CANVAS 2 : RANGE CONDITION
-   ============================================================ */
-(function(){
-  const cv = document.getElementById('cvRange');
-  const ctx = cv.getContext('2d');
-  const sRange = document.getElementById('sRange');
-  const sRangeVal = document.getElementById('sRangeVal');
-  const showSpan = document.getElementById('showSpan');
-  const roNeed = document.getElementById('roNeed');
-
-  const fixedMin = -4, fixedMax = 4;
-
-  function draw(){
-    const W = cv.width = cv.clientWidth * devicePixelRatio;
-    const H = cv.height = 300 * devicePixelRatio;
-    ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
-    const w = cv.clientWidth, h = 300;
-
-    ctx.clearRect(0,0,w,h);
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0,0,w,h);
-
-    const R = parseInt(sRange.value,10);
-    sRangeVal.textContent = R;
-
-    // The extended extremes: symmetric, so positive extreme x satisfies x-(-x)=R
-    const xPos = R/2;
-    const xNeg = -R/2;
-
-    roNeed.innerHTML = 'Need range ' + R + ' → extend by <b>' + (R-8) +
-      '</b> → {' + xPos + ', ' + xNeg + '}';
-
-    const padL = 46, padR = 22, padT = 46, padB = 40;
-    const spanAll = Math.max(Math.abs(xPos), 5) + 1.5;
-    const minV = -spanAll, maxV = spanAll;
-    const x = v => padL + (v - minV)/(maxV-minV) * (w - padL - padR);
-    const yLine = 190;
-
-    // grid
-    ctx.strokeStyle = '#eef2f7';
-    ctx.lineWidth = 1;
-    for (let v = Math.ceil(minV); v <= maxV; v++){
-      ctx.beginPath(); ctx.moveTo(x(v), padT); ctx.lineTo(x(v), h - padB); ctx.stroke();
-    }
-
-    // number line
-    ctx.strokeStyle = '#334155';
-    ctx.lineWidth = 1.6;
+  function arrow(x1,y1,x2,y2,color,width){
+    ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = width || 2;
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+    const ang = Math.atan2(y2-y1, x2-x1);
     ctx.beginPath();
-    ctx.moveTo(padL - 6, yLine);
-    ctx.lineTo(w - padR + 6, yLine);
-    ctx.stroke();
-
-    // ticks
-    ctx.fillStyle = '#64748b';
-    ctx.font = '11px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'top';
-    for (let v = Math.ceil(minV); v <= maxV; v++){
-      ctx.strokeStyle = '#cbd5e1';
-      ctx.beginPath();
-      ctx.moveTo(x(v), yLine - 4);
-      ctx.lineTo(x(v), yLine + 4);
-      ctx.stroke();
-      ctx.fillText(v, x(v), yLine + 8);
-    }
-
-    // fixed values
-    const fixed = [-4,-3,1,1,1,4];
-    const seen = {};
-    fixed.forEach(v => {
-      const lvl = seen[v] || 0; seen[v] = lvl + 1;
-      const cx = x(v), cy = yLine - 30 - lvl*15;
-      ctx.beginPath();
-      ctx.arc(cx, cy, 6, 0, Math.PI*2);
-      ctx.fillStyle = '#0ea5e9';
-      ctx.fill();
-      ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.4; ctx.stroke();
-    });
-
-    // fixed span bracket
-    ctx.strokeStyle = '#94a3b8';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(x(fixedMin), yLine + 26);
-    ctx.lineTo(x(fixedMax), yLine + 26);
-    ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(x(fixedMin), yLine + 20); ctx.lineTo(x(fixedMin), yLine + 32); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(x(fixedMax), yLine + 20); ctx.lineTo(x(fixedMax), yLine + 32); ctx.stroke();
-    ctx.fillStyle = '#64748b';
-    ctx.font = 'bold 11px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'top';
-    ctx.fillText('fixed span = 8', (x(fixedMin)+x(fixedMax))/2, yLine + 36);
-
-    // extremes α, β
-    [xNeg, xPos].forEach((v,i) => {
-      const cx = x(v), cy = yLine - 46;
-      ctx.beginPath();
-      ctx.arc(cx, cy, 8, 0, Math.PI*2);
-      ctx.fillStyle = '#dc2626';
-      ctx.fill();
-      ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.6; ctx.stroke();
-      ctx.fillStyle = '#7f1d1d';
-      ctx.font = 'bold 12px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'bottom';
-      ctx.fillText(v, cx, cy - 10);
-    });
-
-    // range span
-    if (showSpan.checked){
-      ctx.strokeStyle = '#f59e0b';
-      ctx.lineWidth = 2.5;
-      ctx.beginPath();
-      ctx.moveTo(xNeg, padT + 4);
-      ctx.lineTo(xPos, padT + 4);
-      ctx.stroke();
-      // caps
-      ctx.beginPath(); ctx.moveTo(xNeg, padT - 4); ctx.lineTo(xNeg, padT + 12); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(xPos, padT - 4); ctx.lineTo(xPos, padT + 12); ctx.stroke();
-      ctx.fillStyle = '#b45309';
-      ctx.font = 'bold 13px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'bottom';
-      ctx.fillText('range = ' + R, (xNeg+xPos)/2, padT - 6);
-    }
-
-    // δ lines from fixed span to extremes
-    ctx.setLineDash([4,4]);
-    ctx.strokeStyle = '#cbd5e1';
-    ctx.lineWidth = 1.2;
-    ctx.beginPath(); ctx.moveTo(x(xNeg), yLine - 38); ctx.lineTo(x(xNeg), yLine + 26); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(x(xPos), yLine - 38); ctx.lineTo(x(xPos), yLine + 26); ctx.stroke();
-    ctx.setLineDash([]);
-
-    // title
-    ctx.fillStyle = '#1e293b';
-    ctx.font = 'bold 13px sans-serif';
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'top';
-    ctx.fillText('Range must be R: extremes α, β stretch the data symmetrically', padL, 12);
+    ctx.moveTo(x2,y2);
+    ctx.lineTo(x2-9*Math.cos(ang-0.4), y2-9*Math.sin(ang-0.4));
+    ctx.lineTo(x2-9*Math.cos(ang+0.4), y2-9*Math.sin(ang+0.4));
+    ctx.closePath(); ctx.fill();
   }
 
-  sRange.addEventListener('input', draw);
-  showSpan.addEventListener('change', draw);
-  window.addEventListener('resize', draw);
-  draw();
-})();
-
-/* ============================================================
-   CANVAS 3 : ORDERED DATA / MODE / MEDIAN
-   ============================================================ */
-(function(){
-  const cv = document.getElementById('cvData');
-  const ctx = cv.getContext('2d');
-  const sOrder = document.getElementById('sOrder');
-  const sOrderVal = document.getElementById('sOrderVal');
-  const showMed = document.getElementById('showMed');
-
-  const raw = [5, -5, -4, -3, 1, 1, 1, 4];
-  const sorted = [-5, -4, -3, 1, 1, 1, 4, 5];
-
-  function draw(){
-    const W = cv.width = cv.clientWidth * devicePixelRatio;
-    const H = cv.height = 320 * devicePixelRatio;
-    ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
-    const w = cv.clientWidth, h = 320;
-
-    ctx.clearRect(0,0,w,h);
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0,0,w,h);
-
-    const ordered = sOrder.value === '1';
-    sOrderVal.textContent = ordered ? 'ordered' : 'random';
-    const data = ordered ? sorted : raw;
-
-    // Title
-    ctx.fillStyle = '#1e293b';
-    ctx.font = 'bold 13px sans-serif';
+  function drawAxis(){
+    // grid lines
+    ctx.strokeStyle = C.grid; ctx.lineWidth = 1;
+    for(let v = minV+1; v <= maxV-1; v++){
+      if(v === 0) continue;
+      ctx.beginPath(); ctx.moveTo(xOf(v), padT); ctx.lineTo(xOf(v), axisY); ctx.stroke();
+    }
+    // axis line
+    ctx.strokeStyle = C.axis; ctx.lineWidth = 2;
+    arrow(padL-20, axisY, W-16, axisY, C.axis, 2);
+    // ticks + labels
+    ctx.fillStyle = C.text; ctx.font = '600 14px Inter, sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    for(let v = minV; v <= maxV; v++){
+      const x = xOf(v);
+      const isZero = v === 0;
+      ctx.strokeStyle = isZero ? C.axis : '#cbd5e1';
+      ctx.lineWidth = isZero ? 2 : 1;
+      ctx.beginPath(); ctx.moveTo(x, axisY); ctx.lineTo(x, axisY + (isZero?10:6)); ctx.stroke();
+      ctx.fillStyle = isZero ? C.text : '#94a3b8';
+      ctx.fillText(String(v), x, axisY + 12);
+    }
+    ctx.fillStyle = C.axis; ctx.font = '600 13px Inter, sans-serif';
     ctx.textAlign = 'left';
-    ctx.textBaseline = 'top';
-    ctx.fillText(ordered ? 'Data rearranged in ascending order' : 'Original data order (α = 5, β = −5)', 16, 12);
+    ctx.fillText('value', W-52, axisY + 30);
+  }
 
-    // Bars
-    const n = data.length;
-    const baseY = h - 46;
-    const topY = 62;
-    const maxAbs = 6;
-    const zeroY = baseY - (baseY - topY) * (maxAbs / (2*maxAbs)) ;
-    // We'll draw a bar chart with zero in the middle
-    const chartTop = 58, chartBottom = h - 68;
-    const midY = (chartTop + chartBottom) / 2;
-    const unit = (chartBottom - chartTop) / (2 * maxAbs);
+  function dotColor(v){
+    if(v === alpha || v === beta) return C.unknown;
+    return C.known;
+  }
 
-    const slotW = (w - 60) / n;
-    const barW = Math.min(slotW * 0.62, 44);
+  // draw a circular dot
+  function dot(x, y, r, fill, stroke){
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2);
+    ctx.fillStyle = fill; ctx.fill();
+    if(stroke){ ctx.lineWidth = 2; ctx.strokeStyle = stroke; ctx.stroke(); }
+  }
 
-    // zero axis
-    ctx.strokeStyle = '#cbd5e1';
-    ctx.lineWidth = 1.4;
-    ctx.beginPath();
-    ctx.moveTo(30, midY);
-    ctx.lineTo(w - 30, midY);
-    ctx.stroke();
+  // ---------- main draw ----------
+  function draw(step){
+    ctx.clearRect(0, 0, W, H);
+
+    // subtle background
+    ctx.fillStyle = '#ffffff';
+    roundRect(0, 0, W, H, 14); ctx.fill();
+
+    // title
+    ctx.fillStyle = C.text; ctx.font = '700 17px Inter, sans-serif';
+    ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+    ctx.fillText('Data set  (n = 8)', padL - 10, 34);
+    ctx.font = '600 13px Inter, sans-serif';
     ctx.fillStyle = '#94a3b8';
-    ctx.font = '11px sans-serif';
-    ctx.textAlign = 'right';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('0', 26, midY);
+    ctx.fillText('α = 5,  β = −5   ·   mean = 0,  range = 10', padL - 10, 54);
 
-    data.forEach((v,i) => {
-      const cx = 40 + slotW * i + slotW/2;
-      const y = midY - v * unit;
-      const isOne = (v === 1);
-      const isMedian = showMed.checked && ordered && (i === 3 || i === 4);
+    drawAxis();
 
-      // bar
-      ctx.beginPath();
-      if (v >= 0){
-        ctx.rect(cx - barW/2, y, barW, midY - y);
-      } else {
-        ctx.rect(cx - barW/2, midY, barW, y - midY);
+    // value highlights (range / median / mode)
+    const highlight = {};
+    if(step >= 2){
+      // range highlight on -5 and 5
+      highlight[-5] = C.range;
+      highlight[5] = C.range;
+    }
+    if(step >= 3){
+      highlight[1] = C.mode;   // mode
+    }
+
+    // draw dots
+    const vals = Array.from(stacks.keys()).sort((a,b)=>a-b);
+    vals.forEach(v => {
+      const count = stacks.get(v);
+      const x = xOf(v);
+      for(let k=0;k<count;k++){
+        const y = baseY - k*24;
+        let fill = dotColor(v);
+        let stroke = null;
+        let r = 10;
+
+        // step 3: mode highlight
+        if(step >= 3 && v === 1){
+          fill = C.mode;
+        } else if(step >= 1 && (v === alpha || v === beta)){
+          fill = C.unknown;
+        }
+
+        // step 2: range outline
+        if(step >= 2 && (v === -5 || v === 5)){
+          stroke = C.range;
+          r = 11;
+        }
+
+        dot(x, y, r, fill, stroke);
+
+        // label the unknown dots on top
+        if(k === count-1){
+          ctx.fillStyle = (v===alpha||v===beta) ? C.unknown : '#64748b';
+          ctx.font = '700 12px Inter, sans-serif';
+          ctx.textAlign = 'center';
+          const lbl = (v === alpha) ? 'α' : (v === beta ? 'β' : '');
+          if(lbl) ctx.fillText(lbl, x, y - 16);
+        }
       }
-      if (isMedian){
-        ctx.fillStyle = '#f59e0b';
-      } else if (isOne){
-        ctx.fillStyle = '#0ea5e9';
-      } else {
-        ctx.fillStyle = '#93c5fd';
-      }
-      ctx.fill();
-      ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
-
-      // value label
-      ctx.fillStyle = '#1e293b';
-      ctx.font = 'bold 12px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = v >= 0 ? 'bottom' : 'top';
-      ctx.fillText(v, cx, v >= 0 ? y - 4 : y + 4);
-
-      // position index
-      ctx.fillStyle = '#94a3b8';
-      ctx.font = '10px sans-serif';
-      ctx.textBaseline = 'top';
-      ctx.fillText('#' + (i+1), cx, chartBottom + 10);
     });
 
-    // median bracket
-    if (showMed.checked && ordered){
-      const c3 = 40 + slotW * 3 + slotW/2;
-      const c4 = 40 + slotW * 4 + slotW/2;
-      ctx.strokeStyle = '#f59e0b';
-      ctx.lineWidth = 2.2;
-      ctx.beginPath();
-      ctx.moveTo(c3, chartTop + 6);
-      ctx.lineTo(c4, chartTop + 6);
-      ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(c3, chartTop + 6); ctx.lineTo(c3, chartTop + 16); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(c4, chartTop + 6); ctx.lineTo(c4, chartTop + 16); ctx.stroke();
-      ctx.fillStyle = '#b45309';
-      ctx.font = 'bold 12px sans-serif';
-      ctx.textAlign = 'center';
+    // ---------- step-specific overlays ----------
+    ctx.textAlign = 'center';
+
+    if(step >= 2){
+      // range arrow between -5 and 5
+      const x1 = xOf(-5), x2 = xOf(5);
+      const yA = padT + 18;
+      arrow(x1, yA, x2, yA, C.range, 2.5);
+      arrow(x2, yA, x1, yA, C.range, 2.5);
+      ctx.fillStyle = C.range; ctx.font = '700 14px Inter, sans-serif';
       ctx.textBaseline = 'bottom';
-      ctx.fillText('median = (1+1)/2 = 1', (c3+c4)/2, chartTop + 2);
+      ctx.fillText('range = 10', (x1+x2)/2, yA - 6);
+      ctx.textBaseline = 'alphabetic';
     }
 
-    // legend
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'middle';
-    ctx.font = '11px sans-serif';
-    ctx.fillStyle = '#0ea5e9';
-    ctx.fillRect(16, h - 26, 11, 11);
-    ctx.fillStyle = '#475569';
-    ctx.fillText('the value 1 (mode)', 33, h - 20);
-    if (showMed.checked && ordered){
-      ctx.fillStyle = '#f59e0b';
-      ctx.fillRect(180, h - 26, 11, 11);
-      ctx.fillStyle = '#475569';
-      ctx.fillText('4th & 5th (median pair)', 197, h - 20);
+    if(step >= 3){
+      // mode label over the 1's
+      const x = xOf(1);
+      const topY = baseY - (stacks.get(1)-1)*24 - 26;
+      ctx.fillStyle = C.mode; ctx.font = '700 13px Inter, sans-serif';
+      ctx.fillText('mode = 1 (appears 3×)', x, topY);
     }
+
+    if(step >= 4){
+      // median bracket: average of 4th and 5th sorted values (both 1)
+      const x = xOf(1);
+      const yTop = baseY - (stacks.get(1)-1)*24 - 44;
+      ctx.strokeStyle = C.median; ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(x-44, yTop+16); ctx.lineTo(x-44, yTop);
+      ctx.moveTo(x-44, yTop);    ctx.lineTo(x+44, yTop);
+      ctx.moveTo(x+44, yTop);    ctx.lineTo(x+44, yTop+16);
+      ctx.stroke();
+      ctx.fillStyle = C.median; ctx.font = '700 13px Inter, sans-serif';
+      ctx.fillText('median t = (1+1)/2 = 1', x, yTop - 8);
+    }
+
+    // ---------- sorted strip at the bottom (step >= 3) ----------
+    if(step >= 3){
+      const sorted = [-5,-4,-3,1,1,1,4,5];
+      const y0 = H - 30;
+      const cellW = 46, totalW = cellW * sorted.length;
+      let sx = (W - totalW)/2;
+      ctx.font = '700 13px Inter, sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      sorted.forEach((v, i) => {
+        const isMid = (i === 3 || i === 4);
+        ctx.fillStyle = v === -5 || v === 5 ? '#ecfdf5'
+                      : v === 1 ? '#fff1f2' : '#f0f9ff';
+        roundRect(sx + i*cellW + 2, y0 - 14, cellW - 4, 28, 7);
+        ctx.fill();
+        ctx.lineWidth = isMid ? 2.5 : 1.2;
+        ctx.strokeStyle = isMid ? C.median : '#cbd5e1';
+        ctx.stroke();
+        ctx.fillStyle = v === -5 || v === 5 ? C.range
+                      : v === 1 ? C.mode : C.known;
+        ctx.fillText(String(v), sx + i*cellW + cellW/2, y0);
+      });
+      ctx.fillStyle = '#94a3b8'; ctx.font = '600 12px Inter, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText('sorted ↑', sx - 58, y0);
+      ctx.textAlign = 'center';
+    }
+
+    // ---------- readout ----------
+    const txt = {
+      1: 'Step 1: the raw data set with the two unknown values α and β.',
+      2: 'Step 2: mean = 0 gives α + β = 0; range = 10 forces {α, β} = {5, −5}.',
+      3: 'Step 3: the full sorted data is −5, −4, −3, 1, 1, 1, 4, 5; the mode is 1.',
+      4: 'Step 4: the median is the average of the 4th and 5th values = (1+1)/2 = 1.',
+      5: 'Step 5: only statements I and III are true → option B.'
+    }[step] || 'Step 1: raw data.';
+    ro.textContent = txt;
   }
 
-  sOrder.addEventListener('input', draw);
-  showMed.addEventListener('change', draw);
-  window.addEventListener('resize', draw);
-  draw();
+  // ---------- scroll sync ----------
+  let current = 1;
+  const io = new IntersectionObserver(es => {
+    es.forEach(e => {
+      if(e.isIntersecting){
+        current = +e.target.dataset.step;
+        draw(current);
+      }
+    });
+  }, {rootMargin: '-25% 0px -55% 0px'});
+
+  document.querySelectorAll('.step').forEach(s => io.observe(s));
+
+  // initial draw
+  draw(1);
 })();
-
-/* re-render MathJax typeset after load */
-window.addEventListener('load', function(){
-  if (window.MathJax && window.MathJax.typesetPromise){
-    window.MathJax.typesetPromise();
-  }
-});
 </script>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
-
 </body>
 </html>

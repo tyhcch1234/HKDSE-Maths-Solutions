@@ -3,538 +3,360 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HKDSE Math 2019 Paper 2 Q28 – Interactive Solution</title>
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<title>HKDSE 2019 P2 Q28 — Probability</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
   :root{
-    --primary:#2563eb;
-    --primary-light:#dbeafe;
-    --accent:#f59e0b;
-    --success:#16a34a;
-    --bg:#f8fafc;
-    --card:#ffffff;
-    --text:#1e293b;
-    --text-light:#64748b;
-    --border:#e2e8f0;
-    --shadow:0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -1px rgba(0,0,0,0.04);
-    --radius:14px;
+    --bg:#0f172a; --card:#ffffff; --ink:#1e293b; --muted:#64748b;
+    --blue:#2563eb; --red:#dc2626; --green:#16a34a; --amber:#d97706; --violet:#7c3aed;
+    --line:#e2e8f0;
   }
-  *{box-sizing:border-box;margin:0;padding:0}
+  *{box-sizing:border-box;}
   body{
-    font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
-    background:var(--bg);
-    color:var(--text);
-    line-height:1.65;
-    padding:16px;
-    min-height:100vh;
-    -webkit-tap-highlight-color:transparent;
+    margin:0; background:linear-gradient(180deg,#eef2ff 0%,#f8fafc 260px,#f8fafc 100%);
+    color:var(--ink); font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+    font-size:15.5px; line-height:1.55;
   }
-  .container{max-width:900px;margin:0 auto}
+  .wrap{max-width:1180px;margin:0 auto;padding:14px 14px 60px;}
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start;}
+  @media(min-width:900px){.split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}}
+  .diagram{position:sticky;top:16px;max-height:calc(100vh - 2rem);overflow-y:auto;}
+  @media(max-width:640px){body{font-size:14.5px;}.wrap{padding:10px 8px 40px;}}
 
-  /* Header */
-  .header{
-    background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%);
-    color:#fff;
-    padding:24px 22px;
-    border-radius:var(--radius);
-    margin-bottom:18px;
-    box-shadow:var(--shadow);
-  }
-  .header .qnum{font-size:0.85rem;letter-spacing:1.2px;text-transform:uppercase;opacity:0.85;font-weight:600}
-  .header h1{font-size:1.35rem;margin-top:4px;font-weight:700}
-  .tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
-  .tag{
-    background:rgba(255,255,255,0.18);
-    border:1px solid rgba(255,255,255,0.3);
-    padding:4px 12px;
-    border-radius:20px;
-    font-size:0.78rem;
-    font-weight:500;
-    backdrop-filter:blur(4px);
-  }
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 6px 22px rgba(15,23,42,.07);}
+  .diagram .panel{padding:10px;}
+  .right{padding:16px 18px;}
 
-  /* Cards */
-  .card{
-    background:var(--card);
-    border-radius:var(--radius);
-    box-shadow:var(--shadow);
-    padding:22px;
-    margin-bottom:18px;
-    border:1px solid var(--border);
-  }
-  .card h2{
-    font-size:1.05rem;
-    color:var(--primary);
-    margin-bottom:12px;
-    display:flex;
-    align-items:center;
-    gap:8px;
-    font-weight:700;
-  }
-  .card h2 .num{
-    background:var(--primary);
-    color:#fff;
-    width:26px;height:26px;
-    border-radius:50%;
-    display:inline-flex;
-    align-items:center;justify-content:center;
-    font-size:0.8rem;
-    flex-shrink:0;
-  }
+  h1{font-size:1.02rem;margin:0 0 6px;color:var(--violet);letter-spacing:.02em;}
+  .tag{display:inline-block;background:#eef2ff;color:var(--blue);border:1px solid #c7d2fe;
+       border-radius:999px;padding:2px 10px;font-size:.74rem;font-weight:700;margin-bottom:8px;}
 
-  /* Question */
-  .question-text{font-size:1rem;color:var(--text);margin-bottom:14px}
-  .options{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
-  .option{
-    border:1.5px solid var(--border);
-    border-radius:10px;
-    padding:10px 14px;
-    font-size:0.95rem;
-    display:flex;align-items:center;gap:10px;
-    transition:all 0.2s;
-    background:#fafbfc;
-  }
-  .option .lbl{font-weight:700;color:var(--primary);min-width:18px}
-  .option.correct{border-color:var(--success);background:#f0fdf4}
-  .option.correct .lbl{color:var(--success)}
-  .option .check{color:var(--success);font-weight:700;margin-left:auto;display:none}
-  .option.correct .check{display:inline}
+  canvas{display:block;width:100%;height:auto;border-radius:10px;background:#fdfdff;}
+  .ro{font-size:.8rem;color:var(--muted);margin:8px 2px 0;text-align:center;min-height:1.2em;}
 
-  /* Step cards / Accordion */
-  .step{
-    border:1px solid var(--border);
-    border-radius:12px;
-    margin-bottom:12px;
-    overflow:hidden;
-    background:#fafbfc;
-    transition:box-shadow 0.2s;
-  }
-  .step.open{box-shadow:0 2px 10px rgba(37,99,235,0.08);border-color:#bfdbfe}
-  .step-header{
-    display:flex;align-items:center;gap:12px;
-    padding:14px 16px;
-    cursor:pointer;
-    user-select:none;
-    font-weight:600;
-    font-size:0.95rem;
-    color:var(--text);
-    transition:background 0.2s;
-  }
-  .step-header:hover{background:#f1f5f9}
-  .step.open .step-header{background:var(--primary-light);color:var(--primary)}
-  .step-badge{
-    background:var(--primary);
-    color:#fff;
-    width:28px;height:28px;
-    border-radius:50%;
-    display:flex;align-items:center;justify-content:center;
-    font-size:0.8rem;
-    font-weight:700;
-    flex-shrink:0;
-  }
-  .step.open .step-badge{background:var(--primary)}
-  .step-arrow{
-    margin-left:auto;
-    transition:transform 0.3s;
-    font-size:0.8rem;
-    color:var(--text-light);
-  }
-  .step.open .step-arrow{transform:rotate(180deg)}
-  .step-body{
-    max-height:0;
-    overflow:hidden;
-    transition:max-height 0.35s ease, padding 0.3s ease;
-    padding:0 16px;
-  }
-  .step.open .step-body{
-    max-height:1200px;
-    padding:0 16px 16px;
-  }
-  .step-body p{margin-bottom:8px;font-size:0.93rem}
-  .step-body .hint{
-    background:#fffbeb;
-    border-left:3px solid var(--accent);
-    padding:10px 12px;
-    border-radius:0 8px 8px 0;
-    font-size:0.88rem;
-    color:#92400e;
-    margin:10px 0;
-  }
-  .step-body .hint strong{color:#b45309}
+  .qbox{background:#f8fafc;border:1px solid var(--line);border-left:5px solid var(--blue);
+        border-radius:10px;padding:10px 14px;margin:0 0 14px;}
+  .qbox p{margin:.35em 0;}
 
-  /* Highlight box */
-  .highlight{
-    background:#eff6ff;
-    border-left:3px solid var(--primary);
-    padding:12px 14px;
-    border-radius:0 10px 10px 0;
-    margin:10px 0;
-    font-size:0.93rem;
-  }
-  .answer-box{
-    background:linear-gradient(135deg,#dcfce7,#f0fdf4);
-    border:1.5px solid #86efac;
-    border-radius:12px;
-    padding:16px;
-    text-align:center;
-    margin-top:14px;
-  }
-  .answer-box .label{font-size:0.8rem;color:#166534;text-transform:uppercase;letter-spacing:1px;font-weight:600}
-  .answer-box .value{font-size:1.5rem;font-weight:700;color:#15803d;margin-top:4px}
+  .opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 14px;margin-top:10px;}
+  .opt{border:1px solid var(--line);border-radius:8px;padding:5px 10px;background:#fff;font-size:.95rem;}
+  .opt.correct{border-color:#86efac;background:#f0fdf4;box-shadow:0 0 0 2px rgba(22,163,74,.12);}
 
-  /* Visualisation grid */
-  .grid-viz{
-    display:grid;
-    grid-template-columns:repeat(6,1fr);
-    gap:6px;
-    margin:14px 0;
-  }
-  .pair{
-    background:#e2e8f0;
-    border-radius:8px;
-    padding:8px 2px;
-    text-align:center;
-    font-size:0.78rem;
-    font-weight:600;
-    color:#475569;
-    transition:all 0.3s;
-    border:1.5px solid transparent;
-  }
-  .pair.consecutive{
-    background:#bbf7d0;
-    color:#166534;
-    border-color:#4ade80;
-    transform:scale(1.05);
-    box-shadow:0 2px 6px rgba(34,197,94,0.25);
-  }
-  .pair .ico{display:block;font-size:0.7rem;margin-bottom:2px;opacity:0.7}
+  .step{border:1px solid var(--line);border-left:5px solid var(--amber);border-radius:10px;
+        padding:10px 13px;margin:10px 0;background:#fffdf7;transition:box-shadow .25s,transform .25s,border-color .25s;}
+  .step.active{border-color:#fcd34d;box-shadow:0 8px 20px rgba(217,119,6,.18);transform:translateX(2px);}
+  .step .chip{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;
+        background:var(--amber);color:#fff;font-weight:800;font-size:.8rem;margin-right:8px;vertical-align:-3px;}
+  .step b.t{color:#92400e;}
+  .hint{display:block;margin-top:7px;font-size:.85rem;color:var(--muted);border-top:1px dashed var(--line);padding-top:6px;}
 
-  .controls{
-    display:flex;flex-wrap:wrap;gap:10px;
-    margin-top:14px;
-  }
-  .btn{
-    background:var(--primary);
-    color:#fff;
-    border:none;
-    padding:10px 18px;
-    border-radius:10px;
-    font-size:0.88rem;
-    font-weight:600;
-    cursor:pointer;
-    transition:all 0.2s;
-    box-shadow:0 2px 4px rgba(37,99,235,0.3);
-    display:inline-flex;align-items:center;gap:6px;
-  }
-  .btn:hover{background:#1d4ed8;transform:translateY(-1px)}
-  .btn:active{transform:translateY(0)}
-  .btn.secondary{
-    background:#fff;
-    color:var(--primary);
-    border:1.5px solid var(--primary);
-    box-shadow:none;
-  }
-  .btn.secondary:hover{background:var(--primary-light)}
+  .ans{margin-top:16px;padding:12px 14px;border-radius:12px;background:#f0fdf4;border:1px solid #86efac;font-weight:700;color:#065f46;}
+  .ans .big{color:var(--green);font-size:1.25rem;}
 
-  .counter-display{
-    display:flex;
-    gap:16px;
-    flex-wrap:wrap;
-    margin-top:14px;
-  }
-  .counter{
-    background:#f1f5f9;
-    border-radius:10px;
-    padding:10px 16px;
-    flex:1;
-    min-width:130px;
-    text-align:center;
-  }
-  .counter .c-label{font-size:0.75rem;color:var(--text-light);text-transform:uppercase;letter-spacing:0.5px;font-weight:600}
-  .counter .c-value{font-size:1.4rem;font-weight:700;color:var(--primary);margin-top:2px}
-  .counter.green .c-value{color:var(--success)}
-
-  /* Formula chips */
-  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
-  .chip{
-    background:var(--primary-light);
-    color:var(--primary);
-    padding:5px 12px;
-    border-radius:8px;
-    font-size:0.82rem;
-    font-weight:600;
-  }
-
-  /* MathJax sizing */
-  .MathJax{font-size:1rem !important}
-
-  /* Responsive */
-  @media (max-width:560px){
-    body{padding:10px}
-    .header{padding:18px 16px}
-    .header h1{font-size:1.1rem}
-    .card{padding:16px}
-    .options{grid-template-columns:1fr}
-    .grid-viz{grid-template-columns:repeat(4,1fr);gap:5px}
-    .pair{font-size:0.7rem;padding:7px 2px}
-    .counter{min-width:100%}
-  }
+  ul.plain{margin:.4em 0 .4em 1.1em;padding:0;}
+  ul.plain li{margin:.2em 0;}
 </style>
 </head>
 <body>
-<div class="container">
+<div class="wrap">
+  <div class="split">
 
-  <!-- HEADER -->
-  <div class="header">
-    <div class="qnum">HKDSE Math 2019 Paper 2 &middot; Q28</div>
-    <h1>Probability of Drawing Consecutive Integers</h1>
-    <div class="tags">
-      <span class="tag">Probability</span>
-      <span class="tag">Counting Outcomes</span>
-      <span class="tag">Combinations</span>
-      <span class="tag">No Replacement</span>
-    </div>
-  </div>
-
-  <!-- QUESTION -->
-  <div class="card">
-    <h2><span class="num">Q</span>Question</h2>
-    <p class="question-text">
-      Two numbers are randomly drawn <strong>at the same time</strong> from nine balls numbered
-      \(1, 2, 3, 4, 5, 6, 7, 8\) and \(9\) respectively. Find the probability that the two numbers
-      drawn are <strong>consecutive integers</strong>.
-    </p><figure style="margin:12px 0;text-align:center;"><img src="figures/2019_P2_Q28.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
-    <div class="options">
-      <div class="option"><span class="lbl">A.</span> \(\dfrac{1}{2}\)</div>
-      <div class="option"><span class="lbl">B.</span> \(\dfrac{1}{4}\)</div>
-      <div class="option"><span class="lbl">C.</span> \(\dfrac{2}{9}\)<span class="check"></span></div>
-      <div class="option"><span class="lbl">D.</span> \(\dfrac{7}{9}\)</div>
-    </div>
-  </div>
-
-  <!-- STEP BY STEP -->
-  <div class="card">
-    <h2><span class="num">1</span>Step-by-Step Solution</h2>
-
-    <!-- Step 1 -->
-    <div class="step" id="step1">
-      <div class="step-header" onclick="toggleStep('step1')">
-        <span class="step-badge">1</span>
-        <span>Understand the experiment &amp; sample space</span>
-        <span class="step-arrow">▼</span>
+    <!-- ================= LEFT: DIAGRAM ================= -->
+    <div class="diagram">
+      <div class="panel">
+        <canvas id="cv" width="560" height="620"></canvas>
+        <p class="ro" id="ro">Step 1 — Nine balls numbered 1 to 9; choose 2 at the same time.</p>
       </div>
-      <div class="step-body">
-        <p>We draw <strong>two balls at the same time</strong> from a bag of 9 distinctly numbered balls
-        \(1,2,\ldots,9\).</p>
-        <p>"At the same time" means the two balls form an <strong>unordered pair</strong>
-        \(\{a,b\}\) — the order does not matter. For example, \(\{2,5\}\) is the same draw as \(\{5,2\}\).</p>
-        <div class="hint">
-          <strong>Hint — Sample Space Size:</strong>
-          The number of ways to choose 2 objects from 9 (order doesn't matter) is the combination
-          \[ C^{9}_{2} = \frac{9!}{2!\,7!} = \frac{9 \times 8}{2} = 36. \]
-          So there are <strong>36 equally likely outcomes</strong>.
+    </div>
+
+    <!-- ================= RIGHT: QUESTION + SOLUTION ================= -->
+    <div class="right panel">
+      <span class="tag">HKDSE 2019 · Paper 2 · Q28</span>
+      <h1>14. Probability</h1>
+
+      <div class="qbox">
+        <p><strong>Question.</strong> Two numbers are randomly drawn at the same time from nine balls numbered
+        \(1,2,3,4,5,6,7,8\) and \(9\) respectively. Find the probability that the two numbers drawn are
+        consecutive integers.</p>
+        <div class="opts">
+          <div class="opt">A. $\dfrac{1}{2}$</div>
+          <div class="opt">B. $\dfrac{1}{4}$</div>
+          <div class="opt correct">C. $\dfrac{2}{9}$</div>
+          <div class="opt">D. $\dfrac{7}{9}$</div>
         </div>
       </div>
-    </div>
+      <figure style="margin:12px 0;text-align:center;"><img src="figures/2019_P2_Q28.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
 
-    <!-- Step 2 -->
-    <div class="step" id="step2">
-      <div class="step-header" onclick="toggleStep('step2')">
-        <span class="step-badge">2</span>
-        <span>Define what "consecutive integers" means</span>
-        <span class="step-arrow">▼</span>
+      <div class="step" data-step="1">
+        <span class="chip">1</span><b class="t">Model the sample space.</b><br>
+        Nine balls are numbered \(1\) to \(9\). Two are drawn <em>at the same time</em>, so order does not matter —
+        each outcome is a <strong>2-element subset</strong> \(\{a,b\}\) with \(a\ne b\).
+        <span class="hint">Hint: "at the same time" ⇒ unordered pairs ⇒ combination counting.</span>
       </div>
-      <div class="step-body">
-        <p>Two integers are <strong>consecutive</strong> if they differ by exactly 1, e.g. \(3\) and \(4\), or \(8\) and \(9\).</p>
-        <p>So a favourable pair has the form \(\{n,\; n+1\}\) where \(n = 1,2,\ldots,8\).</p>
-        <div class="hint">
-          <strong>Hint — Counting Favourable Pairs:</strong>
-          As the first number \(n\) can be any of \(1\) to \(8\), there are exactly
-          \[ 8 \text{ possible consecutive pairs.} \]
-        </div>
-      </div>
-    </div>
 
-    <!-- Step 3 -->
-    <div class="step" id="step3">
-      <div class="step-header" onclick="toggleStep('step3')">
-        <span class="step-badge">3</span>
-        <span>Apply the probability formula</span>
-        <span class="step-arrow">▼</span>
+      <div class="step" data-step="2">
+        <span class="chip">2</span><b class="t">Count all possible outcomes.</b><br>
+        Number of ways to choose 2 balls from 9:
+        \[ n(S)=\binom{9}{2}=\frac{9\times 8}{2}=36. \]
+        <span class="hint">Hint: total outcomes = \(36\) (matches the table in the official solution).</span>
       </div>
-      <div class="step-body">
-        <p>For equally likely outcomes:</p>
-        <div class="highlight">
-          \[
-            P(\text{event}) = \frac{\text{number of favourable outcomes}}{\text{total number of outcomes}}
-            = \frac{8}{36} = \frac{2}{9}.
-          \]
-        </div>
-        <p>So the required probability is \(\dfrac{2}{9}\). This matches <strong>option C</strong>.</p>
-      </div>
-    </div>
 
-    <!-- Step 4 -->
-    <div class="step" id="step4">
-      <div class="step-header" onclick="toggleStep('step4')">
-        <span class="step-badge">4</span>
-        <span>Alternative check — "ordered" method</span>
-        <span class="step-arrow">▼</span>
-      </div>
-      <div class="step-body">
-        <p>Some students count ordered pairs instead. Then:</p>
-        <ul style="margin:8px 0 8px 20px;font-size:0.93rem">
-          <li>Total ordered pairs \(= 9 \times 8 = 72\)</li>
-          <li>Favourable ordered pairs \(= 8 \times 2 = 16\) (each consecutive pair \(\{n,n+1\}\) can be drawn in 2 orders)</li>
+      <div class="step" data-step="3">
+        <span class="chip">3</span><b class="t">Count the favourable outcomes.</b><br>
+        The two numbers must be consecutive integers: \(\{1,2\},\{2,3\},\{3,4\},\{4,5\},\{5,6\},\{6,7\},\{7,8\},\{8,9\}\).
+        <ul class="plain">
+          <li>These are exactly the adjacent pairs on the number line \(1\!-\!2\!-\!3\!-\!\cdots\!-\!9\).</li>
+          <li>There are \(9-1=8\) such gaps.</li>
         </ul>
-        <div class="highlight">
-          \[
-            P = \frac{16}{72} = \frac{2}{9}
-          \]
-        </div>
-        <p>The same answer is obtained — the method of counting (ordered or unordered) does not affect the probability, as long as both numerator and denominator use the same convention.</p>
+        \[ n(E)=8. \]
+        <span class="hint">Hint: the "diagonal band" in the table = the 8 consecutive pairs.</span>
+      </div>
+
+      <div class="step" data-step="4">
+        <span class="chip">4</span><b class="t">Apply the probability formula.</b><br>
+        \[ P(E)=\frac{n(E)}{n(S)}=\frac{8}{36}=\frac{2}{9}. \]
+        (Quick check: \(P(E)+P(E')=\tfrac{2}{9}+\tfrac{7}{9}=1\), and option D, \(\tfrac79\), is the complement —
+        a common trap.)
+        <span class="hint">Hint: always simplify the fraction, and re-read whether the question asks for "consecutive" or "not consecutive".</span>
+      </div>
+
+      <div class="ans">
+        Answer: <span class="big">C</span> &nbsp;—&nbsp; \(P=\dfrac{8}{36}=\dfrac{2}{9}\).
       </div>
     </div>
 
-    <div class="answer-box">
-      <div class="label">Final Answer</div>
-      <div class="value">C. \(\dfrac{2}{9}\)</div>
-    </div>
   </div>
-
-  <!-- VISUALISATION -->
-  <div class="card">
-    <h2><span class="num">2</span>Visualise the 36 Outcomes</h2>
-    <p style="font-size:0.9rem;color:var(--text-light);margin-bottom:6px">
-      Each tile shows one possible unordered pair. Green tiles are <strong>consecutive pairs</strong>.
-    </p>
-
-    <div class="grid-viz" id="pairGrid"></div>
-
-    <div class="counter-display">
-      <div class="counter">
-        <div class="c-label">Total Outcomes</div>
-        <div class="c-value" id="totalCount">0</div>
-      </div>
-      <div class="counter green">
-        <div class="c-label">Consecutive Pairs</div>
-        <div class="c-value" id="favCount">0</div>
-      </div>
-      <div class="counter green">
-        <div class="c-label">Probability</div>
-        <div class="c-value" id="probVal">0 / 0</div>
-      </div>
-    </div>
-
-    <div class="controls">
-      <button class="btn" onclick="highlightConsecutive()">Highlight Consecutive Pairs</button>
-      <button class="btn secondary" onclick="resetHighlight()">Reset</button>
-    </div>
-  </div>
-
-  <!-- KEY CONCEPTS -->
-  <div class="card">
-    <h2><span class="num">3</span>Key Concepts &amp; Exam Tips</h2>
-    <div class="chips">
-      <span class="chip">Combination \(C^{n}_{r}\)</span>
-      <span class="chip">Sample Space</span>
-      <span class="chip">Favourable Outcomes</span>
-      <span class="chip">"At the same time" → unordered</span>
-    </div>
-    <ul style="margin-top:12px;font-size:0.92rem;padding-left:20px">
-      <li><strong>Read the wording carefully.</strong> "Drawn at the same time" indicates combinations, not permutations.</li>
-      <li><strong>Count total outcomes first.</strong> For \(n\) distinct objects taken 2 at a time: \(C^{n}_{2}\).</li>
-      <li><strong>Consecutive pairs from 1 to 9:</strong> \(\{1,2\},\{2,3\},\ldots,\{8,9\}\) → exactly \(9-1=8\) pairs.</li>
-      <li><strong>Simplify the fraction.</strong> \(\dfrac{8}{36}=\dfrac{2}{9}\).</li>
-    </ul>
-  </div>
-
 </div>
 
 <script>
-  /* ---------- Accordion ---------- */
-  function toggleStep(id){
-    const step = document.getElementById(id);
-    step.classList.toggle('open');
+(function(){
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  const ro = document.getElementById('ro');
+  let current = 1;
+
+  const W = 560, H = 620;
+
+  // colours
+  const C = {
+    ink:'#1e293b', muted:'#64748b', grid:'#e5e7eb',
+    blue:'#2563eb', red:'#dc2626', green:'#16a34a', amber:'#d97706',
+    violet:'#7c3aed', teal:'#0d9488', pink:'#db2777', ball:'#eef2ff'
+  };
+
+  const notes = {
+    1:'Step 1 — Nine balls numbered 1 to 9; choose 2 at the same time (unordered).',
+    2:'Step 2 — Total outcomes: C(9,2) = 36. The grid below shows all 36 unordered pairs.',
+    3:'Step 3 — Favourable: the 8 consecutive pairs {1,2} … {8,9} — the diagonal band.',
+    4:'Step 4 — P = favourable / total = 8 / 36 = 2 / 9.'
+  };
+
+  function roundRect(x,y,w,h,r){
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);
+    ctx.arcTo(x+w,y,x+w,y+h,r);
+    ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r);
+    ctx.arcTo(x,y,x+w,y,r);
+    ctx.closePath();
   }
 
-  /* ---------- Build the 36 unordered pairs ---------- */
-  const pairs = [];
-  for(let a = 1; a <= 9; a++){
-    for(let b = a + 1; b <= 9; b++){
-      pairs.push([a, b]);
+  function text(s,x,y,{font='14px system-ui',color=C.ink,align='left',baseline='alphabetic'}={}){
+    ctx.font=font; ctx.fillStyle=color; ctx.textAlign=align; ctx.textBaseline=baseline;
+    ctx.fillText(s,x,y);
+  }
+
+  function drawBalls(step){
+    // title
+    text('Nine balls numbered 1 – 9', 20, 30, {font:'bold 15px system-ui', color:C.violet});
+
+    const r = 19, gap = 12, y = 78;
+    const totalW = 9*(2*r) + 8*gap;
+    const startX = (W - totalW)/2 + r;
+
+    for(let i=1;i<=9;i++){
+      const x = startX + (i-1)*(2*r+gap);
+
+      // is this number part of a highlighted consecutive pair in step 3/4?
+      const onBlue = (step>=3) && (i===1||i===2);
+      const onGreen = (step>=3) && (i===7||i===8);
+
+      ctx.beginPath();
+      ctx.arc(x,y,r,0,Math.PI*2);
+      ctx.fillStyle = onBlue ? '#dbeafe' : (onGreen ? '#dcfce7' : C.ball);
+      ctx.fill();
+      ctx.lineWidth = onBlue||onGreen ? 3 : 2;
+      ctx.strokeStyle = onBlue ? C.blue : (onGreen ? C.green : '#c7d2fe');
+      ctx.stroke();
+
+      text(String(i), x, y+1, {font:'bold 15px system-ui',
+        color: onBlue ? '#1e40af' : (onGreen ? '#15803d' : C.ink),
+        align:'center', baseline:'middle'});
+    }
+
+    // braces showing consecutive pairs under the balls
+    ctx.lineWidth = 2.5;
+    if(step>=3){
+      for(let i=1;i<=8;i++){
+        const x1 = startX + (i-1)*(2*r+gap) + r;
+        const x2 = startX + i*(2*r+gap) - r + 1; // next centre
+        const yb = y + r + 12;
+        ctx.beginPath();
+        ctx.moveTo(x1+3, yb);
+        ctx.quadraticCurveTo((x1+x2)/2, yb+16, x2-3, yb);
+        ctx.strokeStyle = (i===1)?C.blue : (i===8?C.green : C.amber);
+        ctx.stroke();
+      }
+      text('8 consecutive pairs  →  {1,2}, {2,3}, … , {8,9}', W/2, y+r+42,
+           {font:'bold 12.5px system-ui', color:C.amber, align:'center'});
     }
   }
 
-  const grid = document.getElementById('pairGrid');
-  pairs.forEach(p => {
-    const div = document.createElement('div');
-    div.className = 'pair';
-    div.textContent = '{' + p[0] + ', ' + p[1] + '}';
-    if(p[1] - p[0] === 1) div.dataset.consecutive = 'true';
-    grid.appendChild(div);
-  });
+  function drawGrid(step){
+    const n = 9;
+    const cell = 40;
+    const topY = 168;
+    const startX = (W - n*cell)/2 + 6;
 
-  /* ---------- Counters ---------- */
-  const total = pairs.length;                              // 36
-  const favourable = pairs.filter(p => p[1] - p[0] === 1).length; // 8
-  document.getElementById('totalCount').textContent = total;
-  document.getElementById('favCount').textContent = favourable;
-  document.getElementById('probVal').innerHTML =
-    '\\(' + favourable + '/' + total + ' = ' +
-    '<span style="color:#15803d">' + (favourable/total).toFixed(4) + '</span>\\)';
+    text('All unordered pairs {a, b}  —  36 outcomes', W/2, topY-14,
+         {font:'bold 14px system-ui', color:C.violet, align:'center'});
 
-  /* ---------- Highlight / Reset ---------- */
-  function highlightConsecutive(){
-    document.querySelectorAll('.pair').forEach(el => {
-      if(el.dataset.consecutive === 'true'){
-        el.classList.add('consecutive');
+    // header row: b values
+    for(let b=1;b<=n;b++){
+      const x = startX + (b-1)*cell;
+      text(String(b), x+cell/2, topY-2, {font:'bold 12px system-ui', color:C.blue, align:'center'});
+    }
+    // left column: a values
+    for(let a=1;a<=n;a++){
+      const y = topY + (a-1)*cell;
+      text(String(a), startX-14, y+cell/2, {font:'bold 12px system-ui', color:C.teal, align:'center', baseline:'middle'});
+    }
+
+    for(let a=1;a<=n;a++){
+      for(let b=1;b<=n;b++){
+        const x = startX + (b-1)*cell;
+        const y = topY + (a-1)*cell;
+
+        const offDiag = (a!==b);
+        const consecutive = offDiag && Math.abs(a-b)===1;
+
+        let fill='#f8fafc', stroke='#e2e8f0', lw=1, label='';
+        if(offDiag){
+          fill = '#dbeafe'; stroke = '#93c5fd';
+          label = '{'+Math.min(a,b)+','+Math.max(a,b)+'}';
+        }
+        if(consecutive && step>=2){ fill = '#fde68a'; stroke = '#f59e0b'; lw = 2; }
+        if(consecutive && step>=3){ fill = '#fca5a5'; stroke = C.red; lw = 2.5; }
+
+        ctx.fillStyle = fill;
+        ctx.strokeStyle = stroke;
+        ctx.lineWidth = lw;
+        roundRect(x+1.5, y+1.5, cell-3, cell-3, 6);
+        ctx.fill(); ctx.stroke();
+
+        if(offDiag && a<=b && cell>=36){
+          text(label, x+cell/2, y+cell/2+0.5, {font:'9.5px system-ui',
+            color: consecutive ? '#7f1d1d' : '#1e3a8a', align:'center', baseline:'middle'});
+        }
+      }
+    }
+
+    // shaded legend
+    const ly = topY + n*cell + 16;
+    let lx = 44;
+    const items = [
+      ['#dbeafe','#93c5fd','non-consecutive pair (28)'],
+      ['#fca5a5','#dc2626','consecutive pair (8)']
+    ];
+    items.forEach(([f,s,t])=>{
+      ctx.fillStyle=f; ctx.strokeStyle=s; ctx.lineWidth=2;
+      roundRect(lx, ly, 18, 14, 4); ctx.fill(); ctx.stroke();
+      text(t, lx+24, ly+11, {font:'12px system-ui', color:C.muted});
+      lx += ctx.measureText(t).width + 60;
+    });
+
+    text('Note: the table is symmetric and the diagonal a = b is excluded (a different table shows ordered pairs).',
+         W/2, ly+34, {font:'11.5px system-ui', color:C.muted, align:'center'});
+  }
+
+  function drawCountBar(step){
+    const y = 500;
+    const barW = 300, barH = 34, x0 = (W-barW)/2;
+
+    text('Counting', 24, y-16, {font:'bold 13.5px system-ui', color:C.violet});
+
+    // total bar
+    ctx.fillStyle = '#dbeafe'; ctx.strokeStyle='#93c5fd'; ctx.lineWidth=2;
+    roundRect(x0, y, barW, barH, 8); ctx.fill(); ctx.stroke();
+    text('Total outcomes = 36', x0, y-4, {font:'12px system-ui', color:C.blue});
+
+    // favourable bar (fraction of width)
+    const frac = 8/36;
+    ctx.fillStyle = step>=3 ? '#fca5a5' : '#fde68a';
+    ctx.strokeStyle = step>=3 ? C.red : C.amber;
+    ctx.lineWidth = 2.5;
+    roundRect(x0, y, Math.max(26, barW*frac), barH, 8); ctx.fill(); ctx.stroke();
+
+    const t = 'Favourable = 8';
+    ctx.font='bold 12px system-ui';
+    const tw = ctx.measureText(t).width;
+    text(t, x0 + barW*frac + 10 > W-20 ? x0 + barW*frac - tw - 12 : x0 + barW*frac + 10,
+         y+barH/2+1, {font:'bold 12px system-ui', color: step>=3 ? '#991b1b':'#92400e', baseline:'middle'});
+
+    // probability statement
+    const py = y + barH + 34;
+    if(step>=4){
+      text('P = 8 / 36 = 2 / 9', W/2, py, {font:'bold 19px system-ui', color:C.green, align:'center', baseline:'middle'});
+    } else {
+      text('P = favourable / total', W/2, py, {font:'15px system-ui', color:C.muted, align:'center', baseline:'middle'});
+    }
+  }
+
+  function draw(step){
+    current = step;
+    ctx.clearRect(0,0,W,H);
+
+    // subtle background
+    ctx.fillStyle = '#fdfdff';
+    ctx.fillRect(0,0,W,H);
+
+    // frame accent
+    ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 2;
+    roundRect(6,6,W-12,H-12,16); ctx.stroke();
+
+    drawBalls(step);
+    drawGrid(step);
+    drawCountBar(step);
+
+    ro.textContent = notes[step] || notes[1];
+
+    // highlight active step card
+    document.querySelectorAll('.step').forEach(s=>{
+      s.classList.toggle('active', +s.dataset.step === step);
+    });
+  }
+
+  // ---- scroll sync ----
+  const io = new IntersectionObserver(es=>{
+    es.forEach(e=>{
+      if(e.isIntersecting){
+        const n = +e.target.dataset.step;
+        if(n !== current) draw(n);
       }
     });
-  }
-  function resetHighlight(){
-    document.querySelectorAll('.pair').forEach(el => {
-      el.classList.remove('consecutive');
-    });
-  }
+  }, {rootMargin:'-25% 0px -55% 0px'});
+  document.querySelectorAll('.step').forEach(s=>io.observe(s));
 
-  /* ---------- Re-render MathJax after dynamic insert ---------- */
-  if(window.MathJax && MathJax.typesetPromise){
-    MathJax.typesetPromise();
-  }
+  // initial render (also after MathJax layout may shift things)
+  draw(1);
+  window.addEventListener('load', ()=>draw(current));
+})();
 </script>
-
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
-
 </body>
 </html>

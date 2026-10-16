@@ -1,734 +1,434 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>HKDSE 2022 Paper 1 Q11 — Statistics (Stem &amp; Leaf)</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2022 P1 Q11 — Statistics</title>
 <script>
 window.MathJax = {
-  tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['\\[', '\\]']] },
+  tex: { inlineMath: [['$','$'], ['\\(','\\)']], displayMath: [['$$','$$'], ['\\[','\\]']] },
   svg: { fontCache: 'global' }
 };
 </script>
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
-  :root{
-    --blue:#1d4ed8; --blue-d:#1e3a8a; --amber:#f59e0b; --emerald:#059669;
-    --ink:#0f172a; --slate:#475569; --bg:#f1f5f9; --card:#ffffff;
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: #f4f7fb;
+    color: #1c2733;
+    line-height: 1.55;
   }
-  *{box-sizing:border-box;}
-  body{
-    margin:0; font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    background:var(--bg); color:var(--ink); line-height:1.6;
+  .wrap { max-width: 1250px; margin: 0 auto; padding: 16px 14px 56px; }
+  h1 { font-size: 1.25rem; margin: 0 0 4px; color: #10365e; }
+  .subtitle { font-size: .85rem; color: #5b6d80; margin: 0 0 14px; }
+
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0,1fr) minmax(0,1fr);
+    gap: 12px;
+    align-items: start;
   }
-  .wrap{max-width:960px; margin:0 auto; padding:0 14px 40px;}
-  /* HERO */
-  header.hero{
-    background:linear-gradient(135deg,#1e3a8a 0%,#2563eb 45%,#0ea5e9 100%);
-    color:#fff; padding:38px 20px 34px; text-align:center;
-    box-shadow:0 8px 22px rgba(30,58,138,.28);
-    border-radius:0 0 26px 26px; margin-bottom:22px;
+  @media (min-width:900px) {
+    .split { grid-template-columns: minmax(0,46%) minmax(0,54%); gap: 18px; }
   }
-  .eyebrow{letter-spacing:.16em; text-transform:uppercase; font-size:.72rem; opacity:.85;}
-  .hero h1{
-    font-size:2.05rem; margin:.25rem 0 .1rem; font-weight:800;
-    text-shadow:0 2px 10px rgba(0,0,0,.22);
+  .diagram {
+    position: sticky;
+    top: 16px;
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
   }
-  .hero h2{font-size:1.02rem; font-weight:500; margin:.1rem 0 .8rem; opacity:.95;}
-  .pills{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:6px;}
-  .pill{
-    background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.5);
-    padding:4px 13px; border-radius:999px; font-size:.78rem; font-weight:600;
-    backdrop-filter:blur(4px);
+  @media (max-width:640px) {
+    body { font-size: 14.5px; }
+    .wrap { padding: 10px 8px 40px; }
   }
-  /* CARDS */
-  .card{
-    background:var(--card); border-radius:16px; padding:20px 20px 22px;
-    box-shadow:0 4px 16px rgba(15,23,42,.09); margin-bottom:22px;
-    border:1px solid #e2e8f0; border-top:5px solid var(--blue);
+
+  .card {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 4px 18px rgba(20, 50, 90, .09);
+    padding: 14px 16px;
+    margin-bottom: 14px;
   }
-  .card h3{margin:.1rem 0 12px; font-size:1.18rem; color:var(--blue-d);}
-  .card h3 .badge-q{
-    background:var(--blue); color:#fff; border-radius:8px; padding:2px 10px;
-    font-size:.86rem; margin-right:9px; font-weight:700;
+  .diagram .card { border: 1px solid #dbe6f2; }
+
+  .q-title { font-weight: 700; color: #0b4f8a; font-size: 1rem; margin-bottom: 6px; }
+  .marks { float: right; color: #c0392b; font-size: .82rem; font-weight: 700; }
+
+  canvas { width: 100%; height: auto; display: block; border-radius: 10px; background: #fcfdff; }
+  .ro {
+    font-size: .82rem; color: #33536f; margin: 8px 0 0;
+    background: #eef5fd; border-left: 4px solid #3b82c4;
+    padding: 6px 10px; border-radius: 0 6px 6px 0;
   }
-  .question-text{font-size:1.02rem;}
-  .marks{color:#b45309; font-weight:700;}
-  /* TABLE for stem-leaf */
-  .leafwrap{display:flex; justify-content:center; margin:14px 0 4px;}
-  table.sl{border-collapse:collapse; font-family:"Consolas","Courier New",monospace; font-size:1rem;}
-  table.sl th{
-    background:#e0edff; color:#1e3a8a; padding:7px 18px; border:1px solid #b9d4f7;
-    font-size:.88rem;
+
+  .step {
+    border-left: 4px solid #d6e3f0;
+    padding: 6px 0 6px 12px;
+    margin: 10px 0;
+    transition: border-color .3s, background .3s;
+    border-radius: 0 8px 8px 0;
   }
-  table.sl td{border:1px solid #d7e3f4; padding:6px 10px; text-align:left;}
-  table.sl td.stem{background:#f0f6ff; font-weight:700; text-align:right; color:#1e40af;}
-  table.sl td.hl{color:#b45309; font-weight:800;}
-  /* STEP BLOCKS */
-  .step{
-    display:none; border-left:4px solid var(--blue); background:#f8fbff;
-    border-radius:0 12px 12px 0; padding:13px 15px 11px; margin:12px 0;
-    animation:fade .45s ease;
+  .step.active {
+    border-left-color: #f39c12;
+    background: #fff8ec;
   }
-  .step.show{display:block;}
-  @keyframes fade{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;}}
-  .step-head{display:flex; align-items:center; gap:9px; flex-wrap:wrap; margin-bottom:5px;}
-  .numbadge{
-    background:var(--blue); color:#fff; width:27px; height:27px; border-radius:50%;
-    display:flex; align-items:center; justify-content:center; font-weight:700; font-size:.86rem;
+  .step-tag {
+    display: inline-block;
+    background: #0b4f8a;
+    color: #fff;
+    font-size: .74rem;
+    font-weight: 700;
+    padding: 1px 8px;
+    border-radius: 999px;
+    margin-right: 6px;
+    letter-spacing: .03em;
   }
-  .markbadge{
-    background:var(--amber); color:#3b2500; padding:2px 10px; border-radius:999px;
-    font-size:.74rem; font-weight:800; letter-spacing:.03em;
+  .step.active .step-tag { background: #e67e22; }
+  .hint {
+    font-size: .8rem;
+    color: #4a657f;
+    background: #f0f6fc;
+    border-radius: 6px;
+    padding: 4px 9px;
+    margin-top: 5px;
+    display: inline-block;
   }
-  .steptitle{font-weight:700; color:var(--blue-d); font-size:.96rem;}
-  .hint{
-    background:#fffbeb; border-left:4px solid var(--amber); border-radius:8px;
-    padding:9px 12px; margin:10px 0; font-size:.93rem;
+  .answer {
+    margin-top: 14px;
+    background: linear-gradient(90deg,#e8f5e9,#f1fbf2);
+    border: 1px solid #9fd6a5;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-weight: 700;
+    color: #14632c;
   }
-  .hint::before{content:"💡 Hint: "; font-weight:800; color:#b45309;}
-  .answer{
-    background:#ecfdf5; border-left:4px solid var(--emerald); border-radius:8px;
-    padding:9px 12px; margin:10px 0; font-weight:600; font-size:.96rem;
-  }
-  .answer::before{content:"✅ Answer: "; color:var(--emerald); font-weight:800;}
-  .ctrlbar{display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-top:16px;}
-  button.next{
-    background:linear-gradient(135deg,#2563eb,#1d4ed8); color:#fff; border:none;
-    padding:10px 20px; border-radius:11px; font-size:.95rem; font-weight:700; cursor:pointer;
-    box-shadow:0 3px 11px rgba(37,99,235,.35); transition:.18s;
-  }
-  button.next:hover:not(:disabled){transform:translateY(-2px); box-shadow:0 6px 15px rgba(37,99,235,.45);}
-  button.next:disabled{background:#94a3b8; cursor:not-allowed; box-shadow:none;}
-  .counter{font-size:.87rem; color:var(--slate); font-weight:700;}
-  /* CANVAS AREA */
-  .canvas-box{
-    background:#0b1220; border-radius:14px; padding:12px; margin:14px 0 8px;
-    box-shadow:inset 0 2px 10px rgba(0,0,0,.5);
-  }
-  canvas{width:100%; display:block; border-radius:9px; touch-action:manipulation;}
-  .controlls{
-    background:#f1f5f9; border:1px solid #dbe3ee; border-radius:12px; padding:12px 14px;
-    display:flex; flex-wrap:wrap; gap:18px; align-items:center; margin:10px 0 4px;
-  }
-  .controlls label{font-size:.87rem; font-weight:700; color:#334155; display:flex; align-items:center; gap:8px;}
-  input[type=range]{accent-color:#2563eb; width:150px;}
-  input[type=checkbox]{accent-color:#059669; width:17px; height:17px;}
-  .readout{
-    background:#0f172a; color:#7dd3fc; font-family:"Consolas",monospace; font-size:.85rem;
-    padding:9px 13px; border-radius:10px; margin-top:8px; line-height:1.7;
-  }
-  .readout b{color:#fcd34d;}
-  /* SUMMARY */
-  .summary{
-    background:linear-gradient(150deg,#0f172a,#1e293b); color:#e2e8f0;
-    border-top:5px solid var(--emerald);
-  }
-  .summary h3{color:#6ee7b7;}
-  .summary ul{margin:0; padding-left:22px;}
-  .summary li{margin-bottom:9px; font-size:.97rem;}
-  .summary .key{color:#fcd34d; font-weight:800;}
-  /* FOOTER */
-  footer{
-    text-align:center; color:#64748b; font-size:.83rem; padding:8px 0 26px;
-  }
-  @media(max-width:600px){
-    .hero h1{font-size:1.55rem;}
-    .card{padding:16px 14px 18px;}
-    input[type=range]{width:110px;}
-  }
+  .legend { display:flex; flex-wrap:wrap; gap:10px; font-size:.78rem; margin-top:8px; }
+  .legend span { display:flex; align-items:center; gap:5px; }
+  .swatch { width:12px; height:12px; border-radius:3px; display:inline-block; }
+  code { background:#eef3f8; padding:1px 5px; border-radius:4px; font-size:.88em; }
 </style>
 </head>
 <body>
-
-<header class="hero">
-  <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 1</div>
-  <h1>2022 Paper 1 · Question 11</h1>
-  <h2>15. Statistics — Stem-and-Leaf Diagram, Median, Inter-quartile Range &amp; Standard Deviation</h2>
-  <div class="pills">
-    <span class="pill">Stem-and-Leaf Diagram</span>
-    <span class="pill">Median</span>
-    <span class="pill">Inter-quartile Range</span>
-    <span class="pill">Mode</span>
-    <span class="pill">Standard Deviation</span>
-  </div>
-</header>
-
 <div class="wrap">
+  <h1>HKDSE Mathematics (Compulsory Part) — Paper 1 Q11</h1>
+  <p class="subtitle">Topic 15: Statistics · Stem-and-Leaf, Median, Inter-quartile Range, Mode &amp; Standard Deviation</p>
 
-  <!-- QUESTION CARD -->
-  <section class="card">
-    <h3><span class="badge-q">Q11</span>The Question</h3>
-    <div class="question-text">
-      <p>The stem-and-leaf diagram below shows the distribution of the ages of the players of a football team.</p>
-      <div class="leafwrap">
-        <table class="sl">
-          <thead>
-            <tr><th>Stem (tens)</th><th>Leaf (units)</th></tr>
-          </thead>
-          <tbody>
-            <tr><td class="stem">1</td><td>7&nbsp;&nbsp;8&nbsp;&nbsp;9</td></tr>
-            <tr><td class="stem">2</td><td>0&nbsp;&nbsp;<span class="hl">a</span>&nbsp;&nbsp;<span class="hl">a</span>&nbsp;&nbsp;8&nbsp;&nbsp;8&nbsp;&nbsp;9</td></tr>
-            <tr><td class="stem">3</td><td><span class="hl">b</span>&nbsp;&nbsp;<span class="hl">b</span>&nbsp;&nbsp;5&nbsp;&nbsp;5&nbsp;&nbsp;6&nbsp;&nbsp;6&nbsp;&nbsp;6&nbsp;&nbsp;6&nbsp;&nbsp;7&nbsp;&nbsp;8</td></tr>
-            <tr><td class="stem">4</td><td>3</td></tr>
-          </tbody>
-        </table>
+  <div class="split">
+    <!-- ================= LEFT PANE : DIAGRAM ================= -->
+    <div class="diagram">
+      <div class="card">
+        <div class="q-title">Interactive Figure</div>
+        <canvas id="cv" width="620" height="760"></canvas>
+        <p class="ro" id="readout">Step 1 — Given stem-and-leaf diagram (highlighted: the given facts).</p>
+        <div class="legend">
+          <span><i class="swatch" style="background:#2e86de"></i>Stem values</span>
+          <span><i class="swatch" style="background:#27ae60"></i>Solved leaves</span>
+          <span><i class="swatch" style="background:#e67e22"></i>Highlighted data</span>
+          <span><i class="swatch" style="background:#c0392b"></i>Removed / changed</span>
+        </div>
       </div>
-      <p>The inter-quartile range and the median of the distribution are \(14\) and \(31\) respectively.</p>
-      <p><strong>(a)</strong> Find \(a\) and \(b\). <span class="marks">[3 marks]</span></p>
-      <p><strong>(b)</strong> A player now leaves the football team.</p>
-      <p style="margin-left:22px;"><strong>(i)</strong> Is there any change in the mode of the distribution due to the leaving of the player? Explain your answer.</p>
-      <p style="margin-left:22px;"><strong>(ii)</strong> If the range of the distribution is decreased, find the greatest possible standard deviation of the distribution. <span class="marks">[4 marks]</span></p>
-    </div>
-  </section>
-
-  <!-- PART A -->
-  <section class="card">
-    <h3><span class="badge-q">(a)</span>Finding \(a\) and \(b\)</h3>
-
-    <div class="canvas-box">
-      <canvas id="cvA" width="900" height="600"></canvas>
-    </div>
-    <div class="controlls">
-      <label>Number of data \(n\) <input id="sldN" type="range" min="15" max="26" step="1" value="17">
-        <span id="nVal" style="font-family:monospace;color:#1d4ed8;">17</span></label>
-      <label><input id="chkQ" type="checkbox" checked> Show quartile positions</label>
-      <label><input id="chkMed" type="checkbox" checked> Show median line</label>
     </div>
 
-    <div class="step" data-rich>
-      <div class="step-head"><span class="numbadge">1</span><span class="markbadge">1A</span>
-      <span class="steptitle">Count the number of data using the median</span></div>
-      <p>Reading the stem-and-leaf diagram row by row:</p>
-      <p>Stem \(1\): \(3\) data · Stem \(2\): \(6\) data · Stem \(3\): \(10\) data · Stem \(4\): \(1\) data.</p>
-      \[n=3+6+10+1=20\]
-      <p>Since \(n=20\) is even, the median is the average of the \(\tfrac{20}{2}=10^{\text{th}}\) and the \(11^{\text{th}}\) data values.</p>
-      <div class="hint">For \(n=20\), \(\text{median}=\dfrac{x_{10}+x_{11}}{2}\). Here \(x_{10}=x_{11}=31\), which is consistent with the given median.</div>
+    <!-- ================= RIGHT PANE : QUESTION & SOLUTION ================= -->
+    <div>
+      <div class="card">
+        <div class="q-title">Question</div>
+        <p>The stem-and-leaf diagram below shows the distribution of the ages of the players of a football team.</p>
+        <p style="text-align:center;font-family:monospace;font-weight:700;">
+          Stem (tens) &nbsp;|&nbsp; Leaf (units)<br>
+          1 &nbsp;|&nbsp; 7 8 9<br>
+          2 &nbsp;|&nbsp; 0 <i>a</i> <i>a</i> 8 8 9<br>
+          3 &nbsp;|&nbsp; <i>b</i> <i>b</i> 5 5 6 6 6 6 6 7 8<br>
+          4 &nbsp;|&nbsp; 3
+        </p>
+        <p>The inter-quartile range and the median of the distribution are 14 and 31 respectively.</p>
+        <p><b>(a)</b> Find <i>a</i> and <i>b</i>. <span class="marks">[3 marks]</span></p>
+        <p><b>(b)</b> A player now leaves the football team.</p>
+        <p style="padding-left:18px;">(i) Is there any change in the mode of the distribution due to the leaving of the player? Explain your answer.</p>
+        <p style="padding-left:18px;">(ii) If the range of the distribution is decreased, find the greatest possible standard deviation of the distribution. <span class="marks">[4 marks]</span></p>
+      </div>
+
+      <div class="card">
+        <div class="q-title">Step-by-Step Solution</div>
+
+        <div class="step" data-step="1">
+          <span class="step-tag">STEP 1</span>
+          <b>Write down the ordered data from the stem-and-leaf diagram.</b>
+          <p style="margin:6px 0;">Leaves read in order give:
+          $17,\;18,\;19,\;20,\;a\!a,\;a\!a,\;28,\;28,\;29,\;b\!b,\;b\!b,\;35,\;35,\;36\times5,\;37,\;38,\;43$</p>
+          <p style="margin:6px 0;">Total number of players: $3 + 6 + 11 + 1 = \mathbf{21}$ (odd).</p>
+          <span class="hint">Tip: The median of 21 ordered values is the 11th value.</span>
+        </div>
+
+        <div class="step" data-step="2">
+          <span class="step-tag">STEP 2</span>
+          <b>Use the median = 31 to find $b$.</b>
+          <p style="margin:6px 0;">The 11th value in order is a stem-3 leaf. Counting: positions 10 and 11 come from the stem-3 row,
+          and the smallest two stem-3 values are $b\!b$ (i.e. $30+b$).</p>
+          <p style="margin:6px 0;">Median $= 30 + b = 31 \;\Rightarrow\; \boxed{b = 1}$</p>
+          <span class="hint">Hint: the median must be the 11th of 21 values — it lies in the stem-3 row.</span>
+        </div>
+
+        <div class="step" data-step="3">
+          <span class="step-tag">STEP 3</span>
+          <b>Use the inter-quartile range = 14 to find $a$.</b>
+          <p style="margin:6px 0;">With 21 values, $Q_1$ is at position $\tfrac{1}{4}(21+1)=5.5$ (average of 5th &amp; 6th) and $Q_3$ is at position $16.5$ (average of 16th &amp; 17th).</p>
+          <p style="margin:6px 0;">The smallest possible values are $a\!a$ (i.e. $20+a$), so the 5th and 6th values are both $20+a$:<br>
+          $Q_1 = 20 + a$.</p>
+          <p style="margin:6px 0;">The 16th and 17th values both equal 36 (the 36-runs), so $Q_3 = 36$.</p>
+          <p style="margin:6px 0;">IQR $= 36 - (20+a) = 14 \;\Rightarrow\; \boxed{a = 2}$</p>
+          <span class="hint">Hint: treat the diagram's a-entries as $22,22$. Note $36-(20+a)=14$.</span>
+        </div>
+
+        <div class="step" data-step="4">
+          <span class="step-tag">STEP 4</span>
+          <b>Part (b)(i) — Check the mode.</b>
+          <p style="margin:6px 0;">With $a=2,\;b=1$, the data are:
+          $17,18,19,20,22,22,28,28,29,31,31,35,35,36,36,36,36,36,37,38,43$.</p>
+          <p style="margin:6px 0;">The most frequent value is $36$ (appears 5 times), so the original mode is $36$.</p>
+          <p style="margin:6px 0;">If a player leaves, only the counts change; the value 36 still appears at least 4 times and remains the most frequent.</p>
+          <p style="margin:6px 0;">Therefore there is <b>no change</b> in the mode.</p>
+          <span class="hint">Hint: removing one value cannot create a new value — the mode stays 36.</span>
+        </div>
+
+        <div class="step" data-step="5">
+          <span class="step-tag">STEP 5</span>
+          <b>Part (b)(ii) — Range decreased: which player left?</b>
+          <p style="margin:6px 0;">Original range $= 43 - 17 = 26$.</p>
+          <p style="margin:6px 0;">For the range to decrease, one of the extreme values must leave:
+          either the age <b>17</b> or the age <b>43</b>.</p>
+          <p style="margin:6px 0;">Case 1: 17 leaves → new range $= 43-18=25$.<br>
+          Case 2: 43 leaves → new range $= 38-17=21$.</p>
+          <p style="margin:6px 0;">Both cases reduce the range; we must test the standard deviation in each case.</p>
+          <span class="hint">Hint: the range decreases only when a minimum or maximum data value leaves.</span>
+        </div>
+
+        <div class="step" data-step="6">
+          <span class="step-tag">STEP 6</span>
+          <b>Compute the standard deviations for both cases.</b>
+          <p style="margin:6px 0;">Original (20 values after removal) — use $\sigma=\sqrt{\dfrac{\sum x^2}{n}-\bar{x}^2}$.</p>
+          <p style="margin:6px 0;"><b>Case 1 (17 leaves):</b> $\sigma \approx 7.1625$</p>
+          <p style="margin:6px 0;"><b>Case 2 (43 leaves):</b> $\sigma \approx 7.1323$</p>
+          <p style="margin:6px 0;">Comparing, the greatest possible standard deviation is from Case 1.</p>
+          <p style="margin:6px 0;">$\sigma \approx 7.162537194 \approx \boxed{7.16}$</p>
+          <span class="hint">Hint: choose the larger of the two standard deviations and round to 3 significant figures.</span>
+        </div>
+
+        <div class="answer">
+          Answer: (a) $a = 2$, $b = 1$ &nbsp;|&nbsp; (b)(i) No, the mode is still $36$ &nbsp;|&nbsp; (b)(ii) $7.16$
+        </div>
+      </div>
     </div>
-
-    <div class="step">
-      <div class="step-head"><span class="numbadge">2</span><span class="markbadge">1M</span>
-      <span class="steptitle">Use the inter-quartile range to find \(a\)</span></div>
-      <p>Lower quartile \(Q_1\) is at position \(\dfrac{n}{4}=\dfrac{20}{4}=5\), the \(5^{\text{th}}\) datum. From the diagram the \(5^{\text{th}}\) value comes after the first four values in stem \(2\):</p>
-      \[Q_1=20+a\]
-      <p>Upper quartile \(Q_3\) is at position \(\dfrac{3n}{4}=15\), the \(15^{\text{th}}\) datum. Counting: \(3+6=9\) values up to the end of stem \(2\), then the \(15^{\text{th}}\) value is the \(6^{\text{th}}\) value of stem \(3\):</p>
-      \[Q_3=36\]
-      <p>Inter-quartile range \(=Q_3-Q_1\):</p>
-      \[36-(20+a)=14\]
-      <div class="hint">IQR \(=Q_3-Q_1\) counts the middle \(50\%\) of the data — use the positions \(n/4\) and \(3n/4\) carefully, counting from the smallest age upwards.</div>
-      <div class="answer">\(\;a=2\;\)</div>
-    </div>
-
-    <div class="step">
-      <div class="step-head"><span class="numbadge">3</span><span class="markbadge">1A</span>
-      <span class="steptitle">Use the median to find \(b\)</span></div>
-      <p>The \(10^{\text{th}}\) and \(11^{\text{th}}\) data values are the first two leaves of stem \(3\):</p>
-      \[x_{10}=30+b,\qquad x_{11}=30+b\]
-      \[\text{Median}=\frac{(30+b)+(30+b)}{2}=30+b=31\]
-      <p>Hence</p>
-      \[b=1\]
-      <div class="hint">The two middle values both begin with stem \(3\), so the median equals \(30+b\) — the same digits give the same number, which makes the average simple.</div>
-      <div class="answer">\(\;a=2,\quad b=1\;\)</div>
-      <p style="margin-top:8px;font-weight:600;color:#1e3a8a;">The ordered data set is therefore</p>
-      \[17,18,19,\;20,\underline{22},22,28,28,29,\;31,\underline{31},35,35,36,36,36,36,37,38,\;43\]
-    </div>
-
-    <div class="ctrlbar">
-      <button class="next" onclick="nextStep(this)">Next step →</button>
-      <span class="counter">0 / 3</span>
-    </div>
-  </section>
-
-  <!-- PART B(i) -->
-  <section class="card">
-    <h3><span class="badge-q">(b)(i)</span>Is there any change in the mode?</h3>
-
-    <div class="canvas-box">
-      <canvas id="cvBi" width="900" height="600"></canvas>
-    </div>
-    <div class="controlls">
-      <label>Remove the player aged <input id="sldRm" type="range" min="0" max="3" step="1" value="0">
-        <span id="rmVal" style="font-family:monospace;color:#1d4ed8;">none</span></label>
-      <label><input id="chkCount" type="checkbox" checked> Show frequency counts</label>
-    </div>
-
-    <div class="step">
-      <div class="step-head"><span class="numbadge">1</span><span class="markbadge">1M</span>
-      <span class="steptitle">Find the mode of the original distribution</span></div>
-      <p>From the diagram, the age \(36\) (leaf \(6\) in stem \(3\)) appears \(4\) times while every other age appears at most \(2\) times.</p>
-      <div class="answer">The original mode is \(\;36\;\)</div>
-      <div class="hint">The mode is the MOST FREQUENT value. Count the leaves: four \(6\)'s in the stem \(3\) row stand out immediately.</div>
-    </div>
-
-    <div class="step">
-      <div class="step-head"><span class="numbadge">2</span><span class="markbadge">1A</span>
-      <span class="steptitle">Find the mode of the new distribution</span></div>
-      <p>When any one player leaves, at most one copy of the age \(36\) disappears. Hence the age \(36\) still occurs at least \(3\) times, which is still strictly more than every other frequency.</p>
-      \[\text{New mode}=36\]
-      <div class="hint">Only one datum is removed. The count of \(36\) can drop from \(4\) to \(3\), but no other age can overtake it.</div>
-      <div class="answer">There is <strong>no change</strong> in the mode of the distribution.</div>
-    </div>
-
-    <div class="ctrlbar">
-      <button class="next" onclick="nextStep(this)">Next step →</button>
-      <span class="counter">0 / 2</span>
-    </div>
-  </section>
-
-  <!-- PART B(ii) -->
-  <section class="card">
-    <h3><span class="badge-q">(b)(ii)</span>Greatest possible standard deviation</h3>
-
-    <div class="canvas-box">
-      <canvas id="cvBii" width="900" height="600"></canvas>
-    </div>
-    <div class="controlls">
-      <label>Keep case: <input id="sldCase" type="range" min="0" max="1" step="1" value="0">
-        <span id="caseVal" style="font-family:monospace;color:#1d4ed8;">Case 1 (17 leaves)</span></label>
-      <label><input id="chkMean" type="checkbox" checked> Show mean &amp; deviations</label>
-    </div>
-    <div class="readout" id="readBii">…</div>
-
-    <div class="step">
-      <div class="step-head"><span class="numbadge">1</span><span class="markbadge">1M</span>
-      <span class="steptitle">Decide which player may leave</span></div>
-      <p>A player leaves and the <em>range</em> is decreased, i.e. new range \(&lt;\) old range.</p>
-      <p>Original range \(=43-17=26\). The range can only shrink if one of the two extreme ages, \(17\) (smallest) or \(43\) (largest), is the one removed.</p>
-      <div class="hint">If any other player left, both \(17\) and \(43\) would remain in the team, so the range would stay \(26\) — not decreased.</div>
-      <div class="answer">Two cases only: the \(17\)-year-old leaves, or the \(43\)-year-old leaves.</div>
-    </div>
-
-    <div class="step">
-      <div class="step-head"><span class="numbadge">2</span><span class="markbadge">1M</span>
-      <span class="steptitle">Case 1 — the \(17\)-year-old leaves (\(n=19\))</span></div>
-      <p>New data sum:</p>
-      \[ \sum x = 17+18+19+2(22)+20+28+28+29+31+31+35+35+36\cdot4+37+38+43 \]
-      <p>Removing \(17\): the new sum is \(589-17=572\), so</p>
-      \[\bar{x}=\frac{572}{19}=30.10526316\]
-      \[\sigma \approx 7.162537194\]
-      <div class="hint">Use \(\displaystyle \sigma=\sqrt{\frac{\sum x^2}{n}-\bar{x}^2}\) or \(\displaystyle \sigma=\sqrt{\frac{\sum(x-\bar{x})^2}{n}}\). Keep the FULL calculator value until the last rounding step.</div>
-      <div class="answer">Case 1: \(\sigma\approx 7.162537194\)</div>
-    </div>
-
-    <div class="step">
-      <div class="step-head"><span class="numbadge">3</span><span class="markbadge">1M</span>
-      <span class="steptitle">Case 2 — the \(43\)-year-old leaves (\(n=19\))</span></div>
-      <p>Removing \(43\): the new sum is \(589-43=546\), so</p>
-      \[\bar{x}=\frac{546}{19}=28.73684211\]
-      \[\sigma \approx 7.132307207\]
-      <div class="hint">Removing a datum far above the mean tends to reduce spread, but here \(43\) is a single extreme value while \(17\) sits in a denser cluster — compare the two numerical results to decide which is larger.</div>
-      <div class="answer">Case 2: \(\sigma\approx 7.132307207\)</div>
-    </div>
-
-    <div class="step">
-      <div class="step-head"><span class="numbadge">4</span><span class="markbadge">1A</span>
-      <span class="steptitle">Choose the greatest and round off</span></div>
-      <p>Comparing the two cases:</p>
-      \[7.162537194 > 7.132307207\]
-      <p>Therefore the greatest possible standard deviation occurs in Case 1, and rounding to 3 significant figures:</p>
-      <div class="answer">The greatest possible standard deviation is \(\;7.16\;\) (cor. to 3 sig. fig.).</div>
-      <div class="hint">"Greatest possible" ⇒ you must examine EACH valid case separately, then pick the largest value. Always round at the very end only.</div>
-    </div>
-
-    <div class="ctrlbar">
-      <button class="next" onclick="nextStep(this)">Next step →</button>
-      <span class="counter">0 / 4</span>
-    </div>
-  </section>
-
-  <!-- SUMMARY -->
-  <section class="card summary">
-    <h3>📋 Summary of Answers</h3>
-    <ul>
-      <li>(a) \(\;a=\mathbf{2},\qquad b=\mathbf{1}\)</li>
-      <li>Ordered data: \(17,18,19,20,22,22,28,28,29,31,31,35,35,36,36,36,36,37,38,43\) &nbsp;(\(n=20\))</li>
-      <li>(b)(i) Original mode \(=36\); new mode \(=36\). <span class="key">There is no change in the mode</span> of the distribution.</li>
-      <li>(b)(ii) Range decreases only if the \(17\)- or the \(43\)-year-old leaves.</li>
-      <li>Case 1 (age \(17\) leaves): \(\sigma\approx 7.162537194\) &nbsp;·&nbsp; Case 2 (age \(43\) leaves): \(\sigma\approx 7.132307207\)</li>
-      <li><span class="key">Greatest possible standard deviation \(=7.16\)</span> (cor. to 3 sig. fig.)</li>
-    </ul>
-  </section>
-
-  <footer>HKDSE Mathematics (Compulsory Part) · 2022 Paper 1 Question 11 · Interactive Solution</footer>
+  </div>
 </div>
 
 <script>
-/* ============================================================
-   STEP-BY-STEP REVEAL
-   ============================================================ */
-function nextStep(btn){
-  const card = btn.closest('.card');
-  const steps = card.querySelectorAll('.step');
-  const counter = card.querySelector('.counter');
-  let shown = 0;
-  steps.forEach(s => { if (s.classList.contains('show')) shown++; });
-  if (shown < steps.length){
-    steps[shown].classList.add('show');
-    shown++;
-    counter.textContent = shown + ' / ' + steps.length;
-    if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([steps[shown-1]]);
-    if (shown === steps.length){
-      btn.disabled = true;
-      btn.textContent = 'All steps revealed ✓';
-    }
-  }
+/* ============ canvas drawing ============ */
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+const readout = document.getElementById('readout');
+
+const W = cv.width, H = cv.height;
+
+function clear() {
+  ctx.clearRect(0, 0, W, H);
+  // background
+  const g = ctx.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, '#fbfdff');
+  g.addColorStop(1, '#eef5fc');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, W, H);
 }
 
-/* ============================================================
-   CANVAS HELPERS
-   ============================================================ */
-function setupCanvas(cv){
-  const dpr = window.devicePixelRatio || 1;
-  const rect = cv.getBoundingClientRect();
-  cv.width  = rect.width * dpr;
-  cv.height = rect.height * dpr;
-  const ctx = cv.getContext('2d');
-  ctx.setTransform(dpr,0,0,dpr,0,0);
-  return {ctx, W: rect.width, H: rect.height};
+function roundRect(x, y, w, h, r, fill, stroke, lw) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+  if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+  if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = lw || 1; ctx.stroke(); }
 }
 
-/* ============================================================
-   DIAGRAM A : dot plot of ages with quartile / median markers
-   ============================================================ */
-const AGES_A = [17,18,19,20,22,22,28,28,29,31,31,35,35,36,36,36,36,37,38,43];
+/* Data model */
+const rows = [
+  { stem: 1, leaves: [7, 8, 9] },
+  { stem: 2, leaves: [0, 'a', 'a', 8, 8, 9] },
+  { stem: 3, leaves: ['b', 'b', 5, 5, 6, 6, 6, 6, 6, 7, 8] },
+  { stem: 4, leaves: [3] }
+];
 
-function drawA(){
-  const cv = document.getElementById('cvA');
-  const {ctx, W, H} = setupCanvas(cv);
-
-  // choose how many data to show (slider simulates "unknown" a-count)
-  const showN = +document.getElementById('sldN').value;
-  const showQ = document.getElementById('chkQ').checked;
-  const showM = document.getElementById('chkMed').checked;
-
-  ctx.clearRect(0,0,W,H);
-
-  // background grid
-  const L=58, R=W-24, T=52, B=H-54;
-  ctx.fillStyle='#0b1220'; ctx.fillRect(0,0,W,H);
-  ctx.strokeStyle='#1e293b'; ctx.lineWidth=1;
-  for (let x=0; x<=26; x++){
-    const px = L + (R-L)*x/26;
-    ctx.beginPath(); ctx.moveTo(px,T); ctx.lineTo(px,B); ctx.stroke();
+/* Which cells to highlight for each step */
+function highlights(step) {
+  // returns {rowIndex, leafIndex, type}
+  if (step === 1) {
+    return rows.flatMap((r, ri) => r.leaves.map((_, li) => ({ ri, li, type: 'given' })));
   }
-  for (let y=0; y<=5; y++){
-    const py = B - (B-T)*y/5;
-    ctx.beginPath(); ctx.moveTo(L,py); ctx.lineTo(R,py); ctx.stroke();
+  if (step === 2) {
+    // stem-3 row first two = b b
+    return [{ ri: 2, li: 0, type: 'b' }, { ri: 2, li: 1, type: 'b' }];
   }
-
-  // title
-  ctx.fillStyle='#93c5fd'; ctx.font='bold 15px Segoe UI, sans-serif';
-  ctx.fillText('Ages of the players (dot plot)', L, 26);
-  ctx.fillStyle='#64748b'; ctx.font='12px Segoe UI, sans-serif';
-  ctx.fillText('n = '+showN+'   (each dot = one player)', L+300, 26);
-
-  // axes
-  ctx.strokeStyle='#94a3b8'; ctx.lineWidth=2;
-  ctx.beginPath(); ctx.moveTo(L,B); ctx.lineTo(R,B); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(L,T); ctx.lineTo(L,B); ctx.stroke();
-
-  // x ticks
-  ctx.fillStyle='#94a3b8'; ctx.font='11px monospace'; ctx.textAlign='center';
-  for (let v=15; v<=44; v+=2){
-    const px = L + (R-L)*(v-15)/29;
-    ctx.beginPath(); ctx.moveTo(px,B); ctx.lineTo(px,B+6); ctx.stroke();
-    if (v%4===1 || v===43) ctx.fillText(v, px, B+20);
+  if (step === 3) {
+    // a a in stem-2 row
+    return [{ ri: 1, li: 1, type: 'a' }, { ri: 1, li: 2, type: 'a' }];
   }
-  ctx.textAlign='left';
-
-  // dots: stack by same age
-  const used = AGES_A.slice(0, showN);
-  const counts = {};
-  const dotR = 6;
-  used.forEach(v => {
-    counts[v] = (counts[v]||0)+1;
-    const k = counts[v]-1;
-    const px = L + (R-L)*(v-15)/29;
-    const py = B - 16 - k*15;
-    ctx.beginPath(); ctx.arc(px, py, dotR, 0, Math.PI*2);
-    ctx.fillStyle = '#38bdf8';
-    ctx.fill();
-    ctx.strokeStyle = '#0ea5e9'; ctx.lineWidth=1.5; ctx.stroke();
-  });
-
-  // median line
-  if (showM){
-    const med = 31;
-    const px = L + (R-L)*(med-15)/29;
-    ctx.strokeStyle='#34d399'; ctx.lineWidth=3; ctx.setLineDash([8,5]);
-    ctx.beginPath(); ctx.moveTo(px,T); ctx.lineTo(px,B); ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.fillStyle='#34d399'; ctx.font='bold 12px Segoe UI, sans-serif';
-    ctx.fillText('Median = 31', px+7, T+16);
+  if (step === 4) {
+    // all 6's in stem-3 row
+    return rows[2].leaves.map((v, li) => v === 6 ? { ri: 2, li, type: 'mode' } : null).filter(Boolean);
   }
+  if (step === 5) {
+    // extremes: 17 (stem1,li0), 43 (stem4,li0), 18 (stem1,li1)
+    return [{ ri: 0, li: 0, type: 'extreme' }, { ri: 3, li: 0, type: 'extreme' },
+            { ri: 0, li: 1, type: 'extreme' }];
+  }
+  if (step === 6) {
+    return [{ ri: 0, li: 0, type: 'extreme' }, { ri: 3, li: 0, type: 'extreme' }];
+  }
+  return [];
+}
 
-  // quartiles
-  if (showQ && showN===20){
-    const q1 = 20+2, q3 = 36;
-    [[q1,'Q₁ = 22','#fbbf24',T+40],[q3,'Q₃ = 36','#f472b6',T+62]].forEach(([v,lab,col,ty])=>{
-      const px = L + (R-L)*(v-15)/29;
-      ctx.strokeStyle=col; ctx.lineWidth=2; ctx.setLineDash([5,4]);
-      ctx.beginPath(); ctx.moveTo(px,T); ctx.lineTo(px,B); ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.fillStyle=col; ctx.font='bold 12px Segoe UI, sans-serif';
-      ctx.fillText(lab, px+7, ty);
+function draw(step) {
+  clear();
+  const hl = highlights(step);
+
+  const leftX = 70, rightX = 330;
+  const colW = 250;
+  const rowH = 62;
+  const startY = 120;
+
+  // Title
+  ctx.fillStyle = '#10365e';
+  ctx.font = 'bold 22px "Segoe UI", Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText('Stem-and-Leaf Diagram of Ages', W / 2, 42);
+
+  ctx.font = '15px "Segoe UI", Arial';
+  ctx.fillStyle = '#5b6d80';
+  ctx.fillText('22 players total · median = 31 · inter-quartile range = 14', W / 2, 68);
+
+  // header
+  ctx.font = 'bold 16px "Segoe UI", Arial';
+  ctx.fillStyle = '#2e86de';
+  ctx.fillText('Stem (tens)', leftX + colW / 2, 100);
+  ctx.fillStyle = '#27ae60';
+  ctx.fillText('Leaf (units)', rightX + colW / 2, 100);
+
+  // axis line
+  ctx.strokeStyle = '#b9cde0';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(W / 2, 105);
+  ctx.lineTo(W / 2, startY + rows.length * rowH + 8);
+  ctx.stroke();
+
+  rows.forEach((r, ri) => {
+    const y = startY + ri * rowH;
+
+    // stem box
+    const stemHl = hl.some(h => h.ri === ri && (h.type === 'b' || h.type === 'a' || h.type === 'given' || h.type === 'extreme'));
+    roundRect(leftX, y, colW, rowH - 12, 10,
+      ri % 2 === 0 ? '#dcedfb' : '#e7f4ea',
+      stemHl ? '#e67e22' : '#c5d9ea', stemHl ? 3 : 1.5);
+    ctx.fillStyle = '#10365e';
+    ctx.font = 'bold 24px "Segoe UI", Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(r.stem, leftX + colW / 2, y + (rowH - 12) / 2);
+
+    // leaves
+    r.leaves.forEach((v, li) => {
+      const isHl = hl.some(h => h.ri === ri && h.li === li);
+      const hType = hl.find(h => h.ri === ri && h.li === li)?.type;
+
+      let bg = '#ffffff', border = '#c5d9ea', fg = '#14632c';
+      if (isHl) {
+        if (hType === 'a') { bg = '#d4f5dd'; border = '#27ae60'; fg = '#14632c'; }
+        else if (hType === 'b') { bg = '#d4f5dd'; border = '#27ae60'; fg = '#14632c'; }
+        else if (hType === 'mode') { bg = '#ffe8cc'; border = '#e67e22'; fg = '#b95400'; }
+        else if (hType === 'extreme') { bg = '#ffdede'; border = '#c0392b'; fg = '#a5281c'; }
+        else if (hType === 'given') { bg = '#e8f1fb'; border = '#2e86de'; fg = '#0b4f8a'; }
+      }
+      const slotW = colW / r.leaves.length;
+      const x = rightX + li * slotW;
+      roundRect(x + 2, y + 4, slotW - 4, rowH - 20, 6, bg, border, isHl ? 2.5 : 1);
+
+      ctx.fillStyle = fg;
+      ctx.font = (isHl ? 'bold ' : '') + (v === 'a' || v === 'b' ? 'italic ' : '') + '20px "Segoe UI", Arial';
+      ctx.fillText(v === 'a' ? 'a' : v === 'b' ? 'b' : String(v), x + slotW / 2, y + (rowH - 12) / 2);
     });
-    // IQR bracket
-    const p1 = L + (R-L)*(q1-15)/29, p3 = L + (R-L)*(q3-15)/29;
-    const yb = B-8;
-    ctx.strokeStyle='#fbbf24'; ctx.lineWidth=2;
-    ctx.beginPath(); ctx.moveTo(p1,yb); ctx.lineTo(p3,yb); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(p1,yb-6); ctx.lineTo(p1,yb+6); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(p3,yb-6); ctx.lineTo(p3,yb+6); ctx.stroke();
-    ctx.fillStyle='#fbbf24'; ctx.font='bold 13px monospace'; ctx.textAlign='center';
-    ctx.fillText('IQR = 36 − 22 = 14', (p1+p3)/2, yb-10);
-    ctx.textAlign='left';
-  }
-  if (showQ && showN!==20){
-    ctx.fillStyle='#fbbf24'; ctx.font='bold 12px monospace';
-    ctx.fillText('Q-positions valid only for n = 20 (slide back to 20)', L, T+8);
-  }
-
-  // legend
-  ctx.fillStyle='#94a3b8'; ctx.font='12px Segoe UI, sans-serif';
-  ctx.fillText('● player', L, B+38);
-}
-
-document.getElementById('sldN').addEventListener('input', e=>{
-  document.getElementById('nVal').textContent = e.target.value;
-  drawA();
-});
-document.getElementById('chkQ').addEventListener('change', drawA);
-document.getElementById('chkMed').addEventListener('change', drawA);
-
-/* ============================================================
-   DIAGRAM B(i) : frequency / mode bar chart
-   ============================================================ */
-const FREQ_ALL = {17:1,18:1,19:1,20:1,22:2,28:2,29:1,31:2,35:2,36:4,37:1,38:1,43:1};
-const REMOVE_OPTS = [null, 36, 17, 43]; // slider index -> which age leaves
-const REMOVE_LABELS = ['none','36','17','43'];
-
-function drawBi(){
-  const cv = document.getElementById('cvBi');
-  const {ctx, W, H} = setupCanvas(cv);
-  const idx = +document.getElementById('sldRm').value;
-  const showC = document.getElementById('chkCount').checked;
-  const rm = REMOVE_OPTS[idx];
-
-  ctx.clearRect(0,0,W,H);
-  ctx.fillStyle='#0b1220'; ctx.fillRect(0,0,W,H);
-
-  const L=56, R=W-20, T=54, B=H-52;
-  ctx.strokeStyle='#1e293b'; ctx.lineWidth=1;
-  for(let y=0;y<=5;y++){const py=B-(B-T)*y/5; ctx.beginPath();ctx.moveTo(L,py);ctx.lineTo(R,py);ctx.stroke();}
-
-  ctx.fillStyle='#93c5fd'; ctx.font='bold 15px Segoe UI, sans-serif';
-  ctx.fillText('Frequency of each age'+(rm?('  —  one player aged '+rm+' leaves'):'  —  original team'), L, 26);
-
-  const ages = Object.keys(FREQ_ALL).map(Number).sort((a,b)=>a-b);
-  const bw = (R-L)/ages.length;
-
-  ages.forEach((age,i)=>{
-    let c = FREQ_ALL[age];
-    if (rm === age) c -= 1;
-    const x = L + i*bw + 3;
-    const h = (c/4)*(B-T);
-    const y = B-h;
-    const isMode = (c===4);
-    const grad = ctx.createLinearGradient(0,y,0,B);
-    if (rm===age) { grad.addColorStop(0,'#f87171'); grad.addColorStop(1,'#7f1d1d'); }
-    else if (isMode){ grad.addColorStop(0,'#fbbf24'); grad.addColorStop(1,'#b45309'); }
-    else { grad.addColorStop(0,'#38bdf8'); grad.addColorStop(1,'#1d4ed8'); }
-    ctx.fillStyle = grad;
-    ctx.fillRect(x, y, bw-6, h);
-    ctx.strokeStyle='#0b1220'; ctx.lineWidth=1; ctx.strokeRect(x, y, bw-6, h);
-
-    if (c>0 && showC){
-      ctx.fillStyle='#fef3c7'; ctx.font='bold 11px monospace'; ctx.textAlign='center';
-      ctx.fillText(c, x+(bw-6)/2, y-5);
-      ctx.textAlign='left';
-    }
-    ctx.fillStyle='#94a3b8'; ctx.font='10px monospace'; ctx.textAlign='center';
-    ctx.save(); ctx.translate(L+i*bw+bw/2-3, B+16); ctx.rotate(-Math.PI/3.2);
-    ctx.fillText(age,0,0); ctx.restore(); ctx.textAlign='left';
   });
 
-  // axis
-  ctx.strokeStyle='#94a3b8'; ctx.lineWidth=2;
-  ctx.beginPath(); ctx.moveTo(L,B); ctx.lineTo(R,B); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(L,T); ctx.lineTo(L,B); ctx.stroke();
+  const bottom = startY + rows.length * rowH;
 
-  // mode annotation
-  const modeIdx = ages.indexOf(36);
-  const mx = L + modeIdx*bw + (bw-6)/2;
-  let modeC = FREQ_ALL[36]; if(rm===36) modeC--;
-  ctx.strokeStyle='#fbbf24'; ctx.lineWidth=2; ctx.setLineDash([6,4]);
-  ctx.beginPath(); ctx.moveTo(mx, T+4); ctx.lineTo(mx, B); ctx.stroke();
-  ctx.setLineDash([]);
-  ctx.fillStyle='#fbbf24'; ctx.font='bold 12px Segoe UI, sans-serif'; ctx.textAlign='center';
-  ctx.fillText('mode = 36 (freq ' + modeC + ')', mx, T-6);
-  ctx.textAlign='left';
+  // Status banner
+  const messages = {
+    1: 'Given data — 21 values in 4 stems.',
+    2: 'Median = 31 → the 11th value is b b → b = 1.',
+    3: 'IQR = 14 → Q1 = 20 + a, Q3 = 36 → a = 2.',
+    4: 'Mode: 36 appears 5 times — unchanged.',
+    5: 'Range can only decrease if 17 or 43 leaves.',
+    6: 'Case 1 (17 removed): σ ≈ 7.16 → greatest value.'
+  };
+  roundRect(30, bottom + 14, W - 60, 46, 10, '#fff8ec', '#f0b040', 2);
+  ctx.fillStyle = '#8a5300';
+  ctx.font = 'bold 15px "Segoe UI", Arial';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillText(messages[step] || '', 46, bottom + 44);
+
+  // Extra visual for steps 5/6 : show the two cases as chips
+  if (step === 5 || step === 6) {
+    const cy = bottom + 80;
+    ctx.font = 'bold 13px "Segoe UI", Arial';
+    ctx.fillStyle = '#0b4f8a';
+    ctx.fillText('Two possible cases:', 40, cy);
+
+    const cases = [
+      { t: 'Case 1: 17 leaves  →  range 43 − 18 = 25', c: '#ffdede', b: '#c0392b' },
+      { t: 'Case 2: 43 leaves  →  range 38 − 17 = 21', c: '#dcedfb', b: '#2e86de' }
+    ];
+    cases.forEach((c, i) => {
+      roundRect(40, cy + 12 + i * 42, W - 80, 34, 8, c.c, c.b, 1.5);
+      ctx.fillStyle = c.b;
+      ctx.font = '13px "Segoe UI", Arial';
+      ctx.fillText(c.t, 56, cy + 35 + i * 42);
+    });
+  }
+
+  // readout text
+  const roText = {
+    1: 'Step 1 — Full stem-and-leaf diagram; total 21 values.',
+    2: 'Step 2 — Highlighting the 11th value (b b) → b = 1.',
+    3: 'Step 3 — Highlighting a a → using IQR to find a = 2.',
+    4: 'Step 4 — Highlighting the five 6s (mode = 36).',
+    5: 'Step 5 — Highlighting extremes 17, 18 and 43.',
+    6: 'Step 6 — σ ≈ 7.16 (Case 1) is the greatest.'
+  };
+  readout.textContent = roText[step] || roText[1];
 }
-document.getElementById('sldRm').addEventListener('input', e=>{
-  document.getElementById('rmVal').textContent = REMOVE_LABELS[+e.target.value];
-  drawBi();
-});
-document.getElementById('chkCount').addEventListener('change', drawBi);
 
-/* ============================================================
-   DIAGRAM B(ii) : number line + deviations for the two cases
-   ============================================================ */
-function stats(arr){
-  const n = arr.length;
-  const mean = arr.reduce((a,b)=>a+b,0)/n;
-  const variance = arr.reduce((a,b)=>a+(b-mean)*(b-mean),0)/n;
-  return {n, mean, sd: Math.sqrt(variance)};
-}
-const CASE1 = AGES_A.filter(v=>v!==17);
-const CASE2 = AGES_A.filter(v=>v!==43);
-const S1 = stats(CASE1), S2 = stats(CASE2);
-
-function drawBii(){
-  const cv = document.getElementById('cvBii');
-  const {ctx, W, H} = setupCanvas(cv);
-  const which = +document.getElementById('sldCase').value; // 0 -> case1, 1 -> case2
-  const showMean = document.getElementById('chkMean').checked;
-
-  const data = which===0 ? CASE1 : CASE2;
-  const st   = which===0 ? S1 : S2;
-  const removed = which===0 ? 17 : 43;
-
-  ctx.clearRect(0,0,W,H);
-  ctx.fillStyle='#0b1220'; ctx.fillRect(0,0,W,H);
-
-  const L=54, R=W-22, T=64, B=H-92;
-
-  // grid
-  ctx.strokeStyle='#1e293b'; ctx.lineWidth=1;
-  for (let v=15; v<=45; v+=2){
-    const px = L + (R-L)*(v-15)/30;
-    ctx.beginPath(); ctx.moveTo(px,T-18); ctx.lineTo(px,B); ctx.stroke();
-  }
-
-  ctx.fillStyle='#93c5fd'; ctx.font='bold 15px Segoe UI, sans-serif';
-  ctx.fillText(which===0
-      ? 'Case 1: the 17-year-old leaves (n = 19)'
-      : 'Case 2: the 43-year-old leaves (n = 19)', L, 24);
-  ctx.fillStyle='#64748b'; ctx.font='12px Segoe UI, sans-serif';
-  ctx.fillText('removed age = '+removed, L+330, 24);
-
-  // axis
-  ctx.strokeStyle='#94a3b8'; ctx.lineWidth=2;
-  ctx.beginPath(); ctx.moveTo(L,B); ctx.lineTo(R,B); ctx.stroke();
-  ctx.fillStyle='#94a3b8'; ctx.font='11px monospace'; ctx.textAlign='center';
-  for (let v=15; v<=45; v+=5){
-    const px = L + (R-L)*(v-15)/30;
-    ctx.beginPath(); ctx.moveTo(px,B); ctx.lineTo(px,B+6); ctx.stroke();
-    ctx.fillText(v, px, B+20);
-  }
-  ctx.textAlign='left';
-
-  // mean line
-  if (showMean){
-    const mx = L + (R-L)*(st.mean-15)/30;
-    ctx.strokeStyle='#34d399'; ctx.lineWidth=3; ctx.setLineDash([8,5]);
-    ctx.beginPath(); ctx.moveTo(mx,T-18); ctx.lineTo(mx,B+26); ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.fillStyle='#34d399'; ctx.font='bold 12px monospace';
-    ctx.fillText('mean = '+st.mean.toFixed(6), mx+8, T-24);
-  }
-
-  // dots, stacking + deviation lines
-  const counts = {};
-  data.forEach(v => {
-    counts[v] = (counts[v]||0)+1;
-    const k = counts[v]-1;
-    const px = L + (R-L)*(v-15)/30;
-    const py = B - 22 - k*15;
-
-    if (showMean){
-      const mx = L + (R-L)*(st.mean-15)/30;
-      ctx.strokeStyle = (v>st.mean) ? '#f87171' : '#c084fc';
-      ctx.lineWidth = 1.4;
-      ctx.beginPath(); ctx.moveTo(px, py+7); ctx.lineTo(mx, py+7); ctx.stroke();
+/* ============ scroll sync ============ */
+let current = 1;
+const io = new IntersectionObserver(es => {
+  es.forEach(e => {
+    if (e.isIntersecting) {
+      current = +e.target.dataset.step;
+      draw(current);
+      document.querySelectorAll('.step').forEach(s =>
+        s.classList.toggle('active', +s.dataset.step === current));
     }
-
-    ctx.beginPath(); ctx.arc(px, py, 6.5, 0, Math.PI*2);
-    ctx.fillStyle = '#38bdf8'; ctx.fill();
-    ctx.strokeStyle = '#0ea5e9'; ctx.lineWidth=1.5; ctx.stroke();
   });
+}, { rootMargin: '-25% 0px -55% 0px' });
 
-  // summary readout on canvas
-  const boxY = H-58;
-  ctx.fillStyle='#0f172a'; ctx.fillRect(L, boxY, R-L, 44);
-  ctx.strokeStyle='#334155'; ctx.strokeRect(L, boxY, R-L, 44);
-  ctx.font='bold 13px monospace';
-  ctx.fillStyle='#fcd34d';
-  ctx.fillText('n = '+st.n, L+14, boxY+27);
-  ctx.fillStyle='#7dd3fc';
-  ctx.fillText('mean = '+st.mean.toFixed(6), L+110, boxY+27);
-  ctx.fillStyle='#6ee7b7';
-  ctx.fillText('σ = '+st.sd.toFixed(9), L+360, boxY+27);
+document.querySelectorAll('.step').forEach(s => io.observe(s));
 
-  // update readout div
-  document.getElementById('readBii').innerHTML =
-      'Case '+(which+1)+' (age '+removed+' leaves) &nbsp;→&nbsp; '
-      +' n = <b>'+st.n+'</b>'
-      +' &nbsp;·&nbsp; Σx = <b>'+data.reduce((a,b)=>a+b,0)+'</b>'
-      +' &nbsp;·&nbsp; mean = <b>'+st.mean.toFixed(8)+'</b>'
-      +' &nbsp;·&nbsp; σ = <b>'+st.sd.toFixed(9)+'</b>';
-}
-
-document.getElementById('sldCase').addEventListener('input', e=>{
-  const v = +e.target.value;
-  document.getElementById('caseVal').textContent =
-     v===0 ? 'Case 1 (17 leaves)' : 'Case 2 (43 leaves)';
-  drawBii();
-});
-document.getElementById('chkMean').addEventListener('change', drawBii);
-
-/* ============================================================
-   INIT
-   ============================================================ */
-function redrawAll(){ drawA(); drawBi(); drawBii(); }
-window.addEventListener('load', redrawAll);
-window.addEventListener('resize', () => {
-  clearTimeout(window.__rt);
-  window.__rt = setTimeout(redrawAll, 160);
-});
-redrawAll();
+/* initial */
+draw(1);
+document.querySelector('.step[data-step="1"]').classList.add('active');
 </script>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
-
 </body>
 </html>

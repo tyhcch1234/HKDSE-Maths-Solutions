@@ -1,425 +1,429 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-  <title>HKDSE Math 2021 P1 Q15 – Probability</title>
-  <!-- MathJax -->
-  <script>
-    MathJax = {
-      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
-      svg: { fontCache: 'global' }
-    };
-  </script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #f8fafc; }
-    .card-shadow { box-shadow: 0 4px 20px rgba(0,0,0,0.04), 0 8px 32px rgba(0,0,0,0.02); }
-    .step-transition { transition: all 0.3s ease; }
-    .tag { background: #e0e7ff; color: #3730a3; font-weight: 500; }
-    canvas { touch-action: none; }
-    .seat { transition: background 0.3s, transform 0.2s; }
-    .seat.teacher { background: #4f46e5; color: white; }
-    .seat.student { background: #f59e0b; color: white; }
-    .seat:hover { transform: scale(1.05); }
-    .slider-accent { accent-color: #4f46e5; }
-  </style>
-</head>
-<body class="min-h-screen p-3 sm:p-6">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2021 Paper 1 Q15 — Probability</title>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$','$'],['\\(','\\)']],
+    displayMath: [['$$','$$'],['\\[','\\]']]
+  },
+  svg: { fontCache: 'global' }
+};
+</script>
+<style>
+  :root{
+    --ink:#152238; --muted:#5b6b82; --line:#d8e0ea;
+    --t:#e05a2b;       /* teacher colour */
+    --s:#2b6fe0;       /* student colour */
+    --ok:#12a06a;      /* answer colour */
+    --card:#ffffff;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:linear-gradient(180deg,#eef3f9,#f8fafc 320px);
+    color:var(--ink); font-family:"Segoe UI",Roboto,"Helvetica Neue","PingFang SC","Microsoft JhengHei",Arial,sans-serif;
+    font-size:16px; line-height:1.55;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:18px 14px 48px;}
+  header.title{
+    background:linear-gradient(120deg,#12325e,#1c5aa8 55%,#2b8bd6);
+    color:#fff;border-radius:14px;padding:16px 20px;margin-bottom:14px;
+    box-shadow:0 6px 20px rgba(18,50,94,.22);
+  }
+  header.title h1{margin:0;font-size:1.25rem;letter-spacing:.3px}
+  header.title p{margin:4px 0 0;font-size:.9rem;opacity:.9}
 
-  <!-- Header -->
-  <header class="max-w-4xl mx-auto mb-6">
-    <div class="flex flex-wrap items-center justify-between gap-2">
-      <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-800 tracking-tight">
-        <span class="text-indigo-600">HKDSE Math 2021</span> Paper 1 Q15
-      </h1>
-      <div class="flex flex-wrap gap-2">
-        <span class="tag px-3 py-1 rounded-full text-xs font-semibold">Probability</span>
-        <span class="tag px-3 py-1 rounded-full text-xs font-semibold">Permutations</span>
-        <span class="tag px-3 py-1 rounded-full text-xs font-semibold">Combinations</span>
-      </div>
-    </div>
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start;}
+  @media(min-width:900px){.split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}}
+
+  .diagram{
+    position:sticky;top:16px;max-height:calc(100vh - 2rem);overflow-y:auto;
+    background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:12px;box-shadow:0 3px 14px rgba(21,34,56,.07);
+  }
+  .diagram h2{margin:0 0 6px;font-size:.95rem;color:#12325e;letter-spacing:.3px;text-transform:uppercase;}
+  canvas{width:100%;height:auto;display:block;border-radius:10px;background:#fbfdff;border:1px solid #e6edf5}
+  .ro{margin:8px 2px 2px;font-size:.86rem;color:var(--muted)}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;font-size:.82rem;color:var(--muted)}
+  .legend span{display:inline-flex;align-items:center;gap:5px}
+  .dot{width:11px;height:11px;border-radius:50%;display:inline-block}
+
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;box-shadow:0 3px 14px rgba(21,34,56,.07);}
+  .qbox{border-left:5px solid #1c5aa8;background:#f4f8fe;border-radius:10px;padding:10px 14px;margin-bottom:14px}
+  .qbox .tag{font-weight:700;color:#1c5aa8;font-size:.82rem;letter-spacing:.6px}
+  .qbox p{margin:6px 0}
+  .qbox ol{margin:6px 0 0;padding-left:22px}
+  .qbox ol li{margin:4px 0}
+
+  .step{
+    border:1px solid var(--line);border-left:6px solid #9fb4cc;border-radius:12px;
+    padding:10px 14px;margin:12px 0;background:#fff;transition:box-shadow .25s,border-color .25s,transform .25s;
+  }
+  .step.active{border-left-color:var(--s);box-shadow:0 6px 18px rgba(43,111,224,.16);transform:translateY(-1px)}
+  .step .chip{
+    display:inline-block;background:#12325e;color:#fff;font-weight:700;font-size:.76rem;
+    border-radius:20px;padding:2px 10px;margin-right:8px;letter-spacing:.5px;vertical-align:1px;
+  }
+  .step.active .chip{background:var(--s)}
+  .step h3{display:inline;font-size:1rem;margin:0}
+  .step .body{margin-top:7px}
+  .hint{margin-top:8px;font-size:.86rem;color:var(--muted);background:#f6f9fd;border-left:3px solid #c3d4e8;border-radius:6px;padding:6px 10px}
+  .mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%}
+  .ans{
+    margin-top:16px;background:linear-gradient(100deg,#e8f9f1,#f2fff9);
+    border:1px solid #b7e6cf;border-left:6px solid var(--ok);border-radius:12px;padding:12px 16px;
+  }
+  .ans b{color:#0c7a50}
+  @media(max-width:640px){body{font-size:14.5px;}.wrap{padding:10px 8px 40px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="title">
+    <h1>HKDSE 2021 · Paper 1 · Question 15 — Probability</h1>
+    <p>Interactive queue diagram &amp; step-by-step solution</p>
   </header>
 
-  <main class="max-w-4xl mx-auto space-y-6">
+  <div class="split">
 
-    <!-- Question Card -->
-    <section class="bg-white rounded-2xl card-shadow p-5 sm:p-6 border border-gray-100">
-      <h2 class="text-lg font-bold text-gray-700 mb-3 flex items-center gap-2">
-        <span class="bg-indigo-600 text-white w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold">Q</span>
-        Question
-      </h2>
-      <p class="text-gray-700 leading-relaxed text-base sm:text-lg">
-        A queue is randomly formed by <strong>7 teachers</strong> and <strong>3 students</strong>.
-      </p>
-      <ol class="list-decimal list-inside text-gray-700 mt-2 space-y-1 text-base sm:text-lg">
-        <li>(a) How many different queues can be formed? <span class="text-sm text-gray-500">[1 mark]</span></li>
-        <li>(b) Find the probability that no students are next to each other in the queue. <span class="text-sm text-gray-500">[3 marks]</span></li>
-      </ol>
-    </section>
+    <!-- ============ LEFT: DIAGRAM ============ -->
+    <div class="diagram">
+      <h2>Queue diagram</h2>
+      <canvas id="cv" width="760" height="620"></canvas>
+      <p class="ro" id="ro">Step 1 — 7 teachers (T) and 3 students (S) form a random queue of 10.</p>
+      <div class="legend">
+        <span><i class="dot" style="background:#e05a2b"></i>Teacher (T)</span>
+        <span><i class="dot" style="background:#2b6fe0"></i>Student (S)</span>
+        <span><i class="dot" style="background:#12a06a"></i>Chosen arrangement</span>
+        <span><i class="dot" style="background:#9fb4cc"></i>Gap position</span>
+      </div>
+    </div>
 
-    <!-- Part (a) -->
-    <section class="bg-white rounded-2xl card-shadow p-5 sm:p-6 border border-gray-100">
-      <h2 class="text-lg font-bold text-indigo-700 mb-2 flex items-center gap-2">
-        <span class="bg-indigo-100 text-indigo-700 w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold">a</span>
-        Number of Different Queues
-      </h2>
+    <!-- ============ RIGHT: QUESTION + SOLUTION ============ -->
+    <div class="panel">
 
-      <!-- Step 1 -->
-      <div class="mt-4 border-l-4 border-indigo-300 pl-4">
-        <p class="font-semibold text-gray-800">Step 1: Treat all 10 people as distinct.</p>
-        <p class="text-gray-600 mt-1">There are 7 teachers and 3 students, but each person is unique (e.g., Teacher A, Teacher B, Student X, etc.).</p>
+      <div class="qbox">
+        <span class="tag">[2021#15]</span>
+        <p>A queue is randomly formed by 7 teachers and 3 students.</p>
+        <ol type="a">
+          <li>How many different queues can be formed? &nbsp;<em>[1 mark]</em></li>
+          <li>Find the probability that no students are next to each other in the queue. &nbsp;<em>[3 marks]</em></li>
+        </ol>
       </div>
 
-      <!-- Hint -->
-      <div class="mt-4 bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm">
-        <p class="font-semibold text-amber-800 flex items-center gap-1">💡 Hint</p>
-        <p class="text-amber-700 mt-1">The number of ways to arrange \(n\) distinct objects in a row is \(n!\).</p>
-        <p class="text-amber-700 mt-1">\(P^n_n = n!\)</p>
-      </div>
+      
 
-      <!-- Step 2 -->
-      <div class="mt-4 border-l-4 border-indigo-300 pl-4">
-        <p class="font-semibold text-gray-800">Step 2: Apply the formula for permutations.</p>
-        <p class="text-gray-600 mt-1">Total number of arrangements = \(P^{10}_{10} = 10!\)</p>
-      </div>
-
-      <!-- Calculation with MathJax -->
-      <div class="mt-4 bg-gray-50 rounded-xl p-4 overflow-x-auto text-center">
-        <p class="text-lg">\(10! = 3\,628\,800\)</p>
-      </div>
-
-      <!-- Interactive visual: All permutations -->
-      <div class="mt-5">
-        <button id="showAllBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-xl transition w-full sm:w-auto text-sm sm:text-base">
-          ▶ Show a Random Queue
-        </button>
-        <div id="randomQueueDisplay" class="mt-3 flex flex-wrap gap-2 justify-center min-h-[48px]"></div>
-      </div>
-    </section>
-
-    <!-- Part (b) -->
-    <section class="bg-white rounded-2xl card-shadow p-5 sm:p-6 border border-gray-100">
-      <h2 class="text-lg font-bold text-amber-700 mb-2 flex items-center gap-2">
-        <span class="bg-amber-100 text-amber-700 w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold">b</span>
-        Probability No Students Are Next to Each Other
-      </h2>
-
-      <!-- Step 1 -->
-      <div class="mt-4 border-l-4 border-amber-300 pl-4">
-        <p class="font-semibold text-gray-800">Step 1: Arrange the 7 teachers first.</p>
-        <p class="text-gray-600 mt-1">The 7 teachers can be arranged in \(7!\) ways.</p>
-        <div class="mt-2 flex flex-wrap gap-1">
-          <span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-xs font-mono">T</span>
-          <span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-xs font-mono">T</span>
-          <span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-xs font-mono">T</span>
-          <span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-xs font-mono">T</span>
-          <span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-xs font-mono">T</span>
-          <span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-xs font-mono">T</span>
-          <span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-xs font-mono">T</span>
+      <div class="step" data-step="1">
+        <span class="chip">STEP 1</span><h3>Understand the situation</h3>
+        <div class="body">
+          There are $7$ teachers (T) and $3$ students (S) — all $10$ people are <strong>distinct individuals</strong>.
+          A "queue" means an arrangement in a line, so <strong>order matters</strong>.
         </div>
+        <div class="hint">Hint: "randomly formed queue" → every permutation of the 10 people is equally likely.</div>
       </div>
 
-      <!-- Step 2 -->
-      <div class="mt-4 border-l-4 border-amber-300 pl-4">
-        <p class="font-semibold text-gray-800">Step 2: Identify the gaps between teachers.</p>
-        <p class="text-gray-600 mt-1">With 7 teachers in a row, there are <strong>8 gaps</strong> to place the 3 students so that no two students are adjacent:</p>
-        <div class="mt-2 flex flex-wrap items-center gap-1 text-sm">
-          <span class="text-gray-400">_</span>
-          <span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded font-mono">T</span>
-          <span class="text-gray-400">_</span>
-          <span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded font-mono">T</span>
-          <span class="text-gray-400">_</span>
-          <span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded font-mono">T</span>
-          <span class="text-gray-400">_</span>
-          <span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded font-mono">T</span>
-          <span class="text-gray-400">_</span>
-          <span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded font-mono">T</span>
-          <span class="text-gray-400">_</span>
-          <span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded font-mono">T</span>
-          <span class="text-gray-400">_</span>
-          <span class="bg-indigo-100 text-indigo-700 px-2 py-1 rounded font-mono">T</span>
-          <span class="text-gray-400">_</span>
+      <div class="step" data-step="2">
+        <span class="chip">STEP 2</span><h3>(a) Count all possible queues</h3>
+        <div class="body">
+          Arrange all $10$ distinct people in a row:
+          \[ P_{10}^{10}=10!=3\,628\,800 \]
         </div>
-        <p class="text-gray-600 mt-1 text-sm">(8 gaps including the ends)</p>
+        <div class="hint">1 mark: state $10!$ (or $P_{10}^{10}$) and the value $3\,628\,800$.</div>
       </div>
 
-      <!-- Hint -->
-      <div class="mt-4 bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm">
-        <p class="font-semibold text-amber-800 flex items-center gap-1">💡 Hint</p>
-        <p class="text-amber-700 mt-1">Choose 3 gaps out of the 8 to place the students: \(C^8_3\)</p>
-        <p class="text-amber-700 mt-1">Then arrange the 3 students among themselves: \(3!\)</p>
-      </div>
-
-      <!-- Step 3 -->
-      <div class="mt-4 border-l-4 border-amber-300 pl-4">
-        <p class="font-semibold text-gray-800">Step 3: Calculate favourable arrangements.</p>
-        <p class="text-gray-600 mt-1">Favourable ways = \(7! \times C^8_3 \times 3!\)</p>
-        <p class="text-gray-600 mt-1">= \(5040 \times 56 \times 6 = 1\,693\,440\)</p>
-      </div>
-
-      <!-- Step 4 -->
-      <div class="mt-4 border-l-4 border-amber-300 pl-4">
-        <p class="font-semibold text-gray-800">Step 4: Probability.</p>
-        <p class="text-gray-600 mt-1">\(\displaystyle P = \frac{7! \times C^8_3 \times 3!}{10!}\)</p>
-        <p class="text-gray-600 mt-1">\(\displaystyle = \frac{1\,693\,440}{3\,628\,800} = \frac{7}{15}\)</p>
-      </div>
-
-      <!-- Interactive Simulator -->
-      <div class="mt-6 bg-gray-50 rounded-xl p-4">
-        <h3 class="font-bold text-gray-700 mb-2">🧪 Interactive Queue Simulator</h3>
-        <p class="text-sm text-gray-500 mb-3">Drag the slider to change the number of students (out of 10 people). See the probability that no students are adjacent.</p>
-        <div class="flex items-center gap-4 mb-3">
-          <label for="studentSlider" class="text-sm font-medium text-gray-600">Students:</label>
-          <input type="range" id="studentSlider" min="1" max="5" value="3" class="w-full sm:w-48 slider-accent">
-          <span id="studentCount" class="font-bold text-amber-600 text-lg min-w-[1.5rem] text-center">3</span>
+      <div class="step" data-step="3">
+        <span class="chip">STEP 3</span><h3>(b) Start from the teachers</h3>
+        <div class="body">
+          To keep students apart, first arrange the $7$ teachers:
+          \[ 7! \]
+          These $7$ teachers create $7+1=8$ <strong>gaps</strong> (including the two ends) where students may stand:
+          \[\_\;T\;\_\;T\;\_\;T\;\_\;T\;\_\;T\;\_\;T\;\_\]
         </div>
-        <div id="simulationCanvas" class="bg-white rounded-lg p-2 border border-gray-200 min-h-[60px] flex flex-wrap items-center justify-center gap-1"></div>
-        <div class="mt-3 grid grid-cols-2 gap-2 text-center text-sm">
-          <div class="bg-white rounded-lg p-3 border border-gray-100">
-            <p class="text-gray-500">Total arrangements</p>
-            <p id="totalArr" class="font-bold text-gray-800">3,628,800</p>
-          </div>
-          <div class="bg-white rounded-lg p-3 border border-gray-100">
-            <p class="text-gray-500">Favourable</p>
-            <p id="favArr" class="font-bold text-amber-600">1,693,440</p>
-          </div>
-        </div>
-        <div class="mt-2 text-center">
-          <p class="text-sm text-gray-500">Probability (no students adjacent)</p>
-          <p id="probDisplay" class="text-2xl font-extrabold text-indigo-600">7/15 ≈ 0.4667</p>
-        </div>
+        <div class="hint">Hint: with $n$ objects in a row there are $n+1$ gaps — ends count too.</div>
       </div>
 
-      <!-- Final Answer -->
-      <div class="mt-5 bg-indigo-50 border border-indigo-200 rounded-xl p-4 text-center">
-        <p class="text-sm text-indigo-600 font-semibold">FINAL ANSWER</p>
-        <p class="text-2xl font-bold text-indigo-800">\(\dfrac{7}{15}\)</p>
+      <div class="step" data-step="4">
+        <span class="chip">STEP 4</span><h3>Choose gaps for the students</h3>
+        <div class="body">
+          Choose $3$ of the $8$ gaps and place the $3$ students there (one per gap, so they are never adjacent):
+          \[ C_3^{8}\times 3! \]
+          Hence the number of favourable queues is
+          \[ 7!\;C_3^{8}\;3!=5040\times 56\times 6=1\,693\,440 \]
+        </div>
+        <div class="hint">1M for $7!$, 1M for $C_3^{8}3!$ (choosing 3 gaps × ordering the students).</div>
       </div>
-    </section>
 
-    <!-- Key Concepts -->
-    <section class="bg-white rounded-2xl card-shadow p-5 sm:p-6 border border-gray-100">
-      <h2 class="text-lg font-bold text-gray-700 mb-3">📘 Key Concepts</h2>
-      <ul class="list-disc list-inside text-gray-600 space-y-1 text-sm sm:text-base">
-        <li><strong>Permutations (\(n!\)):</strong> Arranging distinct objects in order.</li>
-        <li><strong>Combinations (\(C^n_r\)):</strong> Choosing r items from n without order.</li>
-        <li><strong>Gap Method:</strong> Placing separators (students) into gaps between fixed items (teachers) to avoid adjacency.</li>
-        <li><strong>Probability = Favourable / Total</strong></li>
-      </ul>
-    </section>
+      <div class="step" data-step="5">
+        <span class="chip">STEP 5</span><h3>Form the probability</h3>
+        <div class="body">
+          \[
+            \frac{7!\,C_3^{8}\,3!}{3\,628\,800}
+            =\frac{1\,693\,440}{3\,628\,800}
+            =\frac{7}{15}
+          \]
+        </div>
+        <div class="hint">1A: must give the fraction in lowest terms, $\dfrac{7}{15}$ (≈ 0.4667).</div>
+      </div>
 
-    <!-- Footer -->
-    <footer class="text-center text-xs text-gray-400 py-4">
-      HKDSE Mathematics 2021 Paper 1 Q15 — Interactive Solution
-    </footer>
+      <div class="ans">
+        <p style="margin:0 0 6px"><b>Answers:</b></p>
+        <p style="margin:0">(a) &nbsp;$10!=3\,628\,800$ different queues.</p>
+        <p style="margin:4px 0 0">(b) &nbsp;$P(\text{no two students adjacent})=\dfrac{7!\,C_3^{8}\,3!}{10!}=\dfrac{7}{15}$.</p>
+      </div>
 
-  </main>
+    </div>
+  </div>
+</div>
 
-  <script>
-    // ---------- Part (a) Random Queue ----------
-    const teachers = ['T1','T2','T3','T4','T5','T6','T7'];
-    const students = ['S1','S2','S3'];
-    const allPeople = [...teachers, ...students];
+<script>
+/* ===================== CANVAS DRAWING ===================== */
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+const ro = document.getElementById('ro');
 
-    function shuffle(arr) {
-      const a = [...arr];
-      for (let i = a.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
+const W = cv.width, H = cv.height;
+
+const C_T = '#e05a2b', C_S = '#2b6fe0', C_OK = '#12a06a', C_GAP = '#9fb4cc';
+
+/* Draw one small "person" badge */
+function person(x, y, r, label, color, fill){
+  ctx.beginPath();
+  ctx.arc(x, y - r*1.25, r*0.52, 0, Math.PI*2);
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(x - r*0.62, y + r*0.75);
+  ctx.quadraticCurveTo(x, y - r*1.0, x + r*0.62, y + r*0.75);
+  ctx.closePath();
+  ctx.fillStyle = fill || color;
+  ctx.fill();
+  // label inside
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold ' + Math.round(r*0.55) + 'px Segoe UI, Arial';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(label, x, y + r*0.05);
+}
+
+/* Draw a slanted row of positions. pos = array of 'T','S', or 'gap' or null */
+function drawRow(positions, yTop, info, highlightFn){
+  const n = positions.length;
+  const margin = 40, gapX = (W - 2*margin) / n;
+  const r = 20;
+  // baseline (the arrow of the queue)
+  ctx.strokeStyle = '#c9d6e5';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(margin - 6, yTop + 48);
+  ctx.lineTo(W - margin + 6, yTop + 48);
+  ctx.stroke();
+  // arrow head
+  ctx.beginPath();
+  ctx.moveTo(W - margin + 6, yTop + 48);
+  ctx.lineTo(W - margin - 4, yTop + 42);
+  ctx.lineTo(W - margin - 4, yTop + 54);
+  ctx.closePath();
+  ctx.fillStyle = '#c9d6e5';
+  ctx.fill();
+
+  positions.forEach((p, i) => {
+    const x = margin + gapX*(i + 0.5);
+    const y = yTop + 26;
+    const hl = highlightFn ? highlightFn(i) : null;
+
+    if(p === 'gap'){
+      // dashed gap marker
+      ctx.setLineDash([4,4]);
+      ctx.strokeStyle = hl ? C_GAP : '#dfe7f0';
+      ctx.lineWidth = hl ? 2 : 1.5;
+      ctx.beginPath();
+      ctx.arc(x, y, 13, 0, Math.PI*2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      if(hl){
+        ctx.fillStyle = C_GAP;
+        ctx.font = 'bold 10px Segoe UI, Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('gap', x, y);
       }
-      return a;
+    } else if(p){
+      const col = p === 'T' ? C_T : C_S;
+      if(hl){
+        ctx.beginPath();
+        ctx.arc(x, y, r*1.45, 0, Math.PI*2);
+        ctx.fillStyle = 'rgba(18,160,106,0.14)';
+        ctx.fill();
+      }
+      person(x, y, r, p, col, col);
+      // index label
+      ctx.fillStyle = '#8b9bb0';
+      ctx.font = '11px Segoe UI, Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      ctx.fillText(i + 1, x, y + r*0.95);
     }
+  });
 
-    document.getElementById('showAllBtn').addEventListener('click', () => {
-      const q = shuffle(allPeople);
-      const container = document.getElementById('randomQueueDisplay');
-      container.innerHTML = '';
-      q.forEach(p => {
-        const span = document.createElement('span');
-        span.textContent = p;
-        span.className = `px-3 py-2 rounded-lg font-mono text-sm font-bold ${p.startsWith('T') ? 'bg-indigo-100 text-indigo-700' : 'bg-amber-100 text-amber-700'}`;
-        container.appendChild(span);
-      });
-    });
+  if(info){
+    ctx.fillStyle = '#12325e';
+    ctx.font = 'bold 14px Segoe UI, Arial';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    ctx.fillText(info, margin, yTop - 26);
+  }
+}
 
-    // ---------- Part (b) Simulator ----------
-    const slider = document.getElementById('studentSlider');
-    const countSpan = document.getElementById('studentCount');
-    const canvasDiv = document.getElementById('simulationCanvas');
-    const totalArrEl = document.getElementById('totalArr');
-    const favArrEl = document.getElementById('favArr');
-    const probDisplay = document.getElementById('probDisplay');
+function clear(){
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = '#fbfdff';
+  ctx.fillRect(0,0,W,H);
+}
 
-    function factorial(n) {
-      if (n <= 1) return 1;
-      let r = 1;
-      for (let i = 2; i <= n; i++) r *= i;
-      return r;
+/* ---------- step renderers ---------- */
+function draw(step){
+  clear();
+  ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+
+  if(step <= 1){
+    const pos = ['T','T','T','T','T','T','T','S','S','S'];
+    drawRow(pos, 90, 'Given: 7 teachers (T) + 3 students (S) — all distinct', () => true);
+    // note
+    ctx.fillStyle = '#5b6b82';
+    ctx.font = '13px Segoe UI, Arial';
+    ctx.fillText('Every ordering of these 10 people is equally likely.', 40, 220);
+    ctx.fillText('Some students may end up next to each other — that is allowed here.', 40, 244);
+
+    // counts box
+    boxedText('Total people  n = 10', 40, 300);
+    ro.textContent = 'Step 1 — 7 teachers (T) and 3 students (S) form a random queue of 10.';
+  }
+
+  if(step === 2){
+    const pos = ['T','T','T','T','T','T','T','S','S','S'];
+    drawRow(pos, 90, '(a) Arrange all 10 distinct people in a row', () => true);
+    ctx.fillStyle = '#12325e';
+    ctx.font = 'bold 20px Segoe UI, Arial';
+    ctx.fillText('Number of queues  =  P(10,10)  =  10!', 40, 230);
+    ctx.fillStyle = '#12a06a';
+    ctx.font = 'bold 26px Segoe UI, Arial';
+    ctx.fillText('=  3 628 800', 40, 272);
+    ctx.fillStyle = '#5b6b82';
+    ctx.font = '13px Segoe UI, Arial';
+    ctx.fillText('Order matters → permutations, not combinations.', 40, 306);
+    ro.textContent = 'Step 2 — Total queues = 10! = 3 628 800.';
+  }
+
+  if(step === 3){
+    // 7 teachers with gaps shown
+    const pos = ['gap','T','gap','T','gap','T','gap','T','gap','T','gap','T','gap','T','gap'];
+    drawRow(pos, 90, 'Arrange the 7 teachers first  →  7!  ways', (i)=> i%2===0);
+    // gap count
+    ctx.fillStyle = '#12325e';
+    ctx.font = 'bold 18px Segoe UI, Arial';
+    ctx.fillText('7 teachers create  7 + 1 = 8  gaps', 40, 230);
+    // show the gap schematic
+    let x = 60, y = 290;
+    ctx.font = 'bold 18px Segoe UI, Arial';
+    ctx.fillStyle = '#9fb4cc';
+    for(let i=0;i<8;i++){
+      ctx.fillText('_', x, y);
+      x += 42;
+      if(i < 7){ ctx.fillStyle = '#e05a2b'; ctx.fillText('T', x, y); x += 30; ctx.fillStyle = '#9fb4cc'; }
     }
+    ctx.fillStyle = '#5b6b82';
+    ctx.font = '13px Segoe UI, Arial';
+    ctx.fillText('The 2 end gaps count as well — students can stand at the front or the back.', 40, 340);
+    ro.textContent = 'Step 3 — Arrange 7 teachers first (7! ways); they leave 8 gaps.';
+  }
 
-    function combination(n, r) {
-      if (r < 0 || r > n) return 0;
-      return factorial(n) / (factorial(r) * factorial(n - r));
+  if(step === 4){
+    const pos = ['gap','T','S','T','gap','T','S','T','gap','T','S','T','gap','T','gap'];
+    drawRow(pos, 90, 'Choose 3 of the 8 gaps and place the 3 students there', (i)=> true);
+    ctx.fillStyle = '#12325e';
+    ctx.font = 'bold 18px Segoe UI, Arial';
+    ctx.fillText('Favourable queues  =  7!  ×  C(8,3)  ×  3!', 40, 230);
+    ctx.fillStyle = '#2b6fe0';
+    ctx.font = 'bold 20px Segoe UI, Arial';
+    ctx.fillText('=  5040  ×  56  ×  6', 40, 266);
+    ctx.fillStyle = '#12a06a';
+    ctx.font = 'bold 24px Segoe UI, Arial';
+    ctx.fillText('=  1 693 440', 40, 302);
+    ctx.fillStyle = '#5b6b82';
+    ctx.font = '13px Segoe UI, Arial';
+    ctx.fillText('One student per chosen gap → no two students are adjacent.', 40, 336);
+    ro.textContent = 'Step 4 — Favourable queues = 7! × C(8,3) × 3! = 1 693 440.';
+  }
+
+  if(step >= 5){
+    const pos = ['gap','T','S','T','gap','T','S','T','gap','T','S','T','gap','T','gap'];
+    drawRow(pos, 90, 'Valid arrangement (no two students adjacent)', (i)=> true);
+    ctx.fillStyle = '#12325e';
+    ctx.font = 'bold 17px Segoe UI, Arial';
+    ctx.fillText('Probability  =', 40, 226);
+    ctx.fillStyle = '#2b6fe0';
+    ctx.font = 'bold 19px Segoe UI, Arial';
+    ctx.fillText('1 693 440', 40, 262);
+    // fraction bar
+    ctx.strokeStyle = '#2b6fe0'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(38, 272); ctx.lineTo(160, 272); ctx.stroke();
+    ctx.fillStyle = '#2b6fe0';
+    ctx.fillText('3 628 800', 40, 296);
+    ctx.fillStyle = '#12a06a';
+    ctx.font = 'bold 30px Segoe UI, Arial';
+    ctx.fillText('=  7 / 15', 200, 280);
+    ctx.fillStyle = '#5b6b82';
+    ctx.font = '13px Segoe UI, Arial';
+    ctx.fillText('≈ 0.4667  —  give the fraction in lowest terms.', 40, 340);
+    ro.textContent = 'Step 5 — Probability = 1 693 440 / 3 628 800 = 7/15.';
+  }
+}
+
+/* small helper: rounded box with text */
+function boxedText(txt, x, y){
+  ctx.font = 'bold 15px Segoe UI, Arial';
+  const w = ctx.measureText(txt).width + 28;
+  ctx.fillStyle = '#eaf2fd';
+  ctx.strokeStyle = '#c3d4e8';
+  ctx.lineWidth = 1.5;
+  roundRect(x, y - 20, w, 34, 8);
+  ctx.fill(); ctx.stroke();
+  ctx.fillStyle = '#12325e';
+  ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+  ctx.fillText(txt, x + 14, y - 2);
+  ctx.textBaseline = 'alphabetic';
+}
+function roundRect(x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+
+/* ===================== SCROLL SYNC ===================== */
+let current = 1;
+const io = new IntersectionObserver(es=>{
+  es.forEach(e=>{
+    if(e.isIntersecting){
+      const n = +e.target.dataset.step;
+      if(n !== current){ current = n; draw(current); }
+      document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+      e.target.classList.add('active');
     }
+  });
+},{rootMargin:'-25% 0px -55% 0px'});
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
 
-    function renderSimulator(numStudents) {
-      const numTeachers = 10 - numStudents;
-      // total arrangements = 10!
-      const total = factorial(10);
-      totalArrEl.textContent = total.toLocaleString('en-US');
-
-      // favourable: arrange teachers (numTeachers!), choose gaps C(numTeachers+1, numStudents), arrange students (numStudents!)
-      const gaps = numTeachers + 1;
-      let fav = 0;
-      if (numStudents <= gaps) {
-        fav = factorial(numTeachers) * combination(gaps, numStudents) * factorial(numStudents);
-      }
-      favArrEl.textContent = fav.toLocaleString('en-US');
-
-      const prob = total > 0 ? fav / total : 0;
-      const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
-      // Fraction simplification
-      let num = fav, den = total;
-      const g = gcd(num, den);
-      num /= g; den /= g;
-      if (fav === 0) {
-        probDisplay.textContent = `0`;
-      } else {
-        probDisplay.textContent = `${num}/${den} ≈ ${prob.toFixed(4)}`;
-      }
-
-      // Visual queue (fixed composition: all teachers then all students, but we show pattern)
-      canvasDiv.innerHTML = '';
-      // Create a pattern that satisfies no adjacent students if possible, else random
-      // We'll just show a valid arrangement if numStudents <= gaps
-      const items = [];
-      const tCount = numTeachers;
-      const sCount = numStudents;
-
-      // Build a valid arrangement: teacher, then repeat (student? teacher)
-      // We'll interleave manually: place teachers first, then insert students in gaps
-      if (sCount <= tCount + 1) {
-        // Create sequence: start with teacher, then alternate
-        let t = tCount, s = sCount;
-        let lastWasStudent = false;
-        // Simple greedy: place as many teachers as needed
-        for (let i = 0; i < 10; i++) {
-          if (t > 0 && (s === 0 || !lastWasStudent || (t > s))) {
-            // place teacher if needed to separate
-            if (lastWasStudent && s > 0 && t > 0) {
-              // must place teacher
-              items.push('T');
-              t--;
-              lastWasStudent = false;
-            } else if (!lastWasStudent && t > 0) {
-              items.push('T');
-              t--;
-              lastWasStudent = false;
-            } else if (s > 0 && t > 0) {
-              items.push('T');
-              t--;
-              lastWasStudent = false;
-            } else {
-              if (s > 0) { items.push('S'); s--; lastWasStudent = true; }
-              else if (t > 0) { items.push('T'); t--; lastWasStudent = false; }
-            }
-          } else if (s > 0 && !lastWasStudent) {
-            items.push('S'); s--; lastWasStudent = true;
-          } else if (t > 0) {
-            items.push('T'); t--; lastWasStudent = false;
-          } else {
-            // fallback
-            if (s > 0) { items.push('S'); s--; lastWasStudent = true; }
-            else if (t > 0) { items.push('T'); t--; lastWasStudent = false; }
-          }
-        }
-      } else {
-        // fallback: just alternate
-        for (let i = 0; i < 10; i++) {
-          if (i < tCount) items.push('T'); else items.push('S');
-        }
-      }
-
-      // If we couldn't place all, fallback
-      if (items.length !== 10) {
-        items.length = 0;
-        for (let i = 0; i < tCount; i++) items.push('T');
-        for (let i = 0; i < sCount; i++) items.push('S');
-      }
-
-      // Render with proper labels
-      let tIdx = 1, sIdx = 1;
-      items.forEach(type => {
-        const span = document.createElement('span');
-        if (type === 'T') {
-          span.textContent = 'T' + (tIdx++);
-          span.className = 'seat teacher px-2 py-1 rounded text-xs font-bold';
-        } else {
-          span.textContent = 'S' + (sIdx++);
-          span.className = 'seat student px-2 py-1 rounded text-xs font-bold';
-        }
-        canvasDiv.appendChild(span);
-      });
-    }
-
-    slider.addEventListener('input', (e) => {
-      const val = parseInt(e.target.value);
-      countSpan.textContent = val;
-      renderSimulator(val);
-    });
-
-    // Initialize
-    renderSimulator(3);
-
-    // Typeset MathJax after dynamic updates
-    if (window.MathJax && MathJax.typesetPromise) {
-      MathJax.typesetPromise();
-    }
-  </script>
-
-  <!-- Fallback MathJax typeset on load -->
-  <script>
-    window.addEventListener('load', () => {
-      if (window.MathJax && MathJax.typesetPromise) {
-        MathJax.typesetPromise();
-      }
-    });
-  </script>
-
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
+/* initial draw */
+draw(1);
+document.querySelector('.step[data-step="1"]').classList.add('active');
 </script>
-
 </body>
 </html>

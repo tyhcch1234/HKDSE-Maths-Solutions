@@ -3,1026 +3,502 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HKDSE 2024 Paper 2 Q29 · Statistics</title>
+<title>HKDSE 2024 P2 Q29 — Box-and-Whisker Diagram</title>
 <script>
-  window.MathJax = {
-    tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['\\[', '\\]']] },
-    svg: { fontCache: 'global' }
-  };
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']]
+  },
+  svg: { fontCache: 'global' }
+};
 </script>
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
-  :root{
-    --blue:#1e40af;
-    --blue-light:#3b82f6;
-    --amber:#d97706;
-    --amber-light:#fbbf24;
-    --emerald:#059669;
-    --emerald-light:#10b981;
-    --ink:#0f172a;
-    --muted:#64748b;
-    --card-bg:#ffffff;
-    --page-bg:#f1f5f9;
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: #f4f7fb;
+    color: #1e2a3a;
+    line-height: 1.55;
   }
-  *{box-sizing:border-box;}
-  body{
-    margin:0;
-    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
-    background:var(--page-bg);
-    color:var(--ink);
-    line-height:1.6;
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 16px 14px 60px; }
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0,1fr) minmax(0,1fr);
+    gap: 12px;
+    align-items: start;
   }
-  /* ---------- Hero ---------- */
-  .hero{
-    background:linear-gradient(135deg,#1e3a8a 0%,#2563eb 45%,#3b82f6 75%,#60a5fa 100%);
-    color:#fff;
-    padding:38px 20px 46px;
-    text-align:center;
-    position:relative;
-    overflow:hidden;
+  @media (min-width: 900px) {
+    .split { grid-template-columns: minmax(0,46%) minmax(0,54%); gap: 18px; }
   }
-  .hero::after{
-    content:"";
-    position:absolute;
-    inset:0;
-    background:radial-gradient(circle at 80% 10%, rgba(255,255,255,.18), transparent 55%),
-               radial-gradient(circle at 15% 85%, rgba(255,255,255,.12), transparent 50%);
-    pointer-events:none;
+  @media (max-width: 640px) {
+    body { font-size: 14.5px; }
+    .wrap { padding: 10px 8px 40px; }
   }
-  .hero .eyebrow{
-    font-size:.82rem;
-    letter-spacing:.16em;
-    text-transform:uppercase;
-    opacity:.92;
-    margin-bottom:10px;
-    font-weight:600;
+
+  .diagram {
+    position: sticky;
+    top: 16px;
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 14px 12px 12px;
+    box-shadow: 0 4px 18px rgba(30,42,58,0.10);
+    border: 1px solid #e3ebf5;
   }
-  .hero h1{
-    margin:0 0 6px;
-    font-size:clamp(1.5rem,4.5vw,2.3rem);
-    font-weight:800;
-    letter-spacing:.02em;
+  .diagram h3 {
+    margin: 0 0 8px;
+    font-size: 0.95rem;
+    color: #2c3e66;
+    letter-spacing: .02em;
+    text-transform: uppercase;
   }
-  .hero .subtitle{
-    font-size:1rem;
-    opacity:.95;
-    margin-bottom:18px;
+  canvas { width: 100%; height: auto; display: block; border-radius: 8px; }
+  .ro {
+    margin: 10px 2px 0;
+    font-size: 0.88rem;
+    background: #eef4ff;
+    border-left: 4px solid #4a7cff;
+    padding: 7px 10px;
+    border-radius: 6px;
+    color: #22335c;
   }
-  .pills{
-    display:flex;
-    flex-wrap:wrap;
-    gap:9px;
-    justify-content:center;
-    position:relative;
-    z-index:1;
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 16px;
+    margin-top: 10px;
+    font-size: 0.82rem;
   }
-  .pill{
-    background:rgba(255,255,255,.18);
-    border:1px solid rgba(255,255,255,.38);
-    backdrop-filter:blur(4px);
-    padding:5px 14px;
-    border-radius:999px;
-    font-size:.78rem;
-    font-weight:600;
-    letter-spacing:.03em;
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .swatch { width: 14px; height: 14px; border-radius: 3px; display: inline-block; }
+
+  .panel {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 18px 18px 22px;
+    box-shadow: 0 4px 18px rgba(30,42,58,0.08);
+    border: 1px solid #e3ebf5;
   }
-  /* ---------- Layout ---------- */
-  .wrap{
-    max-width:900px;
-    margin:0 auto;
-    padding:26px 16px 60px;
+  .qtag {
+    display: inline-block;
+    background: #2c3e66;
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 10px;
   }
-  .card{
-    background:var(--card-bg);
-    border-radius:16px;
-    box-shadow:0 4px 18px rgba(15,23,42,.08),0 1px 3px rgba(15,23,42,.06);
-    padding:22px 22px 24px;
-    margin-bottom:22px;
-    border:1px solid #e2e8f0;
+  .question { font-size: 1.02rem; }
+  .question p { margin: 0 0 10px; }
+
+  .opts { list-style: none; padding: 0; margin: 12px 0 4px; display: grid; gap: 6px; }
+  .opts li {
+    background: #f7faff;
+    border: 1px solid #dbe7fb;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-weight: 600;
+    color: #22335c;
   }
-  .card h2{
-    margin:0 0 6px;
-    font-size:1.18rem;
-    color:var(--blue);
-    font-weight:800;
-    display:flex;
-    align-items:center;
-    gap:9px;
+
+  h2.sol-title {
+    font-size: 1rem;
+    margin: 22px 0 12px;
+    color: #2c3e66;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    border-bottom: 2px solid #e3ebf5;
+    padding-bottom: 6px;
   }
-  .card h2 .num{
-    background:var(--blue);
-    color:#fff;
-    width:30px;height:30px;
-    border-radius:9px;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    font-size:.92rem;
-    flex:0 0 auto;
+
+  .step {
+    border: 1px solid #e3ebf5;
+    border-left: 5px solid #4a7cff;
+    background: #fbfdff;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 14px;
+    transition: box-shadow .25s, background .25s, border-left-color .25s;
   }
-  .card h2 .mk{
-    margin-left:auto;
-    font-size:.72rem;
-    background:#e0e7ff;
-    color:#3730a3;
-    padding:3px 10px;
-    border-radius:999px;
-    font-weight:700;
-    letter-spacing:.04em;
+  .step.active {
+    background: #f0f6ff;
+    box-shadow: 0 3px 14px rgba(74,124,255,0.18);
   }
-  .qtext{
-    font-size:1.02rem;
+  .step-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    color: #2c3e66;
+    font-size: 0.92rem;
+    margin-bottom: 6px;
   }
-  .choices{
-    list-style:none;
-    padding:0;
-    margin:14px 0 0;
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
-    gap:10px;
+  .chip {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: #4a7cff;
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 700;
   }
-  .choices li{
-    background:#f8fafc;
-    border:1px solid #e2e8f0;
-    border-radius:10px;
-    padding:9px 14px;
-    font-weight:600;
-    color:#334155;
+  .step .hint {
+    margin-top: 8px;
+    font-size: 0.85rem;
+    color: #5b6b85;
+    font-style: italic;
   }
-  .choices li.correct{
-    background:#ecfdf5;
-    border-color:#6ee7b7;
-    color:#065f46;
-  }
-  .choices li.correct::after{
-    content:"✓";
-    color:var(--emerald);
-    font-weight:800;
-    margin-left:8px;
-  }
-  /* ---------- Canvas ---------- */
-  .canvas-box{
-    background:#fbfdff;
-    border:1px solid #e2e8f0;
-    border-radius:14px;
-    padding:12px 12px 8px;
-    margin:16px 0 8px;
-  }
-  canvas{
-    width:100%;
-    height:auto;
-    display:block;
-    border-radius:10px;
-    background:#fff;
-    touch-action:none;
-  }
-  .canvas-caption{
-    font-size:.8rem;
-    color:var(--muted);
-    text-align:center;
-    margin-top:6px;
-    font-style:italic;
-  }
-  /* ---------- Controls ---------- */
-  .controls{
-    display:flex;
-    flex-wrap:wrap;
-    align-items:center;
-    gap:14px 22px;
-    margin:10px 0 4px;
-    padding:12px 14px;
-    background:#f8fafc;
-    border-radius:12px;
-    border:1px dashed #cbd5e1;
-  }
-  .ctrl{
-    display:flex;
-    align-items:center;
-    gap:9px;
-    font-size:.86rem;
-    font-weight:600;
-    color:#334155;
-  }
-  input[type=range]{
-    -webkit-appearance:none;
-    width:150px;
-    height:6px;
-    border-radius:5px;
-    background:linear-gradient(90deg,var(--blue-light),var(--amber-light));
-    outline:none;
-  }
-  input[type=range]::-webkit-slider-thumb{
-    -webkit-appearance:none;
-    width:19px;height:19px;
-    border-radius:50%;
-    background:#fff;
-    border:3px solid var(--blue);
-    cursor:pointer;
-    box-shadow:0 1px 4px rgba(0,0,0,.25);
-  }
-  input[type=range]::-moz-range-thumb{
-    width:15px;height:15px;
-    border-radius:50%;
-    background:#fff;
-    border:3px solid var(--blue);
-    cursor:pointer;
-  }
-  input[type=checkbox]{
-    width:17px;height:17px;
-    accent-color:var(--blue);
-    cursor:pointer;
-  }
-  .readout{
-    font-family:"SF Mono",Consolas,Menlo,monospace;
-    font-size:.83rem;
-    background:#0f172a;
-    color:#a5f3fc;
-    border-radius:9px;
-    padding:9px 13px;
-    margin:10px 0 2px;
-    line-height:1.75;
-    overflow-x:auto;
-  }
-  .readout b{color:#fde68a;}
-  .readout .ok{color:#6ee7b7;}
-  .readout .bad{color:#fca5a5;}
-  /* ---------- Steps ---------- */
-  .step{
-    display:none;
-    border-left:4px solid var(--blue-light);
-    background:#f8fafc;
-    border-radius:0 12px 12px 0;
-    padding:14px 16px;
-    margin-top:14px;
-    animation:fade .35s ease;
-  }
-  .step.show{display:block;}
-  @keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
-  .step-head{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    margin-bottom:8px;
-    flex-wrap:wrap;
-  }
-  .badge{
-    background:var(--blue);
-    color:#fff;
-    font-size:.72rem;
-    font-weight:800;
-    padding:3px 10px;
-    border-radius:999px;
-    letter-spacing:.04em;
-  }
-  .badge.marks{
-    background:var(--amber);
-  }
-  .step-body{font-size:.97rem;}
-  .hint{
-    background:#fffbeb;
-    border-left:4px solid var(--amber-light);
-    border-radius:0 10px 10px 0;
-    padding:10px 13px;
-    margin:11px 0;
-    font-size:.9rem;
-    color:#78350f;
-  }
-  .hint::before{
-    content:"💡 Hint";
-    display:block;
-    font-weight:800;
-    font-size:.74rem;
-    letter-spacing:.07em;
-    text-transform:uppercase;
-    color:var(--amber);
-    margin-bottom:3px;
-  }
-  .answer{
-    background:#ecfdf5;
-    border-left:4px solid var(--emerald-light);
-    border-radius:0 10px 10px 0;
-    padding:10px 13px;
-    margin:11px 0 2px;
-    font-size:.95rem;
-    color:#064e3b;
-    font-weight:600;
-  }
-  .answer::before{
-    content:"✔ Answer";
-    display:block;
-    font-weight:800;
-    font-size:.74rem;
-    letter-spacing:.07em;
-    text-transform:uppercase;
-    color:var(--emerald);
-    margin-bottom:3px;
-  }
-  .nextbar{
-    display:flex;
-    align-items:center;
-    gap:14px;
-    margin-top:16px;
-    flex-wrap:wrap;
-  }
-  button.next{
-    background:linear-gradient(135deg,var(--blue),var(--blue-light));
-    color:#fff;
-    border:none;
-    padding:10px 20px;
-    border-radius:10px;
-    font-size:.92rem;
-    font-weight:700;
-    cursor:pointer;
-    box-shadow:0 3px 10px rgba(37,99,235,.35);
-    transition:.2s;
-  }
-  button.next:hover:not(:disabled){
-    transform:translateY(-1px);
-    box-shadow:0 5px 15px rgba(37,99,235,.45);
-  }
-  button.next:disabled{
-    background:#cbd5e1;
-    color:#64748b;
-    cursor:default;
-    box-shadow:none;
-  }
-  .counter{
-    font-size:.85rem;
-    font-weight:700;
-    color:var(--muted);
-  }
-  /* ---------- Summary ---------- */
-  .summary{
-    background:linear-gradient(135deg,#0f172a,#1e293b);
-    color:#e2e8f0;
-    border:none;
-  }
-  .summary h2{color:#93c5fd;}
-  .summary h2 .num{background:#3b82f6;}
-  .summary ul{
-    list-style:none;
-    padding:0;
-    margin:14px 0 0;
-  }
-  .summary li{
-    padding:10px 14px;
-    background:rgba(255,255,255,.06);
-    border-left:4px solid var(--amber-light);
-    border-radius:0 10px 10px 0;
-    margin-bottom:10px;
-    font-size:.97rem;
-  }
-  .summary li b{color:#fcd34d;}
-  .summary .concl{
-    margin-top:14px;
-    padding:12px 14px;
-    background:rgba(16,185,129,.15);
-    border-left:4px solid var(--emerald-light);
-    border-radius:0 10px 10px 0;
-    font-weight:700;
-    color:#a7f3d0;
-  }
-  footer{
-    text-align:center;
-    font-size:.82rem;
-    color:var(--muted);
-    padding:14px 16px 34px;
-  }
-  footer b{color:var(--blue);}
-  @media(max-width:520px){
-    .card{padding:18px 15px;}
-    .controls{gap:10px 16px;}
-    input[type=range]{width:120px;}
+  .answer {
+    margin-top: 18px;
+    background: linear-gradient(135deg,#e8f7ec,#d3f0dd);
+    border: 1px solid #a6dcb8;
+    border-left: 6px solid #29a05a;
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-weight: 700;
+    color: #16522f;
+    font-size: 1.05rem;
   }
 </style>
 </head>
 <body>
-
-<!-- ================= HERO ================= -->
-<header class="hero">
-  <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</div>
-  <h1>2024 Paper 2 · Question 29</h1>
-  <div class="subtitle">Statistics — Range &amp; Inter-quartile Range of a Box-and-Whisker Diagram</div>
-  <div class="pills">
-    <span class="pill">Box-and-Whisker Diagram</span>
-    <span class="pill">Range</span>
-    <span class="pill">Inter-quartile Range</span>
-    <span class="pill">Linear Equation</span>
-  </div>
-</header>
-
 <div class="wrap">
+  <div class="split">
 
-  <!-- ================= QUESTION ================= -->
-  <section class="card">
-    <h2><span class="num">Q</span> Question</h2>
-    <div class="qtext">
-      <p>
-        The box-and-whisker diagram below shows the distribution of the numbers of
-        tokens got by a group of children in a game. If the range of the distribution
-        is <strong>the triple of</strong> its inter-quartile range, find \(m\).
-      </p>
-      <ul class="choices">
-        <li>A. \(248\)</li>
-        <li class="">B. \(275\)</li>
-        <li>C. \(336\)</li>
-        <li>D. \(360\)</li>
-      </ul>
-      <p style="font-size:.85rem;color:var(--muted);margin-top:10px;">
-        Diagram values: minimum \(=136\), lower quartile \(Q_1=163\), median \(=224\),
-        upper quartile \(Q_3=m\), maximum \(=472\).
-      </p><figure style="margin:12px 0;text-align:center;"><img src="figures/2024_P2_Q29.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
-    </div>
-  </section>
-
-  <!-- ================= PART (a) ================= -->
-  <section class="card">
-    <h2><span class="num">a</span> Reading the Range and the Inter-quartile Range </h2>
-    <div class="qtext">
-      Express the range and the inter-quartile range of the distribution in terms of \(m\).
-    </div>
-
-    <!-- CANVAS 1 -->
-    <div class="canvas-box">
-      <canvas id="cv1" width="820" height="600"></canvas>
-      <div class="canvas-caption">
-        Drag the slider to move \(Q_3 = m\). Watch how the range and the inter-quartile range change.
+    <!-- ============ LEFT: DIAGRAM ============ -->
+    <div class="diagram">
+      <h3>Box-and-Whisker Diagram</h3>
+      <canvas id="cv" width="640" height="440"></canvas>
+      <p class="ro" id="readout">Drag the slider to explore how $m$ affects the inter-quartile range.</p>
+      <div class="legend">
+        <span><i class="swatch" style="background:#ff7043"></i>Minimum / Lower whisker</span>
+        <span><i class="swatch" style="background:#4a7cff"></i>Quartiles &amp; box</span>
+        <span><i class="swatch" style="background:#8e44ad"></i>Median</span>
+        <span><i class="swatch" style="background:#29a05a"></i>Maximum / Upper whisker</span>
+      </div>
+      <div style="margin-top:12px;font-size:0.86rem;color:#2c3e66;">
+        <label for="mSlider"><strong>$m$ = <span id="mVal">275</span></strong></label>
+        <input id="mSlider" type="range" min="240" max="340" value="275" step="1" style="width:100%;margin-top:4px;">
       </div>
     </div>
 
-    <div class="controls">
-      <div class="ctrl">
-        <label for="sliderM">Upper quartile \(m\)</label>
-        <input type="range" id="sliderM" min="180" max="440" value="275" step="1">
-        <span id="mVal" style="font-family:monospace;color:var(--blue);font-weight:800;min-width:42px;">275</span>
+    <!-- ============ RIGHT: QUESTION + SOLUTION ============ -->
+    <div class="panel">
+      <span class="qtag">HKDSE 2024 Paper 2 · Q29</span>
+
+      <div class="question">
+        <p>The box-and-whisker diagram below shows the distribution of the numbers of tokens got by a group of children in a game. If the range of the distribution is the triple of its inter-quartile range, find $m$.</p>
+        <ul class="opts">
+          <li>A. 248</li>
+          <li>B. 275</li>
+          <li>C. 336</li>
+          <li>D. 360</li>
+        </ul>
       </div>
-      <div class="ctrl">
-        <input type="checkbox" id="showIQR" checked>
-        <label for="showIQR">Show IQR bracket</label>
+
+      <figure style="margin:12px 0;text-align:center;"><img src="figures/2024_P2_Q29.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
+
+      <h2 class="sol-title">Step-by-step solution</h2>
+
+      <div class="step" data-step="1">
+        <div class="step-tag"><span class="chip">1</span>Read the five-number summary</div>
+        <p>From the diagram the five-number summary is:</p>
+        <p>$\text{Min}=136,\quad Q_1=163,\quad Q_2=224,\quad Q_3=m,\quad \text{Max}=472$</p>
+        <div class="hint">The left edge of the box is $Q_1$; the right edge of the box is $Q_3 = m$ (unknown).</div>
       </div>
-      <div class="ctrl">
-        <input type="checkbox" id="showRange" checked>
-        <label for="showRange">Show range bracket</label>
+
+      <div class="step" data-step="2">
+        <div class="step-tag"><span class="chip">2</span>Compute the range</div>
+        <p>$\text{Range} = \text{Max} - \text{Min} = 472 - 136 = 336$.</p>
+        <div class="hint">The range only uses the two extreme values; it does not involve $m$.</div>
       </div>
-      <div class="ctrl">
-        <input type="checkbox" id="showTriple">
-        <label for="showTriple">Highlight 3 × IQR</label>
+
+      <div class="step" data-step="3">
+        <div class="step-tag"><span class="chip">3</span>Write the inter-quartile range</div>
+        <p>$\text{IQR} = Q_3 - Q_1 = m - 163$.</p>
+        <div class="hint">The IQR is the width of the box.</div>
       </div>
+
+      <div class="step" data-step="4">
+        <div class="step-tag"><span class="chip">4</span>Set up the given relation</div>
+        <p>Range $= 3\times$ IQR:</p>
+        <p>$$472 - 136 = 3(m - 163)$$</p>
+        <p>$$336 = 3(m - 163)$$</p>
+        <div class="hint">"Range is the triple of the inter-quartile range" gives Range $=3\times$ IQR.</div>
+      </div>
+
+      <div class="step" data-step="5">
+        <div class="step-tag"><span class="chip">5</span>Solve for $m$</div>
+        <p>$$m - 163 = \frac{336}{3} = 112$$</p>
+        <p>$$m = 112 + 163 = 275$$</p>
+        <div class="hint">Divide both sides by 3 first, then add 163.</div>
+      </div>
+
+      <div class="answer">Answer: B. 275</div>
     </div>
 
-    <div class="readout" id="readout1"></div>
-
-    <div class="step" data-step="1">
-      <div class="step-head"><span class="badge">Step 1</span></div>
-      <div class="step-body">
-        <p>From the box-and-whisker diagram, the smallest value is the left whisker end and the largest value is the right whisker end:</p>
-        \[ \text{Range} = \text{Maximum} - \text{Minimum} = 472 - 136 = 336 \]
-        <div class="hint">
-          The range depends only on the two whisker ends. It does <em>not</em> involve \(m\) — the upper quartile is inside the box, not at the end.
-        </div>
-        <div class="answer">\(\text{Range} = 336\)</div>
-      </div>
-    </div>
-
-    <div class="step" data-step="2">
-      <div class="step-head"><span class="badge">Step 2</span></div>
-      <div class="step-body">
-        <p>The inter-quartile range is the width of the box, i.e. from \(Q_1\) to \(Q_3\):</p>
-        \[ \text{Inter-quartile range} = Q_3 - Q_1 = m - 163 \]
-        <div class="hint">
-          \(Q_1 = 163\) is the left edge of the box and \(Q_3 = m\) is the right edge. The IQR is the "middle half" of the data.
-        </div>
-        <div class="answer">\(\text{Inter-quartile range} = m - 163\)</div>
-      </div>
-    </div>
-
-    <div class="nextbar">
-      <button class="next" data-target="1">Next step →</button>
-      <span class="counter" id="cnt1">0 / 2</span>
-    </div>
-  </section>
-
-  <!-- ================= PART (b) ================= -->
-  <section class="card">
-    <h2><span class="num">b</span> Setting up the Equation to Find \(m\) </h2>
-    <div class="qtext">
-      It is given that the range is the triple of the inter-quartile range. Solve for \(m\).
-    </div>
-
-    <!-- CANVAS 2 -->
-    <div class="canvas-box">
-      <canvas id="cv2" width="820" height="600"></canvas>
-      <div class="canvas-caption">
-        Adjust \(m\): the range (blue) is fixed at \(336\); the triple of the IQR (amber) grows with \(m\).
-        They match exactly at \(m = 275\).
-      </div>
-    </div>
-
-    <div class="controls">
-      <div class="ctrl">
-        <label for="sliderM2">Upper quartile \(m\)</label>
-        <input type="range" id="sliderM2" min="180" max="440" value="275" step="1">
-        <span id="mVal2" style="font-family:monospace;color:var(--blue);font-weight:800;min-width:42px;">275</span>
-      </div>
-      <div class="ctrl">
-        <input type="checkbox" id="lockEq">
-        <label for="lockEq">Show solution line "range = 3 × IQR"</label>
-      </div>
-    </div>
-
-    <div class="readout" id="readout2"></div>
-
-    <div class="step" data-step="1">
-      <div class="step-head"><span class="badge">Step 1</span></div>
-      <div class="step-body">
-        <p>Translate the word condition into an equation. "The range is the triple of the inter-quartile range" means:</p>
-        \[ \text{Range} = 3 \times \text{Inter-quartile range} \]
-        Substitute the expressions found in part (a):
-        \[ 336 = 3\,(m - 163) \]
-        <div class="hint">
-          Careful — "the triple of the IQR" means multiply the IQR by \(3\), not multiply the range by \(3\). Write \(3(m-163)\), not \(3 \times 336\).
-        </div>
-        <div class="answer">\(3\,(m - 163) = 336\)</div>
-      </div>
-    </div>
-
-    <div class="step" data-step="2">
-      <div class="step-head"><span class="badge">Step 2</span></div>
-      <div class="step-body">
-        <p>Divide both sides by \(3\):</p>
-        \[ m - 163 = \frac{336}{3} = 112 \]
-        <div class="hint">
-          \(336 \div 3 = 112\) since \(3 \times 112 = 336\). This gives the IQR directly — a useful mental check.
-        </div>
-        <div class="answer">\(\text{Inter-quartile range} = 112\)</div>
-      </div>
-    </div>
-
-    <div class="step" data-step="3">
-      <div class="step-head"><span class="badge">Step 3</span></div>
-      <div class="step-body">
-        <p>Add \(163\) to both sides:</p>
-        \[ m = 112 + 163 = 275 \]
-        <div class="hint">
-          Check: \(Q_3 = 275\) lies between the median \(224\) and the maximum \(472\) — consistent with a valid box-and-whisker diagram (quartiles must be in increasing order).
-        </div>
-        <div class="answer">\(m = 275\) &nbsp;⟹&nbsp; Answer: <strong>B</strong></div>
-      </div>
-    </div>
-
-    <div class="nextbar">
-      <button class="next" data-target="2">Next step →</button>
-      <span class="counter" id="cnt2">0 / 3</span>
-    </div>
-  </section>
-
-  <!-- ================= SUMMARY ================= -->
-  <section class="card summary">
-    <h2><span class="num">Σ</span> Summary of Answers</h2>
-    <ul>
-      <li><b>Range</b> \(= 472 - 136 = 336\) (depends only on the whisker ends)</li>
-      <li><b>Inter-quartile range</b> \(= Q_3 - Q_1 = m - 163\) (the width of the box)</li>
-      <li><b>Condition given:</b> Range \(= 3 \times \text{IQR}\)</li>
-      <li><b>Equation:</b> \(336 = 3(m - 163)\)</li>
-      <li><b>Solution:</b> \(m - 163 = 112 \;\Rightarrow\; m = 275\)</li>
-    </ul>
-    <div class="concl">Therefore \(m = 275\), i.e. the answer is <strong>B</strong>.</div>
-  </section>
-
+  </div>
 </div>
 
-<footer>
-  HKDSE Mathematics (Compulsory Part) · <b>2024 Paper 2 Q29</b> · Statistics — Box-and-Whisker Diagram
-</footer>
-
 <script>
-/* =========================================================
-   STEP REVEAL
-   ========================================================= */
-document.querySelectorAll('.nextbar').forEach(bar => {
-  const btn = bar.querySelector('button.next');
-  const counter = bar.querySelector('.counter');
-  const card = bar.closest('.card');
-  const steps = card.querySelectorAll('.step');
-  const total = steps.length;
-  let shown = 0;
-
-  const update = () => {
-    counter.textContent = shown + ' / ' + total;
-    if (shown >= total) {
-      btn.disabled = true;
-      btn.textContent = 'All steps revealed ✓';
-    }
-  };
-
-  btn.addEventListener('click', () => {
-    if (shown < total) {
-      steps[shown].classList.add('show');
-      shown++;
-      if (window.MathJax && MathJax.typesetPromise) {
-        MathJax.typesetPromise([steps[shown - 1]]).catch(() => {});
-      }
-      update();
-    }
-  });
-
-  update();
-});
-
-/* =========================================================
-   CANVAS 1 — Interactive box-and-whisker (Part a)
-   ========================================================= */
 (function () {
-  const cv = document.getElementById('cv1');
+  const cv = document.getElementById('cv');
   const ctx = cv.getContext('2d');
-  const W = cv.width, H = cv.height;
-
-  const slider = document.getElementById('sliderM');
+  const readout = document.getElementById('readout');
+  const slider = document.getElementById('mSlider');
   const mVal = document.getElementById('mVal');
-  const showIQR = document.getElementById('showIQR');
-  const showRange = document.getElementById('showRange');
-  const showTriple = document.getElementById('showTriple');
-  const readout = document.getElementById('readout1');
 
-  const MINV = 136, Q1 = 163, MED = 224, MAXV = 472;
+  // Fixed data values
+  const MIN = 136, Q1 = 163, MED = 224, MAX = 472;
 
-  function X(v) {
-    // map value range 120..500 to pixel 60..W-40
-    return 60 + (v - 120) * (W - 100) / (500 - 120);
+  // Chart geometry (canvas coords)
+  const padL = 70, padR = 60, padT = 70, padB = 90;
+  const W = cv.width, H = cv.height;
+  const x0 = padL, x1 = W - padR;
+  const yTop = padT, yBot = H - padB;
+  const boxH = 70;
+  const boxY = (yTop + yBot) / 2 - boxH / 2;
+  const capH = 34;
+
+  // Axis value range shown
+  const vMin = 120, vMax = 500;
+
+  function mapX(v) {
+    return x0 + (v - vMin) / (vMax - vMin) * (x1 - x0);
   }
 
-  function draw() {
-    const m = +slider.value;
-    mVal.textContent = m;
-
+  function drawStage(step) {
     ctx.clearRect(0, 0, W, H);
 
-    /* background */
-    ctx.fillStyle = '#fbfdff';
+    // background
+    const grad = ctx.createLinearGradient(0, 0, 0, H);
+    grad.addColorStop(0, '#ffffff');
+    grad.addColorStop(1, '#f2f7ff');
+    ctx.fillStyle = grad;
     ctx.fillRect(0, 0, W, H);
 
-    /* number line */
-    const baseY = 225;
-    ctx.strokeStyle = '#94a3b8';
-    ctx.lineWidth = 2;
+    const m = parseFloat(slider.value);
+
+    // ---- Axis ----
+    const axY = yBot + 18;
+    ctx.strokeStyle = '#9aa9c1';
+    ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.moveTo(X(120), baseY);
-    ctx.lineTo(X(500), baseY);
+    ctx.moveTo(x0 - 8, axY);
+    ctx.lineTo(x1 + 22, axY);
     ctx.stroke();
 
-    /* ticks */
-    ctx.fillStyle = '#64748b';
-    ctx.font = '12px sans-serif';
+    // arrow
+    ctx.beginPath();
+    ctx.moveTo(x1 + 22, axY);
+    ctx.lineTo(x1 + 14, axY - 5);
+    ctx.lineTo(x1 + 14, axY + 5);
+    ctx.closePath();
+    ctx.fillStyle = '#9aa9c1';
+    ctx.fill();
+
+    // ticks & labels
+    ctx.fillStyle = '#4a5a75';
+    ctx.font = '13px sans-serif';
     ctx.textAlign = 'center';
-    for (let v = 120; v <= 500; v += 20) {
-      const x = X(v);
-      const major = (v % 100 === 0);
-      ctx.strokeStyle = major ? '#94a3b8' : '#cbd5e1';
-      ctx.lineWidth = major ? 1.6 : 0.9;
+    const ticks = [136, 163, 224, 275, 336, 472];
+    ticks.forEach(t => {
+      const X = mapX(t);
+      ctx.strokeStyle = '#c3cee0';
+      ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.moveTo(x, baseY);
-      ctx.lineTo(x, baseY + (major ? 9 : 5));
+      ctx.moveTo(X, axY - 4);
+      ctx.lineTo(X, axY + 4);
       ctx.stroke();
-      if (major) {
-        ctx.fillStyle = '#94a3b8';
-        ctx.fillText(v.toString(), x, baseY + 24);
-      }
+      ctx.fillStyle = '#4a5a75';
+      ctx.fillText(t, X, axY + 18);
+    });
+    // label for m (variable)
+    const mX = mapX(m);
+    ctx.strokeStyle = '#8e44ad';
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.moveTo(mX, axY - 6);
+    ctx.lineTo(mX, axY + 6);
+    ctx.stroke();
+    ctx.fillStyle = '#8e44ad';
+    ctx.font = 'bold 14px serif';
+    ctx.fillText('m', mX, axY + 18);
+
+    // axis title
+    ctx.fillStyle = '#4a5a75';
+    ctx.font = '13px sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText('Number of tokens', x1 + 20, axY + 38);
+
+    // ---- Box & whiskers ----
+    const drawLine = (color, lw) => { ctx.strokeStyle = color; ctx.lineWidth = lw; };
+
+    // whisker lines (from Q1 to MIN, Q3 to MAX)
+    if (step === 1 || step === 2 || step === 3 || step === 4 || step === 5) {
+      drawLine('#ff7043', 2.5);
+      ctx.beginPath();
+      ctx.moveTo(mapX(Q1), boxY + boxH / 2);
+      ctx.lineTo(mapX(MIN), boxY + boxH / 2);
+      ctx.stroke();
+
+      drawLine('#29a05a', 2.5);
+      ctx.beginPath();
+      ctx.moveTo(mapX(m), boxY + boxH / 2);
+      ctx.lineTo(mapX(MAX), boxY + boxH / 2);
+      ctx.stroke();
     }
-
-    /* ---- Whiskers ---- */
-    const boxY = 95, boxH = 62;
-    const boxTop = boxY, boxBottom = boxY + boxH;
-
-    ctx.strokeStyle = '#2563eb';
-    ctx.lineWidth = 2.4;
-    // left whisker
-    ctx.beginPath();
-    ctx.moveTo(X(MINV), (boxTop + boxBottom) / 2);
-    ctx.lineTo(X(Q1), (boxTop + boxBottom) / 2);
-    ctx.stroke();
-    // right whisker
-    ctx.beginPath();
-    ctx.moveTo(X(MED), (boxTop + boxBottom) / 2);
-    ctx.lineTo(X(MAXV), (boxTop + boxBottom) / 2);
-    ctx.stroke();
 
     // caps
+    const capTop = boxY + boxH / 2 - capH / 2;
+    const capBot = boxY + boxH / 2 + capH / 2;
+
+    drawLine('#ff7043', 3);
     ctx.beginPath();
-    ctx.moveTo(X(MINV), boxTop + 18);
-    ctx.lineTo(X(MINV), boxBottom - 18);
-    ctx.moveTo(X(MAXV), boxTop + 18);
-    ctx.lineTo(X(MAXV), boxBottom - 18);
+    ctx.moveTo(mapX(MIN), capTop);
+    ctx.lineTo(mapX(MIN), capBot);
     ctx.stroke();
 
-    /* ---- Box: Q1 to m ---- */
-    ctx.fillStyle = 'rgba(96,165,250,0.28)';
-    ctx.strokeStyle = '#1e40af';
-    ctx.lineWidth = 2.6;
+    drawLine('#29a05a', 3);
     ctx.beginPath();
-    ctx.rect(X(Q1), boxTop, Math.max(2, X(m) - X(Q1)), boxH);
-    ctx.fill();
+    ctx.moveTo(mapX(MAX), capTop);
+    ctx.lineTo(mapX(MAX), capBot);
     ctx.stroke();
 
-    /* median line */
-    ctx.strokeStyle = '#0f172a';
-    ctx.lineWidth = 2.6;
+    // box
+    const bx1 = mapX(Q1), bx2 = mapX(m);
+    const fillColors = {
+      1: 'rgba(74,124,255,0.22)',
+      2: 'rgba(74,124,255,0.22)',
+      3: 'rgba(142,68,173,0.28)',
+      4: 'rgba(142,68,173,0.28)',
+      5: 'rgba(41,160,90,0.28)'
+    };
+    ctx.fillStyle = fillColors[step] || 'rgba(74,124,255,0.22)';
+    ctx.fillRect(bx1, boxY, bx2 - bx1, boxH);
+    drawLine('#4a7cff', 2.5);
+    ctx.strokeRect(bx1, boxY, bx2 - bx1, boxH);
+
+    // median
+    drawLine('#8e44ad', 3);
     ctx.beginPath();
-    ctx.moveTo(X(MED), boxTop);
-    ctx.lineTo(X(MED), boxBottom);
+    ctx.moveTo(mapX(MED), boxY);
+    ctx.lineTo(mapX(MED), boxY + boxH);
     ctx.stroke();
 
-    /* Q3 = m line */
-    ctx.strokeStyle = '#d97706';
-    ctx.lineWidth = 2.6;
-    ctx.beginPath();
-    ctx.moveTo(X(m), boxTop);
-    ctx.lineTo(X(m), boxBottom);
-    ctx.stroke();
-
-    /* ---- IQR bracket (amber) ---- */
-    if (showIQR.checked) {
-      const y = 62;
-      ctx.strokeStyle = '#d97706';
-      ctx.fillStyle = '#d97706';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(X(Q1), y + 8);
-      ctx.lineTo(X(Q1), y - 6);
-      ctx.moveTo(X(m), y + 8);
-      ctx.lineTo(X(m), y - 6);
-      ctx.moveTo(X(Q1), y + 2);
-      ctx.lineTo(X(m), y + 2);
-      ctx.stroke();
-      // label
-      ctx.font = 'bold 13px sans-serif';
-      ctx.textAlign = 'center';
-      const mid = (X(Q1) + X(m)) / 2;
-      ctx.fillStyle = '#b45309';
-      ctx.fillText('IQR = ' + (m - Q1), mid, y - 12);
-    }
-
-    /* ---- Range bracket (blue) ---- */
-    if (showRange.checked) {
-      const y = 288;
-      ctx.strokeStyle = '#2563eb';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(X(MINV), y + 8);
-      ctx.lineTo(X(MINV), y - 6);
-      ctx.moveTo(X(MAXV), y + 8);
-      ctx.lineTo(X(MAXV), y - 6);
-      ctx.moveTo(X(MINV), y + 2);
-      ctx.lineTo(X(MAXV), y + 2);
-      ctx.stroke();
-      ctx.font = 'bold 13px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillStyle = '#1d4ed8';
-      ctx.fillText('Range = ' + (MAXV - MINV), (X(MINV) + X(MAXV)) / 2, y + 24);
-    }
-
-    /* ---- Triple IQR highlight (emerald) ---- */
-    if (showTriple.checked) {
-      const y = 62;
-      const triple = 3 * (m - Q1);
-      ctx.strokeStyle = '#059669';
-      ctx.fillStyle = '#059669';
-      ctx.lineWidth = 2;
-      ctx.setLineDash([6, 5]);
-      ctx.beginPath();
-      ctx.moveTo(X(Q1), y + 8);
-      ctx.lineTo(X(Q1), y + 30);
-      ctx.moveTo(X(m), y + 8);
-      ctx.lineTo(X(m), y + 30);
-      ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.font = 'bold 13px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('3 × IQR = ' + triple, (X(Q1) + X(m)) / 2, y + 44);
-    }
-
-    /* ---- Point labels ---- */
-    ctx.font = 'bold 11px monospace';
+    // ---- Labels above ----
+    ctx.font = 'bold 12px sans-serif';
     ctx.textAlign = 'center';
+
     const labels = [
-      { v: MINV, t: '136' },
-      { v: Q1, t: '163' },
-      { v: MED, t: '224' },
-      { v: m, t: 'm=' + m },
-      { v: MAXV, t: '472' }
+      { v: MIN, t: '$136$', c: '#ff7043' },
+      { v: Q1, t: '$163$', c: '#4a7cff' },
+      { v: MED, t: '$224$', c: '#8e44ad' },
+      { v: m, t: '$m$', c: '#8e44ad' },
+      { v: MAX, t: '$472$', c: '#29a05a' }
     ];
-    labels.forEach((lb, i) => {
-      const x = X(lb.v);
-      ctx.fillStyle = ['#64748b', '#d97706', '#0f172a', '#b45309', '#64748b'][i];
-      const y = 22 + (i % 2) * 0; // keep aligned
-      ctx.fillText(lb.t, x, 20);
-      // small tick to box
-      ctx.strokeStyle = '#cbd5e1';
-      ctx.lineWidth = 1;
-      ctx.setLineDash([3, 3]);
-      ctx.beginPath();
-      ctx.moveTo(x, 26);
-      ctx.lineTo(x, boxTop - 2);
-      ctx.stroke();
-      ctx.setLineDash([]);
+    labels.forEach(L => {
+      const X = mapX(L.v);
+      ctx.fillStyle = L.c;
+      ctx.fillText(L.t, X, boxY - 10);
     });
 
-    /* ---- Readout ---- */
-    const range = MAXV - MINV;
-    const iqr = m - Q1;
-    const triple = 3 * iqr;
-    const match = (range === triple);
-    readout.innerHTML =
-      'Range  = 472 − 136 = <b>' + range + '</b><br>' +
-      'IQR    = m − 163 = ' + m + ' − 163 = <b>' + iqr + '</b><br>' +
-      '3 × IQR = <b>' + triple + '</b> &nbsp;&nbsp;' +
-      (match
-        ? '<span class="ok">✓ range = 3 × IQR</span>'
-        : '<span class="bad">✗ range ≠ 3 × IQR</span>');
-  }
-
-  ['input', 'change'].forEach(ev => {
-    slider.addEventListener(ev, draw);
-    showIQR.addEventListener(ev, draw);
-    showRange.addEventListener(ev, draw);
-    showTriple.addEventListener(ev, draw);
-  });
-
-  draw();
-})();
-
-/* =========================================================
-   CANVAS 2 — Equation balance visualiser (Part b)
-   ========================================================= */
-(function () {
-  const cv = document.getElementById('cv2');
-  const ctx = cv.getContext('2d');
-  const W = cv.width, H = cv.height;
-
-  const slider = document.getElementById('sliderM2');
-  const mVal = document.getElementById('mVal2');
-  const lockEq = document.getElementById('lockEq');
-  const readout = document.getElementById('readout2');
-
-  const MINV = 136, Q1 = 163, MAXV = 472;
-
-  function draw() {
-    const m = +slider.value;
-    mVal.textContent = m;
-
-    ctx.clearRect(0, 0, W, H);
-    ctx.fillStyle = '#fbfdff';
-    ctx.fillRect(0, 0, W, H);
-
-    const range = MAXV - MINV;          // 336
-    const iqr = m - Q1;
-    const triple = 3 * iqr;
-    const eq = (range === triple);
-
-    /* ---- Title ---- */
-    ctx.font = 'bold 14px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillStyle = eq ? '#059669' : '#475569';
-    ctx.fillText(
-      eq ? 'Balanced!  Range = 3 × IQR  at m = 275'
-         : 'Range (fixed) versus 3 × IQR (grows with m)',
-      W / 2, 26
-    );
-
-    /* ---- Two horizontal bars ---- */
-    const maxBar = 1100;                 // scale cap
-    const barH = 34;
-    const leftX = 150, rightX = W - 150;
-    const barMaxW = rightX - leftX;
-
-    const scale = v => leftX + (Math.min(v, maxBar) / maxBar) * barMaxW;
-
-    // fixed reference line
-    const y1 = 90, y2 = 175;
-
-    /* Bar 1: Range */
-    ctx.fillStyle = '#dbeafe';
-    roundRect(leftX, y1, barMaxW, barH, 8);
-    ctx.fill();
-    ctx.fillStyle = '#2563eb';
-    roundRect(leftX, y1, scale(range) - leftX, barH, 8);
-    ctx.fill();
-    ctx.font = 'bold 13px sans-serif';
-    ctx.textAlign = 'left';
-    ctx.fillStyle = '#1e3a8a';
-    ctx.fillText('Range = 472 − 136 = ' + range, leftX, y1 - 9);
-
-    /* Bar 2: 3 × IQR */
-    ctx.fillStyle = '#fef3c7';
-    roundRect(leftX, y2, barMaxW, barH, 8);
-    ctx.fill();
-    ctx.fillStyle = '#d97706';
-    roundRect(leftX, y2, scale(triple) - leftX, barH, 8);
-    ctx.fill();
-    ctx.fillStyle = '#92400e';
-    ctx.fillText('3 × IQR = 3(' + m + ' − 163) = ' + triple, leftX, y2 - 9);
-
-    /* target marker at range length */
-    ctx.strokeStyle = '#1e40af';
-    ctx.lineWidth = 2;
-    ctx.setLineDash([6, 5]);
-    ctx.beginPath();
-    ctx.moveTo(scale(range), y1 - 4);
-    ctx.lineTo(scale(range), y2 + barH + 4);
-    ctx.stroke();
-    ctx.setLineDash([]);
-
-    /* equality symbol */
-    ctx.font = 'bold 26px serif';
-    ctx.textAlign = 'center';
-    ctx.fillStyle = eq ? '#059669' : '#cbd5e1';
-    ctx.fillText('=', 70, y1 + 46);
-    ctx.font = 'bold 13px sans-serif';
-    ctx.fillStyle = eq ? '#059669' : '#94a3b8';
-    ctx.fillText(eq ? 'equal' : 'not equal', 70, y1 + 66);
-
-    /* ---- Number line of the latest 10 values of m ---- */
-    const yBase = 275;
-    ctx.font = '12px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillStyle = '#64748b';
-    ctx.fillText('Observation: 3 × IQR reaches 336 only when m − 163 = 112, i.e. m = 275.', W / 2, yBase + 30);
-
-    if (lockEq.checked) {
-      ctx.strokeStyle = '#059669';
+    // Highlight based on step
+    if (step === 2) {
+      // range 136 to 472
+      ctx.strokeStyle = 'rgba(255,112,67,0.75)';
       ctx.lineWidth = 2;
+      ctx.setLineDash([6, 4]);
       ctx.beginPath();
-      ctx.moveTo(120, yBase - 4);
-      ctx.lineTo(W - 120, yBase - 4);
+      ctx.moveTo(mapX(MIN), boxY - 32);
+      ctx.lineTo(mapX(MIN), capBot + 18);
+      ctx.moveTo(mapX(MAX), boxY - 32);
+      ctx.lineTo(mapX(MAX), capBot + 18);
       ctx.stroke();
-      ctx.font = 'bold 15px monospace';
-      ctx.textAlign = 'center';
-      ctx.fillStyle = '#065f46';
-      ctx.fillText('3(m − 163) = 336   ⟹   m − 163 = 112   ⟹   m = 275', W / 2, yBase + 16);
+      ctx.setLineDash([]);
+
+      ctx.fillStyle = '#d84315';
+      ctx.font = 'bold 13px sans-serif';
+      ctx.fillText('Range = 472 − 136 = 336', (mapX(MIN) + mapX(MAX)) / 2, boxY - 42);
     }
 
-    /* ---- Readout ---- */
-    readout.innerHTML =
-      'Range      = <b>' + range + '</b><br>' +
-      '3 × IQR    = 3(' + m + ' − 163) = <b>' + triple + '</b><br>' +
-      'Difference = 3 × IQR − Range = <b>' + (triple - range) + '</b> &nbsp;' +
-      (eq
-        ? '<span class="ok">✓ equation satisfied</span>'
-        : '<span class="bad">✗ keep sliding</span>');
+    if (step === 4 || step === 5) {
+      // show 3× IQR relation
+      ctx.fillStyle = '#1b4fa8';
+      ctx.font = 'bold 13px sans-serif';
+      ctx.fillText('Range = 3 × IQR', W / 2, boxY - 42);
+
+      // mark the IQR span
+      ctx.strokeStyle = 'rgba(142,68,173,0.7)';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([4, 3]);
+      ctx.beginPath();
+      ctx.moveTo(mapX(Q1), boxY + boxH + 22);
+      ctx.lineTo(mapX(m), boxY + boxH + 22);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#8e44ad';
+      ctx.font = '12px sans-serif';
+      ctx.fillText('IQR = m − 163', (mapX(Q1) + mapX(m)) / 2, boxY + boxH + 38);
+    }
+
+    if (step === 5) {
+      ctx.fillStyle = '#29a05a';
+      ctx.font = 'bold 15px serif';
+      ctx.fillText('m = 275', W / 2, yTop + 10);
+    }
+
+    // readout text
+    const iqr = m - Q1;
+    const rng = MAX - MIN;
+    let note = '';
+    if (step === 5) {
+      note = `Solved: $m=275$, IQR $= 275-163 = 112$, and $3\\times112 = 336$ = range. ✔`;
+    } else {
+      note = `Range $= 472-136 = ${rng}$. IQR $= m - 163$. Need $3(m-163) = ${rng}$.`;
+    }
+    readout.innerHTML = note;
+    if (window.MathJax && window.MathJax.typesetPromise) {
+      window.MathJax.typesetPromise([readout]).catch(() => {});
+    }
   }
 
-  function roundRect(x, y, w, h, r) {
-    ctx.beginPath();
-    ctx.moveTo(x + r, y);
-    ctx.lineTo(x + w - r, y);
-    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-    ctx.lineTo(x + w, y + h - r);
-    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-    ctx.lineTo(x + r, y + h);
-    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-    ctx.lineTo(x, y + r);
-    ctx.quadraticCurveTo(x, y, x + r, y);
-    ctx.closePath();
-  }
+  // Initial draw
+  let current = 1;
+  drawStage(current);
 
-  ['input', 'change'].forEach(ev => {
-    slider.addEventListener(ev, draw);
-    lockEq.addEventListener(ev, draw);
+  // Slider interaction
+  slider.addEventListener('input', function () {
+    mVal.textContent = this.value;
+    drawStage(current);
   });
 
-  draw();
+  // Scroll sync
+  const io = new IntersectionObserver(es => {
+    es.forEach(e => {
+      if (e.isIntersecting) {
+        current = +e.target.dataset.step;
+        drawStage(current);
+        document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+        e.target.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-25% 0px -55% 0px' });
+
+  document.querySelectorAll('.step').forEach(s => io.observe(s));
+
+  // Activate first step visually
+  const first = document.querySelector('.step[data-step="1"]');
+  if (first) first.classList.add('active');
 })();
 </script>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
-
 </body>
 </html>

@@ -3,713 +3,438 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HKDSE Math 2012 Paper 2 Q28 — Interactive Solution</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<title>HKDSE Math 2012 Paper 2 Q28 - Probability with Stem-and-Leaf Diagram</title>
 <script>
 window.MathJax = {
-  tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']]
+  },
   svg: { fontCache: 'global' }
 };
 </script>
-<script>
-window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] }, svg:{fontCache:'global'} };
-</script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  :root{
-    --blue:#2563eb; --blue-dark:#1d4ed8; --blue-light:#eff6ff;
-    --green:#059669; --green-light:#ecfdf5;
-    --amber:#d97706; --amber-light:#fffbeb;
-    --rose:#e11d48; --rose-light:#fff1f2;
-    --slate:#0f172a; --gray:#64748b; --line:#e2e8f0; --bg:#f1f5f9;
+  :root {
+    --bg: #f8f9fa;
+    --card: #ffffff;
+    --ink: #1f2933;
+    --muted: #52606d;
+    --accent1: #2563eb;
+    --accent2: #dc2626;
+    --accent3: #059669;
+    --accent4: #d97706;
+    --accent5: #7c3aed;
+    --border: #e2e8f0;
+    --step-bg: #f1f5f9;
   }
-  body{
-    font-family:'Inter',system-ui,-apple-system,sans-serif;
-    background:var(--bg); color:var(--slate); line-height:1.6;
-    -webkit-font-smoothing:antialiased; padding:16px;
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.55;
   }
-  .wrap{ max-width:880px; margin:0 auto; }
-
-  /* ---------- header ---------- */
-  .tag{
-    display:inline-block; background:var(--blue); color:#fff;
-    font-size:.72rem; font-weight:700; letter-spacing:.06em;
-    text-transform:uppercase; padding:5px 12px; border-radius:999px;
+  .wrap {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 16px 14px 50px;
   }
-  h1.title{
-    font-size:1.35rem; font-weight:800; margin:10px 0 4px; line-height:1.3;
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0,1fr) minmax(0,1fr);
+    gap: 12px;
+    align-items: start;
   }
-  .sub{ color:var(--gray); font-size:.9rem; }
-
-  /* ---------- cards ---------- */
-  .card{
-    background:#fff; border-radius:18px; padding:20px 18px;
-    box-shadow:0 1px 3px rgba(15,23,42,.06), 0 8px 24px -12px rgba(15,23,42,.12);
-    margin-top:16px;
+  @media(min-width:900px){
+    .split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}
   }
-  h2.section{
-    font-size:1.02rem; font-weight:700; display:flex; align-items:center;
-    gap:9px; margin-bottom:12px;
+  .diagram {
+    position: sticky;
+    top: 16px;
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+    background: var(--card);
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    border: 1px solid var(--border);
   }
-  h2.section .numdot{
-    width:26px; height:26px; border-radius:50%; background:var(--blue);
-    color:#fff; font-size:.8rem; font-weight:700; display:flex;
-    align-items:center; justify-content:center; flex:0 0 auto;
+  .diagram h3 {
+    margin: 0 0 8px 0;
+    font-size: 0.95rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
   }
-
-  /* ---------- pills ---------- */
-  .pills{ display:flex; flex-wrap:wrap; gap:7px; margin:12px 0 4px; }
-  .pill{
-    background:var(--blue-light); color:var(--blue-dark); font-size:.74rem;
-    font-weight:600; padding:5px 11px; border-radius:999px;
-    border:1px solid #dbeafe;
+  canvas {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 8px;
+    background: #fdfdfd;
   }
-  .pill.green{ background:var(--green-light); color:var(--green); border-color:#a7f3d0; }
-  .pill.amber{ background:var(--amber-light); color:var(--amber); border-color:#fde68a; }
-
-  .qtext{ font-size:1rem; margin:8px 0 0; }
-  .qtext strong{ color:var(--blue-dark); }
-
-  /* ---------- stem-and-leaf ---------- */
-  .sl-wrap{
-    margin:16px auto 4px; background:#f8fafc; border:1px solid var(--line);
-    border-radius:12px; padding:14px 10px; max-width:420px;
+  .ro {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin: 8px 0 0 0;
+    background: #f8fafc;
+    padding: 6px 10px;
+    border-radius: 6px;
+    border-left: 3px solid var(--accent1);
   }
-  .sl{
-    display:grid; grid-template-columns:74px 1fr; gap:0;
-    font-family:'SFMono-Regular',Consolas,'Liberation Mono',monospace;
+  .q {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 16px 18px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    border: 1px solid var(--border);
+    margin-bottom: 14px;
   }
-  .sl .hd{
-    font-size:.7rem; text-transform:uppercase; letter-spacing:.05em;
-    color:var(--gray); font-weight:700; padding:4px 8px;
-    border-bottom:2px solid var(--line); margin-bottom:4px;
+  .q h2 {
+    margin: 0 0 4px 0;
+    font-size: 1rem;
+    color: var(--accent1);
+    letter-spacing: 0.03em;
   }
-  .sl .hd.r{ border-left:2px solid var(--line); }
-  .sl .stem{
-    padding:3px 8px; font-size:1rem; font-weight:700; color:var(--slate);
-    text-align:right; line-height:1.75;
+  .q .stem {
+    font-family: "SFMono-Regular", Consolas, monospace;
+    background: #f8fafc;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    font-size: 0.92rem;
+    margin: 10px 0;
+    white-space: pre;
+    overflow-x: auto;
+    line-height: 1.4;
   }
-  .sl .leaf{
-    padding:3px 8px; border-left:2px solid var(--line);
-    display:flex; gap:10px; flex-wrap:wrap; line-height:1.75;
+  .choices {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 18px;
+    margin-top: 10px;
   }
-  .leaf span{
-    font-size:1rem; transition:all .25s ease; border-radius:6px;
-    padding:0 4px; cursor:default;
+  .choices span {
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: #f1f5f9;
+    font-weight: 600;
+    font-size: 0.92rem;
   }
-  .leaf span.dim { opacity:.25; }
-  .leaf span.hi{
-    background:var(--green-light); color:var(--green); font-weight:800;
-    transform:scale(1.12);
+  .solution {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 16px 18px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    border: 1px solid var(--border);
   }
-  .leaf span.hi-bad{
-    background:var(--rose-light); color:var(--rose); font-weight:800;
+  .solution h2 {
+    margin: 0 0 10px 0;
+    font-size: 1rem;
+    color: var(--accent3);
+    letter-spacing: 0.03em;
   }
-  .sl-caption{
-    text-align:center; font-size:.76rem; color:var(--gray); margin-top:10px;
+  .step {
+    border-left: 4px solid var(--accent1);
+    background: var(--step-bg);
+    border-radius: 0 8px 8px 0;
+    padding: 10px 12px 10px 14px;
+    margin: 10px 0;
+    transition: background 0.3s, border-color 0.3s, transform 0.2s;
   }
-
-  /* ---------- choices ---------- */
-  .choices{ display:grid; grid-template-columns:repeat(2,1fr); gap:9px; margin-top:16px; }
-  .choice{
-    border:2px solid var(--line); border-radius:12px; padding:11px 14px;
-    font-weight:600; font-size:.95rem; background:#fff; cursor:pointer;
-    display:flex; align-items:center; gap:9px; transition:.18s;
-    color:var(--slate);
+  .step.active {
+    background: #e0edff;
+    border-left-color: var(--accent2);
+    transform: translateX(2px);
   }
-  .choice .ltr{
-    width:22px; height:22px; border-radius:6px; background:#f1f5f9;
-    color:var(--gray); font-size:.76rem; display:flex; align-items:center;
-    justify-content:center; font-weight:700; flex:0 0 auto; transition:.18s;
+  .step .tag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent1);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.78rem;
+    padding: 1px 9px;
+    border-radius: 999px;
+    margin-right: 8px;
+    vertical-align: middle;
   }
-  .choice:hover{ border-color:#bfdbfe; transform:translateY(-1px); }
-  .choice.correct{ border-color:var(--green); background:var(--green-light); }
-  .choice.correct .ltr{ background:var(--green); color:#fff; }
-  .choice.wrong{ border-color:var(--rose); background:var(--rose-light); }
-  .choice.wrong .ltr{ background:var(--rose); color:#fff; }
-  .choice.disabled{ pointer-events:none; opacity:.75; }
-  .choice.disabled.correct,.choice.disabled.wrong{ opacity:1; }
-  .fb{ margin-top:12px; font-size:.9rem; font-weight:600; min-height:22px; }
-  .fb.ok{ color:var(--green); }
-  .fb.no{ color:var(--rose); }
-
-  /* ---------- steps ---------- */
-  .step{
-    border:1px solid var(--line); border-radius:14px; margin-top:12px;
-    overflow:hidden; background:#fff; transition:.2s;
+  .step.active .tag {
+    background: var(--accent2);
   }
-  .step.open{ border-color:#bfdbfe; box-shadow:0 4px 16px -8px rgba(37,99,235,.3); }
-  .step-head{
-    display:flex; align-items:center; gap:11px; padding:13px 14px;
-    cursor:pointer; user-select:none; background:#fff; transition:.18s;
+  .step .hint {
+    display: block;
+    font-size: 0.86rem;
+    color: var(--muted);
+    margin-top: 6px;
+    font-style: italic;
   }
-  .step-head:hover{ background:#f8fafc; }
-  .step.open .step-head{ background:var(--blue-light); }
-  .step-num{
-    width:26px; height:26px; border-radius:50%; background:#e2e8f0;
-    color:var(--gray); font-size:.8rem; font-weight:700; display:flex;
-    align-items:center; justify-content:center; flex:0 0 auto; transition:.2s;
+  .answer-box {
+    margin-top: 14px;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+    border: 1px solid #a7f3d0;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: #065f46;
+    text-align: center;
   }
-  .step.open .step-num{ background:var(--blue); color:#fff; }
-  .step-title{ font-weight:600; font-size:.92rem; flex:1; }
-  .chev{
-    color:var(--gray); font-size:.8rem; transition:transform .25s; flex:0 0 auto;
+  .highlight {
+    color: var(--accent2);
+    font-weight: 700;
   }
-  .step.open .chev{ transform:rotate(180deg); }
-  .step-body{
-    max-height:0; overflow:hidden; transition:max-height .35s ease;
-  }
-  .step-inner{ padding:0 15px 16px; font-size:.92rem; }
-  .step-inner p{ margin-bottom:9px; }
-  .step-inner p:last-child{ margin-bottom:0; }
-
-  .hint{
-    background:var(--amber-light); border-left:4px solid #f59e0b;
-    border-radius:0 10px 10px 0; padding:11px 13px; margin:11px 0;
-    font-size:.86rem;
-  }
-  .hint .hl{
-    font-weight:700; color:var(--amber); display:block; margin-bottom:4px;
-    font-size:.76rem; text-transform:uppercase; letter-spacing:.05em;
-  }
-  .keybox{
-    background:var(--blue-light); border-radius:10px; padding:12px 14px;
-    margin:11px 0; text-align:center; font-size:1.02rem;
-    border:1px dashed #bfdbfe;
-  }
-  .keybox.green{ background:var(--green-light); border-color:#a7f3d0; }
-  .mrow{ overflow-x:auto; padding:2px 0; }
-
-  .leafcount{
-    display:flex; flex-wrap:wrap; gap:6px; margin:10px 0;
-  }
-  .lc{
-    background:#f1f5f9; border-radius:8px; padding:6px 10px; font-size:.82rem;
-    font-family:monospace; font-weight:600; color:var(--gray);
-  }
-  .lc b{ color:var(--slate); }
-
-  /* ---------- controls ---------- */
-  .ctrls{ display:flex; flex-wrap:wrap; gap:10px; margin-top:16px; }
-  .btn{
-    border:none; border-radius:11px; padding:12px 20px; font-size:.9rem;
-    font-weight:700; cursor:pointer; transition:.18s; font-family:inherit;
-    background:var(--blue); color:#fff; flex:1 1 auto; min-width:140px;
-  }
-  .btn:hover{ background:var(--blue-dark); transform:translateY(-1px); }
-  .btn:active{ transform:translateY(0); }
-  .btn.ghost{ background:#fff; color:var(--blue); border:2px solid #bfdbfe; }
-  .btn.ghost:hover{ background:var(--blue-light); }
-  .btn:disabled{ opacity:.4; cursor:not-allowed; transform:none; }
-
-  /* ---------- tally visual ---------- */
-  .tally{ margin-top:14px; }
-  .tally-row{
-    display:flex; align-items:center; gap:10px; margin-bottom:9px;
-    font-size:.85rem;
-  }
-  .tally-lbl{ width:130px; flex:0 0 auto; font-weight:600; color:var(--gray); font-size:.8rem; }
-  .bar{
-    flex:1; height:26px; background:#f1f5f9; border-radius:8px; overflow:hidden;
-    position:relative;
-  }
-  .bar .fill{
-    height:100%; width:0; border-radius:8px; transition:width .7s ease;
-    display:flex; align-items:center; justify-content:flex-end;
-    padding-right:8px; color:#fff; font-size:.76rem; font-weight:700;
-  }
-  .fill.good{ background:linear-gradient(90deg,#34d399,#059669); }
-  .fill.bad{ background:linear-gradient(90deg,#fda4af,#e11d48); }
-  .tally-num{ width:46px; text-align:right; font-weight:700; font-size:.85rem; flex:0 0 auto; }
-
-  .final-box{
-    margin-top:18px; background:linear-gradient(135deg,#059669,#047857);
-    border-radius:14px; padding:18px; color:#fff; text-align:center;
-    display:none;
-  }
-  .final-box.show{ display:block; animation:pop .45s ease; }
-  @keyframes pop{ from{ opacity:0; transform:scale(.94);} to{opacity:1;transform:scale(1);} }
-  .final-box .big{ font-size:1.7rem; font-weight:800; margin:6px 0 2px; }
-  .final-box .lbl{ font-size:.78rem; text-transform:uppercase; letter-spacing:.08em; opacity:.85; }
-
-  footer{
-    text-align:center; font-size:.75rem; color:var(--gray);
-    padding:22px 0 10px;
-  }
-
-  @media (max-width:520px){
-    body{ padding:10px; }
-    h1.title{ font-size:1.12rem; }
-    .card{ padding:16px 13px; border-radius:15px; }
-    .sl{ grid-template-columns:58px 1fr; }
-    .leaf{ gap:7px; }
-    .leaf span,.sl .stem{ font-size:.92rem; }
-    .choices{ grid-template-columns:1fr; }
-    .btn{ padding:13px 16px; font-size:.88rem; }
-    .tally-lbl{ width:92px; font-size:.72rem; }
-    .final-box .big{ font-size:1.4rem; }
+  .hl-blue { color: var(--accent1); font-weight: 700; }
+  .hl-green { color: var(--accent3); font-weight: 700; }
+  .hl-orange { color: var(--accent4); font-weight: 700; }
+  @media(max-width:640px){
+    body{font-size:14.5px;}
+    .wrap{padding:10px 8px 40px;}
   }
 </style>
 </head>
-<body data-correct="B">
+<body>
 <div class="wrap">
-
-  <!-- ============ HEADER ============ -->
-  <div>
-    <span class="tag">HKDSE Math 2012 · Paper 2 · Q28</span>
-    <h1 class="title">Stem-and-Leaf Diagram &amp; Probability</h1>
-    <p class="sub">Topic 14 · Probability &amp; Data Handling</p>
-    <div class="pills">
-      <span class="pill">Stem-and-Leaf Diagram</span>
-      <span class="pill">Simple Probability</span>
-      <span class="pill green">Complementary Event</span>
-      <span class="pill amber">Reading Data</span>
-    </div>
-  </div>
-
-  <!-- ============ QUESTION ============ -->
-  <div class="card">
-    <h2 class="section"><span class="numdot">Q</span> The Question</h2>
-    <p class="qtext">
-      The stem-and-leaf diagram below shows the distribution of the ages of a group of
-      members in a recreational centre.
-    </p>
-
-    <div class="sl-wrap">
-      <div class="sl">
-        <div class="hd">Stem (tens)</div>
-        <div class="hd r">Leaf (units)</div>
-
-        <div class="stem">5</div>
-        <div class="leaf" data-stem="5">
-          <span data-val="50">0</span><span data-val="55">5</span>
-          <span data-val="56">6</span><span data-val="56b">6</span>
-          <span data-val="58">8</span>
-        </div>
-
-        <div class="stem">6</div>
-        <div class="leaf" data-stem="6">
-          <span data-val="61">1</span><span data-val="64">4</span>
-          <span data-val="65">5</span><span data-val="65b">5</span>
-          <span data-val="67">7</span><span data-val="68">8</span>
-          <span data-val="68b">8</span><span data-val="69">9</span>
-        </div>
-
-        <div class="stem">7</div>
-        <div class="leaf" data-stem="7">
-          <span data-val="73">3</span><span data-val="74">4</span>
-          <span data-val="74b">4</span><span data-val="76">6</span>
-          <span data-val="77">7</span><span data-val="79">9</span>
-        </div>
-
-        <div class="stem">8</div>
-        <div class="leaf" data-stem="8"></div>
-
-        <div class="stem">9</div>
-        <div class="leaf" data-stem="9">
-          <span data-val="91">1</span>
-        </div>
-      </div>
-      <p class="sl-caption">e.g. <b>5&nbsp;|&nbsp;6</b> represents the age <b>56</b></p>
+  <div class="split">
+    <!-- LEFT PANE: DIAGRAM -->
+    <div class="diagram">
+      <h3>Interactive Diagram</h3>
+      <canvas id="cv" width="520" height="560"></canvas>
+      <p class="ro" id="readout">Showing: full stem-and-leaf diagram of the 20 members' ages.</p>
     </div>
 
-    <p class="qtext" style="margin-top:14px;">
-      A member is randomly selected from the group. Find the probability that the
-      selected member is <strong>not under the age of 74</strong>.
-    </p><figure style="margin:12px 0;text-align:center;"><img src="figures/2012_P2_Q28.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
-
-    <div class="choices" id="choices">
-      <button class="choice" data-key="A"><span class="ltr">A</span> 0.2</button>
-      <button class="choice" data-key="B"><span class="ltr">B</span> 0.3</button>
-      <button class="choice" data-key="C"><span class="ltr">C</span> 0.7</button>
-      <button class="choice" data-key="D"><span class="ltr">D</span> 0.8</button>
-    </div>
-    <div class="fb" id="fb"></div>
-  </div>
-
-  <!-- ============ STEP-BY-STEP ============ -->
-  <div class="card">
-    <h2 class="section"><span class="numdot">◆</span> Step-by-Step Solution</h2>
-    <p class="sub" style="margin-bottom:6px;">Tap each step to reveal the reasoning. Try the hint before peeking!</p>
-
-    <!-- Step 1 -->
-    <div class="step" data-step="1">
-      <div class="step-head">
-        <div class="step-num">1</div>
-        <div class="step-title">Read the stem-and-leaf diagram</div>
-        <div class="chev">▼</div>
-      </div>
-      <div class="step-body">
-        <div class="step-inner">
-          <p>In a stem-and-leaf diagram, each entry splits into two parts:</p>
-          <div class="keybox">
-            <b>Stem&nbsp;|&nbsp;Leaf</b> &nbsp;⟶&nbsp; the actual value<br>
-            <span style="color:#2563eb;font-weight:700;">5&nbsp;|&nbsp;6 &nbsp;=&nbsp; 56</span>
-          </div>
-          <p>So the <b>stem (tens)</b> gives the tens digit and every <b>leaf (units)</b> gives a units digit.</p>
-          <div class="hint">
-            <span class="hl">Hint</span>
-            The key line at the bottom of the diagram tells you how to decode it —
-            never ignore the key!
-          </div>
+    <!-- RIGHT PANE: QUESTION + SOLUTION -->
+    <div>
+      <div class="q">
+        <h2>HKDSE Math 2012 Paper 2 &middot; Q28</h2>
+        <p>The stem-and-leaf diagram below shows the distribution of the ages of a group of members in a recreational centre.</p>
+        <div class="stem" id="stemText">Stem (tens) | Leaf (units)
+    5        | 0   5   6   6   8
+    6        | 1   4   5   5   7   8   8   9
+    7        | 3   4   4   6   7   9
+    8        | 
+    9        | 1</div>
+        <p>A member is randomly selected from the group. Find the probability that the selected member is <strong>not under the age of 74</strong>.</p>
+        <div class="choices">
+          <span>A. 0.2</span>
+          <span>B. 0.3</span>
+          <span>C. 0.7</span>
+          <span>D. 0.8</span>
         </div>
+        <figure style="margin:12px 0;text-align:center;"><img src="figures/2012_P2_Q28.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
       </div>
-    </div>
 
-    <!-- Step 2 -->
-    <div class="step" data-step="2">
-      <div class="step-head">
-        <div class="step-num">2</div>
-        <div class="step-title">Count the total number of members</div>
-        <div class="chev">▼</div>
-      </div>
-      <div class="step-body">
-        <div class="step-inner">
-          <p>Every leaf in the diagram represents <b>one member</b>. Count all the leaves row by row:</p>
-          <div class="leafcount">
-            <div class="lc">stem 5 → <b>5</b> leaves</div>
-            <div class="lc">stem 6 → <b>8</b> leaves</div>
-            <div class="lc">stem 7 → <b>6</b> leaves</div>
-            <div class="lc">stem 8 → <b>0</b> leaves</div>
-            <div class="lc">stem 9 → <b>1</b> leaf</div>
-          </div>
-          <div class="keybox green">
-            Total members $= 5 + 8 + 6 + 0 + 1 = \mathbf{20}$
-          </div>
-          <p>This 20 becomes the <b>denominator</b> (the total number of equally likely outcomes).</p>
-        </div>
-      </div>
-    </div>
+      <div class="solution">
+        <h2>Step-by-step Solution</h2>
 
-    <!-- Step 3 -->
-    <div class="step" data-step="3">
-      <div class="step-head">
-        <div class="step-num">3</div>
-        <div class="step-title">Understand "not under the age of 74"</div>
-        <div class="chev">▼</div>
-      </div>
-      <div class="step-body">
-        <div class="step-inner">
-          <p>Translate the phrase carefully:</p>
-          <div class="keybox">
-            "not under 74" &nbsp;⟶&nbsp; <b>NOT</b> "age &lt; 74"<br>
-            i.e. the age is <b>74 or above</b> &nbsp;($\geq 74$)
-          </div>
-          <div class="hint">
-            <span class="hl">Watch out</span>
-            The word "under" means <i>strictly less than</i>. So an age of <b>exactly 74</b>
-            is <b>not</b> under 74 — it must be counted!
-          </div>
-          <p>Favourable members: age $\geq 74$.</p>
+        <div class="step" data-step="1">
+          <span class="tag">1</span><strong>Read the stem-and-leaf diagram to list all ages.</strong>
+          <p>Each entry is read as <em>stem&nbsp;(tens)</em> + <em>leaf&nbsp;(units)</em>.</p>
+          <p>Ages: <span class="hl-blue">50, 55, 56, 56, 58, 61, 64, 65, 65, 67, 68, 68, 69, 73, 74, 74, 76, 77, 79, 91</span>.</p>
+          <span class="hint">Count carefully: there are 5 + 8 + 6 + 0 + 1 = 20 members in total.</span>
         </div>
-      </div>
-    </div>
 
-    <!-- Step 4 -->
-    <div class="step" data-step="4">
-      <div class="step-head">
-        <div class="step-num">4</div>
-        <div class="step-title">Count the favourable members (age ≥ 74)</div>
-        <div class="chev">▼</div>
-      </div>
-      <div class="step-body">
-        <div class="step-inner">
-          <p>Scan the diagram and keep every leaf whose value makes the age $\geq 74$.</p>
-          <div class="leafcount">
-            <div class="lc" style="background:#fff1f2;color:#e11d48;">stem 7 → 4, 4, 6, 7, 9 &nbsp;(73 is excluded ✗)</div>
-            <div class="lc" style="background:#ecfdf5;color:#059669;">stem 9 → 1</div>
-          </div>
-          <p>Count them:</p>
-          <div class="keybox green">
-            $74,\;74,\;76,\;77,\;79,\;91 \;\Rightarrow\; \mathbf{6}$ members
-          </div>
-          <div class="hint">
-            <span class="hl">Alternative — complement</span>
-            Instead of counting $\geq 74$, count the "under 74" group and subtract:
-            members with age &lt; 74 are $50,55,56,56,58,61,64,65,65,67,68,68,69,73$
-            $= 14$ members. Then $20 - 14 = 6$. Same answer!
-          </div>
+        <div class="step" data-step="2">
+          <span class="tag">2</span><strong>Identify the total number of members.</strong>
+          <p>Total members $n = 5 + 8 + 6 + 0 + 1 = 20$.</p>
+          <span class="hint">This is the denominator of our probability.</span>
         </div>
-      </div>
-    </div>
 
-    <!-- Step 5 -->
-    <div class="step" data-step="5">
-      <div class="step-head">
-        <div class="step-num">5</div>
-        <div class="step-title">Apply the probability formula</div>
-        <div class="chev">▼</div>
-      </div>
-      <div class="step-body">
-        <div class="step-inner">
-          <div class="keybox">
-            $P(E) = \dfrac{\text{number of favourable outcomes}}{\text{total number of outcomes}}$
-          </div>
-          <div class="mrow">
-            $$P(\text{age} \geq 74) = \frac{6}{20}$$
-          </div>
-          <div class="mrow">
-            $$= \frac{3}{10} = 0.3$$
-          </div>
-          <p style="margin-top:8px;">So the answer is <b style="color:#059669;">Option B</b>.</p>
+        <div class="step" data-step="3">
+          <span class="tag">3</span><strong>Find how many members are <em>under the age of 74</em>.</strong>
+          <p>"Under 74" means age $< 74$, i.e. age $\le 73$.</p>
+          <p>From the diagram: rows $5$, $6$ and the leaves $3,4,4$ in row $7$.</p>
+          <p>Count: $5 + 8 + 3 = 16$ members.</p>
+          <span class="hint">Do not include the two 74s in row 7.</span>
         </div>
+
+        <div class="step" data-step="4">
+          <span class="tag">4</span><strong>Find how many members are <em>not under 74</em>.</strong>
+          <p>Not under 74 means age $\ge 74$.</p>
+          <p>Count: members aged $74, 74, 76, 77, 79, 91$ &rarr; <span class="highlight">6 members</span>.</p>
+          <p>Alternatively: $20 - 16 = 6$.</p>
+          <span class="hint">You can use the complement: total $-$ (under 74).</span>
+        </div>
+
+        <div class="step" data-step="5">
+          <span class="tag">5</span><strong>Compute the required probability.</strong>
+          <p>$$P(\text{not under }74) = \frac{6}{20} = 0.3.$$</p>
+          <span class="hint">Simplify: $\frac{6}{20} = \frac{3}{10} = 0.3$.</span>
+        </div>
+
+        <div class="answer-box">Answer: B. &nbsp;0.3</div>
       </div>
     </div>
   </div>
-
-  <!-- ============ VISUALISATION ============ -->
-  <div class="card">
-    <h2 class="section"><span class="numdot">▶</span> Visualise the Count</h2>
-    <p class="sub" style="margin-bottom:4px;">Drag the slider to highlight ages in each group and see the tally build up.</p>
-
-    <div class="controls" style="margin-top:14px;">
-      <label style="font-size:.85rem;font-weight:600;color:var(--gray);display:block;width:100%;">
-        Reveal members up to index: <span id="sliderVal" style="color:var(--blue);font-weight:800;">0</span> / 20
-      </label>
-      <input id="slider" type="range" min="0" max="20" value="0" step="1"
-             style="width:100%;margin-top:6px;accent-color:#2563eb;height:34px;">
-    </div>
-
-    <div class="tally">
-      <div class="tally-row">
-        <div class="tally-lbl">✅ Age ≥ 74 (favourable)</div>
-        <div class="bar"><div class="fill good" id="barGood"></div></div>
-        <div class="tally-num" id="numGood">0</div>
-      </div>
-      <div class="tally-row">
-        <div class="tally-lbl">❌ Age &lt; 74</div>
-        <div class="bar"><div class="fill bad" id="barBad"></div></div>
-        <div class="tally-num" id="numBad">0</div>
-      </div>
-    </div>
-
-    <div class="final-box" id="finalBox">
-      <div class="lbl">Probability the member is not under 74</div>
-      <div class="big">6 / 20 = 0.3</div>
-      <div class="lbl">Answer: Option B</div>
-    </div>
-
-    <div class="ctrls">
-      <button class="btn" id="playBtn">▶ Play animation</button>
-      <button class="btn ghost" id="resetBtn">↺ Reset</button>
-    </div>
-  </div>
-
-  <!-- ============ TAKEAWAY ============ -->
-  <div class="card">
-    <h2 class="section"><span class="numdot">★</span> Key Take-aways</h2>
-    <ul style="padding-left:20px;font-size:.9rem;">
-      <li style="margin-bottom:7px;">Always read the <b>key</b> of a stem-and-leaf diagram: stem = tens, leaf = units.</li>
-      <li style="margin-bottom:7px;">The <b>total count</b> = number of leaves → this is the probability denominator.</li>
-      <li style="margin-bottom:7px;">"<b>not under 74</b>" means age $\geq 74$ — careful, 74 itself <i>is</i> included.</li>
-      <li>Use the complement when it's easier: $P(\geq 74) = 1 - P(<74) = 1 - \frac{14}{20} = 0.3$.</li>
-    </ul>
-  </div>
-
-  <footer>HKDSE Mathematics · Paper 2 · Interactive Solution · Q28</footer>
 </div>
 
 <script>
 (function(){
-  /* ---------- data ---------- */
-  // Ages in the order of the diagram
-  const ages = [50,55,56,56,58, 61,64,65,65,67,68,68,69, 73,74,74,76,77,79, 91];
-  const TOTAL = ages.length; // 20
-  const GOOD_AGES = ages.filter(a => a >= 74); // 6
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  const readout = document.getElementById('readout');
+  const W = cv.width, H = cv.height;
 
-  /* ---------- choice interaction ---------- */
-  const choiceBox = document.getElementById('choices');
-  const fb = document.getElementById('fb');
-  const allChoices = choiceBox.querySelectorAll('.choice');
+  // Data for the stem-and-leaf diagram
+  const stems = [5, 6, 7, 8, 9];
+  const leaves = {
+    5: [0, 5, 6, 6, 8],
+    6: [1, 4, 5, 5, 7, 8, 8, 9],
+    7: [3, 4, 4, 6, 7, 9],
+    8: [],
+    9: [1]
+  };
 
-  allChoices.forEach(btn => {
-    btn.addEventListener('click', () => {
-      if(btn.classList.contains('disabled')) return;
-      const key = btn.dataset.key;
-      allChoices.forEach(b => b.classList.add('disabled'));
-      if(key === 'B'){
-        btn.classList.add('correct');
-        fb.textContent = '✓ Correct! There are 6 members aged 74 or above out of 20, so the probability is 6/20 = 0.3.';
-        fb.className = 'fb ok';
+  // Flatten all ages with metadata
+  const allAges = [];
+  stems.forEach(s => {
+    leaves[s].forEach(l => {
+      allAges.push({ age: s*10 + l, stem: s, leaf: l });
+    });
+  });
+
+  // Layout
+  const topY = 62;
+  const rowH = 68;
+  const stemX = 130;
+  const leafStartX = 250;
+  const leafGap = 44;
+
+  function draw(step){
+    ctx.clearRect(0, 0, W, H);
+
+    // Title
+    ctx.fillStyle = '#1f2933';
+    ctx.font = 'bold 20px system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Stem-and-Leaf Diagram of Ages', W/2, 32);
+
+    // Legend
+    ctx.font = '13px system-ui, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#2563eb';
+    ctx.fillRect(20, 44, 12, 12);
+    ctx.fillStyle = '#52606d';
+    ctx.fillText('Under 74 (16 members)', 38, 55);
+    ctx.fillStyle = '#dc2626';
+    ctx.fillRect(230, 44, 12, 12);
+    ctx.fillStyle = '#52606d';
+    ctx.fillText('Not under 74 (6 members)', 248, 55);
+
+    // Column headers
+    ctx.font = 'bold 15px system-ui, sans-serif';
+    ctx.fillStyle = '#1f2933';
+    ctx.textAlign = 'right';
+    ctx.fillText('Stem (tens)', stemX + 10, topY - 14);
+    ctx.textAlign = 'left';
+    ctx.fillText('Leaf (units)', leafStartX - 18, topY - 14);
+
+    // Separator line
+    ctx.strokeStyle = '#94a3b8';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(stemX + 28, topY - 6);
+    ctx.lineTo(stemX + 28, topY + stems.length * rowH - 12);
+    ctx.stroke();
+
+    // Determine highlight sets based on step
+    let highlightSet = null; // array of booleans per age
+    let ringAges = null;     // ages to ring
+    if (step >= 3 && step <= 4) {
+      // highlight under 74 (blue)
+      highlightSet = allAges.map(a => a.age < 74);
+    } else if (step >= 5) {
+      // highlight not under 74 (red)
+      highlightSet = allAges.map(a => a.age >= 74);
+    }
+
+    let ageIdx = 0;
+    stems.forEach((s, ri) => {
+      const y = topY + ri * rowH;
+
+      // Stem row background
+      ctx.fillStyle = (ri % 2 === 0) ? '#f8fafc' : '#f1f5f9';
+      ctx.fillRect(20, y - 18, W - 40, 34);
+
+      // Stem label
+      ctx.font = 'bold 22px "SFMono-Regular", Consolas, monospace';
+      ctx.textAlign = 'right';
+      ctx.fillStyle = '#2563eb';
+      ctx.fillText(s, stemX + 10, y + 6);
+
+      // Leaves
+      ctx.font = 'bold 22px "SFMono-Regular", Consolas, monospace';
+      ctx.textAlign = 'center';
+      const ls = leaves[s];
+      if (ls.length === 0) {
+        // empty row marker
+        ctx.fillStyle = '#cbd5e1';
+        ctx.font = 'italic 16px system-ui, sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText('(no data)', leafStartX, y + 6);
       } else {
-        btn.classList.add('wrong');
-        // highlight correct
-        allChoices.forEach(b => { if(b.dataset.key === 'B') b.classList.add('correct'); });
-        fb.textContent = '✗ Not quite. Remember: 6 favourable members out of 20 total → 6/20 = 0.3. Check the steps below!';
-        fb.className = 'fb no';
-      }
-      // open first step to guide
-      const s1 = document.querySelector('.step[data-step="1"]');
-      if(s1) openStep(s1);
-    });
-  });
-
-  /* ---------- accordion ---------- */
-  function openStep(step){
-    const body = step.querySelector('.step-body');
-    const inner = step.querySelector('.step-inner');
-    step.classList.add('open');
-    body.style.maxHeight = inner.scrollHeight + 40 + 'px';
-    if(window.MathJax && MathJax.typesetPromise){
-      MathJax.typesetPromise([inner]).catch(()=>{});
-    }
-  }
-  function closeStep(step){
-    step.classList.remove('open');
-    step.querySelector('.step-body').style.maxHeight = '0px';
-  }
-
-  document.querySelectorAll('.step').forEach(step => {
-    step.querySelector('.step-head').addEventListener('click', () => {
-      if(step.classList.contains('open')) closeStep(step);
-      else {
-        // optionally close others? keep multiple open for study
-        openStep(step);
+        ls.forEach((l, li) => {
+          const x = leafStartX + li * leafGap;
+          const age = s*10 + l;
+          const idx = ageIdx++;
+          let color = '#334155';
+          if (highlightSet) {
+            color = highlightSet[idx] ? '#dc2626' : '#94a3b8';
+          }
+          // Ring if needed
+          if (highlightSet && highlightSet[idx]) {
+            ctx.beginPath();
+            ctx.arc(x, y - 6, 15, 0, 2*Math.PI);
+            ctx.strokeStyle = '#dc2626';
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+          }
+          ctx.fillStyle = color;
+          ctx.fillText(l, x, y + 6);
+        });
       }
     });
-  });
 
-  // open first step by default once loaded
-  window.addEventListener('load', () => {
-    setTimeout(() => {
-      document.querySelectorAll('.step').forEach(s => {
-        if(s.classList.contains('open')) openStep(s);
-      });
-    }, 200);
-  });
+    // Bottom annotation
+    ctx.textAlign = 'left';
+    ctx.font = '13px system-ui, sans-serif';
+    ctx.fillStyle = '#52606d';
+    let note = 'Total members = 20';
+    if (step >= 3 && step <= 4) note = 'Ages < 74: 5 + 8 + 3 = 16 members (blue)';
+    else if (step >= 5) note = 'Ages \u2265 74: 6 members (red rings)';
+    ctx.fillText(note, 24, H - 18);
 
-  /* ---------- visualisation slider ---------- */
-  const slider = document.getElementById('slider');
-  const sliderVal = document.getElementById('sliderVal');
-  const barGood = document.getElementById('barGood');
-  const barBad = document.getElementById('barBad');
-  const numGood = document.getElementById('numGood');
-  const numBad = document.getElementById('numBad');
-  const finalBox = document.getElementById('finalBox');
+    // Readout
+    if (step === 1) readout.textContent = 'Step 1: Read ages \u2192 50, 55, 56, 56, 58, 61, 64, 65, 65, 67, 68, 68, 69, 73, 74, 74, 76, 77, 79, 91.';
+    else if (step === 2) readout.textContent = 'Step 2: Total members n = 5 + 8 + 6 + 0 + 1 = 20.';
+    else if (step === 3) readout.textContent = 'Step 3: Under 74 (age \u2264 73): 5 (row 5) + 8 (row 6) + 3 (row 7 leaves 3,4,4) = 16 members.';
+    else if (step === 4) readout.textContent = 'Step 4: Not under 74 (age \u2265 74): 6 members. Or 20 \u2212 16 = 6.';
+    else if (step === 5) readout.textContent = 'Step 5: P(not under 74) = 6 / 20 = 0.3.';
+    else readout.textContent = 'Showing: full stem-and-leaf diagram of the 20 members\u2019 ages.';
 
-  // Build an ordered mapping so that as the slider advances we reveal in diagram order
-  // We'll sort positions by their "age order" in the diagram (already ordered in `ages`)
-  function updateVisual(n){
-    // n = how many members revealed
-    let good = 0, bad = 0;
-    // Use the first n entries of the (visually grouped) order so it reads naturally
-    // Reorder ages so that good & bad are revealed progressively as user slides
-    for(let i = 0; i < n; i++){
-      const a = revealOrder[i];
-      if(a >= 74) good++; else bad++;
-    }
-    sliderVal.textContent = n;
-    numGood.textContent = good;
-    numBad.textContent = bad;
-    barGood.style.width = (good / GOOD_AGES.length * 100) + '%';
-    barBad.style.width = (bad / (TOTAL - GOOD_AGES.length) * 100) + '%';
-    barGood.textContent = good ? good : '';
-    barBad.textContent = bad ? bad : '';
-
-    // highlight leaves in the diagram
-    const allLeaves = document.querySelectorAll('.leaf span');
-    allLeaves.forEach(sp => {
-      sp.classList.remove('hi','hi-bad','dim');
+    // Highlight active step in right pane
+    document.querySelectorAll('.step').forEach(el => {
+      el.classList.toggle('active', +el.dataset.step === step);
     });
-    // mark first n leaves (in visual DOM order) as highlighted
-    let count = 0;
-    allLeaves.forEach(sp => {
-      if(count < n){
-        const val = parseInt(sp.dataset.val, 10);
-        if(val >= 74) sp.classList.add('hi');
-        else sp.classList.add('hi-bad');
-      } else {
-        sp.classList.add('dim');
-      }
-      count++;
-    });
-
-    // show final box when all revealed
-    if(n >= TOTAL){
-      finalBox.classList.add('show');
-    } else {
-      finalBox.classList.remove('show');
-    }
   }
 
-  // Reveal order = visual order in the diagram (row-major)
-  const revealOrder = [];
-  document.querySelectorAll('.leaf span').forEach(sp => {
-    revealOrder.push(parseInt(sp.dataset.val, 10));
-  });
-
-  // sanity: DOM leaf count should be 20
-  // (if duplicate data-val exist, parseInt still gives correct numeric value)
-
-  slider.addEventListener('input', e => {
-    updateVisual(parseInt(e.target.value, 10));
-  });
-
-  /* ---------- play / reset ---------- */
-  let playTimer = null;
-  const playBtn = document.getElementById('playBtn');
-  const resetBtn = document.getElementById('resetBtn');
-
-  playBtn.addEventListener('click', () => {
-    if(playTimer){ clearInterval(playTimer); playTimer = null; }
-    slider.value = 0;
-    updateVisual(0);
-    let i = 0;
-    playBtn.textContent = '⏸ Playing...';
-    playTimer = setInterval(() => {
-      i++;
-      slider.value = i;
-      updateVisual(i);
-      if(i >= TOTAL){
-        clearInterval(playTimer); playTimer = null;
-        playBtn.textContent = '▶ Play animation';
+  // IntersectionObserver for scroll sync
+  let current = 0;
+  const io = new IntersectionObserver(es => {
+    es.forEach(e => {
+      if (e.isIntersecting) {
+        current = +e.target.dataset.step;
+        draw(current);
       }
-    }, 320);
-  });
+    });
+  }, { rootMargin: '-25% 0px -55% 0px' });
+  document.querySelectorAll('.step').forEach(s => io.observe(s));
 
-  resetBtn.addEventListener('click', () => {
-    if(playTimer){ clearInterval(playTimer); playTimer = null; }
-    playBtn.textContent = '▶ Play animation';
-    slider.value = 0;
-    updateVisual(0);
-  });
-
-  // initial state
-  updateVisual(0);
+  draw(0);
 })();
 </script>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
-
 </body>
 </html>

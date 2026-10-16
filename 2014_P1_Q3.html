@@ -3,439 +3,481 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>2014 Paper 1 Q03 — Estimation, Approximation and Error</title>
-<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<title>HKDSE 2014 Paper 1 Q3 — Rounding &amp; Significant Figures</title>
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\\[','\\]']]
+  },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
-/* ==========================================================================
-   HKDSE Mathematics (Compulsory Part) — Unified Design System
-   Canonical source of truth. This exact block is inlined into every
-   question page, index.html and DSE_Maths_By_Topic.html so that all
-   deliverables share one visual identity.
-   ========================================================================== */
-
-:root {
-  /* Palette */
-  --slate-900: #1e293b;   /* Primary / header surface */
-  --slate-800: #334155;
-  --slate-600: #475569;
-  --slate-400: #94a3b8;
-  --slate-200: #e2e8f0;
-  --slate-100: #f1f5f9;
-  --slate-50:  #f8fafc;
-  --indigo:    #3b82f6;   /* Primary accent */
-  --indigo-600:#2563eb;
-  --amber-bg:  #fef3c7;   /* Hints / concepts */
-  --amber-bd:  #f59e0b;
-  --emerald-bg:#d1fae5;   /* Final answers */
-  --emerald-bd:#10b981;
-  --badge-bg:  #dbeafe;   /* Badges / marks */
-  --badge-fg:  #1e40af;
-
-  /* Shape & depth */
-  --radius: 12px;
-  --radius-sm: 8px;
-  --pad-card: 1.5rem;
-  --shadow-sm: 0 1px 2px rgba(15, 23, 42, .06), 0 1px 3px rgba(15, 23, 42, .08);
-  --shadow-md: 0 4px 12px rgba(15, 23, 42, .08), 0 2px 4px rgba(15, 23, 42, .04);
-
-  /* Type */
-  --font-body: "Source Serif 4", "Noto Serif TC", Georgia, "Times New Roman", serif;
-  --font-ui: "Inter Tight", "Noto Sans TC", "Segoe UI", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
-  --lh-tight: 1.25;
-  --lh-body: 1.7;
-}
-
-* { box-sizing: border-box; }
-
-html { -webkit-text-size-adjust: 100%; }
-
-body {
-  margin: 0;
-  background: var(--slate-50);
-  background-image:
-    radial-gradient(circle at 12% -10%, rgba(59, 130, 246, .10), transparent 45%),
-    radial-gradient(circle at 95% 0%, rgba(30, 41, 59, .08), transparent 40%);
-  background-attachment: fixed;
-  color: var(--slate-900);
-  font-family: var(--font-body);
-  font-size: 17px;
-  line-height: var(--lh-body);
-}
-
-/* ---------- Layout shells ------------------------------------------------ */
-
-.container {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 1.5rem 1.25rem 3rem;
-}
-
-.split {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 1.5rem 1.25rem 3rem;
-  display: grid;
-  grid-template-columns: minmax(0, 42%) minmax(0, 58%);
-  gap: 1.5rem;
-  align-items: start;
-}
-
-.split__aside {
-  position: sticky;
-  top: 1rem;
-  max-height: calc(100vh - 2rem);
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
-
-.split__main {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
-
-/* ---------- Hero header -------------------------------------------------- */
-
-.hero {
-  background: linear-gradient(135deg, var(--slate-900) 0%, #27364f 55%, #1d4ed8 160%);
-  color: #fff;
-  border-radius: var(--radius);
-  padding: 2rem var(--pad-card);
-  box-shadow: var(--shadow-md);
-  margin-bottom: 1.5rem;
-}
-
-.hero__eyebrow {
-  font-family: var(--font-ui);
-  font-size: .75rem;
-  font-weight: 600;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  color: #93c5fd;
-  margin: 0 0 .5rem;
-}
-
-.hero__title {
-  font-family: var(--font-ui);
-  font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.1rem);
-  line-height: var(--lh-tight);
-  font-weight: 700;
-  margin: 0 0 .5rem;
-}
-
-.hero__subtitle {
-  margin: 0;
-  color: #cbd5e1;
-  font-size: .95rem;
-}
-
-.hero__meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: .5rem;
-  margin-top: 1rem;
-}
-
-/* ---------- Cards -------------------------------------------------------- */
-
-.card {
-  background: #fff;
-  border: 1px solid var(--slate-200);
-  border-radius: var(--radius);
-  padding: var(--pad-card);
-  box-shadow: var(--shadow-sm);
-}
-
-.card + .card { margin-top: 0; }
-
-.card__title {
-  font-family: var(--font-ui);
-  font-size: 1.05rem;
-  font-weight: 700;
-  margin: 0 0 1rem;
-  padding-bottom: .6rem;
-  border-bottom: 2px solid var(--slate-100);
-  display: flex;
-  align-items: center;
-  gap: .6rem;
-  flex-wrap: wrap;
-}
-
-/* ---------- Step cards --------------------------------------------------- */
-
-.step {
-  border-left: 4px solid var(--indigo);
-  background: #fff;
-  border-radius: var(--radius);
-  padding: var(--pad-card);
-  box-shadow: var(--shadow-sm);
-}
-
-.step__head {
-  display: flex;
-  align-items: center;
-  gap: .6rem;
-  flex-wrap: wrap;
-  margin-bottom: .85rem;
-  font-family: var(--font-ui);
-  font-weight: 600;
-}
-
-/* ---------- Callouts ----------------------------------------------------- */
-
-.hint,
-.answer,
-.note {
-  border-radius: var(--radius-sm);
-  padding: 1rem 1.15rem;
-  margin: 1rem 0;
-}
-
-.hint {
-  background: var(--amber-bg);
-  border-left: 4px solid var(--amber-bd);
-}
-
-.answer {
-  background: var(--emerald-bg);
-  border-left: 4px solid var(--emerald-bd);
-}
-
-.note {
-  background: var(--slate-100);
-  border-left: 4px solid var(--slate-400);
-}
-
-.hint__label,
-.answer__label {
-  font-family: var(--font-ui);
-  font-size: .72rem;
-  font-weight: 700;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  display: block;
-  margin-bottom: .35rem;
-}
-
-.hint__label   { color: #92400e; }
-.answer__label { color: #065f46; }
-
-/* ---------- Badges ------------------------------------------------------- */
-
-.badge {
-  display: inline-block;
-  font-family: var(--font-ui);
-  font-size: .72rem;
-  font-weight: 700;
-  letter-spacing: .04em;
-  padding: .2rem .55rem;
-  border-radius: 999px;
-  background: var(--badge-bg);
-  color: var(--badge-fg);
-  white-space: nowrap;
-}
-
-.badge--mark  { background: var(--badge-bg); color: var(--badge-fg); }
-.badge--topic { background: var(--slate-100); color: var(--slate-600); }
-.badge--hard  { background: #fee2e2; color: #991b1b; }
-.badge--rate  { background: #ecfdf5; color: #047857; }
-
-/* ---------- Option list (Paper 2) --------------------------------------- */
-
-.options {
-  list-style: none;
-  margin: .5rem 0 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-  gap: .5rem;
-}
-
-.options li {
-  background: var(--slate-100);
-  border: 1px solid var(--slate-200);
-  border-radius: var(--radius-sm);
-  padding: .6rem .85rem;
-}
-
-.option-key {
-  font-family: var(--font-ui);
-  font-weight: 700;
-  color: var(--slate-600);
-  margin-right: .35rem;
-}
-
-/* ---------- Figures ----------------------------------------------------- */
-
-.figure {
-  background: #fff;
-  border: 1px solid var(--slate-200);
-  border-radius: var(--radius);
-  padding: .75rem;
-  text-align: center;
-}
-
-.figure img,
-.question-img {
-  max-width: 100%;
-  height: auto;
-  border-radius: var(--radius-sm);
-  display: block;
-  margin: 0 auto;
-}
-
-.figure figcaption {
-  font-family: var(--font-ui);
-  font-size: .78rem;
-  color: var(--slate-600);
-  margin-top: .5rem;
-}
-
-.figure svg { max-width: 100%; height: auto; }
-
-/* ---------- Tables ------------------------------------------------------- */
-
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: .95rem;
-}
-
-.table th,
-.table td {
-  border: 1px solid var(--slate-200);
-  padding: .5rem .65rem;
-  text-align: left;
-}
-
-.table th {
-  background: var(--slate-100);
-  font-family: var(--font-ui);
-  font-weight: 600;
-}
-
-/* ---------- Index pages -------------------------------------------------- */
-
-.index-section { margin-bottom: 1.5rem; }
-
-.index-table td:first-child { white-space: nowrap; }
-
-a { color: var(--indigo-600); }
-
-a.qlink {
-  font-family: var(--font-mono);
-  font-weight: 600;
-  text-decoration: none;
-  border-bottom: 1px solid transparent;
-}
-
-a.qlink:hover { border-bottom-color: currentColor; }
-
-/* ---------- Footer ------------------------------------------------------- */
-
-.footer {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 1.5rem 1.25rem 2.5rem;
-  text-align: center;
-  font-family: var(--font-ui);
-  font-size: .8rem;
-  color: var(--slate-600);
-}
-
-/* ---------- MathJax tweaks ---------------------------------------------- */
-
-mjx-container[display="true"] { margin: .75rem 0 !important; }
-
-/* ---------- Responsive -------------------------------------------------- */
-
-@media (max-width: 900px) {
-  .split { grid-template-columns: minmax(0, 1fr); }
-  .split__aside {
-    position: static;
-    max-height: none;
-    overflow-y: visible;
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:#f4f7fb;
+    color:#1f2a44;
+    font-size:16px;
+    line-height:1.55;
   }
-}
-
-@media (max-width: 480px) {
-  body { font-size: 16px; }
-  :root { --pad-card: 1.15rem; }
-  .hero { padding: 1.5rem 1.15rem; }
-}
-
-
-/* ---- solution page extras ---- */
-.hero__title .qstar { color:#fbbf24; }
-.qcard__body { font-size: 1.02rem; }
-.qcard__body .part { border-left: 4px solid var(--indigo); background: var(--slate-50);
-  padding: .7rem 1rem; margin: .7rem 0; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
-.qcard__body .part b { color: var(--indigo-600); font-family: var(--font-ui); }
-.marks-inline { font-family: var(--font-ui); font-size: .75rem; font-weight: 700;
-  color: var(--badge-fg); background: var(--badge-bg); padding: .1rem .5rem; border-radius: 999px; margin-left: .4rem; }
-.options { list-style:none; margin:.75rem 0 0; padding:0; display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:.55rem; }
-.options li { background:var(--slate-50); border:1px solid var(--slate-200);
-  border-radius:var(--radius-sm); padding:.6rem .9rem; }
-.opt-key { font-family:var(--font-ui); font-weight:700; color:var(--slate-600); margin-right:.4rem; }
-.step { border:1px solid var(--slate-200); border-left:4px solid var(--indigo);
-  border-radius:var(--radius); padding:var(--pad-card); box-shadow:var(--shadow-sm); }
-.step + .step { margin-top:1rem; }
-.step__head { display:flex; align-items:center; gap:.6rem; flex-wrap:wrap; margin-bottom:.75rem;
-  font-family:var(--font-ui); font-weight:700; }
-.step__num { background:var(--indigo); color:#fff; border-radius:8px; min-width:1.9rem;
-  text-align:center; padding:.15rem .4rem; font-size:.85rem; }
-.math { margin:.65rem 0; overflow-x:auto; overflow-y:hidden; padding-bottom:2px; }
-.distractor { background:#fff; border:1px solid var(--slate-200); border-radius:var(--radius-sm);
-  padding:.75rem .95rem; margin:.5rem 0; }
-.distractor .opt-tag { font-family:var(--font-ui); font-weight:800; display:inline-block;
-  min-width:1.6rem; color:var(--slate-600); }
-.distractor.correct { background:var(--emerald-bg); border-color:var(--emerald-bd); }
-.distractor.correct .opt-tag { color:#065f46; }
-.distractor.wrong .opt-tag { color:#991b1b; }
-.distractor.wrong { background:#fef2f2; border-color:#fecaca; }
-.figure svg { max-width:100%; height:auto; }
-.step p { margin:.55em 0; }
-
+  .wrap{max-width:1200px;margin:0 auto;padding:16px 14px 60px;}
+  h1{font-size:1.15rem;margin:4px 0 14px;color:#123a6b;letter-spacing:.2px;}
+  h1 span{font-weight:400;color:#5b6b88;font-size:.9rem;}
+  .split{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    gap:12px;
+    align-items:start;
+  }
+  @media(min-width:900px){
+    .split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}
+  }
+  .diagram{
+    position:sticky;
+    top:16px;
+    max-height:calc(100vh - 2rem);
+    overflow-y:auto;
+    background:#ffffff;
+    border:1px solid #dbe4f0;
+    border-radius:14px;
+    padding:12px;
+    box-shadow:0 4px 14px rgba(23,55,110,.07);
+  }
+  @media(max-width:640px){
+    body{font-size:14.5px;}
+    .wrap{padding:10px 8px 40px;}
+  }
+  canvas{width:100%;height:auto;display:block;border-radius:10px;background:#fbfdff;}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;font-size:.82rem;}
+  .legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px;}
+  .ro{
+    margin:10px 0 2px;
+    font-size:.85rem;
+    background:#eef4ff;
+    border:1px dashed #b9cdf0;
+    border-radius:8px;
+    padding:7px 10px;
+    color:#1b3a6b;
+  }
+  .qcard{
+    background:#ffffff;
+    border:1px solid #dbe4f0;
+    border-left:6px solid #2563eb;
+    border-radius:12px;
+    padding:14px 16px;
+    box-shadow:0 4px 14px rgba(23,55,110,.07);
+    margin-bottom:14px;
+  }
+  .qcard h2{margin:0 0 8px;font-size:1rem;color:#1d4ed8;text-transform:uppercase;letter-spacing:.6px;}
+  .qcard p{margin:6px 0;}
+  .step{
+    background:#ffffff;
+    border:1px solid #dbe4f0;
+    border-radius:12px;
+    padding:12px 14px;
+    margin-bottom:12px;
+    box-shadow:0 3px 10px rgba(23,55,110,.05);
+    transition:border-color .25s, box-shadow .25s, transform .25s;
+  }
+  .step.active{
+    border-color:#f59e0b;
+    box-shadow:0 0 0 3px rgba(245,158,11,.18),0 4px 14px rgba(23,55,110,.08);
+    transform:translateX(2px);
+  }
+  .step .tag{
+    display:inline-block;
+    background:#2563eb;
+    color:#fff;
+    font-size:.76rem;
+    font-weight:700;
+    border-radius:999px;
+    padding:2px 11px;
+    margin-bottom:6px;
+    letter-spacing:.4px;
+  }
+  .step .tag.c1{background:#2563eb;}
+  .step .tag.c2{background:#059669;}
+  .step .tag.c3{background:#db2777;}
+  .step .hint{
+    margin-top:8px;
+    font-size:.84rem;
+    color:#6b4b00;
+    background:#fff8e6;
+    border-left:4px solid #f59e0b;
+    border-radius:0 8px 8px 0;
+    padding:6px 10px;
+  }
+  .ans{
+    background:linear-gradient(90deg,#ecfdf5,#f0fdfa);
+    border:1px solid #86efac;
+    border-left:6px solid #10b981;
+    border-radius:12px;
+    padding:12px 16px;
+    font-weight:600;
+    color:#065f46;
+    margin-top:6px;
+  }
+  .ans b{color:#047857;}
+  ul.steps-li{margin:6px 0 6px 18px;padding:0;}
+  ul.steps-li li{margin:3px 0;}
+  code{background:#eef2ff;border-radius:5px;padding:1px 5px;font-size:.9em;}
 </style>
 </head>
 <body>
-<div class="container"><header class="hero"><p class="hero__eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 1</p><h1 class="hero__title">2014 Paper 1 · Question 3<span class="qstar"></span></h1><p class="hero__subtitle">Estimation, Approximation and Error</p><div class="hero__meta"><span class="badge badge--topic">Estimation, Approximation and Error</span><span class="badge badge--rate">Passing rate 58%</span><span class="badge badge--mark">3 marks</span></div></header><section class="card"><h2 class="card__title">Question</h2><div class="qcard__body"><p class="part"><b>(a)</b> Round up \(123.45\) to 1 significant figure.</p><p class="part"><b>(b)</b> Round off \(123.45\) to the nearest integer.</p><p class="part"><b>(c)</b> Round down \(123.45\) to 1 decimal place. <span class="marks-inline">3 marks</span></p></div></section><section class="card"><h2 class="card__title">Solution</h2><div class="qcard__body"><div class="step"><div class="step__head"><span class="step__num">a</span>(a) 1 significant figure</div><div class="math">\[123.45\to 200\]</div><p><span class="badge badge--mark">1A</span> correct rounding up.</p></div><div class="step"><div class="step__head"><span class="step__num">b</span>(b) Nearest integer</div><div class="math">\[123.45\to 123\]</div><p><span class="badge badge--mark">1A</span> correct rounding off.</p></div><div class="step"><div class="step__head"><span class="step__num">c</span>(c) 1 decimal place</div><div class="math">\[123.45\to 123.4\]</div><p><span class="badge badge--mark">1A</span> correct rounding down.</p></div></div></section><section class="card"><h2 class="card__title">Answer</h2><div class="qcard__body"><div class="answer"><span class="answer__label">Answer</span>(a) \(200\) · (b) \(123\) · (c) \(123.4\)</div></div></section></div><footer class="footer">HKDSE Mathematics (Compulsory Part) · 2014 Paper 1 Q03 · <a href="index.html">Index by year</a> · <a href="DSE_Maths_By_Topic.html">Index by topic</a></footer>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
+<div class="wrap">
+  <h1>HKDSE 2014 Paper 1 — Question 3 <span>(Estimation, Approximation and Error · 3 marks)</span></h1>
 
+  <div class="split">
+    <!-- ============ LEFT: DIAGRAM ============ -->
+    <div class="diagram">
+      <canvas id="cv" width="720" height="760"></canvas>
+      <div class="legend">
+        <span><i style="background:#2563eb"></i>Original value 123.45</span>
+        <span><i style="background:#f59e0b"></i>Active step highlight</span>
+        <span><i style="background:#10b981"></i>Answer on number line</span>
+      </div>
+      <p class="ro" id="ro">Step 1 — locate 123.45 on the number line.</p>
+    </div>
+
+    <!-- ============ RIGHT: QUESTION + SOLUTION ============ -->
+    <div class="right-pane">
+
+      <div class="qcard">
+        <h2>Question</h2>
+        <p><b>[2014 #3]</b></p>
+        <p>(a) Round <b>up</b> $123.45$ to $1$ significant figure.</p>
+        <p>(b) Round <b>off</b> $123.45$ to the nearest integer.</p>
+        <p>(c) Round <b>down</b> $123.45$ to $1$ decimal place.</p>
+        <p style="color:#5b6b88;font-size:.9rem;">[3 marks]</p>
+        
+      </div>
+
+      <div class="step" data-step="1">
+        <span class="tag c1">STEP 1 · Locate the number</span>
+        <p>Place $123.45$ on the number line. The digits are:</p>
+        <ul class="steps-li">
+          <li>Hundreds: <b>1</b> &nbsp; · &nbsp; Tens: <b>2</b> &nbsp; · &nbsp; Units: <b>3</b></li>
+          <li>Tenths: <b>4</b> &nbsp; · &nbsp; Hundredths: <b>5</b></li>
+        </ul>
+        <p>So $123.45$ sits between $120$ and $130$, and also just under $123.5$.</p>
+        <div class="hint">The key idea: “round up / round off / round down” mean three different things — check the wording carefully.</div>
+      </div>
+
+      <div class="step" data-step="2">
+        <span class="tag c1">STEP 2 (a) · Round <b>up</b> to 1 significant figure</span>
+        <p>“Round <b>up</b>” means: always take the <i>next higher</i> value — never look at the digit after.</p>
+        <p>For $1$ significant figure we keep only the leading digit, which is $1$ (in the hundreds place).</p>
+        <p>Rounding <b>up</b> forces the hundreds digit from $1$ to $2$, giving $2 \times 10^2$:</p>
+        <p>$$123.45 \;\longrightarrow\; 200$$</p>
+        <div class="hint">If we had used normal “round off”, $123.45$ would give $100$; but “round up” gives $200$. Do not confuse the two!</div>
+      </div>
+
+      <div class="step" data-step="3">
+        <span class="tag c2">STEP 3 (b) · Round <b>off</b> to the nearest integer</span>
+        <p>Now we <i>round off</i> (normal rounding): look at the digit immediately after the units place, i.e. the tenths digit.</p>
+        <ul class="steps-li">
+          <li>Units digit: $3$ (the digit we keep)</li>
+          <li>Next digit (tenths): $4$</li>
+        </ul>
+        <p>Since $4 < 5$, we <b>round down</b> — the units digit stays $3$ and the decimal part is dropped:</p>
+        <p>$$123.45 \;\longrightarrow\; 123$$</p>
+        <div class="hint">Rule of thumb: next digit $0$–$4$ → keep; next digit $5$–$9$ → increase by $1$.</div>
+      </div>
+
+      <div class="step" data-step="4">
+        <span class="tag c3">STEP 4 (c) · Round <b>down</b> to 1 decimal place</span>
+        <p>“Round <b>down</b>” means: always take the <i>next lower</i> value — truncate, never increase.</p>
+        <p>To $1$ decimal place we keep the tenths digit, which is $4$, and discard the hundredths digit $5$:</p>
+        <p>$$123.45 \;\longrightarrow\; 123.4$$</p>
+        <div class="hint">Normal rounding of $123.45$ to 1 d.p. would also give $123.4$ here, but “round down” guarantees we never round up — even if the discarded digit were $9$.</div>
+      </div>
+
+      <div class="ans">
+        <b>Answer:</b><br>
+        (a) $200$ &nbsp;·&nbsp; (b) $123$ &nbsp;·&nbsp; (c) $123.4$
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  const ro = document.getElementById('ro');
+  const W = cv.width, H = cv.height;
+
+  /* ---------- geometry: two number lines ---------- */
+  // Top line: shows 100..200 region (for part a)
+  // Bottom line: zoomed 120..125 region (for parts b and c)
+  const top = { x0: 70, x1: W - 70, y: 150, v0: 100, v1: 200 };
+  const bot = { x0: 70, x1: W - 70, y: 520, v0: 122, v1: 125 };
+
+  function mapX(band, v){
+    return band.x0 + (v - band.v0) / (band.v1 - band.v0) * (band.x1 - band.x0);
+  }
+
+  function arrowHead(x, y, dir){ // dir: 1 right, -1 left
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x - dir*12, y - 6);
+    ctx.lineTo(x - dir*12, y + 6);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  function ticks(band, start, step, labelEvery, fmt, color, yLabelOffset){
+    for(let v = start; mapX(band,v) <= band.x1 + 0.5; v += step){
+      const x = mapX(band, v);
+      if(x < band.x0 - 0.5) continue;
+      const major = Math.abs((v - start) % labelEvery) < 1e-9;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = major ? 1.8 : 1;
+      ctx.beginPath();
+      ctx.moveTo(x, band.y);
+      ctx.lineTo(x, band.y + (major ? 14 : 7));
+      ctx.stroke();
+      if(major){
+        ctx.fillStyle = '#334155';
+        ctx.font = 'bold 15px "Segoe UI", Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(fmt(v), x, band.y + 32 + yLabelOffset);
+      }
+    }
+  }
+
+  function dot(band, v, color, label, dy){
+    const x = mapX(band, v), y = band.y;
+    ctx.beginPath();
+    ctx.arc(x, y, 8, 0, Math.PI*2);
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+    if(label){
+      ctx.fillStyle = color;
+      ctx.font = 'bold 15px "Segoe UI", Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText(label, x, y + (dy || -16));
+    }
+  }
+
+  function bandTitle(band, text, sub, color){
+    ctx.fillStyle = color;
+    ctx.font = 'bold 17px "Segoe UI", Arial';
+    ctx.textAlign = 'left';
+    ctx.fillText(text, band.x0 - 4, band.y - 34);
+    if(sub){
+      ctx.fillStyle = '#64748b';
+      ctx.font = '13px "Segoe UI", Arial';
+      ctx.fillText(sub, band.x0 - 4, band.y - 15);
+    }
+  }
+
+  function chip(x, y, text, bg, fg){
+    ctx.font = 'bold 16px "Segoe UI", Arial';
+    const w = ctx.measureText(text).width + 26;
+    const h = 32;
+    ctx.fillStyle = bg;
+    ctx.beginPath();
+    if(ctx.roundRect) ctx.roundRect(x, y, w, h, 16);
+    else ctx.rect(x, y, w, h);
+    ctx.fill();
+    ctx.fillStyle = fg;
+    ctx.textAlign = 'left';
+    ctx.fillText(text, x + 13, y + 22);
+    return w;
+  }
+
+  /* ---------- main draw ---------- */
+  function draw(step){
+    ctx.clearRect(0, 0, W, H);
+
+    // ---------- top number line (part a) ----------
+    const aColor = (step === 2) ? '#f59e0b' : '#94a3b8';
+    bandTitle(top, 'Part (a)  •  Round UP to 1 s.f.', '"1 s.f." → keep the leading digit (hundreds place)', step===2 ? '#b45309' : '#2563eb');
+
+    ctx.strokeStyle = step===2 ? '#f59e0b' : '#334155';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(top.x0, top.y);
+    ctx.lineTo(top.x1, top.y);
+    ctx.stroke();
+    ctx.fillStyle = step===2 ? '#f59e0b' : '#334155';
+    arrowHead(top.x1 + 12, top.y, 1);
+    arrowHead(top.x0 - 12, top.y, -1);
+
+    ticks(top, 100, 10, 50, v => String(v), aColor, 0);
+
+    // shaded bracket from 100 to 200 to show "round up" jumps a full magnitude
+    if(step === 2){
+      ctx.save();
+      ctx.globalAlpha = 0.15;
+      ctx.fillStyle = '#f59e0b';
+      ctx.fillRect(mapX(top,100), top.y-22, mapX(top,200)-mapX(top,100), 44);
+      ctx.restore();
+    }
+
+    const xT   = mapX(top, 123.45);
+    const xT100 = mapX(top, 100);
+    const xT200 = mapX(top, 200);
+
+    if(step === 2){
+      // arrow from 123.45 up-and-over to 200
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 2.5;
+      ctx.setLineDash([6,5]);
+      ctx.beginPath();
+      ctx.moveTo(xT, top.y - 6);
+      ctx.lineTo(xT, top.y - 60);
+      ctx.lineTo(xT200, top.y - 60);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#b45309';
+      ctx.font = 'bold 15px "Segoe UI", Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('round up → 200', (xT + xT200)/2, top.y - 70);
+    }
+
+    ctx.globalAlpha = step===2 ? 1 : 0.85;
+    dot(top, 123.45, '#2563eb', '123.45', -18);
+    if(step === 2){
+      dot(top, 200, '#10b981', '200', -18);
+    }
+    ctx.globalAlpha = 1;
+
+    // ---------- bottom number line (parts b and c) ----------
+    const bActive = (step === 3);
+    const cActive = (step === 4);
+    const bColor  = bActive ? '#10b981' : (cActive ? '#94a3b8' : '#94a3b8');
+    const bTitle  = 'Parts (b) & (c)  •  zoomed view';
+    const bSub    = '(b) nearest integer   ·   (c) 1 decimal place';
+    bandTitle(bot, bTitle, bSub, (bActive || cActive) ? '#b45309' : '#059669');
+
+    ctx.strokeStyle = (bActive || cActive) ? '#f59e0b' : '#334155';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(bot.x0, bot.y);
+    ctx.lineTo(bot.x1, bot.y);
+    ctx.stroke();
+    ctx.fillStyle = (bActive || cActive) ? '#f59e0b' : '#334155';
+    arrowHead(bot.x1 + 12, bot.y, 1);
+    arrowHead(bot.x0 - 12, bot.y, -1);
+
+    // minor ticks every 0.1, major labels every 0.5
+    for(let v = 122; v <= 125.0001; v += 0.1){
+      const x = mapX(bot, v);
+      const major = Math.abs((v*10) % 5) < 1e-6;
+      ctx.strokeStyle = (bActive||cActive) ? (major ? '#f59e0b' : '#fcd34d') : (major ? '#334155' : '#94a3b8');
+      ctx.lineWidth = major ? 1.8 : 1;
+      ctx.beginPath();
+      ctx.moveTo(x, bot.y);
+      ctx.lineTo(x, bot.y + (major ? 14 : 7));
+      ctx.stroke();
+      if(major){
+        ctx.fillStyle = '#334155';
+        ctx.font = 'bold 14px "Segoe UI", Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(v.toFixed(1), x, bot.y + 32);
+      }
+    }
+
+    const xB = mapX(bot, 123.45);
+    const xB123 = mapX(bot, 123);
+    const xB124 = mapX(bot, 124);
+    const xB1234 = mapX(bot, 123.4);
+
+    if(bActive){
+      // rounded off to 123, next digit 4 < 5 → go LEFT to 123
+      ctx.strokeStyle = '#10b981';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(xB, bot.y - 6);
+      ctx.lineTo(xB, bot.y - 62);
+      ctx.lineTo(xB123, bot.y - 62);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(xB123, bot.y - 62);
+      ctx.lineTo(xB123, bot.y - 6);
+      ctx.stroke();
+      arrowHead(xB123, bot.y - 6, 0); // small downward indicator
+      ctx.fillStyle = '#047857';
+      ctx.font = 'bold 15px "Segoe UI", Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('round off → 123', (xB + xB123)/2, bot.y - 72);
+      dot(bot, 123, '#10b981', '123', -18);
+    }
+
+    if(cActive){
+      // round down to 123.4
+      ctx.strokeStyle = '#db2777';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(xB, bot.y - 6);
+      ctx.lineTo(xB, bot.y - 62);
+      ctx.lineTo(xB1234, bot.y - 62);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(xB1234, bot.y - 62);
+      ctx.lineTo(xB1234, bot.y - 6);
+      ctx.stroke();
+      ctx.fillStyle = '#be185d';
+      ctx.font = 'bold 15px "Segoe UI", Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('round down → 123.4', (xB + xB1234)/2, bot.y - 72);
+      dot(bot, 123.4, '#db2777', '123.4', -18);
+    }
+
+    // always show 123.45 marker on the zoomed line
+    dot(bot, 123.45, '#2563eb', '123.45', -18);
+
+    // ---------- bottom step chips ----------
+    const chipY = 640;
+    let cx = 70;
+    cx += chip(cx, chipY, '1  Locate 123.45', step===1?'#2563eb':'#e2e8f0', step===1?'#ffffff':'#475569') + 10;
+    cx += chip(cx, chipY, '2 (a) round up → 200', step===2?'#f59e0b':'#e2e8f0', step===2?'#ffffff':'#475569') + 10;
+    cx += chip(cx, chipY, '3 (b) round off → 123', step===3?'#10b981':'#e2e8f0', step===3?'#ffffff':'#475569') + 10;
+    cx += chip(cx, chipY, '4 (c) round down → 123.4', step===4?'#db2777':'#e2e8f0', step===4?'#ffffff':'#475569') + 10;
+
+    // legend text
+    ctx.fillStyle = '#64748b';
+    ctx.font = '13px "Segoe UI", Arial';
+    ctx.textAlign = 'left';
+    ctx.fillText('The three roundings of 123.45 — step-by-step visual', 70, chipY + 62);
+
+    // readout update
+    const msgs = {
+      1: 'Step 1 — locate 123.45 on the number line.',
+      2: 'Step 2 (a) — "round up" forces 1 s.f. to 200. The dashed arrow jumps up to the next hundred.',
+      3: 'Step 3 (b) — "round off" to nearest integer: the tenths digit 4 < 5, so 123.45 becomes 123.',
+      4: 'Step 4 (c) — "round down" to 1 d.p. keeps the tenths digit 4 and discards the 5: 123.4.'
+    };
+    ro.textContent = msgs[step] || msgs[1];
+  }
+
+  /* ---------- scroll-sync ---------- */
+  let current = 1;
+  const io = new IntersectionObserver(es => {
+    es.forEach(e => {
+      if(e.isIntersecting){
+        current = +e.target.dataset.step;
+        document.querySelectorAll('.step').forEach(s => s.classList.toggle('active', +s.dataset.step === current));
+        draw(current);
+      }
+    });
+  }, { rootMargin: '-25% 0px -55% 0px' });
+
+  document.querySelectorAll('.step').forEach(s => io.observe(s));
+
+  // initial paint
+  draw(1);
+  document.querySelector('.step[data-step="1"]').classList.add('active');
+})();
+</script>
 </body>
 </html>

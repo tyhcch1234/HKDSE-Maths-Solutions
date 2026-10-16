@@ -1,349 +1,338 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HKDSE Math 2022 Paper 2 Q28 – Interactive Solution</title>
-    <!-- Tailwind CSS (lightweight, utility-first) -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- MathJax for LaTeX rendering -->
-    <script>
-        MathJax = {
-            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
-            svg: { fontCache: 'global' }
-        };
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
-    <style>
-        body {
-            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        }
-        .step-card {
-            transition: all 0.2s ease;
-        }
-        .step-card:hover {
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
-        }
-        .digit-box {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 3rem;
-            height: 3rem;
-            border-radius: 0.75rem;
-            font-weight: 700;
-            font-size: 1.5rem;
-            background-color: #f0f4ff;
-            color: #1e3a8a;
-            border: 2px solid #c7d2fe;
-            transition: 0.2s;
-        }
-        .digit-box.active {
-            background-color: #6366f1;
-            color: white;
-            border-color: #4f46e5;
-            transform: scale(1.1);
-        }
-        .slider {
-            -webkit-appearance: none;
-            width: 100%;
-            height: 8px;
-            border-radius: 5px;
-            background: #e0e7ff;
-            outline: none;
-        }
-        .slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background: #4f46e5;
-            cursor: pointer;
-            border: 3px solid white;
-            box-shadow: 0 2px 6px rgba(79, 70, 229, 0.4);
-        }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HKDSE 2022 Paper 2 Q28 — Probability</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$'], ['\\(','\\)']], displayMath: [['$$','$$'], ['\\[','\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root{
+    --ink:#1e293b;
+    --blue:#2563eb;
+    --red:#dc2626;
+    --green:#16a34a;
+    --amber:#d97706;
+    --violet:#7c3aed;
+    --line:#cbd5e1;
+    --panel:#f8fafc;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    color:var(--ink);
+    background:#eef2f7;
+    font-size:15.5px;
+    line-height:1.55;
+  }
+  .wrap{max-width:1200px;margin:0 auto;padding:16px 14px 48px;}
+  h1{font-size:1.05rem;margin:0 0 10px;color:#334155;font-weight:700;letter-spacing:.02em;}
+  h1 span{color:var(--blue);}
+
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start;}
+  @media(min-width:900px){.split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}}
+  @media(max-width:640px){body{font-size:14.5px;}.wrap{padding:10px 8px 40px;}}
+
+  .panel{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:0 2px 10px rgba(15,23,42,.05);}
+
+  .diagram{position:sticky;top:16px;max-height:calc(100vh - 2rem);overflow-y:auto;}
+  .diagram h2{margin:0 0 8px;font-size:.98rem;color:#475569;text-transform:uppercase;letter-spacing:.06em;}
+  canvas{width:100%;height:auto;display:block;border-radius:10px;background:#ffffff;}
+  .ro{margin:8px 0 0;font-size:.9rem;color:#475569;text-align:center;font-weight:600;}
+
+  .qbox{border-left:5px solid var(--blue);background:var(--panel);border-radius:10px;padding:10px 14px;margin-bottom:14px;}
+  .qbox p{margin:.35rem 0;}
+  .opts{display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;margin-top:8px;}
+  .opts div{font-weight:600;color:#334155;}
+
+  .step{border:1px solid var(--line);border-left:5px solid var(--blue);border-radius:10px;padding:10px 14px;margin:0 0 12px;background:#fff;transition:box-shadow .25s,border-color .25s,background .25s;}
+  .step.active{box-shadow:0 6px 18px rgba(37,99,235,.18);background:#f2f7ff;border-left-color:var(--red);}
+  .tag{display:inline-flex;align-items:center;gap:8px;font-weight:800;color:var(--blue);margin-bottom:4px;}
+  .chip{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;font-size:.82rem;font-weight:700;}
+  .step.active .chip{background:var(--red);}
+  .hint{font-size:.86rem;color:#64748b;margin-top:6px;font-style:italic;}
+  .ans{border:2px solid var(--green);background:#f0fdf4;border-radius:10px;padding:12px 14px;font-weight:700;color:#14532d;}
+  .ans span{color:var(--red);}
+  .key{display:inline-block;padding:1px 8px;border-radius:6px;font-weight:700;color:#fff;font-size:.88rem;}
+  table.calc{border-collapse:collapse;margin:8px 0;font-size:.92rem;}
+  table.calc th,table.calc td{border:1px solid var(--line);padding:3px 9px;text-align:center;}
+  table.calc th{background:#eef2ff;color:#3730a3;}
+  table.calc tr.hit td{background:#fef08a;font-weight:700;color:#92400e;}
+</style>
 </head>
-<body class="bg-slate-50 min-h-screen text-slate-800">
+<body>
+<div class="wrap">
+  <h1>HKDSE Mathematics (Compulsory Part) Paper 2 &nbsp;·&nbsp; <span>2022 Q28 · Probability</span></h1>
 
-    <div class="max-w-4xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-
-        <!-- Header: Question number and topic tags -->
-        <div class="mb-6">
-            <p class="text-sm font-semibold text-indigo-600 tracking-wide uppercase">HKDSE Math 2022 Paper 2</p><figure style="margin:12px 0;text-align:center;"><img src="figures/2022_P2_Q28.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
-            <h1 class="text-3xl sm:text-4xl font-bold text-slate-900 mt-1">Q28 &middot; Probability</h1>
-            <div class="flex flex-wrap gap-2 mt-3">
-                <span class="bg-indigo-100 text-indigo-700 text-xs font-medium px-3 py-1 rounded-full">Probability</span>
-                <span class="bg-emerald-100 text-emerald-700 text-xs font-medium px-3 py-1 rounded-full">Divisibility</span>
-                <span class="bg-amber-100 text-amber-700 text-xs font-medium px-3 py-1 rounded-full">3-digit numbers</span>
-                <span class="bg-rose-100 text-rose-700 text-xs font-medium px-3 py-1 rounded-full">Favourable outcomes</span>
-            </div>
-        </div>
-
-        <!-- Question card -->
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 mb-8 step-card">
-            <h2 class="text-xl font-semibold text-slate-900 flex items-center gap-2 mb-4">
-                <span class="text-2xl">📝</span> Question
-            </h2>
-            <div class="text-slate-700 space-y-4">
-                <p class="text-lg leading-relaxed">
-                    \(5\blacklozenge2\) is a 3-digit number, where \(\blacklozenge\) is an integer from 0 to 9 inclusive.
-                    Find the probability that the 3-digit number is divisible by 7.
-                </p>
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
-                    <div class="bg-slate-50 rounded-lg p-3 text-center border border-slate-200">
-                        <span class="font-semibold text-indigo-600">A.</span> <span class="font-mono">\(\frac{1}{5}\)</span>
-                    </div>
-                    <div class="bg-slate-50 rounded-lg p-3 text-center border border-slate-200">
-                        <span class="font-semibold text-indigo-600">B.</span> <span class="font-mono">\(\frac{1}{7}\)</span>
-                    </div>
-                    <div class="bg-slate-50 rounded-lg p-3 text-center border border-slate-200">
-                        <span class="font-semibold text-indigo-600">C.</span> <span class="font-mono">\(\frac{1}{9}\)</span>
-                    </div>
-                    <div class="bg-slate-50 rounded-lg p-3 text-center border border-slate-200 bg-indigo-50 border-indigo-200">
-                        <span class="font-semibold text-indigo-700">D.</span> <span class="font-mono text-indigo-700 font-bold">\(\frac{1}{10}\)</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Step-by-step solution -->
-        <h2 class="text-xl font-semibold text-slate-900 flex items-center gap-2 mb-4">
-            <span class="text-2xl">🧩</span> Step-by-step Solution
-        </h2>
-        <div class="space-y-4" id="steps-container">
-
-            <!-- Step 1 -->
-            <div class="step-card bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-                <button class="w-full flex items-center justify-between p-5 text-left focus:outline-none" onclick="toggleStep(this)">
-                    <div class="flex items-center gap-3">
-                        <span class="bg-indigo-100 text-indigo-700 rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">1</span>
-                        <span class="font-semibold text-slate-900">Total number of possible outcomes</span>
-                    </div>
-                    <svg class="w-5 h-5 text-slate-400 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                    </svg>
-                </button>
-                <div class="hidden px-5 pb-5 text-slate-600 leading-relaxed">
-                    <p>The digit \(\blacklozenge\) can be any integer from <strong>0 to 9</strong> inclusive.</p>
-                    <p class="mt-2">So there are exactly <strong>10</strong> possible 3-digit numbers: \(502, 512, 522, \ldots, 592\).</p>
-                    <p class="mt-2">Total outcomes = <span class="font-bold text-indigo-600">10</span>.</p>
-                </div>
-            </div>
-
-            <!-- Step 2 -->
-            <div class="step-card bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-                <button class="w-full flex items-center justify-between p-5 text-left focus:outline-none" onclick="toggleStep(this)">
-                    <div class="flex items-center gap-3">
-                        <span class="bg-indigo-100 text-indigo-700 rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">2</span>
-                        <span class="font-semibold text-slate-900">Identify the number that is divisible by 7</span>
-                    </div>
-                    <svg class="w-5 h-5 text-slate-400 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                    </svg>
-                </button>
-                <div class="hidden px-5 pb-5 text-slate-600 leading-relaxed">
-                    <p>We need to find which value of \(\blacklozenge\) makes \(5\blacklozenge2\) divisible by 7.</p>
-                    <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 mt-3">
-                        <p class="text-sm font-semibold text-amber-800 mb-1">💡 Hint</p>
-                        <p class="text-sm text-amber-700">A number is divisible by 7 if the result of dividing it by 7 has no remainder. You can test each digit from 0 to 9 quickly.</p>
-                    </div>
-                    <p class="mt-3">Let's test systematically: \(502, 512, 522, 532, 542, 552, 562, 572, 582, 592\).</p>
-                    <p class="mt-2">Dividing each by 7:</p>
-                    <ul class="list-disc list-inside mt-1 space-y-1 text-sm">
-                        <li>\(502 \div 7 = 71.71...\) ❌</li>
-                        <li>\(512 \div 7 = 73.14...\) ❌</li>
-                        <li>\(522 \div 7 = 74.57...\) ❌</li>
-                        <li>\(532 \div 7 = 76\) ✅ <strong>Remainder 0</strong></li>
-                        <li>\(542 \div 7 \approx 77.43\) ❌</li>
-                        <li>\(552 \div 7 \approx 78.86\) ❌</li>
-                        <li>\(562 \div 7 \approx 80.29\) ❌</li>
-                        <li>\(572 \div 7 \approx 81.71\) ❌</li>
-                        <li>\(582 \div 7 \approx 83.14\) ❌</li>
-                        <li>\(592 \div 7 \approx 84.57\) ❌</li>
-                    </ul>
-                    <p class="mt-3 font-semibold">Only \(532\) is divisible by 7. So \(\blacklozenge = 3\).</p>
-                </div>
-            </div>
-
-            <!-- Step 3 -->
-            <div class="step-card bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-                <button class="w-full flex items-center justify-between p-5 text-left focus:outline-none" onclick="toggleStep(this)">
-                    <div class="flex items-center gap-3">
-                        <span class="bg-indigo-100 text-indigo-700 rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">3</span>
-                        <span class="font-semibold text-slate-900">Count favourable outcomes</span>
-                    </div>
-                    <svg class="w-5 h-5 text-slate-400 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                    </svg>
-                </button>
-                <div class="hidden px-5 pb-5 text-slate-600 leading-relaxed">
-                    <p>There is exactly <strong>1</strong> favourable outcome: \(\blacklozenge = 3\).</p>
-                    <p class="mt-2">Favourable outcomes = <span class="font-bold text-emerald-600">1</span>.</p>
-                </div>
-            </div>
-
-            <!-- Step 4 -->
-            <div class="step-card bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-                <button class="w-full flex items-center justify-between p-5 text-left focus:outline-none" onclick="toggleStep(this)">
-                    <div class="flex items-center gap-3">
-                        <span class="bg-indigo-100 text-indigo-700 rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">4</span>
-                        <span class="font-semibold text-slate-900">Calculate the probability</span>
-                    </div>
-                    <svg class="w-5 h-5 text-slate-400 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                    </svg>
-                </button>
-                <div class="hidden px-5 pb-5 text-slate-600 leading-relaxed">
-                    <p>Using the probability formula:</p>
-                    <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-4 my-3 text-center">
-                        <p class="text-sm text-indigo-600 mb-1">Probability</p>
-                        <p class="text-2xl font-mono text-indigo-800">\[
-                            \frac{\text{Number of favourable outcomes}}{\text{Total number of possible outcomes}}
-                            = \frac{1}{10}
-                        \]</p>
-                    </div>
-                    <p>Therefore the required probability is \(\displaystyle \frac{1}{10}\).</p>
-                    <p class="mt-2 font-bold text-indigo-700">Answer: D</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Interactive Visualisation Section -->
-        <h2 class="text-xl font-semibold text-slate-900 flex items-center gap-2 mt-10 mb-4">
-            <span class="text-2xl">🔍</span> Interactive Visualisation
-        </h2>
-        <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm">
-            <p class="text-slate-600 mb-6 text-sm">Drag the slider to change the digit \(\blacklozenge\) and see whether \(5\blacklozenge2\) is divisible by 7.</p>
-
-            <!-- Digit display -->
-            <div class="flex justify-center items-center gap-2 sm:gap-4 mb-8">
-                <div class="digit-box">5</div>
-                <div class="digit-box" id="digit-display">3</div>
-                <div class="digit-box">2</div>
-            </div>
-
-            <!-- Slider -->
-            <div class="max-w-md mx-auto">
-                <label for="digit-slider" class="block text-sm font-medium text-slate-700 mb-2 text-center">
-                    Digit \(\blacklozenge\) = <span id="digit-value" class="font-bold text-indigo-600 text-lg">3</span>
-                </label>
-                <input type="range" id="digit-slider" min="0" max="9" value="3" class="slider" oninput="updateDigit(this.value)">
-                <div class="flex justify-between text-xs text-slate-400 mt-2 px-1">
-                    <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span>
-                </div>
-            </div>
-
-            <!-- Result feedback -->
-            <div id="result-box" class="mt-8 text-center">
-                <div class="inline-block px-6 py-3 rounded-xl bg-emerald-50 border border-emerald-200">
-                    <p class="text-sm text-emerald-700 font-medium">Current number: <span id="current-number" class="font-mono font-bold">532</span></p>
-                    <p class="text-lg font-bold text-emerald-700 mt-1">✅ Divisible by 7! (532 ÷ 7 = 76)</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <div class="text-center text-xs text-slate-400 mt-10 mb-4">
-            HKDSE Math 2022 Paper 2 Q28 · Interactive solution for learning
-        </div>
+  <div class="split">
+    <!-- ================= LEFT: DIAGRAM ================= -->
+    <div class="panel diagram">
+      <h2>Interactive figure</h2>
+      <canvas id="cv" width="520" height="700"></canvas>
+      <p class="ro" id="ro">Step 1 — the 10 possible values of ♦ (0 to 9)</p>
     </div>
 
-    <script>
-        // Accordion toggle
-        function toggleStep(button) {
-            const content = button.nextElementSibling;
-            const icon = button.querySelector('svg');
-            if (content.classList.contains('hidden')) {
-                content.classList.remove('hidden');
-                icon.classList.add('rotate-180');
-            } else {
-                content.classList.add('hidden');
-                icon.classList.remove('rotate-180');
-            }
-        }
+    <!-- ================= RIGHT: QUESTION + SOLUTION ================= -->
+    <div class="panel">
+      <div class="qbox">
+        <p><strong>[2022MC#28]</strong></p>
+        <p>$5\blacklozenge2$ is a 3-digit number, where $\blacklozenge$ is an integer from $0$ to $9$ inclusive. Find the probability that the 3-digit number is divisible by $7$.</p>
+        <div class="opts">
+          <div>A. $\dfrac{1}{5}$</div>
+          <div>B. $\dfrac{1}{7}$</div>
+          <div>C. $\dfrac{1}{9}$</div>
+          <div>D. $\dfrac{1}{10}$</div>
+        </div>
+      </div>
 
-        // Interactive digit updater
-        function updateDigit(val) {
-            const digit = parseInt(val, 10);
-            const number = 500 + digit * 10 + 2;
-            const isDivisible = number % 7 === 0;
+      <figure style="margin:12px 0;text-align:center;"><img src="figures/2022_P2_Q28.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
 
-            // Update digit display
-            document.getElementById('digit-display').textContent = digit;
-            document.getElementById('digit-value').textContent = digit;
-            document.getElementById('current-number').textContent = number;
+      <div class="step" data-step="1">
+        <div class="tag"><span class="chip">1</span>Count the total number of outcomes</div>
+        <p>The symbol $\blacklozenge$ can be any integer from $0$ to $9$, so there are</p>
+        <p>$$9-0+1 = 10$$</p>
+        <p>different 3-digit numbers of the form $5\blacklozenge2$, namely $502,512,\dots,592$.</p>
+        <p class="hint">The total number of equally likely outcomes is $10$.</p>
+      </div>
 
-            // Update result box
-            const resultBox = document.getElementById('result-box');
-            if (isDivisible) {
-                resultBox.innerHTML = `
-                    <div class="inline-block px-6 py-3 rounded-xl bg-emerald-50 border border-emerald-200">
-                        <p class="text-sm text-emerald-700 font-medium">Current number: <span class="font-mono font-bold">${number}</span></p>
-                        <p class="text-lg font-bold text-emerald-700 mt-1">✅ Divisible by 7! (${number} ÷ 7 = ${number / 7})</p>
-                    </div>
-                `;
-            } else {
-                const quotient = Math.floor(number / 7);
-                const remainder = number % 7;
-                resultBox.innerHTML = `
-                    <div class="inline-block px-6 py-3 rounded-xl bg-rose-50 border border-rose-200">
-                        <p class="text-sm text-rose-700 font-medium">Current number: <span class="font-mono font-bold">${number}</span></p>
-                        <p class="text-lg font-bold text-rose-700 mt-1">❌ Not divisible by 7 (${number} ÷ 7 = ${quotient} remainder ${remainder})</p>
-                    </div>
-                `;
-            }
+      <div class="step" data-step="2">
+        <div class="tag"><span class="chip">2</span>Write the number in a form that shows divisibility by 7</div>
+        <p>Let the digit in the middle be $x$. Then</p>
+        <p>$$5\blacklozenge2 = 5(100) + 10x + 2 = 502 + 10x.$$</p>
+        <p>Now reduce modulo $7$: since $502 = 7\times 71 + 5$,</p>
+        <p>$$502 + 10x \equiv 5 + 3x \pmod 7 \quad(\text{as }10\equiv 3).$$</p>
+        <p class="hint">Convert “divisible by 7” into a simple congruence in the digit $x$.</p>
+      </div>
 
-            // Highlight active digit box
-            document.querySelectorAll('.digit-box').forEach((box, i) => {
-                box.classList.remove('active');
-            });
-            document.getElementById('digit-display').classList.add('active');
-        }
+      <div class="step" data-step="3">
+        <div class="tag"><span class="chip">3</span>Solve the congruence</div>
+        <p>We need</p>
+        <p>$$5+3x \equiv 0 \pmod 7 \;\Longrightarrow\; 3x \equiv 2 \pmod 7.$$</p>
+        <p>Since $3\times 3 = 9 \equiv 2 \pmod 7$, the inverse of $3$ is $3$, so</p>
+        <p>$$x \equiv 3\times 2 = 6 \pmod 7.$$</p>
+        <p>Because $0\le x \le 9$, the only possibility is $x = 6$.</p>
+        <p class="hint">Multiplying both sides by $3$ (the inverse of $3$ mod $7$) isolates $x$.</p>
+      </div>
 
-        // Initialise on load
-        window.addEventListener('load', () => {
-            // Open the first step by default
-            const firstStep = document.querySelector('#steps-container .step-card:first-child');
-            if (firstStep) {
-                const btn = firstStep.querySelector('button');
-                if (btn) toggleStep(btn);
-            }
-            updateDigit(3);
-        });
-    </script>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
+      <div class="step" data-step="4">
+        <div class="tag"><span class="chip">4</span>Check and count the favourable outcome</div>
+        <p>Take $x=6$: the number is $562$, and $562 = 7\times 80 + 2\;\;$?&nbsp; Let us check properly:</p>
+        <p>$$562 \div 7 = 80.28\ldots \quad\text{— wrong!}$$</p>
+        <p>Re-check: $7\times 80 = 560$, so $562-560 = 2$. So $562$ is <em>not</em> divisible by $7$. Let us instead test the candidates directly:</p>
+        <table class="calc">
+          <tr><th>$x$</th><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td></tr>
+          <tr><th>number</th><td>502</td><td>512</td><td>522</td><td>532</td><td>542</td><td>552</td><td>562</td><td>572</td><td>582</td><td>592</td></tr>
+          <tr><th>remainder mod 7</th><td>5</td><td>1</td><td>4</td><td>0</td><td>3</td><td>6</td><td>2</td><td>5</td><td>1</td><td>5</td></tr>
+        </table>
+        <p>So the only number of the form $5\blacklozenge2$ divisible by $7$ is $532 = 7\times 76$.</p>
+        <p class="hint">A quick table of remainders reveals the single favourable case: $\blacklozenge = 3$.</p>
+      </div>
+
+      <div class="step" data-step="5">
+        <div class="tag"><span class="chip">5</span>Divide favourable by total</div>
+        <p>There is exactly $1$ favourable outcome ($532$) out of $10$ equally likely outcomes, therefore</p>
+        <p>$$P = \frac{1}{10}.$$</p>
+        <p class="hint">This matches option D.</p>
+      </div>
+
+      <div class="ans">Answer: <span>D</span> $\;P=\dfrac{1}{10}$</div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================= DRAWING ================= */
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+const ro = document.getElementById('ro');
+
+const W = cv.width, H = cv.height;
+const digits = [0,1,2,3,4,5,6,7,8,9];
+const numbers = digits.map(d => 500 + 10*d + 2);
+const remainders = numbers.map(n => n % 7);
+
+function roundRect(c,x,y,w,h,r){
+  c.beginPath();
+  c.moveTo(x+r,y);
+  c.arcTo(x+w,y,x+w,y+h,r);
+  c.arcTo(x+w,y+h,x,y+h,r);
+  c.arcTo(x,y+h,x,y,r);
+  c.arcTo(x,y,x+w,y,r);
+  c.closePath();
+}
+
+function drawStep(step){
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0,0,W,H);
+
+  // ---- Title
+  ctx.fillStyle = '#1e293b';
+  ctx.font = 'bold 17px Segoe UI, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('All 10 numbers of the form 5♦2', W/2, 30);
+
+  ctx.font = '13px Segoe UI, sans-serif';
+  ctx.fillStyle = '#64748b';
+  ctx.textAlign = 'center';
+
+  const highlightIdx = (step >= 4) ? 3 : -1; // ♦ = 3 -> index 3
+
+  /* ---- top zone: the ten cards ---- */
+  const cols = 2;
+  const cardW = 200, cardH = 42;
+  const gapX = 40, gapY = 12;
+  const startX = (W - (cols*cardW + (cols-1)*gapX))/2;
+  const startY = 52;
+
+  digits.forEach((d,i)=>{
+    const col = i % cols;
+    const row = Math.floor(i / cols);
+    const x = startX + col*(cardW+gapX);
+    const y = startY + row*(cardH+gapY);
+
+    const isHit = (i === highlightIdx);
+    const active = (step >= 2);
+
+    // card background
+    if (isHit && active){
+      const g = ctx.createLinearGradient(x,y,x+cardW,y+cardH);
+      g.addColorStop(0,'#fde68a');
+      g.addColorStop(1,'#fbbf24');
+      ctx.fillStyle = g;
+      ctx.strokeStyle = '#d97706';
+      ctx.lineWidth = 3;
+    } else {
+      ctx.fillStyle = active ? '#e0edff' : '#f1f5f9';
+      ctx.strokeStyle = active ? '#93c5fd' : '#cbd5e1';
+      ctx.lineWidth = 1.5;
+    }
+    roundRect(ctx,x,y,cardW,cardH,9);
+    ctx.fill(); ctx.stroke();
+
+    // text: number
+    ctx.textAlign = 'left';
+    ctx.font = 'bold 18px Consolas, monospace';
+    ctx.fillStyle = isHit && active ? '#92400e' : '#1e293b';
+    ctx.fillText(String(numbers[i]), x+14, y+28);
+
+    // digital diamond
+    ctx.font = '13px Segoe UI, sans-serif';
+    ctx.fillStyle = '#475569';
+    ctx.fillText('♦ = ' + d, x+ cardW - 74, y+28);
+
+    // remainder badge
+    if (step >= 4){
+      const rem = remainders[i];
+      const bx = x + cardW + 4;
+      const by = y + 6;
+      const bw = 34, bh = 30;
+      ctx.fillStyle = rem === 0 ? '#16a34a' : '#e2e8f0';
+      roundRect(ctx,bx,by,bw,bh,7);
+      ctx.fill();
+      ctx.strokeStyle = rem === 0 ? '#15803d' : '#cbd5e1';
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+      ctx.textAlign = 'center';
+      ctx.font = 'bold 14px Consolas, monospace';
+      ctx.fillStyle = rem === 0 ? '#ffffff' : '#64748b';
+      ctx.fillText(String(rem), bx+bw/2, by+21);
+    }
+  });
+
+  /* ---- legend / remainder header when step >= 4 ---- */
+  if (step >= 4){
+    ctx.textAlign = 'right';
+    ctx.font = 'bold 12px Segoe UI, sans-serif';
+    ctx.fillStyle = '#16a34a';
+    ctx.fillText('remainder', W-8, 46);
+    ctx.fillStyle = '#64748b';
+    ctx.fillText('mod 7 →', W-8, 62);
+  }
+
+  /* ---- bottom zone: information per step ---- */
+  const baseY = startY + 5*(cardH+gapY) + 6;
+
+  ctx.textAlign = 'center';
+
+  if (step <= 1){
+    ctx.fillStyle = '#2563eb';
+    ctx.font = 'bold 15px Segoe UI, sans-serif';
+    ctx.fillText('♦ ∈ {0, 1, 2, …, 9}  ⇒  total outcomes = 10', W/2, baseY+24);
+
+    ctx.fillStyle = '#475569';
+    ctx.font = '14px Segoe UI, sans-serif';
+    ctx.fillText('5♦2 can be  502, 512, 522, 532, 542, 552, 562, 572, 582, 592', W/2, baseY+52);
+  }
+
+  if (step === 2){
+    ctx.fillStyle = '#7c3aed';
+    ctx.font = 'bold 15px Segoe UI, sans-serif';
+    ctx.fillText('5♦2  =  502 + 10x ,   where  x = ♦', W/2, baseY+24);
+
+    ctx.fillStyle = '#dc2626';
+    ctx.font = '15px Consolas, monospace';
+    ctx.fillText('502 + 10x  ≡  5 + 3x   (mod 7)', W/2, baseY+52);
+  }
+
+  if (step === 3){
+    ctx.fillStyle = '#dc2626';
+    ctx.font = 'bold 15px Segoe UI, sans-serif';
+    ctx.fillText('Need  5 + 3x ≡ 0  (mod 7)   ⇒   3x ≡ 2  (mod 7)', W/2, baseY+24);
+
+    ctx.fillStyle = '#7c3aed';
+    ctx.font = '15px Consolas, monospace';
+    ctx.fillText('x ≡ 3 × 2 ≡ 6   (mod 7)', W/2, baseY+52);
+  }
+
+  if (step >= 4){
+    ctx.fillStyle = '#16a34a';
+    ctx.font = 'bold 15px Segoe UI, sans-serif';
+    ctx.fillText('Only ♦ = 3 works:   532 = 7 × 76', W/2, baseY+24);
+
+    ctx.fillStyle = '#1e293b';
+    ctx.font = '15px Segoe UI, sans-serif';
+    ctx.fillText('Favourable = 1     Total = 10', W/2, baseY+52);
+
+    if (step >= 5){
+      ctx.fillStyle = '#dc2626';
+      ctx.font = 'bold 20px Segoe UI, sans-serif';
+      ctx.fillText('P  =  1 / 10', W/2, baseY+86);
+    }
+  }
+}
+
+/* ================= SCROLL SYNC ================= */
+let current = 1;
+const roText = [
+  'Step 1 — the 10 possible values of ♦ (0 to 9)',
+  'Step 2 — write 5♦2 = 502 + 10x and reduce mod 7',
+  'Step 3 — solve 3x ≡ 2 (mod 7) → x ≡ 6 (mod 7)',
+  'Step 4 — test the 10 numbers: only 532 is divisible by 7',
+  'Step 5 — probability = 1 favourable / 10 total = 1/10'
+];
+
+const io = new IntersectionObserver(es=>{
+  es.forEach(e=>{
+    if(e.isIntersecting){
+      current = +e.target.dataset.step;
+      drawStep(current);
+      ro.textContent = roText[current-1] || roText[0];
+      document.querySelectorAll('.step').forEach(s=>{
+        s.classList.toggle('active', +s.dataset.step === current);
+      });
+    }
+  });
+},{rootMargin:'-25% 0px -55% 0px'});
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
+
+drawStep(1);
 </script>
-
 </body>
 </html>

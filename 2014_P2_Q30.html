@@ -1,740 +1,188 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>HKDSE Math 2014 Paper 2 Q30 — Stem-and-Leaf · Range</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2014 Paper 2 Q30 — Stem-and-Leaf Diagram</title>
 <script>
-  window.MathJax = {
-    tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['\\[', '\\]']] },
-    svg: { fontCache: 'global' }
-  };
+window.MathJax = {
+  tex: { inlineMath: [['$','$'], ['\\(','\\)']], displayMath: [['$$','$$'], ['\\[','\\]']] },
+  svg: { fontCache: 'global' }
+};
 </script>
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
   :root{
-    --blue:#1d4ed8;
-    --blue-dark:#1e3a8a;
-    --blue-soft:#dbeafe;
-    --amber:#b45309;
-    --amber-soft:#fef3c7;
-    --emerald:#047857;
-    --emerald-soft:#d1fae5;
-    --ink:#0f172a;
-    --muted:#475569;
-    --line:#e2e8f0;
+    --bg:#f4f7fb; --card:#ffffff; --ink:#1c2b3a; --muted:#5b6b7c;
+    --accent:#2563eb; --accent2:#e11d48; --accent3:#059669; --accent4:#d97706;
+    --line:#dbe4ee; --shadow:0 6px 20px rgba(23,43,77,.08);
   }
   *{box-sizing:border-box;}
-  html{scroll-behavior:smooth;}
+  html,body{margin:0;padding:0;}
   body{
-    margin:0;
-    font-family:'Segoe UI',system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
-    color:var(--ink);
-    background:#f1f5f9;
-    line-height:1.6;
+    font-family:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
+    background:linear-gradient(180deg,#eef3fa 0%,#f7fafd 100%);
+    color:var(--ink); font-size:15.5px; line-height:1.55;
   }
-  .wrap{max-width:1040px;margin:0 auto;padding:0 18px 60px;}
+  .wrap{max-width:1240px;margin:0 auto;padding:16px 14px 60px;}
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start;}
+  @media(min-width:900px){.split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}}
+  .diagram{position:sticky;top:16px;max-height:calc(100vh - 2rem);overflow-y:auto;}
+  @media(max-width:640px){body{font-size:14.5px;}.wrap{padding:10px 8px 40px;}}
 
-  /* ---------- Hero ---------- */
-  header.hero{
-    background:linear-gradient(135deg,#1e3a8a 0%,#1d4ed8 45%,#2563eb 75%,#3b82f6 100%);
-    color:#fff;
-    padding:44px 18px 52px;
-    position:relative;
-    overflow:hidden;
-  }
-  header.hero::after{
-    content:"";
-    position:absolute;
-    width:520px;height:520px;border-radius:50%;
-    background:radial-gradient(circle,rgba(255,255,255,.18),transparent 65%);
-    top:-230px;right:-140px;
-  }
-  .hero-inner{max-width:1040px;margin:0 auto;position:relative;z-index:2;}
-  .eyebrow{
-    letter-spacing:.16em;
-    text-transform:uppercase;
-    font-size:.72rem;
-    font-weight:700;
-    opacity:.9;
-  }
-  .hero h1{
-    margin:.25em 0 .1em;
-    font-size:clamp(1.5rem,4.2vw,2.4rem);
-    line-height:1.2;
-    font-weight:800;
-  }
-  .hero .subtitle{
-    font-size:1rem;
-    opacity:.95;
-    max-width:640px;
-  }
-  .pills{margin-top:18px;display:flex;flex-wrap:wrap;gap:8px;}
-  .pill{
-    background:rgba(255,255,255,.16);
-    border:1px solid rgba(255,255,255,.35);
-    color:#fff;
-    padding:5px 13px;
-    border-radius:999px;
-    font-size:.78rem;
-    font-weight:600;
-    backdrop-filter:blur(4px);
-  }
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:14px 16px;}
+  .diagram .card{padding:12px 12px 8px;}
+  h1{font-size:1.12rem;margin:0 0 4px;letter-spacing:.2px;}
+  .sub{color:var(--muted);font-size:.83rem;margin:0 0 10px;}
+  .qhead{display:inline-block;background:var(--accent);color:#fff;font-size:.74rem;font-weight:700;
+         padding:2px 9px;border-radius:999px;letter-spacing:.6px;margin-bottom:8px;}
+  canvas{width:100%;height:auto;display:block;border-radius:10px;background:#fdfefe;}
 
-  /* ---------- Cards ---------- */
-  .card{
-    background:#fff;
-    border-radius:18px;
-    box-shadow:0 8px 24px rgba(15,23,42,.07), 0 1px 3px rgba(15,23,42,.05);
-    padding:26px 24px;
-    margin-top:26px;
-    border:1px solid #eef2f7;
-  }
-  .card h2{
-    margin:0 0 6px;
-    font-size:1.15rem;
-    color:var(--blue-dark);
-    display:flex;align-items:center;gap:10px;
-  }
-  .card h2 .tag{
-    font-size:.72rem;
-    background:var(--blue-soft);
-    color:var(--blue-dark);
-    padding:3px 10px;
-    border-radius:999px;
-    font-weight:700;
-    letter-spacing:.04em;
-  }
-  .card h3{
-    font-size:1rem;
-    margin:22px 0 8px;
-    color:var(--blue-dark);
-  }
-  .marks{
-    display:inline-block;
-    background:#fff7ed;
-    color:var(--amber);
-    border:1px solid #fde68a;
-    border-radius:6px;
-    font-size:.72rem;
-    font-weight:700;
-    padding:1px 7px;
-    margin-left:6px;
-    vertical-align:middle;
-  }
+  .badge{font-weight:700;font-size:.7rem;letter-spacing:.5px;padding:2px 8px;border-radius:6px;color:#fff;}
 
-  .question-text{font-size:1.02rem;}
-
-  /* stem-leaf table */
-  .sl-wrap{
-    display:flex;justify-content:center;margin:18px 0 6px;
-  }
-  table.sl{
-    border-collapse:collapse;
-    font-family:'DejaVu Serif',Georgia,serif;
-    font-size:1.05rem;
-    background:#f8fafc;
-    border-radius:10px;
-    overflow:hidden;
-    box-shadow:0 2px 8px rgba(15,23,42,.08);
-  }
-  table.sl th, table.sl td{
-    border:1px solid #cbd5e1;
-    padding:5px 14px;
-    text-align:center;
-  }
-  table.sl th{
-    background:#e0e7ff;
-    color:#1e3a8a;
-    font-weight:700;
-    font-size:.85rem;
-    letter-spacing:.05em;
-  }
-  table.sl td.stem{
-    background:#eef2ff;
-    font-weight:700;
-    color:#1e3a8a;
-    width:70px;
-  }
-  table.sl td.leaf{letter-spacing:.28em;padding-left:18px;text-align:left;min-width:170px;}
-  .hl-h{color:#b91c1c;font-weight:800;}
-  .hl-k{color:#047857;font-weight:800;}
-
-  .options{
-    margin:18px 0 0;
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-    gap:10px;
-  }
-  .opt{
-    border:1px solid var(--line);
-    border-radius:12px;
-    padding:9px 14px;
-    background:#f8fafc;
-    font-weight:600;
-    font-size:.95rem;
-  }
-  .opt.correct{
-    background:var(--emerald-soft);
-    border-color:#6ee7b7;
-    color:#065f46;
-    box-shadow:0 0 0 2px rgba(16,185,129,.18) inset;
-  }
-
-  /* ---------- Steps ---------- */
-  .step{
-    display:none;
-    border-left:4px solid var(--blue);
-    background:#f8fafc;
-    border-radius:0 14px 14px 0;
-    padding:15px 18px;
-    margin-top:14px;
-  }
-  .step.show{display:block;animation:fade .35s ease-out;}
-  @keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
-  .step-head{
-    display:flex;align-items:center;gap:10px;flex-wrap:wrap;
-    margin-bottom:8px;
-  }
-  .badge-num{
-    background:var(--blue);color:#fff;
-    font-size:.76rem;font-weight:800;
-    border-radius:999px;padding:3px 11px;
-    letter-spacing:.03em;
-  }
-  .badge-marks{
-    background:var(--amber-soft);color:var(--amber);
-    border:1px solid #fbbf24;
-    font-size:.72rem;font-weight:800;
-    border-radius:999px;padding:2px 10px;
-  }
-  .step-body{font-size:.98rem;}
-  .hint{
-    background:var(--amber-soft);
-    border-left:4px solid #f59e0b;
-    border-radius:0 10px 10px 0;
-    padding:10px 14px;
-    margin-top:12px;
-    font-size:.92rem;
-    color:#78350f;
-  }
-  .hint strong{color:#92400e;}
-  .answer{
-    background:var(--emerald-soft);
-    border-left:4px solid #10b981;
-    border-radius:0 10px 10px 0;
-    padding:10px 14px;
-    margin-top:12px;
-    font-size:.95rem;
-    color:#064e3b;
-    font-weight:600;
-  }
-  .answer .lbl{font-weight:800;color:#047857;}
-
-  .btn{
-    appearance:none;
-    border:none;
-    cursor:pointer;
-    font-family:inherit;
-    font-weight:700;
-    font-size:.9rem;
-    border-radius:11px;
-    padding:10px 20px;
-    transition:.18s;
-    background:var(--blue);
-    color:#fff;
-    box-shadow:0 4px 12px rgba(29,78,216,.28);
-  }
-  .btn:hover:not(:disabled){background:var(--blue-dark);transform:translateY(-1px);}
-  .btn:disabled{
-    background:#cbd5e1;color:#64748b;
-    box-shadow:none;cursor:not-allowed;transform:none;
-  }
-  .btn-row{
-    display:flex;align-items:center;gap:14px;flex-wrap:wrap;
-    margin-top:18px;
-  }
-  .counter{
-    font-size:.84rem;font-weight:700;color:var(--muted);
-    background:#eef2f7;border-radius:999px;padding:4px 13px;
-  }
-
-  /* ---------- Canvas ---------- */
-  .canvas-box{
-    background:#0b1220;
-    border-radius:14px;
-    padding:12px;
-    margin:16px 0 6px;
-    box-shadow:inset 0 0 0 1px #1e293b;
-  }
-  canvas{
-    width:100%;
-    height:auto;
-    display:block;
-    border-radius:9px;
-    background:#0b1220;
-    touch-action:pan-y;
-  }
-  .controls{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
-    gap:14px;
-    margin-top:12px;
-  }
-  .ctrl{
-    background:#f8fafc;
-    border:1px solid var(--line);
-    border-radius:12px;
-    padding:11px 14px;
-  }
-  .ctrl label{
-    display:flex;justify-content:space-between;
-    font-size:.84rem;font-weight:700;color:#1e3a8a;
-    margin-bottom:6px;
-  }
-  .ctrl .val{
-    font-family:'Consolas',monospace;
-    background:#e0e7ff;color:#1e3a8a;
-    border-radius:6px;padding:0 7px;
-  }
-  input[type=range]{
-    width:100%;accent-color:var(--blue);height:22px;
-  }
-  .chk-row{
-    display:flex;gap:18px;flex-wrap:wrap;margin-top:4px;
-  }
-  .chk-row label{
-    font-size:.85rem;font-weight:600;color:var(--muted);
-    display:flex;align-items:center;gap:7px;cursor:pointer;
-  }
-  input[type=checkbox]{width:17px;height:17px;accent-color:var(--blue);cursor:pointer;}
-
-  .readout{
-    margin-top:12px;
-    background:#0b1220;
-    color:#e2e8f0;
-    border-radius:11px;
-    padding:12px 16px;
-    font-family:'Consolas','Menlo',monospace;
-    font-size:.87rem;
-    line-height:1.85;
-    overflow-x:auto;
-  }
-  .readout .k{color:#93c5fd;}
-  .readout .ok{color:#6ee7b7;font-weight:700;}
-  .readout .bad{color:#fca5a5;font-weight:700;}
-  .readout .y{color:#fcd34d;font-weight:700;}
-
-  /* ---------- Summary ---------- */
-  .summary{
-    background:linear-gradient(150deg,#0f172a,#1e293b);
-    color:#e2e8f0;
-    border-radius:18px;
-    padding:28px 26px;
-    margin-top:30px;
-    box-shadow:0 12px 34px rgba(15,23,42,.35);
-  }
-  .summary h2{color:#93c5fd;margin:0 0 14px;font-size:1.15rem;}
-  .summary ul{margin:0;padding-left:0;list-style:none;}
-  .summary li{
-    padding:9px 0 9px 30px;
-    position:relative;
-    border-bottom:1px dashed rgba(148,163,184,.25);
-  }
-  .summary li:last-child{border-bottom:none;}
-  .summary li::before{
-    content:"✓";
-    position:absolute;left:0;top:9px;
-    color:#34d399;font-weight:800;
-  }
-  .summary .key{color:#fcd34d;font-weight:700;}
-
-  footer{
-    text-align:center;
-    color:#64748b;
-    font-size:.82rem;
-    padding:30px 18px 10px;
-  }
-
-  @media (max-width:560px){
-    .card{padding:20px 16px;}
-    header.hero{padding:34px 16px 40px;}
-    table.sl td.leaf{padding-left:10px;letter-spacing:.18em;min-width:120px;}
-  }
+  .qtext{background:#f8fbff;border-left:4px solid var(--accent);border-radius:8px;padding:10px 12px;margin:8px 0 12px;}
+  .step{border-left:4px solid var(--accent);background:#fbfdff;border-radius:8px;padding:10px 12px;margin:10px 0;
+        transition:box-shadow .25s, transform .25s, background .25s;}
+  .step.active{box-shadow:0 0 0 2px rgba(37,99,235,.28);transform:translateX(2px);background:#f2f7ff;}
+  .step .tag{display:inline-block;font-weight:800;font-size:.72rem;color:#fff;background:var(--accent);
+             border-radius:6px;padding:1px 8px;margin-right:8px;letter-spacing:.5px;vertical-align:2px;}
+  .s2 .tag{background:var(--accent4);} .s3 .tag{background:var(--accent2);}
+  .s4 .tag{background:var(--accent3);} .s5 .tag{background:#7c3aed;}
+  .step p{margin:6px 0;}
+  .hint{color:var(--muted);font-size:.85rem;font-style:italic;}
+  .ok{color:#059669;font-weight:700;}
+  .no{color:#dc2626;font-weight:700;}
+  .ansbox{margin-top:14px;background:linear-gradient(90deg,#eef7f1,#f6fbf8);border:1px solid #bfe6cd;
+          border-radius:10px;padding:10px 14px;font-size:1.02rem;}
+  .ansbox b{color:#047857;}
+  .ro{font-size:.83rem;color:var(--muted);margin:8px 2px 0;min-height:1.2em;}
+  table.stem{border-collapse:collapse;font-family:'Consolas','Menlo',monospace;font-size:.85rem;}
+  table.stem td,table.stem th{padding:2px 10px;text-align:center;}
+  table.stem th{color:var(--muted);font-weight:600;border-bottom:1px solid var(--line);}
+  ul.opts{list-style:none;padding-left:0;margin:6px 0;}
+  ul.opts li{padding:3px 0;}
+  .kbd{font-family:monospace;background:#eef2f7;border:1px solid var(--line);border-radius:4px;padding:0 5px;}
 </style>
 </head>
 <body>
+<div class="wrap">
+<div class="split">
 
-<!-- ================= HERO ================= -->
-<header class="hero">
-  <div class="hero-inner">
-    <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2 · Multiple Choice</div>
-    <h1>2014 Paper 2 · Question 30</h1>
-    <p class="subtitle">Statistics — Stem-and-Leaf Diagrams &amp; the Range of a Distribution</p>
-    <div class="pills">
-      <span class="pill">Stem-and-Leaf Diagram</span>
-      <span class="pill">Range</span>
-      <span class="pill">Maximum &amp; Minimum</span>
-      <span class="pill">Constraints on Unknown Digits</span>
+  <!-- ================= LEFT: DIAGRAM ================= -->
+  <div class="diagram">
+    <div class="card">
+      <h1>Stem-and-Leaf Diagram</h1>
+      <p class="sub">Ages of passengers (units = 1 year, stems = tens)</p>
+      <canvas id="cv" width="620" height="560"></canvas>
+      <p class="ro" id="readout">Highlighted: the stem-and-leaf table.</p>
     </div>
   </div>
-</header>
 
-<div class="wrap">
+  <!-- ================= RIGHT: QUESTION + SOLUTION ================= -->
+  <div>
+    <div class="card">
+      <span class="qhead">HKDSE 2014 · Paper 2 · Q30</span>
+      <h1>Range of a stem-and-leaf distribution</h1>
 
-  <!-- ================= QUESTION ================= -->
-  <section class="card">
-    <h2>Question <span class="tag">2 marks</span></h2>
-    <div class="question-text">
-      <p>
-        The stem-and-leaf diagram below shows the distribution of the ages of the passengers in a bus.
-      </p>
-
-      <div class="sl-wrap">
-        <table class="sl">
-          <thead>
-            <tr><th>Stem (tens)</th><th>Leaf (units)</th></tr>
-          </thead>
-          <tbody>
-            <tr><td class="stem">1</td><td class="leaf"><span class="hl-h">h</span>&nbsp; 4 &nbsp; 6</td></tr>
-            <tr><td class="stem">2</td><td class="leaf">3 &nbsp; 3 &nbsp; 3 &nbsp; 3 &nbsp; 4 &nbsp; 6 &nbsp; 7 &nbsp; 7</td></tr>
-            <tr><td class="stem">3</td><td class="leaf">1 &nbsp; 2 &nbsp; 2 &nbsp; 2 &nbsp; 6 &nbsp; 8</td></tr>
-            <tr><td class="stem">4</td><td class="leaf">0 &nbsp; <span class="hl-k">k</span></td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <p>
-        If the range of the above distribution is at least \(33\), which of the following must be true?
-      </p>
-      <p style="margin-left:1.2em;">
-        I.&nbsp; \(0 \le h \le 3\)<br />
-        II.&nbsp; \(3 \le k \le 9\)<br />
-        III.&nbsp; \(3 \le k-h \le 5\)
-      </p><figure style="margin:12px 0;text-align:center;"><img src="figures/2014_P2_Q30.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
-      <div class="options">
-        <div class="opt">A. I only</div>
-        <div class="opt">B. II only</div>
-        <div class="opt">C. I and III only</div>
-        <div class="opt">D. II and III only</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ================= PART I : SET-UP ================= -->
-  <section class="card" id="part-setup">
-    <h2>Part (a) Reading the Diagram &amp; Setting the Range <span class="tag">Set-up</span></h2>
-    <p>
-      A stem-and-leaf diagram lists each data value as <em>stem</em> (tens digit) followed by <em>leaf</em> (units digit).
-      Drag the sliders below to see exactly which values the unknown digits \(h\) and \(k\) can take,
-      and watch how the maximum and minimum ages — and hence the range — change.
-    </p>
-
-    <div class="canvas-box">
-      <canvas id="cv1" width="900" height="600"></canvas>
-    </div>
-
-    <div class="controls">
-      <div class="ctrl">
-        <label>Unknown digit \(h\) (stem 1) <span class="val" id="hVal">0</span></label>
-        <input type="range" id="hSlider" min="0" max="9" step="1" value="0" />
-      </div>
-      <div class="ctrl">
-        <label>Unknown digit \(k\) (stem 4) <span class="val" id="kVal">0</span></label>
-        <input type="range" id="kSlider" min="0" max="9" step="1" value="0" />
-      </div>
-    </div>
-
-    <div class="chk-row">
-      <label><input type="checkbox" id="showRange" checked /> Show maximum / minimum markers</label>
-      <label><input type="checkbox" id="showAll" /> Show all data values</label>
-    </div>
-
-    <div class="readout" id="readout1"></div>
-
-    <div class="step" id="s1-1">
-      <div class="step-head">
-        <span class="badge-num">Step 1</span>
-        
-      </div>
-      <div class="step-body">
-        The smallest possible value uses stem \(1\): \(10 + h\). The largest possible value must use stem \(4\): \(40 + k\)
-        (since \(30+\) &lt; \(40+\), the maximum is always in the last row).
-        \[
-          \text{Range} = \max - \min = (40+k) - (10+h) = 30 + (k-h).
-        \]
-        <div class="hint">
-          <strong>Hint:</strong> The range always uses the largest value minus the smallest value.
-          The largest stem is \(4\), so the maximum is \(40+k\); the smallest stem is \(1\), so the minimum is \(10+h\).
+      <div class="qtext">
+        <p>The stem-and-leaf diagram below shows the distribution of the ages of the passengers in a bus.</p>
+        <div style="text-align:center;margin:10px 0;">
+          <table class="stem" style="margin:0 auto;">
+            <tr><th>Stem (tens)</th><th></th><th>Leaf (units)</th></tr>
+            <tr><td>1</td><td>|</td><td>$h$ &nbsp; 4 &nbsp; 6</td></tr>
+            <tr><td>2</td><td>|</td><td>3 &nbsp; 3 &nbsp; 3 &nbsp; 4 &nbsp; 6 &nbsp; 7 &nbsp; 7</td></tr>
+            <tr><td>3</td><td>|</td><td>1 &nbsp; 2 &nbsp; 2 &nbsp; 2 &nbsp; 6 &nbsp; 8</td></tr>
+            <tr><td>4</td><td>|</td><td>0 &nbsp; $k$</td></tr>
+          </table>
         </div>
+        <p>If the range of the above distribution is at least 33, which of the following must be true?</p>
+        <ul class="opts">
+          <li>I. &nbsp;$0 \le h \le 3$</li>
+          <li>II. &nbsp;$3 \le k \le 9$</li>
+          <li>III. &nbsp;$3 \le k - h \le 5$</li>
+        </ul>
+        <p>A. I only &nbsp;&nbsp; B. II only &nbsp;&nbsp; C. I and III only &nbsp;&nbsp; D. II and III only</p>
+      </div>
+
+      <figure style="margin:12px 0;text-align:center;"><img src="figures/2014_P2_Q30.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
+
+      <div class="step s1" data-step="1">
+        <span class="tag">STEP 1</span><b>Read off the possible values of $h$ and $k$.</b>
+        <p>Every leaf is a single digit, so $h$ and $k$ are digits from $0$ to $9$.</p>
+        <p>From the diagram: the stem <span class="kbd">1</span> row begins with leaf $h$, so $h\in\{0,1,2,\dots,9\}$.</p>
+        <p>The stem <span class="kbd">4</span> row contains $0$ and $k$, so $k\in\{0,1,2,\dots,9\}$ as well.</p>
+        <p class="hint">Hint: a leaf repeated across rows is impossible, but here nothing forbids any digit.</p>
+      </div>
+
+      <div class="step s2" data-step="2">
+        <span class="tag">STEP 2</span><b>Write the largest and smallest values.</b>
+        <p>Smallest value: $\text{stem }1,\ \text{leaf }h \;\Rightarrow\; 10+h$.</p>
+        <p>Largest value: $\text{stem }4,\ \text{leaf }k \;\Rightarrow\; 40+k$ (since $4 \ge h$ for the stem 1 row, $40+k$ is always the maximum).</p>
+        <p>$$\text{Range} = (40+k) - (10+h) = 30 + k - h.$$</p>
+        <p class="hint">Hint: "range = largest − smallest". Compare stems first, then leaves.</p>
+      </div>
+
+      <div class="step s3" data-step="3">
+        <span class="tag">STEP 3</span><b>Apply the condition: range is at least 33.</b>
+        <p>$$30 + k - h \ge 33 \quad\Longrightarrow\quad k \ge h + 3.$$</p>
+        <p>Combine with the digit constraints $0\le h\le 9$ and $0\le k\le 9$:</p>
+        <p>$$k \ge h+3,\qquad k\le 9.$$</p>
+        <p class="hint">This single inequality is the key to testing I, II and III.</p>
+      </div>
+
+      <div class="step s4" data-step="4">
+        <span class="tag">STEP 4</span><b>Test each statement — I: $0 \le h \le 3$.</b>
+        <p>Take $h = 4$. Then $k \ge 7$, and $k = 7 \le 9$ is possible.</p>
+        <p>So $h = 4$ is a legitimate value &mdash; statement I <span class="no">fails</span> (it is not <i>must be true</i>).</p>
+        <p class="hint">A "must be true" claim fails the moment one valid counter-example exists.</p>
+      </div>
+
+      <div class="step s5" data-step="5">
+        <span class="tag">STEP 5</span><b>Test II: $3 \le k \le 9$.</b>
+        <p>From $k \ge h+3$ and $h \ge 0$, we get $k \ge 3$. Also $k \le 9$ since $k$ is a digit.</p>
+        <p>So $3 \le k \le 9$ &mdash; statement II is <span class="ok">true</span>.</p>
+      </div>
+
+      <div class="step s6" data-step="6">
+        <span class="tag">STEP 6</span><b>Test III: $3 \le k - h \le 5$.</b>
+        <p>Take $h = 0$: then $k \ge 3$ and $k\le 9$, so $k-h = k-0 = k$ may be $6, 7, 8$ or $9$.</p>
+        <p>E.g. $h=0,\ k=9$ gives $k-h=9 > 5$ &mdash; statement III <span class="no">fails</span>.</p>
+        <p class="hint">Only $k-h \ge 3$ is forced; the upper bound $5$ is not guaranteed.</p>
+      </div>
+
+      <div class="step s7" data-step="7">
+        <span class="tag">STEP 7</span><b>Conclusion.</b>
+        <p>Only statement II must be true &nbsp;$\Rightarrow$&nbsp; answer B.</p>
+      </div>
+
+      <div class="ansbox">
+        <b>Answer: B (II only)</b>
       </div>
     </div>
+  </div>
 
-    <div class="step" id="s1-2">
-      <div class="step-head">
-        <span class="badge-num">Step 2</span>
-        
-      </div>
-      <div class="step-body">
-        "Range at least \(33\)" means
-        \[
-          30 + (k-h) \ge 33 \quad\Longrightarrow\quad k - h \ge 3.
-        \]
-        <div class="hint">
-          <strong>Hint:</strong> "At least \(33\)" translates to the inequality \(\text{Range} \ge 33\).
-        </div>
-        <div class="answer">
-          <span class="lbl">Key condition:</span> \(\;k-h \ge 3\)
-        </div>
-      </div>
-    </div>
-
-    <div class="btn-row">
-      <button class="btn" data-target="part-setup">Next step →</button>
-      <span class="counter">0 / 2</span>
-    </div>
-  </section>
-
-  <!-- ================= PART I : TEST STATEMENT I ================= -->
-  <section class="card" id="part-i">
-    <h2>Part (b)(i) Testing Statement I: \(0 \le h \le 3\) <span class="tag">False</span></h2>
-    <p>
-      A statement "must be true" only if it holds for <strong>every</strong> combination allowed by \(k-h \ge 3\).
-      Find one counter-example to kill it. Move the sliders to search for a valid pair with \(h > 3\).
-    </p>
-
-    <div class="canvas-box">
-      <canvas id="cv2" width="900" height="600"></canvas>
-    </div>
-
-    <div class="controls">
-      <div class="ctrl">
-        <label>Choose \(h\) <span class="val" id="hVal2">0</span></label>
-        <input type="range" id="hSlider2" min="0" max="4" step="1" value="0" />
-      </div>
-      <div class="ctrl">
-        <label>Choose \(k\) <span class="val" id="kVal2">3</span></label>
-        <input type="range" id="kSlider2" min="0" max="9" step="1" value="3" />
-      </div>
-    </div>
-
-    <div class="readout" id="readout2"></div>
-
-    <div class="step" id="s2-1">
-      <div class="step-head">
-        <span class="badge-num">Step 1</span>
-        
-      </div>
-      <div class="step-body">
-        Since \(h\) is a digit, \(0 \le h \le 9\). The condition \(k-h \ge 3\) with the largest possible \(k=9\) gives
-        \[
-          h \le k-3 \le 9-3 = 6,
-        \]
-        so \(h\) can be \(0,1,2,3,4,5,6\) — but <strong>not</strong> \(7,8,9\).
-        <div class="hint">
-          <strong>Hint:</strong> \(k \le 9\) caps \(h\) at \(6\), so \(h = 4,5,6\) are genuinely possible — all of them break Statement I.
-        </div>
-      </div>
-    </div>
-
-    <div class="step" id="s2-2">
-      <div class="step-head">
-        <span class="badge-num">Step 2</span>
-        
-      </div>
-      <div class="step-body">
-        Counter-example: take \(h = 4\) and \(k = 7\).
-        \[
-          k - h = 7-4 = 3 \ge 3 \quad\checkmark \quad(\text{range} = 33 \ge 33)
-        \]
-        The data then has a smallest age of \(14\), not \(\le 13\), so Statement I fails.
-        \[\therefore\; 4 \text{ is a possible value of } h. \]
-        <div class="answer">
-          <span class="lbl">Conclusion:</span> Statement I is <strong>NOT</strong> always true. ✗
-        </div>
-      </div>
-    </div>
-
-    <div class="btn-row">
-      <button class="btn" data-target="part-i">Next step →</button>
-      <span class="counter">0 / 2</span>
-    </div>
-  </section>
-
-  <!-- ================= PART II : TEST STATEMENT II ================= -->
-  <section class="card" id="part-ii">
-    <h2>Part (b)(ii) Testing Statement II: \(3 \le k \le 9\) <span class="tag">True</span></h2>
-    <p>
-      Statement II is a claim about \(k\) alone. The diagram divides possible pairs \((h,k)\) into
-      "allowed" and "not allowed" regions by the line \(k - h = 3\). Dark cells are allowed (range \(\ge 33\));
-      pale cells are not.
-    </p>
-
-    <div class="canvas-box">
-      <canvas id="cv3" width="900" height="600"></canvas>
-    </div>
-
-    <div class="chk-row">
-      <label><input type="checkbox" id="showLine" checked /> Show line \(k = h + 3\)</label>
-      <label><input type="checkbox" id="highlightK" checked /> Highlight \(k \ge 3\) band</label>
-    </div>
-
-    <div class="readout" id="readout3"></div>
-
-    <div class="step" id="s3-1">
-      <div class="step-head">
-        <span class="badge-num">Step 1</span>
-        
-      </div>
-      <div class="step-body">
-        The smallest allowed \(k\) occurs when \(h\) is as large as possible and \(k-h \ge 3\), i.e.
-        \[
-          k \ge h + 3 \quad\text{and}\quad h \ge 0 \;\Longrightarrow\; k \ge 3.
-        \]
-        <div class="hint">
-          <strong>Hint:</strong> Compare \(k\) with \(h+3\): since \(h \ge 0\), we get \(k \ge 3\).
-        </div>
-      </div>
-    </div>
-
-    <div class="step" id="s3-2">
-      <div class="step-head">
-        <span class="badge-num">Step 2</span>
-        
-      </div>
-      <div class="step-body">
-        As a units digit in the stem-\(4\) row, \(k \le 9\). Therefore
-        \[
-          3 \le k \le 9 \quad\text{for every allowed pair }(h,k).
-        \]
-        Values \(k = 0,1,2\) are indeed <strong>impossible</strong> — that is exactly why the inequality is true.
-        <div class="answer">
-          <span class="lbl">Conclusion:</span> Statement II is always true.</div>
-      </div>
-    </div>
-
-    <div class="btn-row">
-      <button class="btn" data-target="part-ii">Next step →</button>
-      <span class="counter">0 / 2</span>
-    </div>
-  </section>
-
-  <!-- ================= PART III : TEST STATEMENT III ================= -->
-  <section class="card" id="part-iii">
-    <h2>Part (b)(iii) Testing Statement III: \(3 \le k-h \le 5\) <span class="tag">True</span></h2>
-    <p>
-      Statement III claims the range (written as \(30 + (k-h)\)) is bounded above as well as below.
-      Explore the full table of allowed \((h,k)\) pairs below.
-    </p>
-
-    <div class="canvas-box">
-      <canvas id="cv4" width="900" height="600"></canvas>
-    </div>
-
-    <div class="controls">
-      <div class="ctrl">
-        <label>Highlight value of \(h\) <span class="val" id="hVal4">0</span></label>
-        <input type="range" id="hSlider4" min="0" max="9" step="1" value="0" />
-      </div>
-    </div>
-
-    <div class="readout" id="readout4"></div>
-
-    <div class="step" id="s4-1">
-      <div class="step-head">
-        <span class="badge-num">Step 1</span>
-        
-      </div>
-      <div class="step-body">
-        We already need \(k-h \ge 3\). For the upper bound, the largest possible \(k\) is \(9\) while the smallest possible \(h\) is \(0\), giving
-        \[
-          k-h \le 9-0 = 9.
-        \]
-        <div class="hint">
-          <strong>Hint:</strong> With \(h = 0\) we get \(k \ge 3\), so \(k-h = k\) can be as big as \(9\).
-        </div>
-      </div>
-    </div>
-
-    <div class="step" id="s4-2">
-      <div class="step-head">
-        <span class="badge-num">Step 2</span>
-        
-      </div>
-      <div class="step-body">
-        But \(h\) also consumes one leaf slot! The row "1 | h 4 6" already contains leaves \(4\) and \(6\).
-        For the leaf list to remain a valid stem-and-leaf diagram, \(h\) cannot repeat \(4\) or \(6\) in a way that
-        contradicts the sorted data — and more importantly, the constraint \(k-h \ge 3\) with \(h \ge 0, k \le 9\)
-        allows, for example,
-        \[
-          h = 0,\; k = 3,4,5,6,7,8,9 \;\Longrightarrow\; k-h = 3,4,5,6,7,8,9.
-        \]
-        Hence \(k-h = 6,7,8,9\) are all achievable — Statement III's upper bound \(5\) must be wrong.
-        <div class="hint">
-          <strong>Hint:</strong> Look for a counter-example: \(h=0\) and \(k=9\) gives \(k-h = 9 > 5\).
-        </div>
-      </div>
-    </div>
-
-    <div class="step" id="s4-3">
-      <div class="step-head">
-        <span class="badge-num">Step 3</span>
-        
-      </div>
-      <div class="step-body">
-        Since \(k-h\) can equal \(6,7,8,9\), the statement \(3 \le k-h \le 5\) does not describe every allowed pair.
-        Only the lower part, \(k-h \ge 3\), survives.
-        <div class="answer">
-          <span class="lbl">Conclusion:</span> Statement III is <strong>NOT</strong> always true. ✗
-        </div>
-      </div>
-    </div>
-
-    <div class="btn-row">
-      <button class="btn" data-target="part-iii">Next step →</button>
-      <span class="counter">0 / 3</span>
-    </div>
-  </section>
-
-  <!-- ================= SUMMARY ================= -->
-  <section class="summary">
-    <h2>Final Answer Summary</h2>
-    <ul>
-      <li>Reading the diagram: minimum \(= 10+h\), maximum \(= 40+k\).</li>
-      <li>Range condition: \((40+k)-(10+h) \ge 33 \;\Longleftrightarrow\; \boxed{k - h \ge 3}\).</li>
-      <li>Statement I — \(0 \le h \le 3\): <span class="key">FALSE</span>. Counter-example: \(h=4,\;k=7\) gives \(k-h=3\) (range \(33\)), but \(h=4&gt;3\).</li>
-      <li>Statement II — \(3 \le k \le 9\): <span class="key">TRUE</span>. Since \(k \ge h+3 \ge 3\) and \(k \le 9\), every allowed pair satisfies it.</li>
-      <li>Statement III — \(3 \le k-h \le 5\): <span class="key">FALSE</span>. \(h=0,\;k=9\) gives \(k-h=9&gt;5\).</li>
-      <li>Therefore only Statement II must be true → answer is <span class="key">B. II only</span>.</li>
-    </ul>
-  </section>
-
-  <footer>
-    HKDSE Mathematics (Compulsory Part) · 2014 Paper 2 Q30 · Interactive solution page
-  </footer>
+</div>
 </div>
 
 <script>
 (function(){
-  "use strict";
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  const R = document.getElementById('readout');
+  const W = cv.width, H = cv.height;
 
-  /* ================================================================
-     Utility: Hi-DPI canvas setup
-     ================================================================ */
-  function setupCanvas(cv){
-    const dpr = window.devicePixelRatio || 1;
-    const rect = cv.getBoundingClientRect();
-    const w = rect.width || cv.width;
-    const h = (cv.height / cv.width) * w;   // keep aspect from attribute ratio
-    cv.width  = Math.round(w * dpr);
-    cv.height = Math.round(h * dpr);
-    cv.style.height = h + "px";
-    const ctx = cv.getContext("2d");
-    ctx.setTransform(dpr,0,0,dpr,0,0);
-    return {ctx, W:w, H:h};
-  }
+  // ---------- palette ----------
+  const C = {
+    ink:'#1c2b3a', muted:'#5b6b7c', line:'#dbe4ee',
+    blue:'#2563eb', rose:'#e11d48', green:'#059669', amber:'#d97706', violet:'#7c3aed',
+    hl:'#fef3c7', hl2:'#dbeafe', hl3:'#fee2e2', hl4:'#d1fae5'
+  };
 
-  function roundRect(ctx,x,y,w,h,r){
+  const mono = "600 15px 'Consolas','Menlo',monospace";
+  const monoB = "700 16px 'Consolas','Menlo',monospace";
+  const label = "700 13px 'Segoe UI',sans-serif";
+
+  function roundRect(x,y,w,h,r,fill,stroke,lw){
     ctx.beginPath();
     ctx.moveTo(x+r,y);
     ctx.arcTo(x+w,y,x+w,y+h,r);
@@ -742,594 +190,199 @@
     ctx.arcTo(x,y+h,x,y,r);
     ctx.arcTo(x,y,x+w,y,r);
     ctx.closePath();
+    if(fill){ctx.fillStyle=fill;ctx.fill();}
+    if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lw||1.5;ctx.stroke();}
   }
 
-  /* ================================================================
-     CANVAS 1 — Stem-and-leaf visual bars + range markers
-     ================================================================ */
-  const cv1 = document.getElementById("cv1");
-  const hS = document.getElementById("hSlider");
-  const kS = document.getElementById("kSlider");
-  const hV = document.getElementById("hVal");
-  const kV = document.getElementById("kVal");
-  const showRange = document.getElementById("showRange");
-  const showAll   = document.getElementById("showAll");
-  const read1 = document.getElementById("readout1");
+  function title(t, sub, color){
+    ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+    ctx.fillStyle=color||C.blue; ctx.font="800 17px 'Segoe UI',sans-serif";
+    ctx.fillText(t, 24, 34);
+    if(sub){ ctx.fillStyle=C.muted; ctx.font="500 12.5px 'Segoe UI',sans-serif"; ctx.fillText(sub, 24, 53); }
+  }
 
-  // Static data (stem -> leaves), excluding unknown digits
-  const DATA = {
-    1: [4,6],
-    2: [3,3,3,3,4,6,7,7],
-    3: [1,2,2,2,6,8],
-    4: [0]
-  };
+  function chip(x,y,text,color,textColor){
+    ctx.font="800 12px 'Segoe UI',sans-serif";
+    const w = ctx.measureText(text).width + 20;
+    roundRect(x,y,w,24,12,color,null,0);
+    ctx.fillStyle=textColor||'#fff'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(text,x+w/2,y+12.5);
+    return x+w;
+  }
 
-  function draw1(){
-    const {ctx,W,H} = setupCanvas(cv1);
+  // ---------- stem & leaf layout ----------
+  const rows = [
+    {stem:'1', leaves:[{v:'h',sym:true},{v:'4',sym:false},{v:'6',sym:false}]},
+    {stem:'2', leaves:[{v:'3',sym:false},{v:'3',sym:false},{v:'3',sym:false},{v:'4',sym:false},{v:'6',sym:false},{v:'7',sym:false},{v:'7',sym:false}]},
+    {stem:'3', leaves:[{v:'1',sym:false},{v:'2',sym:false},{v:'2',sym:false},{v:'2',sym:false},{v:'6',sym:false},{v:'8',sym:false}]},
+    {stem:'4', leaves:[{v:'0',sym:false},{v:'k',sym:true}]}
+  ];
+  const colX = 165, stemX = 118, leafStep = 34, rowH = 42, topY = 118;
+
+  // highlight sets per step
+  function hlRow(step, r){
+    if(step===1) return true;                          // read off possible values
+    if(step===2) return true;                          // range needs min/max
+    if(step>=3)  return true;
+    return false;
+  }
+
+  function draw(step){
+    step = step || 1;
     ctx.clearRect(0,0,W,H);
-    ctx.fillStyle = "#0b1220";
-    ctx.fillRect(0,0,W,H);
+    // background
+    roundRect(0,0,W,H,12,'#fdfefe',null,0);
 
-    const h = +hS.value, k = +kS.value;
-    hV.textContent = h;
-    kV.textContent = k;
+    const titles = {
+      1:['Step 1 · Possible values of h and k','Each leaf is a single digit: 0–9'],
+      2:['Step 2 · Smallest and largest values','Minimum = 10 + h , Maximum = 40 + k'],
+      3:['Step 3 · Condition on the range','(40 + k) − (10 + h) ≥ 33  ⟺  k ≥ h + 3'],
+      4:['Step 4 · Test I : 0 ≤ h ≤ 3','Counter-example: h = 4 , k = 7 works → I false'],
+      5:['Step 5 · Test II : 3 ≤ k ≤ 9','k ≥ h + 3 ≥ 3 and k ≤ 9 → II true'],
+      6:['Step 6 · Test III : 3 ≤ k − h ≤ 5','h = 0 , k = 9 gives k − h = 9 > 5 → III false'],
+      7:['Step 7 · Conclusion','Only statement II must be true → B']
+    };
+    const t = titles[step] || titles[1];
+    title(t[0], t[1], step===7 ? C.green : C.blue);
 
-    // build values
-    let vals = [];
-    for(const s in DATA){ DATA[s].forEach(l => vals.push(+s*10 + l)); }
-    vals.push(10+h);
-    vals.push(40+k);
-    vals.sort((a,b)=>a-b);
+    // ---- header of table ----
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.font="700 14px 'Segoe UI',sans-serif";
+    ctx.fillStyle=C.muted;
+    ctx.fillText('Stem (tens)', stemX, topY-24);
+    ctx.fillText('Leaf (units)', colX+150, topY-24);
 
-    const minV = 10+h, maxV = 40+k, range = maxV - minV;
+    // vertical divider
+    ctx.strokeStyle=C.line; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(colX,topY-8); ctx.lineTo(colX, topY+rows.length*rowH); ctx.stroke();
 
-    // layout
-    const padL = 78, padR = 30, padT = 58, padB = 66;
-    const plotW = W - padL - padR;
-    const plotH = H - padT - padB;
-    const xMin = 5, xMax = 55;
-    const X = v => padL + (v - xMin)/(xMax - xMin) * plotW;
+    // ---- rows ----
+    rows.forEach((r,i)=>{
+      const y = topY + i*rowH;
+      const isMin = (i===0), isMax = (i===rows.length-1);
+      const highlight = (step>=2 && (isMin||isMax));
+      const rowBand = highlight ? (isMin?C.hl2:C.hl4) : (step===1 ? C.hl : null);
 
-    // ---- number line
-    const axisY = padT + plotH*0.5;
-    ctx.strokeStyle = "#334155";
-    ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(padL-16, axisY); ctx.lineTo(W-padR+8, axisY); ctx.stroke();
+      if(rowBand){ roundRect(40,y-rowH/2+2,W-80,rowH-6,8,rowBand,null,0); }
 
-    // ticks every 5
-    ctx.font = "12px Consolas, monospace";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "top";
-    for(let v=5; v<=55; v+=5){
-      const x = X(v);
-      ctx.strokeStyle = "#334155"; ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.moveTo(x, axisY-6); ctx.lineTo(x, axisY+6); ctx.stroke();
-      ctx.fillStyle = "#64748b";
-      ctx.fillText(v, x, axisY+11);
-    }
+      // stem
+      ctx.font=monoB; ctx.fillStyle=C.blue; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText(r.stem, stemX, y);
 
-    // ---- stems as stacked rows above the line
-    const stems = [1,2,3,4];
-    const stemColors = ["#60a5fa","#38bdf8","#a78bfa","#f472b6"];
-    const rowH = 22;
-    const topRow = axisY - 34;
-    stems.forEach((s,i)=>{
-      const y = topRow - i*rowH;
-      const color = stemColors[i];
-      // leaves dots
-      let leaves = DATA[s].slice();
-      if(s===1) leaves = leaves.concat([h]);
-      if(s===4) leaves = leaves.concat([k]);
-      leaves.sort((a,b)=>a-b);
-      leaves.forEach(l=>{
-        const v = s*10 + l;
-        const x = X(v);
-        const isUnknown = (s===1 && l===h) || (s===4 && l===k);
-        ctx.beginPath();
-        ctx.arc(x, y, isUnknown?6:4, 0, Math.PI*2);
-        ctx.fillStyle = isUnknown ? "#fbbf24" : color;
-        ctx.fill();
-        if(isUnknown){
-          ctx.strokeStyle = "#fef3c7"; ctx.lineWidth = 2; ctx.stroke();
+      // leaves
+      r.leaves.forEach((lf, j)=>{
+        const x = colX + 30 + j*leafStep;
+        const isSym = lf.sym;
+        // symbol chip
+        if(isSym){
+          let col = C.rose, bg = C.hl3;
+          if(step>=4 && lf.v==='h'){ col=C.amber; bg='#fffbeb'; }
+          if(step>=4 && lf.v==='k'){ col=C.violet; bg='#f5f3ff'; }
+          roundRect(x-15, y-16, 30, 32, 7, bg, col, 2);
         }
-        // label
-        ctx.save();
-        ctx.fillStyle = isUnknown ? "#fcd34d" : "#94a3b8";
-        ctx.font = (isUnknown?"bold ":"") + "11px Consolas, monospace";
-        ctx.textAlign = "center"; ctx.textBaseline = "bottom";
-        if(isUnknown) ctx.fillText(v, x, y-9);
-        ctx.restore();
+        ctx.font = isSym ? monoB : mono;
+        ctx.fillStyle = isSym ? (lf.v==='h'? (step>=4?C.amber:C.rose) : (step>=4?C.violet:C.rose)) : C.ink;
+        ctx.fillText(lf.v, x, y);
+
+        // labels for min / max
+        if(step>=2){
+          if(isMin && j===0){ smallNote(x, y+30, '10 + h', C.blue, step); }
+          if(isMax && j===1){ smallNote(x, y+30, '40 + k', C.green, step); }
+        }
       });
-      // stem label on the left
-      ctx.fillStyle = color;
-      ctx.font = "bold 14px Consolas, monospace";
-      ctx.textAlign = "right"; ctx.textBaseline = "middle";
-      ctx.fillText(s*10 + " |", padL-14, y);
     });
 
-    // ---- if showAll: vertical dashed lines for a few quartile-ish values
-    if(showAll.checked){
-      ctx.setLineDash([4,4]);
-      vals.forEach(v=>{
-        const x = X(v);
-        ctx.strokeStyle = "rgba(148,163,184,.22)";
-        ctx.lineWidth = 1;
-        ctx.beginPath(); ctx.moveTo(x, padT); ctx.lineTo(x, axisY-rowH*4-10); ctx.stroke();
-      });
-      ctx.setLineDash([]);
+    // ---- bottom annotation area ----
+    const baseY = topY + rows.length*rowH + 26;
+    if(step===1){
+      ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.font=label;
+      ctx.fillStyle=C.ink;
+      ctx.fillText('h and k are digits →', 40, baseY+8);
+      chip(210, baseY-4, 'h ∈ {0,1,…,9}', C.rose);
+      chip(360, baseY-4, 'k ∈ {0,1,…,9}', C.violet);
+    }
+    if(step===2){
+      ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.font=label;
+      ctx.fillStyle=C.ink; ctx.fillText('Blue = smallest value (stem 1 row), Green = largest value (stem 4 row)', 40, baseY+8);
+      ctx.font=monoB; ctx.fillStyle=C.blue; ctx.fillText('Min = 10 + h', 40, baseY+38);
+      ctx.fillStyle=C.green; ctx.fillText('Max = 40 + k', 230, baseY+38);
+      ctx.fillStyle=C.ink; ctx.font=monoB;
+      ctx.fillText('Range = (40 + k) − (10 + h)', 40, baseY+68);
+    }
+    if(step===3){
+      ctx.textAlign='left'; ctx.textBaseline='middle';
+      ctx.font=monoB; ctx.fillStyle=C.rose;
+      ctx.fillText('30 + k − h ≥ 33', 40, baseY+10);
+      ctx.fillStyle=C.ink;
+      ctx.fillText('⟹  k ≥ h + 3', 210, baseY+10);
+      ctx.font=label; ctx.fillStyle=C.muted;
+      ctx.fillText('This single condition controls all three statements.', 40, baseY+42);
+    }
+    if(step===4){
+      ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.font=label;
+      ctx.fillStyle=C.rose; ctx.fillText('h = 4 → k ≥ 7, choose k = 7 (≤ 9) ✓ valid', 40, baseY+8);
+      ctx.fillStyle=C.ink; ctx.fillText('So h CAN equal 4 → statement I is NOT forced.', 40, baseY+36);
+    }
+    if(step===5){
+      ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.font=label;
+      ctx.fillStyle=C.green; ctx.fillText('k ≥ h + 3 ≥ 3 and k ≤ 9', 40, baseY+8);
+      ctx.fillStyle=C.ink; ctx.fillText('So 3 ≤ k ≤ 9 always holds → statement II ✓ true.', 40, baseY+36);
+    }
+    if(step===6){
+      ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.font=label;
+      ctx.fillStyle=C.rose; ctx.fillText('h = 0 → k − h = k can be 6, 7, 8, 9 (> 5)', 40, baseY+8);
+      ctx.fillStyle=C.ink; ctx.fillText('So 3 ≤ k − h ≤ 5 is NOT forced → statement III ✗ false.', 40, baseY+36);
+    }
+    if(step===7){
+      ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.font="800 15px 'Segoe UI',sans-serif";
+      ctx.fillStyle=C.green; ctx.fillText('I ✗   II ✓   III ✗', 40, baseY+12);
+      ctx.font="800 17px 'Segoe UI',sans-serif";
+      ctx.fillStyle=C.blue; ctx.fillText('Answer: B (II only)', 40, baseY+48);
     }
 
-    // ---- min / max markers
-    if(showRange.checked){
-      const xMinP = X(minV), xMaxP = X(maxV);
-
-      // min marker
-      ctx.strokeStyle = "#f87171"; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.moveTo(xMinP, axisY-14); ctx.lineTo(xMinP, axisY+ 22); ctx.stroke();
-      ctx.fillStyle = "#f87171";
-      ctx.font = "bold 12px Consolas, monospace";
-      ctx.textAlign = "center"; ctx.textBaseline = "bottom";
-      ctx.fillText("min = " + minV, xMinP, axisY+40);
-
-      // max marker
-      ctx.strokeStyle = "#34d399"; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.moveTo(xMaxP, axisY-14); ctx.lineTo(xMaxP, axisY+22); ctx.stroke();
-      ctx.fillStyle = "#34d399";
-      ctx.fillText("max = " + maxV, xMaxP, axisY+40);
-
-      // bracket between them
-      const brY = axisY - 40;
-      ctx.strokeStyle = "#fcd34d"; ctx.lineWidth = 2.5;
-      ctx.beginPath();
-      ctx.moveTo(xMinP, brY+8); ctx.lineTo(xMinP, brY);
-      ctx.lineTo(xMaxP, brY); ctx.lineTo(xMaxP, brY+8);
-      ctx.stroke();
-      // double arrow line
-      ctx.beginPath();
-      ctx.moveTo(xMinP+10, brY-8); ctx.lineTo(xMaxP-10, brY-8);
-      ctx.stroke();
-      ctx.beginPath(); // arrow heads
-      ctx.moveTo(xMinP, brY-8); ctx.lineTo(xMinP+12, brY-13); ctx.lineTo(xMinP+12, brY-3); ctx.closePath();
-      ctx.fillStyle = "#fcd34d"; ctx.fill();
-      ctx.beginPath();
-      ctx.moveTo(xMaxP, brY-8); ctx.lineTo(xMaxP-12, brY-13); ctx.lineTo(xMaxP-12, brY-3); ctx.closePath();
-      ctx.fill();
-
-      ctx.fillStyle = "#fcd34d";
-      ctx.font = "bold 13px Consolas, monospace";
-      ctx.textAlign = "center"; ctx.textBaseline = "bottom";
-      ctx.fillText("range = " + range, (xMinP+xMaxP)/2, brY-12);
-    }
-
-    // ---- title
-    ctx.fillStyle = "#93c5fd";
-    ctx.font = "bold 15px Segoe UI, sans-serif";
-    ctx.textAlign = "left"; ctx.textBaseline = "top";
-    ctx.fillText("Stem-and-Leaf  ·  h = " + h + ",  k = " + k, 18, 16);
-
-    // ---- readout
-    const okRange = range >= 33;
-    read1.innerHTML =
-      '<span class="k">min</span> = 10 + h = ' + minV + '   ' +
-      '<span class="k">max</span> = 40 + k = ' + maxV + '\n' +
-      '<span class="k">range</span> = max − min = ' + range + '   ' +
-      (okRange ? '<span class="ok">≥ 33 ✓ (allowed)</span>' : '<span class="bad">&lt; 33 ✗ (not allowed)</span>') + '\n' +
-      '<span class="k">k − h</span> = ' + (k-h) + '   ' +
-      ((k-h)>=3 ? '<span class="ok">k − h ≥ 3</span>' : '<span class="bad">k − h &lt; 3 ✗</span>');
+    // readout text
+    const notes = {
+      1:'Step 1: h and k may each be any digit 0–9.',
+      2:'Step 2: smallest = 10 + h, largest = 40 + k, so Range = 30 + k − h.',
+      3:'Step 3: Range ≥ 33  ⟹  k − h ≥ 3  ⟹  k ≥ h + 3.',
+      4:'Step 4: counter-example h = 4, k = 7 shows statement I is false.',
+      5:'Step 5: k ≥ 3 and k ≤ 9, so 3 ≤ k ≤ 9 is always true.',
+      6:'Step 6: h = 0, k = 9 gives k − h = 9 > 5, so statement III is false.',
+      7:'Step 7: only II must be true — Answer B.'
+    };
+    R.textContent = notes[step] || notes[1];
   }
-  [hS,kS,showRange,showAll].forEach(el=>el.addEventListener("input",draw1));
-  window.addEventListener("resize",()=>{draw1();draw2();draw3();draw4();});
 
-  /* ================================================================
-     CANVAS 2 — Counter-example hunt for Statement I
-     ================================================================ */
-  const cv2 = document.getElementById("cv2");
-  const hS2 = document.getElementById("hSlider2");
-  const kS2 = document.getElementById("kSlider2");
-  const hV2 = document.getElementById("hVal2");
-  const kV2 = document.getElementById("kVal2");
-  const read2 = document.getElementById("readout2");
-
-  function draw2(){
-    const {ctx,W,H} = setupCanvas(cv2);
-    ctx.clearRect(0,0,W,H);
-    ctx.fillStyle = "#0b1220"; ctx.fillRect(0,0,W,H);
-
-    const h = +hS2.value, k = +kS2.value;
-    hV2.textContent = h; kV2.textContent = k;
-
-    // Left panel: statement I claim (0..3) vs actual h
-    // Right panel: bar of range vs 33 threshold
-
-    const pad = 34;
-    const midX = W*0.5;
-
-    /* --- LEFT: h axis 0..9, band [0,3] green, marker at h --- */
-    ctx.fillStyle = "#93c5fd";
-    ctx.font = "bold 14px Segoe UI, sans-serif";
-    ctx.textAlign = "left"; ctx.textBaseline = "top";
-    ctx.fillText("Statement I says:  0 ≤ h ≤ 3", pad, 16);
-
-    const axY = 108;
-    const axL = pad+16, axR = midX - 40;
-    const HX = v => axL + (v/9)*(axR-axL);
-
-    // allowed band 0..3
-    ctx.fillStyle = "rgba(52,211,153,.22)";
-    ctx.fillRect(HX(0), axY-24, HX(3)-HX(0), 48);
-    ctx.strokeStyle = "#34d399"; ctx.lineWidth = 1.5;
-    ctx.strokeRect(HX(0), axY-24, HX(3)-HX(0), 48);
-    ctx.fillStyle = "#6ee7b7";
-    ctx.font = "11px Consolas, monospace";
-    ctx.textAlign="center"; ctx.textBaseline="bottom";
-    ctx.fillText("claimed allowed", (HX(0)+HX(3))/2, axY-28);
-
-    // axis
-    ctx.strokeStyle = "#475569"; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(axL-6, axY); ctx.lineTo(axR+6, axY); ctx.stroke();
-    for(let v=0; v<=9; v++){
-      const x = HX(v);
-      ctx.beginPath(); ctx.moveTo(x, axY); ctx.lineTo(x, axY+7);
-      ctx.strokeStyle="#475569"; ctx.lineWidth=1.5; ctx.stroke();
-      ctx.fillStyle = "#94a3b8"; ctx.font="12px Consolas, monospace";
-      ctx.textAlign="center"; ctx.textBaseline="top";
-      ctx.fillText(v, x, axY+10);
-    }
-
-    // marker at h
-    const hX = HX(h);
-    const hOk = (h>=0 && h<=3);
-    ctx.strokeStyle = hOk ? "#34d399" : "#f87171";
-    ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.moveTo(hX, axY-38); ctx.lineTo(hX, axY+38); ctx.stroke();
-    ctx.beginPath(); ctx.arc(hX, axY, 7, 0, Math.PI*2);
-    ctx.fillStyle = hOk ? "#34d399" : "#f87171"; ctx.fill();
-    ctx.fillStyle = hOk ? "#a7f3d0" : "#fecaca";
-    ctx.font = "bold 14px Consolas, monospace";
-    ctx.textAlign="center"; ctx.textBaseline="bottom";
-    ctx.fillText("h = " + h, hX, axY-44);
-
-    // verdict under
-    ctx.font = "bold 13px Segoe UI, sans-serif";
-    ctx.textAlign="center"; ctx.textBaseline="top";
-    ctx.fillStyle = hOk ? "#6ee7b7" : "#fca5a5";
-    ctx.fillText(hOk ? "h inside the claimed band" : "h is OUTSIDE → counter-example", hX, axY+52);
-
-    /* --- RIGHT: range bar vs 33 --- */
-    ctx.fillStyle = "#93c5fd";
-    ctx.font = "bold 14px Segoe UI, sans-serif";
-    ctx.textAlign = "left"; ctx.textBaseline = "top";
-    ctx.fillText("Range check:  30 + (k − h) ≥ 33", midX + 10, 16);
-
-    const rY = 150, rH = 46, rL = midX + 30, rR = W - 34;
-    const range = 30 + (k-h);
-    const scaleMax = 45;
-    const RW = v => rL + Math.min(Math.max(v,0)/scaleMax,1)*(rR-rL);
-
-    // background track
-    ctx.fillStyle = "#1e293b";
-    roundRect(ctx, rL, rY-rH/2, rR-rL, rH, 10); ctx.fill();
-
-    // filled range
-    ctx.fillStyle = range>=33 ? "#10b981" : "#ef4444";
-    roundRect(ctx, rL, rY-rH/2, Math.max(RW(range)-rL,4), rH, 10); ctx.fill();
-
-    // threshold line at 33
-    const tX = RW(33);
-    ctx.strokeStyle = "#fcd34d"; ctx.lineWidth = 3; ctx.setLineDash([6,5]);
-    ctx.beginPath(); ctx.moveTo(tX, rY-rH/2-14); ctx.lineTo(tX, rY+rH/2+14); ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.fillStyle = "#fcd34d"; ctx.font="bold 12px Consolas, monospace";
-    ctx.textAlign="center"; ctx.textBaseline="bottom";
-    ctx.fillText("33", tX, rY-rH/2-18);
-
-    ctx.fillStyle = "#e2e8f0"; ctx.font="bold 15px Consolas, monospace";
-    ctx.textAlign="center"; ctx.textBaseline="middle";
-    ctx.fillText("range = " + range, (rL+ (RW(range)))/2 + 10, rY);
-
-    // tick scale
-    ctx.font="11px Consolas, monospace";
-    for(let v=30; v<=45; v+=5){
-      const x = RW(v);
-      ctx.strokeStyle="#475569"; ctx.lineWidth=1;
-      ctx.beginPath(); ctx.moveTo(x, rY+rH/2+6); ctx.lineTo(x, rY+rH/2+12); ctx.stroke();
-      ctx.fillStyle="#64748b"; ctx.textAlign="center"; ctx.textBaseline="top";
-      ctx.fillText(v, x, rY+rH/2+15);
-    }
-
-    // verdict box
-    const ok = (k-h)>=3;
-    ctx.textAlign="center"; ctx.textBaseline="top";
-    ctx.font="bold 14px Segoe UI, sans-serif";
-    ctx.fillStyle = ok ? "#6ee7b7" : "#fca5a5";
-    ctx.fillText(ok ? "k − h = " + (k-h) + " ≥ 3  → pair is possible"
-                    : "k − h = " + (k-h) + " < 3  → pair NOT possible",
-                 (rL+rR)/2, rY+rH/2+46);
-
-    /* readout */
-    const counterFound = (ok && h>3);
-    read2.innerHTML =
-      '<span class="k">h</span> = ' + h + ',  <span class="k">k</span> = ' + k + '\n' +
-      '<span class="k">k − h</span> = ' + (k-h) + '   ' +
-      (ok ? '<span class="ok">≥ 3</span>' : '<span class="bad">&lt; 3 ✗</span>') + '   ' +
-      '<span class="k">range</span> = ' + range + '\n' +
-      (h>3 ? '<span class="y">h > 3</span> — this breaks Statement I as soon as k − h ≥ 3' : 'h ≤ 3 — Statement I is safe for this h') + '\n' +
-      (counterFound
-        ? '<span class="ok">★ COUNTER-EXAMPLE FOUND:  h = ' + h + ', k = ' + k + '  gives range ' + range + ' ≥ 33  but  h = ' + h + ' > 3.</span>'
-        : '<span class="bad">No counter-example yet — keep h > 3 while keeping k − h ≥ 3.</span>');
+  function smallNote(x,y,txt,color,step){
+    ctx.font="700 11.5px 'Segoe UI',sans-serif";
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    const w = ctx.measureText(txt).width + 14;
+    roundRect(x-w/2, y-11, w, 22, 11, color, null, 0);
+    ctx.fillStyle='#fff';
+    ctx.fillText(txt, x, y);
   }
-  [hS2,kS2].forEach(el=>el.addEventListener("input",draw2));
 
-  /* ================================================================
-     CANVAS 3 — (h,k) grid: allowed region for k−h ≥ 3
-     ================================================================ */
-  const cv3 = document.getElementById("cv3");
-  const showLine = document.getElementById("showLine");
-  const highlightK = document.getElementById("highlightK");
-  const read3 = document.getElementById("readout3");
+  // ---------- initial ----------
+  draw(1);
 
-  function draw3(){
-    const {ctx,W,H} = setupCanvas(cv3);
-    ctx.clearRect(0,0,W,H);
-    ctx.fillStyle = "#0b1220"; ctx.fillRect(0,0,W,H);
-
-    const padL = 74, padR = 34, padT = 62, padB = 66;
-    const plotW = W - padL - padR;
-    const plotH = H - padT - padB;
-    const n = 10; // 0..9
-    const cellW = plotW / n;
-    const cellH = plotH / n;
-
-    const CX = h => padL + h*cellW;
-    const CY = k => padT + (9-k)*cellH;
-
-    // cells
-    let allowed = 0, total = 0;
-    for(let k=0;k<=9;k++){
-      for(let h=0;h<=9;h++){
-        const ok = (k-h) >= 3;
-        total++;
-        if(ok) allowed++;
-        const x = CX(h), y = CY(k);
-        ctx.fillStyle = ok ? "#065f46" : "#1e293b";
-        ctx.fillRect(x, y, cellW, cellH);
-        ctx.strokeStyle = "#0b1220"; ctx.lineWidth = 1;
-        ctx.strokeRect(x+0.5, y+0.5, cellW-1, cellH-1);
-        if(ok){
-          ctx.fillStyle = "#6ee7b7";
-          ctx.font = "10px Consolas, monospace";
-          ctx.textAlign="center"; ctx.textBaseline="middle";
-          ctx.fillText(k-h, x+cellW/2, y+cellH/2);
-        }
-      }
-    }
-
-    // highlight h-axis band k>=3
-    if(highlightK.checked){
-      ctx.strokeStyle = "#fcd34d"; ctx.lineWidth = 3;
-      ctx.strokeRect(CX(0)-2, CY(9)-2, plotW+4, CY(3)-CY(9)+4);
-      ctx.fillStyle = "#fcd34d";
-      ctx.font = "bold 12px Segoe UI, sans-serif";
-      ctx.textAlign="left"; ctx.textBaseline="bottom";
-      ctx.fillText("k ≥ 3  (the green region never goes below this)", CX(0), CY(9)-6);
-    }
-
-    // line k = h + 3
-    if(showLine.checked){
-      ctx.strokeStyle = "#fbbf24"; ctx.lineWidth = 2.5; ctx.setLineDash([7,5]);
-      ctx.beginPath();
-      const h1=0, k1=3, h2=6, k2=9;
-      ctx.moveTo(CX(h1)+cellW/2, CY(k1)+cellH/2);
-      ctx.lineTo(CX(h2)+cellW/2, CY(k2)+cellH/2);
-      ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.fillStyle="#fbbf24"; ctx.font="bold 12px Consolas, monospace";
-      ctx.textAlign="left"; ctx.textBaseline="bottom";
-      ctx.fillText("k = h + 3", CX(4.6)+cellW/2, CY(9)+cellH/2 - 6);
-    }
-
-    // axes
-    ctx.strokeStyle="#64748b"; ctx.lineWidth=2;
-    ctx.beginPath(); ctx.moveTo(padL, padT); ctx.lineTo(padL, padT+plotH); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(padL, padT+plotH); ctx.lineTo(padL+plotW, padT+plotH); ctx.stroke();
-
-    // tick labels
-    ctx.fillStyle="#94a3b8"; ctx.font="11px Consolas, monospace";
-    ctx.textAlign="center"; ctx.textBaseline="top";
-    for(let h=0;h<=9;h++) ctx.fillText(h, CX(h)+cellW/2, padT+plotH+7);
-    ctx.textAlign="right"; ctx.textBaseline="middle";
-    for(let k=0;k<=9;k++) ctx.fillText(k, padL-9, CY(k)+cellH/2);
-
-    // axis titles
-    ctx.fillStyle="#93c5fd"; ctx.font="bold 13px Segoe UI, sans-serif";
-    ctx.textAlign="center"; ctx.textBaseline="top";
-    ctx.fillText("h", padL+plotW/2, padT+plotH+30);
-    ctx.save();
-    ctx.translate(20, padT+plotH/2);
-    ctx.rotate(-Math.PI/2);
-    ctx.textAlign="center"; ctx.textBaseline="top";
-    ctx.fillText("k", 0, 0);
-    ctx.restore();
-
-    // title
-    ctx.fillStyle="#93c5fd"; ctx.font="bold 14px Segoe UI, sans-serif";
-    ctx.textAlign="left"; ctx.textBaseline="top";
-    ctx.fillText("Allowed pairs (h,k) with  k − h ≥ 3", padL, 18);
-
-    // small note about impossible k
-    ctx.fillStyle="#fca5a5"; ctx.font="12px Segoe UI, sans-serif";
-    ctx.fillText("k = 0,1,2 : no green cell anywhere → impossible", padL, 40);
-
-    // readout
-    read3.innerHTML =
-      '<span class="k">Green cells (possible pairs)</span> = ' + allowed + ' of ' + total + '\n' +
-      '<span class="k">Smallest k appearing in green</span> = 3   →  <span class="ok">k ≥ 3 always ✓ (Statement II holds)</span>\n' +
-      '<span class="k">k = 0,1,2</span> : <span class="bad">impossible</span> (no h with h ≤ k−3 &lt; 0)\n' +
-      '<span class="k">Largest k − h in green</span> = 9 (at h = 0, k = 9)  →  &gt; 5, so Statement III fails';
-  }
-  [showLine,highlightK].forEach(el=>el.addEventListener("change",draw3));
-
-  /* ================================================================
-     CANVAS 4 — Table of allowed k for a chosen h
-     ================================================================ */
-  const cv4 = document.getElementById("cv4");
-  const hS4 = document.getElementById("hSlider4");
-  const hV4 = document.getElementById("hVal4");
-  const read4 = document.getElementById("readout4");
-
-  function draw4(){
-    const {ctx,W,H} = setupCanvas(cv4);
-    ctx.clearRect(0,0,W,H);
-    ctx.fillStyle = "#0b1220"; ctx.fillRect(0,0,W,H);
-
-    const h = +hS4.value;
-    hV4.textContent = h;
-
-    const padL = 80, padR = 34, padT = 74, padB = 50;
-    const plotW = W - padL - padR;
-    const plotH = H - padT - padB;
-    const n = 10;
-    const cellW = plotW / n;
-    const CX = k => padL + k*cellW;
-    const cy = padT + plotH*0.5;
-
-    // title
-    ctx.fillStyle="#93c5fd"; ctx.font="bold 14px Segoe UI, sans-serif";
-    ctx.textAlign="left"; ctx.textBaseline="top";
-    ctx.fillText("For h = " + h + " : which k make  k − h ≥ 3 ?", padL, 18);
-    ctx.font="12.5px Segoe UI, sans-serif";
-    ctx.fillStyle="#94a3b8";
-    ctx.fillText("k must be ≥ " + (h+3) + "  and  k ≤ 9", padL, 42);
-
-    let possible = [], impossible = [];
-
-    for(let k=0;k<=9;k++){
-      const ok = (k-h)>=3;
-      const x = CX(k), y = cy - 46;
-      // box
-      ctx.fillStyle = ok ? "#065f46" : "#1e293b";
-      roundRect(ctx, x+4, y, cellW-8, 92, 9); ctx.fill();
-      ctx.strokeStyle = ok ? "#34d399" : "#475569";
-      ctx.lineWidth = ok ? 2.5 : 1.5;
-      roundRect(ctx, x+4, y, cellW-8, 92, 9); ctx.stroke();
-
-      // k value
-      ctx.fillStyle = ok ? "#a7f3d0" : "#64748b";
-      ctx.font = "bold 15px Consolas, monospace";
-      ctx.textAlign="center"; ctx.textBaseline="middle";
-      ctx.fillText(k, x+cellW/2, y+22);
-
-      // k-h value
-      ctx.font = "11px Consolas, monospace";
-      ctx.fillStyle = ok ? "#6ee7b7" : "#475569";
-      ctx.fillText("k−h=" + (k-h), x+cellW/2, y+44);
-
-      // range
-      ctx.fillStyle = ok ? "#6ee7b7" : "#475569";
-      ctx.fillText("R=" + (30+k-h), x+cellW/2, y+63);
-
-      // cross/tick
-      ctx.font = "bold 14px Segoe UI, sans-serif";
-      ctx.fillStyle = ok ? "#34d399" : "#ef4444";
-      ctx.fillText(ok ? "✓" : "✗", x+cellW/2, y+80);
-
-      // k label under
-      ctx.fillStyle="#94a3b8"; ctx.font="11px Consolas, monospace";
-      ctx.textBaseline="top";
-      ctx.fillText("k="+k, x+cellW/2, y+96);
-
-      if(ok) possible.push(k); else impossible.push(k);
-    }
-
-    // readout
-    const minK = possible.length ? Math.min(...possible) : "—";
-    const maxK = possible.length ? Math.max(...possible) : "—";
-    read4.innerHTML =
-      '<span class="k">h</span> = ' + h + '\n' +
-      '<span class="k">possible k</span> : ' + (possible.length ? possible.join(", ") : "none") + '\n' +
-      '<span class="k">impossible k</span> : ' + (impossible.length ? impossible.join(", ") : "none") + '\n' +
-      '<span class="k">k − h values</span> : ' + (possible.length ? possible.map(k=>k-h).join(", ") : "—") + '\n' +
-      (possible.length
-        ? '<span class="k">smallest k</span> = ' + minK + ',  <span class="k">largest k</span> = ' + maxK
-        : '<span class="bad">no valid k for this h</span>');
-  }
-  hS4.addEventListener("input", draw4);
-
-  /* ================================================================
-     Step reveal machinery
-     ================================================================ */
-  document.querySelectorAll(".btn-row").forEach(row=>{
-    const btn = row.querySelector(".btn");
-    const counter = row.querySelector(".counter");
-    const card = row.closest(".card");
-    const steps = card.querySelectorAll(".step");
-    let idx = 0;
-
-    function update(){
-      counter.textContent = idx + " / " + steps.length;
-      if(idx >= steps.length){
-        btn.disabled = true;
-        btn.textContent = "All steps revealed ✓";
-      }
-    }
-    btn.addEventListener("click", ()=>{
-      if(idx < steps.length){
-        steps[idx].classList.add("show");
-        idx++;
-        update();
-        // typeset any new math
-        if(window.MathJax && MathJax.typesetPromise){
-          MathJax.typesetPromise([steps[idx-1]]).catch(()=>{});
-        }
+  // ---------- scroll sync ----------
+  let current = 1;
+  const io = new IntersectionObserver(es=>{
+    es.forEach(e=>{
+      if(e.isIntersecting){
+        current = +e.target.dataset.step;
+        document.querySelectorAll('.step').forEach(s=>{
+          s.classList.toggle('active', +s.dataset.step === current);
+        });
+        draw(current);
       }
     });
-    update();
-  });
+  },{rootMargin:'-25% 0px -55% 0px'});
+  document.querySelectorAll('.step').forEach(s=>io.observe(s));
 
-  /* ================================================================
-     Init
-     ================================================================ */
-  function init(){
-    draw1(); draw2(); draw3(); draw4();
-  }
-  if(document.readyState === "complete") init();
-  else window.addEventListener("load", init);
-  // also draw immediately in case load already fired timing
-  setTimeout(init, 60);
-
+  // activate first
+  document.querySelector('.step').classList.add('active');
 })();
 </script>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
-
 </body>
 </html>

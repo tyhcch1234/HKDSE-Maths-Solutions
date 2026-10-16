@@ -3,693 +3,580 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HKDSE 2020 Paper 2 Q45 — Variance (Statistics)</title>
-<script>
-  MathJax = {
-    tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['\\[', '\\]']] },
-    svg: { fontCache: 'global' }
-  };
-</script>
+<title>HKDSE Math 2020 Paper 2 Q45 — Variance</title>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$'], ['\\(','\\)']], displayMath: [['$$','$$'], ['\\[','\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
 <style>
   :root{
-    --blue:#1e3a8a; --blue2:#2563eb; --amber:#f59e0b; --amber-lt:#fef3c7;
-    --emerald:#059669; --emerald-lt:#d1fae5; --ink:#0f172a; --muted:#475569;
-    --bg:#f1f5f9; --card:#ffffff; --line:#e2e8f0;
+    --bg:#f7f9fc;
+    --card:#ffffff;
+    --ink:#1c2430;
+    --muted:#5b6b7d;
+    --blue:#2563eb;
+    --green:#0f9d58;
+    --red:#e2453c;
+    --orange:#f59e0b;
+    --purple:#7c3aed;
+    --line:#dbe3ee;
   }
   *{box-sizing:border-box;}
   body{
-    margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    background:var(--bg); color:var(--ink); line-height:1.65; -webkit-font-smoothing:antialiased;
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    font-size:16px;
+    line-height:1.55;
   }
-  .wrap{max-width:960px; margin:0 auto; padding:0 16px 60px;}
+  .wrap{
+    max-width:1180px;
+    margin:0 auto;
+    padding:16px 14px 60px;
+  }
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start;}
+  @media(min-width:900px){.split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}}
+  @media(max-width:640px){body{font-size:14.5px;}.wrap{padding:10px 8px 40px;}}
 
-  /* HERO */
-  header.hero{
-    background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 45%,#2563eb 100%);
-    color:#fff; padding:44px 16px 52px; position:relative; overflow:hidden;
-  }
-  header.hero::after{
-    content:""; position:absolute; right:-80px; top:-80px; width:280px; height:280px;
-    background:radial-gradient(circle,rgba(245,158,11,.35),transparent 65%); border-radius:50%;
-  }
-  .hero-inner{max-width:960px; margin:0 auto; position:relative; z-index:2;}
-  .eyebrow{font-size:.78rem; letter-spacing:.16em; text-transform:uppercase; color:#93c5fd; font-weight:700;}
-  .hero h1{margin:.25em 0 .1em; font-size:clamp(1.5rem,4.5vw,2.15rem); font-weight:800; letter-spacing:-.01em;}
-  .hero .sub{color:#dbeafe; font-size:1rem; margin-top:.15em;}
-  .pills{display:flex; flex-wrap:wrap; gap:8px; margin-top:18px;}
-  .pill{
-    background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.28);
-    padding:5px 13px; border-radius:999px; font-size:.78rem; font-weight:600; color:#eff6ff;
-    backdrop-filter:blur(4px);
-  }
+  .diagram{position:sticky;top:16px;max-height:calc(100vh - 2rem);overflow-y:auto;}
 
-  /* CARDS */
   .card{
-    background:var(--card); border-radius:18px; padding:24px 22px; margin-top:26px;
-    box-shadow:0 6px 22px rgba(15,23,42,.07); border:1px solid var(--line);
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:14px 16px;
+    box-shadow:0 2px 10px rgba(20,40,80,.05);
   }
-  .card h2{
-    margin:0 0 14px; font-size:1.18rem; font-weight:800; display:flex; align-items:center; gap:10px;
+  .diagram.card{padding:12px;}
+  h1{
+    font-size:1.05rem;
+    margin:0 0 10px;
     color:var(--blue);
+    letter-spacing:.2px;
   }
-  .card h2 .num{
-    display:inline-flex; align-items:center; justify-content:center; min-width:30px; height:30px;
-    background:linear-gradient(135deg,var(--blue2),var(--blue)); color:#fff; border-radius:9px;
-    font-size:.85rem; font-weight:800; flex:0 0 auto;
+  canvas{width:100%;height:auto;display:block;border-radius:10px;background:#fdfefe;}
+  .ro{
+    margin:10px 2px 2px;
+    font-size:.92rem;
+    color:var(--muted);
+    min-height:2.6em;
   }
-  .qtext{font-size:1.03rem;}
-  .qtext ol{margin:.4em 0 0 1.1em;}
-  .marks{display:inline-block; background:var(--amber-lt); color:#92400e; font-weight:700;
-    font-size:.72rem; padding:2px 8px; border-radius:6px; border:1px solid #fcd34d; margin-left:6px;}
+  .ro b{color:var(--ink);}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;font-size:.82rem;color:var(--muted);}
+  .legend span{display:flex;align-items:center;gap:5px;}
+  .sw{width:12px;height:12px;border-radius:3px;display:inline-block;}
 
-  /* OPTIONS */
-  .options{display:grid; gap:10px; margin-top:16px;}
-  @media(min-width:640px){ .options{grid-template-columns:1fr 1fr;} }
-  .opt{
-    border:1.5px solid var(--line); border-radius:12px; padding:11px 14px; font-size:.98rem;
-    display:flex; align-items:center; gap:10px; background:#f8fafc; transition:.25s;
+  .qtext{
+    background:#f0f6ff;
+    border-left:5px solid var(--blue);
+    border-radius:10px;
+    padding:12px 14px;
+    margin-bottom:14px;
   }
-  .opt .tag{
-    width:26px; height:26px; border-radius:7px; background:#e0e7ff; color:var(--blue);
-    display:inline-flex; align-items:center; justify-content:center; font-weight:800; font-size:.82rem; flex:0 0 auto;
+  .qtext .tag{
+    font-weight:700;
+    color:var(--blue);
+    font-size:.85rem;
+    letter-spacing:.4px;
+    display:block;
+    margin-bottom:4px;
   }
-  .opt.correct{border-color:var(--emerald); background:var(--emerald-lt);}
-  .opt.correct .tag{background:var(--emerald); color:#fff;}
-  .opt .tick{margin-left:auto; color:var(--emerald); font-weight:800; display:none;}
-  .opt.correct .tick{display:inline;}
+  .opts{margin:10px 0 0;padding:0;list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:4px 14px;}
+  .opts li{font-size:.95rem;}
 
-  /* STEPS */
   .step{
-    display:none; border-left:4px solid var(--blue2); background:#f8fafc;
-    border-radius:0 12px 12px 0; padding:14px 16px; margin-top:14px;
-    animation:fadeIn .35s ease;
+    border:1px solid var(--line);
+    border-left:5px solid #c9d6e8;
+    border-radius:10px;
+    padding:10px 12px;
+    margin:10px 0;
+    background:#fff;
+    transition:border-color .25s, background .25s, box-shadow .25s;
   }
-  .step.show{display:block;}
-  @keyframes fadeIn{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
-  .step-head{display:flex; align-items:center; gap:9px; flex-wrap:wrap; margin-bottom:6px;}
-  .badge{
-    background:linear-gradient(135deg,var(--blue2),var(--blue)); color:#fff; font-weight:800;
-    font-size:.72rem; padding:3px 9px; border-radius:999px; letter-spacing:.03em;
+  .step.active{
+    border-left-color:var(--green);
+    background:#f4fdf8;
+    box-shadow:0 3px 12px rgba(15,157,88,.12);
   }
-  .m-badge{
-    background:var(--amber-lt); color:#92400e; border:1px solid #fcd34d; font-weight:800;
-    font-size:.7rem; padding:2px 8px; border-radius:6px;
+  .chip{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:24px;height:24px;
+    border-radius:50%;
+    background:var(--blue);
+    color:#fff;
+    font-weight:700;
+    font-size:.82rem;
+    margin-right:8px;
+    flex:none;
   }
-  .hint{
-    background:var(--amber-lt); border-left:4px solid var(--amber); border-radius:0 10px 10px 0;
-    padding:9px 12px; margin-top:11px; font-size:.9rem; color:#78350f;
+  .step.active .chip{background:var(--green);}
+  .steptitle{font-weight:700;color:var(--ink);}
+  .step .hint{
+    margin-top:6px;
+    font-size:.86rem;
+    color:var(--muted);
+    border-top:1px dashed var(--line);
+    padding-top:5px;
   }
-  .hint b{color:#92400e;}
-  .ansbox{
-    background:var(--emerald-lt); border:1.5px solid #34d399; border-radius:12px;
-    padding:10px 14px; margin-top:12px; color:#064e3b; font-weight:600;
+  .answer{
+    margin-top:16px;
+    background:#fff3e0;
+    border:1px solid #f3d19b;
+    border-left:5px solid var(--orange);
+    border-radius:10px;
+    padding:12px 14px;
+    font-size:1.05rem;
   }
-  .btn{
-    display:inline-flex; align-items:center; gap:8px; margin-top:16px; cursor:pointer;
-    background:linear-gradient(135deg,var(--blue2),var(--blue)); color:#fff; border:none;
-    padding:11px 22px; border-radius:11px; font-weight:700; font-size:.92rem;
-    box-shadow:0 4px 12px rgba(37,99,235,.3); transition:.2s;
-  }
-  .btn:hover:not(:disabled){transform:translateY(-1px); box-shadow:0 7px 18px rgba(37,99,235,.38);}
-  .btn:disabled{background:#94a3b8; box-shadow:none; cursor:not-allowed; opacity:.85;}
-  .counter{font-size:.82rem; color:var(--muted); margin-left:12px; font-weight:600;}
-
-  /* CANVAS */
-  .canvas-wrap{
-    background:#0f172a; border-radius:14px; padding:12px; margin-top:14px;
-  }
-  canvas{width:100%; height:auto; display:block; border-radius:8px; background:#0b1220;}
-  .controls{
-    display:flex; flex-wrap:wrap; gap:16px; align-items:center; margin-top:12px;
-    font-size:.86rem; color:var(--muted); font-weight:600;
-  }
-  .controls label{display:flex; align-items:center; gap:8px;}
-  input[type=range]{width:150px; accent-color:var(--blue2);}
-  input[type=checkbox]{width:17px; height:17px; accent-color:var(--emerald);}
-  .readout{
-    background:#111c33; color:#7dd3fc; border:1px solid #1e40af; border-radius:10px;
-    padding:9px 14px; margin-top:12px; font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
-    font-size:.83rem; line-height:1.7;
-  }
-  .readout span.k{color:#93c5fd;}
-  .readout span.v{color:#fbbf24; font-weight:700;}
-
-  /* SUMMARY */
-  .summary{background:linear-gradient(135deg,#0f172a,#1e293b); color:#e2e8f0; border:none;}
-  .summary h2{color:#fff;}
-  .summary h2 .num{background:linear-gradient(135deg,var(--amber),#d97706);}
-  .summary ul{margin:0; padding-left:1.2em;}
-  .summary li{margin:.5em 0;}
-  .summary b{color:#fbbf24;}
-
-  footer{text-align:center; color:#94a3b8; font-size:.82rem; padding:34px 16px 10px;}
+  .answer b{color:#b45309;}
+  .note{font-size:.86rem;color:var(--muted);margin-top:10px;}
+  mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
 </style>
 </head>
-<body data-correct="C">
-
-<!-- ================= HERO ================= -->
-<header class="hero">
-  <div class="hero-inner">
-    <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2 · Multiple Choice</div>
-    <h1>2020 Paper 2 · Question 45</h1>
-    <div class="sub">Statistics — How shifting every data value changes (or doesn't change) the variance</div>
-    <div class="pills">
-      <span class="pill">Variance</span>
-      <span class="pill">Mean</span>
-      <span class="pill">Translation of Data</span>
-      <span class="pill">Squared Deviations</span>
-      <span class="pill">MC Technique</span>
-    </div>
-  </div>
-</header>
-
+<body>
 <div class="wrap">
+  <div class="split">
 
-  <!-- ================= QUESTION ================= -->
-  <div class="card qtext" id="question">
-    <h2><span class="num">Q</span>The Question</h2>
-    <p>
-      The variance of the six numbers
-      \[ 20a+3,\quad 20a+5,\quad 20a+9,\quad 20a+11,\quad 20a+15,\quad 20a+17 \]
-      is
-    </p><figure style="margin:12px 0;text-align:center;"><img src="figures/2020_P2_Q45.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
-    <div class="options" id="options">
-      <div class="opt" data-opt="A"><span class="tag">A</span> \(5\) <span class="tick"></span></div>
-      <div class="opt" data-opt="B"><span class="tag">B</span> \(10\) <span class="tick"></span></div>
-      <div class="opt" data-opt="C"><span class="tag">C</span> \(25\) <span class="tick"></span></div>
-      <div class="opt" data-opt="D"><span class="tag">D</span> \(20a+25\) <span class="tick"></span></div>
-    </div>
-  </div>
-
-  <!-- ================= PART (a) CONCEPT ================= -->
-  <div class="card">
-    <h2><span class="num">1</span>Key Idea: Subtracting a Constant Does Not Change Variance</h2>
-    <p>
-      Each of the six numbers can be written as \(20a+10\) plus a small "shift". If we subtract the
-      <em>same</em> constant \(20a+10\) from <em>every</em> number, all values move left by the same
-      amount — the shape (spread) of the data is unchanged, so the variance is unchanged.
-    </p>
-
-    <div class="canvas-wrap">
-      <canvas id="canvasA" width="860" height="600"></canvas>
-    </div>
-    <div class="controls">
-      <label>Shift \(20a+10\): <input type="range" id="shiftA" min="-20" max="20" step="1" value="0"></label>
-      <label><input type="checkbox" id="showMeanA" checked> Show mean line</label>
-      <label><input type="checkbox" id="showDevA" checked> Show deviations</label>
-    </div>
-    <div class="readout" id="readA"></div>
-
-    <!-- steps -->
-    <div class="step" data-step="1">
-      <div class="step-head"><span class="badge">Step 1</span></div>
-      <p>List the six numbers and identify a common constant to subtract:</p>
-      \[ 20a+3,\;20a+5,\;20a+9,\;20a+11,\;20a+15,\;20a+17 \]
-      <p>The average of the first and last is \(20a+10\), so subtract \(20a+10\) from each.</p>
-      <div class="hint"><b>Hint:</b> Adding or subtracting the same constant to all data values only <em>translates</em> the set — the mean moves, but the spread (variance) does not.</div>
+    <!-- ================= LEFT: DIAGRAM ================= -->
+    <div class="diagram card">
+      <h1>Interactive Figure — Shifting &amp; Spread</h1>
+      <canvas id="cv" width="640" height="560"></canvas>
+      <p class="ro" id="ro">Scroll the solution to highlight each step.</p>
+      <div class="legend">
+        <span><i class="sw" style="background:#2563eb"></i>Original data</span>
+        <span><i class="sw" style="background:#eb5757"></i>Shifted data ($-20a-10$)</span>
+        <span><i class="sw" style="background:#0f9d58"></i>Deviations from mean</span>
+        <span><i class="sw" style="background:#f59e0b"></i>Mean line</span>
+      </div>
     </div>
 
-    <div class="step" data-step="2">
-      <div class="step-head"><span class="badge">Step 2</span></div>
-      <p>After subtracting \(20a+10\):</p>
-      \[ -7,\;-5,\;-1,\;1,\;5,\;7 \]
-      <p>These are much simpler numbers to work with — and they contain no \(a\), so the answer cannot depend on \(a\).</p>
-      <div class="hint"><b>Hint:</b> This immediately eliminates option D (which still contains \(a\)).</div>
-      <div class="ansbox">The variance is the same as that of \(\{-7,-5,-1,1,5,7\}\).</div>
-    </div>
+    <!-- ================= RIGHT: QUESTION + SOLUTION ================= -->
+    <div class="right">
 
-    <button class="btn" data-target="1">Next step →</button>
-    <span class="counter" data-counter="1">0 / 2</span>
-  </div>
+      <div class="card qtext">
+        <span class="tag">HKDSE 2020 Paper 2 — Q45 · Statistics</span>
+        The variance of the six numbers
+        $$20a+3,\quad 20a+5,\quad 20a+9,\quad 20a+11,\quad 20a+15,\quad 20a+17$$
+        is
+        <ul class="opts">
+          <li>A. $5$</li>
+          <li>B. $10$</li>
+          <li>C. $25$</li>
+          <li>D. $20a+25$</li>
+        </ul>
+      </div>
 
-  <!-- ================= PART (b) COMPUTE ================= -->
-  <div class="card">
-    <h2><span class="num">2</span>Computing the Variance of \(\{-7,-5,-1,1,5,7\}\)</h2>
-    <p>
-      Variance \(= \dfrac{\sum (x-\bar{x})^2}{n}\). First find the mean \(\bar{x}\), then average the
-      squared deviations.
-    </p>
+      <figure style="margin:12px 0;text-align:center;"><img src="figures/2020_P2_Q45.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
 
-    <div class="canvas-wrap">
-      <canvas id="canvasB" width="860" height="600"></canvas>
-    </div>
-    <div class="controls">
-      <label><input type="checkbox" id="showSquaresB" checked> Show squared areas</label>
-      <label><input type="checkbox" id="showMeanB" checked> Show mean line \(\bar x=0\)</label>
-    </div>
-    <div class="readout" id="readB"></div>
+      <div class="card">
+        <div class="step" data-step="1">
+          <span class="chip">1</span><span class="steptitle">Key idea — shifting does not change the variance</span>
+          <div style="margin-top:6px;">
+            Subtracting the same constant $20a+10$ from every number translates all the data but
+            <b>does not change how far apart they are</b>. So the variance stays the same.
+          </div>
+          <div class="hint">Variance measures spread only — adding/subtracting a constant changes the mean, not the spread.</div>
+        </div>
 
-    <div class="step" data-step="1">
-      <div class="step-head"><span class="badge">Step 1</span></div>
-      <p>Find the mean:</p>
-      \[ \bar{x}=\frac{(-7)+(-5)+(-1)+1+5+7}{6}=\frac{0}{6}=0 \]
-      <div class="hint"><b>Hint:</b> The numbers are symmetric about \(0\), so the mean is \(0\) — the deviations are just the numbers themselves.</div>
-    </div>
+        <div class="step" data-step="2">
+          <span class="chip">2</span><span class="steptitle">Shift every number by $-20a-10$</span>
+          <div style="margin-top:6px;">
+            \[
+            \begin{aligned}
+            (20a+3)-(20a+10)&=-7\\
+            (20a+5)-(20a+10)&=-5\\
+            (20a+9)-(20a+10)&=-1\\
+            (20a+11)-(20a+10)&=\;\;1\\
+            (20a+15)-(20a+10)&=\;\;5\\
+            (20a+17)-(20a+10)&=\;\;7
+            \end{aligned}
+            \]
+            Now the required variance equals the variance of $-7,\,-5,\,-1,\,1,\,5,\,7$.
+          </div>
+          <div class="hint">Choose the shift so the numbers become small and symmetric — this makes the arithmetic easy.</div>
+        </div>
 
-    <div class="step" data-step="2">
-      <div class="step-head"><span class="badge">Step 2</span></div>
-      <p>Square each deviation from the mean:</p>
-      \[ (-7)^2=49,\;(-5)^2=25,\;(-1)^2=1,\;1^2=1,\;5^2=25,\;7^2=49 \]
-      <div class="hint"><b>Hint:</b> Squaring removes signs, so \(-7\) and \(7\) contribute the same amount. The total is \(49+25+1+1+25+49=150\).</div>
-    </div>
+        <div class="step" data-step="3">
+          <span class="chip">3</span><span class="steptitle">Find the mean</span>
+          <div style="margin-top:6px;">
+            \[
+            \bar x=\frac{(-7)+(-5)+(-1)+1+5+7}{6}=\frac{0}{6}=0
+            \]
+          </div>
+          <div class="hint">The shifted data are symmetric about $0$, so the mean is $0$.</div>
+        </div>
 
-    <div class="step" data-step="3">
-      <div class="step-head"><span class="badge">Step 3</span></div>
-      <p>Divide by \(n=6\):</p>
-      \[ \text{Variance}=\frac{49+25+1+1+25+49}{6}=\frac{150}{6}=25 \]
-      <div class="hint"><b>Hint:</b> Do not divide by \(n-1=5\) unless the question uses the <em>sample</em> variance formula. In HKDSE Paper 2, the population variance (divide by \(n\)) is used.</div>
-      <div class="ansbox">The required variance is \(\mathbf{25}\) → <b>Option C</b>.</div>
-    </div>
+        <div class="step" data-step="4">
+          <span class="chip">4</span><span class="steptitle">Compute the variance</span>
+          <div style="margin-top:6px;">
+            \[
+            \sigma^{2}
+            =\frac{(-7)^{2}+(-5)^{2}+(-1)^{2}+1^{2}+5^{2}+7^{2}}{6}
+            =\frac{49+25+1+1+25+49}{6}
+            \]
+            \[
+            =\frac{150}{6}=25
+            \]
+          </div>
+          <div class="hint">Squared deviations from the mean, divided by the number of data $n=6$.</div>
+        </div>
 
-    <button class="btn" data-target="2">Next step →</button>
-    <span class="counter" data-counter="2">0 / 3</span>
-  </div>
+        <div class="step" data-step="5">
+          <span class="chip">5</span><span class="steptitle">Conclusion</span>
+          <div style="margin-top:6px;">
+            The variance of the six original numbers is $25$ — independent of $a$.
+          </div>
+          <div class="hint">Any answer containing $a$ (like D) cannot be a variance after a constant shift.</div>
+        </div>
 
-  <!-- ================= PART (c) MC SHORTCUT ================= -->
-  <div class="card">
-    <h2><span class="num">3</span>MC Shortcut &amp; Comparison Explorer</h2>
-    <p>
-      Explore how the variance changes when you scale or shift the data. Drag the sliders to see the
-      effect on the numbers and on the variance readout.
-    </p>
+        <div class="answer">
+          <b>Answer: C.&nbsp;$25$</b>
+        </div>
+        <div class="note">
+          Note: On a scientific calculator, enter the six shifted numbers and use the built-in
+          variance / standard-deviation function to check the result.
+        </div>
+      </div>
 
-    <div class="canvas-wrap">
-      <canvas id="canvasC" width="860" height="600"></canvas>
-    </div>
-    <div class="controls">
-      <label>Shift (add): <input type="range" id="shiftC" min="-20" max="20" step="1" value="0"></label>
-      <label>Scale (multiply): <input type="range" id="scaleC" min="-3" max="3" step="1" value="1"></label>
-    </div>
-    <div class="readout" id="readC"></div>
-
-    <div class="step" data-step="1">
-      <div class="step-head"><span class="badge">Step 1</span><span class="m-badge">Tip</span></div>
-      <p><b>Shift rule:</b> Adding (or subtracting) a constant \(c\) to every value leaves the variance unchanged.</p>
-      \[ \operatorname{Var}(X+c)=\operatorname{Var}(X) \]
-      <div class="hint"><b>Hint:</b> Here we effectively subtracted \(20a+10\), so the \(a\)-term vanishes.</div>
-    </div>
-
-    <div class="step" data-step="2">
-      <div class="step-head"><span class="badge">Step 2</span><span class="m-badge">Tip</span></div>
-      <p><b>Scale rule:</b> Multiplying every value by a constant \(k\) multiplies the variance by \(k^2\).</p>
-      \[ \operatorname{Var}(kX)=k^2\operatorname{Var}(X) \]
-      <p>Move the “Scale” slider to verify this numerically in the readout above.</p>
-      <div class="hint"><b>Hint:</b> A negative scale changes signs but the square \(k^2\) keeps the variance positive.</div>
-    </div>
-
-    <div class="step" data-step="3">
-      <div class="step-head"><span class="badge">Step 3</span></div>
-      <p>Applying the shift rule with \(c=-(20a+10)\) to the original six numbers:</p>
-      \[ \operatorname{Var}(20a+\{3,5,9,11,15,17\}) = \operatorname{Var}(\{-7,-5,-1,1,5,7\}) = 25 \]
-      <div class="hint"><b>Hint:</b> This is exactly the reasoning in the official solution — no expansion of \((20a+\dots)^2\) needed.</div>
-      <div class="ansbox">Answer: <b>25</b> → <b>Option C</b>.</div>
-    </div>
-
-    <button class="btn" data-target="3">Next step →</button>
-    <span class="counter" data-counter="3">0 / 3</span>
-  </div>
-
-  <!-- ================= SUMMARY ================= -->
-  <div class="card summary">
-    <h2><span class="num"></span>Final Answer at a Glance</h2>
-    <ul>
-      <li>The six numbers are \(20a+3,\;20a+5,\;20a+9,\;20a+11,\;20a+15,\;20a+17\).</li>
-      <li>Subtract the constant \(20a+10\) from every number — the variance does not change.</li>
-      <li>New data set: \(\{-7,-5,-1,1,5,7\}\), whose mean is \(0\).</li>
-      <li>Sum of squared deviations: \(49+25+1+1+25+49 = 150\).</li>
-      <li>\(\displaystyle \text{Variance}=\frac{150}{6}=25\).</li>
-      <li><b>Correct option: C</b></li>
-    </ul>
-  </div>
-
-  <footer>
-    HKDSE Mathematics (Compulsory Part) · 2020 Paper 2 Q45 · Interactive solution — Statistics.
-  </footer>
-</div>
+    </div><!-- /right -->
+  </div><!-- /split -->
+</div><!-- /wrap -->
 
 <script>
-/* ============================================================
-   UTIL
-   ============================================================ */
-function clearCanvas(ctx, w, h){
-  ctx.clearRect(0,0,w,h);
-  ctx.fillStyle = "#0b1220";
-  ctx.fillRect(0,0,w,h);
-}
-
-/* ============================================================
-   OPTION CLICK (reveal correct = C)
-   ============================================================ */
-document.querySelectorAll("#options .opt").forEach(o=>{
-  o.addEventListener("click", ()=>{
-    document.querySelectorAll("#options .opt").forEach(x=>x.classList.remove("correct"));
-    if(o.dataset.opt === "C"){ o.classList.add("correct"); }
-    else {
-      // show that C is the correct one after a wrong pick
-      document.querySelector('#options .opt[data-opt="C"]').classList.add("correct");
-    }
-  });
-});
-
-/* ============================================================
-   STEP-BY-STEP REVEAL
-   ============================================================ */
-document.querySelectorAll(".btn").forEach(btn=>{
-  btn.addEventListener("click", ()=>{
-    const target = btn.dataset.target;
-    const card = btn.closest(".card");
-    const steps = card.querySelectorAll(`.step[data-step]`);
-    const shown  = card.querySelectorAll(`.step[data-step].show`);
-    const counter = card.querySelector(`.counter[data-counter="${target}"]`);
-    const next = [...steps].find(s => !s.classList.contains("show"));
-    if(next){
-      next.classList.add("show");
-      if(window.MathJax && MathJax.typesetPromise){ MathJax.typesetPromise([next]); }
-    }
-    const nowShown = card.querySelectorAll(`.step[data-step].show`).length;
-    counter.textContent = `${nowShown} / ${steps.length}`;
-    if(nowShown === steps.length){
-      btn.disabled = true;
-      btn.textContent = "All steps revealed ✓";
-    }
-  });
-});
-
-/* ============================================================
-   CANVAS A — Translation of data
-   ============================================================ */
 (function(){
-  const cvs = document.getElementById("canvasA");
-  const ctx = cvs.getContext("2d");
-  const W = cvs.width, H = cvs.height;
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  const ro = document.getElementById('ro');
 
-  const base = [3,5,9,11,15,17]; // relative to 20a+10 -> values shifted by c
-  const shiftEl = document.getElementById("shiftA");
-  const meanEl  = document.getElementById("showMeanA");
-  const devEl   = document.getElementById("showDevA");
-  const readEl  = document.getElementById("readA");
+  // Logical drawing space (CSS-ish pixels), independent of devicePixelRatio
+  const W = 640, H = 560;
 
-  function variance(arr){
-    const m = arr.reduce((a,b)=>a+b,0)/arr.length;
-    return arr.reduce((s,v)=>s+(v-m)*(v-m),0)/arr.length;
+  // ---------- Data ----------
+  const a = 1;                     // demo value of a
+  const base = 20*a + 10;          // shift constant
+  const orig = [3,5,9,11,15,17].map(v=>20*a+v);   // 23,25,29,31,35,37
+  const shifted = orig.map(v=>v-base);            // -7,-5,-1,1,5,7
+
+  // Axis range for x (shifted scale)
+  const xmin = -12, xmax = 12;
+  const padL = 66, padR = 26, padT = 46;
+  const plotW = W - padL - padR;
+
+  function X(v){ return padL + (v - xmin)/(xmax - xmin)*plotW; }
+
+  // ---------- Draw ----------
+  let currentStep = 1;
+
+  function clear(){
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle = "#fdfefe";
+    ctx.fillRect(0,0,W,H);
   }
 
-  function draw(){
-    const c = Number(shiftEl.value);
-    const vals = base.map(v => v + c);
-    const m = vals.reduce((a,b)=>a+b,0)/vals.length;
-    const v = variance(vals);
-
-    clearCanvas(ctx, W, H);
-
-    const padL = 60, padR = 30, padT = 30, padB = 55;
-    const plotW = W - padL - padR, plotH = H - padT - padB;
-
-    // x-scale
-    const xMin = -35 + c, xMax = 35 + c;
-    const sx = val => padL + (val - xMin)/(xMax - xMin)*plotW;
-    const baseY = padT + plotH*0.62;
-
-    // grid
-    ctx.strokeStyle = "#1e293b"; ctx.lineWidth = 1;
-    for(let x = Math.ceil(xMin/5)*5; x <= xMax; x += 5){
-      ctx.beginPath(); ctx.moveTo(sx(x), padT); ctx.lineTo(sx(x), padT+plotH); ctx.stroke();
-    }
-    // axis
-    ctx.strokeStyle = "#475569"; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(padL, baseY); ctx.lineTo(W-padR, baseY); ctx.stroke();
-
-    // tick labels
-    ctx.fillStyle = "#94a3b8"; ctx.font = "11px monospace"; ctx.textAlign = "center";
-    for(let x = Math.ceil(xMin/10)*10; x <= xMax; x += 10){
-      ctx.fillText(x, sx(x), baseY+18);
-    }
-
-    // mean line
-    if(meanEl.checked){
-      ctx.strokeStyle = "#22c55e"; ctx.lineWidth = 2; ctx.setLineDash([6,5]);
-      ctx.beginPath(); ctx.moveTo(sx(m), padT); ctx.lineTo(sx(m), padT+plotH); ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.fillStyle = "#22c55e"; ctx.textAlign = "left";
-      ctx.fillText("mean", sx(m)+5, padT+14);
-    }
-
-    // deviations
-    if(devEl.checked){
-      ctx.strokeStyle = "rgba(251,191,36,.7)"; ctx.lineWidth = 2;
-      vals.forEach(vv=>{
-        ctx.beginPath();
-        ctx.moveTo(sx(m), baseY-9);
-        ctx.lineTo(sx(vv), baseY-9);
-        ctx.stroke();
-      });
-    }
-
-    // points
-    vals.forEach((vv,i)=>{
-      const x = sx(vv);
-      const col = vv >= m ? "#60a5fa" : "#f472b6";
-      ctx.beginPath(); ctx.arc(x, baseY, 7, 0, Math.PI*2);
-      ctx.fillStyle = col; ctx.fill();
-      ctx.strokeStyle = "#0b1220"; ctx.lineWidth = 1.5; ctx.stroke();
-      ctx.fillStyle = "#e2e8f0"; ctx.font = "bold 11px monospace"; ctx.textAlign="center";
-      ctx.fillText(vv, x, baseY - 14);
-    });
-
-    // arrows indicating shift
-    if(Math.abs(c) > 0.1){
-      ctx.strokeStyle = "rgba(148,163,184,.5)";
-      ctx.lineWidth = 1;
-      base.forEach(bv=>{
-        const x0 = sx(bv);
-        const x1 = sx(bv + c);
-        ctx.beginPath(); ctx.moveTo(x0, baseY+26); ctx.lineTo(x1, baseY+26); ctx.stroke();
-      });
-    }
-
-    readEl.innerHTML =
-      `<span class="k">Values:</span> [${vals.join(", ")}] &nbsp; ` +
-      `<span class="k">mean:</span> <span class="v">${m}</span> &nbsp; ` +
-      `<span class="k">variance:</span> <span class="v">${v.toFixed(2)}</span> &nbsp; ` +
-      `<span class="k">(constant across shifts!)</span>`;
+  function roundRect(x,y,w,h,r){
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);
+    ctx.arcTo(x+w,y,x+w,y+h,r);
+    ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r);
+    ctx.arcTo(x,y,x+w,y,r);
+    ctx.closePath();
   }
 
-  shiftEl.addEventListener("input", draw);
-  meanEl.addEventListener("change", draw);
-  devEl.addEventListener("change", draw);
-  draw();
-})();
+  function drawHeader(){
+    ctx.fillStyle = "#1c2430";
+    ctx.font = "bold 17px Segoe UI, sans-serif";
+    ctx.textAlign = "left";
+    ctx.fillText("Variance of the six numbers (demo: a = 1)", padL-52, 26);
+    ctx.fillStyle = "#5b6b7d";
+    ctx.font = "13px Segoe UI, sans-serif";
+    ctx.fillText("Shift every number by  \u2212(20a + 10) = \u221230  \u2192  the spread is unchanged", padL-52, 44);
+  }
 
-/* ============================================================
-   CANVAS B — Squared deviations (bar/area visualization)
-   ============================================================ */
-(function(){
-  const cvs = document.getElementById("canvasB");
-  const ctx = cvs.getContext("2d");
-  const W = cvs.width, H = cvs.height;
-  const vals = [-7,-5,-1,1,5,7];
+  // Number line with ticks
+  function drawNumberLine(y, step){
+    ctx.strokeStyle = "#c9d6e8";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(X(xmin)+6, y);
+    ctx.lineTo(X(xmax)-6, y);
+    ctx.stroke();
 
-  const showSq = document.getElementById("showSquaresB");
-  const showMean = document.getElementById("showMeanB");
-  const readEl = document.getElementById("readB");
-
-  function draw(){
-    clearCanvas(ctx, W, H);
-
-    const padL = 70, padR = 30, padT = 34, padB = 60;
-    const plotW = W - padL - padR, plotH = H - padT - padB;
-
-    const xMax = 8, xMin = -8;
-    const sx = v => padL + (v - xMin)/(xMax - xMin)*plotW;
-
-    // number line
-    const axisY = padT + plotH * 0.72;
-    ctx.strokeStyle = "#475569"; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(padL, axisY); ctx.lineTo(W-padR, axisY); ctx.stroke();
+    // arrow
+    ctx.fillStyle = "#c9d6e8";
+    ctx.beginPath();
+    ctx.moveTo(X(xmax)-2, y);
+    ctx.lineTo(X(xmax)-14, y-6);
+    ctx.lineTo(X(xmax)-14, y+6);
+    ctx.closePath();
+    ctx.fill();
 
     // ticks
-    ctx.fillStyle = "#94a3b8"; ctx.font = "11px monospace"; ctx.textAlign = "center";
-    for(let x = -8; x <= 8; x += 2){
-      ctx.beginPath(); ctx.moveTo(sx(x), axisY-4); ctx.lineTo(sx(x), axisY+4);
-      ctx.strokeStyle = "#334155"; ctx.lineWidth = 1; ctx.stroke();
-      ctx.fillText(x, sx(x), axisY+20);
-    }
-
-    // mean line
-    if(showMean.checked){
-      ctx.strokeStyle = "#22c55e"; ctx.lineWidth = 2; ctx.setLineDash([6,5]);
-      ctx.beginPath(); ctx.moveTo(sx(0), padT); ctx.lineTo(sx(0), axisY); ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.fillStyle = "#22c55e"; ctx.textAlign = "left";
-      ctx.fillText("mean = 0", sx(0)+6, padT+12);
-    }
-
-    // dots + deviations
-    const maxDev = 7;
-    vals.forEach((v,i)=>{
-      const x = sx(v);
-      const dev = v; // mean 0
-      const sq = dev*dev;
-      const h = (sq / (maxDev*maxDev)) * (plotH*0.62);
-
-      // deviation segment
-      ctx.strokeStyle = "rgba(251,191,36,.75)"; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.moveTo(sx(0), axisY-10); ctx.lineTo(x, axisY-10); ctx.stroke();
-
-      // squared area
-      if(showSq.checked){
-        const wBar = 22;
-        ctx.fillStyle = v > 0 ? "rgba(96,165,250,.35)" : "rgba(244,114,182,.35)";
-        ctx.fillRect(x - wBar/2, axisY - 10 - h, wBar, h);
-        ctx.strokeStyle = v > 0 ? "#60a5fa" : "#f472b6";
-        ctx.lineWidth = 1.5;
-        ctx.strokeRect(x - wBar/2, axisY - 10 - h, wBar, h);
-
-        // label squared
-        ctx.fillStyle = "#e2e8f0"; ctx.font = "bold 11px monospace"; ctx.textAlign = "center";
-        ctx.fillText(sq, x, axisY - 20 - h);
+    ctx.font = "11px Segoe UI, sans-serif";
+    ctx.textAlign = "center";
+    for(let v=-12; v<=12; v+=2){
+      const x = X(v);
+      const isZero = (v===0);
+      ctx.strokeStyle = isZero ? "#f59e0b" : "#dbe3ee";
+      ctx.lineWidth = isZero ? 2 : 1;
+      ctx.beginPath();
+      ctx.moveTo(x, y-5);
+      ctx.lineTo(x, y+5);
+      ctx.stroke();
+      if(v % 4 === 0){
+        ctx.fillStyle = isZero ? "#b45309" : "#8a99ab";
+        ctx.fillText(String(v), x, y+20);
       }
+    }
+  }
+
+  // Draw dots for a dataset on a given number line
+  function drawDots(data, y, color, radius, labelOffset, labelColor, showLabels){
+    data.forEach((v,i)=>{
+      const x = X(v);
+      // stick
+      ctx.strokeStyle = color;
+      ctx.globalAlpha = 0.35;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(x, y + 4);
+      ctx.lineTo(x, y + labelOffset*0.5);
+      ctx.stroke();
+      ctx.globalAlpha = 1;
 
       // dot
-      ctx.beginPath(); ctx.arc(x, axisY, 6, 0, Math.PI*2);
-      ctx.fillStyle = v > 0 ? "#60a5fa" : "#f472b6"; ctx.fill();
-      ctx.strokeStyle = "#0b1220"; ctx.lineWidth = 1.5; ctx.stroke();
-
-      // value label
-      ctx.fillStyle = "#fbbf24"; ctx.font = "bold 11px monospace"; ctx.textAlign="center";
-      ctx.fillText(v, x, axisY - 16);
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, Math.PI*2);
+      ctx.fillStyle = color;
+      ctx.fill();
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = 2;
+      ctx.stroke();
     });
-
-    const totalSq = vals.reduce((s,v)=>s+v*v,0);
-    readEl.innerHTML =
-      `<span class="k">Data:</span> [-7, -5, -1, 1, 5, 7] &nbsp; ` +
-      `<span class="k">Σ(x−x̄)²:</span> <span class="v">${totalSq}</span> &nbsp; ` +
-      `<span class="k">n:</span> <span class="v">6</span> &nbsp; ` +
-      `<span class="k">variance = Σ/n =</span> <span class="v">${(totalSq/6).toFixed(2)}</span>`;
   }
 
-  showSq.addEventListener("change", draw);
-  showMean.addEventListener("change", draw);
-  draw();
-})();
-
-/* ============================================================
-   CANVAS C — Shift & Scale explorer
-   ============================================================ */
-(function(){
-  const cvs = document.getElementById("canvasC");
-  const ctx = cvs.getContext("2d");
-  const W = cvs.width, H = cvs.height;
-  const base = [-7,-5,-1,1,5,7];
-
-  const shiftEl = document.getElementById("shiftC");
-  const scaleEl = document.getElementById("scaleC");
-  const readEl  = document.getElementById("readC");
-
-  function variance(arr){
-    const m = arr.reduce((a,b)=>a+b,0)/arr.length;
-    return arr.reduce((s,v)=>s+(v-m)*(v-m),0)/arr.length;
-  }
-
-  function draw(){
-    const s = Number(shiftEl.value);
-    const k = Number(scaleEl.value);
-    if(k === 0){ // avoid degenerate
-      scaleEl.value = 1;
-    }
-    const kk = Number(scaleEl.value);
-    const vals = base.map(v => kk*v + s);
-    const m = vals.reduce((a,b)=>a+b,0)/vals.length;
-    const v = variance(vals);
-
-    clearCanvas(ctx, W, H);
-
-    const padL = 70, padR = 30, padT = 40, padB = 60;
-    const plotW = W - padL - padR, plotH = H - padT - padB;
-
-    const span = Math.max(40, Math.max(...vals.map(Math.abs)) * 2.2);
-    const xMin = -span, xMax = span;
-    const sx = val => padL + (val - xMin)/(xMax - xMin)*plotW;
-
-    // grid
-    ctx.strokeStyle = "#1e293b"; ctx.lineWidth = 1;
-    for(let x = Math.ceil(xMin/10)*10; x <= xMax; x += 10){
-      ctx.beginPath(); ctx.moveTo(sx(x), padT); ctx.lineTo(sx(x), padT+plotH); ctx.stroke();
-    }
-    // axis
-    const axisY = padT + plotH*0.68;
-    ctx.strokeStyle = "#475569"; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(padL, axisY); ctx.lineTo(W-padR, axisY); ctx.stroke();
-
-    // ticks
-    ctx.fillStyle = "#94a3b8"; ctx.font = "10px monospace"; ctx.textAlign="center";
-    for(let x = Math.ceil(xMin/10)*10; x <= xMax; x += 10){
-      ctx.fillText(x, sx(x), axisY+18);
-    }
-
-    // mean
-    ctx.strokeStyle = "#22c55e"; ctx.lineWidth = 2; ctx.setLineDash([6,5]);
-    ctx.beginPath(); ctx.moveTo(sx(m), padT); ctx.lineTo(sx(m), axisY); ctx.stroke();
+  function drawMeanLine(y, mean, color, txt){
+    const x = X(mean);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.setLineDash([6,5]);
+    ctx.beginPath();
+    ctx.moveTo(x, y-58);
+    ctx.lineTo(x, y+16);
+    ctx.stroke();
     ctx.setLineDash([]);
-    ctx.fillStyle = "#22c55e"; ctx.textAlign="left";
-    ctx.fillText("mean = " + m.toFixed(1), sx(m)+5, padT+12);
 
-    // points
-    vals.forEach(vv=>{
-      const x = sx(vv);
-      const col = vv >= m ? "#60a5fa" : "#f472b6";
-      ctx.beginPath(); ctx.arc(x, axisY, 6.5, 0, Math.PI*2);
-      ctx.fillStyle = col; ctx.fill();
-      ctx.strokeStyle = "#0b1220"; ctx.lineWidth = 1.5; ctx.stroke();
-      ctx.fillStyle = "#e2e8f0"; ctx.font = "bold 11px monospace"; ctx.textAlign="center";
-      ctx.fillText(vv, x, axisY - 14);
-    });
-
-    readEl.innerHTML =
-      `<span class="k">Values:</span> [${vals.join(", ")}] &nbsp; ` +
-      `<span class="k">shift c =</span> <span class="v">${s}</span> &nbsp; ` +
-      `<span class="k">scale k =</span> <span class="v">${kk}</span> &nbsp; ` +
-      `<span class="k">variance =</span> <span class="v">${v.toFixed(2)}</span><br>` +
-      `<span class="k">Check:</span> Var(k·X + c) = k²·Var(X) = ${kk}² × 25 = <span class="v">${(kk*kk*25).toFixed(2)}</span>`;
+    ctx.fillStyle = color;
+    ctx.font = "bold 12px Segoe UI, sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText(txt, x, y-64);
   }
 
-  shiftEl.addEventListener("input", draw);
-  scaleEl.addEventListener("input", draw);
-  draw();
+  // Deviation bars above the shifted line
+  function drawDeviations(y, data, mean, color, showValues){
+    data.forEach((v)=>{
+      const x1 = X(mean), x2 = X(v);
+      const top = y - 34;
+      const h = 22;
+      ctx.fillStyle = color;
+      ctx.globalAlpha = 0.85;
+      roundRect(Math.min(x1,x2), top, Math.abs(x2-x1), h, 4);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+
+      if(showValues){
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 11px Segoe UI, sans-serif";
+        ctx.textAlign = "center";
+        const cx = (x1+x2)/2;
+        ctx.fillText(String(v-mean), cx, top+h/2+4);
+      }
+    });
+  }
+
+  function drawSquares(y, data, mean, color){
+    // little squares proportional to squared deviations (scaled)
+    const scale = 1.8;
+    data.forEach((v)=>{
+      const d = Math.abs(v - mean);
+      const side = Math.min(40, d*scale);
+      const cx = X(v);
+      const top = y - 58 - side;
+      ctx.fillStyle = color;
+      ctx.globalAlpha = 0.28;
+      roundRect(cx - side/2, top, side, side, 4);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1.5;
+      roundRect(cx - side/2, top, side, side, 4);
+      ctx.stroke();
+
+      ctx.fillStyle = color;
+      ctx.font = "bold 11px Segoe UI, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(String(d*d), cx, top - 4);
+    });
+  }
+
+  // Blue summary box
+  function drawSummary(lines, accent){
+    const bx = 18, by = H - 96, bw = W - 36, bh = 78;
+    ctx.fillStyle = "#f0f6ff";
+    ctx.strokeStyle = accent;
+    ctx.lineWidth = 2;
+    roundRect(bx, by, bw, bh, 10);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.textAlign = "left";
+    ctx.font = "13.5px Segoe UI, sans-serif";
+    lines.forEach((t,i)=>{
+      ctx.fillStyle = i===0 ? accent : "#1c2430";
+      ctx.font = i===0 ? "bold 13.5px Segoe UI, sans-serif" : "13.5px Segoe UI, sans-serif";
+      ctx.fillText(t, bx+14, by+24+i*20);
+    });
+  }
+
+  function draw(step){
+    currentStep = step;
+    clear();
+    drawHeader();
+
+    const yOrig = 150;     // original data line
+    const yShift = 350;    // shifted data line
+
+    // ---------- Original data ----------
+    ctx.fillStyle = "#2563eb";
+    ctx.font = "bold 13px Segoe UI, sans-serif";
+    ctx.textAlign = "left";
+    ctx.fillText("Original numbers:  20a+3, 20a+5, 20a+9, 20a+11, 20a+15, 20a+17", padL-52, 76);
+
+    drawNumberLine(yOrig, step);
+    drawDots(orig, yOrig, "#2563eb", 7, 26, "#2563eb", true);
+
+    // label the values
+    ctx.font = "10.5px Segoe UI, sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#2563eb";
+    orig.forEach((v,i)=>{
+      ctx.fillText(String(v), X(v), yOrig - 12);
+    });
+
+    // ---------- Shifted data ----------
+    ctx.fillStyle = "#eb5757";
+    ctx.font = "bold 13px Segoe UI, sans-serif";
+    ctx.textAlign = "left";
+    ctx.fillText("Shifted numbers (subtract 20a+10):  \u22127, \u22125, \u22121, 1, 5, 7", padL-52, 254);
+
+    drawNumberLine(yShift, step);
+    drawDots(shifted, yShift, "#eb5757", 7, 26, "#eb5757", true);
+
+    ctx.font = "10.5px Segoe UI, sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#eb5757";
+    shifted.forEach((v,i)=>{
+      ctx.fillText(String(v), X(v), yShift - 12);
+    });
+
+    // ---------- Step-dependent overlays ----------
+    if(step === 1){
+      // bracket showing shift
+      ctx.strokeStyle = "#7c3aed";
+      ctx.lineWidth = 2;
+      ctx.setLineDash([5,4]);
+      ctx.beginPath();
+      ctx.moveTo(X(-11), yOrig);
+      ctx.lineTo(X(-11), yShift);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = "#7c3aed";
+      ctx.font = "bold 12px Segoe UI, sans-serif";
+      ctx.textAlign = "left";
+      ctx.save();
+      ctx.translate(X(-11)-14, (yOrig+yShift)/2);
+      ctx.rotate(-Math.PI/2);
+      ctx.textAlign = "center";
+      ctx.fillText("\u2212(20a+10) = \u221230", 0, 0);
+      ctx.restore();
+
+      drawSummary([
+        "\u25B8 Step 1: Subtracting the SAME constant shifts every number equally.",
+        "The gaps between numbers do not change \u2192 the variance is unchanged."
+      ], "#7c3aed");
+      ro.innerHTML = "Step 1 — Both data sets are <b>identical in shape</b>, just translated by the same amount.";
+    }
+
+    if(step === 2){
+      // highlight the shifted values brightly
+      shifted.forEach((v)=>{
+        ctx.beginPath();
+        ctx.arc(X(v), yShift, 13, 0, Math.PI*2);
+        ctx.strokeStyle = "#eb5757";
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+      });
+      drawSummary([
+        "\u25B8 Step 2: The six shifted values are  \u22127, \u22125, \u22121, 1, 5, 7.",
+        "Required variance  =  variance of  { \u22127, \u22125, \u22121, 1, 5, 7 }."
+      ], "#eb5757");
+      ro.innerHTML = "Step 2 — All six shifted values are small, symmetric and <b>free of $a$</b>.";
+    }
+
+    if(step === 3){
+      drawMeanLine(yShift, 0, "#f59e0b", "mean = 0");
+      drawSummary([
+        "\u25B8 Step 3: Mean = ( \u22127 \u22125 \u22121 + 1 + 5 + 7 ) / 6 = 0 / 6 = 0.",
+        "The data are perfectly symmetric about 0."
+      ], "#f59e0b");
+      ro.innerHTML = "Step 3 — The mean of the shifted data is <b>0</b> (orange dashed line).";
+    }
+
+    if(step === 4){
+      drawMeanLine(yShift, 0, "#f59e0b", "mean = 0");
+      drawDeviations(yShift, shifted, 0, "#0f9d58", true);
+      drawSummary([
+        "\u25B8 Step 4: Variance = (49 + 25 + 1 + 1 + 25 + 49) / 6 = 150 / 6 = 25.",
+        "Each green bar is a deviation from the mean."
+      ], "#0f9d58");
+      ro.innerHTML = "Step 4 — Green bars show each <b>deviation from the mean</b>: \u22127, \u22125, \u22121, 1, 5, 7.";
+    }
+
+    if(step === 5){
+      drawMeanLine(yShift, 0, "#f59e0b", "mean = 0");
+      drawDeviations(yShift, shifted, 0, "#0f9d58", true);
+      drawSquares(yShift, shifted, 0, "#0f9d58");
+      drawSummary([
+        "\u25B8 Step 5: Variance = 25, independent of a.",
+        "So the answer is C."
+      ], "#0f9d58");
+      ro.innerHTML = "Step 5 — Squares of the deviations give $49,25,1,1,25,49$; their mean is <b>25</b>.";
+    }
+  }
+
+  // ---------- Scroll sync ----------
+  const io = new IntersectionObserver(es=>{
+    es.forEach(e=>{
+      if(e.isIntersecting){
+        currentStep = +e.target.dataset.step;
+        document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+        e.target.classList.add('active');
+        draw(currentStep);
+      }
+    });
+  },{rootMargin:'-25% 0px -55% 0px'});
+
+  document.querySelectorAll('.step').forEach(s=>io.observe(s));
+
+  // initial
+  draw(1);
+  document.querySelector('.step[data-step="1"]').classList.add('active');
 })();
 </script>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
-
 </body>
 </html>

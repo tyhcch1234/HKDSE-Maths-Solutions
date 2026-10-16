@@ -1,377 +1,628 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HKDSE 2015 Paper 2 Q43 – Probability</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- MathJax for LaTeX rendering -->
-    <script>
-        MathJax = {
-            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
-            svg: { fontCache: 'global' }
-        };
-    </script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <style>
-        body {
-            background: #f8fafc;
-            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
-        }
-        .card {
-            transition: all 0.2s ease;
-        }
-        .card:hover {
-            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-        }
-        .step-hidden {
-            display: none;
-        }
-        .badge {
-            @apply inline-block px-3 py-1 text-xs font-semibold rounded-full mr-2 mb-2;
-        }
-        .btn-primary {
-            @apply bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 px-6 rounded-xl transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed;
-        }
-        .btn-secondary {
-            @apply bg-white border border-indigo-200 text-indigo-700 hover:bg-indigo-50 font-semibold py-2.5 px-6 rounded-xl transition-colors duration-200;
-        }
-        .queue-chip {
-            @apply w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center font-bold text-white text-sm md:text-base shadow-md transition-all duration-300;
-        }
-        .boy-chip { @apply bg-blue-500; }
-        .girl-chip { @apply bg-pink-500; }
-        .slider-thumb {
-            @apply appearance-none h-2 w-full rounded-full bg-indigo-200 outline-none;
-        }
-        .slider-thumb::-webkit-slider-thumb {
-            @apply appearance-none w-5 h-5 rounded-full bg-indigo-600 cursor-pointer shadow;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2015 Paper 2 Q43 — Probability</title>
+<style>
+  :root{
+    --bg:#f7f9fc;
+    --card:#ffffff;
+    --ink:#1b2430;
+    --muted:#5b6b7c;
+    --boy:#2f6df6;
+    --girl:#ef4b8b;
+    --line:#d5dee8;
+    --accent:#0f9d6e;
+    --warn:#f2a33c;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.55;
+    font-size:15.5px;
+  }
+  .wrap{
+    max-width:1220px;
+    margin:0 auto;
+    padding:16px 14px 60px;
+  }
+  .split{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    gap:12px;
+    align-items:start;
+  }
+  @media(min-width:900px){
+    .split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}
+  }
+  /* ---------- LEFT PANE ---------- */
+  .diagram{
+    position:sticky;
+    top:16px;
+    max-height:calc(100vh - 2rem);
+    overflow-y:auto;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:12px 12px 14px;
+    box-shadow:0 4px 18px rgba(20,40,70,.06);
+  }
+  .diagram h2{
+    font-size:.95rem;
+    margin:0 0 8px;
+    letter-spacing:.02em;
+    text-transform:uppercase;
+    color:var(--muted);
+    font-weight:700;
+  }
+  canvas{width:100%;height:auto;display:block;border-radius:10px;background:#fdfefe;}
+  .ro{
+    margin:10px 0 0;
+    font-size:.86rem;
+    color:var(--muted);
+    background:#eef4fb;
+    border-left:4px solid var(--boy);
+    padding:7px 10px;
+    border-radius:6px;
+  }
+  .legend{
+    display:flex;gap:14px;flex-wrap:wrap;
+    margin:10px 0 0;font-size:.85rem;color:var(--muted);
+  }
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .dot{width:12px;height:12px;border-radius:50%;display:inline-block;}
+  .dot.b{background:var(--boy);}
+  .dot.g{background:var(--girl);}
+
+  /* ---------- RIGHT PANE ---------- */
+  .panel{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:16px 18px;
+    box-shadow:0 4px 18px rgba(20,40,70,.06);
+  }
+  .qtag{
+    display:inline-block;
+    font-size:.78rem;
+    font-weight:700;
+    letter-spacing:.06em;
+    color:#fff;
+    background:var(--boy);
+    border-radius:999px;
+    padding:3px 12px;
+    margin-bottom:10px;
+  }
+  h1{font-size:1.18rem;margin:.1rem 0 .6rem;}
+  .qtext{
+    font-size:1.02rem;
+    background:#f4f8ff;
+    border:1px dashed #b9cdf0;
+    border-radius:10px;
+    padding:12px 14px;
+    margin:0 0 14px;
+  }
+  .choices{
+    list-style:none;padding:0;margin:10px 0 0;
+    display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;
+  }
+  .choices li{
+    background:#fff;border:1px solid var(--line);border-radius:8px;
+    padding:6px 10px;font-variant-numeric:tabular-nums;
+  }
+  .choices li b{color:var(--boy);}
+
+  .step{
+    border-left:4px solid var(--line);
+    padding:2px 0 2px 12px;
+    margin:0 0 16px;
+    transition:border-color .25s ease, background .25s ease;
+    border-radius:0 8px 8px 0;
+  }
+  .step.on{
+    border-left-color:var(--accent);
+    background:#f2fbf7;
+  }
+  .steptag{
+    display:inline-flex;align-items:center;gap:8px;
+    font-weight:800;color:var(--ink);margin-bottom:4px;
+  }
+  .chip{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:24px;height:24px;border-radius:50%;
+    background:var(--boy);color:#fff;font-size:.82rem;font-weight:800;
+    flex:0 0 auto;
+  }
+  .step.on .chip{background:var(--accent);}
+  .hint{
+    font-size:.88rem;color:var(--muted);
+    background:#fff8ec;border:1px solid #f6dfb8;border-radius:8px;
+    padding:6px 10px;margin-top:6px;
+  }
+  .ans{
+    margin-top:18px;font-size:1.05rem;font-weight:700;
+    background:#e9f8f1;border:1px solid #a9e0c8;border-radius:10px;
+    padding:10px 14px;
+  }
+  .ans .big{color:var(--accent);font-size:1.15rem;}
+  .hl{background:#fff3c4;border-radius:4px;padding:0 3px;}
+  code{background:#eef2f7;border-radius:4px;padding:1px 5px;font-size:.92em;}
+  @media(max-width:640px){
+    body{font-size:14.5px;}
+    .wrap{padding:10px 8px 40px;}
+    .panel{padding:13px 12px;}
+  }
+</style>
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$','$'], ['\\(','\\)']],
+      displayMath: [['$$','$$'], ['\\[','\\]']]
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 </head>
-<body class="min-h-screen py-6 px-4 md:px-8">
-    <div class="max-w-3xl mx-auto">
+<body>
+<div class="wrap">
+  <div class="split">
 
-        <!-- Header -->
-        <div class="text-center mb-6">
-            <h1 class="text-2xl md:text-3xl font-bold text-gray-800">HKDSE Math 2015 Paper 2 <span class="text-indigo-600">Q43</span></h1>
-            <p class="text-gray-500 text-sm mt-1">Topic 14 · Probability (Arrangements)</p>
-        </div>
-
-        <!-- Question Card -->
-        <div class="card bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
-            <div class="flex flex-wrap gap-2 mb-3">
-                <span class="badge bg-indigo-100 text-indigo-700">Permutations</span>
-                <span class="badge bg-amber-100 text-amber-700">Complementary Counting</span>
-                <span class="badge bg-emerald-100 text-emerald-700">Factorials</span>
-            </div>
-            <p class="text-gray-800 text-base md:text-lg leading-relaxed">
-                A queue is formed by <strong>6 boys</strong> and <strong>2 girls</strong>. If <strong>no girls are next to each other</strong>, how many different queues can be formed?
-            </p><figure style="margin:12px 0;text-align:center;"><img src="figures/2015_P2_Q43.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
-                <div class="bg-gray-50 rounded-xl p-3 text-center border border-gray-100">
-                    <span class="text-xs text-gray-500 block">A</span>
-                    <span class="font-semibold text-gray-700">1 440</span>
-                </div>
-                <div class="bg-gray-50 rounded-xl p-3 text-center border border-gray-100">
-                    <span class="text-xs text-gray-500 block">B</span>
-                    <span class="font-semibold text-gray-700">10 080</span>
-                </div>
-                <div class="bg-gray-50 rounded-xl p-3 text-center border border-gray-100">
-                    <span class="text-xs text-gray-500 block">C</span>
-                    <span class="font-semibold text-gray-700">30 240</span>
-                </div>
-                <div class="bg-gray-50 rounded-xl p-3 text-center border border-gray-100">
-                    <span class="text-xs text-gray-500 block">D</span>
-                    <span class="font-semibold text-gray-700">35 280</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Interactive Visualisation: Queue Simulator -->
-        <div class="card bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
-            <h2 class="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                <span class="text-xl">🎯</span> Queue Simulator
-            </h2>
-            <p class="text-sm text-gray-500 mb-3">Drag the slider to see a random queue. The helper counts how many queues have the girls <em>together</em>.</p>
-            
-            <div class="mb-4">
-                <label for="randomSlider" class="block text-sm font-medium text-gray-600 mb-1">
-                    Random queue number: <span id="queueNumberDisplay" class="font-bold text-indigo-600">0</span>
-                </label>
-                <input type="range" id="randomSlider" min="0" max="40319" value="0" class="slider-thumb w-full">
-            </div>
-
-            <!-- Queue visualisation -->
-            <div id="queueContainer" class="flex flex-wrap justify-center gap-1.5 md:gap-2 mb-4 min-h-[3rem]"></div>
-
-            <!-- Status message -->
-            <div id="statusMessage" class="text-center text-sm font-medium py-2 rounded-lg"></div>
-
-            <!-- Stats -->
-            <div class="mt-4 grid grid-cols-2 gap-3 text-center text-sm">
-                <div class="bg-gray-50 rounded-xl p-3">
-                    <div class="text-gray-500">Total queues (8!)</div>
-                    <div class="font-bold text-gray-800 text-lg">40 320</div>
-                </div>
-                <div class="bg-rose-50 rounded-xl p-3">
-                    <div class="text-gray-500">Girls together (2 · 7!)</div>
-                    <div class="font-bold text-rose-700 text-lg">10 080</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Step-by-step solution -->
-        <div class="card bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
-            <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                <span class="text-xl">🧩</span> Guided Solution
-            </h2>
-
-            <!-- Step 1 -->
-            <div id="step1" class="mb-4 border-l-4 border-indigo-300 pl-4">
-                <div class="flex items-start gap-3">
-                    <span class="bg-indigo-100 text-indigo-700 text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shrink-0 mt-0.5">1</span>
-                    <div>
-                        <p class="font-medium text-gray-800">Understand the total without restriction</p>
-                        <p class="text-sm text-gray-600 mt-1">If we ignore the "no girls next to each other" rule, we just arrange 8 distinct people in a row.</p>
-                        <div class="mt-2 bg-gray-50 rounded-lg p-3 text-sm">
-                            <span class="text-gray-500">Total arrangements</span> = \(8! = 40\,320\)
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Step 2 -->
-            <div id="step2" class="mb-4 border-l-4 border-indigo-300 pl-4 step-hidden">
-                <div class="flex items-start gap-3">
-                    <span class="bg-indigo-100 text-indigo-700 text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shrink-0 mt-0.5">2</span>
-                    <div>
-                        <p class="font-medium text-gray-800">Use complementary counting</p>
-                        <p class="text-sm text-gray-600 mt-1">It's easier to count the <em>opposite</em> case: queues where the girls <strong>are</strong> next to each other.</p>
-                        <div class="mt-2 bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-800">
-                            <strong>💡 Hint:</strong> Desired = Total − (girls together)
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Step 3 -->
-            <div id="step3" class="mb-4 border-l-4 border-indigo-300 pl-4 step-hidden">
-                <div class="flex items-start gap-3">
-                    <span class="bg-indigo-100 text-indigo-700 text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shrink-0 mt-0.5">3</span>
-                    <div>
-                        <p class="font-medium text-gray-800">Count queues where the two girls are together</p>
-                        <p class="text-sm text-gray-600 mt-1">Treat the 2 girls as a single "block". Then we arrange this block together with the 6 boys.</p>
-                        <ul class="list-disc list-inside text-sm text-gray-600 mt-2 space-y-1">
-                            <li>Number of objects to arrange: \(6 + 1 = 7\)</li>
-                            <li>Arrange 7 objects: \(7!\)</li>
-                            <li>The two girls inside the block can swap: \(2!\)</li>
-                        </ul>
-                        <div class="mt-2 bg-gray-50 rounded-lg p-3 text-sm">
-                            <span class="text-gray-500">Girls together</span> = \(2! \times 7! = 2 \times 5\,040 = 10\,080\)
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Step 4 -->
-            <div id="step4" class="mb-4 border-l-4 border-indigo-300 pl-4 step-hidden">
-                <div class="flex items-start gap-3">
-                    <span class="bg-indigo-100 text-indigo-700 text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shrink-0 mt-0.5">4</span>
-                    <div>
-                        <p class="font-medium text-gray-800">Compute the answer</p>
-                        <div class="mt-2 bg-indigo-50 border border-indigo-200 rounded-lg p-4 text-center">
-                            <p class="text-gray-600 text-sm mb-1">Required number of queues</p>
-                            <p class="text-lg md:text-xl font-bold text-indigo-800">\(8! - 2! \cdot 7! = 40\,320 - 10\,080 = 30\,240\)</p>
-                            <p class="text-emerald-600 font-semibold mt-2 text-sm">Answer: C · 30 240</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Controls -->
-            <div class="flex flex-wrap gap-3 mt-6">
-                <button id="nextBtn" class="btn-primary">Next Step ▸</button>
-                <button id="resetBtn" class="btn-secondary">Reset</button>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <p class="text-center text-xs text-gray-400 mt-8 pb-4">HKDSE Mathematics · Probability · Interactive Solution</p>
+    <!-- ================= LEFT PANE ================= -->
+    <div class="diagram">
+      <h2>Interactive Figure</h2>
+      <canvas id="cv" width="520" height="620"></canvas>
+      <div class="legend">
+        <span><i class="dot b"></i> Boy (6)</span>
+        <span><i class="dot g"></i> Girl (2)</span>
+      </div>
+      <p class="ro" id="readout">Step 1 — The problem: 6 boys and 2 girls queue up.</p>
     </div>
 
-    <script>
-        // ---------- Step-by-step reveal ----------
-        const steps = [1, 2, 3, 4];
-        let currentStep = 1;
-        const nextBtn = document.getElementById('nextBtn');
-        const resetBtn = document.getElementById('resetBtn');
+    <!-- ================= RIGHT PANE ================= -->
+    <div class="panel">
+      <span class="qtag">HKDSE 2015 · Paper 2 · Q43</span>
+      <h1>14. Probability — Arrangement of a Queue</h1>
 
-        function showStep(n) {
-            for (let i = 1; i <= 4; i++) {
-                const el = document.getElementById('step' + i);
-                if (i <= n) {
-                    el.classList.remove('step-hidden');
-                } else {
-                    el.classList.add('step-hidden');
-                }
-            }
-            if (n >= 4) {
-                nextBtn.disabled = true;
-                nextBtn.textContent = 'All Steps Shown ✓';
-            } else {
-                nextBtn.disabled = false;
-                nextBtn.textContent = 'Next Step ▸';
-            }
-        }
+      <div class="qtext">
+        A queue is formed by $6$ boys and $2$ girls. If no girls are next to each other,
+        how many different queues can be formed?
+        <ul class="choices">
+          <li><b>A.</b> 1&nbsp;440</li>
+          <li><b>B.</b> 10&nbsp;080</li>
+          <li><b>C.</b> 30&nbsp;240</li>
+          <li><b>D.</b> 35&nbsp;280</li>
+        </ul>
+      </div>
 
-        nextBtn.addEventListener('click', () => {
-            if (currentStep < 4) {
-                currentStep++;
-                showStep(currentStep);
-            }
+      <figure style="margin:12px 0;text-align:center;"><img src="figures/2015_P2_Q43.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
+
+      <div class="step" data-step="1">
+        <div class="steptag"><span class="chip">1</span>Step 1 — Understand the setting</div>
+        There are $8$ people in total: $6$ boys and $2$ girls. We must count the linear
+        arrangements (queues) of these $8$ people where the <span class="hl">two girls are
+        <b>not</b> adjacent</span>.
+        <div class="hint">Hint: counting the complement (total − bad cases) is usually the fastest route.</div>
+      </div>
+
+      <div class="step" data-step="2">
+        <div class="steptag"><span class="chip">2</span>Step 2 — Count all queues with no restriction</div>
+        Arranging $8$ distinct people in a line in any order gives
+        \[ 8! = 8\times7\times6\times5\times4\times3\times2\times1 = 40\,320. \]
+        <div class="hint">Hint: $n$ distinct objects in a queue can be ordered in $n!$ ways.</div>
+      </div>
+
+      <div class="step" data-step="3">
+        <div class="steptag"><span class="chip">3</span>Step 3 — Count the "bad" queues (girls adjacent)</div>
+        Treat the $2$ girls as <b>one unit</b>. That unit together with the $6$ boys makes
+        $7$ objects, arranged in $7!$ ways. Inside the unit the two girls can swap:
+        \[ 2! \times 7! = 2 \times 5\,040 = 10\,080. \]
+        <div class="hint">Hint: "tie" the girls together first, then arrange the block among the others.</div>
+      </div>
+
+      <div class="step" data-step="4">
+        <div class="steptag"><span class="chip">4</span>Step 4 — Subtract to get the required number</div>
+        \[ 8! - 2!\cdot 7! = 40\,320 - 10\,080 = 30\,240. \]
+        This matches option <b>C</b>.
+        <div class="hint">Hint: required = (all arrangements) − (arrangements with girls adjacent).</div>
+      </div>
+
+      <div class="step" data-step="5">
+        <div class="steptag"><span class="chip">5</span>Step 5 — Check by the "gap" method</div>
+        Alternatively, arrange the $6$ boys first ($6!=720$ ways). They create $7$ gaps
+        (before, between, after):
+        \[ \_\,B\,\_\,B\,\_\,B\,\_\,B\,\_\,B\,\_\,B\,\_ \]
+        The $2$ girls must occupy $2$ different gaps: choose $\binom{7}{2}$ gap-pairs and
+        arrange the girls within them in $2!$ ways:
+        \[ 6! \times \tbinom{7}{2}\times 2! = 720 \times 21 \times 2 = 30\,240. \;\checkmark \]
+        <div class="hint">Hint: the gap method directly enforces "no two girls adjacent".</div>
+      </div>
+
+      <div class="ans">
+        Answer: <span class="big">C. 30&nbsp;240</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function(){
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  const readout = document.getElementById('readout');
+
+  const W = cv.width, H = cv.height;
+
+  // ---- palette ----
+  const BOY = '#2f6df6';
+  const GIRL = '#ef4b8b';
+  const LINE = '#c8d4e2';
+  const INK = '#1b2430';
+  const MUTED = '#5b6b7c';
+  const ACCENT = '#0f9d6e';
+  const WARN = '#f2a33c';
+
+  // slot geometry
+  const N = 8;
+  const slotW = 46, slotH = 46, gap = 12;
+  const totalW = N*slotW + (N-1)*gap;
+  const x0 = (W - totalW)/2;
+  const rowY = 96;
+
+  let current = 1;
+
+  function drawPerson(x, y, w, h, kind, label, highlight, dim){
+    const col = kind === 'b' ? BOY : GIRL;
+    ctx.save();
+    ctx.globalAlpha = dim ? 0.28 : 1;
+
+    // shadow / body
+    ctx.beginPath();
+    roundRect(ctx, x, y, w, h, 12);
+    ctx.fillStyle = '#ffffff';
+    ctx.fill();
+    ctx.lineWidth = 2.4;
+    ctx.strokeStyle = highlight ? col : LINE;
+    ctx.stroke();
+
+    // head
+    ctx.beginPath();
+    ctx.arc(x + w/2, y + h*0.34, w*0.20, 0, Math.PI*2);
+    ctx.fillStyle = col;
+    ctx.fill();
+
+    // gender marker
+    ctx.beginPath();
+    if(kind === 'g'){
+      // long hair arcs
+      ctx.arc(x + w/2, y + h*0.36, w*0.30, Math.PI*0.06, Math.PI*0.94);
+      ctx.strokeStyle = col;
+      ctx.lineWidth = 4;
+      ctx.stroke();
+    } else {
+      ctx.arc(x + w/2, y + h*0.34, w*0.30, Math.PI*1.15, Math.PI*1.85);
+      ctx.strokeStyle = col;
+      ctx.lineWidth = 3;
+      ctx.stroke();
+    }
+
+    // shoulders
+    ctx.beginPath();
+    ctx.moveTo(x + w*0.22, y + h*0.80);
+    ctx.quadraticCurveTo(x + w/2, y + h*0.52, x + w*0.78, y + h*0.80);
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = col;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+
+    // label
+    ctx.globalAlpha = dim ? 0.35 : 1;
+    ctx.fillStyle = col;
+    ctx.font = 'bold 13px Segoe UI, Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(label, x + w/2, y + h + 16);
+
+    ctx.restore();
+  }
+
+  function roundRect(c, x, y, w, h, r){
+    c.beginPath();
+    c.moveTo(x+r, y);
+    c.arcTo(x+w, y, x+w, y+h, r);
+    c.arcTo(x+w, y+h, x, y+h, r);
+    c.arcTo(x, y+h, x, y, r);
+    c.arcTo(x, y, x+w, y, r);
+    c.closePath();
+  }
+
+  function arrow(x1,y1,x2,y2,color,lw){
+    ctx.save();
+    ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = lw||2;
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+    const a = Math.atan2(y2-y1, x2-x1), s = 7;
+    ctx.beginPath();
+    ctx.moveTo(x2,y2);
+    ctx.lineTo(x2 - s*Math.cos(a-0.4), y2 - s*Math.sin(a-0.4));
+    ctx.lineTo(x2 - s*Math.cos(a+0.4), y2 - s*Math.sin(a+0.4));
+    ctx.closePath(); ctx.fill();
+    ctx.restore();
+  }
+
+  function title(txt, sub, color){
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.fillStyle = color || INK;
+    ctx.font = 'bold 17px Segoe UI, Arial';
+    ctx.fillText(txt, W/2, 34);
+    if(sub){
+      ctx.fillStyle = MUTED;
+      ctx.font = '13px Segoe UI, Arial';
+      ctx.fillText(sub, W/2, 56);
+    }
+    ctx.restore();
+  }
+
+  function infoBox(lines, y, color){
+    ctx.save();
+    ctx.textAlign = 'left';
+    const pad = 12;
+    ctx.font = '14px Segoe UI, Arial';
+    let maxW = 0;
+    lines.forEach(l=>{ maxW = Math.max(maxW, ctx.measureText(l.t).width); });
+    const bw = Math.min(W-30, maxW + pad*2 + 12);
+    const bx = (W - bw)/2;
+    const bh = lines.length*21 + pad*2 - 6;
+    roundRect(ctx, bx, y, bw, bh, 10);
+    ctx.fillStyle = '#f7fbff';
+    ctx.fill();
+    ctx.strokeStyle = color || LINE;
+    ctx.lineWidth = 1.6;
+    ctx.stroke();
+    lines.forEach((l,i)=>{
+      ctx.fillStyle = l.c || INK;
+      ctx.font = (l.bold ? 'bold ' : '') + '14px Segoe UI, Arial';
+      ctx.fillText(l.t, bx + pad, y + pad + 14 + i*21);
+    });
+    ctx.restore();
+  }
+
+  function baseQueue(opts){
+    // opts: {dimGirls, highlightGirls, showBox, boxFrom, boxTo, boxLabel}
+    opts = opts || {};
+    for(let i=0;i<N;i++){
+      // girls at positions 3 and 6 (0-indexed) in the "bad" illustration
+      const isGirlPos = (i===2 || i===5);
+      let kind, label;
+      if(opts.bad){ kind = isGirlPos ? 'g' : 'b'; }
+      else { kind = isGirlPos ? 'g' : 'b'; }
+      label = kind === 'g' ? 'G' : 'B';
+      const dim = (!opts.bad && kind==='g' && opts.dimGirls) ? true : false;
+      const hl = opts.highlightGirls && kind === 'g';
+      drawPerson(x0 + i*(slotW+gap), rowY, slotW, slotH, kind, label, hl, dim);
+    }
+    // slot numbers
+    ctx.save();
+    ctx.fillStyle = MUTED;
+    ctx.font = '12px Segoe UI, Arial';
+    ctx.textAlign = 'center';
+    for(let i=0;i<N;i++){
+      ctx.fillText(String(i+1), x0 + i*(slotW+gap) + slotW/2, rowY + slotH + 36);
+    }
+    ctx.restore();
+  }
+
+  function draw(step){
+    current = step;
+    ctx.clearRect(0,0,W,H);
+
+    // subtle background wash
+    const g = ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,'#fdfefe');
+    g.addColorStop(1,'#f4f8fd');
+    ctx.fillStyle = g;
+    ctx.fillRect(0,0,W,H);
+
+    if(step === 1){
+      title('The Problem', '6 boys + 2 girls in a queue');
+      baseQueue({highlightGirls:true});
+      infoBox([
+        {t:'• 8 people in total (6B, 2G)', c:INK},
+        {t:'• Girls must NOT stand next to each other', c:GIRL, bold:true},
+        {t:'• Count the valid queues', c:INK}
+      ], rowY + slotH + 60, LINE);
+      readout.textContent = 'Step 1 — The problem: 6 boys and 2 girls queue up, girls not adjacent.';
+
+    } else if(step === 2){
+      title('All Queues (No Restriction)', '8! = 40 320 arrangements');
+      baseQueue({});
+      infoBox([
+        {t:'Total ways to arrange 8 distinct people:', c:MUTED},
+        {t:'8! = 8 × 7 × 6 × 5 × 4 × 3 × 2 × 1', c:BOY, bold:true},
+        {t:'= 40 320', c:BOY, bold:true}
+      ], rowY + slotH + 60, BOY);
+      readout.textContent = 'Step 2 — No restriction: 8! = 40 320 total queues.';
+
+    } else if(step === 3){
+      title('Bad Queues: Girls Adjacent', 'Girls form one unit → 2! × 7!');
+      baseQueue({bad:true, highlightGirls:true});
+
+      // box around the two girls (positions 3 and 6 in this illustration are NOT adjacent;
+      // instead show them adjacent at positions 3,4 for clarity)
+      // redraw a dedicated adjacent illustration below
+      ctx.save();
+      ctx.fillStyle = INK;
+      ctx.font = 'bold 14px Segoe UI, Arial';
+      ctx.textAlign = 'left';
+      ctx.fillText('Illustration: girls tied into a block', 22, rowY + slotH + 78);
+      ctx.restore();
+
+      // mini adjacent row
+      const mY = rowY + slotH + 92;
+      const miniW = 40, miniH = 40, miniGap = 9;
+      const seq = ['B','B','G','G','B','B','B','B'];
+      const mTotal = N*miniW + (N-1)*miniGap;
+      const mx0 = (W - mTotal)/2;
+      seq.forEach((s,i)=>{
+        const x = mx0 + i*(miniW+miniGap);
+        drawPerson(x, mY, miniW, miniH, s==='G'?'g':'b', s, s==='G', false);
+      });
+      // block bracket
+      const bx1 = mx0 + 2*(miniW+miniGap) - 5;
+      const bx2 = mx0 + 3*(miniW+miniGap) + miniW + 5;
+      ctx.save();
+      ctx.strokeStyle = GIRL;
+      ctx.lineWidth = 2.5;
+      ctx.setLineDash([5,4]);
+      roundRect(ctx, bx1, mY-6, bx2-bx1, miniH+12, 10);
+      ctx.stroke();
+      ctx.restore();
+
+      infoBox([
+        {t:'Girls as one unit + 6 boys = 7 objects', c:MUTED},
+        {t:'7! = 5 040  (arrange the 7 objects)', c:WARN, bold:true},
+        {t:'2! = 2  (girls swap inside the unit)', c:GIRL, bold:true},
+        {t:'2! × 7! = 10 080 bad queues', c:GIRL, bold:true}
+      ], mY + miniH + 34, GIRL);
+      readout.textContent = 'Step 3 — Bad queues (girls adjacent): 2! × 7! = 10 080.';
+
+    } else if(step === 4){
+      title('Subtract', '8! − 2!·7! = 30 240');
+      // visual bar subtraction
+      const barW = 340, barH = 34, bx = (W-barW)/2, by = 130;
+      // total bar
+      roundRect(ctx, bx, by, barW, barH, 8);
+      ctx.fillStyle = '#dceafc'; ctx.fill();
+      ctx.strokeStyle = BOY; ctx.lineWidth = 2; ctx.stroke();
+      ctx.fillStyle = BOY; ctx.font='bold 14px Segoe UI, Arial'; ctx.textAlign='center';
+      ctx.fillText('8! = 40 320', bx+barW/2, by+23);
+      ctx.fillStyle = MUTED; ctx.font='13px Segoe UI, Arial';
+      ctx.fillText('All queues', bx+barW/2, by-8);
+
+      // minus
+      ctx.fillStyle = INK; ctx.font='bold 26px Segoe UI, Arial';
+      ctx.fillText('−', W/2, by+barH+46);
+
+      // bad bar (scaled representation)
+      const ratio = 10080/40320;
+      const badW = barW*ratio;
+      const by2 = by + barH + 68;
+      roundRect(ctx, bx, by2, barW, barH, 8);
+      ctx.fillStyle = '#fde3ee'; ctx.fill();
+      ctx.strokeStyle = GIRL; ctx.lineWidth = 2; ctx.stroke();
+      ctx.fillStyle = GIRL; ctx.font='bold 14px Segoe UI, Arial';
+      ctx.fillText('2!·7! = 10 080', bx+barW/2, by2+23);
+      ctx.fillStyle = MUTED; ctx.font='13px Segoe UI, Arial';
+      ctx.fillText('Girls adjacent (removed)', bx+barW/2, by2-8);
+
+      // equals
+      ctx.fillStyle = INK; ctx.font='bold 26px Segoe UI, Arial';
+      ctx.fillText('=', W/2, by2+barH+46);
+
+      // result bar
+      const ry = by2 + barH + 68;
+      roundRect(ctx, bx, ry, barW, barH, 8);
+      ctx.fillStyle = '#d7f4e8'; ctx.fill();
+      ctx.strokeStyle = ACCENT; ctx.lineWidth = 2.4; ctx.stroke();
+      ctx.fillStyle = ACCENT; ctx.font='bold 16px Segoe UI, Arial';
+      ctx.fillText('30 240', bx+barW/2, ry+24);
+      ctx.fillStyle = ACCENT; ctx.font='13px Segoe UI, Arial';
+      ctx.fillText('Required queues (girls not adjacent)', bx+barW/2, ry-8);
+
+      readout.textContent = 'Step 4 — 8! − 2!·7! = 40 320 − 10 080 = 30 240.';
+
+    } else if(step === 5){
+      title('Check: The Gap Method', 'Place 6 boys → 7 gaps for 2 girls');
+      // draw 6 boys with gaps marked
+      const bN = 6;
+      const bW = 44, bH = 44, bGap = 34;
+      const bTotal = bN*bW + (bN-1)*bGap;
+      const bx0 = (W - bTotal)/2;
+      const bY = 110;
+
+      // gaps (7) as small dashed ovals between/around boys
+      const gapCenters = [];
+      for(let i=0;i<=bN;i++){
+        let gx;
+        if(i===0) gx = bx0 - bGap/2;
+        else if(i===bN) gx = bx0 + bTotal + bGap/2;
+        else gx = bx0 + i*(bW+bGap) - bGap/2;
+        gapCenters.push(gx);
+      }
+      // highlight two chosen gaps
+      const chosen = [1,4];
+      gapCenters.forEach((gx,i)=>{
+        const isChosen = chosen.includes(i);
+        ctx.save();
+        ctx.beginPath();
+        ctx.ellipse(gx, bY + bH/2, 13, 15, 0, 0, Math.PI*2);
+        ctx.setLineDash([4,4]);
+        ctx.lineWidth = 2.2;
+        ctx.strokeStyle = isChosen ? GIRL : '#aebfce';
+        ctx.fillStyle = isChosen ? '#fde3ee' : '#f2f6fa';
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+      });
+
+      // boys
+      for(let i=0;i<bN;i++){
+        drawPerson(bx0 + i*(bW+bGap), bY, bW, bH, 'b', 'B', false, false);
+      }
+
+      // place girls into chosen gaps
+      ctx.save();
+      ctx.font = 'bold 18px Segoe UI, Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      chosen.forEach((gi,k)=>{
+        ctx.fillStyle = GIRL;
+        ctx.beginPath();
+        ctx.arc(gapCenters[gi], bY + bH/2, 15, 0, Math.PI*2);
+        ctx.fill();
+        ctx.fillStyle = '#fff';
+        ctx.fillText('G', gapCenters[gi], bY + bH/2 + 1);
+      });
+      ctx.restore();
+
+      // annotation arrows
+      arrow(bx0 + 1*(bW+bGap) - 6, bY - 22, gapCenters[1], bY - 6, GIRL, 2);
+      arrow(bx0 + 4*(bW+bGap) - 6, bY - 22, gapCenters[4], bY - 6, GIRL, 2);
+
+      infoBox([
+        {t:'Arrange 6 boys:  6! = 720', c:BOY, bold:true},
+        {t:'Choose 2 of the 7 gaps:  C(7,2) = 21', c:WARN, bold:true},
+        {t:'Arrange 2 girls in those gaps:  2! = 2', c:GIRL, bold:true},
+        {t:'6! × C(7,2) × 2! = 720 × 21 × 2 = 30 240', c:ACCENT, bold:true}
+      ], bY + bH + 46, ACCENT);
+
+      readout.textContent = 'Step 5 — Gap method: 6! × C(7,2) × 2! = 30 240. ✓';
+    }
+  }
+
+  // -------- scroll sync --------
+  const io = new IntersectionObserver(es=>{
+    es.forEach(e=>{
+      if(e.isIntersecting){
+        const s = +e.target.dataset.step;
+        document.querySelectorAll('.step').forEach(el=>{
+          el.classList.toggle('on', +el.dataset.step === s);
         });
+        draw(s);
+      }
+    });
+  }, {rootMargin:'-25% 0px -55% 0px'});
 
-        resetBtn.addEventListener('click', () => {
-            currentStep = 1;
-            showStep(currentStep);
-            nextBtn.disabled = false;
-            nextBtn.textContent = 'Next Step ▸';
-        });
+  document.querySelectorAll('.step').forEach(s=>io.observe(s));
 
-        // ---------- Queue Simulator ----------
-        const slider = document.getElementById('randomSlider');
-        const queueContainer = document.getElementById('queueContainer');
-        const statusMessage = document.getElementById('statusMessage');
-        const queueNumberDisplay = document.getElementById('queueNumberDisplay');
-
-        // Represent queue as array of 'B' (boy) and 'G' (girl)
-        // We'll generate a specific queue based on slider index.
-        // To make it deterministic and cover all 8! = 40320 permutations,
-        // we'll map index to a lexicographic permutation of 6 B's and 2 G's.
-        // However, there are duplicate B's, so we simply generate one representative.
-
-        // Generate all distinct arrangements of 6 B and 2 G (total 28)
-        // For visualisation, we just need a mapping from 0..40319 to one of these arrangements.
-        // But to make it feel like "random", we can generate a pseudo-random queue from index.
-
-        function indexToQueue(index) {
-            // Simple hash to distribute: use index to pick a random-ish arrangement
-            // We'll just generate an arrangement based on index using a seeded approach.
-            // For educational purposes, we'll create a deterministic "random" queue.
-            
-            // We want positions of the 2 G's among 8 slots.
-            // There are C(8,2)=28 possible positions, but with boys identical.
-            // For visual variety, we'll map the slider value to one of 28 position pairs,
-            // then shuffle the boys' order (but boys are identical so it doesn't matter visually).
-            
-            // To simulate "all 8! queues", we'll use a simple linear congruential generator
-            // seeded by the slider index, then map to a permutation with distinct persons.
-            // Actually, for visual clarity, we just need a queue of B's and G's that looks plausible.
-            
-            // Let's create a deterministic pseudo-random arrangement:
-            let seed = index + 1;
-            function nextRandom() {
-                seed = (seed * 9301 + 49297) % 233280;
-                return seed / 233280;
-            }
-            
-            // Start with all boys
-            let arr = ['B','B','B','B','B','B','G','G'];
-            // Fisher-Yates shuffle
-            for (let i = arr.length - 1; i > 0; i--) {
-                const j = Math.floor(nextRandom() * (i + 1));
-                [arr[i], arr[j]] = [arr[j], arr[i]];
-            }
-            return arr;
-        }
-
-        function isGirlsTogether(queue) {
-            const girlIndices = [];
-            queue.forEach((el, idx) => { if (el === 'G') girlIndices.push(idx); });
-            if (girlIndices.length < 2) return false;
-            return Math.abs(girlIndices[0] - girlIndices[1]) === 1;
-        }
-
-        function renderQueue(queue) {
-            queueContainer.innerHTML = '';
-            queue.forEach((person, i) => {
-                const chip = document.createElement('div');
-                chip.className = `queue-chip ${person === 'B' ? 'boy-chip' : 'girl-chip'}`;
-                chip.textContent = person === 'B' ? '👦' : '👧';
-                chip.style.animation = 'fadeIn 0.3s ease forwards';
-                chip.style.opacity = '0';
-                chip.style.animationDelay = (i * 0.03) + 's';
-                queueContainer.appendChild(chip);
-            });
-        }
-
-        function updateSimulator() {
-            const val = parseInt(slider.value);
-            queueNumberDisplay.textContent = val;
-            const queue = indexToQueue(val);
-            renderQueue(queue);
-
-            const together = isGirlsTogether(queue);
-            if (together) {
-                statusMessage.className = 'text-center text-sm font-medium py-2 rounded-lg bg-rose-100 text-rose-700';
-                statusMessage.innerHTML = '❌ Girls are <strong>next to each other</strong> — this queue is NOT counted.';
-            } else {
-                statusMessage.className = 'text-center text-sm font-medium py-2 rounded-lg bg-emerald-100 text-emerald-700';
-                statusMessage.innerHTML = '✅ Girls are <strong>separated</strong> — this queue IS counted.';
-            }
-        }
-
-        slider.addEventListener('input', updateSimulator);
-
-        // Initial render
-        updateSimulator();
-
-        // Add CSS animation keyframes
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes fadeIn {
-                from { opacity: 0; transform: translateY(8px) scale(0.9); }
-                to { opacity: 1; transform: translateY(0) scale(1); }
-            }
-        `;
-        document.head.appendChild(style);
-
-        // Show step 1 initially
-        showStep(1);
-    </script>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
+  // initial
+  document.querySelector('.step[data-step="1"]').classList.add('on');
+  draw(1);
+})();
 </script>
-
 </body>
 </html>

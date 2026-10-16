@@ -3,916 +3,408 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HKDSE 2014 Paper 1 Q11 — Statistics</title>
+<title>HKDSE 2014 P1 Q11 — Statistics (Box-and-Whisker)</title>
 <script>
-  MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['\\[', '\\]']] } };
+window.MathJax = {
+  tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
+  svg: { fontCache: 'global' }
+};
 </script>
-<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
-  :root {
-    --blue: #1d4ed8;
-    --blue-light: #3b82f6;
-    --amber: #d97706;
-    --amber-bg: #fef3c7;
-    --emerald: #059669;
-    --emerald-bg: #d1fae5;
-    --dark: #0f172a;
-    --slate: #334155;
-    --slate-light: #64748b;
-    --bg: #f1f5f9;
-    --card: #ffffff;
+  :root{
+    --ink:#1c2430; --muted:#5b6b7d; --line:#d6e0ea;
+    --blue:#2f6fd0; --orange:#e8833a; --green:#38a169; --red:#d64545;
+    --purple:#7c5cd6; --teal:#0d9488;
+    --bg:#f7fafc; --card:#ffffff;
   }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    background: var(--bg);
-    color: var(--slate);
-    line-height: 1.6;
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    color:var(--ink); background:var(--bg); font-size:16px; line-height:1.55;
   }
-  /* HERO */
-  .hero {
-    background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 45%, #3b82f6 100%);
-    color: #fff;
-    padding: 42px 24px 38px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
+  .wrap{padding:16px 14px 48px; max-width:1400px; margin:0 auto;}
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start;}
+  @media(min-width:900px){.split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}}
+  @media(max-width:640px){body{font-size:14.5px;}.wrap{padding:10px 8px 40px;}}
+
+  .diagram{position:sticky;top:16px;max-height:calc(100vh - 2rem);overflow-y:auto;}
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:14px;
+    padding:12px 14px; box-shadow:0 2px 10px rgba(23,43,77,.06);
   }
-  .hero::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at 85% 15%, rgba(255,255,255,0.18), transparent 55%);
-    pointer-events: none;
+  .diagram h2{margin:2px 0 8px; font-size:1rem; letter-spacing:.02em; color:var(--blue);}
+  canvas{width:100%; height:auto; display:block; border-radius:10px; background:#fdfefe;}
+  .ro{margin:8px 0 0; font-size:.85rem; color:var(--muted); min-height:2.6em;}
+  .legend{display:flex; flex-wrap:wrap; gap:10px; margin-top:8px; font-size:.78rem; color:var(--muted);}
+  .legend span{display:inline-flex; align-items:center; gap:5px;}
+  .dot{width:11px;height:11px;border-radius:3px;display:inline-block;}
+
+  h1{font-size:1.12rem; margin:0 0 6px;}
+  .tagline{font-size:.82rem; color:var(--muted); margin:0 0 12px; letter-spacing:.03em; text-transform:uppercase;}
+  .qbox{background:#eef5ff; border:1px solid #c6dcf7; border-radius:12px; padding:12px 14px; margin-bottom:14px;}
+  .qbox p{margin:.4em 0;}
+  .step{
+    background:var(--card); border:1px solid var(--line); border-left:5px solid var(--blue);
+    border-radius:10px; padding:10px 13px; margin:10px 0;
+    box-shadow:0 1px 5px rgba(23,43,77,.05); transition:border-color .25s, transform .25s;
   }
-  .eyebrow {
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    font-size: 0.74rem;
-    opacity: 0.85;
-    margin: 0 0 8px;
-    font-weight: 600;
+  .step.active{border-left-color:var(--orange); transform:translateX(2px);}
+  .step .st{display:inline-block; font-weight:700; color:#fff; background:var(--blue);
+    border-radius:999px; font-size:.74rem; padding:2px 9px; margin-right:8px; letter-spacing:.04em;}
+  .step.active .st{background:var(--orange);}
+  .hint{font-size:.83rem; color:var(--muted); margin-top:6px; font-style:italic;}
+  .ans{
+    margin-top:14px; background:#e9f9f0; border:1px solid #b6e6c9; border-left:5px solid var(--green);
+    border-radius:10px; padding:11px 14px; font-weight:600;
   }
-  .hero h1 {
-    margin: 0 0 6px;
-    font-size: 1.9rem;
-    font-weight: 800;
-    letter-spacing: 0.5px;
-  }
-  .hero .subtitle {
-    margin: 0 0 18px;
-    font-size: 1.02rem;
-    opacity: 0.95;
-    font-weight: 500;
-  }
-  .pills {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    justify-content: center;
-  }
-  .pill {
-    background: rgba(255,255,255,0.16);
-    border: 1px solid rgba(255,255,255,0.4);
-    padding: 5px 13px;
-    border-radius: 999px;
-    font-size: 0.78rem;
-    font-weight: 600;
-    backdrop-filter: blur(3px);
-  }
-  /* LAYOUT */
-  .wrap {
-    max-width: 980px;
-    margin: 0 auto;
-    padding: 26px 16px 40px;
-  }
-  .card {
-    background: var(--card);
-    border-radius: 18px;
-    box-shadow: 0 4px 18px rgba(15,23,42,0.07), 0 1px 3px rgba(15,23,42,0.05);
-    padding: 24px 24px 26px;
-    margin-bottom: 24px;
-    border: 1px solid #e2e8f0;
-  }
-  .card h2 {
-    margin: 0 0 14px;
-    font-size: 1.22rem;
-    color: var(--dark);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-weight: 800;
-  }
-  .badge-num {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 30px; height: 30px;
-    border-radius: 50%;
-    background: var(--blue);
-    color: #fff;
-    font-size: 0.92rem;
-    font-weight: 800;
-    flex: none;
-  }
-  .question-text { font-size: 1.02rem; }
-  .marks {
-    display: inline-block;
-    background: var(--amber-bg);
-    color: var(--amber);
-    border-radius: 999px;
-    padding: 1px 10px;
-    font-size: 0.78rem;
-    font-weight: 700;
-    margin-left: 6px;
-    vertical-align: middle;
-  }
-  /* CANVAS */
-  .canvas-box {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 14px;
-    padding: 14px;
-    margin: 16px 0 6px;
-  }
-  canvas {
-    width: 100%;
-    height: auto;
-    display: block;
-    border-radius: 10px;
-    background: #ffffff;
-    touch-action: none;
-  }
-  .controls {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-    align-items: center;
-    margin-top: 12px;
-    font-size: 0.86rem;
-    font-weight: 600;
-    color: var(--slate);
-  }
-  .controls label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: #fff;
-    border: 1px solid #e2e8f0;
-    border-radius: 10px;
-    padding: 6px 12px;
-    box-shadow: 0 1px 2px rgba(15,23,42,0.04);
-  }
-  input[type=range] { accent-color: var(--blue); width: 150px; }
-  input[type=checkbox] { accent-color: var(--emerald); width: 17px; height: 17px; }
-  .readout {
-    margin-top: 12px;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 10px;
-  }
-  .readout div {
-    background: #fff;
-    border: 1px solid #e2e8f0;
-    border-left: 4px solid var(--blue-light);
-    border-radius: 10px;
-    padding: 8px 12px;
-    font-size: 0.85rem;
-  }
-  .readout span.lbl { display: block; color: var(--slate-light); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.6px; font-weight: 700; }
-  .readout span.val { font-size: 1.05rem; font-weight: 800; color: var(--dark); }
-  /* STEPS */
-  .step {
-    display: none;
-    border: 1px solid #e2e8f0;
-    border-radius: 13px;
-    padding: 15px 17px;
-    margin-top: 14px;
-    background: #fbfdff;
-    animation: fadeIn 0.35s ease;
-  }
-  .step.show { display: block; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px);} to {opacity:1; transform:none;} }
-  .step-head {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 8px;
-  }
-  .step-num {
-    background: var(--blue);
-    color: #fff;
-    font-weight: 800;
-    font-size: 0.78rem;
-    padding: 3px 10px;
-    border-radius: 999px;
-  }
-  .mark-badge {
-    background: #e0e7ff;
-    color: #3730a3;
-    font-weight: 800;
-    font-size: 0.74rem;
-    padding: 3px 9px;
-    border-radius: 6px;
-  }
-  .hint {
-    background: var(--amber-bg);
-    border-left: 4px solid var(--amber);
-    border-radius: 8px;
-    padding: 9px 13px;
-    margin-top: 10px;
-    font-size: 0.9rem;
-    color: #78350f;
-  }
-  .hint strong { color: #92400e; }
-  .answerbox {
-    background: var(--emerald-bg);
-    border-left: 4px solid var(--emerald);
-    border-radius: 8px;
-    padding: 9px 13px;
-    margin-top: 10px;
-    font-size: 0.95rem;
-    color: #065f46;
-    font-weight: 600;
-  }
-  .btn-row {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    margin-top: 16px;
-    flex-wrap: wrap;
-  }
-  button.next {
-    background: linear-gradient(135deg, var(--blue), var(--blue-light));
-    color: #fff;
-    border: none;
-    padding: 11px 22px;
-    border-radius: 11px;
-    font-size: 0.92rem;
-    font-weight: 700;
-    cursor: pointer;
-    box-shadow: 0 3px 10px rgba(29,78,216,0.28);
-    transition: transform 0.15s, box-shadow 0.15s;
-  }
-  button.next:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(29,78,216,0.35); }
-  button.next:disabled {
-    background: #cbd5e1;
-    box-shadow: none;
-    cursor: default;
-    color: #64748b;
-  }
-  .counter { font-size: 0.85rem; font-weight: 700; color: var(--slate-light); }
-  /* SUMMARY */
-  .summary {
-    background: linear-gradient(135deg, #0f172a, #1e293b);
-    color: #e2e8f0;
-    border-radius: 18px;
-    padding: 26px 24px;
-    margin-bottom: 24px;
-    box-shadow: 0 8px 26px rgba(15,23,42,0.28);
-  }
-  .summary h2 { color: #fff; margin: 0 0 16px; font-size: 1.22rem; font-weight: 800; }
-  .summary ul { list-style: none; padding: 0; margin: 0; }
-  .summary li {
-    padding: 11px 15px;
-    background: rgba(255,255,255,0.06);
-    border-left: 4px solid var(--amber);
-    border-radius: 8px;
-    margin-bottom: 10px;
-    font-size: 0.96rem;
-  }
-  .summary li strong { color: #fbbf24; }
-  footer {
-    text-align: center;
-    color: var(--slate-light);
-    font-size: 0.82rem;
-    padding: 10px 16px 34px;
-  }
-  @media (max-width: 560px) {
-    .hero h1 { font-size: 1.45rem; }
-    .card { padding: 18px 15px 20px; }
-    .controls { gap: 10px; }
-  }
+  .part{font-weight:700; color:var(--purple); margin-top:14px;}
+  code{background:#f1f5f9; padding:1px 5px; border-radius:5px; font-size:.92em;}
 </style>
 </head>
 <body>
-
-<header class="hero">
-  <p class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 1</p>
-  <h1>2014 Paper 1 · Question 11</h1>
-  <p class="subtitle">Statistics — Range, Inter-quartile Range, Mean &amp; Median</p>
-  <div class="pills">
-    <span class="pill">Box-and-Whisker Diagram</span>
-    <span class="pill">Range &amp; IQR</span>
-    <span class="pill">Mean</span>
-    <span class="pill">Median</span>
-    <span class="pill">Removing Data</span>
-  </div>
-</header>
-
 <div class="wrap">
+<div class="split">
 
-  <!-- QUESTION CARD -->
-  <section class="card">
-    <h2><span class="badge-num">Q</span>Question</h2>
-    <div class="question-text">
+  <!-- ================= LEFT: DIAGRAM ================= -->
+  <div class="diagram">
+    <div class="card">
+      <h2>Box-and-Whisker Diagram of Painting Prices</h2>
+      <canvas id="cv" width="640" height="420"></canvas>
+      <p class="ro" id="ro">Step 1 — the five-number summary is read off the diagram: 18, 42, 55, 63, 91.</p>
+      <div class="legend">
+        <span><i class="dot" style="background:#2f6fd0"></i>whiskers (min / max)</span>
+        <span><i class="dot" style="background:#e8833a"></i>box (Q1, median, Q3)</span>
+        <span><i class="dot" style="background:#38a169"></i>range span</span>
+        <span><i class="dot" style="background:#7c5cd6"></i>inter-quartile span</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= RIGHT: QUESTION + SOLUTION ================= -->
+  <div class="content">
+    <h1>HKDSE 2014 Paper 1 — Question 11</h1>
+    <p class="tagline">Topic 15 · Statistics</p>
+
+    <div class="qbox">
       <p>There are 33 paintings in an art gallery. The box-and-whisker diagram below shows the distribution of the prices (in thousand dollars) of the paintings in the art gallery. It is given that the mean of this distribution is 53 thousand dollars.</p>
-      <div class="canvas-box">
-        <canvas id="qCanvas" width="900" height="600"></canvas>
-      </div>
-      <p><strong>(a)</strong> Find the range and the inter-quartile range of the above distribution.<span class="marks">3 marks</span></p>
-      <p><strong>(b)</strong> Four paintings of respective prices (in thousand dollars) \(32\), \(34\), \(58\) and \(59\) are now donated to a museum. Find the mean and the median of the prices of the remaining paintings in the art gallery.<span class="marks">3 marks</span></p><figure style="margin:12px 0;text-align:center;"><img src="figures/2014_P1_Q11.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
+      <p><b>(a)</b> Find the range and the inter-quartile range of the above distribution. <b>[3 marks]</b></p>
+      <p><b>(b)</b> Four paintings of respective prices (in thousand dollars) 32, 34, 58 and 59 are now donated to a museum. Find the mean and the median of the prices of the remaining paintings in the art gallery. <b>[3 marks]</b></p>
     </div>
-  </section>
+    <figure style="margin:12px 0;text-align:center;"><img src="figures/2014_P1_Q11.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
 
-  <!-- PART (a) -->
-  <section class="card" id="partA">
-    <h2><span class="badge-num">a</span>Part (a) — Range &amp; Inter-quartile Range</h2>
-
-    <div class="canvas-box">
-      <canvas id="boxCanvas" width="900" height="600"></canvas>
-      <div class="controls">
-        <label>Median (Q2): <input type="range" id="sliderMed" min="30" max="80" value="55" step="0.5"><span id="lblMed">55</span></label>
-        <label><input type="checkbox" id="chkLabels" checked> Show value labels</label>
-      </div>
-      <div class="readout">
-        <div><span class="lbl">Minimum</span><span class="val">18</span></div>
-        <div><span class="lbl">Q1</span><span class="val">42</span></div>
-        <div><span class="lbl">Median (Q2)</span><span class="val" id="roMed">55</span></div>
-        <div><span class="lbl">Q3</span><span class="val">63</span></div>
-        <div><span class="lbl">Maximum</span><span class="val">91</span></div>
-        <div><span class="lbl">Range = max − min</span><span class="val" id="roRange">73</span></div>
-        <div><span class="lbl">IQR = Q3 − Q1</span><span class="val" id="roIQR">21</span></div>
-      </div>
+    <div class="part">Part (a)</div>
+    <div class="step" data-step="1">
+      <span class="st">STEP 1</span>Read the five-number summary from the diagram.
+      <div>Minimum $=18$, &nbsp; $Q_1=42$, &nbsp; Median $=55$, &nbsp; $Q_3=63$, &nbsp; Maximum $=91$.</div>
+      <div class="hint">The left whisker ends at the smallest value, the right whisker at the largest; the box edges are $Q_1$ and $Q_3$, the line inside is the median.</div>
     </div>
 
-    <div class="btn-row">
-      <button class="next" data-target="aSteps">Next step →</button>
-      <span class="counter" data-counter="aSteps"></span>
+    <div class="step" data-step="2">
+      <span class="st">STEP 2</span>Find the <b>range</b>.
+      <div>$\text{Range} = \text{Maximum} - \text{Minimum} = 91 - 18 = 73$ (thousand dollars).</div>
+      <div class="hint">Range measures total spread: largest minus smallest.</div>
     </div>
 
-    <div id="aSteps">
-      <div class="step">
-        <div class="step-head"><span class="step-num">Step 1</span><span class="mark-badge">1M</span></div>
-        <p>Read the two extreme ends and the two edges of the box from the box-and-whisker diagram:</p>
-        \[ \text{minimum}=18,\quad Q_1=42,\quad Q_2=55,\quad Q_3=63,\quad \text{maximum}=91 \]
-        <div class="hint"><strong>Hint:</strong> The whiskers end at the minimum and maximum; the box edges are \(Q_1\) and \(Q_3\); the line inside the box is the median \(Q_2\).</div>
-      </div>
-
-      <div class="step">
-        <div class="step-head"><span class="step-num">Step 2</span><span class="mark-badge">1A</span></div>
-        <p>Compute the range:</p>
-        \[ \text{Range}=\text{maximum}-\text{minimum}=91-18=73 \]
-        <div class="answerbox">Range \(=73\) thousand dollars</div>
-        <div class="hint"><strong>Hint:</strong> The range depends only on the two extremes — the median slider does not change it.</div>
-      </div>
-
-      <div class="step">
-        <div class="step-head"><span class="step-num">Step 3</span><span class="mark-badge">1A</span></div>
-        <p>Compute the inter-quartile range:</p>
-        \[ \text{IQR}=Q_3-Q_1=63-42=21 \]
-        <div class="answerbox">Inter-quartile range \(=21\) thousand dollars</div>
-        <div class="hint"><strong>Hint:</strong> IQR measures the spread of the middle 50% of the data and is not affected by extreme values (18 and 91 are ignored).</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PART (b) -->
-  <section class="card" id="partB">
-    <h2><span class="badge-num">b</span>Part (b) — Mean &amp; Median of the Remaining Paintings</h2>
-
-    <div class="canvas-box">
-      <canvas id="dotCanvas" width="900" height="600"></canvas>
-      <div class="controls">
-        <label><input type="checkbox" id="chkRemoved" checked> Remove the four donated paintings</label>
-        <label><input type="checkbox" id="chkMedian" checked> Show median position(s)</label>
-      </div>
-      <div class="readout">
-        <div><span class="lbl">Original count</span><span class="val">33</span></div>
-        <div><span class="lbl">Remaining count</span><span class="val">29</span></div>
-        <div><span class="lbl">Original total sum</span><span class="val" id="roTotal">1749</span></div>
-        <div><span class="lbl">New total sum</span><span class="val" id="roNewTotal">1566</span></div>
-        <div><span class="lbl">New mean</span><span class="val" id="roMean">54.0</span></div>
-        <div><span class="lbl">New median</span><span class="val" id="roMed2">55</span></div>
-      </div>
+    <div class="step" data-step="3">
+      <span class="st">STEP 3</span>Find the <b>inter-quartile range</b>.
+      <div>$\text{IQR} = Q_3 - Q_1 = 63 - 42 = 21$ (thousand dollars).</div>
+      <div class="hint">IQR measures the spread of the middle 50% of the data, so it is unaffected by extreme values.</div>
     </div>
 
-    <div class="btn-row">
-      <button class="next" data-target="bSteps">Next step →</button>
-      <span class="counter" data-counter="bSteps"></span>
+    <div class="part">Part (b)</div>
+    <div class="step" data-step="4">
+      <span class="st">STEP 4</span>Original total price of the 33 paintings.
+      <div>$\text{Total} = 33 \times 53 = 1749$ (thousand dollars).</div>
+      <div class="hint">Mean × number of items = total sum.</div>
     </div>
 
-    <div id="bSteps">
-      <div class="step">
-        <div class="step-head"><span class="step-num">Step 1</span><span class="mark-badge">1M</span></div>
-        <p>First find the total sum of the 33 original prices. Since the mean is \(53\):</p>
-        \[ \text{Total sum}=33\times 53 = 1749 \ \text{(thousand dollars)} \]
-        <div class="hint"><strong>Hint:</strong> Total sum \(=(\text{number of items})\times(\text{mean})\).</div>
-      </div>
-
-      <div class="step">
-        <div class="step-head"><span class="step-num">Step 2</span><span class="mark-badge">1M</span></div>
-        <p>The four donated paintings are removed, so the new total sum is reduced by the prices 32, 34, 58 and 59:</p>
-        \[ \text{New sum}=1749-32-34-58-59=1566 \]
-        \[ \text{New count}=33-4=29 \]
-        <div class="hint"><strong>Hint:</strong> Subtract the exact prices of the removed items, and remember to reduce the number of items from 33 to 29.</div>
-      </div>
-
-      <div class="step">
-        <div class="step-head"><span class="step-num">Step 3</span><span class="mark-badge">1A</span></div>
-        <p>Hence the new mean is:</p>
-        \[ \text{New mean}=\frac{1566}{29}=54 \]
-        <div class="answerbox">Mean of the remaining paintings \(=54\) thousand dollars</div>
-        <div class="hint"><strong>Hint:</strong> Compare with the original mean: the donated paintings had an average \(\frac{32+34+58+59}{4}=45.75\), which is below 53, so the new mean rises slightly.</div>
-      </div>
-
-      <div class="step">
-        <div class="step-head"><span class="step-num">Step 4</span><span class="mark-badge">1A</span></div>
-        <p>For the median, list the 33 prices in ascending order. The original median is the \(17^{\text{th}}\) value, which is \(55\). Now remove \(32,34,58,59\):</p>
-        <ul>
-          <li>\(32,34\) are both below \(55\) → two values are removed from the left of the median.</li>
-          <li>\(58,59\) are both above \(55\) → two values are removed from the right of the median.</li>
-        </ul>
-        <p>For 29 items, the median is the \(\frac{29+1}{2}=15^{\text{th}}\) value of the remaining order. Since two values were removed on each side, the \(15^{\text{th}}\) remaining value is still the original \(17^{\text{th}}\) value:</p>
-        \[ \text{New median}=55 \]
-        <div class="answerbox">Median of the remaining paintings \(=55\) thousand dollars</div>
-        <div class="hint"><strong>Hint:</strong> The median only changes when the balance of values on each side of it changes. Removing equal numbers (2 and 2) from either side keeps the middle value the same.</div>
-      </div>
+    <div class="step" data-step="5">
+      <span class="st">STEP 5</span>Subtract the four donated paintings and recompute the mean.
+      <div>$32+34+58+59 = 183$</div>
+      <div>Remaining total $= 1749 - 183 = 1566$ (thousand dollars).</div>
+      <div>Remaining number of paintings $= 33 - 4 = 29$.</div>
+      <div>$\text{Mean} = \dfrac{1566}{29} = 54$ (thousand dollars).</div>
+      <div class="hint">Be careful: the denominator changes from 33 to 29.</div>
     </div>
-  </section>
 
-  <!-- SUMMARY -->
-  <section class="summary">
-    <h2>Summary of Answers</h2>
-    <ul>
-      <li><strong>(a)</strong> Range \(=73\) thousand dollars; &nbsp; Inter-quartile range \(=21\) thousand dollars</li>
-      <li><strong>(b)</strong> Mean of remaining paintings \(=54\) thousand dollars; &nbsp; Median of remaining paintings \(=55\) thousand dollars</li>
-      <li><strong>Key idea:</strong> Trimmed data — remove values from both the total sum and the count; removing an equal number of values on each side of the median leaves the median unchanged.</li>
-    </ul>
-  </section>
+    <div class="step" data-step="6">
+      <span class="st">STEP 6</span>Find the new median.
+      <div>Note that two donated prices, $32$ and $34$, are <b>less than</b> $55$, while $58$ and $59$ are <b>greater than</b> $55$.</div>
+      <div>Both sides lose 2 paintings, so the middle value is unchanged.</div>
+      <div>$\text{Median} = 55$ (thousand dollars).</div>
+      <div class="hint">The new data set has 29 values (odd) — the 15th smallest value. Removing 2 values below and 2 above $55$ keeps $55$ in the middle position.</div>
+    </div>
+
+    <div class="ans">
+      Answer: (a) Range $=73$ thousand dollars; IQR $=21$ thousand dollars. &nbsp; (b) Mean $=54$ thousand dollars; Median $=55$ thousand dollars.
+    </div>
+  </div>
 
 </div>
-
-<footer>
-  HKDSE Mathematics (Compulsory Part) · 2014 Paper 1 Question 11 · Interactive Solution
-</footer>
+</div>
 
 <script>
-/* ============ QUESTION MINI DIAGRAM ============ */
 (function(){
-  const c = document.getElementById('qCanvas');
-  const ctx = c.getContext('2d');
-  const W = c.width, H = c.height;
-  const padL = 70, padR = 120;
-  const min=18, q1=42, med=55, q3=63, max=91;
-  const x0 = padL, x1 = W - padR;
-  const px = v => x0 + (v-min)/(max-min)*(x1-x0);
-  const midY = H/2 + 5;
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  const ro = document.getElementById('ro');
 
-  ctx.clearRect(0,0,W,H);
+  const W = cv.width, H = cv.height;
 
-  // axis
-  ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2;
-  ctx.beginPath(); ctx.moveTo(x0-25, midY); ctx.lineTo(x1+95, midY); ctx.stroke();
-  // arrow
-  ctx.beginPath(); ctx.moveTo(x1+95, midY); ctx.lineTo(x1+84, midY-6); ctx.lineTo(x1+84, midY+6); ctx.closePath(); ctx.fillStyle='#94a3b8'; ctx.fill();
-  // ticks
-  const ticks = [[18,'18'],[42,'42'],[55,'55'],[63,'63'],[91,'91']];
-  ctx.fillStyle = '#475569'; ctx.font = '600 17px Segoe UI, sans-serif'; ctx.textAlign='center';
-  ticks.forEach(t=>{
-    ctx.beginPath(); ctx.moveTo(px(t[0]), midY-6); ctx.lineTo(px(t[0]), midY+6);
-    ctx.strokeStyle='#94a3b8'; ctx.stroke();
-    ctx.fillText(t[1], px(t[0]), midY+30);
-  });
-  // whiskers
-  ctx.strokeStyle = '#1d4ed8'; ctx.lineWidth = 3;
-  ctx.beginPath(); ctx.moveTo(px(min), midY); ctx.lineTo(px(q1), midY); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(px(q3), midY); ctx.lineTo(px(max), midY); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(px(min), midY-16); ctx.lineTo(px(min), midY+16); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(px(max), midY-16); ctx.lineTo(px(max), midY+16); ctx.stroke();
-  // box
-  ctx.fillStyle = 'rgba(59,130,246,0.18)';
-  ctx.fillRect(px(q1), midY-26, px(q3)-px(q1), 52);
-  ctx.strokeStyle = '#1d4ed8'; ctx.lineWidth = 3;
-  ctx.strokeRect(px(q1), midY-26, px(q3)-px(q1), 52);
-  // median line
-  ctx.strokeStyle = '#d97706'; ctx.lineWidth = 4;
-  ctx.beginPath(); ctx.moveTo(px(med), midY-26); ctx.lineTo(px(med), midY+26); ctx.stroke();
-  // axis title
-  ctx.fillStyle = '#64748b'; ctx.font = 'italic 600 17px Segoe UI, sans-serif'; ctx.textAlign='left';
-  ctx.fillText('Price (thousand dollars)', x1+10, midY+6);
-})();
+  // Axis mapping: price 10 -> 100 across x, with margins
+  const pMin = 10, pMax = 100;
+  const left = 70, right = W - 60;
+  const axisY = H - 90;               // baseline of the number line
+  const boxTop = 150, boxBot = 230;   // box vertical extent
+  const s = (right - left) / (pMax - pMin);
+  const X = v => left + (v - pMin) * s;
 
-/* ============ PART (a) INTERACTIVE BOX PLOT ============ */
-(function(){
-  const c = document.getElementById('boxCanvas');
-  const ctx = c.getContext('2d');
-  const W = c.width, H = c.height;
-  const padL = 75, padR = 70, topY = 60;
-  const min=18, q1=42, q3=63, max=91;
+  const five = {min:18, q1:42, med:55, q3:63, max:91};
 
-  const slider = document.getElementById('sliderMed');
-  const lblMed = document.getElementById('lblMed');
-  const chkL = document.getElementById('chkLabels');
-  const roMed = document.getElementById('roMed');
-  const roRange = document.getElementById('roRange');
-  const roIQR = document.getElementById('roIQR');
-
-  // continuous axis from 10 to 100
-  const aMin = 10, aMax = 100;
-  const x0 = padL, x1 = W - padR;
-  const px = v => x0 + (v-aMin)/(aMax-aMin)*(x1-x0);
-
-  function draw(){
-    const med = parseFloat(slider.value);
+  function clear(){
     ctx.clearRect(0,0,W,H);
-
-    const baseY = H - 62;
-    const boxH = 62;
-
-    // grid
-    ctx.strokeStyle = '#eef2f7'; ctx.lineWidth = 1;
-    for(let v=aMin; v<=aMax; v+=5){
-      ctx.beginPath(); ctx.moveTo(px(v), 30); ctx.lineTo(px(v), baseY+30); ctx.stroke();
-    }
-
-    // axis
-    ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(x0-30, baseY); ctx.lineTo(x1+40, baseY); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(x1+40, baseY); ctx.lineTo(x1+29, baseY-6); ctx.lineTo(x1+29, baseY+6); ctx.closePath(); ctx.fillStyle='#94a3b8'; ctx.fill();
-    ctx.fillStyle='#64748b'; ctx.font='600 15px Segoe UI, sans-serif'; ctx.textAlign='left';
-    ctx.fillText('Price (thousand dollars)', x1-40, baseY+40);
-
-    // tick marks every 10
-    ctx.font = '600 14px Segoe UI, sans-serif'; ctx.textAlign='center';
-    for(let v=aMin; v<=aMax; v+=10){
-      ctx.strokeStyle='#cbd5e1'; ctx.lineWidth=1.5;
-      ctx.beginPath(); ctx.moveTo(px(v), baseY-5); ctx.lineTo(px(v), baseY+5); ctx.stroke();
-      ctx.fillStyle='#94a3b8';
-      ctx.fillText(v, px(v), baseY+22);
-    }
-
-    // whiskers
-    ctx.strokeStyle = '#1d4ed8'; ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.moveTo(px(min), baseY); ctx.lineTo(px(q1), baseY); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(px(q3), baseY); ctx.lineTo(px(max), baseY); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(px(min), baseY-22); ctx.lineTo(px(min), baseY+22); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(px(max), baseY-22); ctx.lineTo(px(max), baseY+22); ctx.stroke();
-
-    // box
-    ctx.fillStyle = 'rgba(59,130,246,0.16)';
-    ctx.fillRect(px(q1), baseY-boxH/2, px(q3)-px(q1), boxH);
-    ctx.strokeStyle = '#1d4ed8'; ctx.lineWidth = 3;
-    ctx.strokeRect(px(q1), baseY-boxH/2, px(q3)-px(q1), boxH);
-
-    // median (draggable via slider)
-    ctx.strokeStyle = '#d97706'; ctx.lineWidth = 4;
-    ctx.beginPath(); ctx.moveTo(px(med), baseY-boxH/2); ctx.lineTo(px(med), baseY+boxH/2); ctx.stroke();
-    // handle marker
-    ctx.beginPath(); ctx.arc(px(med), baseY-boxH/2-14, 7, 0, Math.PI*2);
-    ctx.fillStyle = '#d97706'; ctx.fill();
-    ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
-
-    // IQR bracket
-    ctx.strokeStyle = '#059669'; ctx.lineWidth = 2;
-    const iqrY = baseY + 46;
-    ctx.beginPath(); ctx.moveTo(px(q1), iqrY); ctx.lineTo(px(q3), iqrY); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(px(q1), iqrY-7); ctx.lineTo(px(q1), iqrY+7); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(px(q3), iqrY-7); ctx.lineTo(px(q3), iqrY+7); ctx.stroke();
-    ctx.fillStyle = '#059669'; ctx.font='700 15px Segoe UI, sans-serif'; ctx.textAlign='center';
-    ctx.fillText('IQR = 21', (px(q1)+px(q3))/2, iqrY+24);
-
-    // Range bracket
-    ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 2;
-    const rY = 34;
-    ctx.beginPath(); ctx.moveTo(px(min), rY); ctx.lineTo(px(max), rY); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(px(min), rY-7); ctx.lineTo(px(min), rY+7); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(px(max), rY-7); ctx.lineTo(px(max), rY+7); ctx.stroke();
-    ctx.fillStyle = '#dc2626'; ctx.font='700 15px Segoe UI, sans-serif';
-    ctx.fillText('Range = 73', (px(min)+px(max))/2, rY-12);
-
-    // labels
-    if(chkL.checked){
-      ctx.font = '700 14px Segoe UI, sans-serif'; ctx.textAlign='center';
-      ctx.fillStyle = '#1d4ed8';
-      ctx.fillText('18', px(min), baseY+42);
-      ctx.fillText('42', px(q1), baseY-boxH/2-10);
-      ctx.fillText('63', px(q3), baseY-boxH/2-10);
-      ctx.fillText('91', px(max), baseY+42);
-      ctx.fillStyle = '#d97706';
-      ctx.fillText(med.toFixed(1), px(med), baseY-boxH/2-26);
-      ctx.fillStyle = '#0f172a';
-      ctx.font = '600 13px Segoe UI, sans-serif';
-      ctx.fillText('min', px(min), baseY+60);
-      ctx.fillText('Q₁', px(q1), baseY+60);
-      ctx.fillText('Q₃', px(q3), baseY+60);
-      ctx.fillText('max', px(max), baseY+60);
-    }
-
-    // readouts
-    roMed.textContent = med.toFixed(1);
-    roRange.textContent = (max-min);
-    roIQR.textContent = (q3-q1);
-    lblMed.textContent = med.toFixed(1);
+    ctx.fillStyle = '#fdfefe';
+    ctx.fillRect(0,0,W,H);
   }
 
-  slider.addEventListener('input', draw);
-  chkL.addEventListener('change', draw);
-  draw();
-})();
+  function titleStep(txt){
+    ctx.font = 'bold 15px Segoe UI, Arial';
+    ctx.fillStyle = '#1c2430';
+    ctx.fillText(txt, 22, 30);
+  }
 
-/* ============ PART (b) DOT PLOT ============ */
-(function(){
-  const c = document.getElementById('dotCanvas');
-  const ctx = c.getContext('2d');
-  const W = c.width, H = c.height;
-  const padL = 70, padR = 60;
-  const aMin = 0, aMax = 100;
-  const x0 = padL, x1 = W - padR;
-  const px = v => x0 + (v-aMin)/(aMax-aMin)*(x1-x0);
-
-  const chkRemoved = document.getElementById('chkRemoved');
-  const chkMed = document.getElementById('chkMedian');
-  const roTotal = document.getElementById('roTotal');
-  const roNewTotal = document.getElementById('roNewTotal');
-  const roMean = document.getElementById('roMean');
-  const roMed2 = document.getElementById('roMed2');
-
-  // Construct a representative dataset of 33 items consistent with:
-  // min 18, Q1 42, median 55, Q3 63, max 91, mean 53.
-  // We build it around the quartile structure (8 | 8 | 8 | 9 arrangement by rank).
-  // Use the given quartile landmark values plus fillers so sums match 33*53 = 1749.
-  // Build 8 values <=42, 8 values in (42,55], 8 in (55,63], 9 in (63,91].
-  // We will scale fillers so the total sum is exactly 1749.
-  let data = [];
-  // Below Q1 (8 values): 18 (min) + 7 fillers
-  data.push(18);
-  for(let i=0;i<7;i++) data.push(30 + i*1.2);          // ~30..37.2
-  // Between Q1 and median (8 values)
-  for(let i=0;i<8;i++) data.push(44 + i*1.3);          // ~44..53.1
-  data.push(55);                                       // ensure a 55 sits sensibly
-  // Between median and Q3 (8 values)
-  for(let i=0;i<8;i++) data.push(56 + i*0.8);          // ~56..61.6
-  data.push(63);
-  // Above Q3 (9 values)
-  for(let i=0;i<8;i++) data.push(66 + i*0.9);          // ~66..72.3
-  data.push(91);
-
-  // Now pad/trim to exactly 33 items, then rescale interior values to hit sum 1749.
-  data = data.slice(0, 33);
-  while(data.length < 33) data.push(55);
-  data.sort((a,b)=>a-b);
-
-  // Fix endpoints strictly
-  data[0] = 18; data[data.length-1] = 91;
-  data[32] = 91;
-
-  // Rescale interior values to make sum exactly 1749
-  const target = 1749;
-  const fixed = data[0] + data[32]; // fixed endpoints
-  let interior = data.slice(1, 32);
-  let curSum = interior.reduce((a,b)=>a+b,0);
-  const desired = target - fixed;
-  const scale = desired / curSum;
-  interior = interior.map(v => v*scale);
-  // sort again to preserve order
-  interior.sort((a,b)=>a-b);
-  data = [18, ...interior, 91];
-  data.sort((a,b)=>a-b);
-  // Nudge so exact sum (small correction on largest interior value)
-  let total = data.reduce((a,b)=>a+b,0);
-  let diff = target - total;
-  // apply to a safe interior value near the middle
-  data[16] += diff;
-  data.sort((a,b)=>a-b);
-
-  // store original and removed
-  const removedVals = [32, 34, 58, 59];
-  const originalData = data.slice();
-
-  roTotal.textContent = Math.round(originalData.reduce((a,b)=>a+b,0));
-
-  // Simpler approach: we know answer values exactly for readouts. Show the canonical answer.
-  roNewTotal.textContent = 1566;
-  roMean.textContent = "54.0";
-
-  function draw(){
-    ctx.clearRect(0,0,W,H);
-    const baseY = H - 58;
-    const useRemoved = chkRemoved.checked;
-
-    // Decide which data to show
-    // We simulate removal of the four donated prices from the pool.
-    let shown = originalData.slice();
-    let removed = [];
-    if(useRemoved){
-      // remove one instance of each donated price (closest match)
-      removedVals.forEach(rv=>{
-        // find index with closest value
-        let best = 0, bestD = Infinity;
-        shown.forEach((v,i)=>{
-          const d = Math.abs(v-rv);
-          if(d < bestD){ bestD = d; best = i; }
-        });
-        removed.push(shown.splice(best,1)[0]);
-      });
-    }
-
-    // grid
-    ctx.strokeStyle = '#eef2f7'; ctx.lineWidth = 1;
-    for(let v=aMin; v<=aMax; v+=5){
-      ctx.beginPath(); ctx.moveTo(px(v), 34); ctx.lineTo(px(v), baseY+26); ctx.stroke();
-    }
-
-    // axis
-    ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(x0-30, baseY); ctx.lineTo(x1+30, baseY); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(x1+30, baseY); ctx.lineTo(x1+19, baseY-6); ctx.lineTo(x1+19, baseY+6); ctx.closePath(); ctx.fillStyle='#94a3b8'; ctx.fill();
-
+  function drawAxis(){
+    // number line
+    ctx.strokeStyle = '#9fb2c6';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(left - 24, axisY); ctx.lineTo(right + 26, axisY);
+    ctx.stroke();
     // ticks
-    ctx.font='600 13px Segoe UI, sans-serif'; ctx.textAlign='center';
-    for(let v=aMin; v<=aMax; v+=10){
-      ctx.strokeStyle='#cbd5e1'; ctx.lineWidth=1.5;
-      ctx.beginPath(); ctx.moveTo(px(v), baseY-5); ctx.lineTo(px(v), baseY+5); ctx.stroke();
-      ctx.fillStyle='#94a3b8';
-      ctx.fillText(v, px(v), baseY+22);
-    }
-    ctx.fillStyle='#64748b'; ctx.font='600 14px Segoe UI, sans-serif'; ctx.textAlign='left';
-    ctx.fillText('Price (thousand dollars)', x1-90, baseY+44);
-
-    // stack points to avoid heavy overlap
-    const stacks = {};
-    shown.forEach(v=>{
-      const key = Math.round(v*2)/2; // 0.5 wide bins
-      stacks[key] = (stacks[key]||0) + 1;
-    });
-
-    // draw remaining points
-    const drawn = {};
-    shown.forEach(v=>{
-      const key = Math.round(v*2)/2;
-      drawn[key] = (drawn[key]||0) + 1;
-      const level = drawn[key]-1;
-      const x = px(v);
-      const y = baseY - 14 - level*13;
+    ctx.font = '12px Segoe UI, Arial';
+    ctx.fillStyle = '#5b6b7d';
+    ctx.textAlign = 'center';
+    for(let v=10; v<=100; v+=10){
+      const x = X(v);
       ctx.beginPath();
-      ctx.arc(x, y, 5.5, 0, Math.PI*2);
-      // colour: below median blue, above emerald
-      ctx.fillStyle = v < 55 ? '#3b82f6' : (v > 55 ? '#059669' : '#d97706');
-      ctx.fill();
-      ctx.strokeStyle='#fff'; ctx.lineWidth=1.3; ctx.stroke();
-    });
+      ctx.moveTo(x, axisY); ctx.lineTo(x, axisY+6);
+      ctx.strokeStyle = '#c2d0de'; ctx.lineWidth = 1.4; ctx.stroke();
+      ctx.fillText(v, x, axisY+21);
+    }
+    ctx.fillStyle = '#3b4a5a';
+    ctx.font = 'italic 13px Segoe UI, Arial';
+    ctx.fillText('Price (thousand dollars)', (left+right)/2, axisY + 45);
+    ctx.textAlign = 'left';
+  }
 
-    // draw removed (ghost) if hiding them
-    if(useRemoved){
-      removed.forEach(v=>{
-        const key = 'r'+v.toFixed(1);
-        drawn[key] = (drawn[key]||0) + 1;
-        const level = drawn[key]-1;
-        const x = px(v);
-        const y = baseY - 14 - level*13;
-        ctx.beginPath();
-        ctx.arc(x, y, 5.5, 0, Math.PI*2);
-        ctx.fillStyle = 'rgba(220,38,38,0.18)';
-        ctx.fill();
-        ctx.strokeStyle = 'rgba(220,38,38,0.85)';
-        ctx.lineWidth = 1.6;
-        ctx.setLineDash([3,3]);
-        ctx.stroke();
-        ctx.setLineDash([]);
-        // cross
-        ctx.beginPath();
-        ctx.moveTo(x-4,y-4); ctx.lineTo(x+4,y+4);
-        ctx.moveTo(x+4,y-4); ctx.lineTo(x-4,y+4);
-        ctx.strokeStyle='#dc2626'; ctx.lineWidth=1.6; ctx.stroke();
-      });
+  // colours
+  const C = {
+    blue:'#2f6fd0', orange:'#e8833a', green:'#38a169',
+    red:'#d64545', purple:'#7c5cd6', teal:'#0d9488', slate:'#94a3b8'
+  };
+
+  function whisker(color, lineWidth){
+    ctx.strokeStyle = color; ctx.lineWidth = lineWidth;
+    // from min to Q1
+    ctx.beginPath(); ctx.moveTo(X(five.min), (boxTop+boxBot)/2); ctx.lineTo(X(five.q1), (boxTop+boxBot)/2); ctx.stroke();
+    // from Q3 to max
+    ctx.beginPath(); ctx.moveTo(X(five.q3), (boxTop+boxBot)/2); ctx.lineTo(X(five.max), (boxTop+boxBot)/2); ctx.stroke();
+    // end caps
+    [ [five.min, C.blue], [five.max, C.blue] ].forEach(([v,c])=>{
+      ctx.strokeStyle = c; ctx.lineWidth = lineWidth;
+      ctx.beginPath(); ctx.moveTo(X(v), boxTop+18); ctx.lineTo(X(v), boxBot-18); ctx.stroke();
+    });
+  }
+
+  function box(fill, stroke){
+    ctx.fillStyle = fill;
+    ctx.strokeStyle = stroke; ctx.lineWidth = 2.5;
+    const x0 = X(five.q1), x1 = X(five.q3);
+    ctx.beginPath();
+    ctx.rect(x0, boxTop, x1 - x0, boxBot - boxTop);
+    ctx.fill();
+    ctx.stroke();
+    // median line
+    ctx.strokeStyle = C.red; ctx.lineWidth = 3.5;
+    ctx.beginPath(); ctx.moveTo(X(five.med), boxTop); ctx.lineTo(X(five.med), boxBot); ctx.stroke();
+  }
+
+  function marker(v, color, label, dy, showVal){
+    const x = X(v);
+    ctx.fillStyle = color;
+    ctx.beginPath(); ctx.arc(x, (boxTop+boxBot)/2, 5, 0, Math.PI*2); ctx.fill();
+    ctx.font = 'bold 12.5px Segoe UI, Arial';
+    ctx.fillStyle = color; ctx.textAlign = 'center';
+    ctx.fillText(label, x, (boxTop+boxBot)/2 + dy);
+    if(showVal){
+      ctx.font = '11px Segoe UI, Arial';
+      ctx.fillText(v, x, (boxTop+boxBot)/2 + dy + (dy>0?15:-15));
+    }
+    ctx.textAlign = 'left';
+  }
+
+  function spanBar(v0, v1, y, color, label, sub){
+    const x0 = X(v0), x1 = X(v1);
+    ctx.strokeStyle = color; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(x1, y); ctx.stroke();
+    [x0,x1].forEach(x=>{
+      ctx.beginPath(); ctx.moveTo(x, y-7); ctx.lineTo(x, y+7); ctx.stroke();
+    });
+    ctx.font = 'bold 13px Segoe UI, Arial'; ctx.fillStyle = color; ctx.textAlign = 'center';
+    ctx.fillText(label, (x0+x1)/2, y - 12);
+    if(sub){
+      ctx.font = '11.5px Segoe UI, Arial';
+      ctx.fillText(sub, (x0+x1)/2, y + 22);
+    }
+    ctx.textAlign = 'left';
+  }
+
+  function draw(step){
+    clear();
+    drawAxis();
+
+    if(step === 1){
+      titleStep('Step 1 · Read the five-number summary');
+      box('rgba(232,131,58,0.20)', C.orange);
+      whisker(C.blue, 3);
+      marker(five.min, C.blue, 'min', -22, true);
+      marker(five.q1, C.orange, 'Q₁', 26, true);
+      marker(five.med, C.red, 'median', -22, true);
+      marker(five.q3, C.orange, 'Q₃', 26, true);
+      marker(five.max, C.blue, 'max', -22, true);
+      ro.textContent = 'Step 1 — the five-number summary: min 18, Q₁ 42, median 55, Q₃ 63, max 91 thousand dollars.';
     }
 
-    // median position highlight
-    if(chkMed.checked){
-      const n = shown.length;
-      const midRank = (n+1)/2;
-      const sorted = shown.slice().sort((a,b)=>a-b);
-      let medVal, lo, hi;
-      if(Number.isInteger(midRank)){
-        medVal = sorted[midRank-1];
-        lo = hi = medVal;
-      } else {
-        lo = sorted[Math.floor(midRank)-1];
-        hi = sorted[Math.floor(midRank)];
-        medVal = (lo+hi)/2;
-      }
-      // vertical band
-      ctx.fillStyle = 'rgba(217,119,6,0.10)';
-      const lx = px(lo)-7, wx = (hi-lo)===0 ? 14 : (px(hi)-px(lo)+14);
-      ctx.fillRect(lx, 28, wx, baseY-28);
-      ctx.strokeStyle = '#d97706'; ctx.lineWidth = 2;
-      ctx.setLineDash([6,4]);
-      ctx.beginPath(); ctx.moveTo(px(medVal), 28); ctx.lineTo(px(medVal), baseY); ctx.stroke();
+    else if(step === 2){
+      titleStep('Step 2 · Range = Maximum − Minimum');
+      box('rgba(148,163,184,0.18)', C.slate);
+      whisker(C.slate, 2);
+      spanBar(five.min, five.max, 320, C.green, 'Range = 91 − 18 = 73', '(thousand dollars)');
+      ctx.strokeStyle = C.green; ctx.lineWidth = 2; ctx.setLineDash([5,4]);
+      ctx.beginPath(); ctx.moveTo(X(five.min), axisY); ctx.lineTo(X(five.min), 90); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(X(five.max), axisY); ctx.lineTo(X(five.max), 90); ctx.stroke();
       ctx.setLineDash([]);
-      // label
-      ctx.fillStyle = '#b45309';
-      ctx.font = '700 14px Segoe UI, sans-serif'; ctx.textAlign='center';
-      ctx.fillText('median = '+medVal.toFixed(1), px(medVal), 22);
+      marker(five.min, C.blue, '18', 26, false);
+      marker(five.max, C.blue, '91', 26, false);
+      ro.textContent = 'Step 2 — Range = 91 − 18 = 73 thousand dollars (the whole span of the data).';
     }
 
-    // count label
-    ctx.fillStyle = '#334155'; ctx.font='700 14px Segoe UI, sans-serif'; ctx.textAlign='left';
-    ctx.fillText('n = ' + shown.length, x0-40, 30);
+    else if(step === 3){
+      titleStep('Step 3 · Inter-quartile range = Q₃ − Q₁');
+      box('rgba(148,163,184,0.18)', C.slate);
+      whisker(C.slate, 2);
+      // highlight IQR portion of box
+      ctx.fillStyle = 'rgba(124,92,214,0.28)';
+      ctx.fillRect(X(five.q1), boxTop, X(five.q3) - X(five.q1), boxBot - boxTop);
+      ctx.strokeStyle = C.purple; ctx.lineWidth = 2.5;
+      ctx.strokeRect(X(five.q1), boxTop, X(five.q3) - X(five.q1), boxBot - boxTop);
+      spanBar(five.q1, five.q3, 320, C.purple, 'IQR = 63 − 42 = 21', '(thousand dollars)');
+      ctx.strokeStyle = C.purple; ctx.lineWidth = 2; ctx.setLineDash([5,4]);
+      ctx.beginPath(); ctx.moveTo(X(five.q1), axisY); ctx.lineTo(X(five.q1), 90); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(X(five.q3), axisY); ctx.lineTo(X(five.q3), 90); ctx.stroke();
+      ctx.setLineDash([]);
+      marker(five.q1, C.orange, '42', 26, false);
+      marker(five.q3, C.orange, '63', 26, false);
+      ro.textContent = 'Step 3 — Inter-quartile range = 63 − 42 = 21 thousand dollars (spread of the middle 50%).';
+    }
 
-    // legend
-    ctx.font = '600 13px Segoe UI, sans-serif';
-    let ly = 96;
-    const legend = [
-      ['#3b82f6','price < 55'],
-      ['#d97706','price = 55'],
-      ['#059669','price > 55'],
-    ];
-    if(useRemoved) legend.push(['#dc2626','removed (32,34,58,59)']);
-    legend.forEach(([col,txt])=>{
-      ctx.beginPath(); ctx.arc(x1+2, ly, 5.5, 0, Math.PI*2);
-      ctx.fillStyle = col; ctx.fill();
-      ctx.strokeStyle='#fff'; ctx.lineWidth=1.2; ctx.stroke();
-      ctx.fillStyle='#475569'; ctx.textAlign='left';
-      ctx.fillText(txt, x1-10, ly+5);
-      ly += 22;
-    });
+    else if(step === 4){
+      titleStep('Step 4 · Total of 33 paintings = 33 × 53');
+      box('rgba(232,131,58,0.18)', C.orange);
+      whisker(C.blue, 2.5);
+      ctx.textAlign = 'center';
+      ctx.font = 'bold 22px Segoe UI, Arial'; ctx.fillStyle = C.blue;
+      ctx.fillText('33 paintings  ×  mean 53', (left+right)/2, 78);
+      ctx.font = 'bold 24px Segoe UI, Arial'; ctx.fillStyle = C.green;
+      ctx.fillText('Total = 1749', (left+right)/2, 110);
+      ctx.textAlign = 'left';
+      ro.textContent = 'Step 4 — The original total price of the 33 paintings = 33 × 53 = 1749 thousand dollars.';
+    }
 
-    // readout median value
-    const sortedShow = shown.slice().sort((a,b)=>a-b);
-    const n2 = sortedShow.length;
-    const m2 = (n2 % 2 === 1) ? sortedShow[(n2-1)/2] : (sortedShow[n2/2-1]+sortedShow[n2/2])/2;
-    roMed2.textContent = m2.toFixed(0);
-  }
+    else if(step === 5){
+      titleStep('Step 5 · Remove 32, 34, 58, 59 → mean = 1566 / 29');
+      box('rgba(148,163,184,0.16)', C.slate);
+      whisker(C.slate, 2);
+      // mark donated values
+      [32,34,58,59].forEach(v=>{
+        ctx.strokeStyle = C.red; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(X(v), axisY); ctx.lineTo(X(v), axisY - 42); ctx.stroke();
+        ctx.fillStyle = C.red;
+        ctx.beginPath(); ctx.arc(X(v), axisY - 46, 4, 0, Math.PI*2); ctx.fill();
+        ctx.font = 'bold 11.5px Segoe UI, Arial'; ctx.textAlign = 'center';
+        ctx.fillText(v, X(v), axisY - 56);
+      });
+      ctx.textAlign = 'center';
+      ctx.font = 'bold 14px Segoe UI, Arial'; ctx.fillStyle = C.red;
+      ctx.fillText('4 donated paintings', (left+right)/2, 70);
+      ctx.font = 'bold 14px Segoe UI, Arial'; ctx.fillStyle = C.blue;
+      ctx.fillText('1749 − (32+34+58+59) = 1749 − 183 = 1566', (left+right)/2, 92);
+      ctx.fillStyle = C.green;
+      ctx.fillText('Mean = 1566 ÷ 29 = 54', (left+right)/2, 115);
+      ctx.textAlign = 'left';
+      ro.textContent = 'Step 5 — Remove the four donated paintings: total = 1749 − 183 = 1566, count = 29, so mean = 1566 ÷ 29 = 54 thousand dollars.';
+    }
 
-  chkRemoved.addEventListener('change', draw);
-  chkMed.addEventListener('change', draw);
-  draw();
-})();
-
-/* ============ STEP REVEAL LOGIC ============ */
-document.querySelectorAll('button.next').forEach(btn=>{
-  const targetId = btn.getAttribute('data-target');
-  const steps = Array.from(document.getElementById(targetId).querySelectorAll('.step'));
-  const counter = document.querySelector('[data-counter="'+targetId+'"]');
-  let idx = 0;
-
-  function update(){
-    counter.textContent = idx + ' / ' + steps.length;
-    if(idx >= steps.length){
-      btn.disabled = true;
-      btn.textContent = 'All steps revealed ✓';
+    else if(step === 6){
+      titleStep('Step 6 · Median is unchanged at 55');
+      box('rgba(232,131,58,0.20)', C.orange);
+      whisker(C.blue, 3);
+      // median line emphasised
+      ctx.strokeStyle = C.green; ctx.lineWidth = 4.5;
+      ctx.beginPath(); ctx.moveTo(X(five.med), boxTop - 10); ctx.lineTo(X(five.med), boxBot + 10); ctx.stroke();
+      marker(five.med, C.green, 'Median = 55', -26, false);
+      // arrows showing 2 below / 2 above removed
+      ctx.font = 'italic 12.5px Segoe UI, Arial';
+      ctx.fillStyle = C.red; ctx.textAlign = 'center';
+      ctx.fillText('−2 values below 55', X(45), 300);
+      ctx.fillText('−2 values above 55', X(70), 300);
+      ctx.strokeStyle = C.red; ctx.lineWidth = 1.5; ctx.setLineDash([4,4]);
+      ctx.beginPath(); ctx.moveTo(X(45), 285); ctx.lineTo(X(55), boxBot+4); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(X(70), 285); ctx.lineTo(X(55), boxBot+4); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.textAlign = 'left';
+      ctx.font = 'bold 14px Segoe UI, Arial'; ctx.fillStyle = C.green;
+      ctx.fillText('29 values → the 15th smallest is still 55', 22, 350);
+      ro.textContent = 'Step 6 — Two donated prices lie below 55 and two lie above 55, so the middle (15th of 29) value is still 55. Median = 55 thousand dollars.';
     }
   }
 
-  btn.addEventListener('click', ()=>{
-    if(idx < steps.length){
-      steps[idx].classList.add('show');
-      idx++;
-      update();
-      if(idx === steps.length){
-        setTimeout(()=>update(), 30);
+  // ---------- scroll sync ----------
+  let current = 1;
+  const steps = document.querySelectorAll('.step');
+  const io = new IntersectionObserver(es=>{
+    es.forEach(e=>{
+      if(e.isIntersecting){
+        current = +e.target.dataset.step;
+        document.querySelectorAll('.step').forEach(s=>{
+          s.classList.toggle('active', +s.dataset.step === current);
+        });
+        draw(current);
       }
-      // smooth scroll a touch
-      steps[idx-1].scrollIntoView({behavior:'smooth', block:'nearest'});
-    }
-  });
+    });
+  }, {rootMargin:'-25% 0px -55% 0px'});
+  steps.forEach(s=>io.observe(s));
 
-  update();
-});
-</script>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
+  // initial
+  draw(1);
+  document.querySelector('.step[data-step="1"]').classList.add('active');
 
+  // redraw on resize (canvas is CSS-scaled; keep crisp by resetting bitmap size)
+  function fit(){
+    const cssW = cv.clientWidth;
+    const ratio = 420/640;
+    cv.width = Math.max(320, Math.round(cssW * (window.devicePixelRatio||1)));
+    cv.height = Math.round(cv.width * ratio);
+    // rescale coordinate system to new pixel size
+    const sx = cv.width / W, sy = cv.height / H;
+    ctx.setTransform(sx,0,0,sy,0,0);
+    draw(current);
+  }
+  window.addEventListener('resize', ()=>{ fit(); });
+  fit();
+})();
+</script>
 </body>
 </html>

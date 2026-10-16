@@ -1,1554 +1,337 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>HKDSE 2012 Paper 2 Q29 · Statistics</title>
-
-<!-- MathJax CDN -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2012 Paper 2 Q29 — Standard Deviation of a Bar Chart</title>
 <script>
   window.MathJax = {
-    tex: {
-      inlineMath: [['$','$'],['\\(','\\)']],
-      displayMath: [['\\[', '\\]']]
-    },
-    svg: { fontCache: 'global' }
+    tex: {inlineMath: [['$','$'], ['\\(','\\)']], displayMath: [['$$','$$'], ['\\[','\\]']]},
+    svg: {fontCache: 'global'}
   };
 </script>
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
-
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
-  :root {
-    --blue-900: #0b2545;
-    --blue-700: #14396b;
-    --blue-500: #2563eb;
-    --blue-300: #93c5fd;
-    --amber-500: #f59e0b;
-    --amber-100: #fef3c7;
-    --emerald-600: #059669;
-    --emerald-100: #d1fae5;
-    --slate-900: #0f172a;
-    --slate-700: #334155;
-    --slate-500: #64748b;
-    --slate-200: #e2e8f0;
-    --slate-100: #f1f5f9;
-    --purple-500: #7c3aed;
+  :root{
+    --blue:#2563eb; --green:#16a34a; --amber:#f59e0b; --red:#dc2626;
+    --purple:#7c3aed; --ink:#1e293b; --muted:#64748b; --line:#e2e8f0;
+    --bg:#f8fafc;
   }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    line-height:1.5; font-size:15.5px;
+  }
+  .wrap{padding:16px 14px 60px; max-width:1280px; margin:0 auto;}
+  .split{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:12px; align-items:start;}
+  @media(min-width:900px){.split{grid-template-columns:minmax(0,46%) minmax(0,54%); gap:18px;}}
+  @media(max-width:640px){body{font-size:14.5px;} .wrap{padding:10px 8px 40px;}}
 
-  * { box-sizing: border-box; }
+  .diagram{
+    position:sticky; top:16px; max-height:calc(100vh - 2rem); overflow-y:auto;
+    background:#fff; border:1px solid var(--line); border-radius:14px;
+    padding:12px; box-shadow:0 6px 18px rgba(15,23,42,.06);
+  }
+  .diagram h3{
+    margin:0 0 8px; font-size:14px; letter-spacing:.04em; text-transform:uppercase;
+    color:var(--muted); font-weight:700;
+  }
+  canvas{width:100%; height:auto; display:block; border-radius:10px; background:#fff;}
+  .ro{margin:8px 2px 0; font-size:13px; color:var(--muted);}
+  .ro b{color:var(--ink);}
+  .legend{display:flex; flex-wrap:wrap; gap:8px 14px; margin-top:8px; font-size:12.5px; color:var(--muted);}
+  .legend i{display:inline-block; width:12px; height:12px; border-radius:3px; margin-right:5px; vertical-align:-1px;}
 
-  html, body {
-    margin: 0;
-    padding: 0;
-    background: #eef2f7;
-    color: var(--slate-900);
-    font-family: "Segoe UI", "Helvetica Neue", Arial, system-ui, sans-serif;
-    line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
-  }
+  .panel{background:#fff; border:1px solid var(--line); border-radius:14px; padding:16px 16px 6px; box-shadow:0 6px 18px rgba(15,23,42,.06);}
+  .qhead{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:10px;}
+  .tag{background:var(--blue); color:#fff; font-weight:700; font-size:12px; padding:4px 9px; border-radius:999px; letter-spacing:.03em;}
+  .topic{background:#eff6ff; color:var(--blue); font-weight:600; font-size:12px; padding:4px 9px; border-radius:999px;}
+  .qtext{font-size:15.5px;}
+  .qtext p{margin:.4em 0;}
 
-  /* ---------- HERO ---------- */
-  .hero {
-    position: relative;
-    background: linear-gradient(135deg, #0b2545 0%, #14396b 45%, #2563eb 100%);
-    color: #ffffff;
-    padding: 40px 22px 34px;
-    border-bottom-left-radius: 28px;
-    border-bottom-right-radius: 28px;
-    box-shadow: 0 14px 34px -14px rgba(11,37,69,0.65);
-    overflow: hidden;
+  .step{
+    border-left:4px solid var(--line); padding:8px 0 8px 12px; margin:14px 0;
+    transition:background .25s, border-color .25s;
   }
-  .hero::after {
-    content: "";
-    position: absolute;
-    right: -70px; top: -70px;
-    width: 260px; height: 260px;
-    background: radial-gradient(circle, rgba(245,158,11,0.35), transparent 65%);
-    border-radius: 50%;
+  .step .chip{
+    display:inline-block; min-width:22px; height:22px; line-height:22px; text-align:center;
+    border-radius:50%; color:#fff; font-size:12px; font-weight:700; margin-right:8px; vertical-align:1px;
   }
-  .hero-inner { max-width: 900px; margin: 0 auto; position: relative; z-index: 2; }
-  .eyebrow {
-    font-size: 0.78rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: #bfdbfe;
-    font-weight: 700;
-    margin-bottom: 8px;
-  }
-  .hero h1 {
-    font-size: clamp(1.5rem, 4.6vw, 2.25rem);
-    margin: 0 0 6px;
-    font-weight: 800;
-    letter-spacing: -0.01em;
-  }
-  .hero .subtitle {
-    font-size: clamp(0.95rem, 2.6vw, 1.1rem);
-    color: #dbeafe;
-    margin-bottom: 16px;
-    font-weight: 500;
-  }
-  .pills { display: flex; flex-wrap: wrap; gap: 8px; }
-  .pill {
-    background: rgba(255,255,255,0.14);
-    border: 1px solid rgba(255,255,255,0.32);
-    color: #ffffff;
-    font-size: 0.76rem;
-    font-weight: 600;
-    padding: 5px 12px;
-    border-radius: 999px;
-    backdrop-filter: blur(2px);
-  }
+  .step b{display:inline;}
+  .step .hint{font-size:13px; color:var(--muted); margin-top:5px;}
+  .step .work{margin-top:6px;}
+  .s1 .chip{background:var(--blue);} .s1{border-left-color:var(--blue);}
+  .s2 .chip{background:var(--green);} .s2{border-left-color:var(--green);}
+  .s3 .chip{background:var(--amber);} .s3{border-left-color:var(--amber);}
+  .s4 .chip{background:var(--purple);} .s4{border-left-color:var(--purple);}
+  .s5 .chip{background:var(--red);} .s5{border-left-color:var(--red);}
+  .step.active{background:#f1f5ff; border-left-width:6px; border-radius:0 10px 10px 0;}
 
-  /* ---------- LAYOUT ---------- */
-  .wrap { max-width: 900px; margin: -18px auto 0; padding: 0 16px 60px; }
-  .card {
-    background: #ffffff;
-    border-radius: 18px;
-    padding: 22px 22px 24px;
-    margin-bottom: 22px;
-    box-shadow: 0 8px 24px -14px rgba(15,23,42,0.35);
-    border: 1px solid rgba(226,232,240,0.9);
+  .ans{
+    margin:18px 0 12px; padding:12px 14px; border-radius:12px;
+    background:#ecfdf5; border:1px solid #a7f3d0; color:#065f46; font-weight:700;
   }
-  .card h2 {
-    font-size: 1.14rem;
-    margin: 0 0 4px;
-    color: var(--blue-700);
-    font-weight: 800;
-    letter-spacing: -0.01em;
-  }
-  .card h2 .tagline {
-    display: block;
-    font-size: 0.78rem;
-    font-weight: 600;
-    color: var(--slate-500);
-    letter-spacing: 0.02em;
-    margin-top: 2px;
-  }
-  .qcard {
-    border-top: 5px solid var(--amber-500);
-  }
-  .section-label {
-    display: inline-block;
-    font-size: 0.7rem;
-    font-weight: 800;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--blue-500);
-    margin-bottom: 10px;
-  }
-
-  .qtext { font-size: 1.02rem; }
-  .qtext ul { margin: 10px 0 0 0; padding-left: 0; list-style: none; }
-  .qtext ul li {
-    margin: 6px 0;
-    padding: 8px 12px;
-    background: var(--slate-100);
-    border-left: 4px solid var(--blue-300);
-    border-radius: 8px;
-    font-weight: 600;
-  }
-  .marks {
-    display: inline-block;
-    background: var(--amber-100);
-    color: #92400e;
-    border: 1px solid #fcd34d;
-    font-size: 0.72rem;
-    font-weight: 800;
-    padding: 2px 9px;
-    border-radius: 999px;
-    margin-left: 6px;
-    white-space: nowrap;
-  }
-
-  /* ---------- CANVAS ---------- */
-  .canvas-shell {
-    background: #f8fafc;
-    border: 1px solid var(--slate-200);
-    border-radius: 14px;
-    padding: 10px;
-    margin: 14px 0 6px;
-  }
-  canvas {
-    display: block;
-    width: 100%;
-    height: auto;
-    border-radius: 9px;
-    background: #ffffff;
-    touch-action: pan-y;
-  }
-  .controls {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 14px;
-    align-items: center;
-    margin-top: 10px;
-    padding: 10px 12px;
-    background: #ffffff;
-    border: 1px dashed var(--slate-200);
-    border-radius: 12px;
-    font-size: 0.86rem;
-    color: var(--slate-700);
-  }
-  .ctrl-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-  .ctrl-group label { font-weight: 700; font-size: 0.82rem; color: var(--slate-700); }
-  input[type=range] {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 150px;
-    height: 6px;
-    border-radius: 999px;
-    background: linear-gradient(90deg, var(--blue-500), var(--amber-500));
-    outline: none;
-  }
-  input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 18px; height: 18px;
-    border-radius: 50%;
-    background: #ffffff;
-    border: 3px solid var(--blue-500);
-    cursor: pointer;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.25);
-  }
-  input[type=range]::-moz-range-thumb {
-    width: 16px; height: 16px;
-    border-radius: 50%;
-    background: #ffffff;
-    border: 3px solid var(--blue-500);
-    cursor: pointer;
-  }
-  input[type=checkbox] {
-    width: 17px; height: 17px;
-    accent-color: var(--blue-500);
-    cursor: pointer;
-  }
-  .readout {
-    font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
-    font-size: 0.8rem;
-    background: var(--slate-900);
-    color: #7dd3fc;
-    padding: 4px 10px;
-    border-radius: 7px;
-    font-weight: 700;
-  }
-  .readout.green { color: #6ee7b7; }
-  .readout.amber { color: #fcd34d; }
-
-  .toggle-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: var(--slate-100);
-    border: 1px solid var(--slate-200);
-    border-radius: 999px;
-    padding: 5px 12px;
-    font-weight: 700;
-    font-size: 0.8rem;
-    cursor: pointer;
-    user-select: none;
-  }
-
-  /* ---------- STEPS ---------- */
-  .steps { margin-top: 14px; }
-  .step {
-    display: none;
-    background: #f8fafc;
-    border: 1px solid var(--slate-200);
-    border-left: 5px solid var(--blue-500);
-    border-radius: 12px;
-    padding: 14px 16px 14px 16px;
-    margin-bottom: 12px;
-    animation: fadeUp 0.36s ease both;
-  }
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(10px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  .step.visible { display: block; }
-  .step-head {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-bottom: 8px;
-  }
-  .badge-num {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 28px;
-    height: 28px;
-    padding: 0 8px;
-    border-radius: 8px;
-    background: var(--blue-500);
-    color: #fff;
-    font-size: 0.78rem;
-    font-weight: 800;
-    box-shadow: 0 3px 8px -3px rgba(37,99,235,0.8);
-  }
-  .badge-marks {
-    background: #fff7ed;
-    border: 1px solid #fdba74;
-    color: #9a3412;
-    font-size: 0.7rem;
-    font-weight: 800;
-    padding: 2px 8px;
-    border-radius: 999px;
-  }
-  .step-body { font-size: 0.98rem; }
-  .hint {
-    background: #fffbeb;
-    border-left: 4px solid var(--amber-500);
-    border-radius: 8px;
-    padding: 9px 12px;
-    margin-top: 10px;
-    font-size: 0.9rem;
-    color: #78350f;
-  }
-  .hint strong { color: #92400e; }
-  .answerbox {
-    background: var(--emerald-100);
-    border-left: 4px solid var(--emerald-600);
-    border-radius: 8px;
-    padding: 9px 12px;
-    margin-top: 10px;
-    font-size: 0.96rem;
-    color: #065f46;
-    font-weight: 600;
-  }
-  .answerbox strong { color: #047857; }
-
-  .reveal-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-top: 6px;
-  }
-  .btn {
-    border: none;
-    border-radius: 10px;
-    padding: 10px 20px;
-    font-size: 0.9rem;
-    font-weight: 800;
-    cursor: pointer;
-    transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.2s;
-    font-family: inherit;
-  }
-  .btn-primary {
-    background: linear-gradient(135deg, var(--blue-500), #1d4ed8);
-    color: #fff;
-    box-shadow: 0 7px 16px -8px rgba(37,99,235,0.95);
-  }
-  .btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 10px 20px -8px rgba(37,99,235,1); }
-  .btn:disabled {
-    background: var(--slate-200);
-    color: var(--slate-500);
-    cursor: not-allowed;
-    box-shadow: none;
-  }
-  .counter {
-    font-size: 0.82rem;
-    font-weight: 800;
-    color: var(--slate-500);
-    background: var(--slate-100);
-    border: 1px solid var(--slate-200);
-    padding: 5px 12px;
-    border-radius: 999px;
-  }
-
-  /* ---------- SUMMARY ---------- */
-  .summary {
-    background: linear-gradient(140deg, #0b2545, #14396b);
-    color: #e2e8f0;
-    border: none;
-  }
-  .summary h2 { color: #93c5fd; }
-  .summary ul { padding-left: 20px; margin: 12px 0 0; }
-  .summary li { margin: 9px 0; font-size: 1rem; }
-  .summary li strong { color: #fcd34d; }
-  .final-answer {
-    display: inline-block;
-    background: rgba(16,185,129,0.18);
-    border: 1px solid #34d399;
-    color: #6ee7b7;
-    font-weight: 800;
-    padding: 4px 12px;
-    border-radius: 8px;
-    margin-top: 4px;
-  }
-
-  table.mini {
-    border-collapse: collapse;
-    margin: 12px 0 4px;
-    width: 100%;
-    font-size: 0.9rem;
-  }
-  table.mini th, table.mini td {
-    border: 1px solid var(--slate-200);
-    padding: 7px 10px;
-    text-align: center;
-  }
-  table.mini th { background: var(--slate-100); font-weight: 800; color: var(--blue-700); }
-  table.mini td.hl { background: #eff6ff; font-weight: 700; }
-
-  .note {
-    font-size: 0.86rem;
-    color: var(--slate-500);
-    margin-top: 8px;
-  }
-
-  footer {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 8px 20px 44px;
-    text-align: center;
-    color: var(--slate-500);
-    font-size: 0.8rem;
-  }
-
-  @media (max-width: 520px) {
-    .card { padding: 18px 15px 20px; border-radius: 15px; }
-    .hero { padding: 30px 16px 28px; }
-    input[type=range] { width: 116px; }
-  }
+  .ans span.v{color:#047857; font-size:1.15em;}
+  .choices{list-style:none; padding:0; margin:10px 0;}
+  .choices li{padding:6px 10px; border:1px solid var(--line); border-radius:9px; margin:6px 0; font-size:14px;}
+  .choices li.ok{border-color:#86efac; background:#f0fdf4; font-weight:700; color:#166534;}
+  table.tb{border-collapse:collapse; margin:6px 0; font-size:14px;}
+  table.tb th,table.tb td{border:1px solid var(--line); padding:4px 10px; text-align:center;}
+  table.tb th{background:#f1f5f9;}
 </style>
 </head>
 <body>
+<div class="wrap">
+<div class="split">
 
-<!-- ============ HERO ============ -->
-<header class="hero">
-  <div class="hero-inner">
-    <div class="eyebrow">HKDSE Mathematics (Compulsory Part) · Paper 2</div>
-    <h1>2012 Paper 2 · Question 29</h1>
-    <div class="subtitle">Statistics — Mean, Variance &amp; Standard Deviation of a Discrete Distribution</div>
-    <div class="pills">
-      <span class="pill">Frequency Table</span>
-      <span class="pill">Mean μ</span>
-      <span class="pill">Variance σ²</span>
-      <span class="pill">Standard Deviation σ</span>
-      <span class="pill">2 d.p. Rounding</span>
+  <!-- ================= LEFT: DIAGRAM ================= -->
+  <div class="diagram">
+    <h3>Interactive Bar Chart</h3>
+    <canvas id="cv" width="720" height="560"></canvas>
+    <p class="ro" id="ro">Step 1 — read the data from the bar chart: $x$ = 0,1,2,3,4 rings with frequencies 2, 8, 4, 6, 2.</p>
+    <div class="legend">
+      <span><i style="background:#60a5fa"></i>Bar (frequency)</span>
+      <span><i style="background:#2563eb"></i>Highlighted bar</span>
+      <span><i style="background:#dc2626"></i>Mean position</span>
+      <span><i style="background:#16a34a"></i>Deviation |x−mean|</span>
     </div>
   </div>
-</header>
 
-<div class="wrap">
+  <!-- ================= RIGHT: QUESTION + SOLUTION ================= -->
+  <div class="panel">
+    <div class="qhead">
+      <span class="tag">2012MC#29</span>
+      <span class="topic">15. Statistics</span>
+    </div>
 
-  <!-- ============ QUESTION CARD ============ -->
-  <section class="card qcard">
-    <div class="section-label">The Question</div>
     <div class="qtext">
-      <p><strong>[2012 MC #29]</strong> The bar chart below shows the distribution of the numbers of rings owned by the girls in a group. Find the standard deviation of the distribution correct to 2 decimal places.</p>
-
-      <div class="canvas-shell">
-        <canvas id="qChart" width="760" height="600" aria-label="Bar chart of number of rings owned by girls"></canvas>
-        <div class="controls">
-          <div class="ctrl-group">
-            <label for="barScale">Bar height scale</label>
-            <input type="range" id="barScale" min="14" max="40" value="30" step="1" />
-          </div>
-          <div class="ctrl-group">
-            <label class="toggle-chip">
-              <input type="checkbox" id="showMeanLine" checked />
-              Show mean line
-            </label>
-          </div>
-          <span class="readout" id="qReadout">Total girls = 22</span>
-        </div>
-      </div>
-
-      <ul>
+      <p>The bar chart below shows the distribution of the numbers of rings owned by the girls in a group. Find the standard deviation of the distribution correct to 2 decimal places.</p>
+      <ul class="choices">
         <li>A. 1.04</li>
-        <li>B. 1.16</li>
+        <li class="ok">B. 1.16 &nbsp;✔</li>
         <li>C. 1.19</li>
         <li>D. 2.09</li>
-      </ul<figure style="margin:12px 0;text-align:center;"><img src="figures/2012_P2_Q29.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>>
-    </div>
-    <div class="note">Marks: this is a multiple-choice question (1 mark for the correct option). The full working is broken down below so you can see exactly where each number comes from.</div>
-  </section>
-
-  <!-- ============ PART A ============ -->
-  <section class="card">
-    <h2>Part (a) — Build the frequency table &amp; find the mean
-      <span class="tagline">Step 1: read the bar chart, Step 2: compute μ = Σxf / N</span>
-    </h2>
-
-    <div class="canvas-shell">
-      <canvas id="meanCanvas" width="760" height="600" aria-label="Interactive mean demonstration"></canvas>
-      <div class="controls">
-        <div class="ctrl-group">
-          <label for="shiftSlider">Shift all data by k</label>
-          <input type="range" id="shiftSlider" min="-2" max="2" value="0" step="1" />
-          <span class="readout amber" id="shiftOut">k = 0</span>
-        </div>
-        <div class="ctrl-group">
-          <label class="toggle-chip">
-            <input type="checkbox" id="showBalance" checked />
-            Balance point (mean)
-          </label>
-        </div>
-        <span class="readout green" id="meanOut">μ = 21/11 ≈ 1.9091</span>
-      </div>
+      </ul>
     </div>
 
-    <table class="mini">
-      <thead>
-        <tr><th>Number of rings \(x\)</th><th>Frequency \(f\)</th><th>\(x \cdot f\)</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>0</td><td>2</td><td>0</td></tr>
-        <tr><td>1</td><td>8</td><td>8</td></tr>
-        <tr><td>2</td><td>4</td><td>8</td></tr>
-        <tr><td>3</td><td>6</td><td>18</td></tr>
-        <tr><td>4</td><td>2</td><td>8</td></tr>
-        <tr><td class="hl">Total</td><td class="hl">22</td><td class="hl">42</td></tr>
-      </tbody>
-    </table>
+    <figure style="margin:12px 0;text-align:center;"><img src="figures/2012_P2_Q29.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
 
-    <div class="steps" id="stepsA">
-      <div class="step">
-        <div class="step-head">
-          <span class="badge-num">Step 1</span>
-          
-          <strong>Count the girls (total frequency \(N\))</strong>
-        </div>
-        <div class="step-body">
-          Reading the bar chart heights: \(2, 8, 4, 6, 2\) girls for \(0,1,2,3,4\) rings respectively.
-          \[ N = 2 + 8 + 4 + 6 + 2 = 22 \]
-        </div>
-        <div class="hint"><strong>Hint:</strong> The total frequency is the number of girls — every time you move the bar-chart slider above, this total never changes. It is the denominator of every average.</div>
+    <div class="step s1" data-step="1">
+      <span class="chip">1</span><b>Read the data from the chart.</b>
+      <div class="work">
+        Number of rings $x$: $0,\ 1,\ 2,\ 3,\ 4$<br>
+        Number of girls (frequency $f$): $2,\ 8,\ 4,\ 6,\ 2$
       </div>
-
-      <div class="step">
-        <div class="step-head">
-          <span class="badge-num">Step 2</span>
-          
-          <strong>Compute the total number of rings</strong>
-        </div>
-        <div class="step-body">
-          Multiply each value by its frequency and add:
-          \[ 0\times 2 + 1\times 8 + 2\times 4 + 3\times 6 + 4\times 2 = 0 + 8 + 8 + 18 + 8 = 42 \]
-        </div>
-        <div class="hint"><strong>Hint:</strong> A zero-frequency-value product (\(0\times 2 = 0\)) still contributes nothing to the sum — but it still counts towards \(N\). That is why the mean is not \(42/20\).</div>
-      </div>
-
-      <div class="step">
-        <div class="step-head">
-          <span class="badge-num">Step 3</span>
-          
-          <strong>Mean of the distribution</strong>
-        </div>
-        <div class="step-body">
-          \[ \mu = \frac{\sum x f}{N} = \frac{42}{22} = \frac{21}{11} \approx 1.9091 \]
-        </div>
-        <div class="answerbox"><strong>Answer (a):</strong> \(\mu = \dfrac{21}{11} \approx 1.91\) (correct to 2 d.p.)</div>
-        <div class="hint"><strong>Hint:</strong> Keep the exact fraction \(\frac{21}{11}\) for the variance step — rounding early to \(1.91\) would slightly change the final standard deviation and could push you to the wrong option.</div>
-      </div>
+      <div class="hint">Hint: the bar height gives the frequency of each value of $x$.</div>
     </div>
 
-    <div class="reveal-row">
-      <button class="btn btn-primary" data-target="stepsA">Next step →</button>
-      <span class="counter" data-counter="stepsA">0 / 3</span>
-    </div>
-  </section>
-
-  <!-- ============ PART B ============ -->
-  <section class="card">
-    <h2>Part (b) — Find the variance \(\sigma^2\)
-      <span class="tagline">Sum of squared deviations from the mean, divided by \(N\)</span>
-    </h2>
-
-    <div class="canvas-shell">
-      <canvas id="varianceCanvas" width="760" height="600" aria-label="Interactive variance demonstration"></canvas>
-      <div class="controls">
-        <div class="ctrl-group">
-          <label for="spreadSlider">Data spread factor \(s\)</label>
-          <input type="range" id="spreadSlider" min="0.4" max="2" value="1" step="0.05" />
-          <span class="readout amber" id="spreadOut">s = 1.00</span>
-        </div>
-        <div class="ctrl-group">
-          <label class="toggle-chip">
-            <input type="checkbox" id="showSquares" checked />
-            Show squared deviations
-          </label>
-        </div>
-        <span class="readout green" id="varOut">σ² = 164/121 ≈ 1.3554</span>
-      </div>
+    <div class="step s2" data-step="2">
+      <span class="chip">2</span><b>Find the total number of girls $n$.</b>
+      <div class="work">\[ n = 2+8+4+6+2 = 22 \]</div>
+      <div class="hint">Hint: $n=\sum f$ is the size of the distribution.</div>
     </div>
 
-    <div class="steps" id="stepsB">
-      <div class="step">
-        <div class="step-head">
-          <span class="badge-num">Step 1</span>
-          
-          <strong>Deviation of each value from the mean</strong>
-        </div>
-        <div class="step-body">
-          Use the exact mean \(\mu = \frac{21}{11}\). Compute \(x - \frac{21}{11}\) for each ring count:
-          \[
-          0 - \tfrac{21}{11} = -\tfrac{21}{11}, \quad
-          1 - \tfrac{21}{11} = -\tfrac{10}{11}, \quad
-          2 - \tfrac{21}{11} = \tfrac{1}{11}, \quad
-          3 - \tfrac{21}{11} = \tfrac{12}{11}, \quad
-          4 - \tfrac{21}{11} = \tfrac{23}{11}
-          \]
-        </div>
-        <div class="hint"><strong>Hint:</strong> Deviations can be negative — the girls with 0 or 1 ring sit below the mean. Notice that the number of rings below the mean (2 &amp; 8 girls) noticeably exceeds the number who own 3 or 4 rings.</div>
+    <div class="step s3" data-step="3">
+      <span class="chip">3</span><b>Compute the mean $\mu=\dfrac{\sum fx}{n}$.</b>
+      <div class="work">
+        <table class="tb">
+          <tr><th>$x$</th><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td></tr>
+          <tr><th>$f$</th><td>2</td><td>8</td><td>4</td><td>6</td><td>2</td></tr>
+          <tr><th>$fx$</th><td>0</td><td>8</td><td>8</td><td>18</td><td>8</td></tr>
+        </table>
+        \[ \sum fx = 0+8+8+18+8 = 42 \qquad
+           \mu = \frac{42}{22} = \frac{21}{11} \approx 1.9091 \]
       </div>
-
-      <div class="step">
-        <div class="step-head">
-          <span class="badge-num">Step 2</span>
-          
-          <strong>Square each deviation and weight by frequency</strong>
-        </div>
-        <div class="step-body">
-          \[
-          \sum f(x-\mu)^2 =
-          \left(0-\tfrac{21}{11}\right)^2\!\cdot 2
-          + \left(1-\tfrac{21}{11}\right)^2\!\cdot 8
-          + \left(2-\tfrac{21}{11}\right)^2\!\cdot 4
-          + \left(3-\tfrac{21}{11}\right)^2\!\cdot 6
-          + \left(4-\tfrac{21}{11}\right)^2\!\cdot 2
-          \]
-          \[
-          = \left(\tfrac{21}{11}\right)^2\!\cdot 2
-          + \left(\tfrac{10}{11}\right)^2\!\cdot 8
-          + \left(\tfrac{1}{11}\right)^2\!\cdot 4
-          + \left(\tfrac{12}{11}\right)^2\!\cdot 6
-          + \left(\tfrac{23}{11}\right)^2\!\cdot 2
-          \]
-        </div>
-        <div class="hint"><strong>Hint:</strong> Squaring removes the signs, so both "far below" and "far above" the mean count as spread — exactly what variance is measuring.</div>
-      </div>
-
-      <div class="step">
-        <div class="step-head">
-          <span class="badge-num">Step 3</span>
-          
-          <strong>Variance of the distribution</strong>
-        </div>
-        <div class="step-body">
-          With a common denominator \(121\):
-          \[
-          \sum f(x-\mu)^2 = \frac{2(441) + 8(100) + 4(1) + 6(144) + 2(529)}{121}
-          = \frac{882 + 800 + 4 + 864 + 1058}{121}
-          = \frac{3608}{121}
-          \]
-          \[
-          \sigma^2 = \frac{\sum f(x-\mu)^2}{N} = \frac{3608/121}{22} = \frac{3608}{2662} = \frac{164}{121}
-          \]
-        </div>
-        <div class="answerbox"><strong>Answer (b):</strong> \(\sigma^2 = \dfrac{164}{121} \approx 1.3554\)</div>
-        <div class="hint"><strong>Hint:</strong> Always divide by \(N = 22\) (the total frequency), not by the number of distinct values (5). This is the key trap in this question.</div>
-      </div>
+      <div class="hint">Hint: the mean is marked by the red dashed line on the chart.</div>
     </div>
 
-    <div class="reveal-row">
-      <button class="btn btn-primary" data-target="stepsB">Next step →</button>
-      <span class="counter" data-counter="stepsB">0 / 3</span>
-    </div>
-  </section>
-
-  <!-- ============ PART C ============ -->
-  <section class="card">
-    <h2>Part (c) — Standard deviation to 2 decimal places
-      <span class="tagline">Take the square root and round; compare with the four options</span>
-    </h2>
-
-    <div class="canvas-shell">
-      <canvas id="sdCanvas" width="760" height="600" aria-label="Standard deviation and option comparison"></canvas>
-      <div class="controls">
-        <div class="ctrl-group">
-          <label for="roundSlider">Round to d.p.</label>
-          <input type="range" id="roundSlider" min="0" max="4" value="2" step="1" />
-          <span class="readout amber" id="roundOut">2 d.p.</span>
-        </div>
-        <div class="ctrl-group">
-          <label class="toggle-chip">
-            <input type="checkbox" id="showSigmaBand" checked />
-            Show σ ± band around the mean
-          </label>
-        </div>
-        <span class="readout green" id="sdOut">σ ≈ 1.164204…</span>
+    <div class="step s4" data-step="4">
+      <span class="chip">4</span><b>Compute the variance $\sigma^2=\dfrac{\sum f(x-\mu)^2}{n}$.</b>
+      <div class="work">
+        \[
+        \sigma^2=\frac{\left(0-\frac{21}{11}\right)^{2}\!\!\times 2
+        +\left(1-\frac{21}{11}\right)^{2}\!\!\times 8
+        +\left(2-\frac{21}{11}\right)^{2}\!\!\times 4
+        +\left(3-\frac{21}{11}\right)^{2}\!\!\times 6
+        +\left(4-\frac{21}{11}\right)^{2}\!\!\times 2}{22}
+        \]
+        \[
+        =\frac{441+800+100+1536+1444}{121\times 22}
+        =\frac{4321}{2662}=\frac{164}{121}
+        \]
       </div>
+      <div class="hint">Hint: each bar's height gives the weight of its squared deviation from the mean.</div>
     </div>
 
-    <div class="steps" id="stepsC">
-      <div class="step">
-        <div class="step-head">
-          <span class="badge-num">Step 1</span>
-          
-          <strong>Take the positive square root of the variance</strong>
-        </div>
-        <div class="step-body">
-          \[ \sigma = \sqrt{\sigma^2} = \sqrt{\frac{164}{121}} = \frac{\sqrt{164}}{11} \]
-        </div>
-        <div class="hint"><strong>Hint:</strong> Standard deviation is always taken as the non-negative root. The denominator \(121=11^2\) comes out of the radical neatly.</div>
+    <div class="step s5" data-step="5">
+      <span class="chip">5</span><b>Take the square root: standard deviation.</b>
+      <div class="work">
+        \[ \sigma=\sqrt{\frac{164}{121}}=\frac{\sqrt{164}}{11}\approx 1.16420 \]
+        \[ \sigma \approx 1.16 \ (\text{corr. to 2 d.p.}) \]
       </div>
-
-      <div class="step">
-        <div class="step-head">
-          <span class="badge-num">Step 2</span>
-          
-          <strong>Evaluate numerically</strong>
-        </div>
-        <div class="step-body">
-          \[ \sqrt{164} \approx 12.806248 \quad\Rightarrow\quad \sigma \approx \frac{12.806248}{11} \approx 1.164204407 \]
-        </div>
-        <div class="hint"><strong>Hint:</strong> Keep plenty of decimal places until the very last step; only round when the question asks for it.</div>
-      </div>
-
-      <div class="step">
-        <div class="step-head">
-          <span class="badge-num">Step 3</span>
-          
-          <strong>Round to 2 d.p. and choose the option</strong>
-        </div>
-        <div class="step-body">
-          \[ \sigma \approx 1.16 \quad (\text{correct to } 2 \text{ d.p.}) \]
-          Comparing with the options:
-          <table class="mini">
-            <thead><tr><th>Option</th><th>Value</th><th>Match?</th></tr></thead>
-            <tbody>
-              <tr><td>A</td><td>1.04</td><td>✗</td></tr>
-              <tr><td class="hl">B</td><td class="hl">1.16</td><td class="hl">✓</td></tr>
-              <tr><td>C</td><td>1.19</td><td>✗</td></tr>
-              <tr><td>D</td><td>2.09</td><td>✗</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="answerbox"><strong>Answer (c):</strong> \(\sigma \approx 1.16\), so the correct option is <strong>B</strong>.</div>
-        <div class="hint"><strong>Hint:</strong> Option C (1.19) is the trap: it arises if you forget to divide by \(N = 22\) when computing the variance. Always divide by the <em>total frequency</em>.</div>
-      </div>
+      <div class="hint">Hint: finish by square-rooting the variance, then round to 2 d.p.</div>
     </div>
 
-    <div class="reveal-row">
-      <button class="btn btn-primary" data-target="stepsC">Next step →</button>
-      <span class="counter" data-counter="stepsC">0 / 3</span>
-    </div>
-  </section>
-
-  <!-- ============ SUMMARY ============ -->
-  <section class="card summary">
-    <h2>Summary of Answers</h2>
-    <ul>
-      <li>Total number of girls: \(N = 22\)</li>
-      <li>Total rings: \(\sum xf = 42\)</li>
-      <li>Mean: \(\mu = \dfrac{42}{22} = \dfrac{21}{11} \approx 1.91\)</li>
-      <li>Variance: \(\sigma^2 = \dfrac{164}{121} \approx 1.3554\)</li>
-      <li>Standard deviation: \(\sigma = \sqrt{\dfrac{164}{121}} \approx 1.1642\)</li>
-      <li><strong>Correct option:</strong> B (1.16) — <span class="final-answer">σ ≈ 1.16</span></li>
-    </ul>
-    <div class="note" style="color:#94a3b8;">
-      Reference: HKDSE Mathematics (Compulsory Part) Paper 2, 2012, Question 29.
-    </div>
-  </section>
+    <div class="ans">Answer: <span class="v">B. 1.16</span></div>
+  </div>
 
 </div>
-
-<footer>
-  Interactive HKDSE Mathematics solution · Statistics · Rendering powered by MathJax
-</footer>
+</div>
 
 <script>
-/* ============================================================
-   Helper utilities
-   ============================================================ */
-function setupHiDPI(canvas) {
-  const dpr = window.devicePixelRatio || 1;
-  const rect = canvas.getBoundingClientRect();
-  const cssW = rect.width || canvas.width;
-  const cssH = canvas.height * (cssW / canvas.width);
-  canvas.width = Math.round(cssW * dpr);
-  canvas.height = Math.round(cssH * dpr);
-  canvas.style.height = cssH + 'px';
-  const ctx = canvas.getContext('2d');
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  return { ctx, w: cssW, h: cssH };
-}
+(function(){
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  const ro = document.getElementById('ro');
+  const W = cv.width, H = cv.height;
 
-function roundRect(ctx, x, y, w, h, r) {
-  r = Math.min(r, Math.abs(w) / 2, Math.abs(h) / 2);
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.lineTo(x + w - r, y);
-  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-  ctx.lineTo(x + w, y + h - r);
-  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-  ctx.lineTo(x + r, y + h);
-  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-  ctx.lineTo(x, y + r);
-  ctx.quadraticCurveTo(x, y, x + r, y);
-  ctx.closePath();
-}
+  // data
+  const freqs = [2, 8, 4, 6, 2];           // x = 0..4
+  const xs = [0,1,2,3,4];
+  const n = freqs.reduce((a,b)=>a+b,0);     // 22
+  const sumfx = xs.reduce((a,x,i)=>a + x*freqs[i], 0); // 42
+  const mean = sumfx / n;                   // 21/11
+  const variance = freqs.reduce((a,f,i)=>a + f*Math.pow(xs[i]-mean,2), 0)/n; // 164/121
+  const sd = Math.sqrt(variance);
 
-function arrow(ctx, x1, y1, x2, y2, size) {
-  size = size || 7;
-  ctx.beginPath();
-  ctx.moveTo(x1, y1);
-  ctx.lineTo(x2, y2);
-  ctx.stroke();
-  const ang = Math.atan2(y2 - y1, x2 - x1);
-  ctx.beginPath();
-  ctx.moveTo(x2, y2);
-  ctx.lineTo(x2 - size * Math.cos(ang - Math.PI / 6), y2 - size * Math.sin(ang - Math.PI / 6));
-  ctx.lineTo(x2 - size * Math.cos(ang + Math.PI / 6), y2 - size * Math.sin(ang + Math.PI / 6));
-  ctx.closePath();
-  ctx.fill();
-}
+  // layout
+  const left = 90, right = W-40, top = 40, bottom = H-70;
+  const plotW = right-left, plotH = bottom-top;
+  const maxF = 8;
+  const barGap = 0.28;
+  function xPix(i){ return left + plotW*( (i+0.5)/5 ); }
+  function yPix(f){ return bottom - plotH*(f/maxF); }
 
-/* ============================================================
-   DIAGRAM 1 — The original bar chart (question card)
-   Interactive: bar-height scale slider + mean line toggle
-   ============================================================ */
-(function () {
-  const canvas = document.getElementById('qChart');
-  if (!canvas) return;
-  const data = [2, 8, 4, 6, 2];
-  const labels = [0, 1, 2, 3, 4];
-  const N = data.reduce((a, b) => a + b, 0);
-  const mean = data.reduce((a, b, i) => a + b * labels[i], 0) / N;
+  const colors = ['#60a5fa','#60a5fa','#60a5fa','#60a5fa','#60a5fa'];
 
-  const scaleSlider = document.getElementById('barScale');
-  const meanToggle = document.getElementById('showMeanLine');
-  const readout = document.getElementById('qReadout');
+  function draw(step){
+    ctx.clearRect(0,0,W,H);
 
-  let geo = null;
-
-  function draw() {
-    const { ctx, w, h } = setupHiDPI(canvas);
-    ctx.clearRect(0, 0, w, h);
-
-    const padL = 62, padR = 26, padT = 26, padB = 58;
-    const plotW = w - padL - padR;
-    const plotH = h - padT - padB;
-    const maxY = 9;
-    const unitY = plotH / maxY;
-    const pxPerUnit = parseInt(scaleSlider.value, 10); // bar height scaling reference
-
-    // background
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, w, h);
-
-    // horizontal dotted grid lines at each integer
-    ctx.save();
-    ctx.strokeStyle = '#cbd5e1';
-    ctx.setLineDash([3, 5]);
-    ctx.lineWidth = 1;
-    for (let i = 0; i <= maxY; i++) {
-      const y = padT + plotH - i * unitY;
-      ctx.beginPath();
-      ctx.moveTo(padL, y);
-      ctx.lineTo(padL + plotW, y);
-      ctx.stroke();
-      ctx.setLineDash([3, 5]);
-    }
-    ctx.restore();
-
-    // y-axis tick labels
-    ctx.fillStyle = '#475569';
-    ctx.font = '600 12px Segoe UI, Arial';
-    ctx.textAlign = 'right';
-    ctx.textBaseline = 'middle';
-    for (let i = 0; i <= maxY; i += 2) {
-      const y = padT + plotH - i * unitY;
-      ctx.fillText(i, padL - 10, y);
-      if (i > 0 && i % 2 !== 0) ctx.fillText('', padL - 10, y);
-    }
-    // small odd ticks numbers
-    ctx.fillStyle = '#94a3b8';
-    ctx.font = '500 10px Segoe UI, Arial';
-    for (let i = 1; i <= maxY; i += 2) {
-      const y = padT + plotH - i * unitY;
-      ctx.fillText(i, padL - 10, y);
+    // gridlines + y labels
+    ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1;
+    ctx.font = '14px Segoe UI, sans-serif'; ctx.fillStyle = '#64748b';
+    ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+    for(let f=0; f<=maxF; f+=2){
+      const y = yPix(f);
+      ctx.beginPath(); ctx.moveTo(left, y); ctx.lineTo(right, y); ctx.stroke();
+      ctx.fillText(f, left-12, y);
     }
 
     // axes
-    ctx.strokeStyle = '#0f172a';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(padL, padT);
-    ctx.lineTo(padL, padT + plotH);
-    ctx.lineTo(padL + plotW, padT + plotH);
-    ctx.stroke();
+    ctx.strokeStyle = '#334155'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(left, top-6); ctx.lineTo(left, bottom); ctx.lineTo(right, bottom); ctx.stroke();
 
-    // axis arrows
-    ctx.fillStyle = '#0f172a';
-    arrow(ctx, padL, padT + plotH, padL, padT - 4, 6);
-    arrow(ctx, padL, padT + plotH, padL + plotW + 6, padT + plotH, 6);
-
-    // axis labels
+    // axis titles
     ctx.save();
-    ctx.translate(18, padT + plotH / 2);
-    ctx.rotate(-Math.PI / 2);
-    ctx.fillStyle = '#0f172a';
-    ctx.font = '700 12.5px Segoe UI, Arial';
-    ctx.textAlign = 'center';
+    ctx.translate(28, (top+bottom)/2); ctx.rotate(-Math.PI/2);
+    ctx.textAlign='center'; ctx.fillStyle='#1e293b'; ctx.font='bold 15px Segoe UI, sans-serif';
     ctx.fillText('Number of girls', 0, 0);
     ctx.restore();
 
-    ctx.fillStyle = '#0f172a';
-    ctx.font = '700 12.5px Segoe UI, Arial';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'top';
-    ctx.fillText('Number of rings', padL + plotW / 2, padT + plotH + 40);
-
-    const slot = plotW / data.length;
-    const barW = Math.min(slot * 0.56, pxPerUnit * 1.1);
-    geo = { padL, padT, plotH, unitY, slot, barW };
-
-    // bars with hatch pattern
-    data.forEach((f, i) => {
-      const cx = padL + slot * (i + 0.5);
-      const barH = f * unitY;
-      const x = cx - barW / 2;
-      const y = padT + plotH - barH;
-
-      ctx.save();
-      roundRect(ctx, x, y, barW, barH, 5);
-      ctx.clip();
-
-      const grad = ctx.createLinearGradient(x, y, x + barW, y + barH);
-      grad.addColorStop(0, '#dbeafe');
-      grad.addColorStop(1, '#bfdbfe');
-      ctx.fillStyle = grad;
-      ctx.fillRect(x, y, barW, barH);
-
-      // diagonal hatching
-      ctx.strokeStyle = 'rgba(37,99,235,0.5)';
-      ctx.lineWidth = 1.4;
-      for (let s = -barH; s < barW + barH; s += 8) {
-        ctx.beginPath();
-        ctx.moveTo(x + s, y + barH);
-        ctx.lineTo(x + s + barH, y);
-        ctx.stroke();
-      }
-      ctx.restore();
-
-      // bar outline
-      roundRect(ctx, x, y, barW, barH, 5);
-      ctx.strokeStyle = '#1d4ed8';
-      ctx.lineWidth = 1.8;
-      ctx.stroke();
-
-      // frequency value above the bar
-      ctx.fillStyle = '#1e3a8a';
-      ctx.font = '800 13px Segoe UI, Arial';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'bottom';
-      ctx.fillText(f, cx, y - 6);
-
-      // x labels
-      ctx.fillStyle = '#0f172a';
-      ctx.font = '700 13px Segoe UI, Arial';
-      ctx.textBaseline = 'top';
-      ctx.fillText(labels[i], cx, padT + plotH + 9);
-    });
-
-    // mean line
-    if (meanToggle.checked) {
-      const my = padT + plotH - mean * unitY;
-      ctx.save();
-      ctx.strokeStyle = '#dc2626';
-      ctx.lineWidth = 2;
-      ctx.setLineDash([8, 5]);
-      ctx.beginPath();
-      ctx.moveTo(padL, my);
-      ctx.lineTo(padL + plotW, my);
-      ctx.stroke();
-      ctx.restore();
-
-      ctx.fillStyle = '#dc2626';
-      ctx.font = '800 11.5px Segoe UI, Arial';
-      ctx.textAlign = 'right';
-      ctx.textBaseline = 'bottom';
-      ctx.fillText('mean μ = 21/11 ≈ 1.91', padL + plotW - 4, my - 4);
-    }
-
-    readout.textContent = 'Total girls = ' + N + '   |   Mean = 21/11';
-  }
-
-  scaleSlider.addEventListener('input', draw);
-  meanToggle.addEventListener('change', draw);
-  window.addEventListener('resize', draw);
-  draw();
-})();
-
-/* ============================================================
-   DIAGRAM 2 — Mean as a balance point (Part a)
-   Slider shifts the whole data set by k
-   ============================================================ */
-(function () {
-  const canvas = document.getElementById('meanCanvas');
-  if (!canvas) return;
-  const baseData = [2, 8, 4, 6, 2];
-  const labels = [0, 1, 2, 3, 4];
-  const N = 22;
-
-  const slider = document.getElementById('shiftSlider');
-  const toggle = document.getElementById('showBalance');
-  const shiftOut = document.getElementById('shiftOut');
-  const meanOut = document.getElementById('meanOut');
-
-  function draw() {
-    const { ctx, w, h } = setupHiDPI(canvas);
-    ctx.clearRect(0, 0, w, h);
-
-    const k = parseInt(slider.value, 10);
-    const shifted = labels.map(v => v + k);
-
-    // weighted mean of shifted data = original mean + k
-    const sum = baseData.reduce((a, f, i) => a + f * shifted[i], 0);
-    const mu = sum / N;
-
-    const padL = 60, padR = 30, padT = 46, padB = 70;
-    const plotW = w - padL - padR;
-    const plotH = h - padT - padB;
-
-    // axis value range
-    const minX = Math.min(...shifted) - 1;
-    const maxX = Math.max(...shifted) + 1;
-    const span = maxX - minX;
-    const xOf = v => padL + ((v - minX) / span) * plotW;
-
-    const maxF = 10;
-    const yOf = f => padT + plotH - (f / maxF) * plotH;
-
-    // background
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, w, h);
-
-    // grid
-    ctx.strokeStyle = '#e2e8f0';
-    ctx.lineWidth = 1;
-    for (let f = 0; f <= maxF; f += 2) {
-      const y = yOf(f);
-      ctx.beginPath();
-      ctx.moveTo(padL, y);
-      ctx.lineTo(padL + plotW, y);
-      ctx.stroke();
-      ctx.fillStyle = '#94a3b8';
-      ctx.font = '600 11px Segoe UI, Arial';
-      ctx.textAlign = 'right';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(f, padL - 8, y);
-    }
+    ctx.textAlign='center'; ctx.fillStyle='#1e293b'; ctx.font='bold 15px Segoe UI, sans-serif';
+    ctx.fillText('Number of rings', (left+right)/2, bottom+50);
 
     // bars
-    const barW = Math.min((plotW / (labels.length + 1)) * 0.6, 44);
-    baseData.forEach((f, i) => {
-      const x = xOf(shifted[i]);
-      const y = yOf(f);
-      const bh = padT + plotH - y;
+    const bw = plotW/5*(1-barGap);
+    ctx.textAlign='center'; ctx.textBaseline='bottom';
+    for(let i=0;i<5;i++){
+      const x = left + plotW*(i/5) + (plotW/5-bw)/2;
+      const f = freqs[i];
+      const y = yPix(f);
+      const h = bottom - y;
 
-      const grad = ctx.createLinearGradient(x, y, x, y + bh);
-      grad.addColorStop(0, '#93c5fd');
-      grad.addColorStop(1, '#3b82f6');
-      ctx.fillStyle = grad;
-      roundRect(ctx, x - barW / 2, y, barW, bh, 5);
-      ctx.fill();
-      ctx.strokeStyle = '#1d4ed8';
-      ctx.lineWidth = 1.6;
-      ctx.stroke();
+      // highlight logic per step
+      let base = colors[i];
+      if(step>=3){                       // step 3+: highlight the mean-region / all bars
+        base = ['#60a5fa','#34d399','#fbbf24','#818cf8','#f472b6'][i];
+      }
+      if(step>=4){                       // show deviation shading
+        base = ['#a7f3d0','#34d399','#fbbf24','#818cf8','#f472b6'][i];
+      }
+      ctx.fillStyle = base;
+      ctx.globalAlpha = (step>=2)?0.95:0.8;
+      ctx.fillRect(x, y, bw, h);
+      ctx.globalAlpha = 1;
+      ctx.strokeStyle = '#1e3a8a'; ctx.lineWidth=1.5;
+      ctx.strokeRect(x, y, bw, h);
 
       // frequency label
-      ctx.fillStyle = '#1e3a8a';
-      ctx.font = '800 13px Segoe UI, Arial';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'bottom';
-      ctx.fillText(f, x, y - 5);
+      ctx.fillStyle='#0f172a'; ctx.font='bold 13px Segoe UI, sans-serif';
+      ctx.textBaseline='bottom';
+      ctx.fillText(f, x+bw/2, y-5);
 
-      // x-axis tick label
-      ctx.fillStyle = '#0f172a';
-      ctx.font = '700 13px Segoe UI, Arial';
-      ctx.textBaseline = 'top';
-      ctx.fillText(shifted[i], x, padT + plotH + 10);
-    });
-
-    // x-axis line
-    ctx.strokeStyle = '#0f172a';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(padL, padT);
-    ctx.lineTo(padL, padT + plotH);
-    ctx.lineTo(padL + plotW, padT + plotH);
-    ctx.stroke();
-
-    // axis titles
-    ctx.fillStyle = '#0f172a';
-    ctx.font = '700 12px Segoe UI, Arial';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'top';
-    ctx.fillText('Value of x  (rings)', padL + plotW / 2, padT + plotH + 36);
-
-    ctx.save();
-    ctx.translate(18, padT + plotH / 2);
-    ctx.rotate(-Math.PI / 2);
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('Frequency f', 0, 0);
-    ctx.restore();
-
-    // balance point (mean)
-    if (toggle.checked) {
-      const mx = xOf(mu);
-      ctx.save();
-      ctx.strokeStyle = '#dc2626';
-      ctx.lineWidth = 2.4;
-      ctx.setLineDash([9, 6]);
-      ctx.beginPath();
-      ctx.moveTo(mx, padT - 12);
-      ctx.lineTo(mx, padT + plotH);
-      ctx.stroke();
-      ctx.restore();
-
-      // triangle marker (balance fulcrum)
-      ctx.fillStyle = '#dc2626';
-      ctx.beginPath();
-      ctx.moveTo(mx, padT + plotH + 2);
-      ctx.lineTo(mx - 9, padT + plotH + 17);
-      ctx.lineTo(mx + 9, padT + plotH + 17);
-      ctx.closePath();
-      ctx.fill();
-
-      ctx.fillStyle = '#dc2626';
-      ctx.font = '800 12px Segoe UI, Arial';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'bottom';
-      ctx.fillText('μ = ' + mu.toFixed(4), mx, padT - 16);
+      // x label
+      ctx.textBaseline='top'; ctx.fillStyle='#334155'; ctx.font='14px Segoe UI, sans-serif';
+      ctx.fillText(i, x+bw/2, bottom+8);
     }
 
-    // readouts
-    shiftOut.textContent = 'k = ' + (k >= 0 ? '+' : '') + k;
-    meanOut.textContent = 'μ = ' + (21 / 11 + k).toFixed(4);
-  }
-
-  slider.addEventListener('input', draw);
-  toggle.addEventListener('change', draw);
-  window.addEventListener('resize', draw);
-  draw();
-})();
-
-/* ============================================================
-   DIAGRAM 3 — Variance: squared deviations (Part b)
-   Slider spreads/stretches data; bars show f(x-mu)^2
-   ============================================================ */
-(function () {
-  const canvas = document.getElementById('varianceCanvas');
-  if (!canvas) return;
-  const data = [2, 8, 4, 6, 2];
-  const labels = [0, 1, 2, 3, 4];
-  const N = 22;
-
-  const slider = document.getElementById('spreadSlider');
-  const toggle = document.getElementById('showSquares');
-  const spreadOut = document.getElementById('spreadOut');
-  const varOut = document.getElementById('varOut');
-
-  function draw() {
-    const { ctx, w, h } = setupHiDPI(canvas);
-    ctx.clearRect(0, 0, w, h);
-
-    const s = parseFloat(slider.value);
-    // stretch values around their own mean 21/11 (visual only for teaching)
-    const muBase = 21 / 11;
-    const vals = labels.map(v => muBase + (v - muBase) * s);
-
-    const padL = 64, padR = 34, padT = 56, padB = 66;
-    const plotW = w - padL - padR;
-    const plotH = h - padT - padB;
-
-    const maxVal = Math.max(...vals, muBase);
-    const minVal = Math.min(...vals, muBase);
-    const pad0 = 0.6;
-    const xMin = Math.min(minVal, muBase) - pad0;
-    const xMax = Math.max(maxVal, muBase) + pad0;
-    const span = xMax - xMin || 1;
-    const xOf = v => padL + ((v - xMin) / span) * plotW;
-
-    // maximum squared deviation for scaling
-    const sq = vals.map(v => (v - muBase) * (v - muBase));
-    const maxSq = Math.max(...sq, 0.01);
-    const maxBarH = plotH - 34;
-    const yOfSq = q => padT + plotH - (q / maxSq) * maxBarH;
-
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, w, h);
-
-    // horizontal gridlines
-    ctx.strokeStyle = '#e2e8f0';
-    ctx.lineWidth = 1;
-    for (let i = 0; i <= 4; i++) {
-      const y = padT + plotH - (i / 4) * maxBarH;
-      ctx.beginPath();
-      ctx.moveTo(padL, y);
-      ctx.lineTo(padL + plotW, y);
-      ctx.stroke();
-      ctx.fillStyle = '#94a3b8';
-      ctx.font = '600 10.5px Segoe UI, Arial';
-      ctx.textAlign = 'right';
-      ctx.textBaseline = 'middle';
-      ctx.fillText((maxSq * i / 4).toFixed(2), padL - 8, y);
-    }
-
-    // axes
-    ctx.strokeStyle = '#0f172a';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(padL, padT);
-    ctx.lineTo(padL, padT + plotH);
-    ctx.lineTo(padL + plotW, padT + plotH);
-    ctx.stroke();
-
-    ctx.fillStyle = '#0f172a';
-    ctx.font = '700 11.5px Segoe UI, Arial';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'top';
-    ctx.fillText('Value of x ·  height = f (x − μ)²', padL + plotW / 2, padT + plotH + 34);
-
-    ctx.save();
-    ctx.translate(20, padT + plotH / 2);
-    ctx.rotate(-Math.PI / 2);
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('Squared deviation (weighted)', 0, 0);
-    ctx.restore();
-
-    // squared-deviation bars
-    const barW = Math.min((plotW / (labels.length + 1)) * 0.52, 46);
-    let totalWeighted = 0;
-    vals.forEach((v, i) => {
-      const d = v - muBase;
-      const q = d * d;
-      totalWeighted += data[i] * q;
-
-      const x = xOf(v);
-      const yTop = yOfSq(q);
-      const bh = padT + plotH - yTop;
-
-      if (toggle.checked) {
-        const grad = ctx.createLinearGradient(x, yTop, x, yTop + bh);
-        grad.addColorStop(0, '#fcd34d');
-        grad.addColorStop(1, '#f59e0b');
-        ctx.fillStyle = grad;
-        roundRect(ctx, x - barW / 2, yTop, barW, bh, 5);
-        ctx.fill();
-        ctx.strokeStyle = '#b45309';
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-
-        ctx.fillStyle = '#92400e';
-        ctx.font = '800 11px Segoe UI, Arial';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'bottom';
-        ctx.fillText(q.toFixed(3), x, yTop - 5);
-      }
-
-      // value label on x axis
-      ctx.fillStyle = '#0f172a';
-      ctx.font = '700 11.5px Segoe UI, Arial';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'top';
-      ctx.fillText(v.toFixed(2), x, padT + plotH + 9);
-
-      // frequency note
-      ctx.fillStyle = '#64748b';
-      ctx.font = '600 10px Segoe UI, Arial';
-      ctx.fillText('f = ' + data[i], x, padT + plotH + 24);
-    });
-
-    // mean line
-    const mx = xOf(muBase);
-    ctx.save();
-    ctx.strokeStyle = '#dc2626';
-    ctx.lineWidth = 2.2;
-    ctx.setLineDash([8, 5]);
-    ctx.beginPath();
-    ctx.moveTo(mx, padT - 14);
-    ctx.lineTo(mx, padT + plotH);
-    ctx.stroke();
-    ctx.restore();
-    ctx.fillStyle = '#dc2626';
-    ctx.font = '800 12px Segoe UI, Arial';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'bottom';
-    ctx.fillText('μ = 21/11', mx, padT - 18);
-
-    // readouts
-    const variance = totalWeighted / N;
-    spreadOut.textContent = 's = ' + s.toFixed(2);
-    varOut.textContent = 'σ² = ' + variance.toFixed(4) +
-      (Math.abs(s - 1) < 1e-9 ? '  (= 164/121)' : '  (spread demo)');
-  }
-
-  slider.addEventListener('input', draw);
-  toggle.addEventListener('change', draw);
-  window.addEventListener('resize', draw);
-  draw();
-})();
-
-/* ============================================================
-   DIAGRAM 4 — σ value, rounding, and option match (Part c)
-   Slider changes rounding; band shows μ ± σ
-   ============================================================ */
-(function () {
-  const canvas = document.getElementById('sdCanvas');
-  if (!canvas) return;
-  const sigma = Math.sqrt(164 / 121);
-  const mu = 21 / 11;
-
-  const slider = document.getElementById('roundSlider');
-  const toggle = document.getElementById('showSigmaBand');
-  const roundOut = document.getElementById('roundOut');
-  const sdOut = document.getElementById('sdOut');
-
-  const options = [
-    { label: 'A', value: 1.04 },
-    { label: 'B', value: 1.16 },
-    { label: 'C', value: 1.19 },
-    { label: 'D', value: 2.09 }
-  ];
-
-  function draw() {
-    const { ctx, w, h } = setupHiDPI(canvas);
-    ctx.clearRect(0, 0, w, h);
-
-    const dp = parseInt(slider.value, 10);
-    const rounded = sigma.toFixed(dp);
-
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, w, h);
-
-    // ---------- Left: number line with μ ± σ band ----------
-    const padL = 54, padR = 26, padT = 44;
-    const lineY = 118;
-    const plotW = w - padL - padR;
-    const xMin = 0.3, xMax = 3.3;
-    const xOf = v => padL + ((v - xMin) / (xMax - xMin)) * plotW;
-
-    // sigma band
-    if (toggle.checked) {
-      const x1 = xOf(Math.max(xMin, mu - sigma));
-      const x2 = xOf(Math.min(xMax, mu + sigma));
-      const grad = ctx.createLinearGradient(x1, 0, x2, 0);
-      grad.addColorStop(0, 'rgba(16,185,129,0.10)');
-      grad.addColorStop(0.5, 'rgba(16,185,129,0.26)');
-      grad.addColorStop(1, 'rgba(16,185,129,0.10)');
-      ctx.fillStyle = grad;
-      ctx.fillRect(x1, padT + 8, x2 - x1, 96);
-      ctx.strokeStyle = '#10b981';
-      ctx.lineWidth = 1.6;
-      ctx.setLineDash([5, 4]);
-      ctx.strokeRect(x1, padT + 8, x2 - x1, 96);
+    // mean line (step 3+)
+    if(step>=3){
+      const xm = xPix(mean - 0.5 + 0.5); // mean position in bars space: use continuous mapping
+      const xMean = left + plotW*( (mean)/5 ) + plotW*0.5/5;
+      ctx.setLineDash([7,5]);
+      ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 2.5;
+      ctx.beginPath(); ctx.moveTo(xMean, top-4); ctx.lineTo(xMean, bottom); ctx.stroke();
       ctx.setLineDash([]);
-
-      ctx.fillStyle = '#047857';
-      ctx.font = '800 11.5px Segoe UI, Arial';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'bottom';
-      ctx.fillText('μ ± σ', (x1 + x2) / 2, padT + 6);
+      ctx.fillStyle='#dc2626'; ctx.font='bold 13px Segoe UI, sans-serif';
+      ctx.textAlign='center'; ctx.textBaseline='bottom';
+      ctx.fillText('mean = 21/11 ≈ 1.91', xMean, top-8);
     }
 
-    // axis line
-    ctx.strokeStyle = '#0f172a';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(padL, lineY);
-    ctx.lineTo(padL + plotW, lineY);
-    ctx.stroke();
-
-    // ticks
-    ctx.fillStyle = '#64748b';
-    ctx.font = '600 10.5px Segoe UI, Arial';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'top';
-    for (let v = 0.5; v <= 3.21; v += 0.5) {
-      const x = xOf(v);
-      ctx.strokeStyle = '#94a3b8';
-      ctx.lineWidth = 1.4;
-      ctx.beginPath();
-      ctx.moveTo(x, lineY - 6);
-      ctx.lineTo(x, lineY + 6);
-      ctx.stroke();
-      ctx.fillText(v.toFixed(1), x, lineY + 10);
-    }
-
-    // mean marker
-    const mx = xOf(mu);
-    ctx.fillStyle = '#2563eb';
-    ctx.beginPath();
-    ctx.arc(mx, lineY, 6, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#1e3a8a';
-    ctx.font = '800 11.5px Segoe UI, Arial';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'bottom';
-    ctx.fillText('μ = 1.9091', mx, lineY - 12);
-
-    // sigma marker
-    const sx = xOf(mu + sigma);
-    ctx.fillStyle = '#dc2626';
-    ctx.beginPath();
-    ctx.arc(sx, lineY, 6, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#b91c1c';
-    ctx.font = '800 11.5px Segoe UI, Arial';
-    ctx.textBaseline = 'bottom';
-    ctx.fillText('μ+σ = ' + (mu + sigma).toFixed(4), sx, lineY - 12);
-
-    // sigma arrow from mu to mu+sigma
-    ctx.strokeStyle = '#dc2626';
-    ctx.lineWidth = 2;
-    arrow(ctx, mx, lineY - 34, sx, lineY - 34, 7);
-    ctx.fillStyle = '#dc2626';
-    ctx.font = '800 12px Segoe UI, Arial';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'bottom';
-    ctx.fillText('σ = ' + sigma.toFixed(4), (mx + sx) / 2, lineY - 38);
-
-    // ---------- Right: option comparison bars ----------
-    const barTop = 178;
-    const barH = 22;
-    const gap = 13;
-    const labelW = 30;
-    const valularMax = 2.3;
-    const barMaxW = plotW - labelW - 72;
-
-    ctx.fillStyle = '#0f172a';
-    ctx.font = '800 12.5px Segoe UI, Arial';
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'bottom';
-    ctx.fillText('Which option matches σ ≈ ' + rounded + ' ?', padL, barTop - 6);
-
-    options.forEach((opt, i) => {
-      const y = barTop + i * (barH + gap);
-      const bw = (opt.value / valularMax) * barMaxW;
-
-      // label
-      ctx.fillStyle = '#334155';
-      ctx.font = '800 12.5px Segoe UI, Arial';
-      ctx.textAlign = 'left';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(opt.label, padL, y + barH / 2);
-
-      // bar
-      const isClose = Math.abs(opt.value - sigma) < 0.03;
-      const grad = ctx.createLinearGradient(padL + labelW, y, padL + labelW + bw, y);
-      if (isClose) {
-        grad.addColorStop(0, '#34d399');
-        grad.addColorStop(1, '#059669');
-      } else {
-        grad.addColorStop(0, '#cbd5e1');
-        grad.addColorStop(1, '#94a3b8');
+    // deviation arrows (step 4)
+    if(step>=4){
+      ctx.strokeStyle = '#16a34a'; ctx.lineWidth = 2;
+      ctx.font='12px Segoe UI, sans-serif'; ctx.textAlign='center'; ctx.textBaseline='bottom';
+      for(let i=0;i<5;i++){
+        const x = xPix(i);
+        const yTop = yPix(freqs[i]);
+        const yMean = yPix(mean);
+        const yBase = bottom; // base
+        // draw double arrow between bar top and mean height (clamped)
+        const yA = Math.min(yTop, yMean);
+        const yB = Math.max(yTop, yMean);
+        if(Math.abs(freqs[i]-mean) > 0.05){
+          ctx.beginPath();
+          ctx.moveTo(x, yA+4); ctx.lineTo(x, yB-4);
+          ctx.stroke();
+          // small ticks
+          ctx.beginPath();
+          ctx.moveTo(x-5, yA+4); ctx.lineTo(x+5, yA+4);
+          ctx.moveTo(x-5, yB-4); ctx.lineTo(x+5, yB-4);
+          ctx.stroke();
+        }
       }
-      ctx.fillStyle = grad;
-      roundRect(ctx, padL + labelW, y, bw, barH, 6);
-      ctx.fill();
-      ctx.strokeStyle = isClose ? '#047857' : '#94a3b8';
-      ctx.lineWidth = 1.3;
-      ctx.stroke();
+    }
 
-      // value
-      ctx.fillStyle = isClose ? '#065f46' : '#475569';
-      ctx.font = '800 12px Segoe UI, Arial';
-      ctx.textAlign = 'left';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(opt.value.toFixed(2), padL + labelW + bw + 9, y + barH / 2);
+    // readout
+    const txt = {
+      1: 'Step 1 — Read the chart: $x=0,1,2,3,4$ with frequencies $2,8,4,6,2$.',
+      2: 'Step 2 — Total girls: $n=\\sum f = 2+8+4+6+2 = 22$.',
+      3: 'Step 3 — Mean: $\\sum fx = 42$, $\\mu = 42/22 = 21/11 \\approx 1.91$ (red dashed line).',
+      4: 'Step 4 — Squared deviations $\\sum f(x-\\mu)^2$ give variance $164/121 \\approx 1.3554$.',
+      5: 'Step 5 — Standard deviation $= \\sqrt{164/121} \\approx 1.16$ (to 2 d.p.).'
+    }[step] || '';
+    ro.innerHTML = txt;
+    if(window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([ro]).catch(()=>{});
+  }
 
-      if (isClose) {
-        ctx.fillStyle = '#047857';
-        ctx.font = '800 12px Segoe UI, Arial';
-        ctx.textAlign = 'right';
-        ctx.fillText('✓ BEST MATCH', w - padR, y + barH / 2);
+  // scroll sync
+  let current = 1;
+  const io = new IntersectionObserver(es=>{
+    es.forEach(e=>{
+      if(e.isIntersecting){
+        current = +e.target.dataset.step;
+        document.querySelectorAll('.step').forEach(s=>s.classList.toggle('active', +s.dataset.step===current));
+        draw(current);
       }
     });
+  }, {rootMargin:'-25% 0px -55% 0px', threshold:0});
+  document.querySelectorAll('.step').forEach(s=>io.observe(s));
 
-    // readouts
-    const dpNames = ['0 d.p.', '1 d.p.', '2 d.p.', '3 d.p.', '4 d.p.'];
-    roundOut.textContent = dpNames[dp];
-    sdOut.textContent = 'σ ≈ ' + sigma.toFixed(Math.max(dp, 6)) + '  →  ' + rounded;
-  }
-
-  slider.addEventListener('input', draw);
-  toggle.addEventListener('change', draw);
-  window.addEventListener('resize', draw);
-  draw();
+  draw(1);
+  window.addEventListener('resize', ()=>draw(current));
 })();
-
-/* ============================================================
-   STEP-BY-STEP REVEAL
-   ============================================================ */
-document.querySelectorAll('.reveal-row').forEach(row => {
-  const btn = row.querySelector('button[data-target]');
-  const counter = row.querySelector('.counter');
-  const container = document.getElementById(btn.dataset.target);
-  const steps = Array.from(container.querySelectorAll('.step'));
-  let idx = 0;
-
-  function refresh() {
-    if (counter) counter.textContent = idx + ' / ' + steps.length;
-    if (idx >= steps.length) {
-      btn.disabled = true;
-      btn.textContent = 'All steps revealed ✓';
-    } else {
-      btn.disabled = false;
-      btn.textContent = 'Next step →';
-    }
-  }
-
-  btn.addEventListener('click', () => {
-    if (idx < steps.length) {
-      steps[idx].classList.add('visible');
-      idx++;
-      refresh();
-      if (window.MathJax && MathJax.typesetPromise) {
-        MathJax.typesetPromise([steps[idx - 1]]).catch(() => {});
-      }
-      const top = steps[idx - 1].getBoundingClientRect().top + window.scrollY - 70;
-      window.scrollTo({ top, behavior: 'smooth' });
-    }
-  });
-
-  refresh();
-});
-
-/* Re-layout canvases when fonts/layout settle */
-window.addEventListener('load', () => {
-  setTimeout(() => window.dispatchEvent(new Event('resize')), 220);
-});
 </script>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
-
 </body>
 </html>

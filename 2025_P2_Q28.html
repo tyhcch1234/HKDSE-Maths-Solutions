@@ -3,371 +3,507 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HKDSE Math 2025 Paper 2 Q28 – Expected Value</title>
-<script src="https://cdn.tailwindcss.com"></script>
+<title>HKDSE 2025 P2 Q28 — Expected Number of Tokens</title>
 <script>
-  window.MathJax = {
-    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
-    svg: { fontCache: 'global' }
-  };
+window.MathJax = {
+  tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+  svg: { fontCache: 'global' }
+};
 </script>
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script"></script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
-  html { scroll-behavior: smooth; }
-  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
-  .card { transition: box-shadow .25s ease, transform .25s ease; }
-  .card:hover { box-shadow: 0 12px 30px -10px rgba(37,99,235,.25); }
-  .step-body { max-height: 0; overflow: hidden; transition: max-height .45s ease, opacity .35s ease; opacity: 0; }
-  .step-body.open { max-height: 1200px; opacity: 1; }
-  .chevron { transition: transform .3s ease; }
-  .chevron.open { transform: rotate(180deg); }
-  .bar-seg { transition: height .8s cubic-bezier(.22,1,.36,1); }
-  .fade-in { animation: fadeIn .5s ease both; }
-  @keyframes fadeIn { from { opacity:0; transform: translateY(8px);} to { opacity:1; transform: translateY(0);} }
-  .glow-ring { box-shadow: 0 0 0 3px rgba(59,130,246,.4); }
+  :root{
+    --bg:#f4f6fb;
+    --card:#ffffff;
+    --ink:#1e2430;
+    --muted:#5c677a;
+    --line:#dfe4ee;
+    --blue:#2563eb;
+    --green:#16a34a;
+    --orange:#ea580c;
+    --purple:#7c3aed;
+    --pink:#db2777;
+    --teal:#0d9488;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+    background:linear-gradient(180deg,#eef2fa 0%,#f7f9fd 100%);
+    color:var(--ink);
+    font-size:16px;
+    line-height:1.55;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:18px 16px 60px;}
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start;}
+  @media(min-width:900px){.split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}}
+  @media(max-width:640px){body{font-size:14.5px;}.wrap{padding:10px 8px 40px;}}
+
+  .diagram{position:sticky;top:16px;max-height:calc(100vh - 2rem);overflow-y:auto;}
+  .panel{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    box-shadow:0 6px 20px rgba(30,40,70,.06);
+    padding:14px 16px;
+  }
+  .panel h2{
+    margin:0 0 10px;
+    font-size:1.02rem;
+    letter-spacing:.02em;
+    color:var(--muted);
+    text-transform:uppercase;
+    font-weight:700;
+  }
+  canvas{width:100%;height:auto;display:block;border-radius:10px;}
+  .ro{
+    margin:8px 0 0;
+    font-size:.9rem;
+    color:var(--muted);
+    background:#f8fafc;
+    border:1px dashed var(--line);
+    border-radius:8px;
+    padding:8px 10px;
+    min-height:2.6em;
+  }
+  .ro b{color:var(--ink);}
+
+  .qhead{
+    display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+    margin-bottom:8px;
+  }
+  .badge{
+    background:var(--blue);color:#fff;font-weight:700;
+    font-size:.78rem;padding:3px 9px;border-radius:999px;letter-spacing:.03em;
+  }
+  .badge.grey{background:#64748b;}
+  .qtext{font-size:1.02rem;}
+  .qtable{
+    border-collapse:collapse;width:100%;margin:10px 0 4px;font-size:.95rem;
+  }
+  .qtable th,.qtable td{border:1px solid #cbd5e1;padding:7px 8px;text-align:center;}
+  .qtable th{background:#eef2ff;color:#1e293b;font-weight:700;}
+  .qtable td.num2{background:#e0f2fe;}
+  .qtable td.num3{background:#dcfce7;}
+  .qtable td.num4{background:#fef3c7;}
+  .qtable td.num5{background:#fce7f3;}
+
+  .step{
+    border-left:5px solid var(--blue);
+    background:#fbfcff;
+    border-radius:0 10px 10px 0;
+    padding:10px 12px 10px 14px;
+    margin:12px 0;
+    transition:background .25s, box-shadow .25s, border-color .25s;
+  }
+  .step:hover{background:#f4f7ff;}
+  .step .tag{
+    display:inline-flex;align-items:center;gap:7px;
+    font-weight:800;color:var(--blue);margin-bottom:4px;font-size:.97rem;
+  }
+  .chip{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:22px;height:22px;border-radius:50%;
+    background:var(--blue);color:#fff;font-size:.78rem;font-weight:800;
+  }
+  .s1{border-left-color:#2563eb;} .s1 .tag{color:#2563eb;} .s1 .chip{background:#2563eb;}
+  .s2{border-left-color:#16a34a;} .s2 .tag{color:#16a34a;} .s2 .chip{background:#16a34a;}
+  .s3{border-left-color:#ea580c;} .s3 .tag{color:#ea580c;} .s3 .chip{background:#ea580c;}
+  .s4{border-left-color:#7c3aed;} .s4 .tag{color:#7c3aed;} .s4 .chip{background:#7c3aed;}
+  .hint{
+    font-size:.88rem;color:var(--muted);margin-top:6px;
+    background:#f1f5f9;border-radius:8px;padding:5px 9px;display:inline-block;
+  }
+  .answer{
+    margin-top:16px;
+    border:2px solid var(--green);
+    background:#f0fdf4;
+    border-radius:12px;
+    padding:12px 14px;
+    font-size:1.05rem;
+  }
+  .answer b{color:var(--green);}
+  .opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 14px;margin:10px 0 2px;}
+  .opt{
+    border:1px solid var(--line);border-radius:9px;padding:6px 10px;background:#fff;
+    font-size:.95rem;
+  }
+  .opt.correct{border-color:var(--green);background:#f0fdf4;font-weight:700;}
+  .opt span.k{display:inline-block;width:1.4em;font-weight:700;color:var(--muted);}
+  .opt.correct span.k{color:var(--green);}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;font-size:.85rem;color:var(--muted);}
+  .legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px;}
 </style>
 </head>
-<body class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 min-h-screen text-slate-800">
+<body>
+<div class="wrap">
+  <div class="split">
 
-<!-- Header -->
-<header class="bg-gradient-to-r from-blue-700 via-indigo-700 to-violet-700 text-white shadow-lg">
-  <div class="max-w-4xl mx-auto px-4 py-6 sm:py-8">
-    <p class="text-blue-200 text-xs sm:text-sm font-semibold tracking-widest uppercase">HKDSE Mathematics 2025 · Paper 2</p>
-    <h1 class="text-2xl sm:text-3xl font-bold mt-1">Question 28 · Expected Value</h1>
-    <div class="flex flex-wrap gap-2 mt-4">
-      <span class="bg-white/20 backdrop-blur text-xs sm:text-sm px-3 py-1 rounded-full">Probability</span>
-      <span class="bg-white/20 backdrop-blur text-xs sm:text-sm px-3 py-1 rounded-full">Expected Value</span>
-      <span class="bg-white/20 backdrop-blur text-xs sm:text-sm px-3 py-1 rounded-full">Discrete Random Variable</span>
+    <!-- LEFT: DIAGRAM -->
+    <div class="diagram">
+      <div class="panel">
+        <h2>Interactive Diagram</h2>
+        <canvas id="cv" width="640" height="720"></canvas>
+        <p class="ro" id="ro"></p>
+        <div class="legend">
+          <span><i style="background:#2563eb"></i>Cards in box</span>
+          <span><i style="background:#16a34a"></i>Probability</span>
+          <span><i style="background:#ea580c"></i>Tokens</span>
+          <span><i style="background:#7c3aed"></i>Expectation</span>
+        </div>
+      </div>
     </div>
+
+    <!-- RIGHT: QUESTION + SOLUTION -->
+    <div>
+      <div class="panel">
+        <div class="qhead">
+          <span class="badge">HKDSE 2025 · Paper 2</span>
+          <span class="badge grey">Q28</span>
+          <span class="badge grey">Probability</span>
+        </div>
+
+        <div class="qtext">
+          <p>A box contains six cards numbered $2,2,2,3,4$ and $5$ respectively. In a game, a number is randomly drawn from the box and a certain number of tokens will be got according to the following table:</p>
+
+          <table class="qtable">
+            <tr>
+              <th>Number drawn</th>
+              <td class="num2">$2$</td>
+              <td class="num3">$3$</td>
+              <td class="num4">$4$</td>
+              <td class="num5">$5$</td>
+            </tr>
+            <tr>
+              <th>Number of tokens got</th>
+              <td class="num2">$10$</td>
+              <td class="num3">$15$</td>
+              <td class="num4">$25$</td>
+              <td class="num5">$50$</td>
+            </tr>
+          </table>
+
+          <p style="margin-top:12px;"><strong>Find the expected number of tokens got in the game.</strong></p>
+          <div class="opts">
+            <div class="opt"><span class="k">A.</span> $3$</div>
+            <div class="opt"><span class="k">B.</span> $4$</div>
+            <div class="opt correct"><span class="k">C.</span> $20$</div>
+            <div class="opt"><span class="k">D.</span> $25$</div>
+          </div>
+        </div>
+      </div>
+
+      
+
+      <div class="panel" style="margin-top:14px;">
+        <h2>Step-by-step Solution</h2>
+
+        <div class="step s1" data-step="1">
+          <div class="tag"><span class="chip">1</span>Find the probability of drawing each number</div>
+          <p>The box has $6$ cards in total: three cards show $2$, one card shows $3$, one card shows $4$, one card shows $5$.</p>
+          <p>$$P(2)=\frac{3}{6},\quad P(3)=\frac{1}{6},\quad P(4)=\frac{1}{6},\quad P(5)=\frac{1}{6}$$</p>
+          <span class="hint">Probability = (number of favourable cards) ÷ (total cards) = $\dfrac{n}{6}$.</span>
+        </div>
+
+        <div class="step s2" data-step="2">
+          <div class="tag"><span class="chip">2</span>List each outcome with its token value</div>
+          <p>From the table:</p>
+          <p>$$\text{Number }2 \to 10 \text{ tokens},\quad \text{Number }3 \to 15 \text{ tokens},$$</p>
+          <p>$$\text{Number }4 \to 25 \text{ tokens},\quad \text{Number }5 \to 50 \text{ tokens}$$</p>
+          <span class="hint">The token values depend on which card is drawn.</span>
+        </div>
+
+        <div class="step s3" data-step="3">
+          <div class="tag"><span class="chip">3</span>Apply the expectation formula</div>
+          <p>Expected value is the sum of (probability × value) over all outcomes:</p>
+          <p>$$\begin{aligned}
+          E
+          &amp;= P(2)\times 10 + P(3)\times 15 + P(4)\times 25 + P(5)\times 50 \\[4pt]
+          &amp;= \frac{3}{6}\times 10 + \frac{1}{6}\times 15 + \frac{1}{6}\times 25 + \frac{1}{6}\times 50
+          \end{aligned}$$</p>
+          <span class="hint">Each term = probability of that card × tokens for that card.</span>
+        </div>
+
+        <div class="step s4" data-step="4">
+          <div class="tag"><span class="chip">4</span>Compute the sum</div>
+          <p>$$\begin{aligned}
+          E
+          &amp;= \frac{30}{6} + \frac{15}{6} + \frac{25}{6} + \frac{50}{6} \\[4pt]
+          &amp;= \frac{30+15+25+50}{6} \\[4pt]
+          &amp;= \frac{120}{6} \\[4pt]
+          &amp;= 20
+          \end{aligned}$$</p>
+          <span class="hint">Combine the numerators over the common denominator $6$.</span>
+        </div>
+
+        <div class="answer">
+          <b>Answer: C.&nbsp;20</b>
+        </div>
+      </div>
+    </div>
+
   </div>
-</header>
-
-<main class="max-w-4xl mx-auto px-4 py-8 space-y-8">
-
-  <!-- Question Overview -->
-  <section class="bg-white rounded-2xl shadow-md p-5 sm:p-7 card">
-    <h2 class="text-lg font-bold text-indigo-800 flex items-center gap-2 mb-3">
-      <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 text-sm font-bold">Q</span>
-      Question
-    </h2>
-    <p class="leading-relaxed">
-      A box contains six cards numbered <strong>2, 2, 2, 3, 4 and 5</strong> respectively. In a game,
-      a number is randomly drawn from the box and a certain number of tokens will be got
-      according to the following table:
-    </p>
-
-    <!-- Table -->
-    <div class="mt-5 overflow-x-auto">
-      <table class="w-full text-center border-collapse rounded-xl overflow-hidden shadow-sm">
-        <thead>
-          <tr class="bg-indigo-600 text-white">
-            <th class="py-3 px-3 text-sm sm:text-base font-semibold border border-indigo-500">Number drawn</th>
-            <th class="py-3 px-3 text-sm sm:text-base font-semibold border border-indigo-500">2</th>
-            <th class="py-3 px-3 text-sm sm:text-base font-semibold border border-indigo-500">3</th>
-            <th class="py-3 px-3 text-sm sm:text-base font-semibold border border-indigo-500">4</th>
-            <th class="py-3 px-3 text-sm sm:text-base font-semibold border border-indigo-500">5</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr class="bg-white text-slate-700">
-            <td class="py-3 px-3 border border-slate-200 font-medium bg-indigo-50">Number of tokens got</td>
-            <td class="py-3 px-3 border border-slate-200 font-bold text-blue-700">10</td>
-            <td class="py-3 px-3 border border-slate-200 font-bold text-blue-700">15</td>
-            <td class="py-3 px-3 border border-slate-200 font-bold text-blue-700">25</td>
-            <td class="py-3 px-3 border border-slate-200 font-bold text-blue-700">50</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <p class="mt-5 font-semibold">Find the expected number of tokens got in the game.</p>
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
-      <div class="border-2 border-slate-200 rounded-xl py-3 text-center font-semibold text-slate-600">A. 3</div>
-      <div class="border-2 border-slate-200 rounded-xl py-3 text-center font-semibold text-slate-600">B. 4</div>
-      <div id="optionC" class="border-2 border-slate-200 rounded-xl py-3 text-center font-semibold text-slate-600">C. 20</div>
-      <div class="border-2 border-slate-200 rounded-xl py-3 text-center font-semibold text-slate-600">D. 25</div>
-    </div>
-  </section>
-
-  <!-- Interactive demo -->
-  <section class="bg-white rounded-2xl shadow-md p-5 sm:p-7 card">
-    <h2 class="text-lg font-bold text-indigo-800 flex items-center gap-2 mb-2">
-      <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 text-sm font-bold">1</span>
-      Visualise the Probabilities
-    </h2>
-    <p class="text-sm text-slate-600 mb-5">
-      There are <strong>6 cards</strong> in total. The height of each bar shows the probability
-      \(P(\text{number drawn})\). Press <em>Draw a card</em> to see a random outcome.
-    </p>
-
-    <!-- Bar chart -->
-    <div class="flex items-end justify-around gap-3 h-48 sm:h-56 bg-slate-50 rounded-xl p-4">
-      <div class="flex flex-col items-center w-16">
-        <span class="text-xs font-bold text-blue-700 mb-1" id="p2">3/6</span>
-        <div class="w-full bg-gradient-to-t from-blue-500 to-blue-400 rounded-t-lg bar-seg" style="height:0%" data-h="100%"></div>
-        <span class="text-sm font-bold mt-2">2</span>
-        <span class="text-[10px] text-slate-500">10 tokens</span>
-      </div>
-      <div class="flex flex-col items-center w-16">
-        <span class="text-xs font-bold text-blue-700 mb-1" id="p3">1/6</span>
-        <div class="w-full bg-gradient-to-t from-indigo-500 to-indigo-400 rounded-t-lg bar-seg" style="height:0%" data-h="33.33%"></div>
-        <span class="text-sm font-bold mt-2">3</span>
-        <span class="text-[10px] text-slate-500">15 tokens</span>
-      </div>
-      <div class="flex flex-col items-center w-16">
-        <span class="text-xs font-bold text-blue-700 mb-1" id="p4">1/6</span>
-        <div class="w-full bg-gradient-to-t from-violet-500 to-violet-400 rounded-t-lg bar-seg" style="height:0%" data-h="33.33%"></div>
-        <span class="text-sm font-bold mt-2">4</span>
-        <span class="text-[10px] text-slate-500">25 tokens</span>
-      </div>
-      <div class="flex flex-col items-center w-16">
-        <span class="text-xs font-bold text-blue-700 mb-1" id="p5">1/6</span>
-        <div class="w-full bg-gradient-to-t from-fuchsia-500 to-fuchsia-400 rounded-t-lg bar-seg" style="height:0%" data-h="33.33%"></div>
-        <span class="text-sm font-bold mt-2">5</span>
-        <span class="text-[10px] text-slate-500">50 tokens</span>
-      </div>
-    </div>
-
-    <!-- Draw simulation -->
-    <div class="mt-5 flex flex-col sm:flex-row items-center gap-4 justify-between">
-      <button id="drawBtn" class="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold px-6 py-3 rounded-xl shadow-md active:scale-95 transition">
-        🎲 Draw a card
-      </button>
-      <div id="drawResult" class="text-center sm:text-right text-sm text-slate-600 min-h-[2.5rem] flex items-center justify-center sm:justify-end">
-        Press the button to simulate a draw.
-      </div>
-    </div>
-  </section>
-
-  <!-- Step-by-step solution -->
-  <section class="bg-white rounded-2xl shadow-md p-5 sm:p-7 card">
-    <h2 class="text-lg font-bold text-indigo-800 flex items-center gap-2 mb-4">
-      <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 text-sm font-bold">2</span>
-      Step-by-Step Solution
-    </h2>
-
-    <div class="space-y-3">
-
-      <!-- Step 1 -->
-      <div class="border border-slate-200 rounded-xl overflow-hidden">
-        <button class="step-toggle w-full flex items-center justify-between gap-3 px-4 py-3 bg-slate-50 hover:bg-slate-100 text-left transition">
-          <span class="font-semibold text-slate-800"><span class="text-indigo-600 font-bold mr-2">Step 1</span>Understand the random variable</span>
-          <svg class="chevron w-5 h-5 text-slate-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
-        </button>
-        <div class="step-body px-4">
-          <div class="py-4 text-slate-700 leading-relaxed text-sm sm:text-base">
-            Let \(X\) be the number of tokens obtained. The possible values of \(X\) are
-            \(10,\ 15,\ 25,\ 50\), each corresponding to the drawn number \(2,\ 3,\ 4,\ 5\).
-            <div class="mt-3 bg-blue-50 border-l-4 border-blue-400 rounded-r-lg p-3 text-sm">
-              <strong class="text-blue-800">💡 Hint:</strong> Expected value \(E(X)=\sum x\,P(X=x)\),
-              so we need the probability of drawing each number first.
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Step 2 -->
-      <div class="border border-slate-200 rounded-xl overflow-hidden">
-        <button class="step-toggle w-full flex items-center justify-between gap-3 px-4 py-3 bg-slate-50 hover:bg-slate-100 text-left transition">
-          <span class="font-semibold text-slate-800"><span class="text-indigo-600 font-bold mr-2">Step 2</span>Find the probability of each number</span>
-          <svg class="chevron w-5 h-5 text-slate-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
-        </button>
-        <div class="step-body px-4">
-          <div class="py-4 text-slate-700 text-sm sm:text-base">
-            <p>Six cards exist, so the denominator is always <strong>6</strong>. Count how many cards carry each number:</p>
-            <div class="overflow-x-auto mt-3">
-              <table class="w-full text-center border-collapse text-sm rounded-lg overflow-hidden">
-                <thead><tr class="bg-slate-100 text-slate-700">
-                  <th class="py-2 px-3 border border-slate-200">Number</th>
-                  <th class="py-2 px-3 border border-slate-200">2</th>
-                  <th class="py-2 px-3 border border-slate-200">3</th>
-                  <th class="py-2 px-3 border border-slate-200">4</th>
-                  <th class="py-2 px-3 border border-slate-200">5</th>
-                </tr></thead>
-                <tbody>
-                  <tr><td class="py-2 px-3 border border-slate-200 font-medium bg-slate-50">Frequency</td>
-                    <td class="py-2 px-3 border border-slate-200">3</td>
-                    <td class="py-2 px-3 border border-slate-200">1</td>
-                    <td class="py-2 px-3 border border-slate-200">1</td>
-                    <td class="py-2 px-3 border border-slate-200">1</td></tr>
-                  <tr><td class="py-2 px-3 border border-slate-200 font-medium bg-slate-50">Probability</td>
-                    <td class="py-2 px-3 border border-slate-200 text-blue-700 font-bold">\(\frac{3}{6}\)</td>
-                    <td class="py-2 px-3 border border-slate-200 text-blue-700 font-bold">\(\frac{1}{6}\)</td>
-                    <td class="py-2 px-3 border border-slate-200 text-blue-700 font-bold">\(\frac{1}{6}\)</td>
-                    <td class="py-2 px-3 border border-slate-200 text-blue-700 font-bold">\(\frac{1}{6}\)</td></tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="mt-3 bg-amber-50 border-l-4 border-amber-400 rounded-r-lg p-3 text-sm">
-              <strong class="text-amber-800">⚠️ Common trap:</strong> The probability of drawing 2 is
-              \(\frac{3}{6}\), <em>not</em> \(\frac{1}{6}\), because there are three identical “2” cards.
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Step 3 -->
-      <div class="border border-slate-200 rounded-xl overflow-hidden">
-        <button class="step-toggle w-full flex items-center justify-between gap-3 px-4 py-3 bg-slate-50 hover:bg-slate-100 text-left transition">
-          <span class="font-semibold text-slate-800"><span class="text-indigo-600 font-bold mr-2">Step 3</span>Apply the expectation formula</span>
-          <svg class="chevron w-5 h-5 text-slate-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
-        </button>
-        <div class="step-body px-4">
-          <div class="py-4 text-slate-700 text-sm sm:text-base">
-            \[
-            \begin{aligned}
-            E(X) &= P(2)\times 10 + P(3)\times 15 + P(4)\times 25 + P(5)\times 50 \\[4pt]
-                 &= \frac{3}{6}\times 10 + \frac{1}{6}\times 15 + \frac{1}{6}\times 25 + \frac{1}{6}\times 50
-            \end{aligned}
-            \]
-            <div class="mt-3 bg-blue-50 border-l-4 border-blue-400 rounded-r-lg p-3 text-sm">
-              <strong class="text-blue-800">💡 Hint:</strong> Multiply each outcome by its probability,
-              then sum. Each term is a “weighted” contribution of the tokens.
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Step 4 -->
-      <div class="border border-slate-200 rounded-xl overflow-hidden">
-        <button class="step-toggle w-full flex items-center justify-between gap-3 px-4 py-3 bg-slate-50 hover:bg-slate-100 text-left transition">
-          <span class="font-semibold text-slate-800"><span class="text-indigo-600 font-bold mr-2">Step 4</span>Simplify the arithmetic</span>
-          <svg class="chevron w-5 h-5 text-slate-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
-        </button>
-        <div class="step-body px-4">
-          <div class="py-4 text-slate-700 text-sm sm:text-base">
-            \[
-            \begin{aligned}
-            E(X) &= 5 + 2.5 + \frac{25}{6} + \frac{50}{6} \\[4pt]
-                 &= 5 + 2.5 + \frac{75}{6} \\[4pt]
-                 &= 5 + 2.5 + 12.5 = 20
-            \end{aligned}
-            \]
-            Alternatively, keep the common denominator 6:
-            \[
-            E(X)=\frac{1}{6}(30+15+25+50)=\frac{120}{6}=20
-            \]
-          </div>
-        </div>
-      </div>
-
-      <!-- Step 5 -->
-      <div class="border border-emerald-200 rounded-xl overflow-hidden bg-emerald-50/40">
-        <button class="step-toggle w-full flex items-center justify-between gap-3 px-4 py-3 bg-emerald-50 hover:bg-emerald-100 text-left transition">
-          <span class="font-semibold text-emerald-800"><span class="text-emerald-600 font-bold mr-2">Answer</span>Conclusion</span>
-          <svg class="chevron w-5 h-5 text-emerald-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
-        </button>
-        <div class="step-body px-4">
-          <div class="py-4 text-slate-700 text-sm sm:text-base">
-            The expected number of tokens got in the game is
-            \[ \boxed{E(X) = 20} \]
-            Therefore the correct option is <strong class="text-emerald-700">C</strong>.
-          </div>
-        </div>
-      </div>
-
-    </div>
-
-    <div class="mt-5 text-center">
-      <button id="expandAll" class="text-sm text-indigo-600 hover:text-indigo-800 font-semibold underline underline-offset-2">Expand / Collapse all steps</button>
-    </div>
-  </section>
-
-  <!-- Quick recap -->
-  <section class="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-2xl border border-indigo-100 p-5 sm:p-6">
-    <h3 class="font-bold text-indigo-800 mb-2">📌 Quick Recap</h3>
-    <ul class="text-sm sm:text-base text-slate-700 space-y-1.5 list-disc list-inside">
-      <li>Expected value of a discrete random variable: \(E(X)=\sum x\,P(X=x)\).</li>
-      <li>Probability = (# favourable cards) ÷ (total cards) — repeated numbers increase the probability.</li>
-      <li>Always check the total: \(3+1+1+1=6\), so the probabilities sum to 1.</li>
-    </ul>
-  </section>
-
-</main>
-
-<footer class="text-center text-xs text-slate-400 py-6">
-  HKDSE Mathematics 2025 · Paper 2 Q28 · Interactive Solution
-</footer>
+</div>
 
 <script>
-  // ---- Accordion ----
-  document.querySelectorAll('.step-toggle').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const body = btn.nextElementSibling;
-      const chevron = btn.querySelector('.chevron');
-      body.classList.toggle('open');
-      chevron.classList.toggle('open');
-    });
-  });
+(function(){
+  var cv = document.getElementById('cv');
+  var ctx = cv.getContext('2d');
+  var ro = document.getElementById('ro');
 
-  document.getElementById('expandAll').addEventListener('click', () => {
-    const bodies = document.querySelectorAll('.step-body');
-    const anyClosed = [...bodies].some(b => !b.classList.contains('open'));
-    bodies.forEach(b => {
-      b.classList.toggle('open', anyClosed);
-      b.previousElementSibling.querySelector('.chevron').classList.toggle('open', anyClosed);
-    });
-  });
+  var W = cv.width, H = cv.height;
 
-  // ---- Bar chart animation ----
-  window.addEventListener('load', () => {
-    setTimeout(() => {
-      document.querySelectorAll('.bar-seg').forEach(b => {
-        b.style.height = b.dataset.h;
-      });
-    }, 250);
-  });
+  // Colours per number
+  var COL = {2:'#2563eb', 3:'#16a34a', 4:'#ea580c', 5:'#db2777'};
 
-  // ---- Draw simulation ----
-  const cards = [2,2,2,3,4,5]; // 3 twos, one 3, one 4, one 5
-  const tokenMap = {2:10, 3:15, 4:25, 5:50};
-  const drawBtn = document.getElementById('drawBtn');
-  const drawResult = document.getElementById('drawResult');
-
-  function draw() {
-    const idx = Math.floor(Math.random() * cards.length);
-    const num = cards[idx];
-    const tok = tokenMap[num];
-    drawResult.innerHTML = '';
-    const span = document.createElement('span');
-    span.className = 'fade-in inline-block bg-blue-100 text-blue-800 px-4 py-2 rounded-full font-semibold shadow-sm';
-    span.innerHTML = `Card drawn: <strong>${num}</strong> → you get <strong>${tok}</strong> tokens`;
-    drawResult.appendChild(span);
+  function roundRect(c,x,y,w,h,r){
+    c.beginPath();
+    c.moveTo(x+r,y);
+    c.arcTo(x+w,y,x+w,y+h,r);
+    c.arcTo(x+w,y+h,x,y+h,r);
+    c.arcTo(x,y+h,x,y,r);
+    c.arcTo(x,y,x+w,y,r);
+    c.closePath();
   }
 
-  drawBtn.addEventListener('click', draw);
-</script>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
+  function text(c,s,x,y,font,color,align){
+    c.font = font || '600 16px "Segoe UI",sans-serif';
+    c.fillStyle = color || '#1e2430';
+    c.textAlign = align || 'left';
+    c.textBaseline = 'middle';
+    c.fillText(s,x,y);
+  }
 
+  function draw(step){
+    step = step || 1;
+    ctx.clearRect(0,0,W,H);
+
+    // background
+    var g = ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,'#ffffff');
+    g.addColorStop(1,'#f7f9fd');
+    ctx.fillStyle = g;
+    ctx.fillRect(0,0,W,H);
+
+    // -------- Title --------
+    text(ctx,'Box of 6 Cards → Tokens',W/2,26,'700 18px "Segoe UI",sans-serif','#1e293b','center');
+
+    // -------- Section 1: The box of cards --------
+    var boxY = 48, boxH = 118;
+    ctx.strokeStyle = '#cbd5e1';
+    ctx.lineWidth = 2;
+    roundRect(ctx,20,boxY,W-40,boxH,14);
+    ctx.stroke();
+    ctx.fillStyle = '#f8fafc';
+    ctx.fill();
+
+    text(ctx,'Inside the box (6 cards)',36,boxY+18,'700 14px "Segoe UI",sans-serif','#5c677a','left');
+
+    var cards = [2,2,2,3,4,5];
+    var cw = (W-96)/6;
+    var ch = cw*1.35;
+    var cy0 = boxY + 34;
+    var activeSet = [];
+    if(step>=1){ activeSet = [2,3,4,5]; } // show probabilities
+    var counts = {2:3,3:1,4:1,5:1};
+
+    for(var i=0;i<6;i++){
+      var v = cards[i];
+      var x = 48 + i*(cw+6);
+      var y = cy0;
+      var isActive = (step>=1);
+      ctx.save();
+      if(isActive){
+        ctx.shadowColor = COL[v]+'66';
+        ctx.shadowBlur = 10;
+      }
+      roundRect(ctx,x,y,cw,ch,8);
+      ctx.fillStyle = isActive ? COL[v] : '#e2e8f0';
+      ctx.fill();
+      ctx.restore();
+      roundRect(ctx,x,y,cw,ch,8);
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = isActive ? '#ffffff' : '#cbd5e1';
+      ctx.stroke();
+
+      text(ctx,String(v),x+cw/2,y+ch/2,'800 '+Math.round(cw*0.62)+'px "Segoe UI",sans-serif', isActive ? '#ffffff' : '#64748b','center');
+    }
+
+    // -------- Section 2: Probability column --------
+    var probY = boxY + boxH + 22;
+    text(ctx,'Step 1  ·  Probability = favourable ÷ 6',20,probY,'700 14px "Segoe UI",sans-serif', step>=1?'#2563eb':'#94a3b8','left');
+
+    var nums = [2,3,4,5];
+    var tokens = {2:10,3:15,4:25,5:50};
+    var probs = {2:'3/6',3:'1/6',4:'1/6',5:'1/6'};
+    var pnum = {2:3,3:1,4:1,5:1};
+
+    var rowH = 58;
+    var tableX = 30, tableW = W-60;
+    var colW = (tableW-90)/4;
+    var tY = probY + 16;
+
+    // header row
+    ctx.fillStyle = '#eef2ff';
+    roundRect(ctx,tableX,tY,tableW,26,6);
+    ctx.fill();
+    text(ctx,'Card value',tableX+8,tY+13,'700 12px "Segoe UI",sans-serif','#334155','left');
+    for(var j=0;j<4;j++){
+      var vv = nums[j];
+      text(ctx,String(vv),tableX+90+j*colW+colW/2,tY+13,'700 13px "Segoe UI",sans-serif',COL[vv],'center');
+    }
+
+    // probability row
+    var r1 = tY+26;
+    var active1 = step>=1;
+    for(var j=0;j<4;j++){
+      var vv = nums[j];
+      var x0 = tableX+90+j*colW;
+      ctx.save();
+      ctx.globalAlpha = active1 ? 1 : 0.28;
+      roundRect(ctx,x0+4,r1+5,colW-8,rowH-10,8);
+      ctx.fillStyle = COL[vv]+'1a';
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = COL[vv];
+      ctx.stroke();
+      text(ctx,probs[vv],x0+colW/2,r1+rowH/2-6,'800 19px "Segoe UI",sans-serif',COL[vv],'center');
+      text(ctx,'P = '+pnum[vv]+'/6',x0+colW/2,r1+rowH/2+16,'600 12px "Segoe UI",sans-serif','#5c677a','center');
+      ctx.restore();
+    }
+    text(ctx,'Probability',tableX+8,r1+rowH/2,'700 12px "Segoe UI",sans-serif','#5c677a','left');
+
+    // tokens row
+    var r2 = r1 + rowH + 10;
+    var active2 = step>=2;
+    text(ctx,'Tokens',tableX+8,r2+rowH/2,'700 12px "Segoe UI",sans-serif', active2?'#ea580c':'#94a3b8','left');
+    for(var j=0;j<4;j++){
+      var vv = nums[j];
+      var x0 = tableX+90+j*colW;
+      ctx.save();
+      ctx.globalAlpha = active2 ? 1 : 0.28;
+      roundRect(ctx,x0+4,r2+5,colW-8,rowH-10,8);
+      ctx.fillStyle = '#fff7ed';
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = '#ea580c';
+      ctx.stroke();
+      text(ctx,String(tokens[vv]),x0+colW/2,r2+rowH/2,'800 19px "Segoe UI",sans-serif','#ea580c','center');
+      ctx.restore();
+    }
+
+    // -------- Section 3: Expectation formula --------
+    var eY = r2 + rowH + 30;
+    text(ctx,'Step 3–4  ·  Expected value  E = Σ P × tokens',20,eY,'700 14px "Segoe UI",sans-serif', step>=3?'#7c3aed':'#94a3b8','left');
+
+    // coloured weighted line
+    var lineY = eY + 28;
+    var products = [
+      {p:'3/6 × 10', v: 3/6*10, col: COL[2]},
+      {p:'1/6 × 15', v: 1/6*15, col: COL[3]},
+      {p:'1/6 × 25', v: 1/6*25, col: COL[4]},
+      {p:'1/6 × 50', v: 1/6*50, col: COL[5]}
+    ];
+
+    var x = 30;
+    var totalW = W - 60;
+    var segs = products.map(function(o){return o.v;});
+    var sumSegs = segs.reduce(function(a,b){return a+b;},0);
+
+    // bar representing total = 20
+    var barH = 34;
+    var accum = 0;
+    for(var i=0;i<4;i++){
+      var wSeg = (segs[i]/sumSegs)*totalW;
+      var bx = 30 + accum;
+      ctx.save();
+      ctx.globalAlpha = step>=3 ? 1 : 0.3;
+      roundRect(ctx,bx+1,lineY,wSeg-2,barH,6);
+      ctx.fillStyle = products[i].col;
+      ctx.fill();
+      ctx.restore();
+      accum += wSeg;
+    }
+    ctx.strokeStyle = '#cbd5e1';
+    ctx.lineWidth = 1.5;
+    roundRect(ctx,30,lineY,totalW,barH,6);
+    ctx.stroke();
+
+    // labels below the bar
+    accum = 0;
+    for(var i=0;i<4;i++){
+      var wSeg = (segs[i]/sumSegs)*totalW;
+      var bx = 30 + accum;
+      if(step>=3){
+        ctx.save();
+        ctx.globalAlpha = 1;
+        text(ctx,products[i].p,bx+wSeg/2,lineY+barH+16,'700 11.5px "Segoe UI",sans-serif',products[i].col,'center');
+        // contribution value
+        text(ctx,products[i].v.toFixed(products[i].v%1===0?0:2),bx+wSeg/2,lineY+barH+32,'600 11px "Segoe UI",sans-serif','#5c677a','center');
+        ctx.restore();
+      }
+      accum += wSeg;
+    }
+
+    // total callout
+    var totY = lineY + barH + 60;
+    ctx.save();
+    ctx.globalAlpha = step>=4 ? 1 : 0.35;
+    roundRect(ctx,30,totY,W-60,52,12);
+    ctx.fillStyle = '#f0fdf4';
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#16a34a';
+    ctx.stroke();
+    text(ctx,'E = 3/6×10 + 1/6×15 + 1/6×25 + 1/6×50',W/2,totY+18,'700 13px "Segoe UI",sans-serif','#166534','center');
+    text(ctx,'= 120 / 6  =  20 tokens',W/2,totY+38,'800 17px "Segoe UI",sans-serif','#16a34a','center');
+    ctx.restore();
+
+    // -------- Highlight ring for current step --------
+    var msg = '';
+    if(step===1){
+      msg = '<b>Step 1:</b> The box has 6 cards — three show <b>2</b>, one each shows <b>3, 4, 5</b>. Probability of each is shown in the coloured cells.';
+    } else if(step===2){
+      msg = '<b>Step 2:</b> Match each card value to its token reward: 2→10, 3→15, 4→25, 5→50 (orange row).';
+    } else if(step===3){
+      msg = '<b>Step 3:</b> Weight each reward by its probability and add — the coloured bar shows how much each term contributes to the total.';
+    } else {
+      msg = '<b>Step 4:</b> Total expectation = 120 ÷ 6 = <b>20</b> tokens. Correct option: <b>C</b>.';
+    }
+    ro.innerHTML = msg;
+  }
+
+  // Initial draw
+  draw(1);
+
+  // Scroll sync
+  var current = 1;
+  var steps = document.querySelectorAll('.step');
+  if('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(es){
+      es.forEach(function(e){
+        if(e.isIntersecting){
+          var n = +e.target.dataset.step;
+          if(n !== current){ current = n; draw(current); }
+        }
+      });
+    }, {rootMargin:'-25% 0px -55% 0px'});
+    steps.forEach(function(s){ io.observe(s); });
+  } else {
+    // fallback: redraw all on scroll
+    window.addEventListener('scroll', function(){
+      var best = 1;
+      steps.forEach(function(s){
+        var r = s.getBoundingClientRect();
+        if(r.top < window.innerHeight*0.6) best = +s.dataset.step;
+      });
+      if(best !== current){ current = best; draw(current); }
+    }, {passive:true});
+  }
+
+  // Re-render on resize (canvas is fixed internal size, just crisper)
+  window.addEventListener('resize', function(){ draw(current); });
+})();
+</script>
 </body>
 </html>

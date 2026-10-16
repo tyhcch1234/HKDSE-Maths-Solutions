@@ -1,418 +1,679 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HKDSE Math 2018 P2 Q43 · Interactive Solution</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2018 P2 Q43 — Probability</title>
+<style>
+  :root{
+    --bg:#f4f7fb;
+    --card:#ffffff;
+    --ink:#1f2937;
+    --ink-soft:#4b5563;
+    --line:#e2e8f0;
+    --j1:#2563eb;   /* John colour */
+    --j2:#1d4ed8;
+    --m1:#e11d48;   /* Mary colour */
+    --m2:#be123c;
+    --six:#059669;  /* number 6 */
+    --one:#d97706;  /* number 1 */
+    --other:#94a3b8;/* other faces */
+    --accent:#7c3aed;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(1200px 600px at 10% -10%, #e0e7ff 0%, transparent 55%),
+      radial-gradient(1000px 500px at 110% 0%, #fce7f3 0%, transparent 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:14px 12px 48px;}
 
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  .split{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    gap:12px;
+    align-items:start;
+  }
+  @media(min-width:900px){
+    .split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}
+  }
+  .diagram{
+    position:sticky;
+    top:16px;
+    max-height:calc(100vh - 2rem);
+    overflow-y:auto;
+  }
+  @media(max-width:640px){
+    body{font-size:14.5px;}
+    .wrap{padding:10px 8px 40px;}
+  }
 
-  <!-- MathJax CDN -->
-  <script>
-    MathJax = {
-      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
-      svg: { fontCache: 'global' }
-    };
-  </script>
-  <script>
-window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] }, svg:{fontCache:'global'} };
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:16px;
+    box-shadow:0 8px 24px rgba(15,23,42,.06), 0 2px 6px rgba(15,23,42,.04);
+    padding:14px;
+  }
+
+  h1{
+    font-size:15px;
+    margin:0 0 10px;
+    color:var(--accent);
+    letter-spacing:.02em;
+    text-transform:uppercase;
+    font-weight:800;
+  }
+  h1 .tag{
+    display:inline-block;
+    background:#ede9fe;
+    color:#5b21b6;
+    border-radius:999px;
+    padding:2px 9px;
+    font-size:11px;
+    margin-left:6px;
+    vertical-align:middle;
+    letter-spacing:.04em;
+  }
+
+  .q{
+    background:linear-gradient(180deg,#f8fafc,#ffffff);
+    border:1px solid var(--line);
+    border-left:5px solid var(--j1);
+    border-radius:12px;
+    padding:12px 14px;
+    margin-bottom:14px;
+  }
+  .q p{margin:0 0 8px;}
+  .q p:last-child{margin-bottom:0;}
+  .q b{color:#0f172a;}
+
+  .choices{
+    list-style:none;
+    margin:10px 0 0;
+    padding:0;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:6px 10px;
+  }
+  .choices li{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:9px;
+    padding:5px 9px;
+    font-size:14.5px;
+    color:var(--ink-soft);
+  }
+  .choices li b{color:var(--ink);margin-right:5px;}
+  .choices li.ans{
+    background:#ecfdf5;
+    border-color:#6ee7b7;
+    color:#065f46;
+    font-weight:700;
+  }
+
+  .step{
+    position:relative;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:13px;
+    padding:11px 13px 11px 46px;
+    margin-bottom:11px;
+    transition:box-shadow .25s ease, border-color .25s ease, transform .25s ease;
+  }
+  .step .chip{
+    position:absolute;
+    left:11px;top:11px;
+    width:26px;height:26px;
+    border-radius:50%;
+    display:grid;place-items:center;
+    font-size:13px;font-weight:800;color:#fff;
+    background:var(--j2);
+    box-shadow:0 2px 6px rgba(29,78,216,.35);
+  }
+  .step[data-step="2"] .chip{background:var(--m2);box-shadow:0 2px 6px rgba(190,18,60,.35);}
+  .step[data-step="3"] .chip{background:var(--six);box-shadow:0 2px 6px rgba(5,150,105,.35);}
+  .step[data-step="4"] .chip{background:var(--accent);box-shadow:0 2px 6px rgba(124,58,237,.35);}
+  .step[data-step="5"] .chip{background:#0891b2;box-shadow:0 2px 6px rgba(8,145,178,.35);}
+
+  .step h3{
+    font-size:14px;
+    margin:0 0 4px;
+    color:#0f172a;
+    letter-spacing:.01em;
+  }
+  .step .hint{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    background:#f8fafc;
+    border-left:3px solid #cbd5e1;
+    border-radius:0 7px 7px 0;
+    padding:5px 9px;
+    margin-top:7px;
+  }
+  .step.active{
+    border-color:#c7d2fe;
+    box-shadow:0 10px 26px rgba(37,99,235,.13);
+    transform:translateX(2px);
+  }
+
+  .answer{
+    background:linear-gradient(135deg,#ecfdf5,#d1fae5);
+    border:1px solid #6ee7b7;
+    border-radius:13px;
+    padding:12px 14px;
+    font-weight:700;
+    color:#065f46;
+    margin-top:4px;
+  }
+  .answer span{color:#047857;}
+
+  .legend{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px 12px;
+    font-size:12px;
+    color:var(--ink-soft);
+    margin-top:8px;
+  }
+  .legend i{
+    display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px;
+  }
+
+  canvas{width:100%;height:auto;display:block;border-radius:12px;background:#fff;border:1px solid var(--line);}
+  .ro{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    margin:8px 0 0;
+    background:#f8fafc;
+    border:1px dashed #cbd5e1;
+    border-radius:9px;
+    padding:7px 9px;
+  }
+  .ro b{color:#0f172a;}
+  .cap{
+    font-size:12px;color:var(--ink-soft);text-align:center;margin:6px 0 0;
+  }
+</style>
+
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\\[','\\]']]
+  },
+  svg: { fontCache: 'global' }
+};
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
-
-  <style>
-    body {
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      background: #f0f6ff;
-    }
-    .step-card {
-      transition: all 0.3s ease;
-    }
-    .step-content {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.5s ease, padding 0.3s ease;
-      padding-top: 0;
-      padding-bottom: 0;
-    }
-    .step-content.open {
-      max-height: 1200px;
-      padding-top: 1rem;
-      padding-bottom: 1rem;
-    }
-    .tag {
-      display: inline-block;
-      padding: 0.25rem 0.75rem;
-      border-radius: 9999px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.03em;
-    }
-    .dice-face {
-      width: 56px;
-      height: 56px;
-      border-radius: 10px;
-      background: #fff;
-      border: 2px solid #cbd5e1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: #1e293b;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-    }
-    .tree-line {
-      stroke: #94a3b8;
-      stroke-width: 1.5;
-      fill: none;
-    }
-    .highlight-glow {
-      animation: pulseGlow 1.8s ease-in-out infinite;
-    }
-    @keyframes pulseGlow {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(59,130,246,0.35); }
-      50% { box-shadow: 0 0 0 10px rgba(59,130,246,0); }
-    }
-    .progress-bar {
-      transition: width 0.4s ease;
-    }
-  </style>
 </head>
-<body class="min-h-screen text-slate-800">
+<body>
+<div class="wrap">
+<div class="split">
 
-  <!-- ============ HEADER ============ -->
-  <header class="bg-white shadow-sm sticky top-0 z-50">
-    <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
-      <div>
-        <p class="text-xs font-semibold tracking-widest text-blue-500 uppercase">HKDSE Math 2018 Paper 2</p><figure style="margin:12px 0;text-align:center;"><img src="figures/2018_P2_Q43.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
-        <h1 class="text-lg sm:text-xl font-bold text-slate-900">Q43 · Probability</h1>
-      </div>
-      <div class="text-2xl">🎲</div>
+  <!-- ================= LEFT PANE : DIAGRAM ================= -->
+  <div class="diagram card">
+    <h1>Interactive Tree <span class="tag">Q43</span></h1>
+
+    <canvas id="cv" width="720" height="900"></canvas>
+
+    <p class="ro" id="ro">
+      <b>Step 1:</b> Each turn: face 1 or 6 ends the game (prob 2/6); otherwise the game continues (prob 4/6).
+    </p>
+
+    <div class="legend">
+      <span><i style="background:#2563eb"></i>John's throw</span>
+      <span><i style="background:#e11d48"></i>Mary's throw</span>
+      <span><i style="background:#059669"></i>Get a "6"</span>
+      <span><i style="background:#d97706"></i>Get a "1"</span>
+      <span><i style="background:#94a3b8"></i>Neither (4/6)</span>
     </div>
-    <div class="h-1 bg-slate-100">
-      <div id="progressBar" class="progress-bar h-1 bg-blue-500 w-0"></div>
+    <p class="cap">Tree diagram of the game (vertical = time order)</p>
+  </div>
+
+  <!-- ================= RIGHT PANE : QUESTION + SOLUTION ================= -->
+  <div class="right">
+
+    <h1>HKDSE 2018 Paper 2 — Q43</h1>
+
+    <div class="q">
+      <p><b>John and Mary take turns to throw a fair die until one of them gets a number "1" or "6". John throws the die first. Find the probability that John gets a number "6".</b></p>
+      <ul class="choices">
+        <li><b>A.</b> \(\dfrac{1}{2}\)</li>
+        <li><b>B.</b> \(\dfrac{1}{6}\)</li>
+        <li class="ans"><b>C.</b> \(\dfrac{3}{10}\)</li>
+        <li><b>D.</b> \(\dfrac{7}{10}\)</li>
+      </ul>
     </div>
-  </header>
 
-  <main class="max-w-3xl mx-auto px-4 py-6 space-y-6">
+    <figure style="margin:12px 0;text-align:center;"><img src="figures/2018_P2_Q43.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
 
-    <!-- ============ QUESTION CARD ============ -->
-    <section class="bg-white rounded-2xl shadow-md p-5 sm:p-6">
-      <div class="flex flex-wrap gap-2 mb-4">
-        <span class="tag bg-blue-100 text-blue-700">Probability</span>
-        <span class="tag bg-emerald-100 text-emerald-700">Geometric Series</span>
-        <span class="tag bg-amber-100 text-amber-700">Conditional Logic</span>
-      </div>
+    <div class="step" data-step="1">
+      <span class="chip">1</span>
+      <h3>Step 1 — Read off the per-throw probabilities</h3>
+      <p>A fair die has 6 faces. Getting a "1" or a "6" <b>ends the game</b>:</p>
+      <p>\[ P(\text{ends}) = \frac{2}{6} = \frac{1}{3},\qquad P(\text{continues}) = \frac{4}{6} = \frac{2}{3}. \]</p>
+      <p>Within the "end" outcomes, "6" has probability \(\frac{1}{6}\) and "1" has probability \(\frac{1}{6}\).</p>
+      <div class="hint">Hint: the game only ever "survives" a throw when the face is 2, 3, 4 or 5 — probability \(\frac46\).</div>
+    </div>
 
-      <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-2">The Question</h2>
-      <p class="text-base sm:text-lg leading-relaxed text-slate-800">
-        John and Mary take turns to throw a fair die until one of them gets a
-        number <strong class="text-rose-600">'1'</strong> or <strong class="text-rose-600">'6'</strong>.
-        John throws the die first. Find the probability that <strong>John</strong> gets a number <strong>'6'</strong>.
-      </p>
+    <div class="step" data-step="2">
+      <span class="chip">2</span>
+      <h3>Step 2 — Describe how John wins on his \(k\)-th throw</h3>
+      <p>John throws on turns \(1,3,5,\dots\), i.e. on the \((2k-1)\)-th throw overall. For John to get his "6" on his \(k\)-th throw:</p>
+      <p>\[ \underbrace{\frac{4}{6}\cdot\frac{4}{6}}_{\text{first }2(k-1)\text{ throws survive}} \times \underbrace{\frac{1}{6}}_{\text{John's }k\text{-th throw is a 6}} = \left(\frac{4}{6}\right)^{2(k-1)}\frac{1}{6}. \]</p>
+      <div class="hint">Hint: the \(2(k-1)\) earlier throws are John's \(k-1\) and Mary's \(k-1\); each must avoid 1 and 6.</div>
+    </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-4 text-sm">
-        <div class="bg-slate-50 rounded-xl p-3 border border-slate-200">
-          <span class="font-semibold text-slate-600">A.</span> $\dfrac{1}{2}$
-        </div>
-        <div class="bg-slate-50 rounded-xl p-3 border border-slate-200">
-          <span class="font-semibold text-slate-600">B.</span> $\dfrac{1}{6}$
-        </div>
-        <div class="bg-slate-50 rounded-xl p-3 border border-slate-200">
-          <span class="font-semibold text-slate-600">C.</span> $\dfrac{3}{10}$
-        </div>
-        <div class="bg-slate-50 rounded-xl p-3 border border-slate-200">
-          <span class="font-semibold text-slate-600">D.</span> $\dfrac{7}{10}$
-        </div>
-      </div>
-    </section>
+    <div class="step" data-step="3">
+      <span class="chip">3</span>
+      <h3>Step 3 — Sum over all \(k\) (infinite geometric series)</h3>
+      <p>\[
+        P(\text{John gets a 6}) = \frac{1}{6} + \left(\frac{4}{6}\right)^{2}\frac{1}{6} + \left(\frac{4}{6}\right)^{4}\frac{1}{6} + \cdots
+      \]</p>
+      <p>This is a geometric series with first term \(a=\dfrac{1}{6}\) and common ratio \(r=\left(\dfrac{4}{6}\right)^{2}=\dfrac{4}{9}\).</p>
+      <div class="hint">Hint: put the common factor \(\frac16\) outside first — it makes the series much tidier.</div>
+    </div>
 
-    <!-- ============ DICE VISUAL ============ -->
-    <section class="bg-white rounded-2xl shadow-md p-5 sm:p-6">
-      <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-3">🎲 The Die — Pause Conditions</h2>
-      <p class="text-sm text-slate-600 mb-4">
-        The game stops as soon as a <strong>1</strong> or a <strong>6</strong> appears.
-        The other four faces keep the game going.
-      </p>
-      <div class="flex flex-wrap items-center gap-3">
-        <div class="dice-face bg-rose-50 border-rose-300 text-rose-600">1</div>
-        <div class="dice-face bg-rose-50 border-rose-300 text-rose-600">6</div>
-        <span class="text-xs font-semibold text-slate-400 mx-1">STOP</span>
-        <div class="dice-face text-slate-400">2</div>
-        <div class="dice-face text-slate-400">3</div>
-        <div class="dice-face text-slate-400">4</div>
-        <div class="dice-face text-slate-400">5</div>
-      </div>
-      <div class="mt-4 grid grid-cols-2 gap-3 text-sm">
-        <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-3">
-          <p class="font-semibold text-emerald-700">P(continue) = 4/6 = 2/3</p>
-          <p class="text-emerald-600 text-xs">face 2,3,4,5</p>
-        </div>
-        <div class="bg-rose-50 border border-rose-200 rounded-lg p-3">
-          <p class="font-semibold text-rose-700">P(stop) = 2/6 = 1/3</p>
-          <p class="text-rose-600 text-xs">face 1 or 6</p>
-        </div>
-      </div>
-    </section>
+    <div class="step" data-step="4">
+      <span class="chip">4</span>
+      <h3>Step 4 — Evaluate the geometric sum</h3>
+      <p>\[
+        P = \frac{\frac{1}{6}}{1-\left(\frac{4}{6}\right)^{2}} = \frac{\frac{1}{6}}{1-\frac{4}{9}} = \frac{\frac{1}{6}}{\frac{5}{9}} = \frac{1}{6}\times\frac{9}{5} = \frac{3}{10}.
+      \]</p>
+      <div class="hint">Hint: for \(|r|<1\), the infinite sum is \(S=\dfrac{a}{1-r}\).</div>
+    </div>
 
-    <!-- ============ STEP BY STEP ============ -->
-    <section class="space-y-4">
-      <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wide px-1">Step-by-Step Solution</h2>
+    <div class="step" data-step="5">
+      <span class="chip">5</span>
+      <h3>Step 5 — Check with a symmetry argument</h3>
+      <p>Let \(p\) be the probability that the <b>first</b> thrower wins. Then:</p>
+      <p>\[ p = \frac{1}{6} + \frac{4}{6}\cdot\frac{2}{3}\,p \;\Rightarrow\; p = \frac{1}{6}+\frac{4}{9}p. \]</p>
+      <p>Solving gives \(p=\dfrac{3}{10}\), matching Step 4. \(\checkmark\)</p>
+      <div class="hint">Hint: after both players survive one round (prob \(\frac46\cdot\frac23=\frac49\)), the position repeats with John to throw again.</div>
+    </div>
 
-      <!-- Step 1 -->
-      <div class="step-card bg-white rounded-2xl shadow-md overflow-hidden border-l-4 border-blue-400">
-        <button onclick="toggleStep(1)" class="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-slate-50">
-          <span class="flex items-center gap-3">
-            <span class="w-8 h-8 flex items-center justify-center rounded-full bg-blue-500 text-white text-sm font-bold">1</span>
-            <span class="font-semibold text-slate-800">Understand the game structure</span>
-          </span>
-          <span id="icon1" class="text-slate-400 text-xl transition-transform">›</span>
-        </button>
-        <div id="content1" class="step-content px-5">
-          <p class="text-slate-700 text-sm leading-relaxed">
-            Players alternate: <strong>John → Mary → John → Mary → …</strong>
-            The game continues only while the die shows <strong>2, 3, 4, or 5</strong>.
-            The moment a <strong>1</strong> or <strong>6</strong> appears, the game ends.
-          </p>
-          <div class="mt-3 flex items-center gap-2 text-xs font-semibold text-slate-500">
-            <span class="bg-blue-100 text-blue-700 rounded-full px-3 py-1">John throws on odd turns</span>
-            <span class="bg-pink-100 text-pink-700 rounded-full px-3 py-1">Mary throws on even turns</span>
-          </div>
-        </div>
-      </div>
+    <div class="answer">Answer: <span>C</span> — \(\dfrac{3}{10}\)</div>
+  </div>
 
-      <!-- Step 2 -->
-      <div class="step-card bg-white rounded-2xl shadow-md overflow-hidden border-l-4 border-blue-400">
-        <button onclick="toggleStep(2)" class="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-slate-50">
-          <span class="flex items-center gap-3">
-            <span class="w-8 h-8 flex items-center justify-center rounded-full bg-blue-500 text-white text-sm font-bold">2</span>
-            <span class="font-semibold text-slate-800">When does John win?</span>
-          </span>
-          <span id="icon2" class="text-slate-400 text-xl transition-transform">›</span>
-        </button>
-        <div id="content2" class="step-content px-5">
-          <p class="text-slate-700 text-sm leading-relaxed">
-            John throws on his <strong>$k$-th</strong> turn — which is the <strong>$(2k-1)$-th</strong> throw overall.
-            For John to get a '6' on that throw:
-          </p>
-          <ul class="list-disc list-inside mt-2 text-sm text-slate-700 space-y-1">
-            <li>All previous throws (the first $2(k-1)$ throws) must be <strong>2, 3, 4, or 5</strong> (game continues).</li>
-            <li>John's $(2k-1)$-th throw must be exactly <strong>6</strong>.</li>
-          </ul>
-          <div class="mt-3 bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm">
-            <p class="font-semibold text-amber-700">💡 Hint:</p>
-            <p class="text-amber-800">"First $2(k-1)$ throws all continue" → probability $\\left(\\frac{4}{6}\\right)^{2(k-1)}$</p>
-            <p class="text-amber-800">"The $(2k-1)$-th throw is 6" → probability $\\frac{1}{6}$</p>
-          </div>
-          <p class="text-slate-700 text-sm mt-3">
-            So the probability for John winning on his $k$-th turn is:
-          </p>
-          <p class="text-center text-lg mt-2 font-semibold text-blue-700">
-            $\left(\dfrac{4}{6}\right)^{2(k-1)} \cdot \dfrac{1}{6}$
-          </p>
-        </div>
-      </div>
+</div>
+</div>
 
-      <!-- Step 3 -->
-      <div class="step-card bg-white rounded-2xl shadow-md overflow-hidden border-l-4 border-blue-400">
-        <button onclick="toggleStep(3)" class="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-slate-50">
-          <span class="flex items-center gap-3">
-            <span class="w-8 h-8 flex items-center justify-center rounded-full bg-blue-500 text-white text-sm font-bold">3</span>
-            <span class="font-semibold text-slate-800">Write the total probability as a series</span>
-          </span>
-          <span id="icon3" class="text-slate-400 text-xl transition-transform">›</span>
-        </button>
-        <div id="content3" class="step-content px-5">
-          <p class="text-slate-700 text-sm leading-relaxed">
-            John can win on his <strong>1st, 2nd, 3rd, …</strong> turn. Sum all these possibilities:
-          </p>
-          <p class="text-center text-lg mt-3 font-semibold text-blue-700">
-            $P = \dfrac{1}{6} + \left(\dfrac{4}{6}\right)^{2} \cdot \dfrac{1}{6} + \left(\dfrac{4}{6}\right)^{4} \cdot \dfrac{1}{6} + \cdots$
-          </p>
-          <div class="mt-3 bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm">
-            <p class="font-semibold text-amber-700">📘 Formula — Sum of Infinite Geometric Series:</p>
-            <p class="text-amber-800 mt-1">$S = \dfrac{a}{1 - r}$, &nbsp; where $|r| < 1$</p>
-            <p class="text-amber-800 mt-1">Here $a = \dfrac{1}{6}$ and $r = \left(\dfrac{4}{6}\right)^2$</p>
-          </div>
-        </div>
-      </div>
+<script>
+(function(){
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  const ro = document.getElementById('ro');
+  let current = 1;
 
-      <!-- Step 4 -->
-      <div class="step-card bg-white rounded-2xl shadow-md overflow-hidden border-l-4 border-emerald-400">
-        <button onclick="toggleStep(4)" class="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-slate-50">
-          <span class="flex items-center gap-3">
-            <span class="w-8 h-8 flex items-center justify-center rounded-full bg-emerald-500 text-white text-sm font-bold">4</span>
-            <span class="font-semibold text-slate-800">Apply the formula &amp; simplify</span>
-          </span>
-          <span id="icon4" class="text-slate-400 text-xl transition-transform">›</span>
-        </button>
-        <div id="content4" class="step-content px-5">
-          <p class="text-slate-700 text-sm">
-            $P = \dfrac{\frac{1}{6}}{1 - \left(\frac{4}{6}\right)^2}$
-            $= \dfrac{\frac{1}{6}}{1 - \frac{16}{36}}$
-            $= \dfrac{\frac{1}{6}}{\frac{20}{36}}$
-          </p>
-          <p class="text-slate-700 text-sm mt-2">
-            $= \dfrac{1}{6} \times \dfrac{36}{20} = \dfrac{36}{120} = \boldsymbol{\dfrac{3}{10}}$
-          </p>
-          <div class="mt-4 bg-emerald-50 border border-emerald-300 rounded-xl p-4 text-center">
-            <p class="text-xs font-semibold text-emerald-600 uppercase tracking-wide">Answer</p>
-            <p class="text-2xl font-bold text-emerald-700 mt-1">C. $\dfrac{3}{10}$</p>
-          </div>
-        </div>
-      </div>
+  const W = 720, H = 900;
 
-      <!-- Step 5 -->
-      <div class="step-card bg-white rounded-2xl shadow-md overflow-hidden border-l-4 border-violet-400">
-        <button onclick="toggleStep(5)" class="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-slate-50">
-          <span class="flex items-center gap-3">
-            <span class="w-8 h-8 flex items-center justify-center rounded-full bg-violet-500 text-white text-sm font-bold">5</span>
-            <span class="font-semibold text-slate-800">Check the answer makes sense</span>
-          </span>
-          <span id="icon5" class="text-slate-400 text-xl transition-transform">›</span>
-        </button>
-        <div id="content5" class="step-content px-5">
-          <p class="text-slate-700 text-sm">
-            John has a <strong>first-mover advantage</strong> because he throws first.
-            His probability should be greater than $\frac{1}{2}$ of the total stopping probability.
-          </p>
-          <div class="mt-3 bg-violet-50 border border-violet-200 rounded-lg p-3 text-sm">
-            <p class="text-violet-800">Total P(game stops eventually) $= 1$</p>
-            <p class="text-violet-800 mt-1">John wins with '6' with prob $\frac{3}{10}$</p>
-            <p class="text-violet-800 mt-1">Mary wins with '6' with prob $\frac{1}{6} \cdot \frac{4}{6} \cdot \frac{1}{1-(4/6)^2} = \frac{1}{5}$</p>
-            <p class="text-violet-800 mt-1">$P(\text{John gets } 1) = P(\text{Mary gets } 1) = \frac{6}{20} = \frac{3}{10}$</p>
-            <p class="text-violet-800 mt-1">Check: $\frac{3}{10} + \frac{3}{10} + \frac{1}{5} + \frac{1}{5} = 1$ ✅</p>
-          </div>
-        </div>
-      </div>
-    </section>
+  const COL = {
+    john:'#2563eb', john2:'#1d4ed8',
+    mary:'#e11d48', mary2:'#be123c',
+    six:'#059669', one:'#d97706',
+    other:'#94a3b8', faint:'#e2e8f0',
+    ink:'#1f2937', soft:'#64748b', accent:'#7c3aed'
+  };
 
-    <!-- ============ VISUAL SIMULATION ============ -->
-    <section class="bg-white rounded-2xl shadow-md p-5 sm:p-6">
-      <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-3">🧪 Interactive Simulation</h2>
-      <p class="text-sm text-slate-600 mb-4">Run many games and see if the experimental probability approaches $\\frac{3}{10}$.</p>
+  /* ---------- helpers ---------- */
+  function rr(x,y,w,h,r,fill,stroke,lw){
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);
+    ctx.arcTo(x+w,y,x+w,y+h,r);
+    ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r);
+    ctx.arcTo(x,y,x+w,y,r);
+    ctx.closePath();
+    if(fill){ctx.fillStyle=fill;ctx.fill();}
+    if(stroke){ctx.lineWidth=lw||1.5;ctx.strokeStyle=stroke;ctx.stroke();}
+  }
+  function label(t,x,y,{size=14,color=COL.ink,align='left',baseline='middle',bold=false,italic=false}={}){
+    ctx.save();
+    ctx.font = (italic?'italic ':'')+(bold?'700 ':'600 ')+size+'px "Segoe UI",system-ui,Arial,sans-serif';
+    ctx.fillStyle=color;
+    ctx.textAlign=align;ctx.textBaseline=baseline;
+    ctx.fillText(t,x,y);
+    ctx.restore();
+  }
+  function line(x1,y1,x2,y2,color,w,dash){
+    ctx.save();
+    ctx.strokeStyle=color;ctx.lineWidth=w||2;
+    if(dash)ctx.setLineDash(dash);
+    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+    ctx.restore();
+  }
+  function arrow(x1,y1,x2,y2,color,w){
+    line(x1,y1,x2,y2,color,w||2);
+    const a=Math.atan2(y2-y1,x2-x1), L=8;
+    ctx.save();
+    ctx.fillStyle=color;
+    ctx.beginPath();
+    ctx.moveTo(x2,y2);
+    ctx.lineTo(x2-L*Math.cos(a-0.4), y2-L*Math.sin(a-0.4));
+    ctx.lineTo(x2-L*Math.cos(a+0.4), y2-L*Math.sin(a+0.4));
+    ctx.closePath();ctx.fill();
+    ctx.restore();
+  }
 
-      <div class="flex flex-wrap gap-3 items-center">
-        <button id="simBtn" onclick="runSimulation()" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold text-sm shadow transition">
-          🎲 Run 10,000 Games
-        </button>
-        <span id="simResult" class="text-sm font-semibold text-slate-500"></span>
-      </div>
+  /* small die face icon */
+  function dieFace(x,y,s,color,solid){
+    rr(x-s/2,y-s/2,s,s,6, solid?color:'#ffffff', color, 2);
+    label('?',x,y+1,{size:s*0.55,color:solid?'#ffffff':color,align:'center',bold:true});
+  }
 
-      <div id="simVisual" class="mt-4 h-6 bg-slate-100 rounded-full overflow-hidden">
-        <div id="simBar" class="progress-bar h-full bg-gradient-to-r from-blue-400 to-emerald-400 w-0 rounded-full"></div>
-      </div>
-      <p id="simCaption" class="text-xs text-slate-400 mt-2">Tap the button to run a simulation.</p>
-    </section>
+  /* ---------- draw ---------- */
+  function draw(step){
+    ctx.clearRect(0,0,W,H);
 
-    <!-- ============ FOOTER ============ -->
-    <footer class="text-center text-xs text-slate-400 py-6">
-      HKDSE Math 2018 Paper 2 · Q43 · Probability · Interactive Solution
-    </footer>
-  </main>
+    // background grid tint
+    ctx.save();
+    ctx.fillStyle='#ffffff';
+    ctx.fillRect(0,0,W,H);
+    ctx.restore();
 
-  <script>
-    // ---- Accordion toggles ----
-    function toggleStep(n) {
-      const content = document.getElementById('content' + n);
-      const icon = document.getElementById('icon' + n);
-      const isOpen = content.classList.contains('open');
+    const cx = W/2;
+    const colL = cx-150;
+    const colR = cx+150;
 
-      if (isOpen) {
-        content.classList.remove('open');
-        icon.style.transform = 'rotate(0deg)';
-      } else {
-        content.classList.add('open');
-        icon.style.transform = 'rotate(90deg)';
+    // ---- title band ----
+    rr(20,16,W-40,44,12,'#eef2ff','#c7d2fe',1.5);
+    label('Game tree: each round John then Mary', 36, 38, {size:16,color:'#3730a3',bold:true});
+    label('throw until a "1" or "6" appears', 36, 55, {size:13,color:'#6366f1'});
+
+    // ---- legend of per-throw probabilities (top right of canvas) ----
+    // probabilities bar row placed lower
+
+    const startY = 110;
+    const gapY = 62;
+
+    // Column headers
+    label('John', colL+18, startY-38, {size:15,color:COL.john,align:'center',bold:true});
+    label('Mary', colR+18, startY-38, {size:15,color:COL.mary,align:'center',bold:true});
+
+    // function to draw one throw node
+    // returns nothing; draws die box + branch labels
+    // level = 1..3 ; who = 'J' or 'M'
+    function throwRow(level, who, y, highlight6){
+      const isJohn = who==='J';
+      const baseX = isJohn ? colL : colR;
+      const col   = isJohn ? COL.john : COL.mary;
+
+      // incoming vertical line from previous
+      if(level>1){
+        // vertical line down from previous node
+        line(baseX, y-gapY+20, baseX, y-24, COL.faint, 2, [5,5]);
       }
-      updateProgress();
+
+      // node circle
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(baseX, y, 17, 0, Math.PI*2);
+      ctx.fillStyle = col;
+      ctx.shadowColor = 'rgba(15,23,42,.18)';
+      ctx.shadowBlur = 8;
+      ctx.fill();
+      ctx.shadowBlur=0;
+      ctx.restore();
+
+      label(isJohn?'J':'M', baseX, y+1, {size:14,color:'#fff',align:'center',bold:true});
+
+      // throw label
+      label('Throw '+(level*2-1 + (isJohn?0:1)), baseX, y-30, {size:12,color:COL.soft,align:'center'});
+
+      // three outcomes fan out to the right (or left for Mary)
+      const dir = isJohn ? 1 : -1;   // direction of fan
+      const dY = y-24;
+      const spread = 22;
+      const len = 92;
+
+      // --- branch 1 : "6" (win) ---
+      const b1 = {x:baseX + dir*len, y:dY - spread};
+      arrow(baseX + dir*18, y-6, b1.x, b1.y, COL.six, 2.5);
+      dieFace(b1.x + dir*32, b1.y, 30, COL.six, false);
+      label('6', b1.x + dir*32, b1.y+1, {size:14,color:COL.six,align:'center',bold:true});
+      label('1/6', b1.x + dir*(-6), b1.y-6, {size:11,color:COL.six,align:isJohn?'left':'right'});
+
+      // --- branch 2 : "1" (lose) ---
+      const b2 = {x:baseX + dir*len, y:dY};
+      arrow(baseX + dir*18, y-2, b2.x, b2.y, COL.one, 2.5);
+      dieFace(b2.x + dir*32, b2.y, 30, COL.one, false);
+      label('1', b2.x + dir*32, b2.y+1, {size:14,color:COL.one,align:'center',bold:true});
+      label('1/6', b2.x + dir*(-6), b2.y-5, {size:11,color:COL.one,align:isJohn?'left':'right'});
+
+      // --- branch 3 : "2,3,4,5" (continue) ---
+      const b3 = {x:baseX + dir*len, y:dY + spread};
+      const isFaded = (step>=4) ? false : true; // highlight in later steps
+      const col3 = (step>=3) ? COL.other : '#cbd5e1';
+      arrow(baseX + dir*18, y+2, b3.x, b3.y, col3, (step>=3)?2.5:1.8);
+      // "neither" tag
+      rr(b3.x + dir*8, b3.y-11, 78, 22, 8, (step>=3)?'#f1f5f9':'#f8fafc', col3, 1.5);
+      label('2,3,4,5', b3.x + dir*47, b3.y+1, {size:11,color:(step>=3)?'#475569':'#94a3b8',align:'center',bold:true});
+      label('4/6', b3.x + dir*(-6), b3.y+16, {size:11,color:col3,align:isJohn?'left':'right'});
+
+      // vertical continuation downward from branch 3
+      if(level<3){
+        const nextY = y + gapY;
+        line(b3.x + dir*47, y+gapY-24, b3.x + dir*47 - dir*0 , nextY-24, col3, (step>=3)?2:1.5, (step>=3)?null:[5,5]);
+        // bring it back to the next thrower's X
+        // Actually redraw properly below
+      }
+      return {b3x: b3.x, b3y: b3.y};
     }
 
-    // ---- Progress bar ----
-    function updateProgress() {
-      const total = 5;
-      let open = 0;
-      for (let i = 1; i <= total; i++) {
-        if (document.getElementById('content' + i).classList.contains('open')) open++;
-      }
-      const pct = (open / total) * 100;
-      document.getElementById('progressBar').style.width = pct + '%';
+    // We'll draw manually for clarity, level by level
+    // Level 1 (John's 1st throw)
+    const yJ1 = startY + 40;
+    const yM1 = yJ1 + gapY;
+    const yJ2 = yM1 + gapY;
+    const yM2 = yJ2 + gapY;
+    const yJ3 = yM2 + gapY;
+
+    // helper: draw a throw with explicit fan lines and return positions
+    function throwNode(x,y,col,whoTxt,throwTxt,step,highlight){
+      // circle
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(x,y,17,0,Math.PI*2);
+      ctx.fillStyle=col;
+      ctx.shadowColor='rgba(15,23,42,.18)';
+      ctx.shadowBlur=8;
+      ctx.fill();
+      ctx.shadowBlur=0;
+      ctx.restore();
+      label(whoTxt,x,y+1,{size:14,color:'#fff',align:'center',bold:true});
+      label(throwTxt,x,y-30,{size:12,color:COL.soft,align:'center',bold:true});
     }
 
-    // ---- Simulation ----
-    function runSimulation() {
-      const N = 10000;
-      let johnWins = 0;
+    // we draw the full tree with a cleaner custom routine:
+    // branches at each node go left-ish/right depending who
+    // Layout: John's nodes on column colL, Mary on colR.
+    // At John's turn, outcomes fan to the right; at Mary's turn, outcomes fan to the right too
+    // (keeps the diagram readable), but the "continue" line then goes back to colL via a curve.
+    // For visual clarity we instead place children of John -> Mary column, children of Mary -> John column.
 
-      for (let i = 0; i < N; i++) {
-        let turn = 0;
-        while (true) {
-          turn++;
-          const roll = Math.floor(Math.random() * 6) + 1; // 1–6
-          if (roll === 1 || roll === 6) {
-            // game ends
-            if (roll === 6 && turn % 2 === 1) {
-              johnWins++;           // John got a 6
-            }
-            break;
-          }
+    function drawThrow(x, y, col, whoTxt, throwTxt, childColX, k){
+      throwNode(x,y,col,whoTxt,throwTxt,k);
+
+      // child outcomes positions
+      const spread = 26;
+      const childYs = [y-46, y-14, y+18];  // 6, 1, neither
+      const childX = childColX;
+
+      // labels
+      const names = ['6','1','2,3,4,5'];
+      const cs    = [COL.six, COL.one, (k>=3?COL.other:'#cbd5e1')];
+      const probs = ['1/6','1/6','4/6'];
+      const end   = [true,true,false];
+
+      for(let i=0;i<3;i++){
+        const cy = childYs[i];
+        const active = (k>=3) || i<2;   // branches for 6 and 1 always vivid; neither only after step 3
+        const colr = active ? cs[i] : '#dbe2ea';
+        arrow(x + (childColX>x?18:-18), y, childX + (childColX>x?-34:34), cy, colr, active?2.4:1.6);
+        // small badge at branch end
+        rr(childX + (childColX>x?-34:34) - 22, cy-14, 64, 28, 8,
+           i===0?'#ecfdf5': i===1?'#fff7ed':'#f1f5f9',
+           colr, 1.6);
+        label(names[i], childX + (childColX>x?46:26), cy+1, {size:12,color:active?colr:'#94a3b8',align:childColX>x?'right':'left',bold:true});
+        if(i===2 && !active){
+          label('4/6', childX + (childColX>x?46:26), cy+1, {size:11,color:'#94a3b8',align:childColX>x?'right':'left'});
         }
       }
 
-      const prob = johnWins / N;
-      const pct = (prob * 100).toFixed(2);
-
-      document.getElementById('simResult').textContent =
-        `John got '6': ${johnWins} / ${N} = ${pct}%`;
-      document.getElementById('simBar').style.width = pct + '%';
-
-      const caption = document.getElementById('simCaption');
-      if (Math.abs(prob - 0.3) < 0.015) {
-        caption.textContent = '✅ Great! The simulated probability is very close to 3/10 = 30%.';
-      } else {
-        caption.textContent = `Experimental probability: ${pct}%. Run again — it should hover around 30%.`;
-      }
+      // badge showing probability on each edge near the node
+      // (skip for clarity; probabilities shown in badges above)
     }
 
-    // Set initial icons rotation
-    document.querySelectorAll('[id^="icon"]').forEach(el => {
-      el.style.transform = 'rotate(0deg)';
-      el.style.display = 'inline-block';
+    // ---- Level 1: John ----
+    drawThrow(colL, yJ1, COL.john, 'J', 'John throw 1', colR, 1);
+
+    // ---- Level 2: Mary ----
+    drawThrow(colR, yM1, COL.mary, 'M', 'Mary throw 1', colL, 2);
+
+    // ---- Level 3: John ----
+    drawThrow(colL, yJ2, COL.john, 'J', 'John throw 2', colR, 3);
+
+    // ---- Level 4: Mary ----
+    drawThrow(colR, yM2, COL.mary, 'M', 'Mary throw 2', colL, 4);
+
+    // ---- Level 5: John (ellipsis) ----
+    drawThrow(colL, yJ3, '#93c5fd', 'J', 'John throw 3', colR, 5);
+
+    // ---- ellipsis dots below the last level ----
+    for(let i=0;i<3;i++){
+      ctx.beginPath();
+      ctx.arc(colL-8 + i*10, yJ3+48, 3, 0, Math.PI*2);
+      ctx.fillStyle='#cbd5e1';ctx.fill();
+    }
+    label('⋯ continue until 1 or 6 appears', colL+60, yJ3+48, {size:12,color:COL.soft,align:'left'});
+
+    // ---- bottom summary card (contextual per step) ----
+    const cardY = H-190;
+    rr(20, cardY, W-40, 170, 14, '#ffffff', '#dbeafe', 2);
+
+    const titles = {
+      1:'Step 1 — Per-throw probabilities',
+      2:'Step 2 — John wins on his k-th throw',
+      3:'Step 3 — Sum the geometric series',
+      4:'Step 4 — Evaluate the sum',
+      5:'Step 5 — Symmetry check'
+    };
+    label(titles[step] || titles[1], 38, cardY+26, {size:15,color:'#1e3a8a',bold:true});
+
+    // draw simple textual maths (canvas text; MathJax lives on the right pane)
+    ctx.save();
+    ctx.font='600 15px "Segoe UI",Arial,sans-serif';
+    ctx.fillStyle='#334155';
+
+    if(step===1){
+      ctx.fillText('P(ends) = 2/6 = 1/3', 40, cardY+62);
+      ctx.fillText('P(continues) = 4/6 = 2/3', 40, cardY+88);
+      ctx.fillText('Of the "ends" faces: P(6) = 1/6,  P(1) = 1/6', 40, cardY+114);
+      ctx.fillStyle='#64748b'; ctx.font='600 13px "Segoe UI",Arial,sans-serif';
+      ctx.fillText('A die face of 1 OR 6 stops the game; 2,3,4,5 let it continue.', 40, cardY+144);
+    }
+    if(step===2){
+      ctx.fillText('John throws on overall throws 1, 3, 5, ... = (2k−1).', 40, cardY+62);
+      ctx.fillText('Earlier throws must all be 2,3,4,5:  each has prob 4/6.', 40, cardY+88);
+      ctx.fillText('John\u2019s k-th throw must be 6:  probability 1/6.', 40, cardY+114);
+      ctx.fillStyle='#0f766e'; ctx.font='700 14px "Segoe UI",Arial,sans-serif';
+      ctx.fillText('P(John\u2019s k-th throw is a 6) = (4/6)^(2k−2) · 1/6', 40, cardY+144);
+    }
+    if(step===3){
+      ctx.fillText('P = 1/6 + (4/6)^2·1/6 + (4/6)^4·1/6 + ⋯', 40, cardY+62);
+      ctx.fillText('First term  a = 1/6', 40, cardY+92);
+      ctx.fillText('Common ratio  r = (4/6)^2 = 4/9', 40, cardY+118);
+      ctx.fillStyle='#6d28d9'; ctx.font='700 14px "Segoe UI",Arial,sans-serif';
+      ctx.fillText('Infinite geometric series:  S = a / (1 − r)', 40, cardY+146);
+    }
+    if(step===4){
+      ctx.fillText('P = (1/6) / (1 − 4/9)', 40, cardY+66);
+      ctx.fillText('  = (1/6) / (5/9)', 40, cardY+94);
+      ctx.fillText('  = (1/6) × (9/5)', 40, cardY+122);
+      ctx.fillStyle='#065f46'; ctx.font='800 18px "Segoe UI",Arial,sans-serif';
+      ctx.fillText('P = 3/10  = 0.3', 40, cardY+152);
+    }
+    if(step===5){
+      ctx.fillText('Let p = P(first thrower, John, wins).', 40, cardY+64);
+      ctx.fillText('p = 1/6 + (4/6)·(2/3)·p', 40, cardY+92);
+      ctx.fillText('p − (4/9)p = 1/6   ⇒   (5/9)p = 1/6', 40, cardY+120);
+      ctx.fillStyle='#065f46'; ctx.font='800 18px "Segoe UI",Arial,sans-serif';
+      ctx.fillText('p = 3/10  ✓  matches Step 4', 40, cardY+150);
+    }
+    ctx.restore();
+
+    // highlight ring around relevant levels
+    ctx.save();
+    ctx.lineWidth=3;
+    if(step===1){
+      ctx.strokeStyle='rgba(37,99,235,.55)';
+      ctx.beginPath();ctx.arc(colL,yJ1,34,0,Math.PI*2);ctx.stroke();
+    }
+    if(step===2){
+      ctx.strokeStyle='rgba(5,150,105,.55)';
+      ctx.beginPath();ctx.arc(colL,yJ1,34,0,Math.PI*2);ctx.stroke();
+      ctx.beginPath();ctx.arc(colL,yJ2,34,0,Math.PI*2);ctx.stroke();
+      ctx.beginPath();ctx.arc(colL,yJ3,34,0,Math.PI*2);ctx.stroke();
+    }
+    if(step>=3){
+      ctx.strokeStyle='rgba(124,58,237,.5)';
+      ctx.beginPath();ctx.arc(colL,yJ1,34,0,Math.PI*2);ctx.stroke();
+      ctx.beginPath();ctx.arc(colL,yJ2,34,0,Math.PI*2);ctx.stroke();
+      ctx.beginPath();ctx.arc(colL,yJ3,34,0,Math.PI*2);ctx.stroke();
+    }
+    if(step>=4){
+      ctx.strokeStyle='rgba(5,150,105,.6)';
+      ctx.beginPath();ctx.arc(colL,yJ1,34,0,Math.PI*2);ctx.stroke();
+      ctx.beginPath();ctx.arc(colL,yJ2,34,0,Math.PI*2);ctx.stroke();
+      ctx.beginPath();ctx.arc(colL,yJ3,34,0,Math.PI*2);ctx.stroke();
+    }
+    ctx.restore();
+
+    // ---- readout text ----
+    const texts = {
+      1:'<b>Step 1:</b> Each turn: face 1 or 6 ends the game (prob 2/6); otherwise the game continues (prob 4/6).',
+      2:'<b>Step 2:</b> John wins on his k-th throw → first 2(k−1) throws survive (4/6 each), John\u2019s k-th throw is a 6 (1/6).',
+      3:'<b>Step 3:</b> P = 1/6 + (4/6)²·1/6 + (4/6)⁴·1/6 + ⋯ — a geometric series with a = 1/6, r = 4/9.',
+      4:'<b>Step 4:</b> P = (1/6)/(1 − 4/9) = (1/6)/(5/9) = 3/10.',
+      5:'<b>Step 5:</b> Symmetry check: p = 1/6 + (4/6)(2/3)p ⇒ (5/9)p = 1/6 ⇒ p = 3/10. ✓'
+    };
+    ro.innerHTML = texts[step] || texts[1];
+  }
+
+  /* ---------- scroll-sync ---------- */
+  const io = new IntersectionObserver(es=>{
+    es.forEach(e=>{
+      if(e.isIntersecting){
+        current = +e.target.dataset.step;
+        document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+        e.target.classList.add('active');
+        draw(current);
+      }
     });
-  </script>
+  }, {rootMargin:'-25% 0px -55% 0px'});
 
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
+  document.querySelectorAll('.step').forEach(s=>io.observe(s));
+
+  // initial
+  draw(1);
+  const first = document.querySelector('.step');
+  if(first) first.classList.add('active');
+
+  // redraw on resize (canvas is fixed size, but keeps crisp)
+  window.addEventListener('resize', ()=>draw(current));
+
+  // MathJax re-typeset safety
+  if(window.MathJax && window.MathJax.typesetPromise){
+    window.MathJax.typesetPromise();
+  }
+})();
 </script>
-
 </body>
 </html>

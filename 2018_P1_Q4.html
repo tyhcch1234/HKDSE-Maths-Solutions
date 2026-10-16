@@ -1,386 +1,326 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HKDSE Math 2018 Paper 1 Q4 – Probability</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- MathJax for LaTeX rendering -->
-    <script>
-        MathJax = {
-            tex: {
-                inlineMath: [['$', '$'], ['\\(', '\\)']]
-            },
-            svg: {
-                fontCache: 'global'
-            }
-        };
-    </script>
-    <script>
-window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] }, svg:{fontCache:'global'} };
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2018 P1 Q4 — Probability</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
+  svg: { fontCache: 'global' }
+};
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
-    <style>
-        body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: #f8fafc;
-        }
-        .step-card {
-            transition: all 0.3s ease;
-        }
-        .step-card:hover {
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        }
-        .ball-icon {
-            display: inline-block;
-            width: 1.5rem;
-            height: 1.5rem;
-            border-radius: 50%;
-            margin: 0 0.2rem;
-            box-shadow: inset -2px -2px 4px rgba(0,0,0,0.2);
-        }
-        .ball-white { background: #ffffff; border: 2px solid #cbd5e1; }
-        .ball-black { background: #1e293b; }
-        .ball-red { background: #ef4444; }
-        .ball-white-sm { width: 1rem; height: 1rem; }
-        .ball-black-sm { width: 1rem; height: 1rem; background: #1e293b; }
-        .ball-red-sm { width: 1rem; height: 1rem; background: #ef4444; }
-        .prob-bar {
-            height: 2rem;
-            border-radius: 0.5rem;
-            transition: width 0.5s ease;
-        }
-    </style>
+<style>
+  :root{
+    --red:#e63946; --black:#2b2d42; --white:#f1faee; --wborder:#8d99ae;
+    --accent:#1d3557; --green:#2a9d8f; --amber:#e9a100; --purple:#6a4c93;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;
+    background:#f7f9fc; color:#1c2430; font-size:16px; line-height:1.55;
+  }
+  .wrap{padding:16px 16px 60px; max-width:1400px; margin:0 auto;}
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start;}
+  @media(min-width:900px){.split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}}
+  @media(max-width:640px){body{font-size:14.5px;}.wrap{padding:10px 8px 40px;}}
+
+  .diagram{
+    position:sticky; top:16px; max-height:calc(100vh - 2rem); overflow-y:auto;
+    background:#ffffff; border-radius:14px; padding:14px;
+    box-shadow:0 4px 18px rgba(29,53,87,.10); border:1px solid #e3e9f2;
+  }
+  .diagram h2{margin:0 0 8px;font-size:1rem;color:var(--accent);letter-spacing:.02em;}
+  canvas{width:100%; height:auto; display:block; border-radius:10px; background:#fdfefe;}
+  .ro{
+    margin:10px 0 0; font-size:.85rem; color:#3a4a5e; background:#eef4fb;
+    padding:7px 10px; border-radius:8px; border-left:4px solid var(--accent);
+  }
+  .legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;font-size:.8rem;color:#3a4a5e;}
+  .legend span{display:inline-flex;align-items:center;gap:5px;}
+  .dot{width:11px;height:11px;border-radius:50%;display:inline-block;border:1px solid rgba(0,0,0,.25);}
+
+  .panel{background:#ffffff;border-radius:14px;padding:16px 18px;box-shadow:0 4px 18px rgba(29,53,87,.08);border:1px solid #e3e9f2;}
+  .qtag{display:inline-block;font-weight:700;color:#fff;background:var(--accent);border-radius:6px;padding:2px 9px;font-size:.8rem;letter-spacing:.03em;}
+  .question{margin-top:10px;font-size:1.02rem;}
+  .question p{margin:.4rem 0;}
+
+  .step{
+    margin-top:16px; padding:12px 14px; border-radius:12px; background:#fbfdff;
+    border-left:5px solid var(--accent); transition:background .3s, box-shadow .3s, transform .2s;
+  }
+  .step.active{background:#fff8e6; box-shadow:0 0 0 2px var(--amber) inset, 0 6px 16px rgba(233,161,0,.18);}
+  .step .tag{
+    display:inline-block; font-weight:700; font-size:.74rem; letter-spacing:.05em;
+    text-transform:uppercase; color:#fff; background:var(--green);
+    padding:2px 8px; border-radius:20px; margin-right:8px;
+  }
+  .step[data-step="1"] .tag{background:var(--green);}
+  .step[data-step="2"] .tag{background:var(--amber);}
+  .step[data-step="3"] .tag{background:var(--purple);}
+  .step .hint{display:block;margin-top:7px;font-size:.85rem;color:#5a6b80;font-style:italic;}
+  .answer{
+    margin-top:20px;padding:12px 16px;border-radius:12px;
+    background:linear-gradient(90deg,#1d3557,#2a9d8f);color:#fff;font-weight:700;font-size:1.05rem;
+  }
+</style>
 </head>
-<body class="min-h-screen py-6 px-4 sm:px-6 lg:px-8">
+<body>
+<div class="wrap">
+  <div class="split">
 
-    <div class="max-w-3xl mx-auto">
-        <!-- Header -->
-        <div class="bg-white rounded-2xl shadow-md p-6 mb-6">
-            <div class="flex items-center justify-between mb-2">
-                <span class="text-sm font-semibold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">HKDSE Math 2018 Paper 1 Q4</span>
-                <span class="text-sm font-medium text-gray-500">[3 marks]</span>
-            </div>
-            <h1 class="text-2xl font-bold text-gray-800">Probability with Balls in a Box</h1>
-            <div class="flex flex-wrap gap-2 mt-3">
-                <span class="text-xs font-medium bg-blue-100 text-blue-800 px-2.5 py-1 rounded-full">#Probability</span>
-                <span class="text-xs font-medium bg-green-100 text-green-800 px-2.5 py-1 rounded-full">#Algebra</span>
-                <span class="text-xs font-medium bg-purple-100 text-purple-800 px-2.5 py-1 rounded-full">#LinearEquation</span>
-            </div>
-        </div>
-
-        <!-- Question Display -->
-        <div class="bg-white rounded-2xl shadow-md p-6 mb-6">
-            <h2 class="text-lg font-semibold text-gray-700 mb-3">Question</h2>
-            <div class="text-gray-800 leading-relaxed space-y-3">
-                <p>A box contains \(n\) white balls, \(5\) black balls and \(8\) red balls. If a ball is randomly drawn from the box, then the probability of drawing a red ball is \(\frac{2}{5}\). Find the value of \(n\).</p>
-            </div>
-            <!-- Visual representation of balls -->
-            <div class="mt-5 p-4 bg-gray-50 rounded-xl border border-gray-200">
-                <p class="text-xs font-medium text-gray-500 mb-2">Visual representation (counts are illustrative):</p>
-                <div class="flex flex-wrap items-center gap-1">
-                    <!-- White balls (represented as 'n' - we show 3 as placeholder) -->
-                    <span class="text-xs font-semibold text-gray-600 mr-1">White (n):</span>
-                    <span class="ball-icon ball-white" title="White ball"></span>
-                    <span class="ball-icon ball-white" title="White ball"></span>
-                    <span class="ball-icon ball-white" title="White ball"></span>
-                    <span class="text-gray-400 text-sm">… (n balls)</span>
-                    <span class="mx-2 text-gray-300">|</span>
-                    <!-- Black balls -->
-                    <span class="text-xs font-semibold text-gray-600 mr-1">Black (5):</span>
-                    <span class="ball-icon ball-black" title="Black ball"></span>
-                    <span class="ball-icon ball-black" title="Black ball"></span>
-                    <span class="ball-icon ball-black" title="Black ball"></span>
-                    <span class="ball-icon ball-black" title="Black ball"></span>
-                    <span class="ball-icon ball-black" title="Black ball"></span>
-                    <span class="mx-2 text-gray-300">|</span>
-                    <!-- Red balls -->
-                    <span class="text-xs font-semibold text-gray-600 mr-1">Red (8):</span>
-                    <span class="ball-icon ball-red" title="Red ball"></span>
-                    <span class="ball-icon ball-red" title="Red ball"></span>
-                    <span class="ball-icon ball-red" title="Red ball"></span>
-                    <span class="ball-icon ball-red" title="Red ball"></span>
-                    <span class="ball-icon ball-red" title="Red ball"></span>
-                    <span class="ball-icon ball-red" title="Red ball"></span>
-                    <span class="ball-icon ball-red" title="Red ball"></span>
-                    <span class="ball-icon ball-red" title="Red ball"></span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Step-by-Step Guided Solution -->
-        <div class="bg-white rounded-2xl shadow-md p-6 mb-6">
-            <h2 class="text-lg font-semibold text-gray-700 mb-4">Step-by-Step Solution</h2>
-
-            <!-- Step 1 -->
-            <div class="step-card bg-gray-50 rounded-xl p-4 mb-3 border border-gray-200">
-                <div class="flex items-start gap-3">
-                    <span class="flex-shrink-0 w-8 h-8 bg-indigo-600 text-white rounded-full flex items-center justify-center font-bold text-sm">1</span>
-                    <div class="flex-1">
-                        <p class="font-semibold text-gray-800">Find the total number of balls.</p>
-                        <p class="text-gray-600 mt-1">The box contains:</p>
-                        <ul class="list-disc list-inside text-gray-600 mt-1 space-y-0.5">
-                            <li>\(n\) white balls</li>
-                            <li>\(5\) black balls</li>
-                            <li>\(8\) red balls</li>
-                        </ul>
-                        <p class="mt-2 text-gray-700">Total number of balls \(= n + 5 + 8 = n + 13\).</p>
-                        <details class="mt-2">
-                            <summary class="text-sm text-indigo-600 cursor-pointer hover:underline">Hint</summary>
-                            <p class="text-sm text-gray-500 mt-1">Total count = sum of all individual color counts.</p>
-                        </details>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Step 2 -->
-            <div class="step-card bg-gray-50 rounded-xl p-4 mb-3 border border-gray-200">
-                <div class="flex items-start gap-3">
-                    <span class="flex-shrink-0 w-8 h-8 bg-indigo-600 text-white rounded-full flex items-center justify-center font-bold text-sm">2</span>
-                    <div class="flex-1">
-                        <p class="font-semibold text-gray-800">Write the probability of drawing a red ball.</p>
-                        <p class="text-gray-600 mt-1">Probability \(= \frac{\text{number of red balls}}{\text{total number of balls}} = \frac{8}{n + 13}\).</p>
-                        <details class="mt-2">
-                            <summary class="text-sm text-indigo-600 cursor-pointer hover:underline">Hint</summary>
-                            <p class="text-sm text-gray-500 mt-1">P(event) = (favorable outcomes) / (total outcomes). Here, favorable = red balls = 8.</p>
-                        </details>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Step 3 -->
-            <div class="step-card bg-gray-50 rounded-xl p-4 mb-3 border border-gray-200">
-                <div class="flex items-start gap-3">
-                    <span class="flex-shrink-0 w-8 h-8 bg-indigo-600 text-white rounded-full flex items-center justify-center font-bold text-sm">3</span>
-                    <div class="flex-1">
-                        <p class="font-semibold text-gray-800">Set up the equation.</p>
-                        <p class="text-gray-600 mt-1">Given that the probability is \(\frac{2}{5}\), we have:</p>
-                        <p class="mt-1 text-lg">\[
-                            \frac{8}{n + 13} = \frac{2}{5}
-                        \]</p>
-                        <details class="mt-2">
-                            <summary class="text-sm text-indigo-600 cursor-pointer hover:underline">Hint</summary>
-                            <p class="text-sm text-gray-500 mt-1">Equate the expression from Step 2 to the given probability.</p>
-                        </details>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Step 4 -->
-            <div class="step-card bg-gray-50 rounded-xl p-4 mb-3 border border-gray-200">
-                <div class="flex items-start gap-3">
-                    <span class="flex-shrink-0 w-8 h-8 bg-indigo-600 text-white rounded-full flex items-center justify-center font-bold text-sm">4</span>
-                    <div class="flex-1">
-                        <p class="font-semibold text-gray-800">Solve for \(n\).</p>
-                        <p class="text-gray-600 mt-1">Cross-multiply:</p>
-                        <p class="mt-1">\[
-                            8 \times 5 = 2 \times (n + 13)
-                        \]</p>
-                        <p class="mt-1">\[
-                            40 = 2n + 26
-                        \]</p>
-                        <p class="mt-1">\[
-                            2n = 14
-                        \]</p>
-                        <p class="mt-1 font-bold text-indigo-700">\[
-                            n = 7
-                        \]</p>
-                        <details class="mt-2">
-                            <summary class="text-sm text-indigo-600 cursor-pointer hover:underline">Hint</summary>
-                            <p class="text-sm text-gray-500 mt-1">Cross-multiplication: if \(\frac{a}{b} = \frac{c}{d}\), then \(ad = bc\).</p>
-                        </details>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Interactive Probability Explorer -->
-        <div class="bg-white rounded-2xl shadow-md p-6 mb-6">
-            <h2 class="text-lg font-semibold text-gray-700 mb-4">Interactive Probability Explorer</h2>
-            <p class="text-sm text-gray-500 mb-4">Adjust the slider to change \(n\) and see how the probability of drawing a red ball changes. The target probability is \(\frac{2}{5} = 0.4\).</p>
-            
-            <div class="flex items-center gap-4 mb-4">
-                <label for="nSlider" class="font-medium text-gray-700 whitespace-nowrap">\(n\) =</label>
-                <input type="range" id="nSlider" min="0" max="20" value="0" step="1" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
-                <span id="nValue" class="text-lg font-bold text-indigo-700 w-12 text-center">0</span>
-            </div>
-
-            <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                <div class="flex justify-between text-sm font-medium text-gray-600 mb-1">
-                    <span>Probability of red ball</span>
-                    <span id="probText">0.00</span>
-                </div>
-                <!-- Probability bar -->
-                <div class="w-full bg-gray-200 rounded-full h-6 mb-2 relative overflow-hidden">
-                    <div id="probBar" class="prob-bar bg-red-500" style="width: 0%;"></div>
-                    <!-- Target line at 0.4 -->
-                    <div class="absolute top-0 bottom-0 w-0.5 bg-indigo-600" style="left: 40%;"></div>
-                </div>
-                <div class="flex justify-between text-xs text-gray-400">
-                    <span>0</span>
-                    <span>0.4 (Target)</span>
-                    <span>1</span>
-                </div>
-                <p id="feedback" class="mt-3 text-sm font-medium text-gray-600">Move the slider to see the probability.</p>
-            </div>
-
-            <!-- Visual representation of the box based on n -->
-            <div class="mt-4 p-3 bg-gray-50 rounded-xl border border-gray-200">
-                <p class="text-xs font-medium text-gray-500 mb-2">Current box composition:</p>
-                <div id="boxVisual" class="flex flex-wrap items-center gap-1">
-                    <!-- Populated by JS -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Final Answer Card -->
-        <div class="bg-green-50 border border-green-200 rounded-2xl p-6 text-center">
-            <p class="text-sm font-semibold text-green-700 uppercase tracking-wide">Final Answer</p>
-            <p class="text-3xl font-bold text-green-800 mt-1">\(n = 7\)</p>
-            <p class="text-sm text-green-600 mt-1">Number of white balls in the box</p>
-        </div>
-
-        <!-- Footer -->
-        <div class="text-center text-xs text-gray-400 mt-8 pb-4">
-            HKDSE Mathematics 2018 Paper 1 Q4 · Interactive Solution
-        </div>
+    <!-- ================= LEFT: DIAGRAM ================= -->
+    <div class="diagram">
+      <h2>Interactive Figure — the box of balls</h2>
+      <canvas id="cv" width="620" height="620"></canvas>
+      <p class="ro" id="ro">Step 1: The box contains $n$ white, 5 black and 8 red balls (total $n+13$).</p>
+      <div class="legend">
+        <span><i class="dot" style="background:#e63946"></i>Red (8)</span>
+        <span><i class="dot" style="background:#2b2d42"></i>Black (5)</span>
+        <span><i class="dot" style="background:#f1faee"></i>White ($n$)</span>
+      </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const slider = document.getElementById('nSlider');
-            const nValueSpan = document.getElementById('nValue');
-            const probBar = document.getElementById('probBar');
-            const probText = document.getElementById('probText');
-            const feedback = document.getElementById('feedback');
-            const boxVisual = document.getElementById('boxVisual');
+    <!-- ================= RIGHT: QUESTION + SOLUTION ================= -->
+    <div class="panel">
+      <span class="qtag">HKDSE 2018 · Paper 1 · Q4</span>
+      <div class="question">
+        <p>A box contains $n$ white balls, 5 black balls and 8 red balls. If a ball is randomly drawn from the box, then the probability of drawing a red ball is $\dfrac{2}{5}$.</p>
+        <p>Find the value of $n$. &nbsp; <b>[3 marks]</b></p>
+      </div>
 
-            const BLACK = 5;
-            const RED = 8;
+      
 
-            function update() {
-                const n = parseInt(slider.value, 10);
-                nValueSpan.textContent = n;
+      <div class="step" data-step="1">
+        <span class="tag">Step 1 · Set up</span>
+        Count the total number of balls in the box.
+        $$\text{Total} = n + 5 + 8 = n + 13$$
+        <span class="hint">Hint: the total is the sum of all colours — remember to include the unknown $n$.</span>
+      </div>
 
-                const total = n + BLACK + RED;
-                const prob = total > 0 ? RED / total : 0;
+      <div class="step" data-step="2">
+        <span class="tag">Step 2 · Form the equation</span>
+        Number of favourable outcomes (red balls) $= 8$.
+        $$P(\text{red}) = \frac{8}{n+5+8} = \frac{8}{n+13}$$
+        Given $P(\text{red}) = \dfrac{2}{5}$:
+        $$\frac{8}{n+13} = \frac{2}{5}$$
+        <span class="hint">Hint: probability $=\dfrac{\text{number of red balls}}{\text{total number of balls}}$. (1M for a correct expression.)</span>
+      </div>
 
-                // Update bar width (as percentage, capped at 100%)
-                const widthPercent = Math.min(prob * 100, 100);
-                probBar.style.width = widthPercent + '%';
+      <div class="step" data-step="3">
+        <span class="tag">Step 3 · Solve for n</span>
+        Cross-multiply:
+        $$8 \times 5 = 2(n+13)$$
+        $$40 = 2n + 26$$
+        $$2n = 14$$
+        $$n = 7$$
+        <span class="hint">Hint: cross-multiplication is valid since the denominators are non-zero. (1A for correct answer.)</span>
+      </div>
 
-                // Update probability text
-                probText.textContent = prob.toFixed(4);
+      <div class="step" data-step="4">
+        <span class="tag">Step 4 · Check</span>
+        If $n=7$, total $=7+5+8=20$ and $P(\text{red})=\dfrac{8}{20}=\dfrac{2}{5}$ ✓
+        <span class="hint">Hint: always verify by substituting back into the original probability.</span>
+      </div>
 
-                // Feedback message
-                const target = 0.4;
-                const diff = prob - target;
-                if (Math.abs(diff) < 0.001) {
-                    feedback.textContent = '🎯 Correct! The probability equals 2/5. n = 7.';
-                    feedback.className = 'mt-3 text-sm font-medium text-green-600';
-                    probBar.classList.add('bg-green-500');
-                    probBar.classList.remove('bg-red-500');
-                } else if (prob < target) {
-                    feedback.textContent = 'Probability is too low. Try increasing n.';
-                    feedback.className = 'mt-3 text-sm font-medium text-blue-600';
-                    probBar.classList.add('bg-red-500');
-                    probBar.classList.remove('bg-green-500');
-                } else if (prob > target) {
-                    feedback.textContent = 'Probability is too high. Try decreasing n.';
-                    feedback.className = 'mt-3 text-sm font-medium text-orange-600';
-                    probBar.classList.add('bg-red-500');
-                    probBar.classList.remove('bg-green-500');
-                }
+      <div class="answer">Answer: $n = 7$</div>
+    </div>
 
-                // Update visual box
-                boxVisual.innerHTML = '';
-                
-                // Add white balls (show at most 10 for visual clarity)
-                const whiteToShow = Math.min(n, 10);
-                for (let i = 0; i < whiteToShow; i++) {
-                    const span = document.createElement('span');
-                    span.className = 'ball-icon ball-white ball-white-sm';
-                    span.title = 'White';
-                    boxVisual.appendChild(span);
-                }
-                if (n > 10) {
-                    const more = document.createElement('span');
-                    more.className = 'text-xs text-gray-400 ml-1';
-                    more.textContent = '+' + (n - 10);
-                    boxVisual.appendChild(more);
-                }
-                if (n === 0) {
-                    const none = document.createElement('span');
-                    none.className = 'text-xs text-gray-400 italic';
-                    none.textContent = '(no white balls)';
-                    boxVisual.appendChild(none);
-                }
+  </div>
+</div>
 
-                // Add a small separator
-                const sep = document.createElement('span');
-                sep.className = 'mx-2 text-gray-300';
-                sep.textContent = '|';
-                boxVisual.appendChild(sep);
+<script>
+(function(){
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  const ro = document.getElementById('ro');
+  let current = 1;
 
-                // Black balls (always 5)
-                for (let i = 0; i < BLACK; i++) {
-                    const span = document.createElement('span');
-                    span.className = 'ball-icon ball-black ball-black-sm';
-                    span.title = 'Black';
-                    boxVisual.appendChild(span);
-                }
+  const W = cv.width, H = cv.height;
 
-                // Separator
-                const sep2 = document.createElement('span');
-                sep2.className = 'mx-2 text-gray-300';
-                sep2.textContent = '|';
-                boxVisual.appendChild(sep2);
+  // Colours
+  const RED = '#e63946', BLACK = '#2b2d42', WHITE = '#f1faee', WBORDER = '#8d99ae';
+  const BOX_FILL = 'rgba(29,53,87,0.06)', BOX_EDGE = '#1d3557';
+  const GOLD = '#e9a100', GREEN = '#2a9d8f', PURPLE = '#6a4c93';
 
-                // Red balls (always 8)
-                for (let i = 0; i < RED; i++) {
-                    const span = document.createElement('span');
-                    span.className = 'ball-icon ball-red ball-red-sm';
-                    span.title = 'Red';
-                    boxVisual.appendChild(span);
-                }
-            }
+  function drawBall(x, y, r, fill, edge, label, labelColor, glow){
+    ctx.save();
+    if(glow){
+      ctx.shadowColor = glow; ctx.shadowBlur = 18;
+    }
+    const g = ctx.createRadialGradient(x-r*0.35, y-r*0.4, r*0.15, x, y, r);
+    if(fill === RED){ g.addColorStop(0,'#ff8a8f'); g.addColorStop(1,'#c1121f'); }
+    else if(fill === BLACK){ g.addColorStop(0,'#5b6272'); g.addColorStop(1,'#12141c'); }
+    else { g.addColorStop(0,'#ffffff'); g.addColorStop(1,'#dde5ee'); }
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI*2);
+    ctx.fillStyle = g; ctx.fill();
+    ctx.lineWidth = 1.6; ctx.strokeStyle = edge; ctx.stroke();
+    ctx.restore();
 
-            slider.addEventListener('input', update);
-            update(); // initial call
-        });
-    </script>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
+    if(label){
+      ctx.save();
+      ctx.font = 'bold ' + Math.round(r*0.9) + 'px "Segoe UI", sans-serif';
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillStyle = labelColor;
+      ctx.fillText(label, x, y + r*0.05);
+      ctx.restore();
+    }
+  }
+
+  function drawBox(highlightTotal){
+    const bx = 70, by = 190, bw = 480, bh = 300;
+    ctx.save();
+    ctx.shadowColor = 'rgba(29,53,87,.15)'; ctx.shadowBlur = 14;
+    ctx.fillStyle = BOX_FILL;
+    roundRect(ctx, bx, by, bw, bh, 18);
+    ctx.fill();
+    ctx.restore();
+    ctx.lineWidth = highlightTotal ? 4 : 2.5;
+    ctx.strokeStyle = highlightTotal ? GOLD : BOX_EDGE;
+    roundRect(ctx, bx, by, bw, bh, 18);
+    ctx.stroke();
+    return {bx,by,bw,bh};
+  }
+
+  function roundRect(c,x,y,w,h,r){
+    c.beginPath();
+    c.moveTo(x+r,y);
+    c.arcTo(x+w,y,x+w,y+h,r);
+    c.arcTo(x+w,y+h,x,y+h,r);
+    c.arcTo(x,y+h,x,y,r);
+    c.arcTo(x,y,x+w,y,r);
+    c.closePath();
+  }
+
+  function label(title, x, y, color, size){
+    ctx.save();
+    ctx.font = 'bold ' + (size||15) + 'px "Segoe UI", sans-serif';
+    ctx.fillStyle = color; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(title, x, y);
+    ctx.restore();
+  }
+
+  function draw(step){
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle = '#fdfefe';
+    ctx.fillRect(0,0,W,H);
+
+    // Title text
+    label('Box contains red, black and white balls', W/2, 34, '#1d3557', 17);
+
+    const box = drawBox(step >= 1 && step <= 3);
+    const bx = box.bx, by = box.by, bw = box.bw, bh = box.bh;
+
+    // ---- Layout of balls inside the box ----
+    // We place red balls on the left cluster, black balls in middle-top row, white balls on right/bottom.
+    const r = 17;
+
+    // RED: 8 balls — arranged in 2 columns x 4 rows (left area)
+    const redStartX = bx + 60;
+    const redStartY = by + 60;
+    const gapX = 46, gapY = 46;
+
+    let idx = 0;
+    // draw 8 red balls: 2 cols x 4 rows
+    for(let c=0;c<2;c++){
+      for(let row=0;row<4;row++){
+        const x = redStartX + c*gapX;
+        const y = redStartY + row*gapY;
+        drawBall(x, y, r, RED, '#8a0e16', (idx+1), '#fff', step===2 ? RED : null);
+        idx++;
+      }
+    }
+
+    // BLACK: 5 balls — bottom row area
+    const blackStartX = bx + 70;
+    const blackY = by + bh - 60;
+    for(let i=0;i<5;i++){
+      const x = blackStartX + i*46;
+      drawBall(x, blackY, r, BLACK, '#000', String(i+1), '#fff', step===2 ? '#2b2d42' : null);
+    }
+
+    // WHITE: n balls (draw a placeholder cluster with a big "n")
+    const whiteCX = bx + bw - 95;
+    const whiteCY = by + bh/2 + 20;
+    // draw 3 stylised white balls + label n
+    for(let i=0;i<3;i++){
+      const x = whiteCX - 20 + i*20;
+      const y = whiteCY - 40 + i*16;
+      drawBall(x, y, r*0.85, WHITE, WBORDER, '', '#333', step===1 ? GOLD : '#8d99ae');
+    }
+    // label 'n' big
+    ctx.save();
+    ctx.font = 'bold 40px "Segoe UI", sans-serif';
+    ctx.fillStyle = GOLD; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('n', whiteCX + 10, whiteCY + 30);
+    ctx.font = 'bold 14px "Segoe UI", sans-serif';
+    ctx.fillText('white', whiteCX + 10, whiteCY + 62);
+    ctx.restore();
+
+    // Count labels near each colour cluster
+    if(step >= 1){
+      label('8 red', bx + 60, by - 16, RED, 15);
+      label('5 black', bx + 150, by + bh + 26, BLACK, 15);
+      label('n white', bx + bw - 85, by - 16, GOLD, 15);
+    }
+
+    // Total expression
+    ctx.save();
+    ctx.font = 'bold 16px "Segoe UI", sans-serif';
+    ctx.fillStyle = '#1d3557'; ctx.textAlign='center';
+    ctx.fillText('Total number of balls  =  n + 5 + 8  =  n + 13', W/2, by + bh + 66);
+    ctx.restore();
+
+    // Step 2: show probability fraction
+    if(step >= 2){
+      ctx.save();
+      ctx.font = 'bold 18px "Segoe UI", sans-serif';
+      ctx.fillStyle = PURPLE; ctx.textAlign='center';
+      ctx.fillText('P(red) =  8 / (n + 13)  =  2 / 5', W/2, by + bh + 100);
+      ctx.restore();
+    }
+
+    // Step 3: highlight equation and result
+    if(step >= 3){
+      ctx.save();
+      ctx.font = 'bold 18px "Segoe UI", sans-serif';
+      ctx.fillStyle = GREEN; ctx.textAlign='center';
+      ctx.fillText('n = 7  ⇒  Total = 20,  P(red) = 8/20 = 2/5 ✓', W/2, by + bh + 134);
+      ctx.restore();
+    }
+
+    // Update readout
+    const msgs = {
+      1: 'Step 1: The box contains $n$ white, 5 black and 8 red balls — total $n + 13$.',
+      2: 'Step 2: $P(\\text{red}) = \\dfrac{8}{n+13}$. Given this equals $\\dfrac{2}{5}$, set $\\dfrac{8}{n+13} = \\dfrac{2}{5}$.',
+      3: 'Step 3: Cross-multiply $8 \\times 5 = 2(n+13) \\Rightarrow n = 7$. Check: $8/20 = 2/5$ ✓'
+    };
+    ro.innerHTML = msgs[step] || msgs[3];
+    if(window.MathJax && MathJax.typesetPromise){ MathJax.typesetPromise([ro]); }
+  }
+
+  // IntersectionObserver for scroll sync
+  const steps = document.querySelectorAll('.step');
+  const io = new IntersectionObserver(es => {
+    es.forEach(e => {
+      if(e.isIntersecting){
+        const s = +e.target.dataset.step;
+        if(s !== current){
+          current = s;
+          steps.forEach(el => el.classList.toggle('active', +el.dataset.step === current));
+          draw(current);
+        }
+      }
+    });
+  }, {rootMargin:'-25% 0px -55% 0px'});
+  steps.forEach(s => io.observe(s));
+
+  // initial
+  steps.forEach(el => el.classList.toggle('active', +el.dataset.step === 1));
+  draw(1);
+})();
 </script>
-
 </body>
 </html>

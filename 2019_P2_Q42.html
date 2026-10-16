@@ -3,356 +3,549 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HKDSE 2019 P2 Q42 – Probability of at least 1 blue cup</title>
-<!-- Tailwind CSS (CDN) -->
-<script src="https://cdn.tailwindcss.com"></script>
-<!-- MathJax for LaTeX rendering -->
+<title>HKDSE Math 2019 Paper 2 Q42 — Probability</title>
 <script>
 window.MathJax = {
-  tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']]
+  },
   svg: { fontCache: 'global' }
 };
 </script>
-<script>
-window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] }, svg:{fontCache:'global'} };
-</script>
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
-  body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #f8fafc; }
-  .step-card { transition: all 0.2s ease; }
-  .step-card.hidden-step .step-content { display: none; }
-  .step-card .step-content { display: block; }
-  .interactive-btn { transition: transform 0.1s, box-shadow 0.2s; }
-  .interactive-btn:active { transform: scale(0.97); }
-  .highlight { background: #fef9c3; border-radius: 0.3rem; padding: 0 0.2rem; }
-  .complement-badge { background: #e0f2fe; color: #0369a1; }
-  .fade-in { animation: fadeIn 0.35s ease; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  :root{
+    --green:#2e9e5b;
+    --blue:#1f6fd6;
+    --red:#d93838;
+    --ink:#1c2533;
+    --muted:#5b6b80;
+    --chip:#eef3fa;
+    --line:#d9e2ef;
+    --bg:#f6f8fc;
+    --card:#ffffff;
+    --amber:#e6a100;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    font-size:16px;
+    line-height:1.55;
+  }
+  .wrap{max-width:1280px;margin:0 auto;padding:16px 14px 60px;}
+  .split{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    gap:12px;
+    align-items:start;
+  }
+  @media(min-width:900px){
+    .split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}
+  }
+  @media(max-width:640px){
+    body{font-size:14.5px;}
+    .wrap{padding:10px 8px 40px;}
+  }
+
+  /* ---------- LEFT PANE ---------- */
+  .diagram{
+    position:sticky;
+    top:16px;
+    max-height:calc(100vh - 2rem);
+    overflow-y:auto;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:12px 12px 8px;
+    box-shadow:0 2px 10px rgba(28,37,51,.06);
+  }
+  .diagram h2{
+    font-size:1rem;
+    margin:0 0 8px;
+    letter-spacing:.02em;
+    color:var(--muted);
+    text-transform:uppercase;
+    font-weight:700;
+  }
+  canvas{width:100%;height:auto;display:block;border-radius:10px;background:#fbfdff;}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;font-size:.82rem;}
+  .legend span{display:inline-flex;align-items:center;gap:6px;color:var(--muted);}
+  .dot{width:12px;height:12px;border-radius:50%;display:inline-block;}
+  .ro{
+    margin:10px 0 0;
+    font-size:.85rem;
+    color:var(--muted);
+    background:var(--chip);
+    border-left:3px solid var(--blue);
+    padding:7px 10px;
+    border-radius:6px;
+  }
+
+  /* ---------- RIGHT PANE ---------- */
+  .qcard{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:14px 16px;
+    box-shadow:0 2px 10px rgba(28,37,51,.06);
+  }
+  .tag{
+    display:inline-block;
+    font-size:.72rem;
+    font-weight:700;
+    letter-spacing:.06em;
+    color:#fff;
+    background:var(--blue);
+    padding:3px 9px;
+    border-radius:999px;
+    margin-bottom:8px;
+  }
+  .qtext{font-size:1.02rem;}
+  .options{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(110px,1fr));
+    gap:6px 14px;
+    margin-top:10px;
+    font-size:.98rem;
+  }
+  .opt{
+    background:var(--chip);
+    border-radius:8px;
+    padding:5px 10px;
+    border:1px solid transparent;
+  }
+  .opt.correct{
+    background:#e7f7ec;
+    border-color:#7fd39f;
+    font-weight:700;
+    color:#14663a;
+  }
+  .opt .lbl{font-weight:700;color:var(--muted);margin-right:6px;}
+
+  h3.sec{
+    font-size:1rem;
+    margin:20px 0 8px;
+    color:var(--blue);
+    letter-spacing:.02em;
+  }
+  .step{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-left:5px solid var(--blue);
+    border-radius:12px;
+    padding:11px 14px;
+    margin-bottom:12px;
+    box-shadow:0 1px 6px rgba(28,37,51,.05);
+    transition:background .25s, box-shadow .25s, transform .25s;
+  }
+  .step.active{
+    background:#f3f8ff;
+    box-shadow:0 3px 14px rgba(31,111,214,.18);
+  }
+  .step .chip{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:24px;height:24px;
+    border-radius:50%;
+    background:var(--blue);
+    color:#fff;
+    font-size:.8rem;
+    font-weight:700;
+    margin-right:8px;
+    vertical-align:middle;
+  }
+  .step b.title{display:inline-block;vertical-align:middle;}
+  .step .hint{
+    display:block;
+    margin-top:7px;
+    font-size:.85rem;
+    color:var(--muted);
+    background:var(--chip);
+    border-radius:7px;
+    padding:5px 9px;
+  }
+  .step p{margin:6px 0 0;}
+  .answerbar{
+    background:linear-gradient(135deg,#14663a,#2e9e5b);
+    color:#fff;
+    padding:12px 16px;
+    border-radius:12px;
+    font-weight:700;
+    margin-top:6px;
+    box-shadow:0 3px 12px rgba(46,158,91,.3);
+  }
+  .answerbar span{font-weight:400;opacity:.9;}
+  code{background:#eef3fa;padding:1px 5px;border-radius:4px;font-size:.92em;}
+  .small{font-size:.88rem;color:var(--muted);}
 </style>
 </head>
-<body class="p-4 md:p-8 lg:p-12">
+<body>
+<div class="wrap">
+  <div class="split">
 
-<main class="max-w-3xl mx-auto">
-
-  <!-- ── QUESTION HEADER ─────────────────────────────── -->
-  <header class="mb-8">
-    <h1 class="text-2xl md:text-3xl font-extrabold text-slate-800 tracking-tight">
-      HKDSE Math 2019 Paper 2 <span class="text-indigo-600">Q42</span>
-    </h1>
-    <p class="text-sm text-slate-500 mt-1">Topic 14 · Probability</p>
-  </header>
-
-  <!-- ── QUESTION OVERVIEW ───────────────────────────── -->
-  <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 md:p-7 mb-8">
-    <div class="flex flex-wrap gap-2 mb-4">
-      <span class="text-xs font-semibold bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full">Probability</span>
-      <span class="text-xs font-semibold bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full">Combination</span>
-      <span class="text-xs font-semibold bg-amber-50 text-amber-700 px-3 py-1 rounded-full">Complement Rule</span>
+    <!-- ================= LEFT: DIAGRAM ================= -->
+    <div class="diagram">
+      <h2>Interactive Figure</h2>
+      <canvas id="cv" width="640" height="620"></canvas>
+      <div class="legend">
+        <span><i class="dot" style="background:#2e9e5b"></i> Green (2)</span>
+        <span><i class="dot" style="background:#1f6fd6"></i> Blue (8)</span>
+        <span><i class="dot" style="background:#d93838"></i> Red (9)</span>
+      </div>
+      <p class="ro" id="ro">Step 1 — the bag contains 2 green + 8 blue + 9 red = 19 cups.</p>
     </div>
 
-    <p class="text-slate-700 leading-relaxed mb-3">
-      There are <strong>2 green cups</strong>, <strong>8 blue cups</strong> and <strong>9 red cups</strong> in a bag.
-      If <strong>6 cups</strong> are randomly drawn from the bag at the same time, find the probability
-      that <strong>at least 1 blue cup</strong> is drawn.
-    </p>
-
-    <!-- Option chips -->
-    <div class="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
-      <div class="bg-slate-50 border border-slate-200 rounded-xl py-3 px-2">
-        <p class="text-xs text-slate-400 font-medium mb-1">A</p>
-        <p class="font-semibold text-slate-700">$\frac{31}{57}$</p>
-      </div>
-      <div class="bg-slate-50 border border-slate-200 rounded-xl py-3 px-2">
-        <p class="text-xs text-slate-400 font-medium mb-1">B</p>
-        <p class="font-semibold text-slate-700">$\frac{44}{323}$</p>
-      </div>
-      <div class="bg-slate-50 border border-slate-200 rounded-xl py-3 px-2">
-        <p class="text-xs text-slate-400 font-medium mb-1">C</p>
-        <p class="font-semibold text-slate-700">$\frac{635}{646}$</p>
-      </div>
-      <div class="bg-slate-50 border border-slate-200 rounded-xl py-3 px-2">
-        <p class="text-xs text-slate-400 font-medium mb-1">D</p>
-        <p class="font-semibold text-slate-700">$\frac{968}{969}$</p><figure style="margin:12px 0;text-align:center;"><img src="figures/2019_P2_Q42.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── VISUAL – THE BAG ───────────────────────────── -->
-  <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 md:p-7 mb-8">
-    <h2 class="text-base font-bold text-slate-700 mb-3 flex items-center gap-2">
-      <span class="text-xl">🎨</span> Visual – What's inside the bag?
-    </h2>
-    <div class="flex flex-wrap gap-4 items-center justify-center">
-      <!-- Green cups -->
-      <div class="flex flex-col items-center">
-        <div class="flex gap-1">
-          <div class="w-8 h-10 rounded-b-lg rounded-t-sm bg-green-400 border border-green-600"></div>
-          <div class="w-8 h-10 rounded-b-lg rounded-t-sm bg-green-400 border border-green-600"></div>
+    <!-- ================= RIGHT: QUESTION + SOLUTION ================= -->
+    <div>
+      <div class="qcard">
+        <span class="tag">2019 Paper 2 · Q42</span>
+        <div class="qtext">
+          There are 2 green cups, 8 blue cups and 9 red cups in a bag.
+          If 6 cups are randomly drawn from the bag at the same time,
+          find the probability that at least 1 blue cup is drawn.
         </div>
-        <p class="text-xs text-slate-500 mt-1">2 green</p>
-      </div>
-      <!-- Blue cups -->
-      <div class="flex flex-col items-center">
-        <div class="flex gap-1 flex-wrap justify-center max-w-[200px]">
-          <div class="w-8 h-10 rounded-b-lg rounded-t-sm bg-blue-400 border border-blue-600"></div>
-          <div class="w-8 h-10 rounded-b-lg rounded-t-sm bg-blue-400 border border-blue-600"></div>
-          <div class="w-8 h-10 rounded-b-lg rounded-t-sm bg-blue-400 border border-blue-600"></div>
-          <div class="w-8 h-10 rounded-b-lg rounded-t-sm bg-blue-400 border border-blue-600"></div>
-          <div class="w-8 h-10 rounded-b-lg rounded-t-sm bg-blue-400 border border-blue-600"></div>
-          <div class="w-8 h-10 rounded-b-lg rounded-t-sm bg-blue-400 border border-blue-600"></div>
-          <div class="w-8 h-10 rounded-b-lg rounded-t-sm bg-blue-400 border border-blue-600"></div>
-          <div class="w-8 h-10 rounded-b-lg rounded-t-sm bg-blue-400 border border-blue-600"></div>
+        <div class="options">
+          <div class="opt"><span class="lbl">A.</span> $\dfrac{31}{57}$</div>
+          <div class="opt"><span class="lbl">B.</span> $\dfrac{44}{323}$</div>
+          <div class="opt correct"><span class="lbl">C.</span> $\dfrac{635}{646}$</div>
+          <div class="opt"><span class="lbl">D.</span> $\dfrac{968}{969}$</div>
         </div>
-        <p class="text-xs text-slate-500 mt-1">8 blue</p>
       </div>
-      <!-- Red cups -->
-      <div class="flex flex-col items-center">
-        <div class="flex gap-1 flex-wrap justify-center max-w-[220px]">
-          <div class="w-8 h-10 rounded-b-lg rounded-t-sm bg-red-400 border border-red-600"></div>
-          <div class="w-8 h-10 rounded-b-lg rounded-t-sm bg-red-400 border border-red-600"></div>
-          <div class="w-8 h-10 rounded-b-lg rounded-t-sm bg-red-400 border border-red-600"></div>
-          <div class="w-8 h-10 rounded-b-lg rounded-t-sm bg-red-400 border border-red-600"></div>
-          <div class="w-8 h-10 rounded-b-lg rounded-t-sm bg-red-400 border border-red-600"></div>
-          <div class="w-8 h-10 rounded-b-lg rounded-t-sm bg-red-400 border border-red-600"></div>
-          <div class="w-8 h-10 rounded-b-lg rounded-t-sm bg-red-400 border border-red-600"></div>
-          <div class="w-8 h-10 rounded-b-lg rounded-t-sm bg-red-400 border border-red-600"></div>
-          <div class="w-8 h-10 rounded-b-lg rounded-t-sm bg-red-400 border border-red-600"></div>
-        </div>
-        <p class="text-xs text-slate-500 mt-1">9 red</p>
-      </div>
-    </div>
-    <p class="text-center text-sm text-slate-500 mt-3">Total = 2 + 8 + 9 = <strong>19</strong> cups</p>
-  </section>
 
-  <!-- ── STEP‑BY‑STEP SOLUTION ──────────────────────── -->
-  <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 md:p-7 mb-8">
-    <h2 class="text-base font-bold text-slate-700 mb-4 flex items-center gap-2">
-      <span class="text-xl">📘</span> Step‑by‑Step Solution
-    </h2>
+      <figure style="margin:12px 0;text-align:center;"><img src="figures/2019_P2_Q42.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
 
-    <!-- Step 1 -->
-    <div class="step-card border border-slate-200 rounded-xl mb-3 overflow-hidden">
-      <button class="step-toggle w-full flex justify-between items-center px-4 py-3 bg-slate-50 hover:bg-slate-100 text-left font-semibold text-slate-700 text-sm md:text-base">
-        <span>Step 1 · Understand “at least 1 blue”</span>
-        <span class="text-indigo-500 text-lg step-icon">＋</span>
-      </button>
-      <div class="step-content px-4 py-3 text-sm text-slate-600 border-t border-slate-100">
-        <p>“At least 1 blue cup” means <strong>1, 2, 3, 4, 5, 6 or ... actually up to 8</strong> blue cups (since we can't draw more blue cups than exist).</p>
-        <p class="mt-2">Instead of adding all those cases, we use the <span class="highlight">complement rule</span>:</p>
-        <p class="mt-1 text-center font-mono bg-slate-50 rounded py-2">P(at least 1 blue) = 1 − P(no blue cups)</p>
-        <p class="mt-2 text-xs text-slate-400">💡 This is much faster – only one case to compute!</p>
-      </div>
-    </div>
+      <h3 class="sec">Step-by-step Solution</h3>
 
-    <!-- Step 2 -->
-    <div class="step-card border border-slate-200 rounded-xl mb-3 overflow-hidden">
-      <button class="step-toggle w-full flex justify-between items-center px-4 py-3 bg-slate-50 hover:bg-slate-100 text-left font-semibold text-slate-700 text-sm md:text-base">
-        <span>Step 2 · Count total ways to draw 6 cups</span>
-        <span class="text-indigo-500 text-lg step-icon">＋</span>
-      </button>
-      <div class="step-content px-4 py-3 text-sm text-slate-600 border-t border-slate-100">
-        <p>Total cups: $2 + 8 + 9 = 19$.</p>
-        <p class="mt-2">Number of ways to choose 6 out of 19 (order doesn’t matter):</p>
-        <p class="text-center mt-2 text-base">$$ C^{19}_{6} = 27132 $$</p>
-        <p class="mt-2 text-xs text-slate-400">💡 Combination formula: $C^{n}_{r} = \frac{n!}{r!(n-r)!}$</p>
+      <div class="step" data-step="1">
+        <span class="chip">1</span><b class="title">Read off the contents of the bag.</b>
+        <p>
+          Green $=2$, Blue $=8$, Red $=9$.
+          Total number of cups:
+          \[ 2+8+9 = 19 \]
+          Number of cups that are <em>not</em> blue:
+          \[ 2+9 = 11 \]
+        </p>
+        <span class="hint">Hint: separate “blue” from “non-blue” — the complementary event is much easier here.</span>
       </div>
-    </div>
 
-    <!-- Step 3 -->
-    <div class="step-card border border-slate-200 rounded-xl mb-3 overflow-hidden">
-      <button class="step-toggle w-full flex justify-between items-center px-4 py-3 bg-slate-50 hover:bg-slate-100 text-left font-semibold text-slate-700 text-sm md:text-base">
-        <span>Step 3 · Count ways to draw 6 cups with NO blue</span>
-        <span class="text-indigo-500 text-lg step-icon">＋</span>
-      </button>
-      <div class="step-content px-4 py-3 text-sm text-slate-600 border-t border-slate-100">
-        <p>If no blue cup is drawn, we must pick all 6 cups from the <strong>non‑blue</strong> cups.</p>
-        <p class="mt-2">Number of non‑blue cups: green + red = $2 + 9 = 11$.</p>
-        <p class="mt-2">Number of ways to choose 6 from 11:</p>
-        <p class="text-center mt-2 text-base">$$ C^{11}_{6} = 462 $$</p>
-        <p class="mt-2 text-xs text-slate-400">💡 We are selecting only from the 11 non‑blue cups.</p>
+      <div class="step" data-step="2">
+        <span class="chip">2</span><b class="title">Use the complement: $P(\text{at least 1 blue}) = 1 - P(\text{0 blue})$.</b>
+        <p>
+          “At least 1 blue” and “0 blue” are complementary events, so
+          \[ P(\text{at least 1 blue}) = 1 - P(\text{0 blue}). \]
+        </p>
+        <span class="hint">Hint: “at least one” almost always suggests the complementary event “none”.</span>
       </div>
-    </div>
 
-    <!-- Step 4 -->
-    <div class="step-card border border-slate-200 rounded-xl mb-3 overflow-hidden">
-      <button class="step-toggle w-full flex justify-between items-center px-4 py-3 bg-slate-50 hover:bg-slate-100 text-left font-semibold text-slate-700 text-sm md:text-base">
-        <span>Step 4 · Compute P(0 blue cups)</span>
-        <span class="text-indigo-500 text-lg step-icon">＋</span>
-      </button>
-      <div class="step-content px-4 py-3 text-sm text-slate-600 border-t border-slate-100">
-        <p>$$ P(\text{0 blue}) = \frac{\text{favourable}}{\text{total}} = \frac{C^{11}_{6}}{C^{19}_{6}} = \frac{462}{27132} $$</p>
-        <p class="mt-2">Simplify the fraction:</p>
-        <p class="text-center mt-1">$$ \frac{462 \div 42}{27132 \div 42} = \frac{11}{646} $$</p>
-        <p class="mt-2 text-xs text-slate-400">💡 Divide numerator and denominator by 42.</p>
+      <div class="step" data-step="3">
+        <span class="chip">3</span><b class="title">Count total ways to choose 6 cups from 19.</b>
+        <p>
+          Order does not matter (drawn at the same time), so combinations:
+          \[ \binom{19}{6} \]
+        </p>
+        <span class="hint">Hint: “drawn at the same time” $\Rightarrow$ use $C^n_r$, not permutations.</span>
       </div>
+
+      <div class="step" data-step="4">
+        <span class="chip">4</span><b class="title">Count favourable ways with 0 blue cups (all 6 from the 11 non-blue).</b>
+        <p>
+          Choose 6 cups from the $2+9=11$ non-blue cups:
+          \[ \binom{11}{6} \]
+        </p>
+        <span class="hint">Hint: 0 blue means every chosen cup is green or red.</span>
+      </div>
+
+      <div class="step" data-step="5">
+        <span class="chip">5</span><b class="title">Compute $P(\text{0 blue})$.</b>
+        <p>
+          \[
+          P(\text{0 blue}) = \frac{\binom{11}{6}}{\binom{19}{6}}
+          = \frac{462}{27132}
+          = \frac{11}{646}
+          \]
+        </p>
+        <span class="hint">Hint: $\binom{11}{6}=462$, $\binom{19}{6}=27132$; reduce by dividing by 42.</span>
+      </div>
+
+      <div class="step" data-step="6">
+        <span class="chip">6</span><b class="title">Subtract from 1 to get the required probability.</b>
+        <p>
+          \[
+          P(\text{at least 1 blue}) = 1 - \frac{11}{646}
+          = \frac{646-11}{646}
+          = \frac{635}{646}
+          \]
+        </p>
+        <span class="hint">Hint: give the fraction a common denominator, then simplify if possible.</span>
+      </div>
+
+      <div class="answerbar">
+        Answer: <span>C.</span> $\dfrac{635}{646}$
+      </div>
+
+      <p class="small" style="margin-top:12px;">
+        Alternative check: $P(\text{at least 1 blue}) = P(1B)+P(2B)+\cdots+P(6B)$
+        $= \dfrac{\binom{8}{1}\binom{11}{5}+\binom{8}{2}\binom{11}{4}+\cdots+\binom{8}{6}\binom{11}{0}}{\binom{19}{6}} = \dfrac{635}{646}$.
+      </p>
     </div>
 
-    <!-- Step 5 -->
-    <div class="step-card border border-slate-200 rounded-xl mb-3 overflow-hidden">
-      <button class="step-toggle w-full flex justify-between items-center px-4 py-3 bg-slate-50 hover:bg-slate-100 text-left font-semibold text-slate-700 text-sm md:text-base">
-        <span>Step 5 · Final answer – apply complement</span>
-        <span class="text-indigo-500 text-lg step-icon">＋</span>
-      </button>
-      <div class="step-content px-4 py-3 text-sm text-slate-600 border-t border-slate-100">
-        <p>$$ P(\text{at least 1 blue}) = 1 - P(\text{0 blue}) $$</p>
-        <p class="mt-2 text-center text-base">$$ = 1 - \frac{11}{646} = \frac{646 - 11}{646} = \frac{635}{646} $$</p>
-        <p class="mt-3 font-bold text-indigo-700 text-center text-lg">Answer: C</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── INTERACTIVE EXPLORER ───────────────────────── -->
-  <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 md:p-7 mb-8">
-    <h2 class="text-base font-bold text-slate-700 mb-4 flex items-center gap-2">
-      <span class="text-xl">🧮</span> Interactive Combination Calculator
-    </h2>
-    <p class="text-sm text-slate-500 mb-4">Move the slider to change the number of cups drawn (k) and see how the probability changes.</p>
-
-    <div class="flex flex-col md:flex-row items-center gap-4">
-      <label class="text-sm font-medium text-slate-600 whitespace-nowrap">Number drawn: <span id="k-value" class="font-bold text-indigo-600">6</span></label>
-      <input id="k-slider" type="range" min="1" max="6" value="6" step="1"
-             class="w-full md:w-64 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
-    </div>
-
-    <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3 text-center text-sm">
-      <div class="bg-slate-50 rounded-xl py-3 px-2">
-        <p class="text-slate-400 text-xs">Total ways $C^{19}_{k}$</p>
-        <p id="total-ways" class="font-mono font-semibold text-slate-700">27,132</p>
-      </div>
-      <div class="bg-slate-50 rounded-xl py-3 px-2">
-        <p class="text-slate-400 text-xs">No‑blue ways $C^{11}_{k}$</p>
-        <p id="noblue-ways" class="font-mono font-semibold text-slate-700">462</p>
-      </div>
-      <div class="bg-indigo-50 rounded-xl py-3 px-2">
-        <p class="text-indigo-400 text-xs">P(at least 1 blue)</p>
-        <p id="prob-result" class="font-mono font-bold text-indigo-700">0.98297…</p>
-      </div>
-    </div>
-    <p class="text-xs text-slate-400 mt-3">* Since we draw at most 6 cups, some probabilities are shown for exploration. The original question uses k = 6.</p>
-  </section>
-
-  <!-- ── INSIGHT / TAKEAWAY ─────────────────────────── -->
-  <section class="bg-gradient-to-r from-indigo-50 to-emerald-50 rounded-2xl border border-indigo-100 p-5 md:p-7">
-    <h2 class="text-base font-bold text-slate-700 mb-2 flex items-center gap-2">
-      <span class="text-xl">💡</span> Key Insight
-    </h2>
-    <p class="text-sm text-slate-600 leading-relaxed">
-      When a question says <strong>“at least one”</strong>, always think of the <strong>complement</strong>.
-      Calculating <em>P(no blue)</em> is just one simple combination, whereas adding all possibilities (1 blue, 2 blue, …) would take much longer.
-    </p>
-  </section>
-
-</main>
+  </div>
+</div>
 
 <script>
-  // ── Accordion logic ───────────────────────────────
-  document.querySelectorAll('.step-toggle').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const card = btn.closest('.step-card');
-      const content = card.querySelector('.step-content');
-      const icon = btn.querySelector('.step-icon');
-      const isHidden = content.style.display === 'none' || content.style.display === '';
+(function(){
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  const ro = document.getElementById('ro');
+  let current = 1;
 
-      if (isHidden) {
-        content.style.display = 'block';
-        content.classList.add('fade-in');
-        icon.textContent = '−';
-      } else {
-        content.style.display = 'none';
-        icon.textContent = '＋';
-      }
+  const GREEN='#2e9e5b', BLUE='#1f6fd6', RED='#d93838';
+  const INK='#1c2533', MUTED='#5b6b80', LINE='#d9e2ef';
+
+  // ---------- helpers ----------
+  function rr(x,y,w,h,r,fill,stroke){
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);
+    ctx.arcTo(x+w,y,x+w,y+h,r);
+    ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r);
+    ctx.arcTo(x,y,x+w,y,r);
+    ctx.closePath();
+    if(fill){ctx.fillStyle=fill;ctx.fill();}
+    if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1.5;ctx.stroke();}
+  }
+  function txt(s,x,y,size,color,align,weight){
+    ctx.fillStyle=color||INK;
+    ctx.font=(weight||'600')+' '+(size||13)+'px "Segoe UI",Arial,sans-serif';
+    ctx.textAlign=align||'center';
+    ctx.textBaseline='middle';
+    ctx.fillText(s,x,y);
+  }
+  function cup(x,y,r,color,alpha){
+    // small cup shape: rounded trapezoid + handle
+    ctx.save();
+    ctx.globalAlpha = alpha===undefined?1:alpha;
+    ctx.beginPath();
+    ctx.moveTo(x-r*0.85,y-r*0.9);
+    ctx.lineTo(x+r*0.85,y-r*0.9);
+    ctx.lineTo(x+r*0.6,y+r*0.95);
+    ctx.lineTo(x-r*0.6,y+r*0.95);
+    ctx.closePath();
+    ctx.fillStyle=color;
+    ctx.fill();
+    ctx.strokeStyle='rgba(0,0,0,.22)';
+    ctx.lineWidth=1.2;
+    ctx.stroke();
+    // rim
+    ctx.beginPath();
+    ctx.ellipse(x,y-r*0.9,r*0.85,r*0.22,0,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,255,255,.45)';
+    ctx.fill();
+    ctx.strokeStyle='rgba(0,0,0,.18)';
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // ---------- drawing parts ----------
+  function drawBag(highlightBlue){
+    // bag
+    const bx=120, by=70, bw=380, bh=330;
+    ctx.save();
+    rr(bx,by,bw,bh,16,'#fdf6e6','#c9b98f');
+    // bag mouth
+    ctx.beginPath();
+    ctx.moveTo(bx+20,by);
+    ctx.quadraticCurveTo(bx+bw/2, by-34, bx+bw-20, by);
+    ctx.strokeStyle='#c9b98f';
+    ctx.lineWidth=3;
+    ctx.stroke();
+    ctx.restore();
+
+    txt('BAG', bx+bw/2, by+22, 13, '#a08c50', 'center','700');
+
+    // rows of cups: 2 green, 8 blue, 9 red
+    const r = 17;
+    let gx = bx+55, gy = by+95;
+    // green row (2)
+    for(let i=0;i<2;i++){
+      cup(gx+i*70, gy, r, GREEN);
+    }
+    // blue rows (8) -> 4 + 4
+    let byy = gy+80;
+    for(let i=0;i<4;i++) cup(bx+45+i*68, byy, r, BLUE, highlightBlue===false?0.35:1);
+    for(let i=0;i<4;i++) cup(bx+45+i*68, byy+68, r, BLUE, highlightBlue===false?0.35:1);
+    // red rows (9) -> 5 + 4
+    let ry = byy+142;
+    for(let i=0;i<5;i++) cup(bx+32+i*56, ry, r, RED);
+    for(let i=0;i<4;i++) cup(bx+60+i*56, ry+60, r, RED);
+
+    if(highlightBlue!==false){
+      // highlight ring around blue block
+      ctx.save();
+      ctx.setLineDash([6,5]);
+      ctx.strokeStyle=BLUE;
+      ctx.lineWidth=2.5;
+      rr(bx+22, byy-42, 4*68+18, 2*68+14, 12, null, BLUE);
+      ctx.restore();
+      txt('8 blue cups', bx+bw-70, byy-52, 13, BLUE, 'center','700');
+    }
+  }
+
+  function drawBagLegend(alphaBlue){
+    const y=430;
+    const items=[
+      {c:GREEN, n:'2', label:'green'},
+      {c:BLUE,  n:'8', label:'blue'},
+      {c:RED,   n:'9', label:'red'}
+    ];
+    const w=150, gap=14, startX=120;
+    items.forEach((it,i)=>{
+      const x=startX+i*(w+gap);
+      ctx.save();
+      ctx.globalAlpha = (it.c===BLUE && alphaBlue===false)?0.35:1;
+      rr(x,y,w,58,12,'#ffffff',LINE);
+      cup(x+30, y+29, 15, it.c);
+      txt(it.n+' '+it.label, x+30+w/2+22, y+29, 14, INK, 'center','700');
+      ctx.restore();
     });
-    // initially hide all steps except step 1
-    const card = btn.closest('.step-card');
-    const content = card.querySelector('.step-content');
-    if (card.dataset.step !== '1' && btn.closest('.step-card') !== document.querySelector('.step-card')) {
-      // We’ll handle separately below
+  }
+
+  function drawTree(){
+    // tree diagram: branch blue / non-blue for 6 draws compressed
+    const topY=70;
+    const cx=300;
+    txt('Tree diagram (6 draws)', 320, 40, 14, MUTED,'center','700');
+
+    // root
+    ctx.beginPath();
+    ctx.arc(cx, topY+10, 6, 0, Math.PI*2);
+    ctx.fillStyle=INK; ctx.fill();
+
+    // branch B (blue) on left, non-B on right
+    const y1=160, y2=160;
+    const leftX=150, rightX=470;
+
+    // lines
+    ctx.strokeStyle=BLUE; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(cx, topY+16); ctx.lineTo(leftX, y1-40); ctx.stroke();
+    ctx.strokeStyle=GREEN; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(cx, topY+16); ctx.lineTo(rightX, y2-40); ctx.stroke();
+
+    // nodes
+    ctx.beginPath(); ctx.arc(leftX, y1-30, 24, 0, Math.PI*2);
+    ctx.fillStyle='rgba(31,111,214,.12)'; ctx.fill();
+    ctx.strokeStyle=BLUE; ctx.lineWidth=2.5; ctx.stroke();
+    txt('B', leftX, y1-30, 18, BLUE,'center','800');
+
+    ctx.beginPath(); ctx.arc(rightX, y2-30, 24, 0, Math.PI*2);
+    ctx.fillStyle='rgba(46,158,91,.12)'; ctx.fill();
+    ctx.strokeStyle=GREEN; ctx.lineWidth=2.5; ctx.stroke();
+    txt('B\u0305', rightX, y2-30, 18, GREEN,'center','800');
+
+    // probability labels
+    txt('8/19', (cx+leftX)/2-16, 100, 14, BLUE,'center','700');
+    txt('11/19', (cx+rightX)/2+18, 100, 14, GREEN,'center','700');
+
+    // under branches: text
+    txt('at least', leftX, y1+16, 13, BLUE,'center','700');
+    txt('1 blue', leftX, y1+36, 13, BLUE,'center','700');
+    txt('(success)', leftX, y1+56, 12, MUTED,'center','600');
+
+    txt('0 blue', rightX, y1+16, 13, GREEN,'center','700');
+    txt('(all non-blue)', rightX, y1+40, 12, MUTED,'center','600');
+
+    // bottom formula
+    rr(70, 300, 500, 120, 14, '#f7fbff', LINE);
+    txt('Complement rule', 320, 326, 14, BLUE,'center','800');
+    txt('P(at least 1 blue) = 1 \u2212 P(0 blue)', 320, 356, 16, INK,'center','700');
+    txt('= 1 \u2212 C(11,6)/C(19,6) = 635/646', 320, 390, 16, INK,'center','700');
+  }
+
+  function drawCounting(){
+    // counting visualisation: total C(19,6) vs favourable C(11,6)
+    txt('Counting the ways', 320, 42, 15, MUTED,'center','800');
+
+    // total box
+    rr(60, 80, 500, 96, 14, '#f3f8ff', BLUE);
+    txt('Total ways (choose 6 from 19)', 310, 110, 14, BLUE,'center','800');
+    txt('C(19,6) = 27132', 310, 146, 18, INK,'center','800');
+
+    // favourable box
+    rr(60, 208, 500, 96, 14, '#eefaf1', GREEN);
+    txt('Favourable ways (0 blue: choose 6 from 11 non-blue)', 310, 238, 13.5, GREEN,'center','800');
+    txt('C(11,6) = 462', 310, 274, 18, INK,'center','800');
+
+    // fraction
+    txt('P(0 blue) =', 320, 342, 17, INK,'center','800');
+    ctx.strokeStyle=INK; ctx.lineWidth=2.5;
+    ctx.beginPath(); ctx.moveTo(230,352); ctx.lineTo(410,352); ctx.stroke();
+    txt('462', 320, 336, 18, INK,'center','800');
+    txt('27132', 320, 372, 18, INK,'center','800');
+    txt('=', 440, 356, 18, INK,'center','800');
+    txt('11/646', 500, 356, 18, RED,'center','800');
+
+    // final
+    rr(150, 420, 340, 62, 14, '#14663a', null);
+    txt('1 \u2212 11/646 = 635/646', 320, 451, 19, '#ffffff','center','800');
+  }
+
+  function draw(step){
+    ctx.clearRect(0,0,640,620);
+
+    // frame
+    rr(8,8,624,604,18,'#fbfdff',LINE);
+
+    if(step<=1){
+      drawBag(true);
+      drawBagLegend(true);
+      ro.textContent='Step 1 — the bag contains 2 green + 8 blue + 9 red = 19 cups (11 are non-blue).';
+    }else if(step===2){
+      drawTree();
+      ro.textContent='Step 2 — use the complement: P(at least 1 blue) = 1 \u2212 P(0 blue).';
+    }else if(step<=4){
+      drawCounting();
+      ro.textContent='Step ' + step + ' — count total ways C(19,6) and favourable ways C(11,6).';
+    }else{
+      drawCounting();
+      ro.textContent='Step ' + step + ' — P(0 blue) = 462/27132 = 11/646, so the answer is 635/646.';
     }
+  }
+
+  draw(1);
+
+  // ---------- scroll sync ----------
+  if('IntersectionObserver' in window){
+    const io=new IntersectionObserver(es=>{
+      es.forEach(e=>{
+        if(e.isIntersecting){
+          const n=+e.target.dataset.step;
+          if(n!==current){
+            current=n;
+            draw(current);
+            document.querySelectorAll('.step').forEach(s=>{
+              s.classList.toggle('active', +s.dataset.step===current);
+            });
+          }
+        }
+      });
+    },{rootMargin:'-25% 0px -55% 0px'});
+    document.querySelectorAll('.step').forEach(s=>io.observe(s));
+  }
+
+  // click a step to jump
+  document.querySelectorAll('.step').forEach(s=>{
+    s.addEventListener('click',()=>{
+      current=+s.dataset.step;
+      draw(current);
+      document.querySelectorAll('.step').forEach(x=>x.classList.toggle('active', x===s));
+    });
   });
-
-  // Show only the first step card open by default
-  document.querySelectorAll('.step-card').forEach((card, idx) => {
-    const content = card.querySelector('.step-content');
-    const icon = card.querySelector('.step-icon');
-    if (idx === 0) {
-      content.style.display = 'block';
-      icon.textContent = '−';
-    } else {
-      content.style.display = 'none';
-      icon.textContent = '＋';
-    }
-  });
-
-  // ── Interactive slider ─────────────────────────────
-  const slider = document.getElementById('k-slider');
-  const kValue = document.getElementById('k-value');
-  const totalWaysEl = document.getElementById('total-ways');
-  const noblueWaysEl = document.getElementById('noblue-ways');
-  const probEl = document.getElementById('prob-result');
-
-  // Combinations
-  function comb(n, r) {
-    if (r < 0 || r > n) return 0;
-    let res = 1;
-    for (let i = 0; i < r; i++) {
-      res = res * (n - i) / (i + 1);
-    }
-    return Math.round(res);
-  }
-
-  function update() {
-    const k = parseInt(slider.value);
-    kValue.textContent = k;
-    const total = comb(19, k);
-    const noBlue = comb(11, k);
-    const prob = 1 - (noBlue / total);
-
-    totalWaysEl.textContent = total.toLocaleString();
-    noblueWaysEl.textContent = noBlue.toLocaleString();
-    probEl.textContent = prob.toFixed(5) + '…';
-
-    // Update MathJax if needed (not required for simple text)
-  }
-
-  slider.addEventListener('input', update);
-  update(); // initialise
-
-  // Re-render MathJax when needed
-  if (window.MathJax) {
-    MathJax.typesetPromise && MathJax.typesetPromise();
-  }
+})();
 </script>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
-
 </body>
 </html>

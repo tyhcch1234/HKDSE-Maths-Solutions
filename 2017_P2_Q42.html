@@ -1,386 +1,278 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HKDSE Math 2017 Paper 2 Q42 · Probability · Combination</title>
-  <!-- Tailwind CSS CDN (lightweight, modern) -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- MathJax for LaTeX-like rendering -->
-  <script>
-    window.MathJax = {
-      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
-      svg: { fontCache: 'global' }
-    };
-  </script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
-  <style>
-    /* Custom smooth transitions and subtle effects */
-    .step-card {
-      transition: all 0.25s ease-in-out;
-      border-left: 6px solid #3b82f6; /* blue-500 */
-    }
-    .step-card.closed .step-content {
-      display: none;
-    }
-    .step-card.closed .step-arrow {
-      transform: rotate(-90deg);
-    }
-    .step-arrow {
-      transition: transform 0.2s;
-    }
-    .badge {
-      background: #eef2ff;
-      color: #1e3a8a;
-      font-weight: 500;
-      font-size: 0.8rem;
-      padding: 0.25rem 0.75rem;
-      border-radius: 9999px;
-    }
-    .combo-box {
-      transition: background 0.2s;
-    }
-    .combo-box:hover {
-      background: #f0f9ff;
-    }
-    /* slider styling */
-    input[type=range] {
-      -webkit-appearance: none;
-      width: 100%;
-      height: 8px;
-      border-radius: 4px;
-      background: #d1d5db;
-      outline: none;
-    }
-    input[type=range]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      background: #2563eb;
-      cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-    }
-  </style>
-</head>
-<body class="bg-slate-50 font-sans antialiased text-slate-800 min-h-screen py-6 px-4 sm:px-6">
-
-  <div class="max-w-3xl mx-auto">
-
-    <!-- HEADER / QUESTION OVERVIEW -->
-    <div class="mb-6">
-      <span class="badge mr-2">HKDSE 2017 Paper 2 Q42</span>
-      <span class="badge">Probability</span>
-      <span class="badge">Combination</span>
-    </div>
-    <div class="bg-white rounded-2xl shadow-md p-6 mb-8 border border-slate-100">
-      <h1 class="text-2xl font-semibold tracking-tight mb-3 text-slate-900">Committee Team Selection</h1>
-      <p class="text-lg leading-relaxed">
-        There are <strong>13 students</strong> and <strong>6 teachers</strong> in a committee.
-        If <strong>5 students</strong> and <strong>4 teachers</strong> are selected from the committee to form a team,
-        how many different teams can be formed?
-      </p><figure style="margin:12px 0;text-align:center;"><img src="figures/2017_P2_Q42.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
-      <div class="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2 text-center font-medium text-slate-700">
-        <div class="bg-slate-100 rounded-xl py-2">A. 4 290</div>
-        <div class="bg-slate-100 rounded-xl py-2">B. 19 305</div>
-        <div class="bg-slate-100 rounded-xl py-2">C. 92 378</div>
-        <div class="bg-slate-100 rounded-xl py-2">D. 55 598 400</div>
-      </div>
-    </div>
-
-    <!-- VISUAL / INTERACTIVE CONCEPT: COMBINATION COUNTER -->
-    <div class="bg-white rounded-2xl shadow-md p-6 mb-8 border border-slate-100">
-      <h2 class="text-xl font-semibold mb-3 flex items-center gap-2">
-        <span class="text-blue-600">🔍</span> Visualise the Combinations
-      </h2>
-      <p class="text-sm text-slate-600 mb-4">
-        Click on the students/teachers to select them — the count updates automatically. 
-        You need exactly <strong>5 students</strong> and <strong>4 teachers</strong>.
-      </p>
-      <!-- Student selection area -->
-      <div class="mb-4">
-        <div class="flex justify-between items-center mb-1">
-          <span class="font-medium text-slate-700">Students (need 5)</span>
-          <span id="studentCounter" class="text-sm bg-blue-100 px-3 py-0.5 rounded-full">0 / 5</span>
-        </div>
-        <div id="studentsGrid" class="flex flex-wrap gap-2 p-2 bg-slate-50 rounded-xl min-h-[60px]">
-          <!-- JS will populate 13 student chips -->
-        </div>
-      </div>
-      <!-- Teacher selection area -->
-      <div class="mb-4">
-        <div class="flex justify-between items-center mb-1">
-          <span class="font-medium text-slate-700">Teachers (need 4)</span>
-          <span id="teacherCounter" class="text-sm bg-emerald-100 px-3 py-0.5 rounded-full">0 / 4</span>
-        </div>
-        <div id="teachersGrid" class="flex flex-wrap gap-2 p-2 bg-slate-50 rounded-xl min-h-[60px]">
-          <!-- JS will populate 6 teacher chips -->
-        </div>
-      </div>
-      <!-- Live count display -->
-      <div class="bg-blue-50 p-3 rounded-xl flex flex-wrap items-center justify-between text-sm">
-        <div>
-          <span class="text-slate-600">Current selection:</span>
-          <span id="currentSelection" class="font-semibold text-blue-800 ml-1">0 students, 0 teachers</span>
-        </div>
-        <div class="text-slate-500 italic text-xs">
-          (Visual aid – not a substitute for the mathematical proof)
-        </div>
-      </div>
-      <!-- Reset button -->
-      <button id="resetVisual" class="mt-3 text-sm text-blue-600 underline hover:text-blue-800">Reset selection</button>
-    </div>
-
-    <!-- STEP-BY-STEP SOLUTION (Accordion style) -->
-    <div class="mb-8">
-      <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
-        <span class="text-blue-600">📘</span> Step-by-Step Solution
-      </h2>
-      
-      <!-- Step 1 -->
-      <div class="step-card bg-white rounded-xl shadow-sm mb-3 overflow-hidden closed" data-step="1">
-        <div class="step-header flex justify-between items-center p-4 cursor-pointer hover:bg-slate-50" onclick="toggleStep(1)">
-          <div class="flex items-center gap-3">
-            <span class="w-7 h-7 rounded-full bg-blue-100 text-blue-800 flex items-center justify-center font-semibold text-sm">1</span>
-            <span class="font-medium">Understand the task</span>
-          </div>
-          <span class="step-arrow text-slate-400 text-xl leading-none">▾</span>
-        </div>
-        <div class="step-content px-4 pb-4 text-slate-700 border-t border-slate-100 pt-3">
-          <p>We need to form a team by choosing <strong>5 students out of 13</strong> and <strong>4 teachers out of 6</strong>.</p>
-          <p class="mt-2">The order of selection does <strong>not</strong> matter — we only care about which individuals are chosen.</p>
-          <p class="mt-2">This is a classic <strong>combination</strong> problem. The total number of teams is the product of the two independent selections.</p>
-        </div>
-      </div>
-
-      <!-- Step 2 -->
-      <div class="step-card bg-white rounded-xl shadow-sm mb-3 overflow-hidden closed" data-step="2">
-        <div class="step-header flex justify-between items-center p-4 cursor-pointer hover:bg-slate-50" onclick="toggleStep(2)">
-          <div class="flex items-center gap-3">
-            <span class="w-7 h-7 rounded-full bg-blue-100 text-blue-800 flex items-center justify-center font-semibold text-sm">2</span>
-            <span class="font-medium">Choose the students</span>
-          </div>
-          <span class="step-arrow text-slate-400 text-xl leading-none">▾</span>
-        </div>
-        <div class="step-content px-4 pb-4 text-slate-700 border-t border-slate-100 pt-3">
-          <p>Number of ways to choose 5 students from 13:</p>
-          <p class="my-2 text-lg">\[
-            C^{13}_{5} = C^{13}_{5} = \frac{13!}{5! \cdot 8!}
-          \]</p>
-          <p class="text-slate-600 text-sm">Hint: \(n! = n \times (n-1) \times \dots \times 1\)</p>
-        </div>
-      </div>
-
-      <!-- Step 3 -->
-      <div class="step-card bg-white rounded-xl shadow-sm mb-3 overflow-hidden closed" data-step="3">
-        <div class="step-header flex justify-between items-center p-4 cursor-pointer hover:bg-slate-50" onclick="toggleStep(3)">
-          <div class="flex items-center gap-3">
-            <span class="w-7 h-7 rounded-full bg-blue-100 text-blue-800 flex items-center justify-center font-semibold text-sm">3</span>
-            <span class="font-medium">Choose the teachers</span>
-          </div>
-          <span class="step-arrow text-slate-400 text-xl leading-none">▾</span>
-        </div>
-        <div class="step-content px-4 pb-4 text-slate-700 border-t border-slate-100 pt-3">
-          <p>Number of ways to choose 4 teachers from 6:</p>
-          <p class="my-2 text-lg">\[
-            C^{6}_{4} = C^{6}_{4} = \frac{6!}{4! \cdot 2!}
-          \]</p>
-        </div>
-      </div>
-
-      <!-- Step 4 -->
-      <div class="step-card bg-white rounded-xl shadow-sm mb-3 overflow-hidden closed" data-step="4">
-        <div class="step-header flex justify-between items-center p-4 cursor-pointer hover:bg-slate-50" onclick="toggleStep(4)">
-          <div class="flex items-center gap-3">
-            <span class="w-7 h-7 rounded-full bg-blue-100 text-blue-800 flex items-center justify-center font-semibold text-sm">4</span>
-            <span class="font-medium">Multiply the results</span>
-          </div>
-          <span class="step-arrow text-slate-400 text-xl leading-none">▾</span>
-        </div>
-        <div class="step-content px-4 pb-4 text-slate-700 border-t border-slate-100 pt-3">
-          <p>Since the choice of students and teachers are independent, we multiply the two counts:</p>
-          <p class="my-2 text-lg">\[
-            \text{Total teams} = C^{13}_{5} \cdot C^{6}_{4}
-          \]</p>
-          <p class="mt-2">Now compute each part:</p>
-          <ul class="list-disc pl-5 mt-1 space-y-1">
-            <li>\(C^{13}_{5} = \frac{13 \times 12 \times 11 \times 10 \times 9}{5 \times 4 \times 3 \times 2 \times 1} = \frac{154440}{120} = 1287\)</li>
-            <li>\(C^{6}_{4} = \frac{6 \times 5}{2 \times 1} = 15\)</li>
-          </ul>
-          <p class="mt-3 font-medium">Thus total \(= 1287 \times 15 = 19305\).</p>
-        </div>
-      </div>
-
-      <!-- Step 5 (Answer) -->
-      <div class="step-card bg-blue-50 rounded-xl shadow-sm mb-3 overflow-hidden closed border-blue-300" data-step="5">
-        <div class="step-header flex justify-between items-center p-4 cursor-pointer hover:bg-blue-100" onclick="toggleStep(5)">
-          <div class="flex items-center gap-3">
-            <span class="w-7 h-7 rounded-full bg-blue-200 text-blue-900 flex items-center justify-center font-semibold text-sm">5</span>
-            <span class="font-medium text-blue-900">Answer</span>
-          </div>
-          <span class="step-arrow text-blue-400 text-xl leading-none">▾</span>
-        </div>
-        <div class="step-content px-4 pb-4 text-blue-900 border-t border-blue-200 pt-3">
-          <p class="text-lg font-semibold">\(C^{13}_{5} \cdot C^{6}_{4} = 19305\)</p>
-          <p class="mt-2">Therefore, the correct option is <strong>B. 19 305</strong>.</p>
-          <p class="text-sm mt-1 text-blue-700">Common mistake: using permutations (ordered selection) instead of combinations.</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- EXTRA: Show both combination values with MathJax breakdown -->
-    <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 mt-6">
-      <h3 class="text-lg font-semibold mb-3">🧮 Combination Values</h3>
-      <div class="grid sm:grid-cols-2 gap-3">
-        <div class="combo-box bg-slate-50 p-3 rounded-xl">
-          <p class="text-sm font-medium text-slate-500">Students: \(C^{13}_{5}\)</p>
-          <p class="text-2xl font-bold text-slate-800">1287</p>
-        </div>
-        <div class="combo-box bg-slate-50 p-3 rounded-xl">
-          <p class="text-sm font-medium text-slate-500">Teachers: \(C^{6}_{4}\)</p>
-          <p class="text-2xl font-bold text-slate-800">15</p>
-        </div>
-      </div>
-      <div class="mt-4 text-center border-t border-dashed border-slate-200 pt-3">
-        <p class="text-lg font-semibold">\(1287 \times 15 = 19305\)</p>
-      </div>
-    </div>
-
-    <!-- Footer -->
-    <p class="text-center text-xs text-slate-400 mt-8">HKDSE 2017 Paper 2 Q42 · Interactive explanation</p>
-  </div>
-
-  <script>
-    // ---------- ACCORDION LOGIC ----------
-    function toggleStep(stepNumber) {
-      const card = document.querySelector(`.step-card[data-step="${stepNumber}"]`);
-      if (!card) return;
-      // If card is closed, open it (and optionally close others? we'll allow multiple open)
-      // But we toggle the 'closed' class
-      card.classList.toggle('closed');
-    }
-
-    // Open the first step by default (optional)
-    document.addEventListener('DOMContentLoaded', () => {
-      // Optionally open step 1
-      // document.querySelector('.step-card[data-step="1"]')?.classList.remove('closed');
-    });
-
-    // ---------- INTERACTIVE SELECTION (visual only) ----------
-    (function() {
-      const studentGrid = document.getElementById('studentsGrid');
-      const teacherGrid = document.getElementById('teachersGrid');
-      const studentCounter = document.getElementById('studentCounter');
-      const teacherCounter = document.getElementById('teacherCounter');
-      const currentSelection = document.getElementById('currentSelection');
-
-      // Data: 13 students, 6 teachers
-      const students = Array.from({ length: 13 }, (_, i) => ({ id: `s${i+1}`, label: `S${i+1}`, selected: false }));
-      const teachers = Array.from({ length: 6 }, (_, i) => ({ id: `t${i+1}`, label: `T${i+1}`, selected: false }));
-
-      function renderChips() {
-        // Students
-        studentGrid.innerHTML = '';
-        students.forEach((s, idx) => {
-          const chip = document.createElement('button');
-          chip.className = `px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-100 border ${
-            s.selected 
-              ? 'bg-blue-600 text-white border-blue-700 shadow-sm' 
-              : 'bg-white text-slate-700 border-slate-300 hover:border-blue-400'
-          }`;
-          chip.textContent = s.label;
-          chip.addEventListener('click', (e) => {
-            e.preventDefault();
-            s.selected = !s.selected;
-            renderChips();
-            updateCounters();
-          });
-          studentGrid.appendChild(chip);
-        });
-
-        // Teachers
-        teacherGrid.innerHTML = '';
-        teachers.forEach((t, idx) => {
-          const chip = document.createElement('button');
-          chip.className = `px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-100 border ${
-            t.selected 
-              ? 'bg-emerald-600 text-white border-emerald-700 shadow-sm' 
-              : 'bg-white text-slate-700 border-slate-300 hover:border-emerald-400'
-          }`;
-          chip.textContent = t.label;
-          chip.addEventListener('click', (e) => {
-            e.preventDefault();
-            t.selected = !t.selected;
-            renderChips();
-            updateCounters();
-          });
-          teacherGrid.appendChild(chip);
-        });
-      }
-
-      function updateCounters() {
-        const selStudents = students.filter(s => s.selected).length;
-        const selTeachers = teachers.filter(t => t.selected).length;
-
-        studentCounter.textContent = `${selStudents} / 5`;
-        teacherCounter.textContent = `${selTeachers} / 4`;
-
-        // color feedback
-        studentCounter.className = selStudents === 5 
-          ? 'text-sm bg-blue-200 px-3 py-0.5 rounded-full font-semibold text-blue-900' 
-          : 'text-sm bg-blue-100 px-3 py-0.5 rounded-full';
-        teacherCounter.className = selTeachers === 4 
-          ? 'text-sm bg-emerald-200 px-3 py-0.5 rounded-full font-semibold text-emerald-900' 
-          : 'text-sm bg-emerald-100 px-3 py-0.5 rounded-full';
-
-        currentSelection.textContent = `${selStudents} students, ${selTeachers} teachers`;
-      }
-
-      // Reset function
-      document.getElementById('resetVisual').addEventListener('click', () => {
-        students.forEach(s => s.selected = false);
-        teachers.forEach(t => t.selected = false);
-        renderChips();
-        updateCounters();
-      });
-
-      // Initialize
-      renderChips();
-      updateCounters();
-    })();
-  </script>
-  <!-- Ensure MathJax re-renders if needed (not necessary after load) -->
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2017 Paper 2 Q42 — Probability</title>
+<style>
+  :root{
+    --student:#2563eb;
+    --student-l:#dbeafe;
+    --teacher:#d97706;
+    --teacher-l:#fef3c7;
+    --team:#059669;
+    --team-l:#d1fae5;
+    --ink:#1f2937;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink);background:#f8fafc;line-height:1.55;
+  }
+  .wrap{max-width:1200px;margin:0 auto;padding:16px 14px 60px;}
+  h1{font-size:1.05rem;letter-spacing:.4px;text-transform:uppercase;color:#64748b;margin:4px 0 14px;font-weight:700;}
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start;}
+  @media(min-width:900px){.split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}}
+  .diagram{position:sticky;top:16px;max-height:calc(100vh - 2rem);overflow-y:auto;}
+  .card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;box-shadow:0 1px 3px rgba(15,23,42,.06);padding:14px;}
+  .q{font-size:.98rem;}
+  .q .tag{display:inline-block;font-size:.7rem;font-weight:800;letter-spacing:.5px;color:#fff;background:#0f172a;border-radius:6px;padding:2px 7px;margin-bottom:8px;}
+  .opts{display:grid;grid-template-columns:repeat(2,1fr);gap:6px 14px;margin-top:10px;font-variant-numeric:tabular-nums;}
+  .opts div{background:#f1f5f9;border-radius:8px;padding:5px 10px;font-weight:600;}
+  .opts div.correct{background:var(--team-l);color:#065f46;border:1px solid #6ee7b7;}
+  .step{margin-top:14px;padding:12px 12px 12px 14px;border-left:5px solid #cbd5e1;background:#fcfdff;border-radius:0 12px 12px 0;transition:border-color .25s, background .25s, box-shadow .25s;}
+  .step.active{border-left-color:var(--student);background:#f0f7ff;box-shadow:0 0 0 1px #bfdbfe inset;}
+  .step .stag{display:inline-flex;align-items:center;gap:7px;font-weight:800;font-size:.8rem;letter-spacing:.4px;text-transform:uppercase;color:#475569;margin-bottom:5px;}
+  .chip{width:20px;height:20px;border-radius:50%;background:#0f172a;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;}
+  .step.active .chip{background:var(--student);}
+  .hint{font-size:.82rem;color:#64748b;margin-top:6px;font-style:italic;}
+  .ans{margin-top:16px;background:var(--team-l);border:1px solid #6ee7b7;border-radius:12px;padding:10px 14px;font-weight:700;color:#065f46;font-size:1.02rem;}
+  .ro{font-size:.82rem;color:#475569;text-align:center;margin:8px 0 0;min-height:1.1em;}
+  canvas{width:100%;height:auto;display:block;border-radius:12px;background:#ffffff;}
+  .legend{display:flex;flex-wrap:wrap;gap:8px 14px;justify-content:center;margin-top:8px;font-size:.78rem;color:#334155;}
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .sw{width:12px;height:12px;border-radius:3px;display:inline-block;}
+  @media(max-width:640px){
+    body{font-size:14.5px;}
+    .wrap{padding:10px 8px 40px;}
+    .card{padding:11px;}
+    .opts{grid-template-columns:1fr;}
+  }
 </style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
+<script>
+  window.MathJax = {
+    tex: {inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']]},
+    svg: {fontCache: 'global'}
+  };
 </script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+</head>
+<body>
+<div class="wrap">
+  <h1>HKDSE 2017 Paper 2 · Q42 · Probability (Combinations)</h1>
+  <div class="split">
 
+    <!-- ============ LEFT: DIAGRAM ============ -->
+    <div class="diagram">
+      <div class="card">
+        <canvas id="cv" width="640" height="560"></canvas>
+        <p class="ro" id="ro"></p>
+        <div class="legend">
+          <span><i class="sw" style="background:#2563eb"></i>Students (13)</span>
+          <span><i class="sw" style="background:#d97706"></i>Teachers (6)</span>
+          <span><i class="sw" style="background:#059669"></i>Chosen for team</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ RIGHT: QUESTION + SOLUTION ============ -->
+    <div class="q">
+      <div class="card">
+        <span class="tag">2017MC#42</span>
+        <p>There are $13$ students and $6$ teachers in a committee. If $5$ students and $4$ teachers are selected from the committee to form a team, how many different teams can be formed?</p>
+        <div class="opts">
+          <div>A. &nbsp;4 290</div>
+          <div>B. &nbsp;19 305</div>
+          <div>C. &nbsp;92 378</div>
+          <div>D. &nbsp;55 598 400</div>
+        </div>
+      </div>
+
+      <figure style="margin:12px 0;text-align:center;"><img src="figures/2017_P2_Q42.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
+
+      <div class="step" data-step="1">
+        <div class="stag"><span class="chip">1</span>Understand the task</div>
+        <p>We must pick <strong>5 students out of 13</strong> AND <strong>4 teachers out of 6</strong>. The two choices are independent, so we multiply the two counts.</p>
+        <p>Order inside the team does not matter — so we use <em>combinations</em>, not permutations.</p>
+        <p class="hint">Hint: "select / choose / form a team" ⇒ use $C^n_r = \dfrac{n!}{r!\,(n-r)!}$.</p>
+      </div>
+
+      <div class="step" data-step="2">
+        <div class="stag"><span class="chip">2</span>Count the student choices</div>
+        <p>Choose $5$ students from $13$:</p>
+        <p>$$C^{13}_{5}=\frac{13!}{5!\,8!}=\frac{13\times12\times11\times10\times9}{5\times4\times3\times2\times1}=1287$$</p>
+        <p class="hint">Hint: cancel the numerator and denominator to avoid huge factorials.</p>
+      </div>
+
+      <div class="step" data-step="3">
+        <div class="stag"><span class="chip">3</span>Count the teacher choices</div>
+        <p>Choose $4$ teachers from $6$:</p>
+        <p>$$C^{6}_{4}=\frac{6!}{4!\,2!}=\frac{6\times5}{2\times1}=15$$</p>
+        <p class="hint">Hint: $C^{6}_{4}=C^{6}_{2}=15$ — picking 4 to include = picking 2 to leave out.</p>
+      </div>
+
+      <div class="step" data-step="4">
+        <div class="stag"><span class="chip">4</span>Multiply (multiplication principle)</div>
+        <p>Each student group can team up with any teacher group:</p>
+        <p>$$C^{13}_{5}\times C^{6}_{4}=1287\times15=19305$$</p>
+        <p class="hint">Hint: multiply when the choices are made <em>together</em> ("5 students <strong>and</strong> 4 teachers").</p>
+      </div>
+
+      <div class="step" data-step="5">
+        <div class="stag"><span class="chip">5</span>Check &amp; conclude</div>
+        <p>Total team size $=5+4=9$, as required — no over-counting since order is irrelevant.</p>
+        <p>$1287\times15 = 1287\times10 + 1287\times5 = 12870+6435 = 19305$ ✓</p>
+        <p class="hint">Hint: distractors like $C^{19}_{9}=92378$ ignore the fixed student/teacher split.</p>
+      </div>
+
+      <div class="ans">Answer: B &nbsp;—&nbsp; $19\,305$ teams</div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function(){
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  const ro = document.getElementById('ro');
+
+  const W = cv.width, H = cv.height;
+
+  // colours
+  const BLUE = '#2563eb', BLUE_L='#dbeafe';
+  const ORANGE = '#d97706', ORANGE_L='#fef3c7';
+  const GREEN = '#059669';
+  const GREY = '#94a3b8';
+
+  // geometry of the two "pools"
+  const leftX0 = 40, rightX0 = 340, poolW = 260, topY = 118;
+  const dotR = 13;
+  const cols = 4;
+  const gapX = 60, gapY = 62;
+
+  function dotPos(i, x0){
+    const c = i % cols, r = Math.floor(i / cols);
+    return {x: x0 + 30 + c*gapX, y: topY + r*gapY};
+  }
+
+  function roundRect(x,y,w,h,r){
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);
+    ctx.arcTo(x+w,y,x+w,y+h,r);
+    ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r);
+    ctx.arcTo(x,y,x+w,y,r);
+    ctx.closePath();
+  }
+
+  function drawDot(p, baseCol, baseL, chosen){
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, dotR, 0, Math.PI*2);
+    if(chosen){
+      ctx.fillStyle = GREEN;
+      ctx.fill();
+      ctx.lineWidth = 3; ctx.strokeStyle = '#065f46'; ctx.stroke();
+    } else {
+      ctx.fillStyle = baseL;
+      ctx.fill();
+      ctx.lineWidth = 2; ctx.strokeStyle = baseCol; ctx.stroke();
+    }
+  }
+
+  function draw(step){
+    ctx.clearRect(0,0,W,H);
+
+    // --- titles ---
+    ctx.textAlign = 'center';
+    ctx.font = 'bold 17px system-ui, sans-serif';
+
+    // pool boxes
+    ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 2;
+    roundRect(leftX0-8, topY-42, poolW+16, 5*gapY-6, 16);
+    ctx.fillStyle = '#f8fafc'; ctx.fill(); ctx.stroke();
+
+    roundRect(rightX0-8, topY-42, poolW+16, 5*gapY-6, 16);
+    ctx.fillStyle = '#fffbf5'; ctx.fill(); ctx.stroke();
+
+    ctx.fillStyle = BLUE;
+    ctx.fillText('Students (13)', leftX0 + poolW/2, 62);
+    ctx.fillStyle = ORANGE;
+    ctx.fillText('Teachers (6)', rightX0 + poolW/2, 62);
+
+    // --- which dots are highlighted depending on step ---
+    // step1: all glow lightly (show the whole committee)
+    // step2: first 5 students chosen
+    // step3: first 4 teachers chosen
+    // step4/5: both chosen
+    const studentChosen = step >= 2;
+    const teacherChosen = step >= 3;
+
+    for(let i=0;i<13;i++){
+      const p = dotPos(i, leftX0);
+      drawDot(p, BLUE, BLUE_L, studentChosen && i < 5);
+      ctx.fillStyle = (studentChosen && i<5) ? '#fff' : BLUE;
+      ctx.font = 'bold 12px system-ui, sans-serif';
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText(String(i+1), p.x, p.y+0.5);
+    }
+    for(let i=0;i<6;i++){
+      const p = dotPos(i, rightX0);
+      drawDot(p, ORANGE, ORANGE_L, teacherChosen && i < 4);
+      ctx.fillStyle = (teacherChosen && i<4) ? '#fff' : ORANGE;
+      ctx.font = 'bold 12px system-ui, sans-serif';
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText('T'+(i+1), p.x, p.y+0.5);
+    }
+
+    // --- equation strip at bottom ---
+    ctx.textAlign='center'; ctx.textBaseline='alphabetic';
+    const eqY = 470;
+    let line1 = '', line2 = '';
+    if(step === 1){ line1 = 'Choose 5 students  AND  4 teachers'; line2 = 'Order does not matter  →  combinations'; }
+    else if(step === 2){ line1 = 'C(13,5) = 1287  ways to pick the students'; line2 = 'teacher choice not yet counted'; }
+    else if(step === 3){ line1 = '1287 × C(6,4) = 1287 × 15'; line2 = 'C(6,4) = 15  ways to pick the teachers'; }
+    else { line1 = 'C(13,5) × C(6,4) = 1287 × 15'; line2 = '= 19 305  different teams'; }
+
+    ctx.fillStyle = '#0f172a';
+    ctx.font = 'bold 20px system-ui, sans-serif';
+    if(step >= 4){ ctx.fillStyle = GREEN; }
+    ctx.fillText(line1, W/2, eqY);
+    ctx.fillStyle = '#475569';
+    ctx.font = '15px system-ui, sans-serif';
+    ctx.fillText(line2, W/2, eqY+28);
+
+    // team box on final steps
+    if(step >= 4){
+      ctx.strokeStyle = GREEN; ctx.lineWidth = 3;
+      roundRect(W/2-175, eqY+44, 350, 50, 14);
+      ctx.fillStyle = '#ecfdf5'; ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#065f46';
+      ctx.font = 'bold 22px system-ui, sans-serif';
+      ctx.fillText('Team: 5 + 4 = 9 members', W/2, eqY+76);
+    }
+
+    ro.textContent = ['','Given: 13 students & 6 teachers','Select 5 students → 1287 ways','Select 4 teachers → 15 ways','Multiply: 1287 × 15 = 19 305','Answer B : 19 305 teams'][step] || '';
+  }
+
+  // ---- scroll sync ----
+  let current = 1;
+  const io = new IntersectionObserver(es=>{
+    es.forEach(e=>{
+      if(e.isIntersecting){
+        current = +e.target.dataset.step;
+        document.querySelectorAll('.step').forEach(s=>{
+          s.classList.toggle('active', +s.dataset.step === current);
+        });
+        draw(current);
+      }
+    });
+  }, {rootMargin:'-25% 0px -55% 0px'});
+  document.querySelectorAll('.step').forEach(s=>io.observe(s));
+
+  draw(1);
+  document.querySelector('.step[data-step="1"]').classList.add('active');
+})();
+</script>
 </body>
 </html>

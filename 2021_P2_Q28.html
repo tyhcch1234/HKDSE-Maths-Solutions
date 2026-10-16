@@ -1,358 +1,529 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>HKDSE Math 2021 Paper 2 Q28 – Probability</title>
-    <!-- MathJax for LaTeX rendering -->
-    <script>
-        window.MathJax = {
-            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
-            svg: { fontCache: 'global' }
-        };
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
-    <!-- Tailwind CSS via CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #f8fafc; }
-        .card { background: #ffffff; border-radius: 1.25rem; box-shadow: 0 8px 20px rgba(0,0,0,0.04), 0 2px 6px rgba(0,0,0,0.02); transition: all 0.2s; }
-        .card:hover { box-shadow: 0 12px 28px rgba(0,0,0,0.07); }
-        .step-hidden { display: none; }
-        .btn-primary { background: #2563eb; color: white; transition: background 0.2s; }
-        .btn-primary:hover { background: #1d4ed8; }
-        .btn-outline { border: 1.5px solid #cbd5e1; transition: all 0.2s; }
-        .btn-outline:hover { border-color: #94a3b8; background: #f1f5f9; }
-        .leaf-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(36px, 1fr)); gap: 4px; justify-items: center; }
-        .leaf-item { background: #f1f5f9; border-radius: 6px; padding: 4px 0; width: 100%; text-align: center; font-size: 0.9rem; font-weight: 500; color: #1e293b; }
-        .leaf-item.highlight { background: #fef08a; font-weight: 700; color: #854d0e; }
-        .bar-container { display: flex; align-items: flex-end; gap: 8px; height: 120px; margin-top: 8px; }
-        .bar { background: #3b82f6; border-radius: 6px 6px 0 0; transition: height 0.3s; width: 100%; max-width: 40px; }
-        .bar.highlight { background: #f59e0b; }
-        @media (max-width: 640px) { .leaf-grid { grid-template-columns: repeat(auto-fill, minmax(28px, 1fr)); } .leaf-item { font-size: 0.75rem; } }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HKDSE 2021 Paper 2 Q28 — Probability</title>
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$','$$'], ['\\[','\\]']]
+  },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: #f3f6fb;
+    color: #1e2430;
+    line-height: 1.55;
+    font-size: 15.5px;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 18px 14px 60px; }
+
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0,1fr) minmax(0,1fr);
+    gap: 12px;
+    align-items: start;
+  }
+  @media (min-width: 900px) {
+    .split { grid-template-columns: minmax(0,46%) minmax(0,54%); gap: 18px; }
+  }
+  @media (max-width: 640px) {
+    body { font-size: 14.5px; }
+    .wrap { padding: 10px 8px 40px; }
+  }
+
+  .diagram {
+    position: sticky;
+    top: 16px;
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+  }
+
+  .card {
+    background: #ffffff;
+    border: 1px solid #dbe3ef;
+    border-radius: 14px;
+    box-shadow: 0 4px 14px rgba(30, 50, 90, 0.07);
+    padding: 14px 16px;
+  }
+
+  .diagram h2, .panel h2 {
+    margin: 0 0 8px;
+    font-size: 1.05rem;
+    letter-spacing: .3px;
+    color: #14416b;
+  }
+  .diagram h2::before { content: "■ "; color: #2f80ed; }
+
+  canvas { width: 100%; height: auto; display: block; border-radius: 10px; background: #fbfdff; }
+
+  .ro {
+    margin: 10px 0 0;
+    font-size: .85rem;
+    background: #eef5ff;
+    border-left: 4px solid #2f80ed;
+    padding: 7px 10px;
+    border-radius: 6px;
+    color: #1b3a5c;
+  }
+
+  .legend { display:flex; flex-wrap:wrap; gap:10px 16px; margin-top:10px; font-size:.82rem; }
+  .legend span { display:flex; align-items:center; gap:6px; }
+  .swatch { width:14px; height:14px; border-radius:4px; display:inline-block; }
+
+  .panel { display:flex; flex-direction:column; gap:12px; }
+
+  .qtext { font-size: .98rem; }
+  .qtext .tag {
+    display:inline-block; font-size:.75rem; font-weight:700; letter-spacing:.4px;
+    background:#2f80ed; color:#fff; padding:2px 8px; border-radius:999px; margin-right:6px;
+  }
+
+  .step {
+    border-left: 5px solid #c7d6ea;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 12px 14px;
+    transition: border-color .25s, box-shadow .25s, background .25s;
+    scroll-margin-top: 20px;
+  }
+  .step.active {
+    border-left-color: #f2994a;
+    background: #fff9f2;
+    box-shadow: 0 4px 16px rgba(242, 153, 74, .18);
+  }
+  .step .tag {
+    display: inline-block;
+    font-weight: 700;
+    font-size: .78rem;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    color: #ffffff;
+    background: #2f80ed;
+    border-radius: 999px;
+    padding: 2px 10px;
+    margin-bottom: 6px;
+  }
+  .step.active .tag { background: #f2994a; }
+  .step .hint {
+    font-size: .84rem;
+    color: #5d6b80;
+    margin-top: 8px;
+    border-top: 1px dashed #e2e9f3;
+    padding-top: 6px;
+  }
+  .step .hint::before { content: "💡 "; }
+
+  .ans {
+    background: linear-gradient(135deg,#e8f6ee,#d7f0e2);
+    border: 1px solid #a8dfc0;
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-weight: 700;
+    color: #14653a;
+    font-size: 1.02rem;
+  }
+
+  table.md {
+    border-collapse: collapse;
+    margin: 8px 0;
+    font-size: .88rem;
+  }
+  table.md td, table.md th {
+    border: 1px solid #cfdcec;
+    padding: 4px 10px;
+    text-align: center;
+  }
+  table.md th { background: #eaf2fd; }
+
+  .stemtable {
+    font-family: "Consolas", monospace;
+    font-size: .8rem;
+    border-collapse: collapse;
+    background: #fbf7ef;
+    border: 1px solid #e0d7c6;
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 8px 0;
+  }
+  .stemtable td { padding: 2px 8px; border-bottom: 1px solid #eee4d4; }
+  .stemtable th { padding: 4px 8px; background: #f5ead8; font-weight: 700; }
+</style>
 </head>
-<body class="py-6 px-4 md:px-8">
-    <div class="max-w-4xl mx-auto">
-        <!-- Header -->
-        <div class="mb-6">
-            <div class="flex flex-wrap items-center gap-2 mb-2">
-                <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-3 py-1 rounded-full">HKDSE 2021 Paper 2</span>
-                <span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-3 py-1 rounded-full">Q28</span>
-                <span class="bg-purple-100 text-purple-800 text-xs font-semibold px-3 py-1 rounded-full">Probability &amp; Statistics</span>
-            </div>
-            <h1 class="text-2xl md:text-3xl font-bold text-slate-800">Stem-and-Leaf Diagram &amp; Lower Quartile</h1>
-            <p class="text-slate-500 mt-1">Find the probability that a randomly selected worker weighs not less than the lower quartile.</p><figure style="margin:12px 0;text-align:center;"><img src="figures/2021_P2_Q28.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
-        </div>
+<body>
+<div class="wrap">
+  <div class="split">
 
-        <!-- Question Card -->
-        <div class="card p-5 md:p-6 mb-6">
-            <h2 class="text-lg font-semibold text-slate-700 mb-3 flex items-center gap-2">
-                <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                Question
-            </h2>
-            <p class="text-slate-700 leading-relaxed mb-3">The stem-and-leaf diagram below shows the distribution of the weights (in kg) of a group of workers.</p>
-            
-            <!-- Stem and Leaf Diagram (visual) -->
-            <div class="bg-slate-50 rounded-xl p-4 md:p-5 mb-4 overflow-x-auto">
-                <div class="inline-block min-w-[260px]">
-                    <div class="flex items-center gap-6 mb-2 pb-1 border-b border-slate-300">
-                        <span class="font-bold text-slate-600 text-sm w-16 text-right">Stem (tens)</span>
-                        <span class="font-bold text-slate-600 text-sm flex-1">Leaf (units)</span>
-                    </div>
-                    <div class="space-y-1.5 text-slate-700 font-mono text-sm">
-                        <div class="flex items-center gap-6">
-                            <span class="w-16 text-right font-bold">5</span>
-                            <span class="flex-1 tracking-widest">3 6 7</span>
-                        </div>
-                        <div class="flex items-center gap-6">
-                            <span class="w-16 text-right font-bold">6</span>
-                            <span class="flex-1 tracking-widest">1 2 2 2 6 8</span>
-                        </div>
-                        <div class="flex items-center gap-6">
-                            <span class="w-16 text-right font-bold">7</span>
-                            <span class="flex-1 tracking-widest">2 3 4 5 7 7 9 9</span>
-                        </div>
-                        <div class="flex items-center gap-6">
-                            <span class="w-16 text-right font-bold">8</span>
-                            <span class="flex-1 tracking-widest">3 4 5 6 6 7 8</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <p class="text-slate-700 mb-4">If a worker is randomly selected from the group, find the probability that the weight of the selected worker is <strong>not less than</strong> the lower quartile of the distribution.</p>
-            
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-center">
-                <div class="bg-slate-100 rounded-lg py-2 px-3 text-slate-700 font-medium">A. \(\frac{1}{4}\)</div>
-                <div class="bg-slate-100 rounded-lg py-2 px-3 text-slate-700 font-medium">B. \(\frac{1}{5}\)</div>
-                <div class="bg-slate-100 rounded-lg py-2 px-3 text-slate-700 font-medium">C. \(\frac{1}{6}\)</div>
-                <div class="bg-amber-50 border-2 border-amber-400 rounded-lg py-2 px-3 text-amber-800 font-bold">D. \(\frac{5}{6}\)</div>
-            </div>
-        </div>
-
-        <!-- Interactive Visual: Frequency Bars -->
-        <div class="card p-5 md:p-6 mb-6">
-            <h2 class="text-lg font-semibold text-slate-700 mb-3 flex items-center gap-2">
-                <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-                Weight Distribution (Frequency)
-            </h2>
-            <p class="text-slate-600 text-sm mb-3">Each bar represents the number of workers (frequency) at that weight. The highlighted bar (at 65 kg) is the median of the lower half – the lower quartile.</p>
-            <div id="barChart" class="bar-container items-end">
-                <!-- Bars will be generated by JS -->
-            </div>
-            <div class="flex justify-between text-xs text-slate-500 mt-2 px-1">
-                <span>53 kg</span>
-                <span>66 kg</span>
-                <span>78 kg</span>
-            </div>
-            <div class="mt-3 text-center text-sm text-slate-600">
-                <span class="inline-block bg-amber-100 text-amber-800 px-3 py-1 rounded-full font-medium">Lower Quartile = 62 kg</span>
-            </div>
-        </div>
-
-        <!-- Step-by-Step Solution (Accordion) -->
-        <div class="card p-5 md:p-6 mb-6">
-            <h2 class="text-lg font-semibold text-slate-700 mb-4 flex items-center gap-2">
-                <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
-                Step-by-Step Solution
-            </h2>
-
-            <div class="space-y-3">
-                <!-- Step 1 -->
-                <div class="border border-slate-200 rounded-xl overflow-hidden">
-                    <button class="step-toggle w-full text-left px-4 py-3 bg-slate-50 hover:bg-slate-100 transition flex justify-between items-center" data-target="step1">
-                        <span class="font-semibold text-slate-700 flex items-center gap-2"><span class="bg-blue-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">1</span> Count the total number of workers</span>
-                        <svg class="w-5 h-5 text-slate-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                    </button>
-                    <div id="step1" class="step-content px-4 py-4 bg-white border-t border-slate-200">
-                        <p class="text-slate-700">Count the leaves (each leaf represents one worker):</p>
-                        <ul class="mt-2 space-y-1 text-slate-600 list-disc list-inside">
-                            <li>Stem 5: 3 leaves (53, 56, 57 kg)</li>
-                            <li>Stem 6: 6 leaves (61, 62, 62, 62, 66, 68 kg)</li>
-                            <li>Stem 7: 8 leaves (72, 73, 74, 75, 77, 77, 79, 79 kg)</li>
-                            <li>Stem 8: 7 leaves (83, 84, 85, 86, 86, 87, 88 kg)</li>
-                        </ul>
-                        <p class="mt-2 text-slate-700 font-medium">Total number of workers \( n = 3 + 6 + 8 + 7 = 24 \).</p>
-                        <div class="mt-3 bg-blue-50 border-l-4 border-blue-400 p-3 rounded-r-lg text-sm text-blue-800">
-                            <strong>Hint:</strong> The total number of data values is the sum of all leaves. Here \(n = 24\).
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 2 -->
-                <div class="border border-slate-200 rounded-xl overflow-hidden">
-                    <button class="step-toggle w-full text-left px-4 py-3 bg-slate-50 hover:bg-slate-100 transition flex justify-between items-center" data-target="step2">
-                        <span class="font-semibold text-slate-700 flex items-center gap-2"><span class="bg-blue-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">2</span> Locate the position of the lower quartile</span>
-                        <svg class="w-5 h-5 text-slate-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                    </button>
-                    <div id="step2" class="step-content px-4 py-4 bg-white border-t border-slate-200 hidden">
-                        <p class="text-slate-700">With \( n = 24 \) data values, the lower quartile \(Q_1\) is the median of the lower half of the data.</p>
-                        <p class="mt-2 text-slate-700">The lower half consists of the first \( \frac{24}{2} = 12 \) ordered values.</p>
-                        <p class="mt-2 text-slate-700">Since there are 12 values, the median of the lower half is the <strong>average of the 6th and 7th values</strong> in the ordered data.</p>
-                        <div class="mt-3 bg-blue-50 border-l-4 border-blue-400 p-3 rounded-r-lg text-sm text-blue-800">
-                            <strong>Hint:</strong> For an even number of data, the lower quartile is the mean of the two middle values of the lower half. Here, positions 6 and 7.
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 3 -->
-                <div class="border border-slate-200 rounded-xl overflow-hidden">
-                    <button class="step-toggle w-full text-left px-4 py-3 bg-slate-50 hover:bg-slate-100 transition flex justify-between items-center" data-target="step3">
-                        <span class="font-semibold text-slate-700 flex items-center gap-2"><span class="bg-blue-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">3</span> Find the 6th and 7th values in order</span>
-                        <svg class="w-5 h-5 text-slate-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                    </button>
-                    <div id="step3" class="step-content px-4 py-4 bg-white border-t border-slate-200 hidden">
-                        <p class="text-slate-700">List the data in ascending order (already sorted in the stem-and-leaf diagram):</p>
-                        <div class="mt-2 flex flex-wrap gap-1 text-sm">
-                            <span class="bg-slate-100 px-2 py-1 rounded">53</span>
-                            <span class="bg-slate-100 px-2 py-1 rounded">56</span>
-                            <span class="bg-slate-100 px-2 py-1 rounded">57</span>
-                            <span class="bg-slate-100 px-2 py-1 rounded">61</span>
-                            <span class="bg-slate-100 px-2 py-1 rounded">62</span>
-                            <span class="bg-yellow-200 px-2 py-1 rounded font-bold">62</span>
-                            <span class="bg-yellow-200 px-2 py-1 rounded font-bold">62</span>
-                            <span class="bg-slate-100 px-2 py-1 rounded">66</span>
-                            <span class="bg-slate-100 px-2 py-1 rounded">68</span>
-                            <span class="bg-slate-100 px-2 py-1 rounded">72</span>
-                            <span class="bg-slate-100 px-2 py-1 rounded">73</span>
-                            <span class="bg-slate-100 px-2 py-1 rounded">74</span>
-                            <span class="bg-slate-100 px-2 py-1 rounded">75</span>
-                            <span class="bg-slate-100 px-2 py-1 rounded">77</span>
-                            <span class="bg-slate-100 px-2 py-1 rounded">77</span>
-                            <span class="bg-slate-100 px-2 py-1 rounded">79</span>
-                            <span class="bg-slate-100 px-2 py-1 rounded">79</span>
-                            <span class="bg-slate-100 px-2 py-1 rounded">83</span>
-                            <span class="bg-slate-100 px-2 py-1 rounded">84</span>
-                            <span class="bg-slate-100 px-2 py-1 rounded">85</span>
-                            <span class="bg-slate-100 px-2 py-1 rounded">86</span>
-                            <span class="bg-slate-100 px-2 py-1 rounded">86</span>
-                            <span class="bg-slate-100 px-2 py-1 rounded">87</span>
-                            <span class="bg-slate-100 px-2 py-1 rounded">88</span>
-                        </div>
-                        <p class="mt-3 text-slate-700">The 6th value is <strong>62</strong> kg, and the 7th value is also <strong>62</strong> kg.</p>
-                        <div class="mt-3 bg-blue-50 border-l-4 border-blue-400 p-3 rounded-r-lg text-sm text-blue-800">
-                            <strong>Hint:</strong> Ensure the data is ordered from smallest to largest before locating positions.
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 4 -->
-                <div class="border border-slate-200 rounded-xl overflow-hidden">
-                    <button class="step-toggle w-full text-left px-4 py-3 bg-slate-50 hover:bg-slate-100 transition flex justify-between items-center" data-target="step4">
-                        <span class="font-semibold text-slate-700 flex items-center gap-2"><span class="bg-blue-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">4</span> Calculate the lower quartile \(Q_1\)</span>
-                        <svg class="w-5 h-5 text-slate-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                    </button>
-                    <div id="step4" class="step-content px-4 py-4 bg-white border-t border-slate-200 hidden">
-                        <p class="text-slate-700">Lower quartile \( Q_1 = \frac{62 + 62}{2} = 62 \) kg.</p>
-                        <p class="mt-2 text-slate-700">So, the lower quartile weight is <strong>62 kg</strong>.</p>
-                        <div class="mt-3 bg-blue-50 border-l-4 border-blue-400 p-3 rounded-r-lg text-sm text-blue-800">
-                            <strong>Hint:</strong> The average of 62 and 62 is simply 62. No change to the value.
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 5 -->
-                <div class="border border-slate-200 rounded-xl overflow-hidden">
-                    <button class="step-toggle w-full text-left px-4 py-3 bg-slate-50 hover:bg-slate-100 transition flex justify-between items-center" data-target="step5">
-                        <span class="font-semibold text-slate-700 flex items-center gap-2"><span class="bg-blue-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">5</span> Count workers weighing at least 62 kg</span>
-                        <svg class="w-5 h-5 text-slate-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                    </button>
-                    <div id="step5" class="step-content px-4 py-4 bg-white border-t border-slate-200 hidden">
-                        <p class="text-slate-700">We need workers with weight \( \geq 62 \) kg.</p>
-                        <p class="mt-2 text-slate-700">From the ordered list, the workers with weight \( \geq 62 \) kg are:</p>
-                        <p class="mt-2 text-slate-700"><strong>62, 62, 62, 66, 68, 72, 73, 74, 75, 77, 77, 79, 79, 83, 84, 85, 86, 86, 87, 88</strong></p>
-                        <p class="mt-2 text-slate-700">Count them: \( 3 + 6 + 8 + 7 = 24 \) total, but we exclude the first two values (53 and 56) and one 57? Wait, let's count directly.</p>
-                        <p class="mt-1 text-slate-700">Values below 62: 53, 56, 57, 61 → 4 values.</p>
-                        <p class="text-slate-700">Total values = 24. So values \( \geq 62 \) = \(24 - 4 = 20\).</p>
-                        <div class="mt-3 bg-blue-50 border-l-4 border-blue-400 p-3 rounded-r-lg text-sm text-blue-800">
-                            <strong>Hint:</strong> "Not less than" means \( \geq \). Count all data from 62 kg upwards.
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Step 6 -->
-                <div class="border border-slate-200 rounded-xl overflow-hidden">
-                    <button class="step-toggle w-full text-left px-4 py-3 bg-slate-50 hover:bg-slate-100 transition flex justify-between items-center" data-target="step6">
-                        <span class="font-semibold text-slate-700 flex items-center gap-2"><span class="bg-blue-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">6</span> Calculate the required probability</span>
-                        <svg class="w-5 h-5 text-slate-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                    </button>
-                    <div id="step6" class="step-content px-4 py-4 bg-white border-t border-slate-200 hidden">
-                        <p class="text-slate-700">Probability \( = \frac{\text{number of workers with weight} \geq 62}{\text{total number of workers}} \)</p>
-                        <p class="mt-2 text-slate-700">\( = \frac{20}{24} = \frac{5}{6} \).</p>
-                        <div class="mt-3 bg-green-50 border-l-4 border-green-400 p-3 rounded-r-lg text-sm text-green-800 font-medium">
-                            ✅ Correct answer: <strong>D. \( \frac{5}{6} \)</strong>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Key Concepts Summary -->
-        <div class="card p-5 md:p-6 mb-4 bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100">
-            <h2 class="text-lg font-semibold text-slate-700 mb-3 flex items-center gap-2">
-                <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                Key Concepts
-            </h2>
-            <ul class="text-slate-700 space-y-2 text-sm">
-                <li><strong>Stem-and-leaf diagram:</strong> A way to display data where the last digit is the leaf and the preceding digits form the stem.</li>
-                <li><strong>Lower quartile (\(Q_1\)):</strong> The median of the lower half of the data. For \(n\) data, it's the median of the first \(n/2\) values when \(n\) is even.</li>
-                <li><strong>Probability:</strong> \( P = \frac{\text{number of favourable outcomes}}{\text{total number of outcomes}} \).</li>
-                <li><strong>"Not less than"</strong> means \( \geq \).</li>
-            </ul>
-        </div>
-
-        <div class="text-center text-xs text-slate-400 mt-6 pb-4">HKDSE Math 2021 Paper 2 Q28 – Interactive Solution</div>
+    <!-- ================= LEFT: DIAGRAM ================= -->
+    <div class="diagram card">
+      <h2>Diagram &amp; Order Statistics</h2>
+      <canvas id="cv" width="520" height="700"></canvas>
+      <div class="legend">
+        <span><i class="swatch" style="background:#c9d6e8"></i>Data (24 weights)</span>
+        <span><i class="swatch" style="background:#f2994a"></i>Lower quartile \(Q_1\)</span>
+        <span><i class="swatch" style="background:#27ae60"></i>Weight ≥ \(Q_1\)</span>
+      </div>
+      <p class="ro" id="readout">Scroll the steps on the right →</p>
     </div>
 
-    <script>
-        // --- Bar Chart Generation ---
-        const weightCounts = [
-            { weight: 53, count: 1 }, { weight: 56, count: 1 }, { weight: 57, count: 1 },
-            { weight: 61, count: 1 },
-            { weight: 62, count: 3 }, { weight: 66, count: 1 }, { weight: 68, count: 1 },
-            { weight: 72, count: 1 }, { weight: 73, count: 1 }, { weight: 74, count: 1 },
-            { weight: 75, count: 1 }, { weight: 77, count: 2 }, { weight: 79, count: 2 },
-            { weight: 83, count: 1 }, { weight: 84, count: 1 }, { weight: 85, count: 1 },
-            { weight: 86, count: 2 }, { weight: 87, count: 1 }, { weight: 88, count: 1 }
-        ];
+    <!-- ================= RIGHT: QUESTION + SOLUTION ================= -->
+    <div class="panel">
 
-        const barChart = document.getElementById('barChart');
-        const maxCount = Math.max(...weightCounts.map(d => d.count));
+      <div class="card qtext">
+        <h2>HKDSE 2021 Paper 2 — Q28</h2>
+        <p><span class="tag">Probability</span> The stem-and-leaf diagram below shows the distribution of the weights (in kg) of a group of workers.</p>
 
-        weightCounts.forEach(d => {
-            const heightPercent = (d.count / maxCount) * 100;
-            const barWrapper = document.createElement('div');
-            barWrapper.className = 'flex flex-col items-center flex-1 min-w-[20px]';
-            
-            const bar = document.createElement('div');
-            bar.className = `bar ${d.weight === 62 ? 'highlight' : ''}`;
-            bar.style.height = `${heightPercent * 0.9}px`; // 0.9 factor to fit in 120px container
-            bar.title = `${d.weight} kg: ${d.count} worker(s)`;
-            
-            const label = document.createElement('div');
-            label.className = 'text-[10px] text-slate-500 mt-1 font-mono';
-            label.textContent = d.weight;
-            
-            barWrapper.appendChild(bar);
-            barWrapper.appendChild(label);
-            barChart.appendChild(barWrapper);
-        });
+        <table class="stemtable">
+          <tr><th>Stem (tens)</th><th>Leaf (units)</th></tr>
+          <tr><td>5</td><td>3&nbsp;&nbsp;6&nbsp;&nbsp;7</td></tr>
+          <tr><td>6</td><td>1&nbsp;&nbsp;2&nbsp;&nbsp;2&nbsp;&nbsp;2&nbsp;&nbsp;6&nbsp;&nbsp;8</td></tr>
+          <tr><td>7</td><td>2&nbsp;&nbsp;3&nbsp;&nbsp;4&nbsp;&nbsp;5&nbsp;&nbsp;7&nbsp;&nbsp;7&nbsp;&nbsp;9&nbsp;&nbsp;9</td></tr>
+          <tr><td>8</td><td>3&nbsp;&nbsp;4&nbsp;&nbsp;5&nbsp;&nbsp;6&nbsp;&nbsp;6&nbsp;&nbsp;7&nbsp;&nbsp;8</td></tr>
+        </table>
 
-        // --- Accordion Logic ---
-        document.querySelectorAll('.step-toggle').forEach(button => {
-            button.addEventListener('click', function() {
-                const targetId = this.dataset.target;
-                const targetDiv = document.getElementById(targetId);
-                const icon = this.querySelector('svg');
-                
-                if (targetDiv.classList.contains('hidden')) {
-                    targetDiv.classList.remove('hidden');
-                    targetDiv.classList.add('block');
-                    if (icon) icon.style.transform = 'rotate(180deg)';
-                } else {
-                    targetDiv.classList.add('hidden');
-                    targetDiv.classList.remove('block');
-                    if (icon) icon.style.transform = 'rotate(0deg)';
-                }
-            });
-        });
+        <p>If a worker is randomly selected from the group, find the probability that the weight of the selected worker is <b>not less than</b> the lower quartile of the distribution.</p>
 
-        // --- Optional: Open first step by default ---
-        // Uncomment the line below to have step 1 open on load
-        // document.querySelector('.step-toggle[data-target="step1"]').click();
-    </script>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
+        <p>
+          A. $\dfrac{1}{4}$ &nbsp;&nbsp;&nbsp;
+          B. $\dfrac{1}{5}$ &nbsp;&nbsp;&nbsp;
+          C. $\dfrac{1}{6}$ &nbsp;&nbsp;&nbsp;
+          D. $\dfrac{5}{6}$
+        </p>
+      </div>
+
+      <figure style="margin:12px 0;text-align:center;"><img src="figures/2021_P2_Q28.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
+
+      <div class="step" data-step="1">
+        <span class="tag">Step 1 — Read the diagram</span>
+        <p>Count the leaves to get the total number of workers.</p>
+        <p>$3 + 6 + 8 + 7 = 24$ data values, so $n = 24$.</p>
+        <div class="hint">Always count the leaves first — the total number of data is needed for every probability.</div>
+      </div>
+
+      <div class="step" data-step="2">
+        <span class="tag">Step 2 — Write data in order</span>
+        <p>Reading the stem-and-leaf diagram row by row gives the weights in ascending order:</p>
+        <p style="font-size:.85rem;">
+          53, 56, 57,<br>
+          61, 62, 62, 62, 66, 68,<br>
+          72, 73, 74, 75, 77, 77, 79, 79,<br>
+          83, 84, 85, 86, 86, 87, 88
+        </p>
+        <p>The 6th and 7th values are both $62$ kg.</p>
+        <div class="hint">A stem-and-leaf diagram is already sorted — just read left to right, top to bottom.</div>
+      </div>
+
+      <div class="step" data-step="3">
+        <span class="tag">Step 3 — Find the lower quartile</span>
+        <p>Since there are 24 data, the lower quartile is the mean of the 6th and the 7th ordered data.</p>
+        <p>$$Q_1 = \frac{62 + 62}{2} = 62 \text{ kg}$$</p>
+        <div class="hint">For $n = 24$ (even), $Q_1$ is at position $\frac{n+1}{4}$ for median-based splits, but here we use the "split into two halves" convention: median of the lower 12 values → average of 6th and 7th.</div>
+      </div>
+
+      <div class="step" data-step="4">
+        <span class="tag">Step 4 — Count favourable outcomes</span>
+        <p>We need the number of workers with weight <b>≥ 62 kg</b>.</p>
+        <p>Values below 62: $53, 56, 57, 61$ → 4 values.<br>
+        So values $\ge 62$: $24 - 4 = 20$ values.</p>
+        <div class="hint">"Not less than" means $\ge$. Count carefully — the two 62s are included.</div>
+      </div>
+
+      <div class="step" data-step="5">
+        <span class="tag">Step 5 — Compute the probability</span>
+        <p>$$\text{Required probability} = \frac{20}{24} = \frac{5}{6}$$</p>
+        <p>Answer: <b>D</b></p>
+        <div class="hint">Probability $= \dfrac{\text{number of favourable outcomes}}{\text{total number of outcomes}}$.</div>
+      </div>
+
+      <div class="ans">Answer: D &nbsp;&nbsp; $\dfrac{5}{6}$</div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+/* ---------- Data ---------- */
+const data = [53,56,57,61,62,62,62,66,68,72,73,74,75,77,77,79,79,83,84,85,86,86,87,88];
+const n = data.length;                 // 24
+const Q1 = (data[5] + data[6]) / 2;    // 62
+const fav = data.filter(v => v >= Q1).length; // 20
+
+/* ---------- Canvas setup ---------- */
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+const W = cv.width, H = cv.height;
+
+const readout = document.getElementById('readout');
+
+/* Layout zones */
+const topY = 60;         // stem table top
+const rowH = 34;
+const tableX = 60;
+
+/* Sorted list zone */
+const listY0 = 340;
+const chipX0 = 40;
+const chipW = 62, chipH = 26, chipGapX = 8, chipGapY = 10;
+const chipsPerRow = 7;
+
+function roundRect(x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.arcTo(x+w, y, x+w, y+h, r);
+  ctx.arcTo(x+w, y+h, x, y+h, r);
+  ctx.arcTo(x, y+h, x, y, r);
+  ctx.arcTo(x, y, x+w, y, r);
+  ctx.closePath();
+}
+
+function title(text, y, color='#14416b') {
+  ctx.fillStyle = color;
+  ctx.font = 'bold 15px "Segoe UI", Arial';
+  ctx.textAlign = 'left';
+  ctx.fillText(text, 20, y);
+}
+
+function draw(step) {
+  ctx.clearRect(0, 0, W, H);
+
+  /* ---- background panel ---- */
+  ctx.fillStyle = '#fbfdff';
+  ctx.fillRect(0, 0, W, H);
+
+  /* highlight colour depending on step */
+  const hiStem  = (step >= 1);
+  const hiOrder = (step >= 2);
+  const hiQ1    = (step >= 3);
+  const hiCount = (step >= 4);
+  const hiProb  = (step >= 5);
+
+  /* ======= SECTION 1: STEM-AND-LEAF TABLE ======= */
+  title('Stem-and-leaf diagram (weights in kg)', 30);
+
+  const rows = [
+    { stem: '5', leaves: [3,6,7] },
+    { stem: '6', leaves: [1,2,2,2,6,8] },
+    { stem: '7', leaves: [2,3,4,5,7,7,9,9] },
+    { stem: '8', leaves: [3,4,5,6,6,7,8] }
+  ];
+
+  /* Header */
+  ctx.font = 'bold 13px "Segoe UI", Arial';
+  ctx.fillStyle = '#334a6a';
+  ctx.fillText('Stem (tens)', tableX, topY - 8);
+  ctx.fillText('Leaf (units)', tableX + 130, topY - 8);
+
+  let y = topY;
+  const stemColX = tableX;
+  const leafStartX = tableX + 130;
+  const leafSpacing = 32;
+
+  rows.forEach((r, ri) => {
+    /* stem box */
+    ctx.fillStyle = hiStem ? '#e8f1ff' : '#f3f6fb';
+    roundRect(stemColX - 6, y - 18, 46, 28, 6);
+    ctx.fill();
+    ctx.strokeStyle = hiStem ? '#2f80ed' : '#c9d6e8';
+    ctx.lineWidth = hiStem ? 2 : 1;
+    ctx.stroke();
+
+    ctx.fillStyle = '#14416b';
+    ctx.font = 'bold 15px "Consolas", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(r.stem, stemColX + 17, y);
+
+    /* leaves */
+    r.leaves.forEach((lf, li) => {
+      const cx = leafStartX + li * leafSpacing;
+      const val = parseInt(r.stem) * 10 + lf;
+      const isQ1 = (val === Q1);
+      const isFav = (val >= Q1);
+
+      let fill = '#f7f9fc', stroke = '#c9d6e8', txt = '#213247';
+      if (hiCount && isFav) { fill = '#e7f7ee'; stroke = '#27ae60'; txt = '#14653a'; }
+      if (hiQ1 && isQ1)     { fill = '#fde8d2'; stroke = '#f2994a'; txt = '#a35200'; }
+      if (hiProb && isFav)  { fill = '#e7f7ee'; stroke = '#27ae60'; txt = '#14653a'; }
+
+      roundRect(cx - 13, y - 18, 26, 26, 6);
+      ctx.fillStyle = fill;
+      ctx.fill();
+      ctx.strokeStyle = stroke;
+      ctx.lineWidth = (isQ1 && hiQ1) ? 2.5 : 1;
+      ctx.stroke();
+
+      ctx.fillStyle = txt;
+      ctx.font = (isQ1 && hiQ1) ? 'bold 14px "Consolas", monospace' : '14px "Consolas", monospace';
+      ctx.fillText(lf, cx, y + 1);
+
+      /* value label under Q1 cell */
+      if (hiQ1 && isQ1) {
+        ctx.fillStyle = '#f2994a';
+        ctx.font = 'bold 10px "Segoe UI", Arial';
+        ctx.fillText('62', cx, y + 18);
+      }
+    });
+
+    y += rowH;
+  });
+
+  /* total count badge */
+  if (hiStem) {
+    ctx.fillStyle = '#2f80ed';
+    roundRect(tableX + 270, topY - 30, 150, 26, 13);
+    ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 13px "Segoe UI", Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Total n = 3+6+8+7 = 24', tableX + 345, topY - 12);
+  }
+
+  /* ======= SECTION 2: ORDERED LIST ======= */
+  title('Data in ascending order (24 values)', listY0 - 18);
+
+  data.forEach((v, i) => {
+    const col = i % chipsPerRow;
+    const row = Math.floor(i / chipsPerRow);
+    const x = chipX0 + col * (chipW + chipGapX);
+    const yy = listY0 + row * (chipH + chipGapY);
+
+    const isQ1 = (v === Q1);
+    const isFav = (v >= Q1);
+
+    let fill = '#f7f9fc', stroke = '#c9d6e8', txt = '#213247';
+
+    if (hiOrder) {
+      if (isFav) { fill = '#e7f7ee'; stroke = '#27ae60'; txt = '#14653a'; }
+      else       { fill = '#fdecec'; stroke = '#e07a7a'; txt = '#8a2626'; }
+    }
+    if (hiQ1 && isQ1) { fill = '#fde8d2'; stroke = '#f2994a'; txt = '#a35200'; }
+
+    roundRect(x, yy, chipW, chipH, 7);
+    ctx.fillStyle = fill;
+    ctx.fill();
+    ctx.strokeStyle = stroke;
+    ctx.lineWidth = (isQ1 && hiQ1) ? 2.5 : 1;
+    ctx.stroke();
+
+    ctx.fillStyle = txt;
+    ctx.font = (isQ1 && hiQ1) ? 'bold 13px "Segoe UI", Arial' : '13px "Segoe UI", Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(v, x + chipW/2, yy + 18);
+
+    /* position index */
+    if (hiCount || hiQ1) {
+      ctx.fillStyle = '#9aa9bd';
+      ctx.font = '9px "Segoe UI", Arial';
+      ctx.fillText('#' + (i+1), x + chipW/2, yy - 3);
+    }
+  });
+
+  /* ======= SECTION 3: SUMMARY BAR ======= */
+  const barY = listY0 + 4 * (chipH + chipGapY) + 14;
+  title('Favourable count: weight ≥ Q₁ = 62 kg', barY + 4);
+
+  /* box dividing 4 below vs 20 above */
+  const boxY = barY + 18;
+  const boxH = 40;
+  const totalW = W - 60;
+  const belowW = totalW * (4 / 24);
+
+  /* below Q1 */
+  ctx.fillStyle = hiCount ? '#fdecec' : '#f3f6fb';
+  roundRect(30, boxY, belowW, boxH, 8);
+  ctx.fill();
+  ctx.strokeStyle = '#e07a7a';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  ctx.fillStyle = '#8a2626';
+  ctx.font = 'bold 12px "Segoe UI", Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText('4', 30 + belowW/2, boxY + 18);
+  ctx.font = '10px "Segoe UI", Arial';
+  ctx.fillText('< 62', 30 + belowW/2, boxY + 32);
+
+  /* at/above Q1 */
+  ctx.fillStyle = hiCount ? '#e7f7ee' : '#f3f6fb';
+  roundRect(30 + belowW, boxY, totalW - belowW, boxH, 8);
+  ctx.fill();
+  ctx.strokeStyle = '#27ae60';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  ctx.fillStyle = '#14653a';
+  ctx.font = 'bold 12px "Segoe UI", Arial';
+  ctx.fillText('20', 30 + belowW + (totalW - belowW)/2, boxY + 18);
+  ctx.font = '10px "Segoe UI", Arial';
+  ctx.fillText('≥ 62', 30 + belowW + (totalW - belowW)/2, boxY + 32);
+
+  /* Q1 marker line */
+  ctx.strokeStyle = '#f2994a';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(30 + belowW, boxY - 8);
+  ctx.lineTo(30 + belowW, boxY + boxH + 8);
+  ctx.stroke();
+
+  ctx.fillStyle = '#f2994a';
+  ctx.font = 'bold 11px "Segoe UI", Arial';
+  ctx.textAlign = 'left';
+  ctx.fillText('Q₁ = 62', 30 + belowW + 6, boxY - 12);
+
+  /* ======= SECTION 4: PROBABILITY FRACTION ======= */
+  if (hiProb) {
+    const py = boxY + boxH + 40;
+    ctx.fillStyle = '#fff9f2';
+    roundRect(30, py - 18, W - 60, 64, 12);
+    ctx.fill();
+    ctx.strokeStyle = '#f2994a';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.fillStyle = '#a35200';
+    ctx.font = 'bold 14px "Segoe UI", Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('P(weight ≥ Q₁) = 20 / 24 = 5 / 6', W/2, py + 18);
+  }
+
+  /* ---------- Readout ---------- */
+  const msgs = {
+    0: 'Scroll the steps on the right →',
+    1: 'Step 1: Count the leaves — there are 24 data values.',
+    2: 'Step 2: Read the diagram in order; the 6th and 7th values are both 62.',
+    3: 'Step 3: Q₁ = (62 + 62)/2 = 62 kg (shown in orange).',
+    4: 'Step 4: 4 workers weigh below 62 kg → 24 − 4 = 20 weigh ≥ 62 kg.',
+    5: 'Step 5: P = 20/24 = 5/6 → Answer D.'
+  };
+  readout.textContent = msgs[Math.max(0, Math.min(5, step))] || msgs[0];
+}
+
+/* ---------- Scroll sync ---------- */
+let current = 0;
+const steps = document.querySelectorAll('.step');
+
+const io = new IntersectionObserver(es => {
+  es.forEach(e => {
+    if (e.isIntersecting) {
+      current = +e.target.dataset.step;
+      steps.forEach(s => s.classList.toggle('active', +s.dataset.step === current));
+      draw(current);
+    }
+  });
+}, { rootMargin: '-25% 0px -55% 0px', threshold: 0 });
+
+steps.forEach(s => io.observe(s));
+
+/* initial */
+draw(0);
+steps[0] && steps[0].classList.add('active');
 </script>
-
 </body>
 </html>
