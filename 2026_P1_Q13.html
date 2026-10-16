@@ -61,7 +61,7 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
   <!-- ============ LEFT : DIAGRAM ============ -->
   <section class="panel diagram">
     <h2>Interactive Figure (drawn to scale)</h2>
-    <canvas id="cv" width="880" height="380"></canvas>
+    <canvas id="cv" width="920" height="400"></canvas>
     <div class="legend">
       <span><i class="swatch" style="background:#2563eb"></i>sphere r = 10</span>
       <span><i class="swatch" style="background:#059669"></i>cylinder X</span>
@@ -145,9 +145,9 @@ const S = 12;
 /* ground line (all solids rest on the same floor) */
 const GROUND = H - 46;
 
-/* positions */
-const cxS = 150, cyS = GROUND - R_SPHERE*S;   // sphere centre
-const baseX = 340, baseY = 470, baseZ = 610;   // cylinder centre x (on ground)
+/* positions (spaced so nothing overlaps) */
+const cxS = 140, cyS = GROUND - R_SPHERE*S;   // sphere centre
+const baseX = 330, baseY = 480, baseZ = 700;  // cylinder centre x (on ground)
 
 function label(t, x, y, color, size, align){
   ctx.save();
@@ -181,18 +181,15 @@ function drawCylinder(cx, r, h, color, name){
   ctx.restore();
   // name
   label(name, cx, GROUND + 18, color, 15);
-  // height arrow
+  // vertical dashed line inside cylinder (height reference)
   ctx.save();
-  ctx.strokeStyle = '#475569'; ctx.lineWidth=1.4;
-  ctx.beginPath(); ctx.moveTo(cx+rx+14, GROUND); ctx.lineTo(cx+rx+14, topY); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(cx+rx+14, GROUND); ctx.lineTo(cx+rx+8, GROUND-7); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(cx+rx+14, GROUND); ctx.lineTo(cx+rx+20, GROUND-7); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(cx+rx+14, topY); ctx.lineTo(cx+rx+8, topY+7); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(cx+rx+14, topY); ctx.lineTo(cx+rx+20, topY+7); ctx.stroke();
+  ctx.setLineDash([4,4]);
+  ctx.strokeStyle = '#475569'; ctx.lineWidth=1.2;
+  ctx.beginPath(); ctx.moveTo(cx, GROUND); ctx.lineTo(cx, topY); ctx.stroke();
+  ctx.setLineDash([]);
   ctx.restore();
-  label(h+' cm', cx+rx+28, (GROUND+topY)/2, '#475569', 13, 'left');
-  // radius label on top ellipse
-  label('r', cx, topY - rx*0.28 - 12, color, 13);
+  // height label at top (centred — avoids side overlap)
+  label('h = '+h+' cm', cx, topY - 16, '#475569', 13);
 }
 
 function drawSphere(cx, cy, r, color){
@@ -235,18 +232,17 @@ function draw(){
   // arrow from sphere to cylinders (recast)
   if(mode===0 || mode===1){
     ctx.save();
-    ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2; ctx.setLineDash([6,4]);
+    ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2.5;
     ctx.beginPath();
-    ctx.moveTo(cxS + R_SPHERE*S + 12, cyS);
-    ctx.lineTo(baseX - 60, cyS);
+    ctx.moveTo(cxS + R_SPHERE*S + 8, cyS);
+    ctx.lineTo(baseX - RX*S - 10, cyS);
     ctx.stroke();
-    ctx.setLineDash([]);
     // arrow head
-    const ax = baseX - 60, ay = cyS;
-    ctx.beginPath(); ctx.moveTo(ax,ay); ctx.lineTo(ax-12, ay-7); ctx.lineTo(ax-12, ay+7); ctx.closePath();
+    const ax = baseX - RX*S - 10, ay = cyS;
+    ctx.beginPath(); ctx.moveTo(ax,ay); ctx.lineTo(ax-11, ay-6); ctx.lineTo(ax-11, ay+6); ctx.closePath();
     ctx.fillStyle = '#94a3b8'; ctx.fill();
     ctx.restore();
-    label('melt & recast', (cxS + R_SPHERE*S + baseX - 60)/2, cyS - 24, '#64748b', 13);
+    label('melt', (cxS + R_SPHERE*S + baseX - RX*S)/2, cyS - 20, '#64748b', 12);
   }
 
   // sphere
@@ -281,10 +277,10 @@ function draw(){
     label('V_X : V_Y : V_Z = 8 : 27 : 125', W/2, 60, '#059669', 14);
   }
   if(mode===3){
-    label('r₂ = 5 cm,  h = 9 cm', baseY, GROUND - HY*S - 30, '#d97706', 14);
+    label('Y: r₂ = 5,  h = 9 cm', baseY, GROUND - HY*S - 54, '#d97706', 14);
   }
   if(mode===4||mode===5){
-    label('r₃ = 25/3 cm,  h = 15 cm', baseZ, GROUND - HZ*S - 34, '#db2777', 13);
+    label('Z: r₃ = 25/3,  h = 15 cm', baseZ, GROUND - HZ*S - 58, '#db2777', 13);
   }
   if(mode===5){
     label('TSA_Z = 3500π/9  <  400π = S_sphere', W/2, H - 18, '#db2777', 13);
