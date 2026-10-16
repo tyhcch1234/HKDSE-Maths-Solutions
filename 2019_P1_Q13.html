@@ -258,10 +258,11 @@ const CXp = W/2, CYp = H/2 + 10;
 
 const D2R = Math.PI/180;
 
-/* Place C at -40 deg and B at +40 deg (so angle BOC = 80 deg).
-   => A (diametrically opposite C) at 140 deg.
-   D is on the circle such that BC || OD, F = AC ∩ BD.           */
-const AANG = 140, BANG = 40, CANG = -40;
+/* Place A at 0 deg (right), C at 180 deg (left) => horizontal diameter AC,
+   matching the original exam figure. B at 260 deg (lower-left) so angle
+   BOC = 80 deg. D is computed so that BC || OD (upper-left). E at 30 deg
+   (upper-right). */
+const AANG = 0, BANG = 260, CANG = 180;
 
 /* --- HIDDEN / VISIBLE edges as per original figure:
    - AC is a straight diameter line
@@ -288,9 +289,8 @@ const uBC = {x: dirBC.x/lenBC, y: dirBC.y/lenBC};
    (D on the lower-right region, F = AC ∩ BD between A and C). */
 let D = {x: O.x - uBC.x*R, y: O.y - uBC.y*R};
 
-/* E: on the arc, on the same side as D so ABED is a proper cyclic quad. */
-/* Choose angle of E so ABED looks like the exam figure: E on lower-left arc. */
-const EANG = 218;
+/* E: on the upper-right arc, matching the original exam figure. */
+const EANG = 30;
 const E = pt(EANG, R);
 
 /* F = intersection of line AC (the x-axis through CXp) and line BD */
@@ -336,7 +336,7 @@ function sectorFill(startDeg, endDeg, r, fill){
   ctx.save();
   ctx.beginPath();
   ctx.moveTo(O.x,O.y);
-  ctx.arc(O.x,O.y,r,-s,-e,true); /* canvas y flipped */
+  ctx.arc(O.x,O.y,r,-s,-e,false); /* clockwise in canvas => smaller sector */
   ctx.closePath();
   ctx.fillStyle=fill;ctx.fill();
   ctx.restore();
@@ -389,7 +389,7 @@ function draw(){
     ctx.save();
     ctx.beginPath();
     ctx.moveTo(O.x,O.y);
-    ctx.arc(O.x,O.y,R,-BANG*D2R,-CANG*D2R,true);
+    ctx.arc(O.x,O.y,R,-BANG*D2R,-CANG*D2R,false);
     ctx.closePath();
     ctx.lineWidth=2.4;ctx.strokeStyle="#db2777";ctx.stroke();
     ctx.restore();
@@ -399,7 +399,7 @@ function draw(){
   if(mode===1){
     ctx.save();
     ctx.beginPath();
-    ctx.moveTo(A.x,A.y);ctx.lineTo(B.x,B.y);ctx.lineTo(E.x,E.y);ctx.lineTo(D.x,D.y);
+    ctx.moveTo(A.x,A.y);ctx.lineTo(E.x,E.y);ctx.lineTo(D.x,D.y);ctx.lineTo(B.x,B.y);
     ctx.closePath();
     ctx.fillStyle="rgba(5,150,105,.13)";ctx.fill();
     ctx.lineWidth=2;ctx.strokeStyle="rgba(5,150,105,.65)";ctx.stroke();
