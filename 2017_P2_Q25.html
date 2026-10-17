@@ -6,108 +6,552 @@
 <title>HKDSE 2017 Paper 2 MC25 · Perpendicular Distance in Polar Coordinates</title>
 <script>
   window.MathJax = {
-    tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['\\[','\\]']] },
+    tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
     svg: { fontCache: 'global' }
   };
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
-  :root{--blue:#1d4ed8;--blue-light:#3b82f6;--amber:#f59e0b;--amber-bg:#fffbeb;--emerald:#059669;--emerald-bg:#ecfdf5;--slate:#0f172a;--slate-soft:#475569;--line:#e2e8f0;--card:#ffffff;--bg:#f1f5f9;}
-  *{box-sizing:border-box;} html,body{margin:0;padding:0;}
-  body{font-family:"Segoe UI",system-ui,-apple-system,Helvetica,Arial,sans-serif;color:var(--slate);background:var(--bg);line-height:1.6;-webkit-font-smoothing:antialiased;}
-  .wrap{max-width:920px;margin:0 auto;padding:0 16px 60px;}
-  .hero{background:linear-gradient(120deg,#0f172a,#1e3a8a 45%,#2563eb);color:#fff;padding:32px 20px 28px;}
-  .hero .tag{display:inline-block;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;background:rgba(255,255,255,.16);border-radius:99px;padding:3px 12px;margin-bottom:10px;}
-  .hero h1{margin:0;font-size:1.5rem;font-weight:800;}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin:18px 0;box-shadow:0 1px 3px rgba(15,23,42,.06);}
-  .card h2{margin:0 0 10px;font-size:1.05rem;color:var(--blue);}
-  .question{font-size:1.08rem;}
-  .question ol,.question ul{margin:10px 0;padding-left:22px;}
-  .marks{color:var(--slate-soft);font-size:.85rem;font-style:italic;}
-  .step{border-left:3px solid var(--blue-light);background:#f8fafc;border-radius:8px;padding:12px 16px;margin:12px 0;}
-  .step .step-tag{display:inline-block;font-size:.7rem;font-weight:700;color:#fff;background:var(--blue);border-radius:99px;padding:2px 10px;margin-bottom:8px;}
-  .ans{background:var(--emerald-bg);border:1px solid #6ee7b7;border-radius:10px;padding:14px 18px;font-weight:600;margin:16px 0;}
-  .hint{background:var(--amber-bg);border:1px solid #fcd34d;border-radius:10px;padding:10px 16px;font-size:.9rem;color:#92400e;margin:10px 0;}
-  .mono{font-family:ui-monospace,Consolas,monospace;}
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif;
+    background: linear-gradient(135deg, #eef4ff 0%, #f6f9ff 50%, #eefaf6 100%);
+    color: #1f2937;
+    min-height: 100vh;
+    padding: 12px;
+    font-size: 15px;
+  }
+  header {
+    max-width: 1250px;
+    margin: 0 auto 14px auto;
+    padding: 16px 20px;
+    background: linear-gradient(100deg, #4f46e5 0%, #6366f1 45%, #06b6d4 100%);
+    color: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(79, 70, 229, .25);
+  }
+  header h1 {
+    font-size: 1.25rem;
+    margin: 0 0 4px 0;
+    letter-spacing: .3px;
+  }
+  header .sub { font-size: .85rem; opacity: .9; }
+
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0,1fr) minmax(0,1fr);
+    gap: 12px;
+    align-items: start;
+    max-width: 1250px;
+    margin: 0 auto;
+  }
+  @media (min-width: 900px) {
+    .split { grid-template-columns: minmax(0,46%) minmax(0,54%); gap: 18px; }
+  }
+
+  .panel {
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 6px 22px rgba(30, 41, 59, .08);
+    padding: 14px;
+    border: 1px solid #e5edf7;
+  }
+
+  .diagram {
+    position: sticky;
+    top: 16px;
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+  }
+
+  .diagram h2, .panel h2 {
+    font-size: 1rem;
+    margin: 0 0 10px 0;
+    color: #4338ca;
+    letter-spacing: .3px;
+  }
+
+  canvas#stage {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 12px;
+  }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    margin-top: 10px;
+    font-size: .78rem;
+  }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .swatch { display: inline-block; width: 16px; height: 4px; border-radius: 2px; }
+  .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; }
+
+  h3.qhead {
+    font-size: .95rem;
+    color: #0f766e;
+    margin: 4px 0 8px 0;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+  }
+
+  .qtext {
+    font-size: .95rem;
+    line-height: 1.6;
+    margin-bottom: 10px;
+  }
+
+  .choices {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0,1fr));
+    gap: 8px;
+    margin: 12px 0;
+  }
+  .choice {
+    padding: 8px 10px;
+    border-radius: 10px;
+    background: #f1f5ff;
+    border: 1px solid #dbe4ff;
+    font-size: .9rem;
+  }
+
+  .step {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-left: 5px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    transition: all .35s ease;
+    font-size: .92rem;
+  }
+  .step.active {
+    background: #eef2ff;
+    border-left-color: #6366f1;
+    box-shadow: 0 6px 18px rgba(99, 102, 241, .18);
+    transform: translateX(3px);
+  }
+  .step .tag {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: #4338ca;
+    font-size: .82rem;
+    letter-spacing: .7px;
+    text-transform: uppercase;
+  }
+
+  .hint {
+    background: #fefce8;
+    border: 1px solid #fde68a;
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-size: .88rem;
+    margin: 8px 0;
+    color: #78350f;
+  }
+
+  .answer {
+    background: linear-gradient(100deg, #ecfdf5 0%, #d1fae5 100%);
+    border: 1px solid #6ee7b7;
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-top: 12px;
+    font-weight: 600;
+    color: #065f46;
+    font-size: .95rem;
+  }
+
+  .figure-placeholder {
+    margin: 10px 0;
+    border: 1px dashed #b6c4e0;
+    border-radius: 10px;
+    background: #f8fafc;
+    color: #64748b;
+    padding: 8px;
+    font-size: .8rem;
+    text-align: center;
+    display: none;
+  }
+
+  @media (max-width: 640px) {
+    body { font-size: 13px; padding: 8px; }
+    .panel { padding: 10px; border-radius: 12px; }
+    .tag { font-size: .7rem; }
+    .choices { grid-template-columns: 1fr; gap: 6px; }
+    header h1 { font-size: 1rem; }
+    .legend { font-size: .7rem; }
+  }
 </style>
 </head>
 <body>
-<div class="hero">
-  <div class="wrap">
-    <span class="tag">HKDSE 2017 · Paper 2 · MC25</span>
-    <h1>Perpendicular Distance in Polar Coordinates</h1>
-  </div>
-</div>
-<div class="wrap">
-  <div class="card question">
-    <h2>Question</h2>
-    <p>The polar coordinates of the points \(P\), \(Q\) and \(R\) are \((3,\,160^\circ)\), \((4,\,280^\circ)\) and \((6,\,340^\circ)\) respectively. The perpendicular distance from \(Q\) to \(PR\) is</p>
-    <ol style="list-style-type: upper-alpha;">
-      <li>\(2\)</li>
-      <li>\(3\)</li>
-      <li>\(2\sqrt{3}\)</li>
-      <li>\(3\sqrt{3}\)</li>
-    </ol>
-  <figure class="figure"><svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg" role="img"><rect width="320" height="240" fill="#fff"/><circle cx="160" cy="125" r="70" fill="none" stroke="#e2e8f0"/><line x1="160" y1="125" x2="302" y2="125" stroke="#334155" stroke-width="1.4"/><line x1="160" y1="125" x2="122" y2="111" stroke="#94a3b8" stroke-width="1"/><circle cx="122" cy="111" r="3.5" fill="#e11d48"/><text x="128" y="105" font-size="11" font-weight="700" fill="#1e293b">P</text><line x1="160" y1="125" x2="169" y2="174" stroke="#94a3b8" stroke-width="1"/><circle cx="169" cy="174" r="3.5" fill="#e11d48"/><text x="175" y="168" font-size="11" font-weight="700" fill="#1e293b">Q</text><line x1="160" y1="125" x2="226" y2="149" stroke="#94a3b8" stroke-width="1"/><circle cx="226" cy="149" r="3.5" fill="#e11d48"/><text x="232" y="143" font-size="11" font-weight="700" fill="#1e293b">R</text><circle cx="160" cy="125" r="3" fill="#334155"/><text x="166" y="140" font-size="12" font-weight="700" fill="#1e293b">O</text><text x="304" y="129" font-size="11" fill="#475569">polar axis</text><text x="160" y="232" font-size="10" fill="#475569" text-anchor="middle">P(3,160°), Q(4,280°), R(6,340°)</text></svg><figcaption>Polar coordinate system (not to scale)</figcaption></figure></div>
 
-  <div class="card">
-    <h2>Solution</h2>
-    <div class="step">
-      <span class="step-tag">Step 1 · Notice that line \(PR\) passes through the pole</span>
-      \[ \angle POR = 340^\circ - 160^\circ = 180^\circ, \]
-      <p>so \(P\) and \(R\) lie on <em>opposite rays</em> from the pole \(O\). Hence the line \(PR\) passes through \(O\).</p>
+<header>
+  <h1>HKDSE 2017 · Paper 2 · MC25</h1>
+  <div class="sub">Perpendicular Distance in Polar Coordinates</div>
+</header>
+
+<div class="split">
+
+  <!-- ================= LEFT: DIAGRAM ================= -->
+  <section class="panel diagram">
+    <h2>Interactive Diagram</h2>
+    <canvas id="stage" width="640" height="640"></canvas>
+    <div class="legend">
+      <span><span class="dot" style="background:#ef4444;"></span>Point P (3, 160°)</span>
+      <span><span class="dot" style="background:#3b82f6;"></span>Point Q (4, 280°)</span>
+      <span><span class="dot" style="background:#10b981;"></span>Point R (6, 340°)</span>
+      <span><span class="swatch" style="background:#6366f1;"></span>Line PR (through O)</span>
+      <span><span class="swatch" style="background:#f59e0b;"></span>OQ</span>
+      <span><span class="swatch" style="background:#a855f7;"></span>Perpendicular d</span>
     </div>
-    <div class="step">
-      <span class="step-tag">Step 2 · Angle between \(OQ\) and line \(PR\)</span>
-      <p>The direction of \(OQ\) is \(280^\circ\), and the direction of line \(PR\) is \(160^\circ\) (equivalently \(340^\circ\)). The angle between them is</p>
+  </section>
+
+  <!-- ================= RIGHT: QUESTION + SOLUTION ================= -->
+  <section class="panel">
+    <h3 class="qhead">Question</h3>
+    <div class="qtext">
+      The polar coordinates of the points \(P\), \(Q\) and \(R\) are
+      \((3,\,160^\circ)\), \((4,\,280^\circ)\) and \((6,\,340^\circ)\) respectively.
+      The perpendicular distance from \(Q\) to \(PR\) is
+    </div>
+
+    <div class="choices">
+      <div class="choice">A. \(2\)</div>
+      <div class="choice">B. \(3\)</div>
+      <div class="choice">C. \(2\sqrt{3}\)</div>
+      <div class="choice">D. \(3\sqrt{3}\)</div>
+    </div>
+
+    <!-- FIGURE_HERE -->
+
+    <h3 class="qhead" style="margin-top:16px;">Solution</h3>
+
+    <div class="step" data-step="1">
+      <span class="tag">Step 1 · Line PR passes through the pole</span>
+      \[ \angle POR = 340^\circ - 160^\circ = 180^\circ. \]
+      So \(P\) and \(R\) lie on opposite rays from the pole \(O\); the line \(PR\) therefore passes through \(O\).
+      <div class="hint">Key idea: \(P\), \(O\), \(R\) are collinear — the "line \(PR\)" is the diameter line through the pole.</div>
+    </div>
+
+    <div class="step" data-step="2">
+      <span class="tag">Step 2 · Angle between \(OQ\) and line \(PR\)</span>
+      Direction of \(OQ\) is \(280^\circ\), and the direction of line \(PR\) is \(160^\circ\) (equivalently \(340^\circ\)).
+      The angle between them is
       \[ 280^\circ - 160^\circ = 120^\circ. \]
     </div>
-    <div class="step">
-      <span class="step-tag">Step 3 · Perpendicular distance</span>
-      <p>Dropping a perpendicular from \(Q\) to the line \(PR\) (which passes through \(O\)) forms a right triangle with hypotenuse \(OQ = 4\):</p>
+
+    <div class="step" data-step="3">
+      <span class="tag">Step 3 · Perpendicular distance</span>
+      Dropping a perpendicular from \(Q\) to line \(PR\) (which passes through \(O\)) gives a right triangle with hypotenuse \(OQ = 4\):
       \[ d = OQ \cdot \sin 120^\circ = 4 \times \frac{\sqrt{3}}{2} = 2\sqrt{3}. \]
     </div>
-    <div class="step">
-      <span class="step-tag">Step 4 · Verify the foot lies on segment \(PR\)</span>
-      <p>The projection of \(OQ\) onto line \(PR\) is \(4\cos120^\circ = -2\), i.e. the foot is \(2\) units from \(O\) on the \(R\)-side of \(O\). Since \(OR = 6 > 2\), the foot lies on the segment \(PR\).</p>
+
+    <div class="step" data-step="4">
+      <span class="tag">Step 4 · Verify foot lies on segment \(PR\)</span>
+      The projection of \(OQ\) onto line \(PR\) is \(4\cos 120^\circ = -2\); that is, the foot is \(2\) units from \(O\) on the \(R\)-side of \(O\).
+      Since \(OR = 6 > 2\), the foot lies on the segment \(PR\).
     </div>
-  </div>
 
-  <div class="ans">
-    Final Answer: <strong>C. \(2\sqrt{3}\)</strong>
-  </div>
+    <div class="answer">
+      <strong>Final Answer: C. \(2\sqrt{3}\)</strong>
+    </div>
+  </section>
+
 </div>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
 
+<script>
+(function () {
+  const canvas = document.getElementById('stage');
+  const ctx = canvas.getContext('2d');
+
+  // ---------- Drawing parameters ----------
+  const SIZE = 640;
+  const CX = SIZE / 2, CY = SIZE / 2;
+  const SCALE = 62;               // pixels per unit
+  const O = { x: CX, y: CY };      // pole at canvas centre
+
+  // polar -> canvas coords (math convention: CCW, 0° = +x)
+  function polar(r, deg) {
+    const rad = (deg * Math.PI) / 180;
+    return { x: CX + SCALE * r * Math.cos(rad), y: CY - SCALE * r * Math.sin(rad) };
+  }
+
+  const P = polar(3, 160);
+  const Q = polar(4, 280);
+  const R = polar(6, 340);
+
+  // Foot of perpendicular from Q onto line PR.
+  // Line PR passes through O, direction 160°. Unit vector u = (cos160, sin160) (math coords).
+  // Projection length (signed) = OQ · u = 4cos(120°) = -2 (i.e. -2 units along u).
+  // So foot F = O + (-2) * u = 2 units in direction 340°.
+  const F = polar(2, 340);
+
+  // ---------- Helper drawing functions ----------
+  function clear() {
+    ctx.clearRect(0, 0, SIZE, SIZE);
+    // background
+    const g = ctx.createRadialGradient(CX, CY, 40, CX, CY, SIZE * 0.75);
+    g.addColorStop(0, '#ffffff');
+    g.addColorStop(1, '#f0f5ff');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, SIZE, SIZE);
+  }
+
+  function drawGrid() {
+    ctx.save();
+    ctx.strokeStyle = '#e6edf7';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (let r = 1; r <= 6; r++) {
+      ctx.beginPath();
+      ctx.arc(CX, CY, r * SCALE, 0, Math.PI * 2);
+      ctx.strokeStyle = r % 2 === 0 ? '#dde7f5' : '#eef3fb';
+      ctx.stroke();
+    }
+    // polar axis rays
+    ctx.strokeStyle = '#e2e8f0';
+    for (let a = 0; a < 360; a += 30) {
+      const e = polar(6.6, a);
+      ctx.beginPath();
+      ctx.moveTo(CX, CY);
+      ctx.lineTo(e.x, e.y);
+      ctx.stroke();
+    }
+    // axes labels
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '13px Segoe UI, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const lab = polar(6.9, 30);
+    ctx.fillText('30°', lab.x, lab.y);
+    const lab2 = polar(6.9, 150);
+    ctx.fillText('150°', lab2.x, lab2.y);
+    const lab3 = polar(6.9, 270);
+    ctx.fillText('270°', lab3.x, lab3.y);
+    const lab0 = polar(6.9, 0);
+    ctx.fillText('0°', lab0.x, lab0.y);
+    ctx.restore();
+  }
+
+  function line(x1, y1, x2, y2, color, width, dash) {
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width || 2;
+    ctx.setLineDash(dash || []);
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function dot(p, color, r, label, dx, dy) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, r || 6, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    if (label) {
+      ctx.fillStyle = color;
+      ctx.font = 'bold 18px Segoe UI, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(label, p.x + (dx || 0), p.y + (dy || 0));
+    }
+    ctx.restore();
+  }
+
+  function angleArc(center, radius, startDeg, endDeg, color, width) {
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width || 2;
+    ctx.beginPath();
+    // Canvas arc uses clockwise, screen coords (y down), so convert.
+    const s = -endDeg * Math.PI / 180;
+    const e = -startDeg * Math.PI / 180;
+    ctx.arc(center.x, center.y, radius, s, e, false);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function rightAngleMark(vertex, p1, p2, size, color) {
+    // draw a small square at vertex between rays toward p1 and p2
+    const v1 = { x: p1.x - vertex.x, y: p1.y - vertex.y };
+    const v2 = { x: p2.x - vertex.x, y: p2.y - vertex.y };
+    const n1 = Math.hypot(v1.x, v1.y) || 1;
+    const n2 = Math.hypot(v2.x, v2.y) || 1;
+    const a = { x: v1.x / n1, y: v1.y / n1 };
+    const b = { x: v2.x / n2, y: v2.y / n2 };
+    const p1s = { x: vertex.x + a.x * size, y: vertex.y + a.y * size };
+    const p2s = { x: vertex.x + b.x * size, y: vertex.y + b.y * size };
+    const corner = { x: p1s.x + b.x * size, y: p1s.y + b.y * size };
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(p1s.x, p1s.y);
+    ctx.lineTo(corner.x, corner.y);
+    ctx.lineTo(p2s.x, p2s.y);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function labelPoint(p, text, color, offsetX, offsetY) {
+    ctx.save();
+    ctx.fillStyle = color;
+    ctx.font = 'bold 18px Segoe UI, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, p.x + offsetX, p.y + offsetY);
+    ctx.restore();
+  }
+
+  // ---------- Main draw function ----------
+  let mode = 1;
+
+  function draw() {
+    clear();
+    drawGrid();
+
+    // Line PR through O (from far P-side to far R-side). Direction 160° and 340°.
+    const pFar = polar(7, 160);
+    const rFar = polar(7, 340);
+    line(pFar.x, pFar.y, rFar.x, rFar.y, '#6366f1', 2.5, []);
+    // small arrowheads? Not needed; just extend.
+
+    // OQ segment
+    if (mode >= 2) {
+      line(O.x, O.y, Q.x, Q.y, '#f59e0b', 3, []);
+    } else {
+      line(O.x, O.y, Q.x, Q.y, '#f59e0b', 1.5, [5, 4]);
+    }
+
+    // Perpendicular from Q to PR (drop to F)
+    if (mode >= 3) {
+      line(Q.x, Q.y, F.x, F.y, '#a855f7', 3, []);
+      // right angle mark at F between F->Q and F->O (or F->P direction)
+      const towardO = O;
+      rightAngleMark(F, Q, towardO, 12, '#a855f7');
+      // label d
+      const mid = { x: (Q.x + F.x) / 2, y: (Q.y + F.y) / 2 };
+      ctx.save();
+      ctx.fillStyle = '#a855f7';
+      ctx.font = 'bold 16px Segoe UI, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('d', mid.x + 10, mid.y);
+      ctx.restore();
+    }
+
+    // Angle arc at O between OP (160°) and OQ (280°) for step 2/3 visualisation
+    if (mode >= 2) {
+      angleArc(O, 55, 160, 280, '#0ea5e9', 2.5);
+      ctx.save();
+      ctx.fillStyle = '#0ea5e9';
+      ctx.font = 'bold 15px Segoe UI, sans-serif';
+      const labPos = polar(0.95, 220);
+      ctx.fillText('120°', labPos.x - 18, labPos.y);
+      ctx.restore();
+    }
+
+    // Step 4 highlight: show projection foot and the 2-unit distance along R side
+    if (mode >= 4) {
+      // Highlight the 2-unit segment from O to F (in purple dashes) 
+      line(O.x, O.y, F.x, F.y, '#a855f7', 3, [4, 4]);
+      ctx.save();
+      ctx.fillStyle = '#a855f7';
+      ctx.font = 'bold 14px Segoe UI, sans-serif';
+      const midOF = { x: (O.x + F.x) / 2, y: (O.y + F.y) / 2 };
+      ctx.fillText('2', midOF.x + 8, midOF.y + 12);
+      ctx.restore();
+    }
+
+    // Points
+    // O
+    dot(O, '#475569', 6, 'O', -18, -12);
+    // P
+    dot(P, '#ef4444', 7, 'P', 10, -14);
+    // Q
+    dot(Q, '#3b82f6', 7, 'Q', 10, 14);
+    // R
+    dot(R, '#10b981', 7, 'R', 12, 6);
+
+    // Step 1 highlight: emphasize that P,O,R are collinear
+    if (mode === 1) {
+      ctx.save();
+      ctx.strokeStyle = '#6366f1';
+      ctx.lineWidth = 5;
+      ctx.globalAlpha = 0.35;
+      ctx.beginPath();
+      ctx.moveTo(P.x, P.y);
+      ctx.lineTo(R.x, R.y);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // Radius / length labels
+    ctx.save();
+    ctx.font = '13px Segoe UI, sans-serif';
+    ctx.fillStyle = '#475569';
+
+    // |OP| = 3
+    const opMid = { x: (O.x + P.x) / 2, y: (O.y + P.y) / 2 };
+    ctx.fillText('3', opMid.x - 12, opMid.y + 4);
+
+    // |OQ| = 4
+    const oqMid = { x: (O.x + Q.x) / 2, y: (O.y + Q.y) / 2 };
+    ctx.fillText('4', oqMid.x - 12, oqMid.y + 4);
+
+    // |OR| = 6
+    const orMid = { x: (O.x + R.x) / 2, y: (O.y + R.y) / 2 };
+    ctx.fillText('6', orMid.x + 4, orMid.y + 14);
+
+    ctx.restore();
+
+    // Small caption top-left
+    ctx.save();
+    ctx.fillStyle = '#4338ca';
+    ctx.font = 'bold 14px Segoe UI, sans-serif';
+    const caps = ['Step 1 · P, O, R are collinear', 'Step 2 · angle 120° at O', 'Step 3 · perpendicular distance d', 'Step 4 · foot lies on segment PR'];
+    ctx.fillText(caps[Math.min(mode - 1, caps.length - 1)], 14, 24);
+    ctx.restore();
+  }
+
+  // ---------- Scroll sync ----------
+  const steps = Array.from(document.querySelectorAll('.step'));
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        const m = +entry.target.dataset.step;
+        mode = m;
+        steps.forEach((st) => st.classList.toggle('active', st === entry.target));
+        draw();
+      }
+    });
+  }, { rootMargin: '-15% 0px -55% 0px', threshold: 0 });
+
+  steps.forEach((st) => obs.observe(st));
+
+  // Initial draw
+  draw();
+
+  // Redraw on resize (canvas is CSS-scaled but keep crisp)
+  window.addEventListener('resize', () => {
+    // keep fixed internal resolution; just redraw
+    draw();
+  });
+
+  // Highlight first step initially
+  if (steps.length) steps[0].classList.add('active');
+})();
+</script>
 </body>
 </html>

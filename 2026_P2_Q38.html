@@ -3,123 +3,529 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HKDSE 2026 Paper 2 MC38 · Circle Theorems</title>
+<title>HKDSE 2026 MC38 · Circle Theorems</title>
 <script>
-  window.MathJax = {
-    tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['\\[','\\]']] },
-    svg: { fontCache: 'global' }
-  };
+window.MathJax = {
+  tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
+  svg: { fontCache: 'global' }
+};
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
-  :root{--blue:#1d4ed8;--blue-light:#3b82f6;--amber:#f59e0b;--amber-bg:#fffbeb;--emerald:#059669;--emerald-bg:#ecfdf5;--slate:#0f172a;--slate-soft:#475569;--line:#e2e8f0;--card:#ffffff;--bg:#f1f5f9;}
-  *{box-sizing:border-box;} html,body{margin:0;padding:0;}
-  body{font-family:"Segoe UI",system-ui,-apple-system,Helvetica,Arial,sans-serif;color:var(--slate);background:var(--bg);line-height:1.6;-webkit-font-smoothing:antialiased;}
-  .wrap{max-width:920px;margin:0 auto;padding:0 16px 60px;}
-  .hero{background:linear-gradient(120deg,#0f172a,#1e3a8a 45%,#2563eb);color:#fff;padding:32px 20px 28px;}
-  .hero .tag{display:inline-block;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;background:rgba(255,255,255,.16);border-radius:99px;padding:3px 12px;margin-bottom:10px;}
-  .hero h1{margin:0;font-size:1.5rem;font-weight:800;}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin:18px 0;box-shadow:0 1px 3px rgba(15,23,42,.06);}
-  .card h2{margin:0 0 10px;font-size:1.05rem;color:var(--blue);}
-  .question{font-size:1.08rem;}
-  .question ol,.question ul{margin:10px 0;padding-left:22px;}
-  .marks{color:var(--slate-soft);font-size:.85rem;font-style:italic;}
-  .step{border-left:3px solid var(--blue-light);background:#f8fafc;border-radius:8px;padding:12px 16px;margin:12px 0;}
-  .step .step-tag{display:inline-block;font-size:.7rem;font-weight:700;color:#fff;background:var(--blue);border-radius:99px;padding:2px 10px;margin-bottom:8px;}
-  .ans{background:var(--emerald-bg);border:1px solid #6ee7b7;border-radius:10px;padding:14px 18px;font-weight:600;margin:16px 0;}
-  .hint{background:var(--amber-bg);border:1px solid #fcd34d;border-radius:10px;padding:10px 16px;font-size:.9rem;color:#92400e;margin:10px 0;}
-  .mono{font-family:ui-monospace,Consolas,monospace;}
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Roboto, -apple-system, sans-serif;
+    background: linear-gradient(135deg, #eef3fb 0%, #f7f0ff 100%);
+    color: #1e293b;
+    padding: 14px;
+  }
+  header.topbar {
+    max-width: 1300px;
+    margin: 0 auto 14px auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 16px;
+  }
+  header.topbar h1 {
+    font-size: 1.15rem;
+    margin: 0;
+    background: linear-gradient(90deg, #2563eb, #9333ea);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 800;
+    letter-spacing: .2px;
+  }
+  .pill {
+    font-size: .72rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 999px;
+    color: #fff;
+    background: linear-gradient(90deg, #2563eb, #7c3aed);
+    letter-spacing: .3px;
+  }
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0,1fr) minmax(0,1fr);
+    gap: 12px;
+    align-items: start;
+    max-width: 1300px;
+    margin: 0 auto;
+  }
+  @media(min-width:900px){
+    .split { grid-template-columns: minmax(0,46%) minmax(0,54%); gap: 18px; }
+  }
+  .panel {
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(30,41,59,.09);
+    padding: 14px;
+    border: 1px solid #e6ecf5;
+  }
+  .diagram {
+    position: sticky;
+    top: 16px;
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+  }
+  .diagram h2 {
+    margin: 0 0 8px 0;
+    font-size: .9rem;
+    color: #475569;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+  }
+  canvas { width: 100%; height: auto; display: block; border-radius: 10px; background: #fbfdff; }
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    margin-top: 10px;
+    font-size: .72rem;
+    color: #475569;
+  }
+  .legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .swatch { width: 12px; height: 3px; border-radius: 2px; display: inline-block; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+
+  .qtag {
+    display: inline-block;
+    font-size: .7rem;
+    font-weight: 800;
+    color: #2563eb;
+    background: #e8efff;
+    padding: 3px 9px;
+    border-radius: 8px;
+    letter-spacing: .4px;
+    margin-bottom: 6px;
+  }
+  .qbody { font-size: .9rem; line-height: 1.55; }
+  .qbody p { margin: 6px 0; }
+  .choices {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0 4px 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+  .choices li {
+    background: #f4f7fd;
+    border: 1px solid #e2e9f5;
+    border-radius: 9px;
+    padding: 6px 10px;
+    font-size: .84rem;
+  }
+  .choices b { color: #7c3aed; }
+  .figureph {
+    margin: 12px 0 4px 0;
+    border-radius: 10px;
+    border: 1px dashed #b9c7e0;
+    background: #f8faff;
+    min-height: 26px;
+    padding: 6px 10px;
+    font-size: .72rem;
+    color: #93a3bd;
+    text-align: center;
+  }
+  .step {
+    border-left: 4px solid #cbd8ee;
+    background: #f7f9fd;
+    border-radius: 0 12px 12px 0;
+    padding: 9px 12px;
+    margin: 10px 0;
+    transition: all .25s;
+    font-size: .85rem;
+    line-height: 1.6;
+  }
+  .step.active {
+    border-left-color: #2563eb;
+    background: #eff5ff;
+    box-shadow: 0 4px 14px rgba(37,99,235,.13);
+    transform: translateX(2px);
+  }
+  .steptag {
+    display: block;
+    font-size: .68rem;
+    font-weight: 800;
+    color: #2563eb;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .step.active .steptag { color: #7c3aed; }
+  .hint {
+    font-size: .8rem;
+    background: #fff8e8;
+    border: 1px solid #f5e2b0;
+    border-radius: 10px;
+    padding: 8px 12px;
+    color: #7a5b10;
+    margin: 10px 0;
+  }
+  .answerbox {
+    margin-top: 12px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: linear-gradient(90deg, #e7f7ee, #eef6ff);
+    border: 1px solid #bfe6cf;
+    font-weight: 700;
+    color: #17603a;
+    font-size: .92rem;
+  }
+  @media(max-width:520px){
+    body { padding: 8px; }
+    .panel { padding: 9px; border-radius: 12px; }
+    .qbody { font-size: .78rem; }
+    .step { font-size: .74rem; padding: 7px 8px; }
+    .choices { grid-template-columns: 1fr; }
+    .legend { font-size: .62rem; }
+  }
 </style>
 </head>
 <body>
-<div class="hero">
-  <div class="wrap">
-    <span class="tag">HKDSE 2026 · Paper 2 · MC38</span>
-    <h1>Circle Theorems</h1>
-  </div>
+
+<header class="topbar">
+  <span class="pill">HKDSE 2026 · Paper 2 · MC38</span>
+  <h1>Circle Theorems — Interactive Solution</h1>
+</header>
+
+<div class="split">
+
+  <!-- LEFT: DIAGRAM -->
+  <section class="panel diagram">
+    <h2>Figure (accurate scale)</h2>
+    <canvas id="cv" width="560" height="470"></canvas>
+    <div class="legend">
+      <span><i class="swatch" style="background:#2563eb"></i>Circle</span>
+      <span><i class="swatch" style="background:#ef4444"></i>Chord AC</span>
+      <span><i class="swatch" style="background:#0f766e"></i>Chord BD</span>
+      <span><i class="swatch" style="background:#d946ef"></i>Tangent TC</span>
+      <span><i class="swatch" style="background:#f59e0b"></i>AB, BT</span>
+      <span><i class="dot" style="background:#9333ea"></i>Centre O</span>
+    </div>
+  </section>
+
+  <!-- RIGHT: QUESTION + SOLUTION -->
+  <section class="panel">
+    <span class="qtag">QUESTION</span>
+    <div class="qbody">
+      <p>In the figure, $ABCD$ are points on a circle. $AC$ and $BD$ intersect at the point $E$. $BD$ is produced to the point $T$ such that $TC$ is tangent to the circle. It is given that $AB \parallel TC$. If $\angle AED = 85^\circ$ and $\angle CTE = 23^\circ$, then $\angle ADE =$</p>
+      <ul class="choices">
+        <li><b>A.</b> $39^\circ$</li>
+        <li><b>B.</b> $56^\circ$</li>
+        <li><b>C.</b> $62^\circ$</li>
+        <li><b>D.</b> $72^\circ$</li>
+      </ul>
+    </div>
+
+    <figure style="margin:12px 0;text-align:center;"><img src="figures/figures/2026_P2_38.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
+
+    <div class="hint">💡 Angle chase: use $AB\parallel TC$ with alternating angles, the tangent–chord (alternate segment) theorem, and angles in the same segment.</div>
+
+    <div class="step" data-step="1">
+      <span class="steptag">Step 1 · Parallel lines (transversal BD)</span>
+      Since $AB \parallel TC$ and $BDT$ is a transversal, the alternate angles are equal:
+      $$\angle ABD = \angle CTE = 23^\circ.$$
+    </div>
+
+    <div class="step" data-step="2">
+      <span class="steptag">Step 2 · Angles on a straight line &amp; triangle ABE</span>
+      $A$, $E$, $C$ are collinear and $B$, $E$, $D$ are collinear. $\angle AED$ and $\angle AEB$ are angles on the straight line $BD$, so
+      $$\angle AEB = 180^\circ - 85^\circ = 95^\circ.$$
+      In $\triangle ABE$:
+      $$\angle BAE = 180^\circ - 95^\circ - 23^\circ = 62^\circ,$$
+      and since $AC$ is the same line, $\angle BAC = 62^\circ$.
+    </div>
+
+    <div class="step" data-step="3">
+      <span class="steptag">Step 3 · Parallel lines again (transversal AC)</span>
+      Using $AB \parallel TC$ with transversal $ACT$ (alternate angles):
+      $$\angle TCA = \angle BAC = 62^\circ.$$
+    </div>
+
+    <div class="step" data-step="4">
+      <span class="steptag">Step 4 · Tangent–chord angle (alternate segment)</span>
+      The tangent $TC$ and chord $CA$ make $\angle TCA$, which equals the angle in the alternate segment, $\angle CBA$:
+      $$\angle ABC = \angle TCA = 62^\circ.$$
+    </div>
+
+    <div class="step" data-step="5">
+      <span class="steptag">Step 5 · Angle sum in triangle ABC</span>
+      In $\triangle ABC$:
+      $$\angle ACB = 180^\circ - \angle BAC - \angle ABC = 180^\circ - 62^\circ - 62^\circ = 56^\circ.$$
+    </div>
+
+    <div class="step" data-step="6">
+      <span class="steptag">Step 6 · Angles in the same segment</span>
+      $C$ and $D$ lie on the same arc $AB$, so the angles subtended by arc $AB$ are equal:
+      $$\angle ADB = \angle ACB = 56^\circ.$$
+      Since $D$, $E$, $T$ lie on line $BDT$, $\angle ADE = \angle ADB = 56^\circ$.
+    </div>
+
+    <div class="answerbox">✅ Answer: B — $\angle ADE = 56^\circ$</div>
+  </section>
+
 </div>
-<div class="wrap">
-  <div class="card question">
-    <h2>Question</h2>
-    <p>In the figure, \(ABCD\) are points on a circle. \(AC\) and \(BD\) intersect at the point \(E\). \(BD\) is produced to the point \(T\) such that \(TC\) is tangent to the circle. It is given that \(AB\parallel TC\). If \(\angle AED=85^\circ\) and \(\angle CTE=23^\circ\), then \(\angle ADE=\)</p>
-<ul>
-  <li>A. \(39^\circ\)</li>
-  <li>B. \(56^\circ\)</li>
-  <li>C. \(62^\circ\)</li>
-  <li>D. \(72^\circ\)</li>
-</ul>
-  </div>
-<section style="margin:16px 0;padding:16px;background:var(--bg,#fff);border:1px solid #e2e8f0;border-radius:10px;">
-  <h2 style="font-size:1rem;font-weight:600;margin:0 0 10px;color:var(--fg,#1a1a1a);">Original Figure</h2>
-  <div style="text-align:center;">
-    <img src="figures/2026_P2_38.png" alt="Original figure" style="max-width:100%;height:auto;border-radius:6px;">
-  </div>
-</section>
 
+<script>
+/* ---------- GEOMETRY SETUP ---------- */
+/* We build a circle of radius R. Points defined by angles measured
+   in standard math convention (counter-clockwise) but drawn with y-down. */
 
-  <div class="card">
-    <h2>Solution</h2>
-        <div class="step">
-      <span class="step-tag">Parallel</span>
-      \(AB\parallel TC\), transversal \(BD\Rightarrow \angle ABD=\angle CTE=23^\circ\).
-    </div>
-    <div class="step">
-      <span class="step-tag">Triangle ABE</span>
-      \(\angle AEB=180^\circ-85^\circ=95^\circ\), \(\angle ABE=23^\circ\Rightarrow \angle BAE=62^\circ\), so \(\angle BAC=62^\circ\).
-    </div>
-    <div class="step">
-      <span class="step-tag">Parallel again</span>
-      \(AB\parallel TC\), transversal \(AC\Rightarrow \angle TCA=\angle BAC=62^\circ\).
-    </div>
-    <div class="step">
-      <span class="step-tag">Alternate segment</span>
-      Tangent–chord angle \(\angle TCA=\) angle in the alternate segment \(=\angle CBA\Rightarrow \angle ABC=62^\circ\).
-    </div>
-    <div class="step">
-      <span class="step-tag">Angle ACB</span>
-      In \(\triangle ABC\): \(\angle ACB=180^\circ-62^\circ-62^\circ=56^\circ\).
-    </div>
-    <div class="step">
-      <span class="step-tag">Same arc AB</span>
-      C and D lie on the same (major) arc \(AB\), so \(\angle ADB=\angle ACB=56^\circ\). Hence \(\angle ADE=56^\circ\).
-    </div>
-  </div>
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+let W = cv.width, H = cv.height;
 
-  <div class="ans">
-    <b>Answer: B</b> &mdash; 56&deg;
-  </div>
-</div>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
+// Circle parameters (in math coords, y-up); we convert to screen at draw time
+const R = 150;
+const cx = 235, cy = 235;   // screen centre of circle
+
+// Helper: convert math point (angle deg, radius) -> screen coords
+const P = (aDeg, rad=R) => {
+  const a = aDeg * Math.PI/180;
+  return { x: cx + rad*Math.cos(a), y: cy - rad*Math.sin(a) };
+};
+
+/* Choose vertex angles (degrees) so that the configuration matches the exam figure:
+   In the figure: B at far left, A top, D right, C bottom.
+   - B at 180° (left)
+   - A near top (about 100°)
+   - D near right (about -20° ≈ 340°) so that BD is roughly horizontal
+   - C near bottom (about 300°)
+   The tangent at C meets BD produced at T.
+   We will pick angles so chords look like the figure. */
+
+// Tune angles
+const angB = 180;
+const angA = 100;
+const angD = 338;   // D slightly below horizontal on right
+const angC = 283;   // C bottom-right
+
+// Decide circle angles to match observed picture: In figure, D is just above BD line and C left-bottom.
+// We'll adjust: D at ~352, C at ~295
+const A_ang = 100;
+const B_ang = 180;
+const D_ang = 353;
+const C_ang = 297;
+
+const A = P(A_ang);
+const B = P(B_ang);
+const D = P(D_ang);
+const C = P(C_ang);
+
+/* Intersection of lines AC and BD = E */
+function lineIntersect(p1,p2,p3,p4){
+  const d = (p1.x-p2.x)*(p3.y-p4.y) - (p1.y-p2.y)*(p3.x-p4.x);
+  const a = p1.x*p2.y - p1.y*p2.x;
+  const b = p3.x*p4.y - p3.y*p4.x;
+  return { x: (a*(p3.x-p4.x) - (p1.x-p2.x)*b)/d,
+           y: (a*(p3.y-p4.y) - (p1.y-p2.y)*b)/d };
+}
+const E = lineIntersect(A,C,B,D);
+
+/* Tangent at C: perpendicular to OC (radius). Centre O = (cx,cy) in screen coords. */
+const OCx = C.x - cx, OCy = C.y - cy;
+const tdx = -OCy, tdy = OCx;    // tangent direction
+const tLen = Math.hypot(tdx,tdy);
+const tux = tdx/tLen, tuy = tdy/tLen;
+
+/* Intersection of tangent line at C with line BD produced: parametrize BD.
+   Line BD: B + s*(D-B).  Tangent: C + u*(tux,tuy). Solve. */
+function intersectLines(p1, d1, p2, d2){
+  // p1 + t*d1 = p2 + u*d2
+  const det = d1.x*(-d2.y) - d1.y*(-d2.x);
+  const rx = p2.x - p1.x, ry = p2.y - p1.y;
+  const t = (rx*(-d2.y) - ry*(-d2.x)) / det;
+  return { x: p1.x + t*d1.x, y: p1.y + t*d1.y };
+}
+const BDdir = { x: D.x - B.x, y: D.y - B.y };
+const T = intersectLines(B, BDdir, C, { x: tux, y: tuy });
+
+/* If T lands on wrong side (should be beyond D), flip tangent direction */
+let Tfinal = T;
+// If T is between B and D, use opposite tangent direction
+function between(p,a,b){ return (p.x-a.x)*(b.x-a.x)+(p.y-a.y)*(b.y-a.y) > 0 && Math.hypot(p.x-b.x,p.y-b.y) < Math.hypot(a.x-b.x,a.y-b.y); }
+if (between(Tfinal, B, D)) {
+  Tfinal = intersectLines(B, BDdir, C, { x: -tux, y: -tuy });
+}
+
+/* ---------- DRAW ---------- */
+let mode = 1;
+
+function drawArc(pts, color, width, dash=[]){
+  ctx.save();
+  ctx.setLineDash(dash);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, pts[0].y);
+  for (let i=1;i<pts.length;i++) ctx.lineTo(pts[i].x, pts[i].y);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawPoint(p, label, color, dx=0, dy=0){
+  ctx.save();
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(p.x, p.y, 4, 0, Math.PI*2);
+  ctx.fill();
+  ctx.fillStyle = '#1e293b';
+  ctx.font = 'bold 15px Georgia, serif';
+  ctx.fillText(label, p.x + 8 + dx, p.y - 8 + dy);
+  ctx.restore();
+}
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = '#fbfdff';
+  ctx.fillRect(0,0,W,H);
+
+  // Which elements to highlight based on mode
+  const hi = (n) => mode===n;
+
+  // --- Circle ---
+  ctx.save();
+  ctx.strokeStyle = '#2563eb';
+  ctx.lineWidth = hi(0)?3:2.2;
+  ctx.beginPath();
+  ctx.arc(cx, cy, R, 0, Math.PI*2);
+  ctx.stroke();
+  ctx.restore();
+
+  // --- Tangent line at C to T (magenta) ---
+  // extend a little past T
+  const extT = { x: Tfinal.x + tux*20, y: Tfinal.y + tuy*20 };
+  drawArc([C, Tfinal], '#d946ef', hi(4)?4:2.5);
+
+  // --- Chord BD (teal) extended to T (BD produced). Actually B-D-T line ---
+  drawArc([B, Tfinal], '#0f766e', hi(1)||hi(4)?3.5:2.2);
+
+  // --- Chord AC (red) ---
+  drawArc([A, C], '#ef4444', hi(2)||hi(3)||hi(5)?3.5:2.2);
+
+  // --- AB (amber) parallel to TC ---
+  drawArc([A, B], '#f59e0b', hi(1)||hi(2)||hi(3)?4:2.6);
+
+  // --- AD (dashed for hidden? Actually AD is not drawn in figure; skip) ---
+
+  // --- Highlight triangle ABC edges when mode 5 ---
+  if (mode===5){
+    drawArc([B, C], '#7c3aed', 3.2);
+  }
+
+  // --- Points ---
+  drawPoint(A,'A','#9333ea');
+  drawPoint(B,'B','#9333ea');
+  drawPoint(C,'C','#9333ea');
+  drawPoint(D,'D','#9333ea');
+  drawPoint(E,'E','#dc2626', -18, 14);
+  drawPoint(Tfinal,'T','#d946ef');
+
+  // Centre O (small, purple)
+  ctx.fillStyle = '#9333ea';
+  ctx.beginPath(); ctx.arc(cx,cy,2.5,0,Math.PI*2); ctx.fill();
+
+  // --- Right-angle marker at C between radius and tangent ---
+  // (subtle)
+
+  // --- Labelled angle arcs ---
+  function angleArc(vertex, p1, p2, rad, color, label, labelOff=0){
+    const a1 = Math.atan2(p1.y-vertex.y, p1.x-vertex.x);
+    const a2 = Math.atan2(p2.y-vertex.y, p2.x-vertex.x);
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    // choose shorter arc
+    let start = a1, end = a2;
+    let diff = end - start;
+    while (diff <= -Math.PI) diff += 2*Math.PI;
+    while (diff > Math.PI) diff -= 2*Math.PI;
+    ctx.arc(vertex.x, vertex.y, rad, start, start+diff, diff<0);
+    ctx.stroke();
+    // label
+    const mid = start + diff/2;
+    const lx = vertex.x + (rad+14)*Math.cos(mid);
+    const ly = vertex.y + (rad+14)*Math.sin(mid);
+    ctx.fillStyle = color;
+    ctx.font = 'bold 12px sans-serif';
+    ctx.textAlign='center';
+    ctx.fillText(label, lx, ly+labelOff);
+    ctx.restore();
+  }
+
+  // Angle AED (85°) at E — show in red always faintly, stronger in mode 2
+  angleArc(E, A, D, 34, hi(2)?'#dc2626':'#f3a3a3', '');
+  // Angle CTE (23°) at T
+  angleArc(Tfinal, C, D, 30, hi(1)?'#7c3aed':'#e2b5ef', '');
+  // Angle ABD / ABE at B (23°)
+  if (mode>=1) angleArc(B, A, D, 36, '#16a34a', '');
+  // Angle BAE at A (62°)
+  if (mode>=2) angleArc(A, B, C, 40, '#0891b2', '');
+  // Angle TCA at C (62°)
+  if (mode>=3) angleArc(C, Tfinal, A, 34, '#d97706', '');
+  // Angle ABC at B (62°)
+  if (mode>=4) angleArc(B, A, C, 44, '#2563eb', '');
+  // Angle ACB at C (56°)
+  if (mode>=5) angleArc(C, A, B, 30, '#7c3aed', '');
+  // Angle ADE at D (56°)
+  if (mode>=6) angleArc(D, A, B, 32, '#db2777', '');
+
+  // Parallel marks on AB and TC
+  if (mode>=1 && mode<=3){
+    // small arrow marks
+    function parMark(p, dir){
+      ctx.save();
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 2;
+      for (let k=0;k<2;k++){
+        const o = (k-0.5)*6;
+        ctx.beginPath();
+        ctx.moveTo(p.x + dir.y*4 + o*dir.x/2, p.y - dir.x*4 + o*dir.y/2);
+        ctx.lineTo(p.x, p.y);
+        ctx.lineTo(p.x + dir.y*4 - o*dir.x/2, p.y - dir.x*4 - o*dir.y/2);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+    const midAB = { x:(A.x+B.x)/2, y:(A.y+B.y)/2 };
+    const dAB = { x:(B.x-A.x), y:(B.y-A.y) };
+    const mLen = Math.hypot(dAB.x,dAB.y); dAB.x/=mLen; dAB.y/=mLen;
+    parMark(midAB, dAB);
+    const midTC = { x:(C.x+Tfinal.x)/2, y:(C.y+Tfinal.y)/2 };
+    const dTC = { x:(Tfinal.x-C.x), y:(Tfinal.y-C.y) };
+    const mLen2 = Math.hypot(dTC.x,dTC.y); dTC.x/=mLen2; dTC.y/=mLen2;
+    parMark(midTC, dTC);
+  }
+}
+
+/* ---------- SCROLL SYNC ---------- */
+const steps = Array.from(document.querySelectorAll('.step'));
+const obs = new IntersectionObserver((es)=>{
+  es.forEach(e=>{
+    if(e.isIntersecting){
+      const m = +e.target.dataset.step;
+      mode = m;
+      steps.forEach(st=>st.classList.toggle('active', st===e.target));
+      draw();
+    }
+  });
+},{rootMargin:'-15% 0px -55% 0px', threshold:0});
+steps.forEach(st=>obs.observe(st));
+
+/* Redraw on resize (keep canvas crisp) */
+function resizeCanvas(){
+  // keep internal resolution; CSS scales. Nothing needed.
+}
+window.addEventListener('load', ()=>{ draw(); });
+draw();
 </script>
-
 </body>
 </html>

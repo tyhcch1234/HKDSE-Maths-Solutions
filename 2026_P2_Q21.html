@@ -3,121 +3,462 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HKDSE 2026 Paper 2 MC21 · Similar Triangles and Perimeter</title>
+<title>HKDSE 2026 P2 MC21 — Similar Triangles and Perimeter</title>
 <script>
-  window.MathJax = {
-    tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['\\[','\\]']] },
-    svg: { fontCache: 'global' }
-  };
+MathJax = {
+  tex: {inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']]},
+  svg: {fontCache: 'global'}
+};
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
-  :root{--blue:#1d4ed8;--blue-light:#3b82f6;--amber:#f59e0b;--amber-bg:#fffbeb;--emerald:#059669;--emerald-bg:#ecfdf5;--slate:#0f172a;--slate-soft:#475569;--line:#e2e8f0;--card:#ffffff;--bg:#f1f5f9;}
-  *{box-sizing:border-box;} html,body{margin:0;padding:0;}
-  body{font-family:"Segoe UI",system-ui,-apple-system,Helvetica,Arial,sans-serif;color:var(--slate);background:var(--bg);line-height:1.6;-webkit-font-smoothing:antialiased;}
-  .wrap{max-width:920px;margin:0 auto;padding:0 16px 60px;}
-  .hero{background:linear-gradient(120deg,#0f172a,#1e3a8a 45%,#2563eb);color:#fff;padding:32px 20px 28px;}
-  .hero .tag{display:inline-block;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;background:rgba(255,255,255,.16);border-radius:99px;padding:3px 12px;margin-bottom:10px;}
-  .hero h1{margin:0;font-size:1.5rem;font-weight:800;}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin:18px 0;box-shadow:0 1px 3px rgba(15,23,42,.06);}
-  .card h2{margin:0 0 10px;font-size:1.05rem;color:var(--blue);}
-  .question{font-size:1.08rem;}
-  .question ol,.question ul{margin:10px 0;padding-left:22px;}
-  .marks{color:var(--slate-soft);font-size:.85rem;font-style:italic;}
-  .step{border-left:3px solid var(--blue-light);background:#f8fafc;border-radius:8px;padding:12px 16px;margin:12px 0;}
-  .step .step-tag{display:inline-block;font-size:.7rem;font-weight:700;color:#fff;background:var(--blue);border-radius:99px;padding:2px 10px;margin-bottom:8px;}
-  .ans{background:var(--emerald-bg);border:1px solid #6ee7b7;border-radius:10px;padding:14px 18px;font-weight:600;margin:16px 0;}
-  .hint{background:var(--amber-bg);border:1px solid #fcd34d;border-radius:10px;padding:10px 16px;font-size:.9rem;color:#92400e;margin:10px 0;}
-  .mono{font-family:ui-monospace,Consolas,monospace;}
+  :root{
+    --bg:#f4f7fb;
+    --card:#ffffff;
+    --ink:#1f2937;
+    --muted:#64748b;
+    --blue:#2563eb;
+    --red:#e11d48;
+    --green:#059669;
+    --amber:#d97706;
+    --purple:#7c3aed;
+    --line:#e2e8f0;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:linear-gradient(160deg,#eef4ff 0%,#f7f9fc 40%,#f0fdf9 100%);
+    color:var(--ink);
+    padding:12px;
+    line-height:1.55;
+  }
+  .wrap{max-width:1280px;margin:0 auto;}
+  .header{
+    background:linear-gradient(120deg,#2563eb,#7c3aed);
+    color:#fff;border-radius:18px;padding:14px 22px;margin-bottom:14px;
+    box-shadow:0 8px 24px rgba(37,99,235,.25);
+  }
+  .header h1{margin:0;font-size:1.15rem;letter-spacing:.3px;}
+  .header p{margin:4px 0 0;font-size:.85rem;opacity:.9;}
+
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start;}
+  @media(min-width:900px){.split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}}
+
+  .panel{
+    background:var(--card);border-radius:18px;padding:14px;
+    box-shadow:0 6px 22px rgba(15,23,42,.08);
+    border:1px solid var(--line);
+    min-width:0;
+  }
+  .diagram{
+    position:sticky;top:16px;max-height:calc(100vh - 2rem);overflow-y:auto;
+    padding:10px;
+  }
+  .diagram canvas{width:100%;height:auto;display:block;border-radius:12px;background:#fbfdff;}
+
+  .legend{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:10px;font-size:.72rem;color:var(--muted);}
+  .legend span{display:inline-flex;align-items:center;gap:5px;}
+  .swatch{width:12px;height:4px;border-radius:2px;display:inline-block;}
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block;}
+
+  h2.q-title{font-size:1rem;margin:0 0 6px;color:var(--blue);letter-spacing:.3px;}
+  .question{font-size:.92rem;background:#f8fafc;border-left:4px solid var(--blue);padding:10px 12px;border-radius:10px;margin-bottom:12px;}
+  .options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:8px;font-size:.85rem;}
+  .options div{background:#eef4ff;border-radius:8px;padding:4px 8px;}
+  .options div.correct{background:#dcfce7;border:1.5px solid #16a34a;font-weight:700;color:#166534;}
+
+  .step{
+    background:#fbfdff;border:1.5px solid var(--line);border-radius:14px;
+    padding:10px 12px;margin-bottom:10px;transition:all .25s ease;
+  }
+  .step.active{
+    border-color:#7c3aed;background:#faf5ff;
+    box-shadow:0 6px 18px rgba(124,58,237,.18);transform:translateX(2px);
+  }
+  .step-tag{
+    font-size:.72rem;font-weight:800;letter-spacing:.7px;text-transform:uppercase;
+    color:var(--purple);margin-bottom:5px;
+  }
+  .step.active .step-tag{color:var(--blue);}
+  .step .math{font-size:.9rem;overflow-x:auto;}
+
+  .hint{background:#fffbeb;border:1px dashed #f59e0b;border-radius:10px;padding:8px 10px;font-size:.82rem;color:#92400e;margin:8px 0;}
+  .answer-box{
+    background:linear-gradient(120deg,#089f6e,#0ea5e9);color:#fff;border-radius:14px;
+    padding:10px 14px;margin-top:6px;font-weight:700;font-size:1rem;
+    box-shadow:0 8px 22px rgba(14,165,233,.28);
+  }
+  .answer-box small{display:block;font-weight:500;opacity:.92;font-size:.75rem;margin-bottom:2px;letter-spacing:.5px;}
+
+  @media(max-width:600px){
+    body{padding:8px;}
+    .panel{padding:10px;border-radius:14px;}
+    .question{font-size:.8rem;padding:8px;}
+    .step{padding:8px;}
+    .step .math{font-size:.8rem;}
+    .header h1{font-size:.95rem;}
+    .legend{font-size:.62rem;gap:5px 9px;}
+    .options{font-size:.76rem;}
+  }
 </style>
 </head>
 <body>
-<div class="hero">
-  <div class="wrap">
-    <span class="tag">HKDSE 2026 · Paper 2 · MC21</span>
-    <h1>Similar Triangles and Perimeter</h1>
-  </div>
-</div>
 <div class="wrap">
-  <div class="card question">
-    <h2>Question</h2>
-    <p>It is given that \(WXYZ\) is a quadrilateral, where \(\angle WXY=\angle YWZ\) and \(\angle WYX=\angle WZY\). If \(WX=9\) cm, \(WY=40\) cm and \(XY=41\) cm, find the perimeter of the quadrilateral \(WXYZ\).</p>
-    <ul>
-      <li><strong>A.</strong> \(100\) cm</li>
-      <li><strong>B.</strong> \(180\) cm</li>
-      <li><strong>C.</strong> \(410\) cm</li>
-      <li><strong>D.</strong> \(490\) cm</li>
-    </ul>
-  <figure class="figure"><svg viewBox="0 0 300 220" xmlns="http://www.w3.org/2000/svg" role="img"><rect width="300" height="220" fill="#fff"/><polygon points="120,180 240,180 200,60 80,100" fill="#eef2ff" stroke="#334155" stroke-width="2"/><line x1="120" y1="180" x2="200" y2="60" stroke="#b45309" stroke-width="1.4"/><path d="M120,180 L134,180 A14,14 0 0 1 120,166 Z" fill="none" stroke="#e11d48" stroke-width="1.2"/><text x="112" y="200" font-size="12" font-weight="700" fill="#1e293b">W</text><text x="246" y="200" font-size="12" font-weight="700" fill="#1e293b">X</text><text x="204" y="52" font-size="12" font-weight="700" fill="#1e293b">Y</text><text x="70" y="98" font-size="12" font-weight="700" fill="#1e293b">Z</text></svg><figcaption>Quadrilateral WXYZ (not to scale)</figcaption></figure></div>
-
-  <div class="card">
-    <h2>Solution</h2>
-    <div class="step">
-      <span class="step-tag">Establish the similarity</span>
-      <p>In \(\triangle XYW\) and \(\triangle WZY\):</p>
-      <p>\(\angle WXY=\angle YWZ\) (given), and \(\angle WYX=\angle WZY\) (given). The third angles are therefore also equal: \(\angle XWY=\angle WYZ\).</p>
-      <p>Hence \(\triangle XYW\sim\triangle WZY\).</p>
-    </div>
-    <div class="step">
-      <span class="step-tag">Write the ratio of corresponding sides</span>
-      <p>Matching vertices \(X\leftrightarrow W\), \(Y\leftrightarrow Z\), \(W\leftrightarrow Y\):</p>
-      \[
-      \frac{WX}{WY}=\frac{XY}{WZ}=\frac{WY}{YZ}=\frac{9}{40}
-      \]
-    </div>
-    <div class="step">
-      <span class="step-tag">Find \(WZ\) and \(YZ\)</span>
-      \[
-      WZ=\frac{40\times XY}{9}=\frac{40\times41}{9}=\frac{1640}{9}\text{ cm}
-      \]
-      \[
-      YZ=\frac{40\times WY}{9}=\frac{40\times40}{9}=\frac{1600}{9}\text{ cm}
-      \]
-    </div>
-    <div class="step">
-      <span class="step-tag">Compute the perimeter</span>
-      \[
-      \text{Perimeter}=WX+XY+YZ+WZ=9+41+\frac{1640}{9}+\frac{1600}{9}
-      =50+\frac{3240}{9}=50+360=410\text{ cm}
-      \]
-    </div>
+  <div class="header">
+    <h1>HKDSE 2026 · Paper 2 · MC21</h1>
+    <p>Similar Triangles and Perimeter</p>
   </div>
 
-  <div class="ans">
-    Final Answer: <span class="mono">C</span>
+  <div class="split">
+    <!-- LEFT: DIAGRAM -->
+    <section class="panel diagram">
+      <canvas id="cv" width="640" height="620"></canvas>
+      <div class="legend">
+        <span><i class="swatch" style="background:#2563eb"></i>WX = 9</span>
+        <span><i class="swatch" style="background:#e11d48"></i>WY = 40 (diagonal)</span>
+        <span><i class="swatch" style="background:#059669"></i>XY = 41</span>
+        <span><i class="swatch" style="background:#d97706"></i>WZ, YZ (found)</span>
+        <span><i class="dot" style="background:#7c3aed"></i>Vertices</span>
+      </div>
+    </section>
+
+    <!-- RIGHT: QUESTION + SOLUTION -->
+    <section class="panel">
+      <h2 class="q-title">Question</h2>
+      <div class="question">
+        It is given that \(WXYZ\) is a quadrilateral, where \(\angle WXY=\angle YWZ\) and \(\angle WYX=\angle WZY\).
+        If \(WX=9\) cm, \(WY=40\) cm and \(XY=41\) cm, find the perimeter of the quadrilateral \(WXYZ\).
+        <div class="options">
+          <div>A. \(100\) cm</div>
+          <div>B. \(180\) cm</div>
+          <div class="correct">C. \(410\) cm</div>
+          <div>D. \(490\) cm</div>
+        </div>
+      </div>
+      <!-- FIGURE_HERE -->
+
+      <div class="step" data-step="1">
+        <div class="step-tag">Step 1 · Establish the similarity</div>
+        <div class="math">
+          In \(\triangle XYW\) and \(\triangle WZY\):
+          \[
+          \angle WXY=\angle YWZ \quad(\text{given}),\qquad
+          \angle WYX=\angle WZY \quad(\text{given}).
+          \]
+          The third angles must then also be equal:
+          \(\angle XWY=\angle WYZ\).
+          Hence
+          \[
+          \triangle XYW \sim \triangle WZY \quad(\text{A.A.A.})
+          \]
+        </div>
+      </div>
+
+      <div class="step" data-step="2">
+        <div class="step-tag">Step 2 · Ratio of corresponding sides</div>
+        <div class="math">
+          Match vertices \(X\leftrightarrow W,\; Y\leftrightarrow Z,\; W\leftrightarrow Y\):
+          \[
+          \frac{WX}{WY}=\frac{XY}{WZ}=\frac{WY}{YZ}=\frac{9}{40}
+          \]
+        </div>
+        <div class="hint">The ratio is fixed by the known sides \(WX=9\) and \(WY=40\).</div>
+      </div>
+
+      <div class="step" data-step="3">
+        <div class="step-tag">Step 3 · Find \(WZ\) and \(YZ\)</div>
+        <div class="math">
+          \[
+          WZ=\frac{40\times XY}{9}=\frac{40\times 41}{9}=\frac{1640}{9}\text{ cm}
+          \]
+          \[
+          YZ=\frac{40\times WY}{9}=\frac{40\times 40}{9}=\frac{1600}{9}\text{ cm}
+          \]
+        </div>
+      </div>
+
+      <div class="step" data-step="4">
+        <div class="step-tag">Step 4 · Compute the perimeter</div>
+        <div class="math">
+          \[
+          \begin{aligned}
+          \text{Perimeter}
+          &=WX+XY+YZ+WZ\\
+          &=9+41+\frac{1640}{9}+\frac{1600}{9}\\
+          &=50+\frac{3240}{9}=50+360=410\text{ cm}
+          \end{aligned}
+          \]
+        </div>
+      </div>
+
+      <div class="answer-box">
+        <small>FINAL ANSWER</small>
+        C. \(410\) cm
+      </div>
+    </section>
   </div>
 </div>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
 
+<script>
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+const W = cv.width, H = cv.height;
+
+/* ---------- Geometry (true scale) ---------- */
+// Triangle WXY: WX=9, WY=40, XY=41  -> right angle at X (9-40-41 Pythagorean triple)
+// Place W at origin, X along +x-axis at distance 9, Y such that WY=40 & XY=41.
+const Wx0 = 0, Wy0 = 0;
+const Xx0 = 9, Xy0 = 0;
+// solve: X + t direction; but directly: since 9^2+40^2=41^2, angle XWY=90 not needed; we know WX=9, WY=40, XY=41.
+// Using law of cosines at W: cos(angle XWY) = (9^2+40^2-41^2)/(2*9*40) = (81+1600-1681)/720 = 0
+// So angle at W is 90 deg! Great -> Y is along +y-axis at distance 40.
+const Yx0 = 0, Yy0 = 40;
+
+// Z lies on the other side of WY from X (since quadrilateral WXYZ is convex with WX, XY, YZ, ZW)
+// Similarity maps:  WX/WY = XY/WZ = WY/YZ = 9/40 with triangles XYW ~ WZY
+// So WZ = 1640/9, YZ = 1600/9.
+// Z is such that |WZ| = 1640/9, |YZ| = 1600/9, and Z on opposite side of line WY from X (right side since X is on +x, WY is on y-axis).
+// Solve: Z=(zx,zy): zx^2+zy^2 = (1640/9)^2 ; zx^2+(zy-40)^2 = (1600/9)^2
+// subtract: zy^2 - (zy-40)^2 = (1640^2-1600^2)/81 => 80*zy - 1600 = (2689600-2560000)/81 = 129600/81 = 1600
+// => 80 zy = 3200 => zy = 40. Then zx^2 = (1640/9)^2 - 1600 = 2689600/81 - 129600/81 = 2560000/81
+// => zx = 1600/9.
+const Zx0 = 1600/9, Zy0 = 40;
+
+/* ---------- Fit to canvas ---------- */
+const allX = [Wx0, Xx0, Yx0, Zx0];
+const allY = [Wy0, Xy0, Yy0, Zy0];
+const minX = Math.min(...allX), maxX = Math.max(...allX);
+const minY = Math.min(...allY), maxY = Math.max(...allY);
+const padL = 60, padR = 60, padT = 50, padB = 60;
+const scaleX = (W - padL - padR) / (maxX - minX);
+const scaleY = (H - padT - padB) / (maxY - minY);
+const s = Math.min(scaleX, scaleY);
+const offX = padL + ((W - padL - padR) - s * (maxX - minX)) / 2 - s * minX;
+// invert y so up is positive
+const offY = padT + ((H - padT - padB) - s * (maxY - minY)) / 2 + s * maxY;
+
+function tx(x){ return offX + s * x; }
+function ty(y){ return offY - s * y; }
+
+const P = {
+  W: {x: tx(Wx0), y: ty(Wy0), label:'W'},
+  X: {x: tx(Xx0), y: ty(Xy0), label:'X'},
+  Y: {x: tx(Yx0), y: ty(Yy0), label:'Y'},
+  Z: {x: tx(Zx0), y: ty(Zy0), label:'Z'}
+};
+
+/* ---------- Colours ---------- */
+const C = {
+  WX:'#2563eb', WY:'#e11d48', XY:'#059669', WZ:'#d97706', YZ:'#d97706',
+  vertex:'#7c3aed', dim:'#94a3b8', fill:'#eef4ff'
+};
+
+let mode = 1;
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = '#fbfdff';
+  ctx.fillRect(0,0,W,H);
+
+  // Determine which parts are highlighted
+  const hi = {
+    tri1: mode===1 || mode===2 || mode===3,
+    tri2: mode===1 || mode===2 || mode===3,
+    found: mode===3 || mode===4,
+    perim: mode===4
+  };
+
+  // Filled triangle WXY (triangle XYW)
+  ctx.beginPath();
+  ctx.moveTo(P.W.x,P.W.y);
+  ctx.lineTo(P.X.x,P.X.y);
+  ctx.lineTo(P.Y.x,P.Y.y);
+  ctx.closePath();
+  ctx.fillStyle = mode<=2 ? 'rgba(37,99,235,0.10)' : 'rgba(37,99,235,0.05)';
+  ctx.fill();
+
+  // Filled triangle WZY
+  ctx.beginPath();
+  ctx.moveTo(P.W.x,P.W.y);
+  ctx.lineTo(P.Z.x,P.Z.y);
+  ctx.lineTo(P.Y.x,P.Y.y);
+  ctx.closePath();
+  ctx.fillStyle = mode<=2 ? 'rgba(217,119,6,0.10)' : 'rgba(217,119,6,0.05)';
+  ctx.fill();
+
+  // Lines helper
+  function line(a,b,color,width,dash){
+    ctx.save();
+    ctx.setLineDash(dash||[]);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(a.x,a.y);
+    ctx.lineTo(b.x,b.y);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // Sides of triangle XYW
+  const wBase = mode===1||mode===2 ? 4 : 3;
+  const baseAlpha = mode>=3 ? 0.55 : 1;
+  ctx.globalAlpha = baseAlpha;
+  line(P.W,P.X,C.WX, wBase);      // WX
+  line(P.X,P.Y,C.XY, wBase);      // XY
+  line(P.W,P.Y,C.WY, wBase);      // WY
+  ctx.globalAlpha = 1;
+
+  // Sides WZ and YZ (found in step 3+)
+  if (hi.found){
+    line(P.W,P.Z,C.WZ, 4);
+    line(P.Y,P.Z,C.YZ, 4);
+  } else {
+    ctx.save();
+    ctx.setLineDash([6,6]);
+    line(P.W,P.Z,'#cbd5e1',2);
+    line(P.Y,P.Z,'#cbd5e1',2);
+    ctx.restore();
+  }
+
+  // Vertices
+  function vertex(p,color,label,size){
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,size,0,Math.PI*2);
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+  const vs = mode===4 ? 7 : 6;
+  vertex(P.W,C.vertex,'W',vs);
+  vertex(P.X,C.vertex,'X',vs);
+  vertex(P.Y,C.vertex,'Y',vs);
+  vertex(P.Z,C.vertex,'Z',vs);
+
+  // Labels
+  ctx.font = 'bold 18px -apple-system,Segoe UI,Roboto,sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#0f172a';
+  function label(p, text, dx, dy){
+    ctx.fillText(text, p.x+dx, p.y+dy);
+  }
+  label(P.W,'W', -18, 6);
+  label(P.X,'X', 14, 12);
+  label(P.Y,'Y', -14, -14);
+  label(P.Z,'Z', 16, -12);
+
+  // Side length labels (always show base known sides)
+  ctx.font = 'bold 15px -apple-system,Segoe UI,Roboto,sans-serif';
+  function midLabel(a,b,text,color,offx,offy){
+    const mx = (a.x+b.x)/2 + (offx||0);
+    const my = (a.y+b.y)/2 + (offy||0);
+    ctx.font='bold 14px -apple-system,Segoe UI,Roboto,sans-serif';
+    const w = ctx.measureText(text).width;
+    ctx.fillStyle = 'rgba(255,255,255,0.9)';
+    ctx.fillRect(mx - w/2 - 4, my - 10, w + 8, 20);
+    ctx.fillStyle = color;
+    ctx.fillText(text, mx, my);
+  }
+
+  midLabel(P.W,P.X,'9',C.WX, 0, 18);
+  midLabel(P.X,P.Y,'41',C.XY, 22, 0);
+  midLabel(P.W,P.Y,'40',C.WY, 22, -14);
+
+  if (hi.found){
+    midLabel(P.W,P.Z,'1640/9',C.WZ, 0, 16);
+    midLabel(P.Y,P.Z,'1600/9',C.YZ, 0, -16);
+  }
+
+  // Angle markers for similarity (step 1)
+  if (mode===1){
+    // angle at X of triangle XYW (between XW and XY)
+    drawAngleArc(P.X, P.W, P.Y, 26, '#e11d48');
+    // angle at W of triangle WZY (between WY and WZ)
+    drawAngleArc(P.W, P.Y, P.Z, 26, '#e11d48');
+
+    // angle at Y of triangle XYW (between YX and YW)
+    drawAngleArc(P.Y, P.X, P.W, 26, '#7c3aed');
+    // angle at Z of triangle WZY (between ZW and ZY)
+    drawAngleArc(P.Z, P.W, P.Y, 26, '#7c3aed');
+  }
+
+  // Show the ratio numbers on step 2
+  if (mode===2){
+    ctx.font = 'bold 14px -apple-system,Segoe UI,Roboto,sans-serif';
+    ctx.fillStyle = C.WX;
+    ctx.fillText('WX = 9', 25, H-25);
+    ctx.fillStyle = C.WY;
+    ctx.fillText('WY = 40', 130, H-25);
+    ctx.fillStyle = C.XY;
+    ctx.fillText('XY = 41', 245, H-25);
+    ctx.fillStyle = '#7c3aed';
+    ctx.fillText('ratio 9:40', 360, H-25);
+  }
+
+  if (mode===3){
+    ctx.font = 'bold 14px -apple-system,Segoe UI,Roboto,sans-serif';
+    ctx.fillStyle = C.WZ;
+    ctx.fillText('WZ = 1640/9', 30, H-25);
+    ctx.fillStyle = C.YZ;
+    ctx.fillText('YZ = 1600/9', 200, H-25);
+  }
+
+  if (mode===4){
+    // perimeter highlight - trace the outline
+    ctx.save();
+    ctx.setLineDash([8,5]);
+    ctx.strokeStyle = 'rgba(14,165,233,0.7)';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(P.W.x,P.W.y);
+    ctx.lineTo(P.X.x,P.X.y);
+    ctx.lineTo(P.Y.x,P.Y.y);
+    ctx.lineTo(P.Z.x,P.Z.y);
+    ctx.closePath();
+    ctx.stroke();
+    ctx.restore();
+
+    ctx.font = 'bold 16px -apple-system,Segoe UI,Roboto,sans-serif';
+    ctx.fillStyle = '#0284c7';
+    ctx.fillText('Perimeter = 410 cm', W/2, H-20);
+  }
+}
+
+function drawAngleArc(vertex, p1, p2, r, color){
+  const a1 = Math.atan2(p1.y - vertex.y, p1.x - vertex.x);
+  const a2 = Math.atan2(p2.y - vertex.y, p2.x - vertex.x);
+  let diff = a2 - a1;
+  while (diff > Math.PI) diff -= 2*Math.PI;
+  while (diff < -Math.PI) diff += 2*Math.PI;
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.arc(vertex.x, vertex.y, r, a1, a1 + diff, diff < 0);
+  ctx.stroke();
+  ctx.restore();
+}
+
+/* ---------- Scroll sync ---------- */
+const steps = Array.from(document.querySelectorAll('.step'));
+const obs = new IntersectionObserver((es)=>{
+  es.forEach(e=>{
+    if(e.isIntersecting){
+      const m = +e.target.dataset.step;
+      mode = m;
+      steps.forEach(st=>st.classList.toggle('active', st===e.target));
+      draw();
+    }
+  });
+}, {rootMargin:'-15% 0px -55% 0px', threshold:0});
+steps.forEach(st=>obs.observe(st));
+
+/* initial */
+draw();
+</script>
 </body>
 </html>

@@ -3,125 +3,383 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HKDSE 2026 Paper 2 MC20 · Similar Triangles</title>
-<script>
-  window.MathJax = {
-    tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['\\[','\\]']] },
-    svg: { fontCache: 'global' }
-  };
-</script>
+<title>HKDSE 2026 P2 MC20 · Similar Triangles</title>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
 <style>
-  :root{--blue:#1d4ed8;--blue-light:#3b82f6;--amber:#f59e0b;--amber-bg:#fffbeb;--emerald:#059669;--emerald-bg:#ecfdf5;--slate:#0f172a;--slate-soft:#475569;--line:#e2e8f0;--card:#ffffff;--bg:#f1f5f9;}
-  *{box-sizing:border-box;} html,body{margin:0;padding:0;}
-  body{font-family:"Segoe UI",system-ui,-apple-system,Helvetica,Arial,sans-serif;color:var(--slate);background:var(--bg);line-height:1.6;-webkit-font-smoothing:antialiased;}
-  .wrap{max-width:920px;margin:0 auto;padding:0 16px 60px;}
-  .hero{background:linear-gradient(120deg,#0f172a,#1e3a8a 45%,#2563eb);color:#fff;padding:32px 20px 28px;}
-  .hero .tag{display:inline-block;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;background:rgba(255,255,255,.16);border-radius:99px;padding:3px 12px;margin-bottom:10px;}
-  .hero h1{margin:0;font-size:1.5rem;font-weight:800;}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin:18px 0;box-shadow:0 1px 3px rgba(15,23,42,.06);}
-  .card h2{margin:0 0 10px;font-size:1.05rem;color:var(--blue);}
-  .question{font-size:1.08rem;}
-  .question ol,.question ul{margin:10px 0;padding-left:22px;}
-  .marks{color:var(--slate-soft);font-size:.85rem;font-style:italic;}
-  .step{border-left:3px solid var(--blue-light);background:#f8fafc;border-radius:8px;padding:12px 16px;margin:12px 0;}
-  .step .step-tag{display:inline-block;font-size:.7rem;font-weight:700;color:#fff;background:var(--blue);border-radius:99px;padding:2px 10px;margin-bottom:8px;}
-  .ans{background:var(--emerald-bg);border:1px solid #6ee7b7;border-radius:10px;padding:14px 18px;font-weight:600;margin:16px 0;}
-  .hint{background:var(--amber-bg);border:1px solid #fcd34d;border-radius:10px;padding:10px 16px;font-size:.9rem;color:#92400e;margin:10px 0;}
-  .mono{font-family:ui-monospace,Consolas,monospace;}
+  *{box-sizing:border-box;}
+  body{
+    margin:0;padding:14px;
+    font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+    background:linear-gradient(135deg,#eef3ff 0%,#f7fbff 50%,#f0f9f4 100%);
+    color:#1e2a3a;font-size:15px;line-height:1.55;
+  }
+  .split{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    gap:12px;align-items:start;
+  }
+  @media(min-width:900px){
+    .split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}
+  }
+  .panel{
+    background:#ffffff;
+    border-radius:16px;
+    box-shadow:0 6px 24px rgba(38,70,130,.10),0 1px 3px rgba(38,70,130,.08);
+    padding:16px;
+    border:1px solid #e6eeff;
+  }
+  .diagram{
+    position:sticky;top:16px;
+    max-height:calc(100vh - 2rem);
+    overflow-y:auto;
+  }
+  h1{font-size:17px;margin:0 0 4px;color:#16325c;letter-spacing:.2px;}
+  .sub{font-size:12px;color:#6b7f9e;margin-bottom:12px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;}
+  canvas{width:100%;height:auto;display:block;border-radius:12px;background:#fbfdff;}
+  .legend{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:12px;font-size:12px;color:#41546f;}
+  .legend span{display:flex;align-items:center;gap:6px;}
+  .dot{width:11px;height:11px;border-radius:3px;display:inline-block;}
+  .qbox{
+    background:linear-gradient(135deg,#f2f7ff,#fdfdff);
+    border:1px solid #dbe7ff;border-radius:12px;padding:12px 14px;margin-bottom:14px;
+  }
+  .qbox .tag{
+    display:inline-block;background:#2f6df6;color:#fff;font-size:11px;font-weight:700;
+    padding:2px 9px;border-radius:20px;margin-bottom:8px;letter-spacing:.5px;
+  }
+  .options{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px;font-size:14px;}
+  .opt{background:#fff;border:1px solid #dbe7ff;border-radius:8px;padding:5px 10px;}
+  .step{
+    border:1px solid #e3ecff;border-left:5px solid #b9ccf0;
+    border-radius:12px;padding:10px 14px;margin-bottom:12px;
+    background:#fff;transition:all .25s ease;opacity:.72;
+  }
+  .step.active{
+    border-left-color:#2f6df6;background:#f7faff;
+    box-shadow:0 4px 16px rgba(47,109,246,.14);opacity:1;transform:translateX(2px);
+  }
+  .step .stag{font-size:12px;font-weight:800;color:#2f6df6;letter-spacing:.6px;margin-bottom:4px;}
+  .answer{
+    margin-top:6px;background:linear-gradient(135deg,#e8fff1,#f4fff9);
+    border:1.5px solid #34c77b;border-radius:12px;padding:12px 16px;
+    font-weight:700;color:#137a45;text-align:center;font-size:16px;
+  }
+  .hint{font-size:12.5px;color:#6b7f9e;font-style:italic;margin-top:6px;}
+  mjx-container{font-size:1.02em !important;}
+  @media(max-width:520px){
+    body{font-size:13px;padding:8px;}
+    .panel{padding:10px;border-radius:12px;}
+    .options{grid-template-columns:1fr;font-size:13px;}
+    .step{padding:8px 10px;}
+  }
 </style>
 </head>
 <body>
-<div class="hero">
-  <div class="wrap">
-    <span class="tag">HKDSE 2026 · Paper 2 · MC20</span>
-    <h1>Similar Triangles</h1>
-  </div>
+
+<div class="split">
+
+  <!-- LEFT: DIAGRAM -->
+  <section class="panel diagram">
+    <h1>Interactive Diagram</h1>
+    <div class="sub">Similar Triangles</div>
+    <canvas id="cv" width="640" height="680"></canvas>
+    <div class="legend">
+      <span><i class="dot" style="background:#e8433b"></i>Rectangle ABCD</span>
+      <span><i class="dot" style="background:#2f6df6"></i>Line DEF extended</span>
+      <span><i class="dot" style="background:#7a3cf0"></i>Similar triangles</span>
+      <span><i class="dot" style="background:#f5a623"></i>Points</span>
+    </div>
+  </section>
+
+  <!-- RIGHT: QUESTION + SOLUTION -->
+  <section class="panel">
+    <h1>HKDSE 2026 · Paper 2 · MC20</h1>
+    <div class="sub">Similar Triangles</div>
+
+    <div class="qbox">
+      <span class="tag">QUESTION</span>
+      <div>
+        In the figure, \(ABCD\) is a rectangle. Let \(E\) be a point on \(BC\). The extension of \(AB\) and the extension of \(DE\) meet at point \(F\). If \(AB=3\text{ cm}\), \(BE=12\text{ cm}\) and \(CE=4\text{ cm}\), then \(EF=\)
+      </div>
+      <div class="options">
+        <div class="opt">A. \(13\) cm</div>
+        <div class="opt">B. \(15\) cm</div>
+        <div class="opt">C. \(16\) cm</div>
+        <div class="opt">D. \(20\) cm</div>
+      </div>
+    </div>
+
+    <figure style="margin:12px 0;text-align:center;"><img src="figures/figures/2026_P2_20.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
+
+    <div class="step" data-step="1">
+      <div class="stag">STEP 1 · Find AD</div>
+      <div>Opposite sides of a rectangle are equal, so</div>
+      \[ AD=BC=BE+CE=12+4=16\text{ cm} \]
+    </div>
+
+    <div class="step" data-step="2">
+      <div class="stag">STEP 2 · Similar triangles</div>
+      <div>Since \(BE\parallel AD\), \(\triangle FBE\sim\triangle FAD\). Hence</div>
+      \[ \frac{FB}{FA}=\frac{BE}{AD}=\frac{12}{16}=\frac{3}{4} \]
+      <div>With \(FA=FB+AB=FB+3\):</div>
+      \[ \frac{FB}{FB+3}=\frac{3}{4}\;\Rightarrow\;4FB=3FB+9\;\Rightarrow\;FB=9\text{ cm} \]
+    </div>
+
+    <div class="step" data-step="3">
+      <div class="stag">STEP 3 · Pythagoras in △FBE</div>
+      <div>Since \(\angle FBE=90^\circ\),</div>
+      \[ EF=\sqrt{BE^2+FB^2}=\sqrt{12^2+9^2}=\sqrt{144+81}=\sqrt{225}=15\text{ cm} \]
+      <div class="hint">Tip: recognise the \(9\text{-}12\text{-}15\) (i.e. \(3\text{-}4\text{-}5\)) right triangle.</div>
+    </div>
+
+    <div class="answer">Final Answer: B &nbsp;(\(EF=15\) cm)</div>
+  </section>
+
 </div>
-<div class="wrap">
-  <div class="card question">
-    <h2>Question</h2>
-    <p>In the figure, \(ABCD\) is a rectangle. Let \(E\) be a point on \(BC\). The extension of \(AB\) and the extension of \(DE\) meet at point \(F\). If \(AB=3\) cm, \(BE=12\) cm and \(CE=4\) cm, then \(EF=\)</p>
-    <ul>
-      <li><strong>A.</strong> \(13\) cm</li>
-      <li><strong>B.</strong> \(15\) cm</li>
-      <li><strong>C.</strong> \(16\) cm</li>
-      <li><strong>D.</strong> \(20\) cm</li>
-    </ul>
-    <p class="marks">In the figure, \(AB\) is the right-hand short side, \(BC\) the long top side with \(E\) on it, and \(F\) lies above \(B\) where \(AB\) and \(DE\) are extended.</p>
-  </div>
-<section style="margin:16px 0;padding:16px;background:var(--bg,#fff);border:1px solid #e2e8f0;border-radius:10px;">
-  <h2 style="font-size:1rem;font-weight:600;margin:0 0 10px;color:var(--fg,#1a1a1a);">Original Figure</h2>
-  <div style="text-align:center;">
-    <img src="figures/2026_P2_20.png" alt="Original figure" style="max-width:100%;height:auto;border-radius:6px;">
-  </div>
-</section>
 
+<script>
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
 
-  <div class="card">
-    <h2>Solution</h2>
-    <div class="step">
-      <span class="step-tag">Find \(AD\)</span>
-      <p>Opposite sides of a rectangle are equal, so</p>
-      \[
-      AD=BC=BE+CE=12+4=16\text{ cm}
-      \]
-    </div>
-    <div class="step">
-      <span class="step-tag">Similar triangles</span>
-      <p>Since \(BE\parallel AD\), \(\triangle FBE\sim\triangle FAD\). Hence</p>
-      \[
-      \frac{FB}{FA}=\frac{BE}{AD}=\frac{12}{16}=\frac{3}{4}
-      \]
-      <p>With \(FA=FB+AB=FB+3\):</p>
-      \[
-      \frac{FB}{FB+3}=\frac{3}{4}\ \Rightarrow\ 4FB=3FB+9\ \Rightarrow\ FB=9\text{ cm}
-      \]
-    </div>
-    <div class="step">
-      <span class="step-tag">Apply Pythagoras in \(\triangle FBE\)</span>
-      <p>\(\angle FBE=90^\circ\), so</p>
-      \[
-      EF=\sqrt{BE^2+FB^2}=\sqrt{12^2+9^2}=\sqrt{144+81}=\sqrt{225}=15\text{ cm}
-      \]
-    </div>
-  </div>
+// ----- Real geometry (cm) -----
+// Rectangle: width BC = 16, height AB = 3
+// Coordinates in cm: set A at origin-ish, x to the right, y up.
+// Layout: BC horizontal (long top), AB vertical (right side)
+// C ---- E(12) ---------------- B
+// |                            |
+// D -------------------------- A
+// F is above B, on extension of AB (x = B.x), where D-E extended meets x = B.x
+// AD = 16, DC = 3? Wait: AB=3, AD=16 -> width is AD? Let's align with figure:
+// Figure: left side C(top-left) ... D(bottom-left); right side B(top-right) ... A(bottom-right)
+// So AD = BC = 16 (long, horizontal), AB = CD = 3 (short, vertical)
+// D = (0,0), A = (16,0), C = (0,3), B = (16,3)
+// E on BC with CE=4, BE=12 -> E = (4,3)
+// Line DE: from D(0,0) to E(4,3), slope 3/4. Extends beyond E to x=16 -> y = 12. F = (16,12)
 
-  <div class="ans">
-    Final Answer: <span class="mono">B</span>
-  </div>
-</div>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
+const D = {x:0, y:0};
+const A = {x:16, y:0};
+const C = {x:0, y:3};
+const B = {x:16, y:3};
+const E = {x:4, y:3};
+const F = {x:16, y:12};
+
+// Extents for scaling
+const minX = -2, maxX = 20;
+const minY = -2, maxY = 15;
+
+function makeTransform(){
+  const W = cv.width, H = cv.height;
+  const pad = 46;
+  const sx = (W - 2*pad) / (maxX - minX);
+  const sy = (H - 2*pad) / (maxY - minY);
+  const s = Math.min(sx, sy); // uniform scale
+  const ox = pad + (W - 2*pad - s*(maxX-minX))/2 - s*minX;
+  const oy = pad + (H - 2*pad - s*(maxY-minY))/2 - s*minY;
+  return (p) => ({ px: ox + p.x*s, py: H - (oy + p.y*s) });
+}
+
+let mode = 1;
+
+function drawPoint(pt, color, label, labelColor, dx=0, dy=0){
+  ctx.beginPath();
+  ctx.arc(pt.px, pt.py, 5.5, 0, Math.PI*2);
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.fillStyle = labelColor || color;
+  ctx.font = 'bold 17px Georgia, serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(label, pt.px + dx, pt.py + dy);
+}
+
+function draw(){
+  const W = cv.width, H = cv.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = '#fbfdff';
+  ctx.fillRect(0,0,W,H);
+
+  const T = makeTransform();
+  const pD = T(D), pA = T(A), pC = T(C), pB = T(B), pE = T(E), pF = T(F);
+
+  // grid (light)
+  ctx.strokeStyle = '#eef4ff';
+  ctx.lineWidth = 1;
+  for(let x=-2;x<=20;x+=2){
+    const a=T({x,y:minY}), b=T({x,y:maxY});
+    ctx.beginPath(); ctx.moveTo(a.px,a.py); ctx.lineTo(b.px,b.py); ctx.stroke();
+  }
+  for(let y=-2;y<=15;y+=2){
+    const a=T({x:minX,y}), b=T({x:maxX,y});
+    ctx.beginPath(); ctx.moveTo(a.px,a.py); ctx.lineTo(b.px,b.py); ctx.stroke();
+  }
+
+  // === Highlight fills based on mode ===
+  if(mode===1){
+    // Rectangle ABCD highlight
+    ctx.beginPath();
+    ctx.moveTo(pD.px,pD.py); ctx.lineTo(pA.px,pA.py);
+    ctx.lineTo(pB.px,pB.py); ctx.lineTo(pC.px,pC.py); ctx.closePath();
+    ctx.fillStyle = 'rgba(232,67,59,0.10)';
+    ctx.fill();
+  }
+  if(mode===2){
+    // Two similar triangles FBE and FAD
+    ctx.beginPath();
+    ctx.moveTo(pF.px,pF.py); ctx.lineTo(pB.px,pB.py); ctx.lineTo(pE.px,pE.py); ctx.closePath();
+    ctx.fillStyle = 'rgba(122,60,240,0.20)';
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.moveTo(pF.px,pF.py); ctx.lineTo(pA.px,pA.py); ctx.lineTo(pD.px,pD.py); ctx.closePath();
+    ctx.fillStyle = 'rgba(47,109,246,0.12)';
+    ctx.fill();
+  }
+  if(mode===3){
+    // Right triangle FBE for Pythagoras
+    ctx.beginPath();
+    ctx.moveTo(pF.px,pF.py); ctx.lineTo(pB.px,pB.py); ctx.lineTo(pE.px,pE.py); ctx.closePath();
+    ctx.fillStyle = 'rgba(52,199,123,0.20)';
+    ctx.fill();
+
+    // right angle mark at B
+    const s = 16;
+    const bx = pB.px, by = pB.py;
+    ctx.strokeStyle = '#e8433b';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(bx, by - s);
+    ctx.lineTo(bx + s, by - s);
+    ctx.lineTo(bx + s, by);
+    ctx.stroke();
+  }
+
+  // === Rectangle ABCD ===
+  ctx.strokeStyle = '#e8433b';
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.moveTo(pD.px,pD.py);
+  ctx.lineTo(pA.px,pA.py);
+  ctx.lineTo(pB.px,pB.py);
+  ctx.lineTo(pC.px,pC.py);
+  ctx.closePath();
+  ctx.stroke();
+
+  // === Line DEF extended ===
+  ctx.strokeStyle = '#2f6df6';
+  ctx.lineWidth = 2.5;
+  ctx.setLineDash(mode===2 ? [] : []);
+  ctx.beginPath();
+  ctx.moveTo(pD.px,pD.py);
+  ctx.lineTo(pF.px,pF.py);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // === Extension FB (part of AB extended) ===
+  ctx.strokeStyle = mode===2 ? '#7a3cf0' : '#2f6df6';
+  ctx.lineWidth = mode===2 ? 3 : 2;
+  ctx.setLineDash([6,5]);
+  ctx.beginPath();
+  ctx.moveTo(pB.px,pB.py);
+  ctx.lineTo(pF.px,pF.py);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // === Points ===
+  drawPoint(pD, '#f5a623', 'D', '#8a5a00', -16, 12);
+  drawPoint(pA, '#f5a623', 'A', '#8a5a00', 16, 14);
+  drawPoint(pC, '#f5a623', 'C', '#8a5a00', -16, -12);
+  drawPoint(pB, '#f5a623', 'B', '#8a5a00', 16, -12);
+  drawPoint(pE, '#e8433b', 'E', '#b02a22', 0, -18);
+  drawPoint(pF, '#7a3cf0', 'F', '#4a1fa8', 0, -18);
+
+  // === Side labels ===
+  ctx.font = 'italic 14px Georgia, serif';
+  ctx.fillStyle = '#41546f';
+  ctx.textAlign = 'center';
+
+  // CE and EB on BC
+  ctx.fillStyle = '#e8433b';
+  ctx.fillText('4', (pC.px+pE.px)/2, pC.py - 8);
+  ctx.fillText('12', (pE.px+pB.px)/2, pC.py - 8);
+
+  // AB on right
+  ctx.fillStyle = '#e8433b';
+  ctx.save();
+  ctx.translate(pA.px + 14, (pA.py+pB.py)/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.fillText('3', 0, 0);
+  ctx.restore();
+
+  // FB
+  if(mode>=2){
+    ctx.fillStyle = '#7a3cf0';
+    ctx.save();
+    ctx.translate(pB.px + 14, (pB.py+pF.py)/2);
+    ctx.rotate(-Math.PI/2);
+    ctx.fillText('9', 0, 0);
+    ctx.restore();
+  }
+
+  // === Mode banner ===
+  const banner = {
+    1: 'Rectangle ABCD: AD = BC = 16',
+    2: '△FBE ~ △FAD  →  FB = 9',
+    3: '△FBE right-angled: EF = 15'
+  }[mode] || '';
+  ctx.fillStyle = 'rgba(47,109,246,0.10)';
+  ctx.beginPath();
+  ctx.roundRect(10, 10, 260, 30, 8);
+  ctx.fill();
+  ctx.fillStyle = '#16325c';
+  ctx.font = 'bold 13px Segoe UI, sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText(banner, 20, 29);
+}
+
+// polyfill roundRect for older browsers
+if(!CanvasRenderingContext2D.prototype.roundRect){
+  CanvasRenderingContext2D.prototype.roundRect = function(x,y,w,h,r){
+    this.beginPath();
+    this.moveTo(x+r,y);
+    this.arcTo(x+w,y,x+w,y+h,r);
+    this.arcTo(x+w,y+h,x,y+h,r);
+    this.arcTo(x,y+h,x,y,r);
+    this.arcTo(x,y,x+w,y,r);
+    this.closePath();
+    return this;
+  };
+}
+
+// ===== Scroll-sync =====
+const steps = Array.from(document.querySelectorAll('.step'));
+const obs = new IntersectionObserver((es)=>{
+  es.forEach(e=>{
+    if(e.isIntersecting){
+      const m = +e.target.dataset.step;
+      mode = m;
+      steps.forEach(st=>st.classList.toggle('active', st===e.target));
+      draw();
+    }
+  });
+}, {rootMargin:'-15% 0px -55% 0px', threshold:0});
+steps.forEach(st=>obs.observe(st));
+
+// Initial active state
+steps[0].classList.add('active');
+draw();
+
+// Redraw on resize
+let rt;
+window.addEventListener('resize', ()=>{ clearTimeout(rt); rt=setTimeout(draw, 80); });
 </script>
-
 </body>
 </html>

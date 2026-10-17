@@ -3,119 +3,465 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HKDSE 2026 Paper 2 MC39 · Quadrilateral & Trigonometry</title>
+<title>HKDSE 2026 P2 MC39 — Quadrilateral &amp; Trigonometry</title>
 <script>
   window.MathJax = {
-    tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['\\[','\\]']] },
+    tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
     svg: { fontCache: 'global' }
   };
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
-  :root{--blue:#1d4ed8;--blue-light:#3b82f6;--amber:#f59e0b;--amber-bg:#fffbeb;--emerald:#059669;--emerald-bg:#ecfdf5;--slate:#0f172a;--slate-soft:#475569;--line:#e2e8f0;--card:#ffffff;--bg:#f1f5f9;}
-  *{box-sizing:border-box;} html,body{margin:0;padding:0;}
-  body{font-family:"Segoe UI",system-ui,-apple-system,Helvetica,Arial,sans-serif;color:var(--slate);background:var(--bg);line-height:1.6;-webkit-font-smoothing:antialiased;}
-  .wrap{max-width:920px;margin:0 auto;padding:0 16px 60px;}
-  .hero{background:linear-gradient(120deg,#0f172a,#1e3a8a 45%,#2563eb);color:#fff;padding:32px 20px 28px;}
-  .hero .tag{display:inline-block;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;background:rgba(255,255,255,.16);border-radius:99px;padding:3px 12px;margin-bottom:10px;}
-  .hero h1{margin:0;font-size:1.5rem;font-weight:800;}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin:18px 0;box-shadow:0 1px 3px rgba(15,23,42,.06);}
-  .card h2{margin:0 0 10px;font-size:1.05rem;color:var(--blue);}
-  .question{font-size:1.08rem;}
-  .question ol,.question ul{margin:10px 0;padding-left:22px;}
-  .marks{color:var(--slate-soft);font-size:.85rem;font-style:italic;}
-  .step{border-left:3px solid var(--blue-light);background:#f8fafc;border-radius:8px;padding:12px 16px;margin:12px 0;}
-  .step .step-tag{display:inline-block;font-size:.7rem;font-weight:700;color:#fff;background:var(--blue);border-radius:99px;padding:2px 10px;margin-bottom:8px;}
-  .ans{background:var(--emerald-bg);border:1px solid #6ee7b7;border-radius:10px;padding:14px 18px;font-weight:600;margin:16px 0;}
-  .hint{background:var(--amber-bg);border:1px solid #fcd34d;border-radius:10px;padding:10px 16px;font-size:.9rem;color:#92400e;margin:10px 0;}
-  .mono{font-family:ui-monospace,Consolas,monospace;}
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
+    background:linear-gradient(135deg,#eef4ff 0%,#f7f0ff 50%,#eafaf5 100%);
+    color:#1c2541;
+    padding:12px;
+    min-height:100vh;
+    line-height:1.5;
+  }
+  .wrap{max-width:1280px;margin:0 auto;}
+  header.page{
+    background:linear-gradient(100deg,#4f46e5,#7c3aed 45%,#06b6d4);
+    color:#fff;border-radius:18px;
+    padding:14px 20px;margin-bottom:12px;
+    box-shadow:0 10px 26px rgba(79,70,229,.28);
+  }
+  header.page h1{font-size:1.15rem;margin:0 0 3px;letter-spacing:.3px;}
+  header.page p{margin:0;font-size:.82rem;opacity:.9;}
+
+  .split{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    gap:12px;
+    align-items:start;
+  }
+  @media(min-width:900px){
+    .split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}
+  }
+
+  .panel{
+    background:#fff;
+    border-radius:16px;
+    padding:12px;
+    box-shadow:0 6px 20px rgba(30,41,89,.10);
+    border:1px solid rgba(99,102,241,.10);
+  }
+  @media(min-width:900px){ .panel{padding:18px;} }
+
+  .diagram{
+    position:sticky;
+    top:16px;
+    max-height:calc(100vh - 2rem);
+    overflow-y:auto;
+  }
+  .diagram h2{
+    font-size:.85rem;margin:0 0 8px;color:#4338ca;
+    text-transform:uppercase;letter-spacing:1px;font-weight:700;
+  }
+  canvas{width:100%;height:auto;display:block;border-radius:12px;background:#fbfcff;}
+
+  .legend{
+    display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:10px;
+    font-size:.72rem;color:#334155;
+  }
+  .legend span{display:inline-flex;align-items:center;gap:5px;}
+  .dot{width:11px;height:11px;border-radius:3px;display:inline-block;}
+
+  .qhead{
+    display:inline-block;background:#eef2ff;color:#4338ca;
+    font-size:.68rem;font-weight:700;letter-spacing:1px;
+    padding:3px 9px;border-radius:999px;margin-bottom:8px;
+  }
+  .qtext{font-size:.95rem;margin:0 0 10px;}
+  .options{
+    display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:6px;margin:10px 0 4px;
+  }
+  .opt{
+    background:#f8faff;border:1.5px solid #e0e7ff;border-radius:10px;
+    padding:6px 9px;font-size:.85rem;font-weight:600;color:#312e81;
+  }
+  .opt.correct{background:#dcfce7;border-color:#4ade80;color:#166534;}
+
+  .figure-slot{
+    margin:10px 0 4px;padding:8px;border:1.5px dashed #c7d2fe;
+    border-radius:12px;text-align:center;font-size:.72rem;color:#818cf8;
+    background:#f8faff;
+  }
+
+  hr.sep{border:none;border-top:2px dashed #e0e7ff;margin:16px 0 12px;}
+
+  .step{
+    background:#f8faff;border:1.5px solid #e6ecff;border-left:5px solid #a5b4fc;
+    border-radius:12px;padding:10px 12px;margin-bottom:10px;
+    transition:.28s ease;opacity:.68;
+  }
+  .step.active{
+    opacity:1;background:#fff;border-left-color:#4f46e5;
+    box-shadow:0 6px 18px rgba(79,70,229,.16);transform:translateX(2px);
+  }
+  .step .tag{
+    display:block;font-size:.66rem;font-weight:800;letter-spacing:1px;
+    color:#6366f1;margin-bottom:4px;
+  }
+  .step.active .tag{color:#4338ca;}
+  .step .body{font-size:.87rem;}
+  .step .body p{margin:6px 0;}
+
+  .hint{
+    background:#fff7ed;border:1.5px solid #fed7aa;border-radius:12px;
+    padding:9px 12px;font-size:.8rem;color:#9a3412;margin:12px 0;
+  }
+  .hint b{color:#c2410c;}
+
+  .answer{
+    background:linear-gradient(100deg,#dcfce7,#d1fae5);
+    border:2px solid #34d399;border-radius:14px;
+    padding:12px 16px;margin-top:14px;text-align:center;
+  }
+  .answer .lbl{
+    font-size:.68rem;font-weight:800;letter-spacing:1.4px;color:#047857;display:block;
+  }
+  .answer .val{font-size:1.25rem;font-weight:800;color:#065f46;}
+
+  .step:not(.active){opacity:.62;}
+
+  /* smaller screens */
+  @media(max-width:899px){
+    body{padding:8px;}
+    .panel{padding:9px;border-radius:12px;}
+    .qtext{font-size:.82rem;}
+    .step .body{font-size:.76rem;}
+    .step{padding:8px 9px;}
+    .opt{font-size:.74rem;padding:5px 7px;}
+    .legend{font-size:.62rem;}
+    header.page{padding:10px 14px;}
+    header.page h1{font-size:.92rem;}
+    header.page p{font-size:.7rem;}
+  }
 </style>
 </head>
 <body>
-<div class="hero">
-  <div class="wrap">
-    <span class="tag">HKDSE 2026 · Paper 2 · MC39</span>
-    <h1>Quadrilateral & Trigonometry</h1>
-  </div>
-</div>
 <div class="wrap">
-  <div class="card question">
-    <h2>Question</h2>
-    <p>The figure shows the quadrilateral \(STUV\), where \(ST=8\) cm and \(SV=5\) cm. If \(\angle UTV=30^\circ\) and \(\angle TSU=\angle TVU=90^\circ\), find \(\angle SUV\) correct to the nearest degree.</p>
-<ul>
-  <li>A. \(22^\circ\)</li>
-  <li>B. \(28^\circ\)</li>
-  <li>C. \(30^\circ\)</li>
-  <li>D. \(38^\circ\)</li>
-</ul>
-  </div>
-<section style="margin:16px 0;padding:16px;background:var(--bg,#fff);border:1px solid #e2e8f0;border-radius:10px;">
-  <h2 style="font-size:1rem;font-weight:600;margin:0 0 10px;color:var(--fg,#1a1a1a);">Original Figure</h2>
-  <div style="text-align:center;">
-    <img src="figures/2026_P2_39.png" alt="Original figure" style="max-width:100%;height:auto;border-radius:6px;">
-  </div>
-</section>
 
+  <header class="page">
+    <h1>HKDSE 2026 · Paper 2 · MC39</h1>
+    <p>Quadrilateral &amp; Trigonometry — interactive diagram &amp; step-by-step solution</p>
+  </header>
 
-  <div class="card">
-    <h2>Solution</h2>
-        <div class="step">
-      <span class="step-tag">Coordinates</span>
-      Set \(S=(0,0),\ T=(0,8)\). Since \(\angle TSU=90^\circ\), \(U=(u,0)\).
-    </div>
-    <div class="step">
-      <span class="step-tag">Right triangle</span>
-      \(\angle TVU=90^\circ\) puts \(V\) on the circle with diameter \(TU\); with \(\angle UTV=30^\circ\), \(V\) lies at the 30&deg;-position on that circle.
-    </div>
-    <div class="step">
-      <span class="step-tag">Use SV = 5</span>
-      Locating \(V\) from \(T\) and imposing \(|SV|=5\) yields \(u=6\sqrt{3}\) and \(V=(2.5\sqrt{3},\,-2.5)\).
-    </div>
-    <div class="step">
-      <span class="step-tag">Angle at U</span>
-      \(\overrightarrow{US}=(-6\sqrt3,0),\ \overrightarrow{UV}=(-3.5\sqrt3,-2.5)\). \(\cos\angle SUV=\dfrac{63}{6\sqrt3\cdot\sqrt{43}}\approx0.924\).
-    </div>
-    <div class="step">
-      <span class="step-tag">Result</span>
-      \(\angle SUV\approx22.4^\circ\approx22^\circ\).
-    </div>
-  </div>
+  <div class="split">
 
-  <div class="ans">
-    <b>Answer: A</b> &mdash; 22&deg;
+    <!-- ================= LEFT: DIAGRAM ================= -->
+    <section class="panel diagram">
+      <h2>Diagram (scroll to sync)</h2>
+      <canvas id="cv" width="720" height="720"></canvas>
+      <div class="legend" id="legend">
+        <span><i class="dot" style="background:#f59e0b"></i>T</span>
+        <span><i class="dot" style="background:#ec4899"></i>S</span>
+        <span><i class="dot" style="background:#0ea5e9"></i>U</span>
+        <span><i class="dot" style="background:#16a34a"></i>V</span>
+        <span><i class="dot" style="background:#7c3aed"></i>Right angle</span>
+        <span><i class="dot" style="background:#ef4444"></i>ST = 8</span>
+        <span><i class="dot" style="background:#0d9488"></i>SV = 5</span>
+        <span><i class="dot" style="background:#6366f1"></i>30&deg; / angle at U</span>
+      </div>
+    </section>
+
+    <!-- ================= RIGHT: QUESTION + SOLUTION ================= -->
+    <section class="panel">
+      <span class="qhead">QUESTION</span>
+      <p class="qtext">
+        The figure shows the quadrilateral \(STUV\), where \(ST=8\) cm and \(SV=5\) cm.
+        If \(\angle UTV=30^\circ\) and \(\angle TSU=\angle TVU=90^\circ\), find \(\angle SUV\)
+        correct to the nearest degree.
+      </p>
+
+      <div class="options">
+        <div class="opt correct">A. \(22^\circ\)</div>
+        <div class="opt">B. \(28^\circ\)</div>
+        <div class="opt">C. \(30^\circ\)</div>
+        <div class="opt">D. \(38^\circ\)</div>
+      </div>
+
+      <figure style="margin:12px 0;text-align:center;"><img src="figures/figures/2026_P2_39.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
+
+      <hr class="sep">
+
+      <div class="step" data-step="1">
+        <span class="tag">STEP 1 · SET UP COORDINATES</span>
+        <div class="body">
+          <p>Put \(S=(0,0)\). Since \(ST=8\) and \(\angle TSU=90^\circ\), take \(T=(0,8)\) and \(U=(u,0)\) on the positive \(x\)-axis.</p>
+          <p>Then \(ST=8\) is the vertical leg and \(SU=u\) is the horizontal leg.</p>
+        </div>
+      </div>
+
+      <div class="step" data-step="2">
+        <span class="tag">STEP 2 · RIGHT ANGLE AT V</span>
+        <div class="body">
+          <p>\(\angle TVU=90^\circ\) means \(V\) lies on the circle with diameter \(TU\) (Thales' theorem).</p>
+          <p>In \(\triangle TUV\), \(\angle UTV=30^\circ\), so \(V\) sits at the \(30^\circ\) position measured from \(T\) along this circle.</p>
+        </div>
+      </div>
+
+      <div class="step" data-step="3">
+        <span class="tag">STEP 3 · USE \(SV=5\)</span>
+        <div class="body">
+          <p>Writing \(V\) from the \(30^\circ\) construction and imposing \(|SV|=5\) gives</p>
+          <p>\[ u=6\sqrt{3},\qquad V=\left(\tfrac{5\sqrt3}{2},\,-\tfrac52\right). \]</p>
+          <p>So \(SU=6\sqrt3\) cm.</p>
+        </div>
+      </div>
+
+      <div class="step" data-step="4">
+        <span class="tag">STEP 4 · ANGLE AT U</span>
+        <div class="body">
+          <p>Vectors from \(U=(6\sqrt3,0)\):</p>
+          <p>\[ \overrightarrow{US}=(-6\sqrt3,\,0),\qquad \overrightarrow{UV}=\left(-\tfrac{7\sqrt3}{2},\,-\tfrac52\right). \]</p>
+          <p>\[ \cos\angle SUV=\frac{\overrightarrow{US}\cdot\overrightarrow{UV}}{|US|\,|UV|}
+             =\frac{63}{6\sqrt3\cdot\sqrt{43}}\approx 0.924. \]</p>
+        </div>
+      </div>
+
+      <div class="step" data-step="5">
+        <span class="tag">STEP 5 · RESULT</span>
+        <div class="body">
+          <p>\[ \angle SUV\approx 22.4^\circ \approx 22^\circ \text{ (nearest degree)}. \]</p>
+        </div>
+      </div>
+
+      <div class="hint">
+        <b>Hint:</b> \(\angle TVU=90^\circ\) is the key — it forces \(V\) onto the circle with diameter \(TU\),
+        turning a hard "quadrilateral" problem into two right triangles you can coordinate.
+      </div>
+
+      <div class="answer">
+        <span class="lbl">FINAL ANSWER</span>
+        <span class="val">A &nbsp;—&nbsp; \(22^\circ\)</span>
+      </div>
+    </section>
+
   </div>
 </div>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
 
+<script>
+/* ---------- Geometry (units = cm) ---------- */
+const S = {x:0, y:0};
+const T = {x:0, y:8};
+const SQ3 = Math.sqrt(3);
+const U = {x:6*SQ3, y:0};                 // ≈ 10.392
+const V = {x:2.5*SQ3, y:-2.5};            // ≈ (4.330, -2.5)
+
+/* ---------- Canvas ---------- */
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+
+/* uniform scale + fit */
+let scale, ox, oy;
+function computeView(){
+  const W = cv.width, H = cv.height;
+  const xs = [S.x, T.x, U.x, V.x];
+  const ys = [S.y, T.y, U.y, V.y];
+  const minX = Math.min(...xs), maxX = Math.max(...xs);
+  const minY = Math.min(...ys), maxY = Math.max(...ys);
+  const pad = 95;
+  const sx = (W - 2*pad)/(maxX-minX || 1);
+  const sy = (H - 2*pad)/(maxY-minY || 1);
+  scale = Math.min(sx, sy);
+  // centre
+  ox = W/2 - scale*(minX+maxX)/2;
+  oy = H/2 + scale*(minY+maxY)/2;   // flip y
+}
+function X(p){ return ox + scale*p.x; }
+function Y(p){ return oy - scale*p.y; }
+
+/* ---------- drawing helpers ---------- */
+function line(p,q,color,w,dash){
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = w||2.5;
+  ctx.lineCap='round';
+  if(dash) ctx.setLineDash(dash);
+  ctx.beginPath(); ctx.moveTo(X(p),Y(p)); ctx.lineTo(X(q),Y(q)); ctx.stroke();
+  ctx.restore();
+}
+function dotAt(p,color,r,label,dx,dy){
+  ctx.save();
+  ctx.fillStyle=color;
+  ctx.beginPath(); ctx.arc(X(p),Y(p),r||7,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
+  if(label){
+    ctx.fillStyle=color;
+    ctx.font='bold 20px Segoe UI, Arial';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(label, X(p)+(dx||0), Y(p)+(dy||0));
+  }
+  ctx.restore();
+}
+function mid(p,q){ return {x:(p.x+q.x)/2, y:(p.y+q.y)/2}; }
+function lenLabel(p,q,text,color,off){
+  const m = mid(p,q);
+  ctx.save();
+  ctx.fillStyle=color; ctx.font='bold 15px Segoe UI, Arial';
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(text, X(m)+(off?off[0]:0), Y(m)+(off?off[1]:0));
+  ctx.restore();
+}
+
+/* right-angle marker at vertex p, between directions to a and b */
+function rightAngle(p,a,b,color,size){
+  size = size || 16;
+  const v1 = normalize(a,p), v2 = normalize(b,p);
+  const p1 = {x:p.x+v1.x*size/scale, y:p.y+v1.y*size/scale};
+  const p2 = {x:p.x+v2.x*size/scale, y:p.y+v2.y*size/scale};
+  const p3 = {x:p.x+(v1.x+v2.x)*size/scale, y:p.y+(v1.y+v2.y)*size/scale};
+  ctx.save();
+  ctx.strokeStyle=color; ctx.lineWidth=2; ctx.lineJoin='round';
+  ctx.beginPath();
+  ctx.moveTo(X(p1),Y(p1));
+  ctx.lineTo(X(p3),Y(p3));
+  ctx.lineTo(X(p2),Y(p2));
+  ctx.stroke();
+  ctx.restore();
+}
+function normalize(v,from){
+  const dx=v.x-from.x, dy=v.y-from.y;
+  const L=Math.hypot(dx,dy)||1;
+  return {x:dx/L,y:dy/L};
+}
+
+/* angle arc at vertex p between rays to a and b */
+function angleArc(p,a,b,deg,color,radius){
+  radius = radius || 46;
+  const a1 = Math.atan2(-(a.y-p.y), a.x-p.x);
+  const a2 = Math.atan2(-(b.y-p.y), b.x-p.x);
+  ctx.save();
+  ctx.strokeStyle=color; ctx.lineWidth=2.5;
+  ctx.beginPath();
+  ctx.arc(X(p),Y(p),radius, Math.min(a1,a2), Math.max(a1,a2));
+  ctx.stroke();
+  // label
+  const midA = (a1+a2)/2;
+  ctx.fillStyle=color; ctx.font='bold 15px Segoe UI, Arial';
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(deg, X(p)+Math.cos(midA)*(radius+18), Y(p)-Math.sin(midA)*(radius+18));
+  ctx.restore();
+}
+
+/* highlight polygon fill */
+function fillQuad(pts,color,alpha){
+  ctx.save();
+  ctx.globalAlpha = alpha==null?0.18:alpha;
+  ctx.fillStyle=color;
+  ctx.beginPath();
+  ctx.moveTo(X(pts[0]),Y(pts[0]));
+  for(let i=1;i<pts.length;i++) ctx.lineTo(X(pts[i]),Y(pts[i]));
+  ctx.closePath(); ctx.fill();
+  ctx.restore();
+}
+
+/* Thales circle on diameter TU */
+let mode = 1;
+
+function draw(){
+  computeView();
+  ctx.clearRect(0,0,cv.width,cv.height);
+
+  /* soft grid background */
+  ctx.save();
+  ctx.strokeStyle='#eef2fb'; ctx.lineWidth=1;
+  for(let i=0;i<cv.width;i+=40){ctx.beginPath();ctx.moveTo(i,0);ctx.lineTo(i,cv.height);ctx.stroke();}
+  for(let j=0;j<cv.height;j+=40){ctx.beginPath();ctx.moveTo(0,j);ctx.lineTo(cv.width,j);ctx.stroke();}
+  ctx.restore();
+
+  /* highlights by mode */
+  if(mode===1){
+    // right angle at S
+    fillQuad([S,T,U], '#22c55e', 0.16);
+  }
+  if(mode===2){
+    // circle with diameter TU + triangle TUV
+    const c = mid(T,U);
+    const R = Math.hypot(T.x-U.x,T.y-U.y)/2;
+    ctx.save();
+    ctx.globalAlpha=0.35;
+    ctx.strokeStyle='#7c3aed'; ctx.lineWidth=2.5; ctx.setLineDash([7,6]);
+    ctx.beginPath(); ctx.arc(X(c),Y(c),R*scale,0,Math.PI*2); ctx.stroke();
+    ctx.restore();
+    fillQuad([T,U,V], '#7c3aed', 0.16);
+  }
+  if(mode===3){
+    fillQuad([S,U,V], '#0d9488', 0.16);
+  }
+  if(mode===4){
+    fillQuad([S,U,V], '#6366f1', 0.20);
+  }
+  if(mode===5){
+    fillQuad([S,U,V], '#f59e0b', 0.22);
+  }
+
+  /* main edges */
+  line(S,T,'#ef4444',3.5);            // ST
+  line(S,U,'#0ea5e9',3.5);            // SU
+  line(S,V,'#0d9488',3.5);            // SV
+  line(T,U,'#94a3b8',2);              // TU (diagonal)
+  line(U,V,'#16a34a',3.5);            // UV
+  line(T,V,'#a855f7',3.5);            // TV
+
+  /* right angle marks */
+  rightAngle(S,T,U,'#22c55e',18);        // at S
+  rightAngle(V,T,U,'#7c3aed',18);        // at V
+
+  /* angle markings */
+  // ∠UTV = 30
+  if(mode>=2){
+    angleArc(T,U,V,'30°','#6366f1',52);
+  }
+  // ∠SUV  (the answer)
+  if(mode>=4){
+    angleArc(U,S,V,'θ','#dc2626',60);
+  }
+
+  /* length labels */
+  lenLabel(S,T,'8','#ef4444',[-28,0]);
+  lenLabel(S,V,'5','#0d9488',[-26,-6]);
+
+  /* vertices */
+  dotAt(T,'#f59e0b',9,'T',-22,-14);
+  dotAt(S,'#ec4899',9,'S',-22,16);
+  dotAt(U,'#0ea5e9',9,'U',22,-8);
+  dotAt(V,'#16a34a',9,'V',16,20);
+
+  /* title text bottom-left */
+  ctx.save();
+  ctx.fillStyle='#94a3b8';
+  ctx.font='13px Segoe UI, Arial';
+  ctx.textAlign='left'; ctx.textBaseline='bottom';
+  ctx.fillText('not drawn to scale in label positions, but lengths & angles are proportional', 10, cv.height-8);
+  ctx.restore();
+}
+
+/* ---------- scroll sync ---------- */
+const steps = Array.from(document.querySelectorAll('.step'));
+const obs = new IntersectionObserver((es)=>{
+  es.forEach(e=>{
+    if(e.isIntersecting){
+      const m = +e.target.dataset.step;
+      mode = m;
+      steps.forEach(st=>st.classList.toggle('active', st===e.target));
+      draw();
+    }
+  });
+},{rootMargin:'-15% 0px -55% 0px', threshold:0});
+steps.forEach(st=>obs.observe(st));
+
+/* initial */
+window.addEventListener('load', ()=>{ draw(); });
+window.addEventListener('resize', ()=>{ draw(); });
+computeView();
+draw();
+</script>
 </body>
 </html>

@@ -3,124 +3,344 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HKDSE 2025 Paper 2 MC24 · Equilateral Triangle in Polar Coordinates</title>
+<title>HKDSE 2025 P2 MC24 · Equilateral Triangle in Polar Coordinates</title>
 <script>
-  window.MathJax = {
-    tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['\\[','\\]']] },
-    svg: { fontCache: 'global' }
-  };
+window.MathJax = {
+  tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
+  svg: { fontCache: 'global' }
+};
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
-  :root{--blue:#1d4ed8;--blue-light:#3b82f6;--amber:#f59e0b;--amber-bg:#fffbeb;--emerald:#059669;--emerald-bg:#ecfdf5;--slate:#0f172a;--slate-soft:#475569;--line:#e2e8f0;--card:#ffffff;--bg:#f1f5f9;}
-  *{box-sizing:border-box;} html,body{margin:0;padding:0;}
-  body{font-family:"Segoe UI",system-ui,-apple-system,Helvetica,Arial,sans-serif;color:var(--slate);background:var(--bg);line-height:1.6;-webkit-font-smoothing:antialiased;}
-  .wrap{max-width:920px;margin:0 auto;padding:0 16px 60px;}
-  .hero{background:linear-gradient(120deg,#0f172a,#1e3a8a 45%,#2563eb);color:#fff;padding:32px 20px 28px;}
-  .hero .tag{display:inline-block;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;background:rgba(255,255,255,.16);border-radius:99px;padding:3px 12px;margin-bottom:10px;}
-  .hero h1{margin:0;font-size:1.5rem;font-weight:800;}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin:18px 0;box-shadow:0 1px 3px rgba(15,23,42,.06);}
-  .card h2{margin:0 0 10px;font-size:1.05rem;color:var(--blue);}
-  .question{font-size:1.08rem;}
-  .question ol,.question ul{margin:10px 0;padding-left:22px;}
-  .marks{color:var(--slate-soft);font-size:.85rem;font-style:italic;}
-  .step{border-left:3px solid var(--blue-light);background:#f8fafc;border-radius:8px;padding:12px 16px;margin:12px 0;}
-  .step .step-tag{display:inline-block;font-size:.7rem;font-weight:700;color:#fff;background:var(--blue);border-radius:99px;padding:2px 10px;margin-bottom:8px;}
-  .ans{background:var(--emerald-bg);border:1px solid #6ee7b7;border-radius:10px;padding:14px 18px;font-weight:600;margin:16px 0;}
-  .hint{background:var(--amber-bg);border:1px solid #fcd34d;border-radius:10px;padding:10px 16px;font-size:.9rem;color:#92400e;margin:10px 0;}
-  .mono{font-family:ui-monospace,Consolas,monospace;}
+  *{box-sizing:border-box;}
+  body{
+    margin:0; padding:14px;
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    background:linear-gradient(135deg,#eef4ff 0%,#f7fbff 40%,#eefaf3 100%);
+    color:#1a2433;
+    line-height:1.5;
+  }
+  h1{font-size:1.05rem;margin:0 0 10px;color:#153a6b;letter-spacing:.2px;}
+  .split{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    gap:12px; align-items:start;
+  }
+  @media(min-width:900px){
+    .split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}
+  }
+  .panel{
+    background:#fff; border-radius:16px; padding:12px;
+    box-shadow:0 8px 26px rgba(30,60,120,.10), 0 2px 6px rgba(30,60,120,.06);
+  }
+  .diagram{
+    position:sticky; top:16px;
+    max-height:calc(100vh - 2rem);
+    overflow-y:auto;
+  }
+  canvas{width:100%;height:auto;display:block;border-radius:12px;background:#fbfdff;}
+  .legend{
+    display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:8px;font-size:.72rem;color:#2b3a52;
+  }
+  .legend span{display:flex;align-items:center;gap:5px;}
+  .sw{width:14px;height:4px;border-radius:2px;display:inline-block;}
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block;}
+  .qtag{
+    display:inline-block;background:#153a6b;color:#fff;font-size:.68rem;
+    padding:3px 9px;border-radius:20px;letter-spacing:.6px;font-weight:700;margin-bottom:6px;
+  }
+  .question{font-size:.92rem;}
+  .question p{margin:.35em 0;}
+  .step{
+    border-left:5px solid #cbd8ea; background:#f8faff;
+    border-radius:10px; padding:9px 11px; margin:10px 0;
+    font-size:.87rem; transition:all .25s ease;
+  }
+  .step.active{
+    border-left-color:#ff8a1e; background:#fff7ec;
+    box-shadow:0 4px 14px rgba(255,138,30,.18);
+  }
+  .step .tag{
+    display:inline-block;font-weight:800;font-size:.71rem;letter-spacing:.5px;
+    color:#0b5cd5;margin-bottom:4px;
+  }
+  .step.active .tag{color:#c2570a;}
+  .hint{
+    background:#eaf6ff;border:1px dashed #86bdf0;border-radius:10px;
+    padding:8px 11px;font-size:.78rem;color:#184a7c;margin:10px 0;
+  }
+  .answer{
+    margin-top:12px;background:linear-gradient(135deg,#0b5cd5,#0f9d6c);
+    color:#fff;border-radius:12px;padding:11px 14px;font-weight:700;font-size:.92rem;
+    box-shadow:0 6px 16px rgba(11,92,213,.25);
+  }
+  .opts{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0;font-size:.85rem;}
+  .opt{background:#f1f6ff;border-radius:8px;padding:5px 9px;border:1px solid #dbe7fa;}
+  .opt.correct{background:#e3fbef;border-color:#2fbf7d;font-weight:700;}
+  @media(max-width:560px){
+    body{padding:8px;}
+    .panel{padding:9px;border-radius:12px;}
+    .question,.step{font-size:.8rem;}
+    .step{padding:7px 8px;}
+    h1{font-size:.9rem;}
+    .legend{font-size:.63rem;}
+  }
 </style>
 </head>
 <body>
-<div class="hero">
-  <div class="wrap">
-    <span class="tag">HKDSE 2025 · Paper 2 · MC24</span>
-    <h1>Equilateral Triangle in Polar Coordinates</h1>
-  </div>
-</div>
-<div class="wrap">
-  <div class="card question">
-    <h2>Question</h2>
-    <p>The polar coordinates of the points \( X \), \( Y \) and \( Z \) are \( \left(1,20^{\circ}\right) \), \( \left(2,80^{\circ}\right) \) and \( \left(r,\theta\right) \) respectively, where \( 20^{\circ} < \theta < 80^{\circ} \). If \( \triangle XYZ \) is an equilateral triangle, find \( r \).</p>
-    <ol type="A">
-      <li>\( \sqrt{3} \)</li>
-      <li>\( \sqrt{5} \)</li>
-      <li>\( \sqrt{7} \)</li>
-      <li>\( \sqrt{10} \)</li>
-    </ol>
-  <figure class="figure"><svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg" role="img"><rect width="320" height="240" fill="#fff"/><circle cx="160" cy="125" r="70" fill="none" stroke="#e2e8f0"/><line x1="160" y1="125" x2="302" y2="125" stroke="#334155" stroke-width="1.4"/><line x1="160" y1="125" x2="208" y2="108" stroke="#94a3b8" stroke-width="1"/><circle cx="208" cy="108" r="3.5" fill="#e11d48"/><text x="214" y="102" font-size="11" font-weight="700" fill="#1e293b">X</text><line x1="160" y1="125" x2="172" y2="56" stroke="#94a3b8" stroke-width="1"/><circle cx="172" cy="56" r="3.5" fill="#e11d48"/><text x="178" y="50" font-size="11" font-weight="700" fill="#1e293b">Y</text><circle cx="160" cy="125" r="3" fill="#334155"/><text x="166" y="140" font-size="12" font-weight="700" fill="#1e293b">O</text><text x="304" y="129" font-size="11" fill="#475569">polar axis</text><text x="160" y="232" font-size="10" fill="#475569" text-anchor="middle">X(1,20°), Y(2,80°)</text></svg><figcaption>Polar coordinate system (not to scale)</figcaption></figure></div>
 
-  <div class="card">
-    <h2>Solution</h2>
-    <div class="step">
-      <span class="step-tag">STEP 1 · Side length of the equilateral triangle</span>
-      \( \angle XOY = 80^{\circ}-20^{\circ} = 60^{\circ} \). By the cosine rule in \( \triangle XOY \):
-      \[ XY^{2} = 1^{2}+2^{2}-2(1)(2)\cos 60^{\circ} = 1+4-2 = 3 \implies XY = \sqrt{3}. \]
-      So \( XZ = YZ = \sqrt{3} \) as well.
-    </div>
-    <div class="step">
-      <span class="step-tag">STEP 2 · Set up equations for \( Z = (r,\theta) \)</span>
-      Let \( u = \theta - 20^{\circ} \); then \( \theta - 80^{\circ} = u - 60^{\circ} \).
-      \[ XZ^{2}: \quad r^{2}+1-2r\cos u = 3 \implies r^{2}-2 = 2r\cos u \quad (1) \]
-      \[ YZ^{2}: \quad r^{2}+4-4r\cos(u-60^{\circ}) = 3 \implies r^{2}+1 = 4r\cos(u-60^{\circ}) \quad (2) \]
-    </div>
-    <div class="step">
-      <span class="step-tag">STEP 3 · Eliminate \( \cos u \)</span>
-      Expand (2) using \( \cos(u-60^{\circ}) = \tfrac{1}{2}\cos u + \tfrac{\sqrt{3}}{2}\sin u \):
-      \[ r^{2}+1 = 2r\cos u + 2\sqrt{3}\,r\sin u. \]
-      Substitute (1) (\( 2r\cos u = r^{2}-2 \)):
-      \[ r^{2}+1 = r^{2}-2 + 2\sqrt{3}\,r\sin u \implies 2\sqrt{3}\,r\sin u = 3 \implies \sin u = \frac{\sqrt{3}}{2r}. \]
-      From (1): \( \cos u = \dfrac{r^{2}-2}{2r} \).
-    </div>
-    <div class="step">
-      <span class="step-tag">STEP 4 · Use \( \sin^{2}u + \cos^{2}u = 1 \)</span>
-      \[ \frac{3}{4r^{2}} + \frac{(r^{2}-2)^{2}}{4r^{2}} = 1 \implies 3 + (r^{2}-2)^{2} = 4r^{2}. \]
-      Expanding:
-      \[ r^{4} - 4r^{2} + 4 + 3 - 4r^{2} = 0 \implies r^{4} - 8r^{2} + 7 = 0 \]
-      \[ (r^{2}-1)(r^{2}-7) = 0 \implies r = 1 \ \text{or}\ r = \sqrt{7}. \]
-    </div>
-    <div class="step">
-      <span class="step-tag">STEP 5 · Apply the restriction \( 20^{\circ} < \theta < 80^{\circ} \)</span>
-      - If \( r = 1 \): \( \cos u = \frac{1-2}{2} = -\tfrac{1}{2} \), \( \sin u = \tfrac{\sqrt{3}}{2} \implies u = 120^{\circ} \implies \theta = 140^{\circ} \) — rejected.
-      - If \( r = \sqrt{7} \): \( \cos u = \frac{5}{2\sqrt{7}} \), \( \sin u = \frac{\sqrt{3}}{2\sqrt{7}} \implies u \approx 19.1^{\circ} \implies \theta \approx 39.1^{\circ} \) — accepted.
-    </div>
-  </div>
+<h1>HKDSE 2025 · Paper 2 · MC24 — Equilateral Triangle in Polar Coordinates</h1>
 
-  <div class="ans">
-    Final Answer: C. \( r = \sqrt{7} \)
-  </div>
+<div class="split">
+
+  <!-- LEFT: STICKY INTERACTIVE DIAGRAM -->
+  <section class="panel diagram">
+    <canvas id="cv" width="700" height="700"></canvas>
+    <div class="legend">
+      <span><i class="dot" style="background:#e63946"></i>X (1, 20°)</span>
+      <span><i class="dot" style="background:#1d7ff2"></i>Y (2, 80°)</span>
+      <span><i class="dot" style="background:#0f9d6c"></i>Z (r, θ)</span>
+      <span><i class="sw" style="background:#e63946"></i>OX</span>
+      <span><i class="sw" style="background:#1d7ff2"></i>OY</span>
+      <span><i class="sw" style="background:#0f9d6c"></i>OZ</span>
+      <span><i class="sw" style="background:#a855f7"></i>XY / XZ / YZ</span>
+    </div>
+  </section>
+
+  <!-- RIGHT: QUESTION + SOLUTION -->
+  <section class="panel">
+    <span class="qtag">QUESTION</span>
+    <div class="question">
+      <p>The polar coordinates of the points $X$, $Y$ and $Z$ are $\left(1,20^{\circ}\right)$, $\left(2,80^{\circ}\right)$ and $\left(r,\theta\right)$ respectively, where $20^{\circ}<\theta<80^{\circ}$ and $r>0$. If $XYZ$ is an equilateral triangle and $O$ is the pole, find $r$.</p>
+      <div class="opts">
+        <div class="opt">A. $\sqrt{3}$</div>
+        <div class="opt">B. $\sqrt{5}$</div>
+        <div class="opt">C. $\sqrt{7}$</div>
+        <div class="opt">D. $\sqrt{10}$</div>
+      </div>
+    </div>
+    <!-- FIGURE_HERE -->
+
+    <div class="step" data-step="1">
+      <span class="tag">STEP 1 · SIDE LENGTH OF THE EQUILATERAL TRIANGLE</span>
+      <p>$\angle XOY = 80^{\circ}-20^{\circ}=60^{\circ}$. By the cosine rule in $\triangle XOY$:</p>
+      <p>$$XY^{2}=1^{2}+2^{2}-2(1)(2)\cos 60^{\circ}=1+4-2=3 \implies XY=\sqrt{3}.$$</p>
+      <p>So $XZ=YZ=\sqrt{3}$ as well.</p>
+    </div>
+
+    <div class="step" data-step="2">
+      <span class="tag">STEP 2 · SET UP EQUATIONS FOR Z = (r, θ)</span>
+      <p>Let $u=\theta-20^{\circ}$; then $\theta-80^{\circ}=u-60^{\circ}$.</p>
+      <p>$$XZ^{2}:\quad r^{2}+1-2r\cos u=3 \implies r^{2}-2=2r\cos u \quad (1)$$</p>
+      <p>$$YZ^{2}:\quad r^{2}+4-4r\cos(u-60^{\circ})=3 \implies r^{2}+1=4r\cos(u-60^{\circ}) \quad (2)$$</p>
+    </div>
+
+    <div class="step" data-step="3">
+      <span class="tag">STEP 3 · ELIMINATE cos u</span>
+      <p>Expand (2) using $\cos(u-60^{\circ})=\tfrac{1}{2}\cos u+\tfrac{\sqrt{3}}{2}\sin u$:</p>
+      <p>$$r^{2}+1=2r\cos u+2\sqrt{3}\,r\sin u.$$</p>
+      <p>Substitute (1) ($2r\cos u=r^{2}-2$):</p>
+      <p>$$r^{2}+1=r^{2}-2+2\sqrt{3}\,r\sin u \implies 2\sqrt{3}\,r\sin u=3 \implies \sin u=\frac{\sqrt{3}}{2r}.$$</p>
+      <p>From (1): $\cos u=\dfrac{r^{2}-2}{2r}$.</p>
+    </div>
+
+    <div class="step" data-step="4">
+      <span class="tag">STEP 4 · USE sin²u + cos²u = 1</span>
+      <p>$$\frac{3}{4r^{2}}+\frac{(r^{2}-2)^{2}}{4r^{2}}=1 \implies 3+(r^{2}-2)^{2}=4r^{2}.$$</p>
+      <p>Expanding:</p>
+      <p>$$r^{4}-4r^{2}+4+3-4r^{2}=0 \implies r^{4}-8r^{2}+7=0$$</p>
+      <p>$$(r^{2}-1)(r^{2}-7)=0 \implies r=1\ \text{or}\ r=\sqrt{7}.$$</p>
+    </div>
+
+    <div class="step" data-step="5">
+      <span class="tag">STEP 5 · APPLY THE RESTRICTION 20° &lt; θ &lt; 80°</span>
+      <p>If $r=1$: $\cos u=\frac{1-2}{2}=-\tfrac{1}{2}$, $\sin u=\tfrac{\sqrt{3}}{2}\implies u=120^{\circ}\implies\theta=140^{\circ}$ — rejected.</p>
+      <p>If $r=\sqrt{7}$: $\cos u=\frac{5}{2\sqrt{7}}$, $\sin u=\frac{\sqrt{3}}{2\sqrt{7}}\implies u\approx 19.1^{\circ}\implies\theta\approx 39.1^{\circ}$ — accepted.</p>
+    </div>
+
+    <div class="hint">💡 Key ideas: (i) the angle between the two given radii is the difference of the polar angles; (ii) an equilateral triangle makes all three chords equal, so $XZ=YZ=XY$; (iii) using $\sin^2u+\cos^2u=1$ converts the system into a quadratic in $r^2$.</div>
+
+    <div class="answer">Final Answer: C. $\;r=\sqrt{7}$ &nbsp;(with $\theta\approx 39.1^{\circ}$)</div>
+  </section>
+
 </div>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
+
+<script>
+/* ---------- CANVAS SETUP ---------- */
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+const W = cv.width, H = cv.height;
+const D2R = Math.PI/180;
+
+/* Real geometry: O at pole, X=(1,20°), Y=(2,80°), Z=(√7, ~39.1°) */
+const X = {r:1, a:20};
+const Y = {r:2, a:80};
+const Z = {r:Math.sqrt(7), a:20 + Math.acos(5/(2*Math.sqrt(7)))*180/Math.PI};
+
+/* Convert polar (r, a in degrees) to math coords (x right, y up) */
+function polar(p){ return {x:p.r*Math.cos(p.a*D2R), y:p.r*Math.sin(p.a*D2R)}; }
+const PX = polar(X), PY = polar(Y), PZ = polar(Z);
+
+/* uniform scale to fit all points nicely */
+const all = [PX,PY,PZ,{x:0,y:0}];
+let maxAbs = 0;
+all.forEach(p=>{maxAbs = Math.max(maxAbs, Math.abs(p.x), Math.abs(p.y));});
+const S = (Math.min(W,H)/2 - 60) / (maxAbs*1.15);
+const CX = W/2, CY = H/2;
+function toScreen(p){ return {x: CX + p.x*S, y: CY - p.y*S}; }
+
+const SX = toScreen(PX), SY = toScreen(PY), SZ = toScreen(PZ), SO = toScreen({x:0,y:0});
+
+/* ---------- DRAWING HELPERS ---------- */
+function line(a,b,color,width,dash){
+  ctx.save();
+  ctx.strokeStyle=color; ctx.lineWidth=width||2; ctx.lineCap='round';
+  ctx.setLineDash(dash||[]);
+  ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+  ctx.restore();
+}
+function dot(p,color,label,rad){
+  rad = rad||7;
+  ctx.save();
+  ctx.shadowColor=color; ctx.shadowBlur=10;
+  ctx.fillStyle=color;
+  ctx.beginPath(); ctx.arc(p.x,p.y,rad,0,2*Math.PI); ctx.fill();
+  ctx.restore();
+  if(label){
+    ctx.fillStyle='#fff'; ctx.font='bold 13px Segoe UI, Arial';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(label,p.x,p.y);
+  }
+}
+function textAt(p,str,color,dx,dy,size){
+  ctx.save();
+  ctx.fillStyle=color; ctx.font=(size||12)+'px Segoe UI, Arial';
+  ctx.textAlign='left'; ctx.textBaseline='middle';
+  ctx.fillText(str,p.x+(dx||0),p.y+(dy||0));
+  ctx.restore();
+}
+function angleArc(center,p1,p2,rad,color){
+  const a1 = Math.atan2(p1.y-center.y, p1.x-center.x);
+  const a2 = Math.atan2(p2.y-center.y, p2.x-center.x);
+  ctx.save();
+  ctx.strokeStyle=color; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.arc(center.x,center.y,rad,a1,a2,false); ctx.stroke();
+  ctx.restore();
+}
+
+/* ---------- MAIN DRAW ---------- */
+let mode = 1;
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+
+  /* background grid / polar rings */
+  ctx.save();
+  for(let rr=1; rr<=3; rr++){
+    const rad = rr*S;
+    ctx.strokeStyle = rr===2 ? '#cfdff5' : '#e6eefb';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(SO.x,SO.y,rad,0,2*Math.PI); ctx.stroke();
+  }
+  /* polar axis */
+  line(SO,{x:SO.x+ (maxAbs*1.05*S), y:SO.y},'#9db4d6',1.5,[5,5]);
+  textAt({x:SO.x+(maxAbs*1.05*S)-48, y:SO.y},'polar axis','#7d94b8',0,-12,12);
+  ctx.restore();
+
+  /* --- step-specific emphasis --- */
+  const showTriangle = true;
+
+  /* radii */
+  line(SO,SX,'#e63946',2.2,[]);
+  line(SO,SY,'#1d7ff2',2.2,[]);
+  if(mode>=2){
+    line(SO,SZ,'#0f9d6c',2.2,[]);
+  }
+
+  /* triangle sides */
+  const triColor = '#a855f7';
+  if(mode>=1){
+    line(SX,SY,triColor,2.4,[]);
+  }
+  if(mode>=2){
+    line(SX,SZ,triColor,2.4,[]);
+    line(SY,SZ,triColor,2.4,[]);
+  }
+
+  /* angle arcs */
+  if(mode>=1){
+    angleArc(SO,SX,SY,34,'#e07b00');
+    textAt(SO,'60°','#c2690a',42,14,12);
+  }
+  if(mode>=2){
+    angleArc(SO,SX,SZ,48,'#0f9d6c');
+    angleArc(SO,SY,SZ,58,'#0f9d6c');
+  }
+
+  /* points */
+  dot(SO,'#6b7a94','',6);
+  textAt(SO,'O','#42506a',10,14,14);
+
+  dot(SX,'#e63946','X');
+  dot(SY,'#1d7ff2','Y');
+  if(mode>=2){ dot(SZ,'#0f9d6c','Z'); }
+
+  /* labels */
+  textAt(SX,'(1,20°)','#b3212d',12,-14,12);
+  textAt(SY,'(2,80°)','#0f5fb8',12,-14,12);
+  if(mode>=2){ textAt(SZ,'(r,θ)','#0a7a52',12,-14,12); }
+
+  /* side labels */
+  if(mode>=1){
+    textAt({x:(SX.x+SY.x)/2,y:(SX.y+SY.y)/2},'XY = √3','#7b38c4',6,-10,12);
+  }
+  if(mode>=3){
+    textAt({x:(SX.x+SZ.x)/2,y:(SX.y+SZ.y)/2},'XZ = √3','#7b38c4',6,14,12);
+    textAt({x:(SY.x+SZ.x)/2,y:(SY.y+SZ.y)/2},'YZ = √3','#7b38c4',6,14,12);
+  }
+
+  /* step banner on canvas */
+  const titles = {
+    1:'Step 1 — ∠XOY = 60°, XY = √3',
+    2:'Step 2 — Set up equations for Z',
+    3:'Step 3 — Eliminate cos u',
+    4:'Step 4 — sin²u + cos²u = 1',
+    5:'Step 5 — Test r = 1 and r = √7'
+  };
+  ctx.save();
+  ctx.fillStyle='rgba(21,58,107,.92)';
+  const bw = 300, bh = 30, bx = 14, by = 14;
+  ctx.beginPath();
+  if(ctx.roundRect){ ctx.roundRect(bx,by,bw,bh,10); }
+  else { ctx.rect(bx,by,bw,bh); }
+  ctx.fill();
+  ctx.fillStyle='#fff';
+  ctx.font='bold 12px Segoe UI, Arial';
+  ctx.textAlign='left'; ctx.textBaseline='middle';
+  ctx.fillText(titles[mode]||'', bx+12, by+bh/2);
+  ctx.restore();
+}
+
+draw();
+window.addEventListener('resize',()=>{ /* fixed canvas size; redraw for crispness */ draw(); });
+
+/* ---------- SCROLL SYNC ---------- */
+const steps = Array.from(document.querySelectorAll('.step'));
+const obs = new IntersectionObserver((es)=>{
+  es.forEach(e=>{
+    if(e.isIntersecting){
+      const m = +e.target.dataset.step;
+      mode = m;
+      steps.forEach(st=>st.classList.toggle('active', st===e.target));
+      draw();
+    }
+  });
+},{rootMargin:'-15% 0px -55% 0px',threshold:0});
+
+steps.forEach(st=>obs.observe(st));
+
+/* highlight first step by default */
+if(steps.length){ steps[0].classList.add('active'); }
 </script>
-
 </body>
 </html>

@@ -3,120 +3,553 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HKDSE 2026 Paper 2 MC17 · Volume of a Frustum</title>
+<title>HKDSE 2026 P2 MC17 · Volume of a Frustum</title>
 <script>
   window.MathJax = {
-    tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['\\[','\\]']] },
+    tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
     svg: { fontCache: 'global' }
   };
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
-  :root{--blue:#1d4ed8;--blue-light:#3b82f6;--amber:#f59e0b;--amber-bg:#fffbeb;--emerald:#059669;--emerald-bg:#ecfdf5;--slate:#0f172a;--slate-soft:#475569;--line:#e2e8f0;--card:#ffffff;--bg:#f1f5f9;}
-  *{box-sizing:border-box;} html,body{margin:0;padding:0;}
-  body{font-family:"Segoe UI",system-ui,-apple-system,Helvetica,Arial,sans-serif;color:var(--slate);background:var(--bg);line-height:1.6;-webkit-font-smoothing:antialiased;}
-  .wrap{max-width:920px;margin:0 auto;padding:0 16px 60px;}
-  .hero{background:linear-gradient(120deg,#0f172a,#1e3a8a 45%,#2563eb);color:#fff;padding:32px 20px 28px;}
-  .hero .tag{display:inline-block;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;background:rgba(255,255,255,.16);border-radius:99px;padding:3px 12px;margin-bottom:10px;}
-  .hero h1{margin:0;font-size:1.5rem;font-weight:800;}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin:18px 0;box-shadow:0 1px 3px rgba(15,23,42,.06);}
-  .card h2{margin:0 0 10px;font-size:1.05rem;color:var(--blue);}
-  .question{font-size:1.08rem;}
-  .question ol,.question ul{margin:10px 0;padding-left:22px;}
-  .marks{color:var(--slate-soft);font-size:.85rem;font-style:italic;}
-  .step{border-left:3px solid var(--blue-light);background:#f8fafc;border-radius:8px;padding:12px 16px;margin:12px 0;}
-  .step .step-tag{display:inline-block;font-size:.7rem;font-weight:700;color:#fff;background:var(--blue);border-radius:99px;padding:2px 10px;margin-bottom:8px;}
-  .ans{background:var(--emerald-bg);border:1px solid #6ee7b7;border-radius:10px;padding:14px 18px;font-weight:600;margin:16px 0;}
-  .hint{background:var(--amber-bg);border:1px solid #fcd34d;border-radius:10px;padding:10px 16px;font-size:.9rem;color:#92400e;margin:10px 0;}
-  .mono{font-family:ui-monospace,Consolas,monospace;}
+  :root{
+    --ink:#1e293b;
+    --muted:#64748b;
+    --bg:#f1f5f9;
+    --card:#ffffff;
+    --blue:#2563eb;
+    --sky:#0ea5e9;
+    --purple:#7c3aed;
+    --amber:#f59e0b;
+    --green:#16a34a;
+    --rose:#e11d48;
+    --border:#e2e8f0;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
+    background:linear-gradient(180deg,#eef4fb 0%,#f8fafc 100%);
+    color:var(--ink);
+    font-size:15px;
+    line-height:1.55;
+  }
+  header.topbar{
+    background:linear-gradient(120deg,#1e3a8a 0%,#2563eb 55%,#0ea5e9 100%);
+    color:#fff;
+    padding:16px 20px;
+    box-shadow:0 4px 18px rgba(30,58,138,.25);
+  }
+  header.topbar .kicker{
+    font-size:12px;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    opacity:.85;
+    font-weight:600;
+  }
+  header.topbar h1{
+    margin:2px 0 0;
+    font-size:20px;
+    font-weight:700;
+    letter-spacing:.01em;
+  }
+  .wrap{
+    max-width:1280px;
+    margin:0 auto;
+    padding:18px 16px 60px;
+  }
+  .split{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    gap:12px;
+    align-items:start;
+  }
+  @media(min-width:900px){
+    .split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}
+  }
+  .panel{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:16px;
+    box-shadow:0 6px 22px rgba(15,23,42,.07);
+    padding:14px;
+  }
+  .diagram{
+    position:sticky;
+    top:16px;
+    max-height:calc(100vh - 2rem);
+    overflow-y:auto;
+  }
+  .diagram h2{
+    margin:0 0 8px;
+    font-size:14px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--muted);
+    font-weight:700;
+  }
+  canvas{
+    display:block;
+    width:100%;
+    height:auto;
+    border-radius:12px;
+    background:radial-gradient(circle at 50% 20%,#ffffff 0%,#f0f7ff 70%,#e6f0fb 100%);
+  }
+  .legend{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px 14px;
+    margin-top:10px;
+    font-size:12px;
+    color:var(--muted);
+  }
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .swatch{width:12px;height:12px;border-radius:3px;display:inline-block;}
+  .qcard h2{
+    margin:0 0 10px;
+    font-size:13px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--blue);
+    font-weight:800;
+  }
+  .qtext{
+    font-size:15px;
+    margin:0 0 12px;
+  }
+  .options{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;
+    margin:14px 0 6px;
+  }
+  .opt{
+    border:1.5px solid var(--border);
+    border-radius:10px;
+    padding:8px 10px;
+    font-size:14px;
+    background:#f8fafc;
+  }
+  .opt b{color:var(--blue);margin-right:6px;}
+  .opt.right{
+    border-color:var(--green);
+    background:#f0fdf4;
+  }
+  .opt.right b{color:var(--green);}
+  .caption{
+    font-size:12px;
+    color:var(--muted);
+    margin-top:10px;
+    font-style:italic;
+  }
+  .step{
+    border:1.5px solid var(--border);
+    border-radius:14px;
+    padding:12px 14px;
+    margin:12px 0;
+    background:#fbfdff;
+    transition:border-color .25s, box-shadow .25s, background .25s, transform .25s;
+  }
+  .step.active{
+    border-color:var(--sky);
+    background:#f0f9ff;
+    box-shadow:0 6px 18px rgba(14,165,233,.18);
+    transform:translateX(2px);
+  }
+  .step .tag{
+    display:inline-block;
+    font-size:11px;
+    font-weight:800;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:#fff;
+    background:linear-gradient(120deg,#2563eb,#0ea5e9);
+    padding:3px 10px;
+    border-radius:999px;
+    margin-bottom:8px;
+  }
+  .step.active .tag{
+    background:linear-gradient(120deg,#0ea5e9,#22c55e);
+  }
+  .step p{margin:6px 0;}
+  .hint{
+    border-left:4px solid var(--amber);
+    background:#fffbeb;
+    border-radius:0 10px 10px 0;
+    padding:8px 12px;
+    font-size:13px;
+    color:#92400e;
+    margin:10px 0;
+  }
+  .answer{
+    margin-top:16px;
+    border-radius:14px;
+    padding:14px 16px;
+    background:linear-gradient(120deg,#065f46,#16a34a);
+    color:#fff;
+    font-weight:700;
+    box-shadow:0 8px 22px rgba(22,163,74,.25);
+  }
+  .answer .big{font-size:18px;}
+  @media(max-width:640px){
+    body{font-size:14px;}
+    .panel{padding:10px;border-radius:12px;}
+    header.topbar h1{font-size:16px;}
+    .step{padding:10px 11px;}
+    .options{grid-template-columns:1fr;}
+    .legend{font-size:10.5px;}
+  }
 </style>
 </head>
 <body>
-<div class="hero">
-  <div class="wrap">
-    <span class="tag">HKDSE 2026 · Paper 2 · MC17</span>
-    <h1>Volume of a Frustum</h1>
-  </div>
-</div>
+
+<header class="topbar">
+  <div class="kicker">HKDSE 2026 · Paper 2 · MC17</div>
+  <h1>Volume of a Frustum</h1>
+</header>
+
 <div class="wrap">
-  <div class="card question">
-    <h2>Question</h2>
-    <p>The base of a right pyramid is a rectangle. The length and the breadth of the base are \(18\) cm and \(16\) cm respectively. The height of the pyramid is \(12\) cm. The pyramid is divided into a pyramid \(X\) and a frustum \(Y\) by a plane parallel to its base. If the breadth of the base of \(X\) is \(12\) cm, then the volume of \(Y\) is</p>
-    <ul>
-      <li><strong>A.</strong> \(486\) cm\(^3\)</li>
-      <li><strong>B.</strong> \(666\) cm\(^3\)</li>
-      <li><strong>C.</strong> \(688\) cm\(^3\)</li>
-      <li><strong>D.</strong> \(944\) cm\(^3\)</li>
-    </ul>
-  <figure class="figure"><svg viewBox="0 0 300 230" xmlns="http://www.w3.org/2000/svg" role="img"><rect width="300" height="230" fill="#fff"/><path d="M150,25 L70,190 L230,190 Z" fill="#eef2ff" stroke="#334155" stroke-width="2"/><line x1="112" y1="90" x2="188" y2="90" stroke="#b45309" stroke-width="1.5"/><text x="150" y="80" font-size="11" fill="#0d9488" text-anchor="middle">pyramid (top)</text><text x="150" y="150" font-size="11" fill="#0d9488" text-anchor="middle">frustum (bottom)</text><text x="150" y="212" font-size="11" fill="#475569" text-anchor="middle">rectangular base 18 × 16</text></svg><figcaption>Rectangular-based pyramid divided (not to scale)</figcaption></figure></div>
+  <div class="split">
 
-  <div class="card">
-    <h2>Solution</h2>
-    <div class="step">
-      <span class="step-tag">Volume of the whole pyramid</span>
-      \[
-      V=\frac{1}{3}\times(\text{area of base})\times\text{height}
-      =\frac{1}{3}(18)(16)(12)=1152\ \text{cm}^3
-      \]
-    </div>
-    <div class="step">
-      <span class="step-tag">Pyramid \(X\) is similar to the whole pyramid</span>
-      <p>The cutting plane is parallel to the base, so \(X\) is a similar pyramid. Its linear scale factor is</p>
-      \[
-      \frac{12}{16}=\frac{3}{4}
-      \]
-      <p>(breadth of \(X\)'s base over breadth of the original base).</p>
-    </div>
-    <div class="step">
-      <span class="step-tag">Volume of \(X\)</span>
-      <p>Volumes scale as the cube of the linear ratio:</p>
-      \[
-      V_X=\left(\frac{3}{4}\right)^3\times1152=\frac{27}{64}\times1152=486\ \text{cm}^3
-      \]
-    </div>
-    <div class="step">
-      <span class="step-tag">Volume of the frustum \(Y\)</span>
-      \[
-      V_Y=1152-486=666\ \text{cm}^3
-      \]
-    </div>
-  </div>
+    <!-- LEFT PANEL: DIAGRAM -->
+    <section class="panel diagram">
+      <h2>Interactive Diagram</h2>
+      <canvas id="cv" width="560" height="520"></canvas>
+      <div class="legend">
+        <span><i class="swatch" style="background:#2563eb"></i>Full pyramid (edges)</span>
+        <span><i class="swatch" style="background:#7c3aed"></i>Pyramid \(X\) (top)</span>
+        <span><i class="swatch" style="background:#f59e0b"></i>Frustum \(Y\) (bottom)</span>
+        <span><i class="swatch" style="background:#16a34a"></i>Base breadth labels</span>
+        <span><i class="swatch" style="background:#e11d48"></i>Cutting plane</span>
+      </div>
+    </section>
 
-  <div class="ans">
-    Final Answer: <span class="mono">B</span>
+    <!-- RIGHT PANEL: QUESTION + SOLUTION -->
+    <section class="panel qcard">
+      <h2>Question</h2>
+      <p class="qtext">
+        The base of a right pyramid is a rectangle. The length and the breadth of the base are
+        \(18\text{ cm}\) and \(16\text{ cm}\) respectively. The height of the pyramid is
+        \(12\text{ cm}\). The pyramid is divided into a pyramid \(X\) and a frustum \(Y\) by a plane
+        parallel to its base. If the breadth of the base of \(X\) is \(12\text{ cm}\), then the
+        volume of \(Y\) is
+      </p>
+
+      <div class="options">
+        <div class="opt"><b>A</b>\(486\ \text{cm}^3\)</div>
+        <div class="opt right"><b>B</b>\(666\ \text{cm}^3\)</div>
+        <div class="opt"><b>C</b>\(688\ \text{cm}^3\)</div>
+        <div class="opt"><b>D</b>\(944\ \text{cm}^3\)</div>
+      </div>
+
+      <!-- FIGURE_HERE -->
+
+      <p class="caption">Rectangular-based pyramid divided by a plane parallel to its base (not to scale).</p>
+
+      <h2 style="margin-top:20px;">Solution</h2>
+
+      <div class="step" data-step="1">
+        <span class="tag">Step 1 · Whole pyramid volume</span>
+        <p>Use the pyramid volume formula:</p>
+        \[
+          V=\frac{1}{3}\times(\text{area of base})\times\text{height}
+          =\frac{1}{3}(18)(16)(12)=1152\ \text{cm}^3
+        \]
+      </div>
+
+      <div class="step" data-step="2">
+        <span class="tag">Step 2 · Similar pyramids</span>
+        <p>
+          The cutting plane is parallel to the base, so pyramid \(X\) is similar to the whole
+          pyramid. The linear scale factor is the ratio of the breadths:
+        </p>
+        \[
+          \frac{12}{16}=\frac{3}{4}
+        \]
+        <div class="hint">
+          Lengths in similar solids scale by the linear ratio \(k\).
+        </div>
+      </div>
+
+      <div class="step" data-step="3">
+        <span class="tag">Step 3 · Volume of \(X\)</span>
+        <p>Volumes scale as the cube of the linear ratio:</p>
+        \[
+          V_X=\left(\frac{3}{4}\right)^{3}\times 1152
+          =\frac{27}{64}\times 1152 = 486\ \text{cm}^3
+        \]
+      </div>
+
+      <div class="step" data-step="4">
+        <span class="tag">Step 4 · Volume of the frustum \(Y\)</span>
+        <p>The frustum is the whole pyramid minus the top pyramid \(X\):</p>
+        \[
+          V_Y = 1152 - 486 = 666\ \text{cm}^3
+        \]
+        <div class="hint">
+          Always check: \(V_Y\) must equal the whole volume minus \(V_X\).
+        </div>
+      </div>
+
+      <div class="answer">
+        Final Answer: <span class="big">B · \(666\ \text{cm}^3\)</span>
+      </div>
+    </section>
+
   </div>
 </div>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
 
+<script>
+(function(){
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  let mode = 1;
+
+  // ---------- Geometry ----------
+  // Base rectangle: length 18 (along x, into the depth on screen), breadth 16 (along width).
+  // We draw an oblique 3D-ish projection but keep a genuinely proportional 2D figure.
+  // The most faithful "2D figure" of the exam: the front view is a trapezium (frustum)
+  // with the top triangle removed -> we draw the full pyramid footprint with the
+  // cutting plane, using an isometric-style projection.
+
+  // World coordinates (cm). Base centre at origin, apex above.
+  const L = 18, B = 16, H = 12;
+  const bTop = 12;                       // breadth of X's base
+  const k = bTop / B;                    // 3/4
+  const hCut = H * (1 - k);              // height from base to cutting plane = 3
+  const hTop = H * k;                    // height of X = 9
+
+  // Projection: isometric-ish. x -> right, y -> depth, z -> up.
+  const iso = (x,y,z) => {
+    const a = Math.PI/6;                 // 30 deg
+    const cosA = Math.cos(a), sinA = Math.sin(a);
+    return {
+      X: x*cosA + y*cosA,
+      Y: -x*sinA + y*sinA - z
+    };
+  };
+
+  // Base corners (z = 0), length along x, breadth along y.
+  const halfL = L/2, halfB = B/2;
+  const P = {
+    A: iso(-halfL, -halfB, 0),
+    Bp: iso( halfL, -halfB, 0),
+    C: iso( halfL,  halfB, 0),
+    D: iso(-halfL,  halfB, 0),
+    apex: iso(0,0,H)
+  };
+
+  // Cutting plane corners at height z = hCut, scaled by k about the apex axis.
+  const cx = 0, cy = 0;
+  const s = B > 0 ? (bTop/B) : 1;        // linear ratio 3/4
+  const cutCorner = (x,y) => iso(x*s, y*s, hCut);
+  const Q = {
+    A: cutCorner(-halfL, -halfB),
+    Bp: cutCorner( halfL, -halfB),
+    C: cutCorner( halfL,  halfB),
+    D: cutCorner(-halfL,  halfB)
+  };
+
+  // ---------- View transform ----------
+  let VIEW = {sx:1, sy:1, ox:0, oy:0};
+
+  function computeView(){
+    const pts = [P.A,P.Bp,P.C,P.D,P.apex, Q.A,Q.Bp,Q.C,Q.D];
+    let minX=1e9,maxX=-1e9,minY=1e9,maxY=-1e9;
+    pts.forEach(p=>{
+      minX=Math.min(minX,p.X); maxX=Math.max(maxX,p.X);
+      minY=Math.min(minY,p.Y); maxY=Math.max(maxY,p.Y);
+    });
+    const pad = 70;
+    const w = cv.width - 2*pad;
+    const h = cv.height - 2*pad;
+    const sx = w/(maxX-minX || 1);
+    const sy = h/(maxY-minY || 1);
+    const s = Math.min(sx,sy);
+    const ox = cv.width/2 - s*(minX+maxX)/2;
+    const oy = cv.height/2 - s*(minY+maxY)/2;
+    // NOTE: this is a UNIFORM scale so circles stay round and lengths proportional.
+    VIEW = {s, ox, oy};
+  }
+
+  function tp(p){ return {X: p.X*VIEW.s + VIEW.ox, Y: p.Y*VIEW.s + VIEW.oy}; }
+
+  // ---------- Drawing helpers ----------
+  function line(a,b,color,width,dash){
+    const A=tp(a), B=tp(b);
+    ctx.save();
+    ctx.strokeStyle=color;
+    ctx.lineWidth=width||2;
+    ctx.setLineDash(dash||[]);
+    ctx.lineCap='round';
+    ctx.beginPath();
+    ctx.moveTo(A.X,A.Y);
+    ctx.lineTo(B.X,B.Y);
+    ctx.stroke();
+    ctx.restore();
+  }
+  function fillPoly(pts,color,alpha){
+    ctx.save();
+    ctx.globalAlpha=alpha==null?1:alpha;
+    ctx.fillStyle=color;
+    ctx.beginPath();
+    pts.forEach((p,i)=>{const q=tp(p); i?ctx.lineTo(q.X,q.Y):ctx.moveTo(q.X,q.Y);});
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+  function strokePoly(pts,color,width,dash){
+    const n=pts.length;
+    for(let i=0;i<n;i++){
+      line(pts[i],pts[(i+1)%n],color,width,dash);
+    }
+  }
+  function dot(p,color,r){
+    const q=tp(p);
+    ctx.save();
+    ctx.fillStyle=color;
+    ctx.beginPath();
+    ctx.arc(q.X,q.Y,r||4.5,0,Math.PI*2);
+    ctx.fill();
+    ctx.strokeStyle='#fff';
+    ctx.lineWidth=1.5;
+    ctx.stroke();
+    ctx.restore();
+  }
+  function label(p,text,color,dx,dy,size){
+    const q=tp(p);
+    ctx.save();
+    ctx.fillStyle=color;
+    ctx.font='600 '+(size||13)+'px Segoe UI, Arial, sans-serif';
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    ctx.fillText(text,q.X+(dx||0),q.Y+(dy||0));
+    ctx.restore();
+  }
+
+  // ---------- Main draw ----------
+  function draw(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    computeView();
+
+    const showBase   = mode<=1 || mode===4;
+    const showFrustum= mode>=2;
+    const showTop    = mode===3 || mode===4;
+    const highlightWhole = mode===1;
+
+    // --- Base (bottom face) filled ---
+    fillPoly([P.A,P.Bp,P.C,P.D], highlightWhole?'#bfdbfe':'#e2e8f0', .55);
+    strokePoly([P.A,P.Bp,P.C,P.D], '#2563eb', 2.5);
+
+    // --- Back edges (dashed) ---
+    // Use hidden-edge test roughly: edges to apex that go behind.
+    line(P.apex, P.A, '#2563eb', 1.6, [6,5]); // back left-ish (dashed)
+    line(P.A, P.Bp, '#2563eb', 1.6, [6,5]);
+
+    // --- Frustum side faces ---
+    if (showFrustum){
+      fillPoly([P.A,P.Bp,Q.Bp,Q.A], '#f59e0b', .18);
+      fillPoly([P.Bp,P.C,Q.C,Q.Bp], '#f59e0b', .26);
+      fillPoly([P.C,P.D,Q.D,Q.C], '#f59e0b', .18);
+      fillPoly([P.D,P.A,Q.A,Q.D], '#f59e0b', .10);
+      strokePoly([P.A,P.Bp,Q.Bp,Q.A], '#d97706', 1.6, [4,4]);
+      line(P.Bp,P.C,'#d97706',2);
+      line(P.C,P.D,'#d97706',2);
+      line(Q.A,Q.Bp,'#d97706',2.2);
+      line(Q.Bp,Q.C,'#d97706',2.2);
+      line(Q.C,Q.D,'#d97706',2.2);
+      line(Q.D,Q.A,'#d97706',2.2);
+    }
+
+    // --- Top pyramid X faces ---
+    if (showTop){
+      fillPoly([Q.A,Q.Bp,P.apex], '#7c3aed', .30);
+      fillPoly([Q.Bp,Q.C,P.apex], '#7c3aed', .38);
+      fillPoly([Q.C,Q.D,P.apex], '#7c3aed', .30);
+      fillPoly([Q.D,Q.A,P.apex], '#7c3aed', .18);
+    }
+
+    // --- Full pyramid edges (always shown as the outer framework) ---
+    line(P.Bp,P.C,'#2563eb',2.6);
+    line(P.C,P.D,'#2563eb',2.6);
+    line(P.D,P.A,'#2563eb',2.2);
+    line(P.Bp,P.apex,'#2563eb',2.6);
+    line(P.C,P.apex,'#2563eb',2.6);
+    line(P.D,P.apex,'#2563eb',2.2);
+
+    // --- Cutting plane outline (highlighted in mode 2/3) ---
+    strokePoly([Q.A,Q.Bp,Q.C,Q.D], mode===2?'#e11d48':'#be185d', mode===2?3.2:2.4, mode===2?[8,5]:[7,5]);
+
+    // --- Base breadth label: width 16 along front edge ---
+    const midFront = {X:(P.D.X+P.C.X)/2, Y:(P.D.Y+P.C.Y)/2};
+    {
+      const q=tp(midFront);
+      ctx.save();
+      ctx.strokeStyle='#16a34a'; ctx.lineWidth=2; ctx.setLineDash([5,4]);
+      ctx.beginPath(); ctx.moveTo(q.X,q.Y); ctx.lineTo(q.X+0,q.Y+26); ctx.stroke();
+      ctx.restore();
+    }
+
+    // --- Vertices ---
+    dot(P.apex,'#7c3aed',5.5);
+    dot(P.A,'#2563eb',4.5); dot(P.Bp,'#2563eb',4.5);
+    dot(P.C,'#2563eb',4.5); dot(P.D,'#2563eb',4.5);
+    if (mode>=2){
+      dot(Q.A,'#e11d48',4); dot(Q.Bp,'#e11d48',4);
+      dot(Q.C,'#e11d48',4); dot(Q.D,'#e11d48',4);
+    }
+
+    // --- Labels ---
+    if (mode===1){
+      label(P.apex,'Apex','#7c3aed', 0, -16, 13);
+      label(P.C,'16','#16a34a', 36, 8, 13);
+      label(P.Bp,'18','#2563eb', 28, 2, 13);
+    }
+    if (mode===2){
+      label(Q.C,'12','#e11d48', 34, -4, 13);
+      label(P.D,'16','#16a34a', 34, 8, 13);
+    }
+    if (mode===3){
+      label(Q.C,'X • 12','#7c3aed', 44, -6, 12);
+    }
+    if (mode===4){
+      label(P.C,'Y','#d97706', 40, 12, 14);
+      label(Q.Bp,'X','#7c3aed', -30, -6, 13);
+    }
+
+    // --- Caption on canvas ---
+    ctx.save();
+    ctx.fillStyle='#475569';
+    ctx.font='600 12px Segoe UI, Arial, sans-serif';
+    ctx.textAlign='left';
+    const captions = {
+      1:'Whole pyramid · base 18 × 16, height 12',
+      2:'Cut by a plane ∥ base · breadth 12 vs 16',
+      3:'Pyramid X (top) · similar to whole, k = 3/4',
+      4:'Frustum Y = whole − X'
+    };
+    ctx.fillText(captions[mode]||'', 14, 22);
+    ctx.restore();
+  }
+
+  // ---------- Scroll sync ----------
+  const steps = Array.from(document.querySelectorAll('.step'));
+  const obs = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if (e.isIntersecting){
+        const m = +e.target.dataset.step;
+        mode = m;
+        steps.forEach(st=>st.classList.toggle('active', st===e.target));
+        draw();
+      }
+    });
+  }, {rootMargin:'-15% 0px -55% 0px', threshold:0});
+  steps.forEach(st=>obs.observe(st));
+
+  // Initial draw
+  window.addEventListener('resize', ()=>{ draw(); });
+  draw();
+})();
+</script>
 </body>
 </html>

@@ -3,108 +3,314 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HKDSE 2026 Paper 2 MC27 · Circle: Circumference</title>
+<title>HKDSE 2026 P2 MC27 · Circle Circumference</title>
 <script>
-  window.MathJax = {
-    tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['\\[','\\]']] },
-    svg: { fontCache: 'global' }
-  };
+window.MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},svg:{fontCache:'global'}};
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
-  :root{--blue:#1d4ed8;--blue-light:#3b82f6;--amber:#f59e0b;--amber-bg:#fffbeb;--emerald:#059669;--emerald-bg:#ecfdf5;--slate:#0f172a;--slate-soft:#475569;--line:#e2e8f0;--card:#ffffff;--bg:#f1f5f9;}
-  *{box-sizing:border-box;} html,body{margin:0;padding:0;}
-  body{font-family:"Segoe UI",system-ui,-apple-system,Helvetica,Arial,sans-serif;color:var(--slate);background:var(--bg);line-height:1.6;-webkit-font-smoothing:antialiased;}
-  .wrap{max-width:920px;margin:0 auto;padding:0 16px 60px;}
-  .hero{background:linear-gradient(120deg,#0f172a,#1e3a8a 45%,#2563eb);color:#fff;padding:32px 20px 28px;}
-  .hero .tag{display:inline-block;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;background:rgba(255,255,255,.16);border-radius:99px;padding:3px 12px;margin-bottom:10px;}
-  .hero h1{margin:0;font-size:1.5rem;font-weight:800;}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin:18px 0;box-shadow:0 1px 3px rgba(15,23,42,.06);}
-  .card h2{margin:0 0 10px;font-size:1.05rem;color:var(--blue);}
-  .question{font-size:1.08rem;}
-  .question ol,.question ul{margin:10px 0;padding-left:22px;}
-  .marks{color:var(--slate-soft);font-size:.85rem;font-style:italic;}
-  .step{border-left:3px solid var(--blue-light);background:#f8fafc;border-radius:8px;padding:12px 16px;margin:12px 0;}
-  .step .step-tag{display:inline-block;font-size:.7rem;font-weight:700;color:#fff;background:var(--blue);border-radius:99px;padding:2px 10px;margin-bottom:8px;}
-  .ans{background:var(--emerald-bg);border:1px solid #6ee7b7;border-radius:10px;padding:14px 18px;font-weight:600;margin:16px 0;}
-  .hint{background:var(--amber-bg);border:1px solid #fcd34d;border-radius:10px;padding:10px 16px;font-size:.9rem;color:#92400e;margin:10px 0;}
-  .mono{font-family:ui-monospace,Consolas,monospace;}
+  *{box-sizing:border-box;}
+  body{
+    margin:0;padding:14px;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:linear-gradient(135deg,#eef4ff 0%,#f7fbff 50%,#eefaf3 100%);
+    color:#1e2a3a;
+    -webkit-font-smoothing:antialiased;
+  }
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start;}
+  @media(min-width:900px){.split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}}
+
+  .panel{
+    background:#fff;border-radius:18px;
+    box-shadow:0 6px 24px rgba(31,62,120,.10),0 1px 3px rgba(31,62,120,.06);
+    padding:14px;
+  }
+  .diagram{position:sticky;top:16px;max-height:calc(100vh - 2rem);overflow-y:auto;}
+  .diagram h2{margin:0 0 8px;font-size:15px;letter-spacing:.4px;color:#3a4c6b;text-transform:uppercase;font-weight:800;}
+  canvas{width:100%;height:auto;display:block;border-radius:12px;background:#fbfdff;}
+
+  .badge{
+    display:inline-block;font-size:11px;font-weight:800;letter-spacing:.6px;
+    color:#fff;background:linear-gradient(90deg,#4f7cff,#8b5cf6);
+    padding:4px 10px;border-radius:999px;margin-bottom:8px;
+  }
+  h1{font-size:19px;margin:4px 0 10px;line-height:1.25;color:#16233a;}
+  .qtext{font-size:15px;line-height:1.55;}
+  .choices{
+    display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0 4px;
+  }
+  .choice{
+    background:#f3f7ff;border:1.5px solid #dbe6ff;border-radius:12px;
+    padding:8px 10px;font-size:15px;font-weight:600;color:#26406e;
+  }
+  .choice b{color:#4f7cff;margin-right:6px;}
+  .choice.ans{background:#e8fbf0;border-color:#9be3b8;color:#116b39;}
+
+  .step{
+    border-left:5px solid #cfdcf5;background:#f8faff;
+    border-radius:12px;padding:10px 12px;margin:10px 0;
+    transition:all .3s ease;opacity:.75;
+  }
+  .step.active{
+    opacity:1;background:#fff;border-left-color:#4f7cff;
+    box-shadow:0 6px 18px rgba(79,124,255,.20);transform:translateX(2px);
+  }
+  .step-tag{
+    display:block;font-size:11px;font-weight:800;letter-spacing:.7px;
+    color:#4f7cff;margin-bottom:4px;
+  }
+  .step p{margin:4px 0;font-size:14.5px;line-height:1.5;}
+  .hint{
+    background:#fff8e6;border:1px solid #ffe2a3;border-radius:12px;
+    padding:10px 12px;font-size:13.5px;color:#7a5a12;margin:10px 0;
+  }
+  .answer{
+    margin-top:14px;background:linear-gradient(90deg,#e8fbf0,#eef4ff);
+    border:2px solid #9be3b8;border-radius:14px;padding:12px 14px;
+    font-size:16px;font-weight:800;color:#116b39;
+  }
+  .legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;font-size:12px;color:#405272;}
+  .legend span{display:inline-flex;align-items:center;gap:5px;}
+  .sw{width:14px;height:4px;border-radius:2px;display:inline-block;}
+  .dot{width:10px;height:10px;border-radius:50%;display:inline-block;}
+
+  @media(max-width:640px){
+    body{padding:8px;}
+    .panel{padding:10px;border-radius:14px;}
+    h1{font-size:16px;}
+    .qtext{font-size:13.5px;}
+    .choices{grid-template-columns:1fr;gap:6px;}
+    .choice{font-size:13px;padding:6px 8px;}
+    .step p{font-size:13px;}
+    .legend{font-size:10.5px;}
+    .answer{font-size:14px;}
+  }
 </style>
 </head>
 <body>
-<div class="hero">
-  <div class="wrap">
-    <span class="tag">HKDSE 2026 · Paper 2 · MC27</span>
+<div class="split">
+  <!-- LEFT: DIAGRAM -->
+  <section class="panel diagram">
+    <h2>Interactive Diagram</h2>
+    <canvas id="cv" width="720" height="720"></canvas>
+    <div class="legend" id="legend"></div>
+  </section>
+
+  <!-- RIGHT: QUESTION + SOLUTION -->
+  <section class="panel">
+    <span class="badge">HKDSE 2026 · PAPER 2 · MC27</span>
     <h1>Circle: Circumference</h1>
-  </div>
-</div>
-<div class="wrap">
-  <div class="card question">
-    <h2>Question</h2>
-    <p>The \(x\)-coordinate of the centre of the circle \(C\) is \(5\). If \(C\) passes through the points \((5,0)\) and \((11,4)\), then the circumference of \(C\) is</p>
-<ul>
-  <li>A. \(13\pi\)</li>
-  <li>B. \(14\pi\)</li>
-  <li>C. \(22\pi\)</li>
-  <li>D. \(42\pi\)</li>
-</ul>
-  <figure class="figure"><svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg" role="img"><rect width="320" height="240" fill="#fff"/><line x1="40" y1="200" x2="300" y2="200" stroke="#334155" stroke-width="1.4"/><line x1="40" y1="200" x2="40" y2="30" stroke="#334155" stroke-width="1.4"/><g stroke="#eef2f0" stroke-width="1"><line x1="40" y1="140" x2="300" y2="140"/><line x1="40" y1="80" x2="300" y2="80"/><line x1="100" y1="30" x2="100" y2="200"/><line x1="160" y1="30" x2="160" y2="200"/><line x1="220" y1="30" x2="220" y2="200"/></g><circle cx="160" cy="120" r="58" fill="#eef2ff" fill-opacity="0.5" stroke="#4f46e5" stroke-width="2"/><circle cx="160" cy="120" r="3.5" fill="#e11d48"/><text x="168" y="116" font-size="11" font-weight="700" fill="#e11d48">centre (5,k)</text><circle cx="160" cy="200" r="3" fill="#0d9488"/><circle cx="220" cy="140" r="3" fill="#0d9488"/><text x="40" y="214" font-size="10" fill="#475569">O</text><text x="300" y="214" font-size="10" fill="#475569" text-anchor="end">x</text><text x="34" y="34" font-size="10" fill="#475569">y</text><text x="160" y="234" font-size="10" fill="#475569" text-anchor="middle">through (5,0) and (11,4)</text></svg><figcaption>Circle on the coordinate plane (not to scale)</figcaption></figure></div>
 
-  <div class="card">
-    <h2>Solution</h2>
-        <div class="step">
-      <span class="step-tag">Centre</span>
-      Let the centre be \((5,k)\). Through \((5,0)\): \(r^2=(5-5)^2+(k-0)^2=k^2\).
+    <div class="qtext">
+      <p>The \(x\)-coordinate of the centre of the circle \(C\) is \(5\). If \(C\) passes through the points \((5,0)\) and \((11,4)\), then the circumference of \(C\) is</p>
+      <div class="choices">
+        <div class="choice ans"><b>A.</b> \(13\pi\)</div>
+        <div class="choice"><b>B.</b> \(14\pi\)</div>
+        <div class="choice"><b>C.</b> \(22\pi\)</div>
+        <div class="choice"><b>D.</b> \(42\pi\)</div>
+      </div>
     </div>
-    <div class="step">
-      <span class="step-tag">Second point</span>
-      Through \((11,4)\): \((11-5)^2+(4-k)^2=k^2\Rightarrow 36+16-8k+k^2=k^2\).
-    </div>
-    <div class="step">
-      <span class="step-tag">Solve</span>
-      \(52-8k=0\Rightarrow k=6.5\), so \(r=6.5\).
-    </div>
-    <div class="step">
-      <span class="step-tag">Circumference</span>
-      \(2\pi r=2\pi(6.5)=13\pi\).
-    </div>
-  </div>
+    <!-- FIGURE_HERE -->
 
-  <div class="ans">
-    <b>Answer: A</b> &mdash; 13&pi;
-  </div>
+    <div class="step" data-step="1">
+      <span class="step-tag">STEP 1 · CENTRE</span>
+      <p>The \(x\)-coordinate of the centre is \(5\), so write the centre as \((5,k)\).</p>
+      <p>Using \(P(5,0)\): \(\;r^2=(5-5)^2+(k-0)^2=k^2\).</p>
+    </div>
+
+    <div class="step" data-step="2">
+      <span class="step-tag">STEP 2 · SECOND POINT</span>
+      <p>Using \(Q(11,4)\): \(\;(11-5)^2+(4-k)^2=r^2=k^2\).</p>
+      <p>So \(\;36+16-8k+k^2=k^2\).</p>
+    </div>
+
+    <div class="step" data-step="3">
+      <span class="step-tag">STEP 3 · SOLVE FOR k</span>
+      <p>\(52-8k=0\Rightarrow k=6.5\).</p>
+      <p>Hence the centre is \((5,\,6.5)\) and the radius is \(\;r=k=6.5\).</p>
+    </div>
+
+    <div class="step" data-step="4">
+      <span class="step-tag">STEP 4 · CIRCUMFERENCE</span>
+      <p>Circumference \(=2\pi r = 2\pi(6.5) = 13\pi\).</p>
+    </div>
+
+    <div class="hint">💡 Hint: since the centre has \(x=5\) and the circle passes through \((5,0)\), the vertical segment from the centre down to \((5,0)\) is a radius — so \(r\) equals the \(y\)-coordinate \(k\) of the centre.</div>
+
+    <div class="answer">Answer: A &mdash; \(13\pi\)</div>
+  </section>
 </div>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
+
+<script>
+(function(){
+  const cv=document.getElementById('cv');
+  const ctx=cv.getContext('2d');
+  let mode=1;
+
+  // World coordinates: x in [-3, 19], y in [-6, 14]
+  // Centre (5,6.5), radius 6.5, P(5,0), Q(11,4)
+  const W=720,H=720,margin=60;
+  const xMin=-3,xMax=19,yMin=-6,yMax=14;
+  const sx=(W-2*margin)/(xMax-xMin);
+  const sy=(H-2*margin)/(yMax-yMin);
+  const s=Math.min(sx,sy);
+  const cx0=margin+((xMax-xMin)-s*(xMax-xMin)/s)/2;
+  // compute offsets so plot is centred
+  const plotW=s*(xMax-xMin), plotH=s*(yMax-yMin);
+  const ox=(W-plotW)/2, oy=(H-plotH)/2;
+
+  function X(x){return ox+(x-xMin)*s;}
+  function Y(y){return H-(oy+(y-yMin)*s);}
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    // background grid
+    ctx.strokeStyle='#eef2f9';ctx.lineWidth=1;
+    for(let gx=Math.ceil(xMin);gx<=xMax;gx+=2){
+      ctx.beginPath();ctx.moveTo(X(gx),Y(yMin));ctx.lineTo(X(gx),Y(yMax));ctx.stroke();
+    }
+    for(let gy=Math.ceil(yMin);gy<=yMax;gy+=2){
+      ctx.beginPath();ctx.moveTo(X(xMin),Y(gy));ctx.lineTo(X(xMax),Y(gy));ctx.stroke();
+    }
+
+    // axes
+    ctx.strokeStyle='#9aa8bf';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(X(xMin),Y(0));ctx.lineTo(X(xMax),Y(0));ctx.stroke();
+    ctx.beginPath();ctx.moveTo(X(0),Y(yMin));ctx.lineTo(X(0),Y(yMax));ctx.stroke();
+    // arrowheads
+    drawArrow(X(xMax),Y(0),0);
+    drawArrow(X(0),Y(yMax),-Math.PI/2);
+    ctx.fillStyle='#7d8aa3';ctx.font='16px sans-serif';
+    ctx.fillText('x',X(xMax)-14,Y(0)-8);
+    ctx.fillText('y',X(0)+8,Y(yMax)+12);
+    ctx.fillText('O',X(0)-18,Y(0)+18);
+
+    // tick labels at 5 and 11
+    ctx.fillStyle='#5a6b87';
+    ctx.fillText('5',X(5)-4,Y(0)+20);
+    ctx.fillText('11',X(11)-8,Y(0)+20);
+    ctx.fillText('4',X(0)-16,Y(4)+6);
+    ctx.fillStyle=X(5)&&'#5a6b87';
+
+    // circle
+    const Cx=5,Cy=6.5,r=6.5;
+    const active=mode;
+
+    // highlight circle
+    ctx.lineWidth= active===4?4:3;
+    ctx.strokeStyle= active===4?'#e0561f':'#2f7ff0';
+    ctx.beginPath();
+    ctx.arc(X(Cx),Y(Cy),r*s,0,Math.PI*2);
+    ctx.stroke();
+    if(active===4){
+      ctx.fillStyle='rgba(224,86,31,0.07)';
+      ctx.fill();
+    }
+
+    // centre
+    const cCol= active===1?'#b02fd6':'#8b5cf6';
+    ctx.fillStyle=cCol;
+    ctx.beginPath();ctx.arc(X(Cx),Y(Cy),active===1?7:5,0,Math.PI*2);ctx.fill();
+
+    // radius lines
+    const radCol= active===4?'#e0561f':'#2f7ff0';
+    ctx.setLineDash([]);
+    ctx.strokeStyle=radCol;ctx.lineWidth=active===4?3:2;
+    ctx.beginPath();ctx.moveTo(X(Cx),Y(Cy));ctx.lineTo(X(5),Y(0));ctx.stroke();
+    ctx.beginPath();ctx.moveTo(X(Cx),Y(Cy));ctx.lineTo(X(11),Y(4));ctx.stroke();
+
+    // radius tick label
+    const mx=X(5)+14, my=(Y(Cy)+Y(0))/2;
+    ctx.fillStyle=radCol;ctx.font='bold 14px sans-serif';
+    ctx.fillText('r = 6.5',mx,my);
+
+    // points P(5,0), Q(11,4)
+    const pCol=active===1?'#ff9f1c':'#f4b400';
+    const qCol=active===2?'#e0561f':'#2ec27e';
+    drawPoint(X(5),Y(0),pCol,'(5, 0)',-10,26,active===1);
+    drawPoint(X(11),Y(4),qCol,'(11, 4)',10,-12,active===2);
+
+    // right angle marker at P between vertical radius and x-axis
+    if(active>=2){
+      ctx.strokeStyle='#c7d2e8';ctx.lineWidth=1.5;
+      const pxs=X(5),pys=Y(0);
+      ctx.beginPath();
+      ctx.moveTo(pxs+14,pys);ctx.lineTo(pxs+14,pys-14);ctx.lineTo(pxs,pys-14);ctx.stroke();
+    }
+
+    // right-angle / horizontal leg for Q
+    if(active>=2){
+      ctx.setLineDash([5,5]);ctx.strokeStyle='#c7a3f0';ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.moveTo(X(5),Y(4));ctx.lineTo(X(11),Y(4));ctx.stroke();
+      ctx.beginPath();ctx.moveTo(X(11),Y(4));ctx.lineTo(X(11),Y(0));ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle='#a175d8';ctx.font='12px sans-serif';
+      ctx.fillText('6',X(8),Y(4)-6);
+      ctx.fillText('4',X(11)+6,Y(2)+4);
+    }
+
+    // centre label
+    ctx.fillStyle=cCol;ctx.font='bold 13px sans-serif';
+    ctx.fillText('(5, 6.5)',X(Cx)+8,Y(Cy)-8);
+
+    // extra labels for steps
+    if(active===1){
+      ctx.fillStyle='#7c1ea0';ctx.font='bold 15px sans-serif';
+      ctx.fillText('R² = (5-5)² + (k-0)² = k²',X(xMin)+10,Y(yMax)-30);
+    }
+    if(active===2){
+      ctx.fillStyle='#b03a0f';ctx.font='bold 14px sans-serif';
+      ctx.fillText('(11-5)² + (4-k)² = k²',X(xMin)+10,Y(yMax)-30);
+    }
+    if(active===3){
+      ctx.fillStyle='#116b39';ctx.font='bold 15px sans-serif';
+      ctx.fillText('k = 6.5,  r = 6.5',X(xMin)+10,Y(yMax)-30);
+    }
+    if(active===4){
+      ctx.fillStyle='#b03a0f';ctx.font='bold 15px sans-serif';
+      ctx.fillText('2πr = 13π',X(xMin)+10,Y(yMax)-30);
+    }
+  }
+
+  function drawPoint(px,py,col,label,lx,ly,active){
+    ctx.fillStyle=col;
+    ctx.beginPath();ctx.arc(px,py,active?8:6,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
+    ctx.fillStyle=col;ctx.font='bold 13px sans-serif';
+    ctx.fillText(label,px+lx,py+ly);
+  }
+  function drawArrow(x,y,rot){
+    ctx.save();ctx.translate(x,y);ctx.rotate(rot||0);
+    ctx.fillStyle='#9aa8bf';
+    ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(-10,-5);ctx.lineTo(-10,5);ctx.closePath();ctx.fill();
+    ctx.restore();
+  }
+
+  // Legend
+  const legend=document.getElementById('legend');
+  legend.innerHTML=[
+    ['dot','#8b5cf6','Centre (5, 6.5)'],
+    ['sw','#2f7ff0','Radius r'],
+    ['sw','#2f7ff0','Circle C'],
+    ['dot','#f4b400','P (5, 0)'],
+    ['dot','#2ec27e','Q (11, 4)']
+  ].map(([t,c,n])=>`<span><span class="${t}" style="background:${c}"></span>${n}</span>`).join('');
+
+  // Scroll sync
+  const steps=Array.from(document.querySelectorAll('.step'));
+  const obs=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){
+    const m=+e.target.dataset.step; mode=m;
+    steps.forEach(st=>st.classList.toggle('active',st===e.target)); draw();}});},
+    {rootMargin:'-15% 0px -55% 0px',threshold:0});
+  steps.forEach(st=>obs.observe(st));
+
+  draw();
+  if(window.MathJax&&window.MathJax.typesetPromise){
+    MathJax.typesetPromise();
+  }else{
+    window.addEventListener('load',()=>{if(window.MathJax)MathJax.typesetPromise();});
+  }
+})();
 </script>
-
 </body>
 </html>

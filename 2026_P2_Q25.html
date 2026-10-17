@@ -1,121 +1,490 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HKDSE 2026 Paper 2 MC25 · Circle Geometry</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HKDSE 2026 P2 MC25 · Circle Geometry</title>
 <script>
   window.MathJax = {
-    tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['\\[','\\]']] },
+    tex: {
+      inlineMath: [['$','$'],['\\(','\\)']],
+      displayMath: [['$$','$$'],['\\[','\\]']]
+    },
     svg: { fontCache: 'global' }
   };
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
-  :root{--blue:#1d4ed8;--blue-light:#3b82f6;--amber:#f59e0b;--amber-bg:#fffbeb;--emerald:#059669;--emerald-bg:#ecfdf5;--slate:#0f172a;--slate-soft:#475569;--line:#e2e8f0;--card:#ffffff;--bg:#f1f5f9;}
-  *{box-sizing:border-box;} html,body{margin:0;padding:0;}
-  body{font-family:"Segoe UI",system-ui,-apple-system,Helvetica,Arial,sans-serif;color:var(--slate);background:var(--bg);line-height:1.6;-webkit-font-smoothing:antialiased;}
-  .wrap{max-width:920px;margin:0 auto;padding:0 16px 60px;}
-  .hero{background:linear-gradient(120deg,#0f172a,#1e3a8a 45%,#2563eb);color:#fff;padding:32px 20px 28px;}
-  .hero .tag{display:inline-block;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;background:rgba(255,255,255,.16);border-radius:99px;padding:3px 12px;margin-bottom:10px;}
-  .hero h1{margin:0;font-size:1.5rem;font-weight:800;}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin:18px 0;box-shadow:0 1px 3px rgba(15,23,42,.06);}
-  .card h2{margin:0 0 10px;font-size:1.05rem;color:var(--blue);}
-  .question{font-size:1.08rem;}
-  .question ol,.question ul{margin:10px 0;padding-left:22px;}
-  .marks{color:var(--slate-soft);font-size:.85rem;font-style:italic;}
-  .step{border-left:3px solid var(--blue-light);background:#f8fafc;border-radius:8px;padding:12px 16px;margin:12px 0;}
-  .step .step-tag{display:inline-block;font-size:.7rem;font-weight:700;color:#fff;background:var(--blue);border-radius:99px;padding:2px 10px;margin-bottom:8px;}
-  .ans{background:var(--emerald-bg);border:1px solid #6ee7b7;border-radius:10px;padding:14px 18px;font-weight:600;margin:16px 0;}
-  .hint{background:var(--amber-bg);border:1px solid #fcd34d;border-radius:10px;padding:10px 16px;font-size:.9rem;color:#92400e;margin:10px 0;}
-  .mono{font-family:ui-monospace,Consolas,monospace;}
+  :root{
+    --blue:#2563eb;
+    --red:#dc2626;
+    --green:#059669;
+    --amber:#d97706;
+    --purple:#7c3aed;
+    --pink:#db2777;
+    --ink:#1e293b;
+    --muted:#64748b;
+    --card:#ffffff;
+    --bg:#f1f5f9;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    padding:16px;
+    background:linear-gradient(135deg,#eef4ff 0%,#f8fafc 45%,#fdf4ff 100%);
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    color:var(--ink);
+    line-height:1.5;
+  }
+  .wrap{max-width:1280px;margin:0 auto;}
+  header.top{
+    background:linear-gradient(120deg,#1e3a8a,#2563eb 55%,#7c3aed);
+    color:#fff;
+    border-radius:18px;
+    padding:16px 22px;
+    margin-bottom:14px;
+    box-shadow:0 10px 26px rgba(37,99,235,.28);
+  }
+  header.top h1{margin:0;font-size:1.15rem;letter-spacing:.3px;}
+  header.top p{margin:4px 0 0;font-size:.82rem;opacity:.9;}
+
+  .split{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    gap:12px;
+    align-items:start;
+  }
+  @media(min-width:900px){
+    .split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}
+  }
+
+  .panel{
+    background:var(--card);
+    border-radius:18px;
+    padding:14px;
+    box-shadow:0 6px 22px rgba(15,23,42,.09);
+    border:1px solid #e2e8f0;
+  }
+  .diagram{
+    position:sticky;
+    top:16px;
+    max-height:calc(100vh - 2rem);
+    overflow-y:auto;
+  }
+  .diagram h2{
+    margin:0 0 8px;
+    font-size:.85rem;
+    letter-spacing:1.2px;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+  canvas{width:100%;height:auto;display:block;border-radius:12px;background:#fbfdff;}
+  .legend{
+    display:flex;flex-wrap:wrap;gap:6px 14px;
+    margin-top:10px;font-size:.72rem;color:var(--muted);
+  }
+  .legend span{display:inline-flex;align-items:center;gap:5px;}
+  .dot{width:11px;height:11px;border-radius:50%;display:inline-block;}
+
+  .qbox{
+    background:linear-gradient(135deg,#eff6ff,#f5f3ff);
+    border:1px solid #dbeafe;
+    border-radius:14px;
+    padding:12px 14px;
+    margin-bottom:14px;
+    font-size:.92rem;
+  }
+  .qbox .tag{
+    display:inline-block;background:var(--blue);color:#fff;
+    font-size:.68rem;letter-spacing:1px;font-weight:700;
+    padding:2px 9px;border-radius:999px;margin-bottom:7px;
+  }
+  .opts{display:grid;grid-template-columns:1fr 1fr;gap:5px 10px;margin-top:8px;font-size:.88rem;}
+
+  .step{
+    background:#fff;
+    border:1px solid #e2e8f0;
+    border-left:5px solid #cbd5e1;
+    border-radius:12px;
+    padding:10px 13px;
+    margin-bottom:11px;
+    transition:.25s;
+    font-size:.9rem;
+  }
+  .step.active{
+    border-left-color:var(--blue);
+    background:#f8fbff;
+    box-shadow:0 6px 18px rgba(37,99,235,.16);
+    transform:translateX(2px);
+  }
+  .step .stag{
+    display:block;
+    font-size:.7rem;
+    font-weight:800;
+    letter-spacing:1.1px;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:4px;
+  }
+  .step.active .stag{color:var(--blue);}
+  .step .reason{
+    display:inline-block;
+    font-size:.68rem;
+    background:#eef2ff;
+    color:#4338ca;
+    padding:1px 7px;
+    border-radius:999px;
+    margin-left:6px;
+    font-weight:600;
+  }
+
+  .hint{
+    background:#fffbeb;
+    border:1px dashed #fbbf24;
+    border-radius:12px;
+    padding:10px 13px;
+    font-size:.83rem;
+    color:#92400e;
+    margin-bottom:12px;
+  }
+  .answer{
+    margin-top:6px;
+    background:linear-gradient(120deg,#ecfdf5,#d1fae5);
+    border:1px solid #6ee7b7;
+    border-radius:14px;
+    padding:12px 14px;
+    text-align:center;
+    font-weight:800;
+    font-size:1.05rem;
+    color:#065f46;
+    box-shadow:0 6px 18px rgba(5,150,105,.18);
+  }
+  .answer .letter{
+    display:inline-block;
+    background:var(--green);color:#fff;
+    border-radius:8px;padding:0 9px;margin-right:6px;
+  }
+  ol.steps-list{padding-left:0;margin:0;list-style:none;}
+
+  @media(max-width:520px){
+    body{padding:8px;}
+    .panel{padding:9px;border-radius:14px;}
+    .step{font-size:.8rem;padding:8px 9px;}
+    .qbox{font-size:.82rem;padding:9px;}
+    .legend{font-size:.62rem;}
+    header.top h1{font-size:.95rem;}
+    .answer{font-size:.92rem;}
+  }
 </style>
 </head>
 <body>
-<div class="hero">
-  <div class="wrap">
-    <span class="tag">HKDSE 2026 · Paper 2 · MC25</span>
-    <h1>Circle Geometry</h1>
-  </div>
-</div>
 <div class="wrap">
-  <div class="card question">
-    <h2>Question</h2>
-    <p>In the figure, \(O\) is the centre of the circle \(PQRS\). \(PR\) and \(OQ\) intersect at the point \(T\). If \(\angle POT=82^\circ\) and \(\angle PTQ=104^\circ\), then \(\angle QSR=\)</p>
-<ul>
-  <li>A. \(22^\circ\)</li>
-  <li>B. \(27^\circ\)</li>
-  <li>C. \(30^\circ\)</li>
-  <li>D. \(49^\circ\)</li>
-</ul>
-  </div>
-<section style="margin:16px 0;padding:16px;background:var(--bg,#fff);border:1px solid #e2e8f0;border-radius:10px;">
-  <h2 style="font-size:1rem;font-weight:600;margin:0 0 10px;color:var(--fg,#1a1a1a);">Original Figure</h2>
-  <div style="text-align:center;">
-    <img src="figures/2026_P2_25.png" alt="Original figure" style="max-width:100%;height:auto;border-radius:6px;">
-  </div>
-</section>
+  <header class="top">
+    <h1>HKDSE 2026 · Paper 2 · MC25 — Circle Geometry</h1>
+    <p>Interactive worked solution · scroll the steps to highlight the figure</p>
+  </header>
 
+  <div class="split">
+    <!-- ================= LEFT : DIAGRAM ================= -->
+    <section class="panel diagram">
+      <h2>Interactive Figure</h2>
+      <canvas id="cv" width="640" height="640"></canvas>
+      <div class="legend">
+        <span><i class="dot" style="background:#2563eb"></i>Circle / radii (OP, OR)</span>
+        <span><i class="dot" style="background:#dc2626"></i>Chord PR</span>
+        <span><i class="dot" style="background:#059669"></i>Chord QR / line OQ</span>
+        <span><i class="dot" style="background:#7c3aed"></i>Centre O</span>
+        <span><i class="dot" style="background:#d97706"></i>Point T</span>
+        <span><i class="dot" style="background:#db2777"></i>Chord PS</span>
+      </div>
+    </section>
 
-  <div class="card">
-    <h2>Solution</h2>
-        <div class="step">
-      <span class="step-tag">Same line</span>
-      Since \(O,T,Q\) are collinear, \(\angle POT=\angle POQ=82^\circ\).
-    </div>
-    <div class="step">
-      <span class="step-tag">Triangle POT</span>
-      \(\angle PTO=180^\circ-104^\circ=76^\circ\), so \(\angle OPT=180^\circ-82^\circ-76^\circ=22^\circ\).
-    </div>
-    <div class="step">
-      <span class="step-tag">Isosceles OPR</span>
-      \(OP=OR\) (radii) \(\Rightarrow \angle ORP=\angle OPR=22^\circ \Rightarrow \angle POR=180^\circ-2(22^\circ)=136^\circ\).
-    </div>
-    <div class="step">
-      <span class="step-tag">Central angle</span>
-      \(\angle QOR=\angle POR-\angle POQ=136^\circ-82^\circ=54^\circ\).
-    </div>
-    <div class="step">
-      <span class="step-tag">Angle at circumference</span>
-      \(\angle QSR=\tfrac12\angle QOR=\tfrac12(54^\circ)=27^\circ\).
-    </div>
-  </div>
+    <!-- ================= RIGHT : QUESTION + SOLUTION ================= -->
+    <section class="panel">
+      <div class="qbox">
+        <span class="tag">QUESTION</span>
+        <p style="margin:0 0 6px;">
+          In the figure, \(O\) is the centre of the circle \(PQRS\). \(PR\) and \(OQ\) intersect at the point \(T\).
+          If \(\angle POT=82^\circ\) and \(\angle PTQ=104^\circ\), then \(\angle QSR=\)
+        </p>
+        <div class="opts">
+          <div>A. \(22^\circ\)</div>
+          <div>B. \(27^\circ\)</div>
+          <div>C. \(30^\circ\)</div>
+          <div>D. \(49^\circ\)</div>
+        </div>
+      </div>
 
-  <div class="ans">
-    <b>Answer: B</b> &mdash; 27&deg;
+      <figure style="margin:12px 0;text-align:center;"><img src="figures/figures/2026_P2_25.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
+
+      <div class="hint">
+        💡 Hint: \(O,T,Q\) lie on the same straight line, so \(\angle POQ = \angle POT\). Then use the
+        isosceles triangle \(OPR\) (two radii) and the angle at the centre.
+      </div>
+
+      <ol class="steps-list">
+        <div class="step" data-step="1">
+          <span class="stag">STEP 1 · Same Line <span class="reason">collinear O, T, Q</span></span>
+          Since \(O,\,T,\,Q\) are collinear,
+          \[ \angle POQ=\angle POT=82^\circ. \]
+        </div>
+
+        <div class="step" data-step="2">
+          <span class="stag">STEP 2 · Triangle \(POT\)</span>
+          💡 \(T\) lies on \(OQ\), so \(PTH\) is not straight — instead use angles on a straight line at \(T\):
+          \[ \angle PTO=180^\circ-104^\circ=76^\circ. \]
+          Angle sum of \(\triangle POT\):
+          \[ \angle OPT=180^\circ-82^\circ-76^\circ=22^\circ. \]
+        </div>
+
+        <div class="step" data-step="3">
+          <span class="stag">STEP 3 · Isosceles \(\triangle OPR\)</span>
+          \(OP=OR\) (radii of the same circle), so
+          \[ \angle ORP=\angle OPR=22^\circ \]
+          \[ \angle POR=180^\circ-2(22^\circ)=136^\circ. \]
+        </div>
+
+        <div class="step" data-step="4">
+          <span class="stag">STEP 4 · Angle at the centre</span>
+          Since \(OQ\) lies inside \(\angle POR\),
+          \[ \angle QOR=\angle POR-\angle POQ=136^\circ-82^\circ=54^\circ. \]
+        </div>
+
+        <div class="step" data-step="5">
+          <span class="stag">STEP 5 · Angle at the circumference</span>
+          The angle subtended by arc \(QR\) at the circumference is half the central angle:
+          \[ \angle QSR=\tfrac12\,\angle QOR=\tfrac12(54^\circ)=27^\circ. \]
+        </div>
+      </ol>
+
+      <div class="answer"><span class="letter">B</span> &nbsp;\(\angle QSR = 27^\circ\)</div>
+    </section>
   </div>
 </div>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
 
+<script>
+(function(){
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+  let mode = 1;
+
+  // ---------- Geometry (uniform scale, orientation matching exam figure) ----------
+  const cx = W*0.5, cy = H*0.52;
+  const R  = Math.min(W,H)*0.40;
+
+  const rad = d => d*Math.PI/180;
+
+  // Place P at angle 82° below the OQ line, with Q on the OQ ray.
+  // Let OQ point along direction 0° (to the right-ish, down-right as in figure).
+  // We define angles measured from +x axis, y downward on canvas.
+  // Choose OQ direction = 12° (down-right), P at 12°+82° = 94° (down-left).
+  const dirQ = rad(8);            // OQ direction on screen
+  const dirP = dirQ + rad(82);    // OP at 82° from OQ
+
+  function pt(angleDeg, r){
+    const a = rad(angleDeg);
+    return { x: cx + r*Math.cos(a), y: cy + r*Math.sin(a) };
+  }
+
+  const Q = pt(8, R);
+  const P = pt(8+82, R);          // OP 82° from OQ
+
+  // R must satisfy: POR = 136° (isosceles OPR with base 22°).
+  // OP direction = 90°, so OR = 90° - 136° = -46° (up-right)
+  const Rpt = pt(8+82-136, R);    // = -46°
+
+  // S: on circle such that QSR = 27° -> arc QR central angle 54°.
+  // S lies on the major side; choose S so that chord PS appears as in figure.
+  // Put S at angle 8 - 54 = -46 (same as R) -- no. Use S on the left.
+  // The figure shows S on left, roughly opposite R.
+  const S = pt(8+82-136-54-180, R); // place S roughly at left
+  // Fallback: ensure S is on the left side
+  // Let's recompute: central angle QOR = 54°, so Q at 8°, R at 8-54 = -46°
+  // S is on the major arc QR, angle QSR = 27°. Choose S at angle 8+180 = 188° (left side)
+  const Spt = pt(8+180, R);
+
+  // O
+  const O = { x: cx, y: cy };
+
+  // T = intersection of PR and OQ
+  function lineInt(a,b,c,d){
+    const r = {x:b.x-a.x, y:b.y-a.y};
+    const s = {x:d.x-c.x, y:d.y-c.y};
+    const den = r.x*s.y - r.y*s.x;
+    const t = ((c.x-a.x)*s.y - (c.y-a.y)*s.x)/den;
+    return { x:a.x + t*r.x, y:a.y + t*r.y };
+  }
+  const T = lineInt(P, Rpt, O, Q);
+
+  // ---------- Drawing helpers ----------
+  function line(a,b,color,w,dash){
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = w || 2;
+    ctx.setLineDash(dash || []);
+    ctx.beginPath();
+    ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y);
+    ctx.stroke();
+    ctx.restore();
+  }
+  function circle(c,r,color,w,dash){
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = w || 2;
+    ctx.setLineDash(dash || []);
+    ctx.beginPath();
+    ctx.arc(c.x,c.y,r,0,Math.PI*2);
+    ctx.stroke();
+    ctx.restore();
+  }
+  function dot(p,color,r,label,dx,dy){
+    ctx.save();
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,r||5,0,Math.PI*2);
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.restore();
+    if(label){
+      ctx.save();
+      ctx.fillStyle = color;
+      ctx.font = 'bold 16px "Segoe UI",Arial';
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText(label, p.x+(dx||0), p.y+(dy||0));
+      ctx.restore();
+    }
+  }
+  function angleArc(vertex, p1, p2, color, radius, label, labelOff, filled){
+    const a1 = Math.atan2(p1.y-vertex.y, p1.x-vertex.x);
+    const a2 = Math.atan2(p2.y-vertex.y, p2.x-vertex.x);
+    let start = a1, end = a2;
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(vertex.x, vertex.y, radius, start, end, false);
+    if(filled){ ctx.fillStyle = color+'33'; ctx.fill(); }
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.restore();
+    if(label){
+      const mid = (start+end)/2;
+      const lx = vertex.x + (radius+labelOff||16)*Math.cos(mid);
+      const ly = vertex.y + (radius+labelOff||16)*Math.sin(mid);
+      ctx.save();
+      ctx.fillStyle = color;
+      ctx.font = 'bold 14px "Segoe UI",Arial';
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText(label, lx, ly);
+      ctx.restore();
+    }
+  }
+
+  // ---------- Draw ----------
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+
+    // background grid
+    ctx.save();
+    ctx.strokeStyle = '#e8eef7';
+    ctx.lineWidth = 1;
+    for(let x=0;x<W;x+=40){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+    for(let y=0;y<H;y+=40){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+    ctx.restore();
+
+    // --- circle ---
+    circle(O, R, '#1e40af', 2.5);
+
+    // --- chords (base, grey) ---
+    line(P, Rpt, '#94a3b8', 1.6, [6,5]);
+    line(O, Q,   '#94a3b8', 1.6, [6,5]);
+    line(Spt, Rpt, '#94a3b8', 1.6, [6,5]);
+    line(P, Q,   '#94a3b8', 1.6, [6,5]);
+    line(P, Spt, '#94a3b8', 1.6, [6,5]);
+
+    // --- Step-specific highlights ---
+    if(mode === 1){
+      line(O, Q, '#059669', 3.2);
+      line(O, P, '#2563eb', 3.2);
+      angleArc(O, P, Q, '#059669', 46, '82°', 20);
+      dot(O,'#7c3aed',6,'O',-16,-14);
+      dot(P,'#111827',5,'P',-16,14);
+      dot(Q,'#059669',5,'Q',16,8);
+    }
+    if(mode === 2){
+      line(P, T, '#dc2626', 3.2);
+      line(O, T, '#059669', 3.2);
+      line(O, P, '#2563eb', 3.2);
+      angleArc(T, P, Q, '#dc2626', 26, '104°', 22);
+      angleArc(T, P, O, '#7c3aed', 38, '76°', 20);
+      angleArc(P, O, Rpt, '#d97706', 30, '22°', 20);
+      dot(O,'#7c3aed',6,'O',-16,-14);
+      dot(P,'#111827',5,'P',-16,14);
+      dot(T,'#d97706',6,'T',14,-8);
+      dot(Q,'#059669',5,'Q',16,8);
+    }
+    if(mode === 3){
+      line(O, P, '#2563eb', 3.2);
+      line(O, Rpt, '#2563eb', 3.2);
+      line(P, Rpt, '#dc2626', 3.2);
+      angleArc(O, P, Rpt, '#2563eb', 40, '136°', 24);
+      angleArc(P, O, Rpt, '#d97706', 26, '22°', 18);
+      angleArc(Rpt, O, P, '#d97706', 26, '22°', 18);
+      dot(O,'#7c3aed',6,'O',-16,-14);
+      dot(P,'#111827',5,'P',-16,14);
+      dot(Rpt,'#dc2626',5,'R',16,-8);
+    }
+    if(mode === 4){
+      line(O, P, '#2563eb', 3.2);
+      line(O, Rpt, '#2563eb', 3.2);
+      line(O, Q, '#059669', 3.2);
+      angleArc(O, P, Q, '#059669', 40, '82°', 20);
+      angleArc(O, Q, Rpt, '#db2777', 40, '54°', 18);
+      angleArc(O, P, Rpt, '#2563eb', 56, '136°', 20);
+      dot(O,'#7c3aed',6,'O',-16,-14);
+      dot(P,'#111827',5,'P',-16,14);
+      dot(Q,'#059669',5,'Q',16,8);
+      dot(Rpt,'#dc2626',5,'R',16,-8);
+    }
+    if(mode === 5){
+      line(O, Q, '#059669', 3.2);
+      line(O, Rpt, '#2563eb', 3.2);
+      line(Spt, Q, '#db2777', 3.2);
+      line(Spt, Rpt, '#db2777', 3.2);
+      angleArc(O, Q, Rpt, '#059669', 36, '54°', 16);
+      angleArc(Spt, Q, Rpt, '#db2777', 40, '27°', 22);
+      dot(O,'#7c3aed',6,'O',-16,-14);
+      dot(Q,'#059669',5,'Q',16,8);
+      dot(Rpt,'#dc2626',5,'R',16,-8);
+      dot(Spt,'#db2777',5,'S',-17,0);
+    }
+
+    // --- Points labels (always) ---
+    dot(O,'#7c3aed',6,'O',-16,-14);
+    dot(P,'#111827',5,'P',-16,14);
+    dot(Q,'#059669',5,'Q',16,8);
+    dot(Rpt,'#dc2626',5,'R',16,-8);
+    dot(Spt,'#db2777',5,'S',-17,0);
+    if(mode===1 || mode===2){
+      dot(T,'#d97706',6,'T',14,-8);
+    }
+  }
+
+  draw();
+
+  // ---------- Scroll-sync ----------
+  const steps=Array.from(document.querySelectorAll('.step'));
+  const obs=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){
+    const m=+e.target.dataset.step; mode=m;
+    steps.forEach(st=>st.classList.toggle('active',st===e.target)); draw();}});},
+    {rootMargin:'-15% 0px -55% 0px',threshold:0});
+  steps.forEach(st=>obs.observe(st));
+
+  // resize-independent redraw (canvas uses fixed internal coords)
+  window.addEventListener('resize', ()=>draw());
+})();
+</script>
 </body>
 </html>

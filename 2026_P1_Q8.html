@@ -3,116 +3,489 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HKDSE 2026 Paper 1 Q8 · Similar Triangles & Congruence (SAS)</title>
+<title>HKDSE 2026 P1 Q8 · Similar Triangles & Congruence</title>
 <script>
-  window.MathJax = {
-    tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['\\[','\\]']] },
-    svg: { fontCache: 'global' }
+  MathJax = {
+    tex: {inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']]},
+    svg: {fontCache: 'global'}
   };
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
-  :root{--blue:#1d4ed8;--blue-light:#3b82f6;--amber:#f59e0b;--amber-bg:#fffbeb;--emerald:#059669;--emerald-bg:#ecfdf5;--slate:#0f172a;--slate-soft:#475569;--line:#e2e8f0;--card:#ffffff;--bg:#f1f5f9;}
-  *{box-sizing:border-box;} html,body{margin:0;padding:0;}
-  body{font-family:"Segoe UI",system-ui,-apple-system,Helvetica,Arial,sans-serif;color:var(--slate);background:var(--bg);line-height:1.6;-webkit-font-smoothing:antialiased;}
-  .wrap{max-width:920px;margin:0 auto;padding:0 16px 60px;}
-  .hero{background:linear-gradient(120deg,#0f172a,#1e3a8a 45%,#2563eb);color:#fff;padding:32px 20px 28px;}
-  .hero .tag{display:inline-block;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;background:rgba(255,255,255,.16);border-radius:99px;padding:3px 12px;margin-bottom:10px;}
-  .hero h1{margin:0;font-size:1.5rem;font-weight:800;}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin:18px 0;box-shadow:0 1px 3px rgba(15,23,42,.06);}
-  .card h2{margin:0 0 10px;font-size:1.05rem;color:var(--blue);}
-  .question{font-size:1.08rem;}
-  .question ol,.question ul{margin:10px 0;padding-left:22px;}
-  .marks{color:var(--slate-soft);font-size:.85rem;font-style:italic;}
-  .step{border-left:3px solid var(--blue-light);background:#f8fafc;border-radius:8px;padding:12px 16px;margin:12px 0;}
-  .step .step-tag{display:inline-block;font-size:.7rem;font-weight:700;color:#fff;background:var(--blue);border-radius:99px;padding:2px 10px;margin-bottom:8px;}
-  .ans{background:var(--emerald-bg);border:1px solid #6ee7b7;border-radius:10px;padding:14px 18px;font-weight:600;margin:16px 0;}
-  .hint{background:var(--amber-bg);border:1px solid #fcd34d;border-radius:10px;padding:10px 16px;font-size:.9rem;color:#92400e;margin:10px 0;}
-  .mono{font-family:ui-monospace,Consolas,monospace;}
+  *{box-sizing:border-box;}
+  body{
+    margin:0;padding:12px;
+    font-family:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',sans-serif;
+    background:linear-gradient(135deg,#eef4ff 0%,#f7f0ff 55%,#eafaf7 100%);
+    color:#1f2937;
+    min-height:100vh;
+  }
+  h1{
+    font-size:1.15rem;margin:4px 6px 12px;
+    color:#1e3a8a;letter-spacing:.3px;
+  }
+  h1 small{display:block;font-weight:500;color:#6d28d9;font-size:.78rem;margin-top:3px;letter-spacing:.5px;}
+
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start;}
+  @media(min-width:900px){.split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}}
+
+  .panel{
+    background:#ffffff;
+    border-radius:16px;
+    padding:14px;
+    box-shadow:0 8px 24px rgba(30,64,175,.10),0 2px 6px rgba(0,0,0,.04);
+    border:1px solid #e5e7eb;
+  }
+  .diagram{position:sticky;top:16px;max-height:calc(100vh - 2rem);overflow-y:auto;}
+
+  canvas{width:100%;height:auto;display:block;border-radius:12px;background:#fbfdff;}
+
+  .legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;font-size:.72rem;color:#374151;}
+  .legend span{display:inline-flex;align-items:center;gap:5px;background:#f8fafc;padding:3px 8px;border-radius:999px;border:1px solid #e5e7eb;}
+  .dot{width:10px;height:10px;border-radius:50%;display:inline-block;}
+
+  .qtag{
+    display:inline-block;background:linear-gradient(90deg,#2563eb,#7c3aed);
+    color:#fff;font-size:.68rem;font-weight:700;letter-spacing:1px;
+    padding:4px 10px;border-radius:999px;margin-bottom:8px;
+  }
+  .question{font-size:.86rem;line-height:1.65;}
+  .question p{margin:6px 0;}
+
+  .step{
+    border:1px solid #e5e7eb;border-left:5px solid #cbd5e1;
+    background:#fcfdff;border-radius:12px;
+    padding:10px 12px;margin-top:12px;
+    transition:all .25s ease;
+    font-size:.83rem;line-height:1.6;
+  }
+  .step.active{
+    border-left-color:#2563eb;
+    background:linear-gradient(90deg,#eff6ff,#ffffff);
+    box-shadow:0 6px 18px rgba(37,99,235,.15);
+  }
+  .step .stag{
+    font-weight:800;font-size:.72rem;letter-spacing:.8px;
+    color:#7c3aed;text-transform:uppercase;margin-bottom:4px;display:block;
+  }
+  .step.active .stag{color:#2563eb;}
+  .step p{margin:4px 0;}
+
+  .answer{
+    margin-top:14px;padding:12px 14px;border-radius:12px;
+    background:linear-gradient(135deg,#ecfdf5,#eff6ff);
+    border:1.5px solid #34d399;font-size:.85rem;font-weight:600;color:#065f46;
+  }
+
+  .hint{
+    background:#fff7ed;border:1px dashed #fb923c;border-radius:10px;
+    padding:8px 11px;font-size:.76rem;color:#9a3412;margin-top:10px;
+  }
+
+  .figure-slot{
+    margin:10px 0;border:1.5px dashed #c7d2fe;border-radius:10px;
+    background:#f5f7ff;min-height:30px;
+  }
+
+  @media(max-width:600px){
+    body{padding:6px;}
+    .panel{padding:9px;border-radius:12px;}
+    h1{font-size:.9rem;}
+    .question{font-size:.72rem;}
+    .step{font-size:.7rem;padding:8px;}
+    .legend{font-size:.6rem;}
+  }
 </style>
 </head>
 <body>
-<div class="hero">
-  <div class="wrap">
-    <span class="tag">HKDSE 2026 · Paper 1 · Q8</span>
-    <h1>Similar Triangles & Congruence (SAS)</h1>
-  </div>
+
+<h1>HKDSE 2026 · Paper 1 · Question 8
+  <small>Similar Triangles &amp; Congruence (SAS)</small>
+</h1>
+
+<div class="split">
+
+  <!-- LEFT: DIAGRAM -->
+  <section class="panel diagram">
+    <canvas id="cv" width="640" height="600"></canvas>
+    <div class="legend">
+      <span><i class="dot" style="background:#2563eb"></i>△ABC</span>
+      <span><i class="dot" style="background:#7c3aed"></i>△CEF</span>
+      <span><i class="dot" style="background:#ef4444"></i>BD / EF equal</span>
+      <span><i class="dot" style="background:#f59e0b"></i>Vertex</span>
+      <span><i class="dot" style="background:#10b981"></i>Equal sides</span>
+    </div>
+  </section>
+
+  <!-- RIGHT: QUESTION + SOLUTION -->
+  <section class="panel">
+    <span class="qtag">HKDSE 2026 · P1 · Q8</span>
+    <div class="question">
+      <p>In Figure 1, $ABC$ is a triangle. $D$ is a point lying on $AB$. Let $E$ and $F$ be points lying on $CB$ produced and $CD$ produced respectively such that $BD \parallel EF$ and $BC=EF$. It is given that $BD=8\text{ cm}$ and $BE=6\text{ cm}$.</p>
+      <p><b>(a)</b> By considering a pair of similar triangles, find the length of $BC$.</p>
+      <p><b>(b)</b> Suppose that $AD=10\text{ cm}$. Prove that $\triangle ABC \cong \triangle CEF$. (5 marks)</p>
+    </div>
+
+    <figure style="margin:12px 0;text-align:center;"><img src="figures/figures/2026_P1_8.png" alt="Original figure" style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:10px;background:#fff;"><figcaption style="font-size:.78rem;color:#64748b;margin-top:6px;">Figure (original exam diagram)</figcaption></figure>
+
+    <div class="step" data-step="1">
+      <span class="stag">Step 1 · Identify similar triangles</span>
+      <p>Let $BC=x$. Since $E$ lies on $CB$ produced, $C,B,E$ are collinear; since $F$ lies on $CD$ produced, $C,D,F$ are collinear.</p>
+      <p>In $\triangle CFE$, the segment $DB$ joins points on $CF$ and $CE$, and $DB\parallel FE$, so</p>
+      <p>\[ \triangle CDB \sim \triangle CFE \]</p>
+      <p>(corresponding angles equal, e.g. $\angle CDB=\angle CFE$).</p>
+    </div>
+
+    <div class="step" data-step="2">
+      <span class="stag">Step 2 · Use the ratio of sides</span>
+      <p>\[ \frac{CB}{CE}=\frac{DB}{FE} \implies \frac{x}{x+6}=\frac{8}{x} \]</p>
+      <p>(because $EF=BC=x$ and $CE=CB+BE=x+6$). Hence</p>
+      <p>\[ x^2=8(x+6) \implies x^2-8x-48=0 \implies (x-12)(x+4)=0 \]</p>
+      <p>Since $x>0$: \[ BC=12\text{ cm} \]</p>
+    </div>
+
+    <div class="step" data-step="3">
+      <span class="stag">Step 3 · Part (b) — gather the SAS ingredients</span>
+      <p><b>Side 1:</b> $AB=AD+DB=10+8=18$ and $CE=CB+BE=12+6=18$, so</p>
+      <p>\[ AB=CE \]</p>
+      <p><b>Side 2:</b> given $BC=EF$ (both $=12$).</p>
+    </div>
+
+    <div class="step" data-step="4">
+      <span class="stag">Step 4 · The included angle</span>
+      <p>Since $BD\parallel EF$ and $CBE$ is a straight line, corresponding angles give</p>
+      <p>\[ \angle DBC=\angle FEC \]</p>
+      <p>and since $D$ lies on $AB$, ray $BD$ is ray $BA$, so $\angle ABC=\angle DBC$. Therefore</p>
+      <p>\[ \angle ABC=\angle CEF \]</p>
+      <p>which is the included angle between the two pairs of equal sides.</p>
+    </div>
+
+    <div class="step" data-step="5">
+      <span class="stag">Step 5 · Conclusion</span>
+      <p>In $\triangle ABC$ and $\triangle CEF$:</p>
+      <p>\[ AB=CE,\quad \angle ABC=\angle CEF,\quad BC=EF \]</p>
+      <p>\[ \therefore\;\triangle ABC\cong\triangle CEF\ \ (\text{SAS})\ \qquad\blacksquare \]</p>
+    </div>
+
+    <div class="answer">
+      (a) $BC=12$ cm &nbsp;&nbsp; (b) $\triangle ABC\cong\triangle CEF$ proved by SAS.
+    </div>
+
+    <div class="hint">
+      💡 Tip: Parallel lines $BD\parallel EF$ create the similar triangle pair $CDB\sim CFE$ — always look for the “bow-tie” shape first.
+    </div>
+  </section>
+
 </div>
-<div class="wrap">
-  <div class="card question">
-    <h2>Question</h2>
-    In Figure 1, \(ABC\) is a triangle. \(D\) is a point lying on \(AB\). Let \(E\) and \(F\) be points lying on \(CB\) produced and \(CD\) produced respectively such that \(BD \;/\!/\; EF\) and \(BC=EF\). It is given that \(BD=8\text{ cm}\) and \(BE=6\text{ cm}\).<br>(a) By considering a pair of similar triangles, find the length of \(BC\).<br>(b) Suppose that \(AD=10\text{ cm}\). Prove that \(\triangle ABC \cong \triangle CEF\). <span class="marks">(5 marks)</span>
-  </div>
-<section style="margin:16px 0;padding:16px;background:var(--bg,#fff);border:1px solid #e2e8f0;border-radius:10px;">
-  <h2 style="font-size:1rem;font-weight:600;margin:0 0 10px;color:var(--fg,#1a1a1a);">Original Figure</h2>
-  <div style="text-align:center;">
-    <img src="figures/2026_P1_8.png" alt="Original figure" style="max-width:100%;height:auto;border-radius:6px;">
-  </div>
-</section>
 
+<script>
+(function(){
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  let mode = 1;
+  let W, H;
 
-  <div class="card">
-    <h2>Solution</h2>
-    <div class="step"><span class="step-tag">PART (a) — identify similar triangles</span><br>
-Let \(BC=x\). Since \(E\) lies on \(CB\) produced, \(C\), \(B\), \(E\) are collinear; since \(F\) lies on \(CD\) produced, \(C\), \(D\), \(F\) are collinear. In \(\triangle CFE\), the segment \(DB\) joins points on \(CF\) and \(CE\), and \(DB\parallel FE\), so
-\[ \triangle CDB \sim \triangle CFE \]
-(corresponding angles are equal; e.g. \(\angle CDB=\angle CFE\)).</div>
-<div class="step"><span class="step-tag">PART (a) — use the ratio of sides</span><br>
-\[ \frac{CB}{CE}=\frac{DB}{FE} \implies \frac{x}{x+6}=\frac{8}{x} \]
-(because \(EF=BC=x\) and \(CE=CB+BE=x+6\)). Hence
-\[ x^2=8(x+6) \implies x^2-8x-48=0 \implies (x-12)(x+4)=0 \]
-Since \(x>0\):
-\[ BC=12\text{ cm} \]</div>
-<div class="step"><span class="step-tag">PART (b) — gather the three SAS ingredients</span><br>
-Side 1: \(AB=AD+DB=10+8=18\) and \(CE=CB+BE=12+6=18\), so
-\[ AB=CE \]
-Side 2: given \(BC=EF\) (both \(=12\)).
-Angle: since \(BD\parallel EF\) and \(CBE\) is a straight line, corresponding angles give
-\[ \angle DBC=\angle FEC \]
-and since \(D\) lies on \(AB\), ray \(BD\) is ray \(BA\), so \(\angle ABC=\angle DBC\). Therefore
-\[ \angle ABC=\angle CEF \]
-which is the <em>included</em> angle between the two pairs of equal sides.</div>
-<div class="step"><span class="step-tag">PART (b) — conclusion</span><br>
-In \(\triangle ABC\) and \(\triangle CEF\):
-\[ AB=CE,\quad \angle ABC=\angle CEF,\quad BC=EF \]
-\[ \therefore\;\triangle ABC\cong\triangle CEF\ \ (\text{SAS})\ \qquad\blacksquare \]</div>
-  </div>
+  // ---- Real-world coordinates (cm) ----
+  // Build a proper geometry so shapes are similar/accurate.
+  // We take C at origin, CB along +x axis on base.
+  // AB = 18, BC = 12, and (from figure) A is above between C and B.
+  // We choose A such that the figure looks like the original: A above, D on AB, F on CD extended beyond D.
+  // Coordinates in "cm":
+  // C = (0,0)
+  // B = (12,0)
+  // E on CB produced beyond B: BE = 6 -> E = (18,0)
+  // A: AB = 18. Also BD=8 along BA. We pick A so that AB=18 and A is left-ish above C.
+  // Choose A = (6, 17) approx to keep figure looking like original (steep triangle).
+  // Actually to match the figure, A should be fairly above and between C & B; let's compute a plausible A.
+  // Use AD = 10, DB = 8 => AB=18, D between A and B with AD=10.
+  // Choose A such that |AB|=18 and A above. To match original, A is roughly (8,17).
+  // We will set A = (7, 16.7) and then verify AB length. Let's just pick A so AB=18 exactly.
+  // Place A above B shifted left: A = (Bx - 10, sqrt(18^2 - 10^2)) = (2, sqrt(324-100)) = (2, sqrt(224)=14.9666)
+  // That gives A near x=2 which is between C and B, above. Good match.
+  const Bx = 12, By = 0;
+  const AB = 18, AD = 10, DB = 8;
+  // A offset from B by vector of length 18, choose direction to match figure (A up-left of B)
+  // dx = -10, dy = sqrt(18^2 - 10^2)
+  const dy = Math.sqrt(AB*AB - 100);
+  const Ax = Bx - 10;
+  const Ay = -dy; // negative y = up in canvas coordinates
+  const Cx = 0, Cy = 0;
+  const Ex = 18, Ey = 0;
+  // D on AB with AD = 10 (so D = A + (A->B) * 10/18)
+  const dxAB = (Bx - Ax), dyAB = (By - Ay);
+  const Dx = Ax + dxAB * (AD/AB);
+  const Dy = Ay + dyAB * (AD/AB);
+  // F on CD produced beyond D such that BD || EF, BC = EF = 12.
+  // In triangle CFE with D on CF, B on CE, DB || FE.
+  // DB/FE = CB/CE = 12/18 = 2/3, so FE = DB * 3/2 = 8 * 1.5 = 12. ✓ consistent
+  // F lies on ray C->D extended beyond D. Position F such that FE=12 and E=(18,0), BD||EF.
+  // Vector BD = D - B; vector EF must be parallel and same direction (both from C perspective).
+  // Let F = C + t*(D-C) where t>1.
+  // Then EF = F - E must be parallel to BD = D - B.
+  // We can solve: F = t*D (since C=origin). Then F - E = t*D - E must be parallel to D - B.
+  // t*D - E = k*(D - B) for some scalar k.
+  // From figure, EF || DB and E on extension of CB. Let's solve numerically.
+  // Actually just use the constraint |FE| = 12 and F on ray CD.
+  // Since FE=12 and parallel to BD, direction of BD unit:
+  const bdLen = Math.hypot(Dx-Bx, Dy-By);
+  const bdUx = (Dx-Bx)/bdLen, bdUy = (Dy-By)/bdLen;
+  // F = E + 12 * (direction of BD). Which sign? In the figure, F is up-right of E,
+  // and BD points from B up-left to D. So F = E - 12*(bdU) if BD is up-left... let's check.
+  // From figure: E bottom right, F up-right → EF points up-right. BD points from B to D (up-left).
+  // So EF is anti-parallel to BD. Using given BD || EF.
+  // Let F = E + 12 * (-bdUx, -bdUy) → gives EF vector in direction opposite to BD.
+  // Wait, in figure D is up-left of B AND F is up-right of E, so BD and EF point opposite directions.
+  // But actual length |EF| = 12 = |BC|, good.
+  // Let's use: EF direction such that F is on ray CD extended. Solve for F on line C->D with |EF|=12.
+  // Param: P(t) = t*D. |P(t) - E| = 12.
+  // Direction of D: normalize D.
+  const dLen = Math.hypot(Dx, Dy);
+  const dUx = Dx/dLlen_placeholder = 0; // placeholder to be fixed
+  // ---- recompute cleanly ----
+  const Dmag = Math.hypot(Dx, Dy);
+  const dux = Dx/Dmag, duy = Dy/Dmag;
+  // |t*D - E|^2 = 144. E=(18,0). (t*Dx - 18)^2 + (t*Dy)^2 = 144
+  // t^2 * Dmag^2 - 36*t*Dx + 324 - 144 = 0  (since E on x-axis)
+  const aq = Dmag*Dmag;
+  const bq = -2*18*Dx;
+  const cq = 18*18 - 144;
+  const disc = bq*bq - 4*aq*cq;
+  const sq = Math.sqrt(Math.max(0, disc));
+  const t1 = (-bq + sq)/(2*aq);
+  const t2 = (-bq - sq)/(2*aq);
+  const t = Math.max(t1, t2); // choose F beyond D (t>1)
+  const Fx = t*Dx, Fy = t*Dy;
 
-  <div class="ans">
-    (a) \(BC=12\) cm &nbsp;&nbsp; (b) \(\triangle ABC\cong\triangle CEF\) proved by SAS (shown above).
-  </div>
-</div>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
+  // ---- Compute scale to fit canvas with padding ----
+  const pad = 55;
+  function bounds(){
+    const xs = [Cx,Bx,Ex,Ax,Dx,Fx];
+    const ys = [Cy,By,Ey,Ay,Dy,Fy];
+    return {minX: Math.min(...xs), maxX: Math.max(...xs),
+            minY: Math.min(...ys), maxY: Math.max(...ys)};
+  }
+
+  let scale = 1, ox = 0, oy = 0;
+  function computeTransform(){
+    W = cv.width; H = cv.height;
+    const b = bounds();
+    const w = b.maxX - b.minX, h = b.maxY - b.minY;
+    scale = Math.min((W - 2*pad)/w, (H - 2*pad)/h);
+    ox = pad + (W - 2*pad - w*scale)/2 - b.minX*scale;
+    oy = pad + (H - 2*pad - h*scale)/2 - b.minY*scale;
+  }
+  function P(x,y){ return [x*scale + ox, y*scale + oy]; }
+
+  // ---- Draw helpers ----
+  function line(a,b,color,width,dash){
+    const p = P(...a), q = P(...b);
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.setLineDash(dash||[]);
+    ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(p[0],p[1]); ctx.lineTo(q[0],q[1]); ctx.stroke();
+    ctx.restore();
+  }
+  function fillTri(pts, color){
+    ctx.save();
+    const p = pts.map(v=>P(...v));
+    ctx.beginPath(); ctx.moveTo(p[0][0],p[0][1]);
+    p.slice(1).forEach(v=>ctx.lineTo(v[0],v[1]));
+    ctx.closePath();
+    ctx.fillStyle = color; ctx.fill();
+    ctx.restore();
+  }
+  function point(a, color, label, offx, offy){
+    const p = P(...a);
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(p[0], p[1], 5.5, 0, Math.PI*2);
+    ctx.fillStyle = color; ctx.fill();
+    ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
+    if(label){
+      ctx.fillStyle = '#1f2937';
+      ctx.font = 'bold 16px "Segoe UI",sans-serif';
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText(label, p[0]+(offx||0), p[1]+(offy||0));
+    }
+    ctx.restore();
+  }
+  function arrowTick(a,b,color,size){
+    const p = P(...a), q = P(...b);
+    const midx = (p[0]+q[0])/2, midy=(p[1]+q[1])/2;
+    const ang = Math.atan2(q[1]-p[1], q[0]-p[0]);
+    ctx.save();
+    ctx.strokeStyle = color; ctx.lineWidth = 2.5; ctx.lineCap='round';
+    ctx.translate(midx,midy); ctx.rotate(ang);
+    const s = size||7;
+    ctx.beginPath(); ctx.moveTo(-s,0); ctx.lineTo(0,-s*0.5); ctx.lineTo(0,s*0.5); ctx.closePath(); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0,-s*0.5); ctx.lineTo(0,s*0.5); ctx.stroke();
+    ctx.restore();
+  }
+
+  // ---- Main draw ----
+  function draw(){
+    computeTransform();
+    ctx.clearRect(0,0,W,H);
+
+    // triangle ABC filled (light blue)
+    fillTri([[Cx,Cy],[Ax,Ay],[Bx,By]], 'rgba(37,99,235,0.10)');
+    // triangle CEF filled (light purple)
+    fillTri([[Cx,Cy],[Ex,Ey],[Fx,Fy]], 'rgba(124,58,237,0.10)');
+
+    // Base line C-B-E
+    line([Cx,Cy],[Ex,Ey], '#94a3b8', 2, []);
+
+    // Triangle ABC edges
+    line([Cx,Cy],[Ax,Ay], '#2563eb', 2.5);
+    line([Ax,Ay],[Bx,By], '#2563eb', 2.5);
+    line([Cx,Cy],[Bx,By], '#2563eb', 2.5);
+
+    // Triangle CEF edges
+    line([Cx,Cy],[Ex,Ey], '#7c3aed', 2.5);
+    line([Cx,Cy],[Fx,Fy], '#7c3aed', 2.5);
+    line([Ex,Ey],[Fx,Fy], '#7c3aed', 2.5);
+
+    // BD / EF highlighted depending on mode
+    if(mode===1 || mode===2 || mode===4){
+      line([Bx,By],[Dx,Dy], '#ef4444', 3.2);
+      line([Ex,Ey],[Fx,Fy], '#ef4444', 3.2);
+    } else {
+      line([Bx,By],[Dx,Dy], '#ef4444', 2.2);
+      line([Ex,Ey],[Fx,Fy], '#ef4444', 2.2);
+    }
+
+    // parallel marks (>>>)
+    arrowTick([Bx,By],[Dx,Dy], '#ef4444', 7);
+    arrowTick([Ex,Ey],[Fx,Fy], '#ef4444', 7);
+
+    // Equal-side marks for SAS step (step 3 & 5): AB=CE, BC=EF
+    if(mode===3 || mode===5){
+      // AB double tick
+      (function(){ const p=P(Ax,Ay), q=P(Bx,By);
+        const mx=(p[0]+q[0])/2, my=(p[1]+q[1])/2;
+        const ang=Math.atan2(q[1]-p[1],q[0]-p[0]);
+        ctx.save(); ctx.translate(mx,my); ctx.rotate(ang);
+        ctx.strokeStyle='#10b981'; ctx.lineWidth=2.5; ctx.lineCap='round';
+        for(let k=-1;k<=1;k+=2){ ctx.beginPath(); ctx.moveTo(-3, -6); ctx.lineTo(3, k*6+0); ctx.stroke(); }
+        // simpler double tick
+        ctx.beginPath();
+        ctx.moveTo(-4,-7); ctx.lineTo(4,-3); ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(-4,3); ctx.lineTo(4,7); ctx.stroke();
+        ctx.restore();
+      })();
+      // CE double tick
+      (function(){ const p=P(Cx,Cy), q=P(Ex,Ey);
+        const mx=(p[0]+q[0])/2, my=(p[1]+q[1])/2;
+        const ang=Math.atan2(q[1]-p[1],q[0]-p[0]);
+        ctx.save(); ctx.translate(mx,my); ctx.rotate(ang);
+        ctx.strokeStyle='#10b981'; ctx.lineWidth=2.5; ctx.lineCap='round';
+        ctx.beginPath(); ctx.moveTo(-4,-7); ctx.lineTo(4,-3); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(-4,3); ctx.lineTo(4,7); ctx.stroke();
+        ctx.restore();
+      })();
+      // BC = EF single tick style
+      (function(){ const p=P(Bx,By), q=P(Cx,Cy);
+        const mx=(p[0]+q[0])/2, my=(p[1]+q[1])/2;
+        const ang=Math.atan2(q[1]-p[1],q[0]-p[0]);
+        ctx.save(); ctx.translate(mx,my); ctx.rotate(ang);
+        ctx.strokeStyle='#f59e0b'; ctx.lineWidth=2.5; ctx.lineCap='round';
+        ctx.beginPath(); ctx.moveTo(0,-6); ctx.lineTo(0,6); ctx.stroke();
+        ctx.restore();
+      })();
+      (function(){ const p=P(Ex,Ey), q=P(Fx,Fy);
+        const mx=(p[0]+q[0])/2, my=(p[1]+q[1])/2;
+        const ang=Math.atan2(q[1]-p[1],q[0]-p[0]);
+        ctx.save(); ctx.translate(mx,my); ctx.rotate(ang);
+        ctx.strokeStyle='#f59e0b'; ctx.lineWidth=2.5; ctx.lineCap='round';
+        ctx.beginPath(); ctx.moveTo(0,-6); ctx.lineTo(0,6); ctx.stroke();
+        ctx.restore();
+      })();
+    }
+
+    // Angle marks for step 4 & 5
+    if(mode===4 || mode===5){
+      // angle at B in triangle ABC (between BC and BA)
+      drawAngleArc(Bx,By, Cx,Cy, Ax,Ay, '#0ea5e9', 22);
+      // angle at E in triangle CEF (between EC and EF)
+      drawAngleArc(Ex,Ey, Cx,Cy, Fx,Fy, '#db2777', 22);
+    }
+
+    // Vertices
+    point([Ax,Ay], '#f59e0b', 'A', 0, -18);
+    point([Bx,By], '#f59e0b', 'B', 0, 18);
+    point([Cx,Cy], '#f59e0b', 'C', -16, 12);
+    point([Dx,Dy], '#f59e0b', 'D', -16, -8);
+    point([Ex,Ey], '#f59e0b', 'E', 12, 14);
+    point([Fx,Fy], '#f59e0b', 'F', 4, -16);
+
+    // Labels for equal lengths (BD=8, BE=6)
+    drawMidLabel([Bx,By],[Dx,Dy], '8', '#ef4444');
+    drawMidLabel([Bx,By],[Ex,Ey], '6', '#0ea5e9');
+
+    // In-plot caption
+    ctx.save();
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = 'italic 12px "Segoe UI",sans-serif';
+    ctx.textAlign='right';
+    ctx.fillText('Figure 1 (not to scale)', W-12, H-10);
+    ctx.restore();
+  }
+
+  function drawMidLabel(a,b,txt,color){
+    const p = P(...a), q = P(...b);
+    const mx = (p[0]+q[0])/2, my = (p[1]+q[1])/2;
+    const ang = Math.atan2(q[1]-p[1], q[0]-p[0]);
+    ctx.save();
+    ctx.translate(mx,my); ctx.rotate(ang);
+    ctx.fillStyle = color;
+    ctx.font = 'bold 13px "Segoe UI",sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='bottom';
+    ctx.fillText(txt, 0, -6);
+    ctx.restore();
+  }
+
+  function drawAngleArc(vertex, p1, p2, color, r){
+    const v = P(...vertex), a = P(...p1), b = P(...p2);
+    const a1 = Math.atan2(a[1]-v[1], a[0]-v[0]);
+    const a2 = Math.atan2(b[1]-v[1], b[0]-v[0]);
+    let diff = a2 - a1;
+    while(diff > Math.PI) diff -= 2*Math.PI;
+    while(diff < -Math.PI) diff += 2*Math.PI;
+    ctx.save();
+    ctx.strokeStyle = color; ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.arc(v[0], v[1], r, a1, a1 + diff, diff < 0);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // ---- Scroll sync ----
+  const steps = Array.from(document.querySelectorAll('.step'));
+  const obs = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        const m = +e.target.dataset.step;
+        mode = m;
+        steps.forEach(st=>st.classList.toggle('active', st===e.target));
+        draw();
+      }
+    });
+  }, {rootMargin:'-15% 0px -55% 0px', threshold:0});
+  steps.forEach(st=>obs.observe(st));
+
+  // Initial highlight
+  if(steps[0]) steps[0].classList.add('active');
+
+  // Redraw on resize
+  let raf;
+  window.addEventListener('resize', ()=>{ cancelAnimationFrame(raf); raf = requestAnimationFrame(draw); });
+
+  // First draw
+  draw();
+})();
 </script>
-
 </body>
 </html>

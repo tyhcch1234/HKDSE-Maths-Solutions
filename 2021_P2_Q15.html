@@ -3,109 +3,512 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HKDSE 2021 Paper 2 MC15 · Total Surface Area of a Right Prism (Hexagonal Base)</title>
+<title>HKDSE 2021 P2 MC15 · Hexagonal Prism TSA</title>
 <script>
   window.MathJax = {
-    tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['\\[','\\]']] },
+    tex: {
+      inlineMath: [['$','$'],['\\(','\\)']],
+      displayMath: [['$$','$$'],['\\[','\\]']]
+    },
     svg: { fontCache: 'global' }
   };
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
-  :root{--blue:#1d4ed8;--blue-light:#3b82f6;--amber:#f59e0b;--amber-bg:#fffbeb;--emerald:#059669;--emerald-bg:#ecfdf5;--slate:#0f172a;--slate-soft:#475569;--line:#e2e8f0;--card:#ffffff;--bg:#f1f5f9;}
-  *{box-sizing:border-box;} html,body{margin:0;padding:0;}
-  body{font-family:"Segoe UI",system-ui,-apple-system,Helvetica,Arial,sans-serif;color:var(--slate);background:var(--bg);line-height:1.6;-webkit-font-smoothing:antialiased;}
-  .wrap{max-width:920px;margin:0 auto;padding:0 16px 60px;}
-  .hero{background:linear-gradient(120deg,#0f172a,#1e3a8a 45%,#2563eb);color:#fff;padding:32px 20px 28px;}
-  .hero .tag{display:inline-block;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;background:rgba(255,255,255,.16);border-radius:99px;padding:3px 12px;margin-bottom:10px;}
-  .hero h1{margin:0;font-size:1.5rem;font-weight:800;}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin:18px 0;box-shadow:0 1px 3px rgba(15,23,42,.06);}
-  .card h2{margin:0 0 10px;font-size:1.05rem;color:var(--blue);}
-  .question{font-size:1.08rem;}
-  .question ol,.question ul{margin:10px 0;padding-left:22px;}
-  .marks{color:var(--slate-soft);font-size:.85rem;font-style:italic;}
-  .step{border-left:3px solid var(--blue-light);background:#f8fafc;border-radius:8px;padding:12px 16px;margin:12px 0;}
-  .step .step-tag{display:inline-block;font-size:.7rem;font-weight:700;color:#fff;background:var(--blue);border-radius:99px;padding:2px 10px;margin-bottom:8px;}
-  .ans{background:var(--emerald-bg);border:1px solid #6ee7b7;border-radius:10px;padding:14px 18px;font-weight:600;margin:16px 0;}
-  .hint{background:var(--amber-bg);border:1px solid #fcd34d;border-radius:10px;padding:10px 16px;font-size:.9rem;color:#92400e;margin:10px 0;}
-  .mono{font-family:ui-monospace,Consolas,monospace;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif;
+    background:linear-gradient(135deg,#eef4ff 0%,#f8fbff 40%,#eefcf6 100%);
+    color:#1c2b3a;
+    padding:14px;
+    min-height:100vh;
+  }
+  header.top{
+    max-width:1200px;margin:0 auto 14px;
+    background:linear-gradient(120deg,#3b82f6,#6366f1 45%,#8b5cf6);
+    color:#fff;padding:12px 18px;border-radius:16px;
+    box-shadow:0 8px 22px rgba(59,130,246,.28);
+    display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  }
+  header.top h1{font-size:1.02rem;font-weight:600;letter-spacing:.2px;}
+  header.top .badge{
+    background:rgba(255,255,255,.22);padding:3px 10px;border-radius:999px;
+    font-size:.72rem;font-weight:700;letter-spacing:.4px;
+  }
+  .split{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    gap:12px;align-items:start;
+    max-width:1200px;margin:0 auto;
+  }
+  @media(min-width:900px){
+    .split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}
+  }
+  .panel{
+    background:#fff;border-radius:16px;
+    box-shadow:0 6px 20px rgba(30,60,110,.10);
+    padding:14px;
+  }
+  .diagram{
+    position:sticky;top:16px;
+    max-height:calc(100vh - 2rem);
+    overflow-y:auto;
+  }
+  .diagram h2{
+    font-size:.86rem;text-transform:uppercase;letter-spacing:.8px;
+    color:#64748b;margin-bottom:10px;font-weight:700;
+  }
+  canvas{width:100%;height:auto;display:block;border-radius:12px;background:#fbfdff;}
+  .legend{
+    display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:10px;
+    font-size:.72rem;color:#334155;
+  }
+  .legend span{display:inline-flex;align-items:center;gap:5px;}
+  .swatch{width:12px;height:12px;border-radius:3px;display:inline-block;}
+  .legend .note{
+    display:block;width:100%;color:#94a3b8;font-size:.68rem;margin-top:4px;
+  }
+  .qhead{
+    font-size:.74rem;font-weight:700;color:#8b5cf6;
+    letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;
+  }
+  .qtext{font-size:.92rem;line-height:1.6;margin-bottom:10px;}
+  .choices{
+    display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;margin:12px 0 6px;
+  }
+  .choice{
+    background:#f1f5ff;border:1.5px solid #dbe4ff;border-radius:10px;
+    padding:8px 10px;font-size:.86rem;font-weight:600;color:#26364d;
+  }
+  .choice.correct{
+    background:#e8fbf1;border-color:#34d399;color:#047857;
+    box-shadow:0 4px 12px rgba(52,211,153,.25);
+  }
+  .steps{margin-top:14px;display:flex;flex-direction:column;gap:10px;}
+  .step{
+    border:1.5px solid #e6ecf5;border-radius:12px;
+    padding:10px 12px;background:#fcfdff;
+    transition:border-color .25s,box-shadow .25s,background .25s;
+  }
+  .step.active{
+    border-color:#6366f1;background:#f7f9ff;
+    box-shadow:0 6px 18px rgba(99,102,241,.16);
+  }
+  .step .tag{
+    display:inline-block;font-size:.7rem;font-weight:800;
+    letter-spacing:.6px;color:#fff;background:#6366f1;
+    padding:3px 9px;border-radius:999px;margin-bottom:8px;
+  }
+  .step:nth-child(2) .tag{background:#0ea5e9;}
+  .step:nth-child(3) .tag{background:#10b981;}
+  .step:nth-child(4) .tag{background:#f59e0b;}
+  .step .m{font-size:.9rem;line-height:1.5;}
+  .answer{
+    margin-top:14px;padding:12px 14px;border-radius:12px;
+    background:linear-gradient(120deg,#ecfdf5,#e0f2fe);
+    border:1.5px solid #34d399;font-size:.95rem;font-weight:700;color:#065f46;
+    display:flex;align-items:center;gap:10px;
+  }
+  .answer .k{
+    background:#10b981;color:#fff;border-radius:8px;padding:3px 10px;font-size:.78rem;
+    letter-spacing:.5px;
+  }
+  .hint{
+    margin-top:10px;font-size:.78rem;color:#7c4a03;background:#fffbeb;
+    border:1px dashed #fbbf24;border-radius:10px;padding:8px 10px;line-height:1.5;
+  }
+  @media(max-width:600px){
+    body{padding:8px;}
+    .panel{padding:10px;border-radius:12px;}
+    .qtext{font-size:.82rem;}
+    .step .m{font-size:.8rem;}
+    .choices{grid-template-columns:1fr;}
+    canvas{border-radius:8px;}
+  }
 </style>
 </head>
 <body>
-<div class="hero">
-  <div class="wrap">
-    <span class="tag">HKDSE 2021 · Paper 2 · MC15</span>
-    <h1>Total Surface Area of a Right Prism (Hexagonal Base)</h1>
-  </div>
-</div>
-<div class="wrap">
-  <div class="card question">
-    <h2>Question</h2>
-    <p>The base of a solid right prism is a regular 6-sided polygon of side 8 cm. If the volume of the prism is 288 cm³, find the total surface area of the prism correct to the nearest cm².</p>
-    <ol type="A">
-      <li>166 cm²</li>
-      <li>249 cm²</li>
-      <li>416 cm²</li>
-      <li>748 cm²</li>
-    </ol>
-  <figure class="figure"><svg viewBox="0 0 300 210" xmlns="http://www.w3.org/2000/svg" role="img"><rect width="300" height="210" fill="#fff"/><polygon points="150,30 210,64 210,146 150,180 90,146 90,64" fill="#eef2ff" stroke="#334155" stroke-width="2"/><line x1="150" y1="30" x2="150" y2="180" stroke="#94a3b8" stroke-width="1.2"/><text x="150" y="202" font-size="11" fill="#0d9488" text-anchor="middle">regular hexagon (side 8)</text></svg><figcaption>Regular hexagonal base (not to scale)</figcaption></figure></div>
 
-  <div class="card">
-    <h2>Solution</h2>
-    <div class="step">
-      <span class="step-tag">STEP 1 · Area of the regular hexagonal base</span>
-      A regular hexagon of side \( a \) consists of 6 equilateral triangles:
-      \[ \text{Base area} = \frac{3\sqrt{3}}{2}a^{2} = \frac{3\sqrt{3}}{2}(8^{2}) = 96\sqrt{3}\ \text{cm}^{2}. \]
-    </div>
-    <div class="step">
-      <span class="step-tag">STEP 2 · Find the height from the volume</span>
-      \[ V = \text{base area} \times h \implies 288 = 96\sqrt{3}\,h \implies h = \frac{288}{96\sqrt{3}} = \frac{3}{\sqrt{3}} = \sqrt{3}\ \text{cm}. \]
-    </div>
-    <div class="step">
-      <span class="step-tag">STEP 3 · Curved (lateral) surface area</span>
-      \[ \text{Curved area} = \text{perimeter} \times h = (6\times8)\times\sqrt{3} = 48\sqrt{3}\ \text{cm}^{2}. \]
-    </div>
-    <div class="step">
-      <span class="step-tag">STEP 4 · Total surface area</span>
-      \[ \text{TSA} = 2\times96\sqrt{3} + 48\sqrt{3} = 240\sqrt{3} \approx 240\times1.73205 \approx 415.69 \approx 416\ \text{cm}^{2}. \]
-    </div>
-  </div>
+<header class="top">
+  <span class="badge">HKDSE 2021 · P2 · MC15</span>
+  <h1>Total Surface Area of a Right Prism (Hexagonal Base)</h1>
+</header>
 
-  <div class="ans">
-    Final Answer: C. 416 cm²
-  </div>
+<div class="split">
+
+  <!-- LEFT: STICKY DIAGRAM -->
+  <section class="panel diagram">
+    <h2>Interactive Diagram</h2>
+    <canvas id="cv" width="560" height="560"></canvas>
+    <div class="legend">
+      <span><i class="swatch" style="background:#2563eb"></i>Hexagon base (top)</span>
+      <span><i class="swatch" style="background:#f59e0b"></i>Slant / hidden base (bottom)</span>
+      <span><i class="swatch" style="background:#10b981"></i>Vertical edges (height h)</span>
+      <span><i class="swatch" style="background:#8b5cf6"></i>Centre / apothem</span>
+      <span><i class="swatch" style="background:#ef4444"></i>Active highlight</span>
+      <span class="note">Scroll the right panel — the diagram highlights the current step.</span>
+    </div>
+  </section>
+
+  <!-- RIGHT: QUESTION + SOLUTION -->
+  <section class="panel">
+    <div class="qhead">Question</div>
+    <p class="qtext">
+      The base of a solid right prism is a regular 6-sided polygon of side $8\ \text{cm}$.
+      If the volume of the prism is $288\ \text{cm}^3$, find the total surface area of the prism
+      correct to the nearest $\text{cm}^2$.
+    </p>
+
+    <div class="choices">
+      <div class="choice">A. $166\ \text{cm}^2$</div>
+      <div class="choice">B. $249\ \text{cm}^2$</div>
+      <div class="choice correct">C. $416\ \text{cm}^2$</div>
+      <div class="choice">D. $748\ \text{cm}^2$</div>
+    </div>
+    <!-- FIGURE_HERE -->
+
+    <div class="steps">
+
+      <div class="step active" data-step="1">
+        <span class="tag">STEP 1 · Area of the regular hexagonal base</span>
+        <div class="m">
+          A regular hexagon of side $a$ consists of $6$ equilateral triangles:
+          \[
+            \text{Base area} = \frac{3\sqrt{3}}{2}a^{2}
+            = \frac{3\sqrt{3}}{2}(8^{2})
+            = 96\sqrt{3}\ \text{cm}^{2}.
+          \]
+        </div>
+      </div>
+
+      <div class="step" data-step="2">
+        <span class="tag">STEP 2 · Find the height from the volume</span>
+        <div class="m">
+          \[
+            V = \text{base area}\times h
+            \implies 288 = 96\sqrt{3}\,h
+            \implies h = \frac{288}{96\sqrt{3}} = \frac{3}{\sqrt{3}} = \sqrt{3}\ \text{cm}.
+          \]
+        </div>
+      </div>
+
+      <div class="step" data-step="3">
+        <span class="tag">STEP 3 · Curved (lateral) surface area</span>
+        <div class="m">
+          \[
+            \text{Curved area} = \text{perimeter}\times h
+            = (6\times 8)\times\sqrt{3}
+            = 48\sqrt{3}\ \text{cm}^{2}.
+          \]
+        </div>
+      </div>
+
+      <div class="step" data-step="4">
+        <span class="tag">STEP 4 · Total surface area</span>
+        <div class="m">
+          \[
+            \text{TSA} = 2\times 96\sqrt{3} + 48\sqrt{3}
+            = 240\sqrt{3}
+            \approx 240\times 1.73205
+            \approx 415.69 \approx 416\ \text{cm}^{2}.
+          \]
+        </div>
+        <div class="hint">💡 Key idea: TSA = 2 × (base area) + perimeter × height. For a right prism the lateral faces are always rectangles.</div>
+      </div>
+
+    </div>
+
+    <div class="answer">
+      <span class="k">ANSWER</span>
+      C. $416\ \text{cm}^2$
+    </div>
+  </section>
 </div>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
+
+<script>
+(function(){
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  // handle HiDPI
+  const DPR = window.devicePixelRatio || 1;
+  const CSS_W = 560, CSS_H = 560;
+  cv.width = CSS_W * DPR;
+  cv.height = CSS_H * DPR;
+  cv.style.width = '100%';
+  cv.style.height = 'auto';
+  ctx.scale(DPR, DPR);
+
+  let mode = 1;
+
+  // ---- geometry (true proportions): regular hexagon side 8, height sqrt(3) ----
+  const R_HEX = 8;                 // circumradius = side for regular hexagon
+  const H = Math.sqrt(3);          // height ~1.732
+
+  // oblique projection: projected height factor so the solid reads as a prism
+  const KZ = 0.55;                 // depth compression for the top offset
+  const TILT = -Math.PI/6;         // slight tilt of top face
+
+  // produce the 6 corners of a hexagon in the given plane
+  function hexCorners(cx, cy, rx, ry, rot){
+    const pts = [];
+    for(let i=0;i<6;i++){
+      const a = rot + i*Math.PI/3;
+      pts.push([cx + rx*Math.cos(a), cy + ry*Math.sin(a)]);
+    }
+    return pts;
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,CSS_W,CSS_H);
+
+    // ---------- layout of the two hexagon rings ----------
+    // Determine drawing size so the whole solid fits nicely
+    const S = 24;                     // px per cm in horizontal direction
+    const rx = R_HEX * S;             // 192 px radius
+    const ry = rx * 0.5;              // perspective compression of the hexagon's vertical axis
+    const depthPx = H * S * KZ * 3.2; // vertical offset between bottom and top face
+
+    // centre of the bottom face (screen coords)
+    const bCx = CSS_W/2;
+    const bCy = CSS_H/2 + depthPx*0.55;
+    const tCx = bCx;
+    const tCy = bCy - depthPx;
+
+    // ---------- draw back edges of the bottom hexagon (hidden) ----------
+    const bottom = hexCorners(bCx, bCy, rx, ry, TILT);
+    const top    = hexCorners(tCx, tCy, rx, ry, TILT);
+
+    // TOP FACE (flat-ish hexagon) – fill with light blue
+    ctx.beginPath();
+    ctx.moveTo(top[0][0], top[0][1]);
+    for(let i=1;i<6;i++) ctx.lineTo(top[i][0], top[i][1]);
+    ctx.closePath();
+    ctx.fillStyle = (mode===1 || mode===4) ? 'rgba(37,99,235,0.18)' : 'rgba(37,99,235,0.10)';
+    ctx.fill();
+    ctx.lineWidth = (mode===1 || mode===4) ? 3.2 : 2;
+    ctx.strokeStyle = (mode===1 || mode===4) ? '#ef4444' : '#2563eb';
+    ctx.stroke();
+
+    // BOTTOM FACE – dashed, only visible edges solid
+    ctx.beginPath();
+    ctx.moveTo(bottom[0][0], bottom[0][1]);
+    for(let i=1;i<6;i++) ctx.lineTo(bottom[i][0], bottom[i][1]);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(245,158,11,0.08)';
+    ctx.fill();
+    ctx.setLineDash([6,5]);
+    ctx.lineWidth = 1.6;
+    ctx.strokeStyle = (mode===1 || mode===4) ? '#ef4444' : '#f59e0b';
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // ---------- vertical edges (prism sides) ----------
+    // Which hexagon vertices are "front" vs "back"?
+    // Because we tilt slightly, define back = upper half of the (screen) top face
+    // Use the geometric angle: for TILT = -PI/6, corners at i=0,1,2,3 ...
+    // Simpler: determine by projected y relative to centre.
+    const visTop = []; // indices of top ring vertices that are 'front'
+    const topCenterY = tCy;
+    const bottomCenterY = bCy;
+    const frontIdx = [];
+    const backIdx = [];
+    for(let i=0;i<6;i++){
+      // average of top & bottom y tells us front/back
+      const avgY = (top[i][1] + bottom[i][1]) / 2;
+      if(avgY > (topCenterY + bottomCenterY)/2 - ry*0.20) frontIdx.push(i);
+      else backIdx.push(i);
+    }
+
+    // back vertical edges: dashed
+    ctx.setLineDash([6,5]);
+    ctx.lineWidth = 1.6;
+    ctx.strokeStyle = '#94a3b8';
+    for(const i of backIdx){
+      ctx.beginPath();
+      ctx.moveTo(top[i][0], top[i][1]);
+      ctx.lineTo(bottom[i][0], bottom[i][1]);
+      ctx.stroke();
+    }
+    ctx.setLineDash([]);
+
+    // front vertical edges: solid, green
+    ctx.lineWidth = (mode===2 || mode===3 || mode===4) ? 3.6 : 2.4;
+    ctx.strokeStyle = (mode===2 || mode===3 || mode===4) ? '#ef4444' : '#10b981';
+    for(const i of frontIdx){
+      ctx.beginPath();
+      ctx.moveTo(top[i][0], top[i][1]);
+      ctx.lineTo(bottom[i][0], bottom[i][1]);
+      ctx.stroke();
+    }
+
+    // ---------- centre / apothem on the top face (purple) ----------
+    if(mode===1){
+      // draw the 6 triangles of the hexagon (equilateral subdivision)
+      ctx.save();
+      ctx.lineWidth = 1.2;
+      ctx.strokeStyle = 'rgba(139,92,246,0.85)';
+      for(const v of top){
+        ctx.beginPath();
+        ctx.moveTo(tCx,tCy);
+        ctx.lineTo(v[0],v[1]);
+        ctx.stroke();
+      }
+      ctx.restore();
+      // mark the centre
+      dot(tCx,tCy,6,'#8b5cf6');
+    } else {
+      dot(tCx,tCy,4.5,'#8b5cf6');
+    }
+
+    // apothem (from centre to midpoint of one top edge)
+    if(mode===1 || mode===4){
+      const p1 = top[0], p2 = top[1];
+      const mx = (p1[0]+p2[0])/2, my = (p1[1]+p2[1])/2;
+      ctx.beginPath();
+      ctx.setLineDash([4,3]);
+      ctx.strokeStyle = '#8b5cf6';
+      ctx.lineWidth = 1.5;
+      ctx.moveTo(tCx,tCy);
+      ctx.lineTo(mx,my);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    // ---------- vertex dots ----------
+    for(let i=0;i<6;i++){
+      dot(top[i][0], top[i][1], 4.5, '#2563eb');
+      dot(bottom[i][0], bottom[i][1], 3.6, '#f59e0b');
+    }
+
+    // ---------- labels ----------
+    ctx.font = '600 13px "Segoe UI",sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    // side label 8 cm on top front edge
+    {
+      const i = findFrontEdge(top, tCy);
+      const a = top[i], b = top[(i+1)%6];
+      const mx = (a[0]+b[0])/2, my = (a[1]+b[1])/2;
+      label(mx, my + 20, '8 cm', '#2563eb');
+    }
+
+    // height label along the right-most front vertical edge
+    if(mode===2 || mode===3 || mode===4){
+      let best = null, bestX = -1;
+      for(const i of frontIdx){
+        if(top[i][0] > bestX){ bestX = top[i][0]; best = i; }
+      }
+      if(best !== null){
+        const tx = top[best][0], ty = top[best][1];
+        const bx = bottom[best][0], by = bottom[best][1];
+        // draw dimension arrow
+        const offX = 26;
+        arrowLine(tx+offX, ty, bx+offX, by, '#ef4444', 2);
+        label(tx+offX+32, (ty+by)/2, 'h = √3', '#ef4444');
+        // little tick lines
+        ctx.strokeStyle = '#ef4444';
+        ctx.lineWidth = 1.2;
+        ctx.setLineDash([3,3]);
+        ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(tx+offX, ty); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(bx+offX, by); ctx.stroke();
+        ctx.setLineDash([]);
+      }
+    }
+
+    // mode-specific annotation
+    if(mode===1){
+      label(tCx, tCy + ry*0.55, 'base area = 96√3', '#7c3aed');
+    }
+    if(mode===4){
+      label(CSS_W/2, 30, 'TSA = 2 × base + perimeter × h', '#ef4444');
+    }
+  }
+
+  function findFrontEdge(pts, cy){
+    // returns index i such that edge (i,i+1) is near the bottom of the top hexagon
+    let best = 0, bestY = -Infinity;
+    for(let i=0;i<6;i++){
+      const a = pts[i], b = pts[(i+1)%6];
+      const my = (a[1]+b[1])/2;
+      if(my > bestY){ bestY = my; best = i; }
+    }
+    return best;
+  }
+
+  function dot(x,y,r,color){
+    ctx.beginPath();
+    ctx.arc(x,y,r,0,Math.PI*2);
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = '#fff';
+    ctx.stroke();
+  }
+
+  function label(x,y,text,color){
+    ctx.save();
+    ctx.font = '700 14px "Segoe UI",sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const w = ctx.measureText(text).width + 14;
+    ctx.fillStyle = 'rgba(255,255,255,0.92)';
+    roundRect(x-w/2, y-11, w, 22, 8);
+    ctx.fill();
+    ctx.fillStyle = color;
+    ctx.fillText(text, x, y+0.5);
+    ctx.restore();
+  }
+
+  function roundRect(x,y,w,h,r){
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);
+    ctx.arcTo(x+w,y,x+w,y+h,r);
+    ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r);
+    ctx.arcTo(x,y,x+w,y,r);
+    ctx.closePath();
+  }
+
+  function arrowLine(x1,y1,x2,y2,color,lw){
+    ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = lw;
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+    // arrows
+    const a = Math.atan2(y2-y1, x2-x1);
+    const s = 7;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x1 + s*Math.cos(a - Math.PI/6), y1 + s*Math.sin(a - Math.PI/6));
+    ctx.lineTo(x1 + s*Math.cos(a + Math.PI/6), y1 + s*Math.sin(a + Math.PI/6));
+    ctx.closePath(); ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(x2, y2);
+    ctx.lineTo(x2 - s*Math.cos(a - Math.PI/6), y2 - s*Math.sin(a - Math.PI/6));
+    ctx.lineTo(x2 - s*Math.cos(a + Math.PI/6), y2 - s*Math.sin(a + Math.PI/6));
+    ctx.closePath(); ctx.fill();
+  }
+
+  // ---------- scroll sync ----------
+  const steps = Array.from(document.querySelectorAll('.step'));
+  const obs = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        const m = +e.target.dataset.step;
+        mode = m;
+        steps.forEach(st=>st.classList.toggle('active', st===e.target));
+        draw();
+      }
+    });
+  }, {rootMargin:'-15% 0px -55% 0px', threshold:0});
+  steps.forEach(st=>obs.observe(st));
+
+  // redraw on resize (keeps canvas crisp)
+  let rid;
+  window.addEventListener('resize', ()=>{ cancelAnimationFrame(rid); rid = requestAnimationFrame(draw); });
+
+  draw();
+})();
 </script>
-
 </body>
 </html>

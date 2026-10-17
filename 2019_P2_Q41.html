@@ -3,115 +3,545 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HKDSE 2019 Paper 2 MC41 · Centres of a Right-Angled Triangle</title>
-<script>
-  window.MathJax = {
-    tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['\\[','\\]']] },
-    svg: { fontCache: 'global' }
-  };
-</script>
+<title>HKDSE 2019 P2 MC41 · Centres of a Right-Angled Triangle</title>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$','$'],['\\(','\\)']],
+    displayMath: [['$$','$$'],['\\[','\\]']]
+  },
+  svg: { fontCache: 'global' }
+};
+</script>
 <style>
-  :root{--blue:#1d4ed8;--blue-light:#3b82f6;--amber:#f59e0b;--amber-bg:#fffbeb;--emerald:#059669;--emerald-bg:#ecfdf5;--slate:#0f172a;--slate-soft:#475569;--line:#e2e8f0;--card:#ffffff;--bg:#f1f5f9;}
-  *{box-sizing:border-box;} html,body{margin:0;padding:0;}
-  body{font-family:"Segoe UI",system-ui,-apple-system,Helvetica,Arial,sans-serif;color:var(--slate);background:var(--bg);line-height:1.6;-webkit-font-smoothing:antialiased;}
-  .wrap{max-width:920px;margin:0 auto;padding:0 16px 60px;}
-  .hero{background:linear-gradient(120deg,#0f172a,#1e3a8a 45%,#2563eb);color:#fff;padding:32px 20px 28px;}
-  .hero .tag{display:inline-block;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;background:rgba(255,255,255,.16);border-radius:99px;padding:3px 12px;margin-bottom:10px;}
-  .hero h1{margin:0;font-size:1.5rem;font-weight:800;}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin:18px 0;box-shadow:0 1px 3px rgba(15,23,42,.06);}
-  .card h2{margin:0 0 10px;font-size:1.05rem;color:var(--blue);}
-  .question{font-size:1.08rem;}
-  .question ol,.question ul{margin:10px 0;padding-left:22px;}
-  .marks{color:var(--slate-soft);font-size:.85rem;font-style:italic;}
-  .step{border-left:3px solid var(--blue-light);background:#f8fafc;border-radius:8px;padding:12px 16px;margin:12px 0;}
-  .step .step-tag{display:inline-block;font-size:.7rem;font-weight:700;color:#fff;background:var(--blue);border-radius:99px;padding:2px 10px;margin-bottom:8px;}
-  .ans{background:var(--emerald-bg);border:1px solid #6ee7b7;border-radius:10px;padding:14px 18px;font-weight:600;margin:16px 0;}
-  .hint{background:var(--amber-bg);border:1px solid #fcd34d;border-radius:10px;padding:10px 16px;font-size:.9rem;color:#92400e;margin:10px 0;}
-  .mono{font-family:ui-monospace,Consolas,monospace;}
+  :root{
+    --bg:#f4f7fb;
+    --card:#ffffff;
+    --ink:#1e2a3a;
+    --muted:#5c6b7f;
+    --blue:#2b7de9;
+    --red:#e8453c;
+    --green:#16a34a;
+    --amber:#f59e0b;
+    --purple:#8b5cf6;
+    --line:#e2e8f0;
+    --radius:14px;
+    --shadow:0 4px 18px rgba(30,42,58,.08);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:linear-gradient(180deg,#eef3fa 0%, #f4f7fb 100%);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-size:15px;
+    line-height:1.55;
+    padding:14px;
+    min-height:100vh;
+  }
+  .wrap{max-width:1240px;margin:0 auto;}
+  .header{
+    background:linear-gradient(120deg,#2b7de9,#8b5cf6);
+    color:#fff;
+    border-radius:var(--radius);
+    padding:14px 18px;
+    margin-bottom:12px;
+    box-shadow:var(--shadow);
+  }
+  .header .tag{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;opacity:.85;font-weight:600;}
+  .header h1{margin:4px 0 0;font-size:1.12rem;font-weight:700;line-height:1.3;}
+
+  .split{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    gap:12px;
+    align-items:start;
+  }
+  @media(min-width:900px){
+    .split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}
+  }
+
+  .panel{
+    background:var(--card);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    border:1px solid var(--line);
+    padding:12px;
+    min-width:0;
+  }
+  .diagram{
+    position:sticky;
+    top:16px;
+    max-height:calc(100vh - 2rem);
+    overflow-y:auto;
+  }
+  .diagram h2{
+    margin:0 0 8px;
+    font-size:.82rem;
+    text-transform:uppercase;
+    letter-spacing:.1em;
+    color:var(--muted);
+    font-weight:700;
+  }
+  canvas{
+    width:100%;
+    height:auto;
+    display:block;
+    border-radius:10px;
+    background:#fbfdff;
+    border:1px solid #eef2f8;
+    touch-action:none;
+  }
+  .legend{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 14px;
+    margin-top:10px;
+    font-size:.74rem;
+    color:var(--muted);
+  }
+  .legend span{display:inline-flex;align-items:center;gap:5px;}
+  .dot{width:10px;height:10px;border-radius:50%;display:inline-block;}
+
+  h2.qtitle{margin:0 0 8px;font-size:.82rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700;}
+  .question{
+    background:#f8fbff;
+    border:1px solid #e3edf9;
+    border-radius:12px;
+    padding:12px;
+    margin-bottom:12px;
+  }
+  .question p{margin:6px 0;}
+  .question ol{margin:6px 0 6px 0;padding-left:22px;}
+  .question ol li{margin:3px 0;}
+  .choices{
+    list-style:none;
+    padding:0;
+    margin:10px 0 0;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:6px 12px;
+    font-size:.92rem;
+  }
+  .choices li{background:#fff;border:1px solid var(--line);border-radius:8px;padding:5px 9px;}
+
+  .step{
+    border:1px solid var(--line);
+    border-left:5px solid #cbd5e1;
+    border-radius:10px;
+    padding:10px 12px;
+    margin-bottom:10px;
+    background:#fff;
+    transition:all .25s ease;
+  }
+  .step.active{
+    border-left-color:var(--blue);
+    background:#f5f9ff;
+    box-shadow:0 3px 14px rgba(43,125,233,.12);
+  }
+  .steptag{
+    display:inline-block;
+    font-size:.7rem;
+    font-weight:800;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:#fff;
+    background:linear-gradient(120deg,#2b7de9,#8b5cf6);
+    border-radius:999px;
+    padding:3px 10px;
+    margin-bottom:6px;
+  }
+  .step p{margin:6px 0;}
+  .hint{
+    font-size:.82rem;
+    color:var(--muted);
+    background:#fffbeb;
+    border:1px dashed #f5d98b;
+    border-radius:8px;
+    padding:7px 10px;
+    margin-top:8px;
+  }
+  .hint b{color:#b45309;}
+  .answer{
+    margin-top:12px;
+    background:linear-gradient(120deg,#e8f5ee,#eef9f1);
+    border:1px solid #b7e4c7;
+    border-radius:12px;
+    padding:12px 14px;
+    font-weight:700;
+    color:#14532d;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .answer .badge{
+    background:#16a34a;
+    color:#fff;
+    border-radius:999px;
+    padding:3px 12px;
+    font-size:.78rem;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+  }
+  .false{color:var(--red);font-weight:700;}
+  .true{color:var(--green);font-weight:700;}
+  mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
+
+  @media(max-width:640px){
+    body{padding:8px;font-size:13.5px;}
+    .panel{padding:8px;}
+    .diagram h2, h2.qtitle{font-size:.72rem;}
+    .step{padding:8px;}
+    .choices{grid-template-columns:1fr;}
+    .header h1{font-size:.95rem;}
+    .legend{font-size:.66rem;gap:6px 10px;}
+  }
 </style>
 </head>
 <body>
-<div class="hero">
-  <div class="wrap">
-    <span class="tag">HKDSE 2019 · Paper 2 · MC41</span>
-    <h1>Orthocentre, Centroid and In-centre of a Right Triangle</h1>
-  </div>
-</div>
 <div class="wrap">
-  <div class="card question">
-    <h2>Question</h2>
-    <p>If \(\triangle ABC\) is a right-angled triangle with \(\angle ABC = 90^\circ\), which of the following is/are true?</p>
-    <ul>
-      <li><b>I.</b>&nbsp; The orthocentre of \(\triangle ABC\) lies on \(AC\).</li>
-      <li><b>II.</b>&nbsp; The centroid of \(\triangle ABC\) lies inside \(\triangle ABC\).</li>
-      <li><b>III.</b>&nbsp; The in-centre of \(\triangle ABC\) lies outside \(\triangle ABC\).</li>
-    </ul>
-    <ol style="list-style-type: upper-alpha;">
-      <li>I only</li>
-      <li>II only</li>
-      <li>I and III only</li>
-      <li>II and III only</li>
-    </ol>
-  <figure class="figure"><svg viewBox="0 0 300 220" xmlns="http://www.w3.org/2000/svg" role="img"><rect width="300" height="220" fill="#fff"/><polygon points="60,180 240,180 240,60" fill="#eef2ff" stroke="#334155" stroke-width="2"/><path d="M240,180 L222,180 L222,162" fill="none" stroke="#334155" stroke-width="1.4"/><text x="52" y="200" font-size="13" font-weight="700" fill="#1e293b">A</text><text x="244" y="200" font-size="13" font-weight="700" fill="#1e293b">B</text><text x="244" y="54" font-size="13" font-weight="700" fill="#1e293b">C</text><circle cx="240" cy="180" r="3" fill="#e11d48"/><text x="226" y="150" font-size="10" fill="#e11d48">orthocentre</text><text x="150" y="130" font-size="10" fill="#0d9488">centroid</text></svg><figcaption>Right-angled triangle with orthocentre and centroid (not to scale)</figcaption></figure></div>
-
-  <div class="card">
-    <h2>Solution</h2>
-    <div class="step">
-      <span class="step-tag">Step 1 · Check statement I (orthocentre)</span>
-      <p>The altitude from \(A\) is the side \(AB\) (since \(AB \perp BC\)), and the altitude from \(B\) is the side \(BC\) (since \(BC \perp AB\)). These two altitudes meet at the right-angle vertex \(B\).</p>
-      <p>So the orthocentre is <b>at vertex \(B\)</b>, not on \(AC\). Statement I is <b>false</b>.</p>
-    </div>
-    <div class="step">
-      <span class="step-tag">Step 2 · Check statement II (centroid)</span>
-      <p>The centroid is the intersection of the medians. For <em>every</em> triangle — acute, right or obtuse — the centroid lies <b>inside</b> the triangle. Statement II is <b>true</b>.</p>
-    </div>
-    <div class="step">
-      <span class="step-tag">Step 3 · Check statement III (in-centre)</span>
-      <p>The in-centre is the intersection of the internal angle bisectors; it is the centre of the inscribed circle, which fits inside the triangle. For <em>every</em> triangle the in-centre lies <b>inside</b> the triangle. Statement III is <b>false</b>.</p>
-      <div class="hint"><b>Recall:</b> in an obtuse triangle the orthocentre and circumcentre lie outside, but the centroid and in-centre always lie inside.</div>
-    </div>
-    <div class="step">
-      <span class="step-tag">Step 4 · Conclusion</span>
-      <p>Only statement II is true.</p>
-    </div>
+  <div class="header">
+    <div class="tag">HKDSE 2019 · Paper 2 · MC41</div>
+    <h1>Orthocentre, Centroid and In-centre of a Right-Angled Triangle</h1>
   </div>
 
-  <div class="ans">
-    Final Answer: <strong>B. II only</strong>
+  <div class="split">
+    <!-- LEFT: DIAGRAM -->
+    <section class="panel diagram">
+      <h2>Interactive Diagram</h2>
+      <canvas id="cv" width="640" height="560"></canvas>
+      <div class="legend">
+        <span><i class="dot" style="background:#2b7de9"></i>Triangle ABC</span>
+        <span><i class="dot" style="background:#e8453c"></i>Right angle at B</span>
+        <span><i class="dot" style="background:#8b5cf6"></i>Orthocentre (B)</span>
+        <span><i class="dot" style="background:#16a34a"></i>Centroid</span>
+        <span><i class="dot" style="background:#f59e0b"></i>In-centre</span>
+      </div>
+    </section>
+
+    <!-- RIGHT: QUESTION + SOLUTION -->
+    <section class="panel">
+      <h2 class="qtitle">Question</h2>
+      <div class="question">
+        <p>If $\triangle ABC$ is a right-angled triangle with $\angle ABC = 90^\circ$, which of the following is/are true?</p>
+        <ol type="I">
+          <li>The orthocentre of $\triangle ABC$ lies on $AC$.</li>
+          <li>The centroid of $\triangle ABC$ lies inside $\triangle ABC$.</li>
+          <li>The in-centre of $\triangle ABC$ lies outside $\triangle ABC$.</li>
+        </ol>
+        <ul class="choices">
+          <li>A.&nbsp; I only</li>
+          <li>B.&nbsp; II only</li>
+          <li>C.&nbsp; I and III only</li>
+          <li>D.&nbsp; II and III only</li>
+        </ul>
+        <!-- FIGURE_HERE -->
+      </div>
+
+      <h2 class="qtitle">Solution</h2>
+
+      <div class="step" data-step="1">
+        <span class="steptag">Step 1 · Check statement I (orthocentre)</span>
+        <p>The altitude from $A$ is the side $AB$ (since $AB \perp BC$), and the altitude from $B$ is the side $BC$ (since $BC \perp AB$). These two altitudes meet at the right-angle vertex $B$.</p>
+        <p>So the orthocentre is at vertex $B$, not on $AC$. <span class="false">Statement I is false.</span></p>
+      </div>
+
+      <div class="step" data-step="2">
+        <span class="steptag">Step 2 · Check statement II (centroid)</span>
+        <p>The centroid is the intersection of the medians. For every triangle — acute, right or obtuse — the centroid lies inside the triangle.</p>
+        <p><span class="true">Statement II is true.</span></p>
+      </div>
+
+      <div class="step" data-step="3">
+        <span class="steptag">Step 3 · Check statement III (in-centre)</span>
+        <p>The in-centre is the intersection of the internal angle bisectors; it is the centre of the inscribed circle, which fits inside the triangle. For every triangle the in-centre lies inside the triangle.</p>
+        <p><span class="false">Statement III is false.</span></p>
+        <div class="hint"><b>Recall:</b> In an obtuse triangle the orthocentre and circumcentre lie outside, but the centroid and in-centre always lie inside.</div>
+      </div>
+
+      <div class="step" data-step="4">
+        <span class="steptag">Step 4 · Conclusion</span>
+        <p>Only statement II is true.</p>
+        <div class="answer">
+          <span class="badge">Final Answer</span>
+          <span>B. II only</span>
+        </div>
+      </div>
+    </section>
   </div>
 </div>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
 
+<script>
+(function(){
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  let mode = 1;
+
+  // ---- Geometry (real proportional values) ----
+  // Right angle at B.  Let AB = 4, BC = 3, AC = 5.
+  const AB = 4, BC = 3;
+  // Canvas world coords centered around the drawing
+  const W = cv.width, H = cv.height;
+  const pad = 60;
+
+  // We'll place B at bottom-left, A above B, C to right of B
+  // (so that angle at B looks like a right angle)
+  // World coordinates: choose a scale to fit nicely
+  const worldMinX = -0.6, worldMaxX = BC + 0.8;
+  const worldMinY = -0.8, worldMaxY = AB + 1.4;
+  const worldW = worldMaxX - worldMinX;
+  const worldH = worldMaxY - worldMinY;
+  const scale = Math.min((W - 2*pad)/worldW, (H - 2*pad)/worldH);
+
+  function toPx(x, y){
+    // world y-up -> canvas y-down
+    return {
+      x: pad + (x - worldMinX)*scale,
+      y: H - pad - (y - worldMinY)*scale
+    };
+  }
+
+  const B = toPx(0, 0);
+  const A = toPx(0, AB);
+  const C = toPx(BC, 0);
+  const M_AC = toPx(BC/2, AB/2);   // midpoint of AC
+  const Centroid = toPx(BC/3, AB/3); // centroid = (B+A+C)/3 => x = (0+0+BC)/3, y = (0+AB+0)/3
+  // In-centre: for right triangle at B, r = (a+c-b)/2? Use formula r = (AB+BC-AC)/2
+  const s = (AB + BC + 5)/2;
+  const area = 0.5*AB*BC;
+  const r_in = area / s; // inradius
+  // In-centre is at distance r from both legs AB (x=0) and BC (y=0)
+  const I = toPx(r_in, r_in);
+
+  // Medians - midpoints
+  const MidAB = toPx(0, AB/2);
+  const MidBC = toPx(BC/2, 0);
+  // MidAC already M_AC
+
+  // ---- Drawing helpers ----
+  function line(p,q,color,width,dash){
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width || 2;
+    ctx.setLineDash(dash || []);
+    ctx.beginPath();
+    ctx.moveTo(p.x, p.y);
+    ctx.lineTo(q.x, q.y);
+    ctx.stroke();
+    ctx.restore();
+  }
+  function dot(p,color,r, label, labelColor){
+    ctx.save();
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,r||5,0,Math.PI*2);
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    if(label){
+      ctx.fillStyle = labelColor || color;
+      ctx.font = 'bold 15px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      // offset labels outward
+      let dx = 0, dy = 0;
+      const cx = W/2, cy = H/2;
+      if(p.x < cx) dx = -18; else dx = 18;
+      if(p.y < cy) dy = -12; else dy = 18;
+      ctx.fillText(label, p.x + dx, p.y + dy);
+    }
+    ctx.restore();
+  }
+
+  function vertexLabel(p, text, offset){
+    ctx.save();
+    ctx.fillStyle = '#1e2a3a';
+    ctx.font = 'bold 16px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, p.x + offset.x, p.y + offset.y);
+    ctx.restore();
+  }
+
+  function drawRightAngle(){
+    // small square at B
+    const size = 16;
+    const p1 = { x: B.x + size, y: B.y };
+    const p2 = { x: B.x + size, y: B.y - size };
+    const p3 = { x: B.x, y: B.y - size };
+    ctx.save();
+    ctx.strokeStyle = '#e8453c';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(p1.x,p1.y);
+    ctx.lineTo(p2.x,p2.y);
+    ctx.lineTo(p3.x,p3.y);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+
+    // Background grid (subtle)
+    ctx.save();
+    ctx.strokeStyle = '#eef3fa';
+    ctx.lineWidth = 1;
+    const step = 22;
+    for(let x=0;x<W;x+=step){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+    for(let y=0;y<H;y+=step){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+    ctx.restore();
+
+    // Triangle fill
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,B.y); ctx.lineTo(C.x,C.y);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(43,125,233,0.06)';
+    ctx.fill();
+    ctx.restore();
+
+    // Triangle edges
+    line(A,B,'#2b7de9',3);
+    line(B,C,'#2b7de9',3);
+
+    // AC dashed when needed - always draw, red in step 1
+    const acColor = (mode===1) ? '#e8453c' : '#2b7de9';
+    line(A,C, acColor, (mode===1)?3:3, (mode===1)?[8,6]:[]);
+
+    // Right-angle marker
+    drawRightAngle();
+
+    // ---- Highlight per step ----
+    if(mode === 1){
+      // Show altitudes AB and BC as dashed highlighted, and orthocentre at B
+      ctx.save();
+      // highlight AB
+      line(A,B,'#8b5cf6',6,[10,6]);
+      line(B,C,'#8b5cf6',6,[10,6]);
+      // Orthocentre at B
+      dot(B,'#8b5cf6',9);
+      ctx.restore();
+      // Label
+      ctx.save();
+      ctx.fillStyle = '#8b5cf6';
+      ctx.font = 'bold 13px sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText('orthocentre = B', B.x - 6, B.y + 45);
+      ctx.restore();
+    }
+
+    if(mode === 2){
+      // Medians
+      line(A, MidBC, '#16a34a', 2, [6,4]);
+      line(B, M_AC, '#16a34a', 2, [6,4]);
+      line(C, MidAB, '#16a34a', 2, [6,4]);
+      // Midpoints
+      dot(MidBC,'#16a34a',5);
+      dot(M_AC,'#16a34a',5);
+      dot(MidAB,'#16a34a',5);
+      // Centroid
+      dot(Centroid,'#16a34a',9);
+      ctx.save();
+      ctx.fillStyle = '#16a34a';
+      ctx.font = 'bold 13px sans-serif';
+      ctx.fillText('centroid', Centroid.x + 12, Centroid.y - 10);
+      ctx.restore();
+    }
+
+    if(mode === 3){
+      // Inscribed circle
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(I.x, I.y, r_in*scale, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(245,158,11,0.15)';
+      ctx.fill();
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([5,4]);
+      ctx.stroke();
+      ctx.restore();
+      // In-centre
+      dot(I,'#f59e0b',9);
+      ctx.save();
+      ctx.fillStyle = '#b45309';
+      ctx.font = 'bold 13px sans-serif';
+      ctx.fillText('in-centre', I.x + 12, I.y + 4);
+      ctx.restore();
+      // Angle bisectors (dashed)
+      // We can draw simple lines from vertices to in-centre
+      line(A, I, '#f59e0b', 2, [4,4]);
+      line(B, I, '#f59e0b', 2, [4,4]);
+      line(C, I, '#f59e0b', 2, [4,4]);
+    }
+
+    if(mode === 4){
+      // Show all three centres for final overview
+      dot(B,'#8b5cf6',8);
+      dot(Centroid,'#16a34a',8);
+      dot(I,'#f59e0b',8);
+      // Inscribed circle faint
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(I.x, I.y, r_in*scale, 0, Math.PI*2);
+      ctx.strokeStyle = 'rgba(245,158,11,0.5)';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([4,4]);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // ---- Vertex labels ----
+    vertexLabel(A, 'A', {x: -20, y: 0});
+    vertexLabel(B, 'B', {x: -18, y: 18});
+    vertexLabel(C, 'C', {x: 20, y: 20});
+
+    // Side length labels
+    ctx.save();
+    ctx.font = '13px sans-serif';
+    ctx.fillStyle = '#5c6b7f';
+    ctx.textAlign = 'center';
+    // AB vertical on the left
+    ctx.fillText('4', A.x - 24, (A.y + B.y)/2 + 4);
+    // BC horizontal at bottom
+    ctx.fillText('3', (B.x + C.x)/2, B.y + 24);
+    // AC hypotenuse
+    const mx = (A.x + C.x)/2, my = (A.y + C.y)/2;
+    ctx.fillText('5', mx + 4, my - 12);
+    ctx.restore();
+
+    // Title
+    ctx.save();
+    ctx.fillStyle = '#1e2a3a';
+    ctx.font = 'bold 13px sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('Right triangle ABC with ∠ABC = 90°', 12, 22);
+    ctx.restore();
+  }
+
+  // ---- Scroll sync ----
+  const steps = Array.from(document.querySelectorAll('.step'));
+  const obs = new IntersectionObserver((es)=>{
+    es.forEach(e=>{
+      if(e.isIntersecting){
+        const m = +e.target.dataset.step;
+        mode = m;
+        steps.forEach(st=>st.classList.toggle('active', st===e.target));
+        draw();
+      }
+    });
+  }, {rootMargin:'-15% 0px -55% 0px', threshold:0});
+  steps.forEach(st=>obs.observe(st));
+
+  // Initial draw
+  draw();
+
+  // Redraw on resize (canvas fixed pixel size; keep sharpness)
+  window.addEventListener('resize', draw);
+})();
+</script>
 </body>
 </html>

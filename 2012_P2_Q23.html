@@ -1,114 +1,326 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HKDSE 2012 Paper 2 MC23 · Rotation and Polar Coordinates</title>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>HKDSE 2012 P2 MC23 · Rotation and Polar Coordinates</title>
 <script>
-  window.MathJax = {
-    tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['\\[','\\]']] },
-    svg: { fontCache: 'global' }
-  };
+window.MathJax = {
+  tex: {inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']]},
+  svg: {fontCache: 'global'}
+};
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
-  :root{--blue:#1d4ed8;--blue-light:#3b82f6;--amber:#f59e0b;--amber-bg:#fffbeb;--emerald:#059669;--emerald-bg:#ecfdf5;--slate:#0f172a;--slate-soft:#475569;--line:#e2e8f0;--card:#ffffff;--bg:#f1f5f9;}
-  *{box-sizing:border-box;} html,body{margin:0;padding:0;}
-  body{font-family:"Segoe UI",system-ui,-apple-system,Helvetica,Arial,sans-serif;color:var(--slate);background:var(--bg);line-height:1.6;-webkit-font-smoothing:antialiased;}
-  .wrap{max-width:920px;margin:0 auto;padding:0 16px 60px;}
-  .hero{background:linear-gradient(120deg,#0f172a,#1e3a8a 45%,#2563eb);color:#fff;padding:32px 20px 28px;}
-  .hero .tag{display:inline-block;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;background:rgba(255,255,255,.16);border-radius:99px;padding:3px 12px;margin-bottom:10px;}
-  .hero h1{margin:0;font-size:1.5rem;font-weight:800;}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin:18px 0;box-shadow:0 1px 3px rgba(15,23,42,.06);}
-  .card h2{margin:0 0 10px;font-size:1.05rem;color:var(--blue);}
-  .question{font-size:1.08rem;}
-  .question ol,.question ul{margin:10px 0;padding-left:22px;}
-  .marks{color:var(--slate-soft);font-size:.85rem;font-style:italic;}
-  .step{border-left:3px solid var(--blue-light);background:#f8fafc;border-radius:8px;padding:12px 16px;margin:12px 0;}
-  .step .step-tag{display:inline-block;font-size:.7rem;font-weight:700;color:#fff;background:var(--blue);border-radius:99px;padding:2px 10px;margin-bottom:8px;}
-  .ans{background:var(--emerald-bg);border:1px solid #6ee7b7;border-radius:10px;padding:14px 18px;font-weight:600;margin:16px 0;}
-  .hint{background:var(--amber-bg);border:1px solid #fcd34d;border-radius:10px;padding:10px 16px;font-size:.9rem;color:#92400e;margin:10px 0;}
-  .mono{font-family:ui-monospace,Consolas,monospace;}
+  *{box-sizing:border-box;}
+  body{
+    margin:0;padding:14px;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:linear-gradient(135deg,#eef4ff 0%,#f8f9ff 50%,#fef6f0 100%);
+    color:#1e293b;
+  }
+  h1{font-size:1.05rem;margin:0 0 10px;letter-spacing:.3px;color:#334155;}
+  h1 .badge{background:#4f46e5;color:#fff;border-radius:8px;padding:2px 8px;font-size:.72rem;margin-right:8px;vertical-align:middle;font-weight:600;}
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start;}
+  @media(min-width:900px){.split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}}
+  .panel{
+    background:#fff;border-radius:16px;padding:14px;
+    box-shadow:0 6px 24px rgba(79,70,229,.10),0 2px 6px rgba(15,23,42,.05);
+    border:1px solid #e8ecf8;
+  }
+  .diagram{position:sticky;top:16px;max-height:calc(100vh - 2rem);overflow-y:auto;}
+  canvas{width:100%;height:auto;display:block;border-radius:12px;background:#fbfcff;}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;font-size:.72rem;color:#475569;}
+  .legend span{display:inline-flex;align-items:center;gap:5px;}
+  .dot{width:11px;height:11px;border-radius:50%;display:inline-block;}
+  .qtext{font-size:.95rem;line-height:1.6;margin:0 0 6px;}
+  .options{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0;}
+  .opt{
+    border:1.5px solid #e2e8f0;border-radius:10px;padding:8px 10px;font-size:.9rem;
+    background:#f8fafc;transition:.2s;
+  }
+  .opt.correct{border-color:#10b981;background:#ecfdf5;box-shadow:0 0 0 3px rgba(16,185,129,.12);}
+  .opt .lbl{font-weight:700;color:#4f46e5;margin-right:6px;}
+  .opt.correct .lbl{color:#059669;}
+  .step{
+    border-left:5px solid #cbd5e1;background:#f8fafc;border-radius:12px;
+    padding:10px 14px;margin:12px 0;transition:.25s;
+  }
+  .step.active{border-left-color:#4f46e5;background:#eef2ff;box-shadow:0 4px 14px rgba(79,70,229,.14);}
+  .tag{font-weight:800;font-size:.78rem;letter-spacing:.6px;color:#4f46e5;text-transform:uppercase;display:block;margin-bottom:4px;}
+  .step.active .tag{color:#3730a3;}
+  .step p{margin:4px 0;font-size:.92rem;line-height:1.55;}
+  .hint{
+    margin-top:14px;background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;
+    padding:10px 14px;font-size:.85rem;color:#9a3412;
+  }
+  .answer{
+    margin-top:14px;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;
+    border-radius:14px;padding:12px 16px;font-weight:700;font-size:1rem;
+    box-shadow:0 8px 22px rgba(79,70,229,.35);
+  }
+  .answer small{display:block;font-weight:400;opacity:.85;font-size:.72rem;margin-top:2px;}
+  mjx-container{font-size:96% !important;}
+  @media(max-width:600px){
+    body{padding:8px;}
+    .panel{padding:9px;border-radius:12px;}
+    .qtext,.step p{font-size:.82rem;}
+    .opt{font-size:.78rem;padding:6px 7px;}
+    .legend{font-size:.62rem;gap:6px;}
+    h1{font-size:.9rem;}
+  }
 </style>
 </head>
 <body>
-<div class="hero">
-  <div class="wrap">
-    <span class="tag">HKDSE 2012 · Paper 2 · MC23</span>
-    <h1>Rotation and Polar Coordinates</h1>
-  </div>
-</div>
-<div class="wrap">
-  <div class="card question">
-    <h2>Question</h2>
-    <p>The rectangular coordinates of the point \(P\) are \((-3,\,-3\sqrt{3})\). If \(P\) is rotated anticlockwise about the origin through \(90^\circ\), then the polar coordinates of its image are</p>
-    <ol style="list-style-type: upper-alpha;">
-      <li>\((3,\,150^\circ)\)</li>
-      <li>\((3,\,330^\circ)\)</li>
-      <li>\((6,\,150^\circ)\)</li>
-      <li>\((6,\,330^\circ)\)</li>
-    </ol>
-  <figure class="figure"><svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg" role="img"><rect width="320" height="240" fill="#fff"/><circle cx="160" cy="125" r="70" fill="none" stroke="#e2e8f0"/><line x1="160" y1="125" x2="302" y2="125" stroke="#334155" stroke-width="1.4"/><line x1="160" y1="125" x2="125" y2="186" stroke="#94a3b8" stroke-width="1"/><circle cx="125" cy="186" r="3.5" fill="#e11d48"/><text x="131" y="180" font-size="11" font-weight="700" fill="#1e293b">P</text><circle cx="160" cy="125" r="3" fill="#334155"/><text x="166" y="140" font-size="12" font-weight="700" fill="#1e293b">O</text><text x="304" y="129" font-size="11" fill="#475569">polar axis</text><text x="160" y="232" font-size="10" fill="#475569" text-anchor="middle">P in polar form</text></svg><figcaption>Polar coordinate system (not to scale)</figcaption></figure></div>
 
-  <div class="card">
-    <h2>Solution</h2>
-    <div class="step">
-      <span class="step-tag">Step 1 · Apply the rotation</span>
+<h1><span class="badge">HKDSE 2012 · P2 · MC23</span>Rotation and Polar Coordinates</h1>
+
+<div class="split">
+
+  <!-- LEFT: DIAGRAM -->
+  <section class="panel diagram">
+    <canvas id="cv" width="720" height="720"></canvas>
+    <div class="legend">
+      <span><i class="dot" style="background:#2563eb"></i>Point \(P(-3,-3\sqrt3)\)</span>
+      <span><i class="dot" style="background:#dc2626"></i>Image \(P'(3\sqrt3,-3)\)</span>
+      <span><i class="dot" style="background:#7c3aed"></i>Origin</span>
+      <span><i class="dot" style="background:#f59e0b"></i>Radius \(r=6\)</span>
+      <span><i class="dot" style="background:#10b981"></i>Angle</span>
+    </div>
+  </section>
+
+  <!-- RIGHT: QUESTION + SOLUTION -->
+  <section class="panel">
+    <p class="qtext">
+      The rectangular coordinates of the point \(P\) are \((-3,\,-3\sqrt{3})\).
+      If \(P\) is rotated anticlockwise about the origin through \(90^\circ\), then the
+      polar coordinates of its image are
+    </p>
+
+    <!-- FIGURE_HERE -->
+
+    <div class="options">
+      <div class="opt" id="optA"><span class="lbl">A</span>\((3,\,150^\circ)\)</div>
+      <div class="opt" id="optB"><span class="lbl">B</span>\((3,\,330^\circ)\)</div>
+      <div class="opt" id="optC"><span class="lbl">C</span>\((6,\,150^\circ)\)</div>
+      <div class="opt correct" id="optD"><span class="lbl">D</span>\((6,\,330^\circ)\)</div>
+    </div>
+
+    <div class="step" data-step="1">
+      <span class="tag">Step 1 · Apply the rotation</span>
       <p>A \(90^\circ\) anticlockwise rotation about the origin sends \((x,\,y)\mapsto(-y,\,x)\). Hence</p>
-      \[ P(-3,\,-3\sqrt{3}) \;\mapsto\; P'(3\sqrt{3},\,-3). \]
+      <p>\[ P(-3,\,-3\sqrt{3}) \;\longmapsto\; P'(3\sqrt{3},\,-3). \]</p>
     </div>
-    <div class="step">
-      <span class="step-tag">Step 2 · Find the radius \(r\)</span>
-      \[ r = \sqrt{(3\sqrt{3})^2 + (-3)^2} = \sqrt{27 + 9} = \sqrt{36} = 6. \]
-    </div>
-    <div class="step">
-      <span class="step-tag">Step 3 · Find the angle \(\theta\)</span>
-      <p>\(P'\) has \(x>0\), \(y<0\), so it lies in the 4th quadrant. Its reference angle satisfies</p>
-      \[ \tan\theta_{\text{ref}} = \frac{3}{3\sqrt{3}} = \frac{1}{\sqrt{3}} \;\Rightarrow\; \theta_{\text{ref}} = 30^\circ, \]
-      <p>so \(\theta = 360^\circ - 30^\circ = 330^\circ\).</p>
-    </div>
-    <div class="step">
-      <span class="step-tag">Step 4 · Write the polar coordinates</span>
-      <p>The image is \((6,\,330^\circ)\).</p>
-      <div class="hint"><b>Check:</b> rotating \((-3,-3\sqrt3)\) (which is \((6,240^\circ)\)) by \(90^\circ\) adds \(90^\circ\) to the angle: \(240^\circ+90^\circ=330^\circ\), with the radius unchanged, \(6\).</div>
-    </div>
-  </div>
 
-  <div class="ans">
-    Final Answer: <strong>D. \((6,\,330^\circ)\)</strong>
-  </div>
+    <div class="step" data-step="2">
+      <span class="tag">Step 2 · Find the radius \(r\)</span>
+      <p>\[ r=\sqrt{(3\sqrt{3})^2+(-3)^2}=\sqrt{27+9}=\sqrt{36}=6. \]</p>
+    </div>
+
+    <div class="step" data-step="3">
+      <span class="tag">Step 3 · Find the angle \(\theta\)</span>
+      <p>The reference angle satisfies \(\tan\alpha=\dfrac{3}{3\sqrt{3}}=\dfrac{1}{\sqrt{3}}\), so \(\alpha=30^\circ\).</p>
+      <p>\(P'\) has \(x>0\) and \(y<0\), so it lies in quadrant IV and</p>
+      <p>\[ \theta = 360^\circ - 30^\circ = 330^\circ. \]</p>
+    </div>
+
+    <div class="step" data-step="4">
+      <span class="tag">Step 4 · Write the polar coordinates</span>
+      <p>The image is therefore \((6,\,330^\circ)\).</p>
+      <p><strong>Check:</strong> \(P=(-3,-3\sqrt3)\) is \((6,240^\circ)\). A \(90^\circ\) anticlockwise rotation adds \(90^\circ\):
+      \(240^\circ+90^\circ=330^\circ\), with the radius unchanged at \(6\). ✔</p>
+    </div>
+
+    <div class="hint">
+      💡 <strong>Hint:</strong> A rotation about the origin changes the polar <em>angle</em> by the rotation amount, but keeps the distance \(r\) from the origin the same.
+    </div>
+
+    <div class="answer">
+      Final Answer: D. \((6,\,330^\circ)\)
+      <small>Radius 6, direction \(330^\circ\) (quadrant IV)</small>
+    </div>
+  </section>
+
 </div>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
 
+<script>
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+let mode = 1;
+
+/* World coordinates: x,y ranges roughly -7..7. Map to canvas. */
+const W = cv.width, H = cv.height;
+const CX = W/2, CY = H/2;
+const SCALE = (W/2) / 7.6;   // px per unit
+
+function X(x){ return CX + x*SCALE; }
+function Y(y){ return CY - y*SCALE; }
+
+/* Fixed data */
+const P  = {x:-3, y:-3*Math.sqrt(3)};   // (-3, -3√3)
+const Pr = {x: 3*Math.sqrt(3), y:-3};   // (3√3, -3)
+
+function drawArrow(ctx, x1,y1,x2,y2,color,{dash=false,width=2,head=9}={}){
+  ctx.save();
+  ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineWidth=width;
+  if(dash) ctx.setLineDash([7,6]);
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  ctx.setLineDash([]);
+  const ang=Math.atan2(y2-y1,x2-x1);
+  ctx.beginPath();
+  ctx.moveTo(x2,y2);
+  ctx.lineTo(x2-head*Math.cos(ang-0.4), y2-head*Math.sin(ang-0.4));
+  ctx.lineTo(x2-head*Math.cos(ang+0.4), y2-head*Math.sin(ang+0.4));
+  ctx.closePath(); ctx.fill();
+  ctx.restore();
+}
+
+function point(x,y,color,r=7,label=null,labelColor=null,dx=14,dy=-14){
+  ctx.save();
+  ctx.beginPath(); ctx.arc(X(x),Y(y),r,0,Math.PI*2);
+  ctx.fillStyle=color; ctx.fill();
+  ctx.strokeStyle='#fff'; ctx.lineWidth=2.5; ctx.stroke();
+  if(label){
+    ctx.fillStyle=labelColor||color;
+    ctx.font='700 22px -apple-system,Segoe UI,Roboto,sans-serif';
+    ctx.fillText(label, X(x)+dx, Y(y)+dy);
+  }
+  ctx.restore();
+}
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+
+  /* soft background grid */
+  ctx.save();
+  ctx.strokeStyle='#eef2fb'; ctx.lineWidth=1;
+  for(let g=-12; g<=12; g++){
+    ctx.beginPath(); ctx.moveTo(X(g),0); ctx.lineTo(X(g),H); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0,Y(g)); ctx.lineTo(W,Y(g)); ctx.stroke();
+  }
+  ctx.restore();
+
+  /* axes */
+  drawArrow(ctx, X(-7.2), CY, X(7.2), CY, '#94a3b8', {width:2});
+  drawArrow(ctx, CX, Y(-7.0), CX, Y(7.0), '#94a3b8', {width:2});
+  ctx.save();
+  ctx.fillStyle='#94a3b8'; ctx.font='italic 700 18px serif';
+  ctx.fillText('x', X(7.0), CY-10);
+  ctx.fillText('y', CX+10, Y(6.8));
+  ctx.restore();
+
+  /* reference circle radius 6 */
+  ctx.save();
+  ctx.beginPath(); ctx.arc(CX, CY, 6*SCALE, 0, Math.PI*2);
+  ctx.strokeStyle='#f1d5a8'; ctx.lineWidth=2; ctx.setLineDash([5,6]); ctx.stroke();
+  ctx.restore();
+
+  /* ---- Mode 1: original point & rotation ---- */
+  if(mode===1){
+    // rotation arc from P angle to P' angle
+    const a1 = Math.atan2(P.y,P.x);         // P at 240°
+    const a2 = Math.atan2(Pr.y,Pr.x);       // P' at -30° = 330°
+    ctx.save();
+    ctx.strokeStyle='#10b981'; ctx.lineWidth=3;
+    ctx.beginPath();
+    ctx.arc(CX,CY, 2.2*SCALE, -a1, -a2, true); // canvas y is flipped
+    ctx.stroke();
+    // arrowhead at the end of arc
+    const endAng = -a2;
+    const ex = CX + 2.2*SCALE*Math.cos(endAng);
+    const ey = CY + 2.2*SCALE*Math.sin(endAng);
+    const tang = endAng - Math.PI/2;
+    drawArrow(ctx, ex-6*Math.cos(tang), ey-6*Math.sin(tang), ex, ey, '#10b981',{width:3,head:10});
+    ctx.restore();
+
+    // P and P'
+    point(P.x,P.y,'#2563eb',9,'P','#2563eb',-46,26);
+    point(Pr.x,Pr.y,'#dc2626',9,"P'",'#dc2626',16,-14);
+    point(0,0,'#7c3aed',8,'O','#7c3aed',-30,30);
+
+    // 90° label
+    ctx.save();
+    ctx.fillStyle='#059669'; ctx.font='700 20px -apple-system,sans-serif';
+    ctx.fillText('90°', CX+2.9*SCALE*Math.cos(-Math.PI*0.72), CY+2.9*SCALE*Math.sin(-Math.PI*0.72));
+    ctx.restore();
+  }
+
+  /* ---- Mode 2: radius ---- */
+  if(mode===2){
+    ctx.save();
+    ctx.strokeStyle='#f59e0b'; ctx.lineWidth=4;
+    ctx.setLineDash([9,6]);
+    ctx.beginPath(); ctx.moveTo(X(0),Y(0)); ctx.lineTo(X(Pr.x),Y(Pr.y)); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+    point(0,0,'#7c3aed',8,'O','#7c3aed',-30,30);
+    point(Pr.x,Pr.y,'#dc2626',10,"P'(3√3,-3)",'#dc2626',16,-14);
+    ctx.save();
+    ctx.fillStyle='#b45309'; ctx.font='700 22px -apple-system,sans-serif';
+    ctx.fillText('r = 6', (X(0)+X(Pr.x))/2 + 10, (Y(0)+Y(Pr.y))/2 - 6);
+    ctx.restore();
+  }
+
+  /* ---- Mode 3: angle 330° ---- */
+  if(mode===3){
+    ctx.save();
+    ctx.strokeStyle='#10b981'; ctx.lineWidth=4;
+    ctx.beginPath(); ctx.arc(CX,CY, 1.8*SCALE, 0, Math.PI*2*330/360); ctx.stroke();
+    ctx.restore();
+    // radius line to P'
+    ctx.save();
+    ctx.strokeStyle='#f59e0b'; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(X(0),Y(0)); ctx.lineTo(X(Pr.x),Y(Pr.y)); ctx.stroke();
+    ctx.restore();
+    // reference angle 30 below x-axis (dashed)
+    ctx.save();
+    ctx.strokeStyle='#94a3b8'; ctx.lineWidth=2; ctx.setLineDash([5,5]);
+    ctx.beginPath(); ctx.moveTo(X(0),Y(0)); ctx.lineTo(X(6*Math.cos(-Math.PI/6)), Y(6*Math.sin(-Math.PI/6))); ctx.stroke();
+    ctx.restore();
+    ctx.save();
+    ctx.fillStyle='#059669'; ctx.font='700 22px -apple-system,sans-serif';
+    ctx.fillText('θ = 330°', CX+1.2*SCALE, CY+2.2*SCALE);
+    ctx.fillStyle='#64748b'; ctx.font='italic 700 18px serif';
+    ctx.fillText('30°', CX+3.2*SCALE, CY+0.55*SCALE);
+    ctx.restore();
+    point(0,0,'#7c3aed',8,'O','#7c3aed',-30,30);
+    point(Pr.x,Pr.y,'#dc2626',10,"P'",'#dc2626',16,-14);
+  }
+
+  /* ---- Mode 4: both points + answer ---- */
+  if(mode===4){
+    ctx.save();
+    ctx.strokeStyle='#f59e0b'; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(X(0),Y(0)); ctx.lineTo(X(P.x),Y(P.y)); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(X(0),Y(0)); ctx.lineTo(X(Pr.x),Y(Pr.y)); ctx.stroke();
+    ctx.restore();
+    // rotation arc
+    const a1 = Math.atan2(P.y,P.x), a2 = Math.atan2(Pr.y,Pr.x);
+    ctx.save();
+    ctx.strokeStyle='#10b981'; ctx.lineWidth=3; ctx.setLineDash([7,5]);
+    ctx.beginPath(); ctx.arc(CX,CY, 2.4*SCALE, -a1, -a2, true); ctx.stroke();
+    ctx.restore();
+    point(P.x,P.y,'#2563eb',10,'P(6,240°)','#2563eb',-140,20);
+    point(Pr.x,Pr.y,'#dc2626',10,"P'(6,330°)",'#dc2626',16,-16);
+    point(0,0,'#7c3aed',8,'O','#7c3aed',-30,30);
+    ctx.save();
+    ctx.fillStyle='#4f46e5'; ctx.font='700 24px -apple-system,sans-serif';
+    ctx.fillText('Answer: (6, 330°)', 30, 44);
+    ctx.restore();
+  }
+}
+
+/* ---- Scroll sync ---- */
+const steps=Array.from(document.querySelectorAll('.step'));
+const obs=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){
+  const m=+e.target.dataset.step; mode=m;
+  steps.forEach(st=>st.classList.toggle('active',st===e.target)); draw();}});},
+  {rootMargin:'-15% 0px -55% 0px',threshold:0});
+steps.forEach(st=>obs.observe(st));
+
+steps[0].classList.add('active');
+draw();
+window.addEventListener('resize', draw);
+</script>
 </body>
 </html>

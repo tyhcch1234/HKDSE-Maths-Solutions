@@ -3,109 +3,430 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HKDSE 2021 Paper 1 Q7 · Polar Coordinates</title>
-<script>
-  window.MathJax = {
-    tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['\\[','\\]']] },
-    svg: { fontCache: 'global' }
-  };
-</script>
+<title>HKDSE 2021 P1 Q7 · Polar Coordinates</title>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
-  :root{--blue:#1d4ed8;--blue-light:#3b82f6;--amber:#f59e0b;--amber-bg:#fffbeb;--emerald:#059669;--emerald-bg:#ecfdf5;--slate:#0f172a;--slate-soft:#475569;--line:#e2e8f0;--card:#ffffff;--bg:#f1f5f9;}
-  *{box-sizing:border-box;} html,body{margin:0;padding:0;}
-  body{font-family:"Segoe UI",system-ui,-apple-system,Helvetica,Arial,sans-serif;color:var(--slate);background:var(--bg);line-height:1.6;-webkit-font-smoothing:antialiased;}
-  .wrap{max-width:920px;margin:0 auto;padding:0 16px 60px;}
-  .hero{background:linear-gradient(120deg,#0f172a,#1e3a8a 45%,#2563eb);color:#fff;padding:32px 20px 28px;}
-  .hero .tag{display:inline-block;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;background:rgba(255,255,255,.16);border-radius:99px;padding:3px 12px;margin-bottom:10px;}
-  .hero h1{margin:0;font-size:1.5rem;font-weight:800;}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin:18px 0;box-shadow:0 1px 3px rgba(15,23,42,.06);}
-  .card h2{margin:0 0 10px;font-size:1.05rem;color:var(--blue);}
-  .question{font-size:1.08rem;}
-  .question ol,.question ul{margin:10px 0;padding-left:22px;}
-  .marks{color:var(--slate-soft);font-size:.85rem;font-style:italic;}
-  .step{border-left:3px solid var(--blue-light);background:#f8fafc;border-radius:8px;padding:12px 16px;margin:12px 0;}
-  .step .step-tag{display:inline-block;font-size:.7rem;font-weight:700;color:#fff;background:var(--blue);border-radius:99px;padding:2px 10px;margin-bottom:8px;}
-  .ans{background:var(--emerald-bg);border:1px solid #6ee7b7;border-radius:10px;padding:14px 18px;font-weight:600;margin:16px 0;}
-  .hint{background:var(--amber-bg);border:1px solid #fcd34d;border-radius:10px;padding:10px 16px;font-size:.9rem;color:#92400e;margin:10px 0;}
-  .mono{font-family:ui-monospace,Consolas,monospace;}
+  :root{
+    --bg:#f4f7fb;
+    --card:#ffffff;
+    --ink:#1e2a3a;
+    --muted:#5b6b80;
+    --blue:#2563eb;
+    --red:#e11d48;
+    --green:#10b981;
+    --amber:#f59e0b;
+    --purple:#7c3aed;
+    --teal:#0891b2;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    padding:14px;
+    background:linear-gradient(135deg,#eef4fb,#e8eefc 60%,#f6f1ff);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink);
+    min-height:100vh;
+  }
+  h1{font-size:1.05rem;margin:0 0 10px 0;letter-spacing:.3px;color:#243b53;}
+  .split{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    gap:12px;
+    align-items:start;
+  }
+  @media(min-width:900px){
+    .split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}
+  }
+  .panel{
+    background:var(--card);
+    border-radius:18px;
+    box-shadow:0 6px 24px rgba(30,58,138,.08),0 1px 3px rgba(30,58,138,.06);
+    padding:14px;
+  }
+  @media(max-width:899px){
+    .panel{padding:10px;border-radius:14px;}
+  }
+  .diagram{
+    position:sticky;
+    top:16px;
+    max-height:calc(100vh - 2rem);
+    overflow-y:auto;
+  }
+  .diagram h2, .panel h2{
+    font-size:.82rem;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    color:var(--muted);
+    margin:0 0 8px 0;
+  }
+  canvas{width:100%;height:auto;display:block;border-radius:12px;background:#fbfdff;}
+  .legend{
+    display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:10px;font-size:.74rem;color:var(--muted);
+  }
+  .legend span{display:inline-flex;align-items:center;gap:5px;}
+  .swatch{width:14px;height:4px;border-radius:2px;display:inline-block;}
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block;}
+
+  .qtext{font-size:.95rem;line-height:1.55;background:#f1f6ff;border-left:4px solid var(--blue);padding:10px 12px;border-radius:10px;}
+  .qtext p{margin:0 0 6px 0;}
+  .qtext ol{margin:6px 0 0 0;padding-left:20px;}
+  .tag{
+    display:inline-block;font-size:.68rem;font-weight:700;letter-spacing:.8px;padding:3px 9px;border-radius:99px;
+    background:var(--blue);color:#fff;text-transform:uppercase;margin-bottom:6px;
+  }
+  .steps{margin-top:14px;display:flex;flex-direction:column;gap:12px;}
+  .step{
+    background:#fff;border:1.5px solid #e5ecf6;border-radius:14px;padding:12px 14px;
+    transition:border-color .25s, box-shadow .25s, transform .25s;
+  }
+  .step.active{
+    border-color:var(--purple);
+    box-shadow:0 6px 20px rgba(124,58,237,.18);
+    background:#fbf8ff;
+  }
+  .step .stag{
+    font-size:.72rem;font-weight:800;letter-spacing:1px;color:var(--purple);text-transform:uppercase;margin-bottom:6px;
+  }
+  .step p{margin:6px 0;font-size:.92rem;line-height:1.5;}
+  .hint{
+    font-size:.82rem;color:var(--teal);background:#ecfeff;border-radius:8px;padding:6px 10px;margin-top:8px;
+  }
+  .answer{
+    margin-top:14px;background:linear-gradient(135deg,#eefdf6,#e6f4ff);
+    border:1.5px solid #b9e8d3;border-radius:14px;padding:12px 14px;font-size:.92rem;
+  }
+  .answer .stag{color:var(--green);}
+  .answer strong{color:#047857;}
+  .subhead{font-size:.8rem;color:var(--muted);margin:14px 0 4px 0;letter-spacing:.5px;text-transform:uppercase;}
+  mjx-container{font-size:0.95em !important;}
+  @media(max-width:899px){
+    body{padding:8px;}
+    h1{font-size:.9rem;}
+    .qtext,.step p,.answer{font-size:.82rem;}
+    .legend{font-size:.66rem;}
+  }
 </style>
 </head>
 <body>
-<div class="hero">
-  <div class="wrap">
-    <span class="tag">HKDSE 2021 · Paper 1 · Q7</span>
-    <h1>Polar Coordinates</h1>
-  </div>
-</div>
-<div class="wrap">
-  <div class="card question">
+
+<h1>HKDSE 2021 · Paper 1 · Q7 — Polar Coordinates</h1>
+
+<div class="split">
+
+  <!-- LEFT: diagram -->
+  <section class="panel diagram">
+    <h2>Interactive Diagram</h2>
+    <canvas id="cv" width="640" height="640"></canvas>
+    <div class="legend">
+      <span><i class="swatch" style="background:#7c3aed"></i>Polar axis / angle</span>
+      <span><i class="swatch" style="background:#2563eb"></i>OP, OQ radii</span>
+      <span><i class="swatch" style="background:#e11d48"></i>PQ</span>
+      <span><i class="dot" style="background:#f59e0b"></i>P</span>
+      <span><i class="dot" style="background:#10b981"></i>Q</span>
+      <span><i class="dot" style="background:#1e2a3a"></i>O (pole)</span>
+    </div>
+  </section>
+
+  <!-- RIGHT: question + solution -->
+  <section class="panel">
     <h2>Question</h2>
-    <p>In a polar coordinate system, \( O \) is the pole. The polar coordinates of the points \( P \) and \( Q \) are \( \left(r,80^{\circ}\right) \) and \( \left(r,140^{\circ}\right) \) respectively, where \( r \) is a positive constant. It is given that the distance between \( P \) and \( Q \) is 21. Find</p>
-    <ol type="a">
-      <li>\( \angle POQ \),</li>
-      <li>\( r \),</li>
-      <li>the perimeter of \( \triangle OPQ \). <span class="marks">(4 marks)</span></li>
-    </ol>
-  <figure class="figure"><svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg" role="img"><rect width="320" height="240" fill="#fff"/><circle cx="160" cy="125" r="70" fill="none" stroke="#e2e8f0"/><line x1="160" y1="125" x2="302" y2="125" stroke="#334155" stroke-width="1.4"/><line x1="160" y1="125" x2="172" y2="56" stroke="#94a3b8" stroke-width="1"/><circle cx="172" cy="56" r="3.5" fill="#e11d48"/><text x="178" y="50" font-size="11" font-weight="700" fill="#1e293b">P</text><line x1="160" y1="125" x2="106" y2="80" stroke="#94a3b8" stroke-width="1"/><circle cx="106" cy="80" r="3.5" fill="#e11d48"/><text x="112" y="74" font-size="11" font-weight="700" fill="#1e293b">Q</text><circle cx="160" cy="125" r="3" fill="#334155"/><text x="166" y="140" font-size="12" font-weight="700" fill="#1e293b">O</text><text x="304" y="129" font-size="11" fill="#475569">polar axis</text><text x="160" y="232" font-size="10" fill="#475569" text-anchor="middle">P(r,80°), Q(r,140°)</text></svg><figcaption>Polar coordinate system (not to scale)</figcaption></figure></div>
+    <div class="qtext">
+      <p>In a polar coordinate system, \(O\) is the pole. The polar coordinates of the points \(P\) and \(Q\) are \(\left(r,80^{\circ}\right)\) and \(\left(r,140^{\circ}\right)\) respectively, where \(r\) is a positive constant. It is given that the distance between \(P\) and \(Q\) is 21. Find</p>
+      <ol>
+        <li>\(\angle POQ\),</li>
+        <li>\(r\),</li>
+        <li>the perimeter of \(\triangle OPQ\). &nbsp;(4 marks)</li>
+      </ol>
+    </div>
+    <!-- FIGURE_HERE -->
 
-  <div class="card">
-    <h2>Solution</h2>
-    <div class="step">
-      <span class="step-tag">STEP 1 · Part (a) — the angle at the pole</span>
-      The two position vectors make angles \( 80^{\circ} \) and \( 140^{\circ} \) with the initial line, so
-      \[ \angle POQ = 140^{\circ}-80^{\circ} = 60^{\circ}. \]
-    </div>
-    <div class="step">
-      <span class="step-tag">STEP 2 · Part (b) — find \( r \)</span>
-      Since \( OP = OQ = r \), \( \triangle OPQ \) is isosceles. By the cosine rule on \( \triangle OPQ \):
-      \[ PQ^{2} = r^{2}+r^{2}-2r^{2}\cos 60^{\circ} = 2r^{2}-r^{2} = r^{2}, \]
-      so \( PQ = r \). Given \( PQ = 21 \),
-      \[ r = 21. \]
-      (Equivalently: an isosceles triangle with vertex angle \( 60^{\circ} \) is equilateral.)
-    </div>
-    <div class="step">
-      <span class="step-tag">STEP 3 · Part (c) — the perimeter</span>
-      All three sides of \( \triangle OPQ \) equal 21, so the perimeter is
-      \[ 21+21+21 = 63. \]
-    </div>
-  </div>
+    <div class="steps">
 
-  <div class="ans">
-    Final Answer: (a) \( 60^{\circ} \) &nbsp;|&nbsp; (b) \( r = 21 \) &nbsp;|&nbsp; (c) \( 63 \)
-  </div>
+      <div class="step" data-step="1">
+        <div class="stag">Step 1 · Part (a) — the angle at the pole</div>
+        <p>The two position vectors make angles \(80^{\circ}\) and \(140^{\circ}\) with the initial line, so</p>
+        <p>\[ \angle POQ = 140^{\circ}-80^{\circ}=60^{\circ}. \]</p>
+      </div>
+
+      <div class="step" data-step="2">
+        <div class="stag">Step 2 · Part (b) — find \(r\)</div>
+        <p>Since \(OP=OQ=r\), \(\triangle OPQ\) is isosceles. By the cosine rule on \(\triangle OPQ\):</p>
+        <p>\[ PQ^{2}=r^{2}+r^{2}-2r^{2}\cos 60^{\circ}=2r^{2}-r^{2}=r^{2}, \]</p>
+        <p>so \(PQ=r\). Given \(PQ=21\),</p>
+        <p>\[ r=21. \]</p>
+        <div class="hint">Equivalently: an isosceles triangle with vertex angle \(60^{\circ}\) is equilateral.</div>
+      </div>
+
+      <div class="step" data-step="3">
+        <div class="stag">Step 3 · Part (c) — the perimeter</div>
+        <p>All three sides of \(\triangle OPQ\) equal \(21\), so the perimeter is</p>
+        <p>\[ 21+21+21=63. \]</p>
+      </div>
+
+    </div>
+
+    <div class="answer">
+      <div class="stag">Final Answer</div>
+      <p><strong>(a)</strong> \(\;60^{\circ}\) &nbsp;|&nbsp; <strong>(b)</strong> \(\;r=21\) &nbsp;|&nbsp; <strong>(c)</strong> \(\;63\)</p>
+    </div>
+
+  </section>
 </div>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
+
+<script>
+  /* ---------- MathJax config placed via inline script after load is fine ---------- */
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$','$'],['\\(','\\)']],
+      displayMath: [['$$','$$'],['\\[','\\]']]
+    },
+    svg: { fontCache: 'global' }
+  };
 </script>
 
+<script>
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  let mode = 1;
+
+  const DPR = window.devicePixelRatio || 1;
+  function fitCanvas(){
+    const cssW = cv.clientWidth || 400;
+    const cssH = cssW; // square
+    cv.width = cssW * DPR;
+    cv.height = cssH * DPR;
+    cv.style.height = cssH + 'px';
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+    draw();
+  }
+
+  const COL = {
+    blue:'#2563eb', red:'#e11d48', green:'#10b981',
+    amber:'#f59e0b', purple:'#7c3aed', ink:'#1e2a3a',
+    teal:'#0891b2', axis:'#94a3b8'
+  };
+
+  function draw(){
+    const W = cv.clientWidth || 400;
+    const H = W;
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle = '#fbfdff';
+    ctx.fillRect(0,0,W,H);
+
+    // Geometry: O at origin. r = 21. P at 80°, Q at 140°.
+    // Choose a uniform scale so the whole figure fits with margin.
+    // The farthest extent: circle radius r; angle spans 0..140°. We'll set O offset.
+    const r = 21;
+    const deg = d => d * Math.PI / 180;
+    const pA = deg(80), qA = deg(140);
+
+    // Model coordinates (math, y up). We will map to canvas.
+    const P = {x: r*Math.cos(pA), y: r*Math.sin(pA)};
+    const Q = {x: r*Math.cos(qA), y: r*Math.sin(qA)};
+    const O = {x: 0, y: 0};
+
+    // World bounds including polar axis a bit and circle
+    const world = [
+      {x:-2,y:-2},{x:r*0.55, y:-2}, P, Q, O,
+      {x:r+2, y:0}
+    ];
+
+    // Compute bounding box with margin (need the triangle + a bit of axis)
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    [P,Q,O,{x:r+4,y:0},{x:0,y:r+4}].forEach(pt=>{
+      minX = Math.min(minX, pt.x); maxX = Math.max(maxX, pt.x);
+      minY = Math.min(minY, pt.y); maxY = Math.max(maxY, pt.y);
+    });
+    minX = Math.min(minX, -6);
+    const pad = 34;
+    const spanX = maxX - minX;
+    const spanY = maxY - minY;
+    const scale = Math.min((W - 2*pad)/spanX, (H - 2*pad)/spanY);
+    // Base translation: place O toward lower-right region (since figure sits in upper right quadrant).
+    // We want O near bottom, P/Q upper-right. We'll map: canvasX = ox + (x - minX)*scale
+    const ox = pad + (W - 2*pad - spanX*scale)/2;
+    const oy = pad + (H - 2*pad - spanY*scale)/2;
+    const toC = pt => ({
+      x: ox + (pt.x - minX)*scale,
+      y: H - (oy + (pt.y - minY)*scale) // flip y
+    });
+
+    const cO = toC(O), cP = toC(P), cQ = toC(Q);
+
+    // ---- Draw polar axis (initial line) ----
+    ctx.strokeStyle = COL.axis;
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([5,5]);
+    const axisEnd = toC({x: maxX, y:0});
+    ctx.beginPath();
+    ctx.moveTo(cO.x, cO.y);
+    ctx.lineTo(axisEnd.x, axisEnd.y);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    // label axis
+    ctx.fillStyle = COL.axis;
+    ctx.font = '600 11px sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('polar axis', axisEnd.x - 62, axisEnd.y - 8);
+
+    // ---- Angle sector highlight (mode 1) ----
+    if(mode === 1){
+      ctx.fillStyle = 'rgba(124,58,237,0.13)';
+      ctx.beginPath();
+      ctx.moveTo(cO.x, cO.y);
+      const rad = 42;
+      // On canvas, y is flipped, so use canvas angles: angleCanvas = -angleMath
+      ctx.arc(cO.x, cO.y, rad, -qA, -pA, false);
+      ctx.closePath();
+      ctx.fill();
+      // arc stroke
+      ctx.strokeStyle = COL.purple;
+      ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      ctx.arc(cO.x, cO.y, rad, -qA, -pA, false);
+      ctx.stroke();
+      // angle label
+      const midA = -deg(110);
+      ctx.fillStyle = COL.purple;
+      ctx.font = '700 13px sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline='middle';
+      ctx.fillText('60°', cO.x + (rad+18)*Math.cos(midA), cO.y + (rad+18)*Math.sin(midA));
+    }
+
+    // ---- Arc showing standard angles (80° and 140°) ----
+    ctx.strokeStyle = 'rgba(37,99,235,0.25)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(cO.x, cO.y, 24, -qA, 0, false);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(cO.x, cO.y, 24, -pA, 0, false);
+    ctx.stroke();
+
+    // ---- Triangle sides ----
+    const drawLine = (a,b,color,width,dash) => {
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
+      ctx.setLineDash(dash || []);
+      ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+      ctx.setLineDash([]);
+    };
+
+    // OP (blue) and OQ (green)
+    drawLine(cO, cP, COL.blue, 3);
+    drawLine(cO, cQ, COL.green, 3);
+    // PQ (red) — emphasize in mode 2 & 3
+    drawLine(cP, cQ, COL.red, mode>=2 ? 4.2 : 3);
+
+    // ---- Radii labels ----
+    const mid = (a,b) => ({x:(a.x+b.x)/2, y:(a.y+b.y)/2});
+    const offsetLabel = (pt, color, text) => {
+      ctx.fillStyle = color;
+      ctx.font = '700 12px sans-serif';
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText(text, pt.x, pt.y);
+    };
+
+    // OP label
+    let mOP = mid(cO,cP);
+    ctx.save();
+    ctx.translate(mOP.x, mOP.y);
+    ctx.rotate(Math.atan2(cP.y-cO.y, cP.x-cO.x));
+    ctx.fillStyle = COL.blue;
+    ctx.font = '700 13px sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='bottom';
+    ctx.fillText('r', 0, -6);
+    ctx.restore();
+
+    // OQ label
+    let mOQ = mid(cO,cQ);
+    ctx.save();
+    ctx.translate(mOQ.x, mOQ.y);
+    ctx.rotate(Math.atan2(cQ.y-cO.y, cQ.x-cO.x));
+    ctx.fillStyle = COL.green;
+    ctx.font = '700 13px sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='bottom';
+    ctx.fillText('r', 0, -6);
+    ctx.restore();
+
+    // PQ label
+    let mPQ = mid(cP,cQ);
+    const pqlabel = mode>=2 ? '21' : 'PQ';
+    offsetLabel({x:mPQ.x, y:mPQ.y - 12}, COL.red, pqlabel);
+
+    // ---- Points ----
+    const drawPoint = (p, color, radius=6) => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, radius, 0, Math.PI*2);
+      ctx.fillStyle = '#fff';
+      ctx.fill();
+      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = color;
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, radius*0.45, 0, Math.PI*2);
+      ctx.fillStyle = color;
+      ctx.fill();
+    };
+
+    drawPoint(cP, COL.amber, 7);
+    drawPoint(cQ, COL.green, 7);
+    drawPoint(cO, COL.ink, 7);
+
+    // P, Q, O labels
+    const placeLabel = (p, dx, dy, text, color) => {
+      ctx.fillStyle = color;
+      ctx.font = '800 14px sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(text, p.x + dx, p.y + dy);
+    };
+    placeLabel(cP, 16, -14, 'P', COL.amber);
+    placeLabel(cQ, -16, -14, 'Q', COL.green);
+    placeLabel(cO, -16, 10, 'O', COL.ink);
+
+    // Coordinate tags near P, Q
+    ctx.font = '600 10.5px sans-serif';
+    ctx.textAlign = 'left'; ctx.textBaseline='middle';
+    ctx.fillStyle = COL.amber;
+    ctx.fillText('(r, 80°)', cP.x + 10, cP.y + 4);
+    ctx.fillStyle = COL.green;
+    ctx.fillText('(r, 140°)', cQ.x - 62, cQ.y + 4);
+
+    // Title tag
+    ctx.fillStyle = COL.ink;
+    ctx.font = '700 12px sans-serif';
+    ctx.textAlign='left'; ctx.textBaseline='top';
+    ctx.fillText('Triangle OPQ (angles in degrees)', 12, 10);
+
+    // Mode tag bottom-right
+    ctx.fillStyle = 'rgba(124,58,237,0.9)';
+    ctx.font = '700 11px sans-serif';
+    ctx.textAlign='right'; ctx.textBaseline='bottom';
+    const modeLabel = mode === 1 ? 'Highlight: ∠POQ = 60°'
+                    : mode === 2 ? 'Highlight: PQ = 21 ⟹ r = 21'
+                    : 'Highlight: perimeter = 3·21 = 63';
+    ctx.fillText(modeLabel, W - 10, H - 8);
+  }
+
+  window.addEventListener('resize', fitCanvas);
+  fitCanvas();
+
+  /* ---------- Scroll sync ---------- */
+  const steps = Array.from(document.querySelectorAll('.step'));
+  const obs = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        const m = +e.target.dataset.step;
+        mode = m;
+        steps.forEach(st => st.classList.toggle('active', st === e.target));
+        draw();
+      }
+    });
+  }, {rootMargin:'-15% 0px -55% 0px', threshold:0});
+  steps.forEach(st => obs.observe(st));
+
+  // activate first step by default
+  if(steps.length){ steps[0].classList.add('active'); mode = 1; draw(); }
+</script>
 </body>
 </html>

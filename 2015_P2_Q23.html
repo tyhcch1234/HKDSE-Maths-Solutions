@@ -3,112 +3,542 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HKDSE 2015 Paper 2 MC23 · Reflection and Polar Coordinates</title>
+<title>HKDSE 2015 P2 MC23 · Reflection &amp; Polar Coordinates</title>
 <script>
   window.MathJax = {
-    tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['\\[','\\]']] },
+    tex: {
+      inlineMath: [['$','$'],['\\(','\\)']],
+      displayMath: [['$$','$$'],['\\[','\\]']]
+    },
     svg: { fontCache: 'global' }
   };
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
-  :root{--blue:#1d4ed8;--blue-light:#3b82f6;--amber:#f59e0b;--amber-bg:#fffbeb;--emerald:#059669;--emerald-bg:#ecfdf5;--slate:#0f172a;--slate-soft:#475569;--line:#e2e8f0;--card:#ffffff;--bg:#f1f5f9;}
-  *{box-sizing:border-box;} html,body{margin:0;padding:0;}
-  body{font-family:"Segoe UI",system-ui,-apple-system,Helvetica,Arial,sans-serif;color:var(--slate);background:var(--bg);line-height:1.6;-webkit-font-smoothing:antialiased;}
-  .wrap{max-width:920px;margin:0 auto;padding:0 16px 60px;}
-  .hero{background:linear-gradient(120deg,#0f172a,#1e3a8a 45%,#2563eb);color:#fff;padding:32px 20px 28px;}
-  .hero .tag{display:inline-block;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;background:rgba(255,255,255,.16);border-radius:99px;padding:3px 12px;margin-bottom:10px;}
-  .hero h1{margin:0;font-size:1.5rem;font-weight:800;}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin:18px 0;box-shadow:0 1px 3px rgba(15,23,42,.06);}
-  .card h2{margin:0 0 10px;font-size:1.05rem;color:var(--blue);}
-  .question{font-size:1.08rem;}
-  .question ol,.question ul{margin:10px 0;padding-left:22px;}
-  .marks{color:var(--slate-soft);font-size:.85rem;font-style:italic;}
-  .step{border-left:3px solid var(--blue-light);background:#f8fafc;border-radius:8px;padding:12px 16px;margin:12px 0;}
-  .step .step-tag{display:inline-block;font-size:.7rem;font-weight:700;color:#fff;background:var(--blue);border-radius:99px;padding:2px 10px;margin-bottom:8px;}
-  .ans{background:var(--emerald-bg);border:1px solid #6ee7b7;border-radius:10px;padding:14px 18px;font-weight:600;margin:16px 0;}
-  .hint{background:var(--amber-bg);border:1px solid #fcd34d;border-radius:10px;padding:10px 16px;font-size:.9rem;color:#92400e;margin:10px 0;}
-  .mono{font-family:ui-monospace,Consolas,monospace;}
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:"Segoe UI", "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+    background:linear-gradient(160deg,#eef4ff 0%,#f8fbff 40%,#fdf6ff 100%);
+    color:#1e2433;
+    min-height:100vh;
+    padding:14px;
+  }
+  h1{
+    font-size:1.02rem;
+    letter-spacing:.03em;
+    color:#2b3a67;
+    margin:0 0 10px 2px;
+    font-weight:700;
+  }
+  h1 span{color:#6b46c1;}
+
+  .split{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    gap:12px;
+    align-items:start;
+  }
+  @media(min-width:900px){
+    .split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}
+  }
+
+  .panel{
+    background:#ffffff;
+    border-radius:16px;
+    box-shadow:0 6px 24px rgba(43,58,103,.10), 0 1px 3px rgba(43,58,103,.06);
+    padding:14px;
+    border:1px solid #e8eefc;
+  }
+  @media(max-width:600px){
+    .panel{padding:9px;border-radius:12px;}
+    h1{font-size:.85rem;}
+  }
+
+  /* LEFT / diagram */
+  .diagram{
+    position:sticky;
+    top:16px;
+    max-height:calc(100vh - 2rem);
+    overflow-y:auto;
+  }
+  .diagram-title{
+    font-size:.78rem;
+    font-weight:700;
+    color:#6b46c1;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    margin:0 0 6px 2px;
+  }
+  canvas{
+    display:block;
+    width:100%;
+    height:auto;
+    border-radius:12px;
+    background:#fcfdff;
+    touch-action:none;
+  }
+  .legend{
+    display:flex;
+    flex-wrap:wrap;
+    gap:4px 12px;
+    margin-top:8px;
+    font-size:.68rem;
+    color:#43507a;
+  }
+  .legend i{
+    display:inline-block;
+    width:10px;height:10px;border-radius:3px;
+    margin-right:4px;
+    vertical-align:-1px;
+  }
+  .hintbox{
+    margin-top:8px;
+    font-size:.68rem;
+    color:#5b678c;
+    background:#f4f7ff;
+    border-radius:8px;
+    padding:6px 8px;
+    line-height:1.35;
+  }
+
+  /* RIGHT panel */
+  .qtag{
+    display:inline-block;
+    background:linear-gradient(90deg,#6b46c1,#8b5cf6);
+    color:#fff;
+    font-size:.64rem;
+    font-weight:700;
+    letter-spacing:.09em;
+    padding:4px 10px;
+    border-radius:999px;
+    margin-bottom:8px;
+  }
+  .question{
+    font-size:.86rem;
+    line-height:1.55;
+    background:#f7f9ff;
+    border-left:4px solid #8b5cf6;
+    border-radius:8px;
+    padding:10px 12px;
+    margin-bottom:12px;
+  }
+  @media(max-width:600px){
+    .question{font-size:.75rem;}
+  }
+  .choices{
+    display:grid;
+    gap:5px;
+    margin:10px 0 0;
+    padding:0;
+    list-style:none;
+  }
+  .choices li{
+    font-size:.8rem;
+    background:#fff;
+    border:1px solid #e2e9f8;
+    border-radius:8px;
+    padding:5px 10px;
+    color:#2b3a67;
+  }
+  .choices li b{
+    color:#6b46c1;
+    margin-right:6px;
+  }
+
+  .step{
+    background:#ffffff;
+    border:1px solid #e6ecfa;
+    border-left:5px solid #cbd6ef;
+    border-radius:12px;
+    padding:10px 12px;
+    margin-bottom:10px;
+    transition:all .22s ease;
+    opacity:.92;
+  }
+  .step.active{
+    border-left-color:#7c3aed;
+    box-shadow:0 6px 20px rgba(124,58,237,.16);
+    transform:translateX(1px);
+    opacity:1;
+    background:#fbfaff;
+  }
+  .step .tag{
+    display:block;
+    font-size:.66rem;
+    font-weight:800;
+    letter-spacing:.1em;
+    color:#8b5cf6;
+    text-transform:uppercase;
+    margin-bottom:5px;
+  }
+  .step p{
+    margin:6px 0;
+    font-size:.8rem;
+    line-height:1.55;
+  }
+  @media(max-width:600px){
+    .step{padding:8px;border-radius:10px;}
+    .step p{font-size:.7rem;}
+    .step .tag{font-size:.58rem;}
+  }
+  .step mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
+
+  .ans{
+    margin-top:12px;
+    border-radius:12px;
+    padding:12px 14px;
+    background:linear-gradient(120deg,#ecfdf5,#e0f2fe);
+    border:1px solid #b7e4d0;
+    font-size:.85rem;
+    line-height:1.5;
+  }
+  .ans .label{
+    font-size:.64rem;
+    font-weight:800;
+    letter-spacing:.12em;
+    color:#0f766e;
+    text-transform:uppercase;
+    display:block;
+    margin-bottom:4px;
+  }
+  .ans strong{color:#0f766e;}
+  @media(max-width:600px){
+    .ans{font-size:.74rem;padding:9px;}
+  }
+
+  .hint{
+    font-size:.74rem;
+    color:#8a5a00;
+    background:#fffaeb;
+    border:1px dashed #f2cf72;
+    border-radius:8px;
+    padding:7px 10px;
+    margin-top:8px;
+  }
 </style>
 </head>
 <body>
-<div class="hero">
-  <div class="wrap">
-    <span class="tag">HKDSE 2015 · Paper 2 · MC23</span>
-    <h1>Reflection and Polar Coordinates</h1>
-  </div>
-</div>
-<div class="wrap">
-  <div class="card question">
-    <h2>Question</h2>
-    <p>The rectangular coordinates of the point \(A\) are \((\sqrt{3},\,-1)\). If \(A\) is reflected with respect to the \(y\)-axis, then the polar coordinates of its image are</p>
-    <ol style="list-style-type: upper-alpha;">
-      <li>\((1,\,210^\circ)\)</li>
-      <li>\((1,\,240^\circ)\)</li>
-      <li>\((2,\,210^\circ)\)</li>
-      <li>\((2,\,240^\circ)\)</li>
-    </ol>
-  <figure class="figure"><svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg" role="img"><rect width="320" height="240" fill="#fff"/><circle cx="160" cy="125" r="70" fill="none" stroke="#e2e8f0"/><line x1="160" y1="125" x2="302" y2="125" stroke="#334155" stroke-width="1.4"/><line x1="160" y1="125" x2="221" y2="160" stroke="#94a3b8" stroke-width="1"/><circle cx="221" cy="160" r="3.5" fill="#e11d48"/><text x="227" y="154" font-size="11" font-weight="700" fill="#1e293b">A</text><circle cx="160" cy="125" r="3" fill="#334155"/><text x="166" y="140" font-size="12" font-weight="700" fill="#1e293b">O</text><text x="304" y="129" font-size="11" fill="#475569">polar axis</text><text x="160" y="232" font-size="10" fill="#475569" text-anchor="middle">A(√3,-1)</text></svg><figcaption>Polar coordinate system (not to scale)</figcaption></figure></div>
 
-  <div class="card">
-    <h2>Solution</h2>
-    <div class="step">
-      <span class="step-tag">Step 1 · Apply the reflection</span>
+<h1>HKDSE 2015 · Paper 2 · <span>MC23</span> — Reflection &amp; Polar Coordinates</h1>
+
+<div class="split">
+
+  <!-- ================= LEFT : DIAGRAM ================= -->
+  <section class="panel diagram">
+    <p class="diagram-title">Interactive Diagram</p>
+    <canvas id="cv" width="640" height="640"></canvas>
+    <div class="legend">
+      <span><i style="background:#2563eb"></i>\(A(\sqrt3,-1)\)</span>
+      <span><i style="background:#dc2626"></i>Image \(A'(-\sqrt3,-1)\)</span>
+      <span><i style="background:#94a3b8"></i>y-axis (mirror)</span>
+      <span><i style="background:#7c3aed"></i>Radius \(r=2\)</span>
+      <span><i style="background:#f59e0b"></i>Angle \(\theta\)</span>
+    </div>
+    <div class="hintbox">The dashed arrow shows the reflection across the \(y\)-axis. The amber arc marks the polar angle measured from the positive \(x\)-axis.</div>
+  </section>
+
+  <!-- ================= RIGHT : SOLUTION ================= -->
+  <section class="panel">
+    <span class="qtag">HKDSE 2015 · P2 · MC23</span>
+
+    <div class="question">
+      The rectangular coordinates of the point \(A\) are \((\sqrt{3},\,-1)\). If \(A\) is reflected with respect to the \(y\)-axis, then the polar coordinates of its image are
+      <ul class="choices">
+        <li><b>A</b>\((1,\,210^\circ)\)</li>
+        <li><b>B</b>\((1,\,240^\circ)\)</li>
+        <li><b>C</b>\((2,\,210^\circ)\)</li>
+        <li><b>D</b>\((2,\,240^\circ)\)</li>
+      </ul>
+    </div>
+    <!-- FIGURE_HERE -->
+
+    <div class="step" data-step="1">
+      <span class="tag">Step 1 · Apply the reflection</span>
       <p>Reflection about the \(y\)-axis sends \((x,\,y)\mapsto(-x,\,y)\). Hence</p>
-      \[ A(\sqrt{3},\,-1) \;\mapsto\; A'(-\sqrt{3},\,-1). \]
+      <p>\[ A(\sqrt{3},\,-1) \;\longmapsto\; A'(-\sqrt{3},\,-1). \]</p>
     </div>
-    <div class="step">
-      <span class="step-tag">Step 2 · Find the radius \(r\)</span>
-      \[ r = \sqrt{(-\sqrt{3})^2 + (-1)^2} = \sqrt{3+1} = \sqrt{4} = 2. \]
-    </div>
-    <div class="step">
-      <span class="step-tag">Step 3 · Find the angle \(\theta\)</span>
-      <p>\(A'\) has \(x<0\), \(y<0\), so it lies in the 3rd quadrant. Its reference angle satisfies</p>
-      \[ \tan\theta_{\text{ref}} = \frac{1}{\sqrt{3}} \;\Rightarrow\; \theta_{\text{ref}} = 30^\circ, \]
-      <p>so \(\theta = 180^\circ + 30^\circ = 210^\circ\).</p>
-    </div>
-    <div class="step">
-      <span class="step-tag">Step 4 · Write the polar coordinates</span>
-      <p>The image is \((2,\,210^\circ)\).</p>
-      <div class="hint"><b>Check:</b> \(A(\sqrt3,-1)\) is \((2,330^\circ)\). Reflection about the \(y\)-axis sends angle \(\theta\) to \(180^\circ-\theta\): \(180^\circ-330^\circ = -150^\circ \equiv 210^\circ\).</div>
-    </div>
-  </div>
 
-  <div class="ans">
-    Final Answer: <strong>C. \((2,\,210^\circ)\)</strong>
-  </div>
+    <div class="step" data-step="2">
+      <span class="tag">Step 2 · Find the radius \(r\)</span>
+      <p>\[ r = \sqrt{(-\sqrt{3})^2 + (-1)^2} = \sqrt{3+1} = \sqrt{4} = 2. \]</p>
+      <div class="hint">The radius is the distance from the pole \(O\) — it is unchanged by reflection, so \(r=2\) for both \(A\) and \(A'\).</div>
+    </div>
+
+    <div class="step" data-step="3">
+      <span class="tag">Step 3 · Find the angle \(\theta\)</span>
+      <p>\(A'\) lies in the third quadrant, since its \(x\)- and \(y\)-coordinates are both negative: \(x=-\sqrt3&lt;0\), \(y=-1&lt;0\).</p>
+      <p>Reference angle: \(\tan\alpha = \dfrac{1}{\sqrt3} \Rightarrow \alpha = 30^\circ\).</p>
+      <p>So the polar angle is</p>
+      <p>\[ \theta = 180^\circ + 30^\circ = 210^\circ. \]</p>
+    </div>
+
+    <div class="step" data-step="4">
+      <span class="tag">Step 4 · Write the polar coordinates</span>
+      <p>The image is \[ (2,\,210^\circ). \]</p>
+      <p>Check: \(A(\sqrt3,-1)\) is \((2,\,330^\circ)\). Reflection about the \(y\)-axis sends \(\theta\) to \(180^\circ-\theta\):
+      \[ 180^\circ-330^\circ = -150^\circ \equiv 210^\circ. \]</p>
+    </div>
+
+    <div class="ans">
+      <span class="label">Final Answer</span>
+      <strong>C. \((2,\,210^\circ)\)</strong>
+    </div>
+  </section>
 </div>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
-</script>
 
+<script>
+/* ============ Canvas & coordinate system ============ */
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+
+const SQ3 = Math.sqrt(3);
+
+/* World extents (uniform scale for x and y) */
+const XMIN = -3.2, XMAX = 3.2, YMIN = -2.6, YMAX = 2.6;
+
+let pad = 40;                       // recomputed per size
+let scale = 1, ox = 0, oy = 0;
+
+function resize(){
+  const cssW = cv.clientWidth || 320;
+  const dpr = window.devicePixelRatio || 1;
+  const H = cssW;                   // square canvas
+  cv.width  = Math.round(cssW * dpr);
+  cv.height = Math.round(H * dpr);
+  cv.style.height = H + 'px';
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+
+  pad = Math.max(26, cssW * 0.09);
+  const availW = cssW - 2*pad;
+  const availH = H - 2*pad;
+  const sx = availW / (XMAX - XMIN);
+  const sy = availH / (YMAX - YMIN);
+  scale = Math.min(sx, sy);         // uniform scale
+  ox = cssW/2 - scale * (XMIN + XMAX)/2;
+  oy = H/2 + scale * (YMIN + YMAX)/2;
+
+  draw();
+}
+
+const X = x => ox + x*scale;
+const Y = y => oy - y*scale;
+
+/* ============ Drawing helpers ============ */
+function arrowHead(x1,y1,x2,y2,color,size){
+  const ang = Math.atan2(y2-y1, x2-x1);
+  const s = size || 7;
+  ctx.beginPath();
+  ctx.moveTo(x2,y2);
+  ctx.lineTo(x2 - s*Math.cos(ang-0.4), y2 - s*Math.sin(ang-0.4));
+  ctx.lineTo(x2 - s*Math.cos(ang+0.4), y2 - s*Math.sin(ang+0.4));
+  ctx.closePath();
+  ctx.fillStyle = color;
+  ctx.fill();
+}
+function dashedLine(x1,y1,x2,y2,color,w,dash){
+  ctx.save();
+  ctx.setLineDash(dash || [6,5]);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = w || 1.5;
+  ctx.beginPath();
+  ctx.moveTo(x1,y1);
+  ctx.lineTo(x2,y2);
+  ctx.stroke();
+  ctx.restore();
+}
+function dot(x,y,color,r){
+  ctx.beginPath();
+  ctx.arc(x,y,r||5,0,2*Math.PI);
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = '#fff';
+  ctx.stroke();
+}
+function label(text,x,y,color,size,align){
+  ctx.font = '600 ' + (size||13) + 'px "Segoe UI", Arial, sans-serif';
+  ctx.fillStyle = color;
+  ctx.textAlign = align || 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text,x,y);
+}
+
+/* Points */
+const A  = { x: SQ3,  y: -1 };
+const Ap = { x: -SQ3, y: -1 };
+
+/* ============ Main draw ============ */
+let mode = 1;
+
+function draw(){
+  const cssW = cv.clientWidth || 320;
+  const H = cssW;
+  ctx.clearRect(0,0,cssW,H);
+
+  /* background grid */
+  ctx.save();
+  ctx.strokeStyle = '#eef2fb';
+  ctx.lineWidth = 1;
+  for(let i=-4;i<=4;i++){
+    ctx.beginPath(); ctx.moveTo(X(i),Y(YMIN)); ctx.lineTo(X(i),Y(YMAX)); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(X(XMIN),Y(i)); ctx.lineTo(X(XMAX),Y(i)); ctx.stroke();
+  }
+  ctx.restore();
+
+  /* ---- Axes ---- */
+  const axesC = '#9aa8c7';
+  ctx.strokeStyle = axesC;
+  ctx.lineWidth = 1.6;
+  /* x-axis */
+  ctx.beginPath(); ctx.moveTo(X(XMIN),Y(0)); ctx.lineTo(X(XMAX),Y(0)); ctx.stroke();
+  arrowHead(X(XMAX)-14,Y(0),X(XMAX),Y(0),axesC,8);
+  /* y-axis */
+  ctx.beginPath(); ctx.moveTo(X(0),Y(YMIN)); ctx.lineTo(X(0),Y(YMAX)); ctx.stroke();
+  arrowHead(X(0),Y(YMAX)+14,X(0),Y(YMAX),axesC,8);
+
+  label('x',X(XMAX)-6,Y(0)-14,'#7c89a8',12,'right');
+  label('y',X(0)+12,Y(YMAX)+10,'#7c89a8',12,'left');
+  label('O',X(0)-12,Y(0)+12,'#7c89a8',12,'right');
+  ctx.beginPath(); ctx.arc(X(0),Y(0),3.2,0,2*Math.PI);
+  ctx.fillStyle='#7c89a8'; ctx.fill();
+
+  /* ---- Polar axis highlight (step 4) ---- */
+  if(mode === 4){
+    ctx.save();
+    ctx.strokeStyle = '#f59e0b';
+    ctx.globalAlpha = .55;
+    ctx.lineWidth = 5;
+    ctx.beginPath(); ctx.moveTo(X(0),Y(0)); ctx.lineTo(X(XMAX),Y(0)); ctx.stroke();
+    ctx.restore();
+    label('polar axis', X(1.9), Y(0)-14, '#b45309', 11, 'left');
+  }
+
+  /* ---- y-axis mirror emphasis (step 1) ---- */
+  if(mode === 1){
+    ctx.save();
+    ctx.strokeStyle = 'rgba(148,163,184,.55)';
+    ctx.lineWidth = 7;
+    ctx.beginPath(); ctx.moveTo(X(0),Y(YMIN)+4); ctx.lineTo(X(0),Y(YMAX)-4); ctx.stroke();
+    ctx.restore();
+  }
+
+  /* ---- Radius lines OA and OA' ---- */
+  const rC1 = 'rgba(124,58,237,.28)';
+  const rC2 = 'rgba(37,99,235,.85)';   // emphasis colours
+
+  if(mode === 1){
+    /* before/after reflection: show both fragile */
+    dashedLine(X(0),Y(0),X(A.x),Y(A.y),'rgba(37,99,235,.55)',2,[7,5]);
+    dashedLine(X(0),Y(0),X(Ap.x),Y(Ap.y),'rgba(220,38,38,.85)',2.4,[7,5]);
+    /* reflection arrow */
+    const midY = Y(A.y) - 18;
+    dottedReflectArrow(X(A.x)+8, midY, X(Ap.x)-8, midY);
+  }else{
+    dashedLine(X(0),Y(0),X(A.x),Y(A.y),rC1,1.8,[5,5]);
+    dashedLine(X(0),Y(0),X(Ap.x),Y(Ap.y),'#7c3aed',2.4,[]);
+  }
+
+  /* ---- Angle arc for step 3 / 4 ---- */
+  if(mode === 3 || mode === 4){
+    const theta = 210 * Math.PI/180;   // from +x going CCW in world; draw going the 210° sweep
+    const rad = scale * 0.85;
+    ctx.save();
+    ctx.strokeStyle = '#f59e0b';
+    ctx.lineWidth = mode===3 ? 3.2 : 2.4;
+    ctx.beginPath();
+    ctx.arc(X(0), Y(0), rad, 0, -theta, true);  // canvas y flipped → negative angle
+    ctx.stroke();
+    ctx.restore();
+    /* extra: mark the 30° reference slice faintly */
+    if(mode === 3){
+      ctx.save();
+      ctx.strokeStyle = 'rgba(16,185,129,.75)';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([4,4]);
+      const ref = 30*Math.PI/180;
+      ctx.beginPath();
+      ctx.arc(X(0),Y(0), rad*0.62, Math.PI, Math.PI + ref, false);
+      ctx.stroke();
+      ctx.restore();
+      /* right-angle marker */
+      const bx = -SQ3, by = -1;
+      const ux = 0.28, uy = 0.28;
+      ctx.save();
+      ctx.strokeStyle = 'rgba(16,185,129,.85)';
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      ctx.moveTo(X(bx)+ux*scale, Y(by));
+      ctx.lineTo(X(bx)+ux*scale, Y(by)-uy*scale);
+      ctx.lineTo(X(bx), Y(by)-uy*scale);
+      ctx.stroke();
+      ctx.restore();
+      label('30°', X(0)-rad*0.72, Y(0)-rad*0.30, '#047857', 12, 'center');
+      label('210°', X(0)-rad*0.30, Y(0)+rad*0.72, '#b45309', 12, 'center');
+    }
+    if(mode === 4){
+      label('210°', X(0)-rad*0.5, Y(0)+rad*0.55, '#b45309', 12, 'center');
+    }
+  }
+
+  /* ---- Points ---- */
+  /* A */
+  dot(X(A.x), Y(A.y), '#2563eb', 6.5);
+  label('A(√3, −1)', X(A.x)+10, Y(A.y)+16, '#1d4ed8', 12.5, 'left');
+  /* A' */
+  if(mode >= 1){
+    dot(X(Ap.x), Y(Ap.y), '#dc2626', 6.5);
+    label("A'(−√3, −1)", X(Ap.x)-10, Y(Ap.y)+16, '#b91c1c', 12.5, 'right');
+  }
+
+  /* radius labels */
+  if(mode === 2){
+    label('r = 2', (X(0)+X(Ap.x))/2 - 10, (Y(0)+Y(Ap.y))/2, '#7c3aed', 13, 'right');
+    /* highlight both dashed distances */
+    dashedLine(X(0),Y(0),X(A.x),Y(A.y),'#93c5fd',2.2,[6,5]);
+    dashedLine(X(0),Y(0),X(Ap.x),Y(Ap.y),'#a78bfa',2.6,[]);
+    dot(X(0),Y(0),'#7c3aed',5);
+  }
+  if(mode === 4){
+    label('r = 2', (X(0)+X(Ap.x))/2 - 10, (Y(0)+Y(Ap.y))/2, '#7c3aed', 12.5, 'right');
+  }
+
+  /* mirror annotation */
+  if(mode === 1){
+    label('mirror', X(0), Y(YMAX)-2, '#94a3b8', 11, 'center');
+  }
+}
+
+function dottedReflectArrow(x1,y1,x2,y2){
+  ctx.save();
+  ctx.setLineDash([5,4]);
+  ctx.strokeStyle = 'rgba(220,38,38,.75)';
+  ctx.lineWidth = 1.8;
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  ctx.restore();
+  arrowHead(x1,y1,x2,y2,'rgba(220,38,38,.9)',7);
+}
+
+/* ============ Scroll sync ============ */
+const steps = Array.from(document.querySelectorAll('.step'));
+const obs = new IntersectionObserver((es)=>{
+  es.forEach(e=>{
+    if(e.isIntersecting){
+      const m = +e.target.dataset.step;
+      mode = m;
+      steps.forEach(st=>st.classList.toggle('active', st===e.target));
+      draw();
+    }
+  });
+},{ rootMargin:'-15% 0px -55% 0px', threshold:0 });
+steps.forEach(st=>obs.observe(st));
+
+/* active default */
+if(steps.length) steps[0].classList.add('active');
+
+/* ============ Init ============ */
+window.addEventListener('resize', resize);
+resize();
+</script>
 </body>
 </html>

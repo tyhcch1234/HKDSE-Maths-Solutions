@@ -3,114 +3,434 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HKDSE 2018 Paper 2 MC24 · Perimeter from Polar Coordinates</title>
+<title>HKDSE 2018 P2 MC24 — Perimeter from Polar Coordinates</title>
 <script>
-  window.MathJax = {
-    tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['\\[','\\]']] },
-    svg: { fontCache: 'global' }
-  };
+window.MathJax = {
+  tex: {inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']]},
+  svg: {fontCache: 'global'}
+};
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
-  :root{--blue:#1d4ed8;--blue-light:#3b82f6;--amber:#f59e0b;--amber-bg:#fffbeb;--emerald:#059669;--emerald-bg:#ecfdf5;--slate:#0f172a;--slate-soft:#475569;--line:#e2e8f0;--card:#ffffff;--bg:#f1f5f9;}
-  *{box-sizing:border-box;} html,body{margin:0;padding:0;}
-  body{font-family:"Segoe UI",system-ui,-apple-system,Helvetica,Arial,sans-serif;color:var(--slate);background:var(--bg);line-height:1.6;-webkit-font-smoothing:antialiased;}
-  .wrap{max-width:920px;margin:0 auto;padding:0 16px 60px;}
-  .hero{background:linear-gradient(120deg,#0f172a,#1e3a8a 45%,#2563eb);color:#fff;padding:32px 20px 28px;}
-  .hero .tag{display:inline-block;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;background:rgba(255,255,255,.16);border-radius:99px;padding:3px 12px;margin-bottom:10px;}
-  .hero h1{margin:0;font-size:1.5rem;font-weight:800;}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin:18px 0;box-shadow:0 1px 3px rgba(15,23,42,.06);}
-  .card h2{margin:0 0 10px;font-size:1.05rem;color:var(--blue);}
-  .question{font-size:1.08rem;}
-  .question ol,.question ul{margin:10px 0;padding-left:22px;}
-  .marks{color:var(--slate-soft);font-size:.85rem;font-style:italic;}
-  .step{border-left:3px solid var(--blue-light);background:#f8fafc;border-radius:8px;padding:12px 16px;margin:12px 0;}
-  .step .step-tag{display:inline-block;font-size:.7rem;font-weight:700;color:#fff;background:var(--blue);border-radius:99px;padding:2px 10px;margin-bottom:8px;}
-  .ans{background:var(--emerald-bg);border:1px solid #6ee7b7;border-radius:10px;padding:14px 18px;font-weight:600;margin:16px 0;}
-  .hint{background:var(--amber-bg);border:1px solid #fcd34d;border-radius:10px;padding:10px 16px;font-size:.9rem;color:#92400e;margin:10px 0;}
-  .mono{font-family:ui-monospace,Consolas,monospace;}
+  *{box-sizing:border-box;}
+  body{
+    margin:0;padding:14px;
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    background:linear-gradient(160deg,#eef4ff 0%,#f7f9fc 40%,#fdf6ff 100%);
+    color:#1c2536;
+  }
+  h1{font-size:1.05rem;margin:0 0 2px;letter-spacing:.2px;}
+  .subtitle{font-size:.78rem;color:#5a6b85;margin-bottom:12px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;}
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start;}
+  @media(min-width:900px){.split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}}
+
+  .panel{
+    background:#ffffff;border-radius:18px;padding:14px;
+    box-shadow:0 8px 24px rgba(38,64,120,.10), 0 2px 6px rgba(38,64,120,.06);
+    border:1px solid rgba(120,150,210,.18);
+  }
+  .diagram{
+    position:sticky;top:16px;max-height:calc(100vh - 2rem);overflow-y:auto;
+    background:linear-gradient(180deg,#ffffff,#fbfdff);
+  }
+  .diagram canvas{width:100%;height:auto;display:block;border-radius:12px;}
+
+  .legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;font-size:.68rem;color:#41506b;}
+  .legend span{display:flex;align-items:center;gap:5px;}
+  .swatch{width:11px;height:11px;border-radius:3px;display:inline-block;}
+
+  .qtitle{font-size:.72rem;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:#5b6ee8;margin-bottom:6px;}
+  .qtext{font-size:.95rem;line-height:1.6;margin-bottom:8px;}
+  .choices{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:10px 0 14px;}
+  .choice{
+    background:#f4f7ff;border:1px solid #dbe4fb;border-radius:10px;
+    padding:7px 10px;font-size:.85rem;color:#2b3b5e;
+  }
+  .choice b{color:#4a5bd4;margin-right:6px;}
+  .choice.correct{background:#e6fbef;border-color:#9de5bb;}
+  .choice.correct b{color:#169150;}
+
+  .step{
+    background:#ffffff;border:1px solid #e3e9f7;border-left:5px solid #c9d4f2;
+    border-radius:12px;padding:10px 12px;margin-bottom:10px;
+    transition:all .28s ease;opacity:.72;
+  }
+  .step.active{
+    opacity:1;border-left-color:#5b6ee8;
+    box-shadow:0 6px 18px rgba(91,110,232,.20);
+    background:linear-gradient(180deg,#ffffff,#f5f8ff);
+    transform:translateY(-1px);
+  }
+  .tag{
+    display:inline-block;font-size:.66rem;font-weight:800;letter-spacing:1px;
+    text-transform:uppercase;color:#fff;background:#5b6ee8;
+    padding:3px 9px;border-radius:999px;margin-bottom:6px;
+  }
+  .step.active .tag{background:#4253d6;}
+  .step p{margin:5px 0;font-size:.88rem;line-height:1.55;}
+  .step .eq{font-size:.95rem;}
+
+  .final{
+    margin-top:12px;padding:12px 14px;border-radius:12px;
+    background:linear-gradient(135deg,#e8fdf1,#dff4ff);
+    border:1px solid #a9e3c4;font-weight:700;font-size:.95rem;color:#0f7a45;
+  }
+  .hint{
+    font-size:.75rem;color:#6a7a95;background:#f6f8ff;
+    border-radius:9px;padding:8px 10px;margin-top:8px;line-height:1.5;
+  }
+  @media(max-width:899px){
+    body{padding:8px;}
+    .panel{padding:9px;border-radius:13px;}
+    h1{font-size:.9rem;}
+    .qtext{font-size:.82rem;}
+    .step p{font-size:.78rem;}
+    .step .eq{font-size:.82rem;}
+    .choice{font-size:.75rem;padding:5px 7px;}
+    .legend{font-size:.6rem;gap:7px;}
+  }
 </style>
 </head>
 <body>
-<div class="hero">
-  <div class="wrap">
-    <span class="tag">HKDSE 2018 · Paper 2 · MC24</span>
-    <h1>Perimeter from Polar Coordinates</h1>
-  </div>
-</div>
-<div class="wrap">
-  <div class="card question">
-    <h2>Question</h2>
-    <p>The polar coordinates of the points \(C\), \(D\) and \(E\) are \((16,\,127^\circ)\), \((12,\,217^\circ)\) and \((5,\,307^\circ)\) respectively. Find the perimeter of \(\triangle CDE\).</p>
-    <ol style="list-style-type: upper-alpha;">
-      <li>\(54\)</li>
-      <li>\(78\)</li>
-      <li>\(126\)</li>
-      <li>\(130\)</li>
-    </ol>
-  <figure class="figure"><svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg" role="img"><rect width="320" height="240" fill="#fff"/><circle cx="160" cy="125" r="70" fill="none" stroke="#e2e8f0"/><line x1="160" y1="125" x2="302" y2="125" stroke="#334155" stroke-width="1.4"/><line x1="160" y1="125" x2="118" y2="69" stroke="#94a3b8" stroke-width="1"/><circle cx="118" cy="69" r="3.5" fill="#e11d48"/><text x="124" y="63" font-size="11" font-weight="700" fill="#1e293b">C</text><line x1="160" y1="125" x2="118" y2="157" stroke="#94a3b8" stroke-width="1"/><circle cx="118" cy="157" r="3.5" fill="#e11d48"/><text x="124" y="151" font-size="11" font-weight="700" fill="#1e293b">D</text><line x1="160" y1="125" x2="181" y2="153" stroke="#94a3b8" stroke-width="1"/><circle cx="181" cy="153" r="3.5" fill="#e11d48"/><text x="187" y="147" font-size="11" font-weight="700" fill="#1e293b">E</text><circle cx="160" cy="125" r="3" fill="#334155"/><text x="166" y="140" font-size="12" font-weight="700" fill="#1e293b">O</text><text x="304" y="129" font-size="11" fill="#475569">polar axis</text><text x="160" y="232" font-size="10" fill="#475569" text-anchor="middle">C(16,127°), D(12,217°), E(5,307°)</text></svg><figcaption>Polar coordinate system (not to scale)</figcaption></figure></div>
 
-  <div class="card">
-    <h2>Solution</h2>
-    <div class="step">
-      <span class="step-tag">Step 1 · Angle between \(OC\) and \(OD\)</span>
-      \[ \angle COD = 217^\circ - 127^\circ = 90^\circ, \]
-      <p>so \(\triangle COD\) is right-angled at \(O\), and by the Pythagorean theorem,</p>
-      \[ CD = \sqrt{16^{2} + 12^{2}} = \sqrt{256 + 144} = \sqrt{400} = 20. \]
-    </div>
-    <div class="step">
-      <span class="step-tag">Step 2 · Angle between \(OD\) and \(OE\)</span>
-      \[ \angle DOE = 307^\circ - 217^\circ = 90^\circ, \]
-      <p>so \(\triangle DOE\) is right-angled at \(O\), and</p>
-      \[ DE = \sqrt{12^{2} + 5^{2}} = \sqrt{144 + 25} = \sqrt{169} = 13. \]
-    </div>
-    <div class="step">
-      <span class="step-tag">Step 3 · Angle between \(OC\) and \(OE\)</span>
-      \[ \angle COE = 307^\circ - 127^\circ = 180^\circ, \]
-      <p>so \(C\), \(O\), \(E\) are collinear with \(O\) between \(C\) and \(E\). Therefore</p>
-      \[ CE = OC + OE = 16 + 5 = 21. \]
-    </div>
-    <div class="step">
-      <span class="step-tag">Step 4 · Perimeter</span>
-      \[ \text{Perimeter} = CD + DE + CE = 20 + 13 + 21 = 54. \]
-    </div>
-  </div>
+<h1>HKDSE 2018 · Paper 2 · MC24 — Perimeter from Polar Coordinates</h1>
+<div class="subtitle">Interactive diagram · step-by-step solution</div>
 
-  <div class="ans">
-    Final Answer: <strong>A. \(54\)</strong>
-  </div>
+<div class="split">
+  <!-- LEFT: DIAGRAM -->
+  <section class="panel diagram">
+    <canvas id="cv" width="520" height="520"></canvas>
+    <div class="legend">
+      <span><i class="swatch" style="background:#2a6df4"></i>OC (16)</span>
+      <span><i class="swatch" style="background:#e8471f"></i>OD (12)</span>
+      <span><i class="swatch" style="background:#12a15c"></i>OE (5)</span>
+      <span><i class="swatch" style="background:#8b3fd6"></i>CD</span>
+      <span><i class="swatch" style="background:#ff9b1a"></i>DE</span>
+      <span><i class="swatch" style="background:#0e7c86"></i>CE</span>
+      <span><i class="swatch" style="background:#b02a6a"></i>Right-angle mark</span>
+    </div>
+  </section>
+
+  <!-- RIGHT: QUESTION + SOLUTION -->
+  <section class="panel">
+    <div class="qtitle">Question</div>
+    <div class="qtext">
+      The polar coordinates of the points \(C\), \(D\) and \(E\) are
+      \((16,\,127^\circ)\), \((12,\,217^\circ)\) and \((5,\,307^\circ)\) respectively.
+      Find the perimeter of \(\triangle CDE\).
+    </div>
+    <div class="choices">
+      <div class="choice correct"><b>A</b> 54</div>
+      <div class="choice"><b>B</b> 78</div>
+      <div class="choice"><b>C</b> 126</div>
+      <div class="choice"><b>D</b> 130</div>
+    </div>
+
+    <!-- FIGURE_HERE -->
+
+    <div class="qtitle" style="margin-top:6px;">Solution</div>
+
+    <div class="step" data-step="1">
+      <span class="tag">Step 1 · Angle between OC and OD</span>
+      <p class="eq">\[ \angle COD = 217^\circ - 127^\circ = 90^\circ \]</p>
+      <p>So \(\triangle COD\) is right-angled at \(O\). By the Pythagorean theorem,</p>
+      <p class="eq">\[ CD = \sqrt{16^{2} + 12^{2}} = \sqrt{256+144} = \sqrt{400} = 20 \]</p>
+    </div>
+
+    <div class="step" data-step="2">
+      <span class="tag">Step 2 · Angle between OD and OE</span>
+      <p class="eq">\[ \angle DOE = 307^\circ - 217^\circ = 90^\circ \]</p>
+      <p>So \(\triangle DOE\) is right-angled at \(O\), and</p>
+      <p class="eq">\[ DE = \sqrt{12^{2} + 5^{2}} = \sqrt{144+25} = \sqrt{169} = 13 \]</p>
+    </div>
+
+    <div class="step" data-step="3">
+      <span class="tag">Step 3 · Angle between OC and OE</span>
+      <p class="eq">\[ \angle COE = 307^\circ - 127^\circ = 180^\circ \]</p>
+      <p>Hence \(C\), \(O\), \(E\) are collinear with \(O\) between \(C\) and \(E\). Therefore</p>
+      <p class="eq">\[ CE = OC + OE = 16 + 5 = 21 \]</p>
+    </div>
+
+    <div class="step" data-step="4">
+      <span class="tag">Step 4 · Perimeter</span>
+      <p class="eq">\[ \text{Perimeter} = CD + DE + CE = 20 + 13 + 21 = 54 \]</p>
+      <div class="hint">Tip: convert each polar point to a bearing difference — a \(90^\circ\) gap gives a right-angled triangle at the pole, and a \(180^\circ\) gap gives collinear points.</div>
+    </div>
+
+    <div class="final">Final Answer: A. \(54\)</div>
+  </section>
 </div>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
+
+<script>
+(function(){
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  let mode = 1;
+
+  // ---------- Data (real polar values) ----------
+  const C = {r:16, th:127, color:'#2a6df4', label:'C(16, 127°)'};
+  const D = {r:12, th:217, color:'#e8471f', label:'D(12, 217°)'};
+  const E = {r:5,  th:307, color:'#12a15c', label:'E(5, 307°)'};
+
+  // Geometry: convert polar to cartesian (math: x=r cos θ, y=r sin θ)
+  function pt(P){
+    const t = P.th * Math.PI/180;
+    return {x: P.r*Math.cos(t), y: P.r*Math.sin(t)};
+  }
+  const pc = pt(C), pd = pt(D), pe = pt(E);
+  const O = {x:0,y:0};
+
+  // ---- canvas setup ----
+  const W = cv.width, H = cv.height;
+  const cx = W*0.5, cy = H*0.5;
+  const scale = Math.min(W,H) / 40;   // 40 units span radius, 16 max
+  const toScreen = (p)=>({ x: cx + p.x*scale, y: cy - p.y*scale });
+
+  function drawPolarGrid(){
+    // concentric circles r = 5, 10, 15
+    ctx.save();
+    ctx.strokeStyle = '#e5ecf9';
+    ctx.lineWidth = 1;
+    [5,10,15].forEach(r=>{
+      ctx.beginPath();
+      ctx.arc(cx, cy, r*scale, 0, Math.PI*2);
+      ctx.stroke();
+    });
+    // radial spokes every 30°
+    ctx.strokeStyle = '#eef2fb';
+    for(let a=0; a<360; a+=30){
+      const t = a*Math.PI/180;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(cx + 17*scale*Math.cos(t), cy - 17*scale*Math.sin(t));
+      ctx.stroke();
+    }
+    // axes
+    ctx.strokeStyle = '#cfd8ee';
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.moveTo(cx-17*scale, cy); ctx.lineTo(cx+17*scale, cy);
+    ctx.moveTo(cx, cy-17*scale); ctx.lineTo(cx, cy+17*scale);
+    ctx.stroke();
+
+    // angle ticks
+    ctx.fillStyle = '#9aa8c4';
+    ctx.font = '11px "Segoe UI", sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    for(let a=0; a<360; a+=30){
+      const t = a*Math.PI/180;
+      const x = cx + 17.8*scale*Math.cos(t);
+      const y = cy - 17.8*scale*Math.sin(t);
+      ctx.fillText(a+'°', x, y);
+    }
+    ctx.restore();
+  }
+
+  function line(a, b, color, width, dash){
+    const A = toScreen(a), B = toScreen(b);
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.lineCap = 'round';
+    ctx.setLineDash(dash || []);
+    ctx.beginPath();
+    ctx.moveTo(A.x, A.y);
+    ctx.lineTo(B.x, B.y);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function dot(a, color, r, ring){
+    const A = toScreen(a);
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(A.x, A.y, r, 0, Math.PI*2);
+    ctx.fillStyle = color;
+    ctx.fill();
+    if(ring){
+      ctx.lineWidth = 2; ctx.strokeStyle = '#ffffff'; ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function label(a, text, color, dx, dy){
+    const A = toScreen(a);
+    ctx.save();
+    ctx.font = 'bold 13px "Segoe UI", sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    const w = ctx.measureText(text).width;
+    const padding = 5;
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    ctx.beginPath();
+    ctx.roundRect(A.x+dx-w/2-padding, A.y+dy-9, w+2*padding, 18, 5);
+    ctx.fill();
+    ctx.fillStyle = color;
+    ctx.fillText(text, A.x+dx, A.y+dy+1);
+    ctx.restore();
+  }
+
+  function rightAngle(vertex, p1, p2, color){
+    // draw right angle symbol at vertex between p1 and p2
+    const V = toScreen(vertex);
+    const A = toScreen(p1), B = toScreen(p2);
+    const u1 = normalize({x:A.x-V.x, y:A.y-V.y});
+    const u2 = normalize({x:B.x-V.x, y:B.y-V.y});
+    const s = 14;
+    const pA = {x:V.x+u1.x*s, y:V.y+u1.y*s};
+    const pB = {x:V.x+u2.x*s, y:V.y+u2.y*s};
+    const pC = {x:pA.x+u2.x*s, y:pA.y+u2.y*s};
+    ctx.save();
+    ctx.strokeStyle = color; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(pA.x,pA.y); ctx.lineTo(pC.x,pC.y); ctx.lineTo(pB.x,pB.y);
+    ctx.stroke();
+    ctx.restore();
+  }
+  function normalize(v){ const m = Math.hypot(v.x,v.y)||1; return {x:v.x/m, y:v.y/m}; }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    // background
+    ctx.fillStyle = '#fdfeff';
+    ctx.fillRect(0,0,W,H);
+
+    drawPolarGrid();
+
+    // ---- Highlight logic ----
+    const hiC  = mode===1 || mode===3;
+    const hiD  = mode===1 || mode===2;
+    const hiE  = mode===2 || mode===3;
+
+    // Radial OC, OD, OE
+    line(O, pc, hiC ? '#2a6df4' : '#9fbdf5', hiC?4:2, mode===3 && hiC?[]:[]);
+    line(O, pd, hiD ? '#e8471f' : '#f5b8a6', hiD?4:2);
+    line(O, pe, hiE ? '#12a15c' : '#a7dfc0', hiE?4:2);
+
+    // CE line (collinear) — shown in step 3 highlighted
+    if(mode===3){
+      // full line C-O-E
+      line(pc, pe, '#0e7c86', 4);
+    } else {
+      line(pc, pe, 'rgba(14,124,134,0.35)', 1.5, [5,4]);
+    }
+
+    // CD edge
+    line(pc, pd, mode===1 ? '#8b3fd6' : '#c7a9e8', mode===1?4:2);
+    // DE edge
+    line(pd, pe, mode===2 ? '#ff9b1a' : '#f8d4a0', mode===2?4:2);
+
+    // Right angles
+    if(mode===1) rightAngle(O, pc, pd, '#b02a6a');
+    if(mode===2) rightAngle(O, pd, pe, '#b02a6a');
+
+    // Arcs indicating angles (optional small)
+    if(mode===1) angleArc(O, pc, pd, '#8b3fd6', 34, '90°');
+    if(mode===2) angleArc(O, pd, pe, '#ff9b1a', 30, '90°');
+    if(mode===3) angleArc(O, pc, pe, '#0e7c86', 26, '180°');
+
+    // Points
+    dot(O, '#7b4bd6', 6, true);
+    dot(pc, C.color, 7, true);
+    dot(pd, D.color, 7, true);
+    dot(pe, E.color, 7, true);
+
+    // Labels (positioned to match original orientation)
+    label(O, 'O', '#7b4bd6', -16, 16);
+    label(pc, 'C', C.color, 22, -10);
+    label(pd, 'D', D.color, -18, -14);
+    label(pe, 'E', E.color, 18, 12);
+
+    // Length annotations
+    if(mode===1 || true) lengthTag(pc, pd, '20', '#8b3fd6');
+    if(mode===2 || true) lengthTag(pd, pe, '13', '#ff9b1a');
+    if(mode===3) lengthTag(pc, pe, '21', '#0e7c86');
+
+    // corner badge
+    ctx.save();
+    ctx.font = 'bold 12px "Segoe UI", sans-serif';
+    ctx.fillStyle = '#5b6ee8';
+    ctx.textAlign = 'left';
+    ctx.fillText('Polar axis', 12, 20);
+    ctx.strokeStyle = '#5b6ee8'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(12,28); ctx.lineTo(60,28); ctx.stroke();
+    ctx.restore();
+  }
+
+  function angleArc(vertex, p1, p2, color, radius, labelText){
+    const V = toScreen(vertex);
+    const A = toScreen(p1), B = toScreen(p2);
+    let a1 = Math.atan2(-(A.y-V.y), A.x-V.x);
+    let a2 = Math.atan2(-(B.y-V.y), B.x-V.x);
+    // choose orientation to draw inside angle (short way)
+    let start = a1, end = a2;
+    let delta = end - start;
+    while(delta <= -Math.PI) delta += 2*Math.PI;
+    while(delta > Math.PI) delta -= 2*Math.PI;
+    ctx.save();
+    ctx.strokeStyle = color; ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    if(delta >= 0){
+      ctx.arc(V.x, V.y, radius, -start, -start - delta, true);
+    } else {
+      ctx.arc(V.x, V.y, radius, -start, -start - delta, false);
+    }
+    ctx.stroke();
+    // label mid-angle
+    const mid = start + delta/2;
+    const lx = V.x + (radius+16)*Math.cos(mid);
+    const ly = V.y - (radius+16)*Math.sin(mid);
+    ctx.font = 'bold 11px "Segoe UI", sans-serif';
+    ctx.fillStyle = color;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(labelText, lx, ly);
+    ctx.restore();
+  }
+
+  function lengthTag(p1, p2, txt, color){
+    const A = toScreen(p1), B = toScreen(p2);
+    const mx = (A.x+B.x)/2, my=(A.y+B.y)/2;
+    ctx.save();
+    ctx.font='bold 12px "Segoe UI", sans-serif';
+    const w = ctx.measureText(txt).width;
+    ctx.fillStyle='rgba(255,255,255,0.9)';
+    ctx.beginPath(); ctx.roundRect(mx-w/2-5, my-9, w+10, 18, 5); ctx.fill();
+    ctx.fillStyle = color; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(txt, mx, my+1);
+    ctx.restore();
+  }
+
+  // polyfill roundRect
+  if(!ctx.roundRect){
+    CanvasRenderingContext2D.prototype.roundRect = function(x,y,w,h,r){
+      this.beginPath();
+      this.moveTo(x+r,y);
+      this.arcTo(x+w,y,x+w,y+h,r);
+      this.arcTo(x+w,y+h,x,y+h,r);
+      this.arcTo(x,y+h,x,y,r);
+      this.arcTo(x,y,x+w,y,r);
+      this.closePath();
+      return this;
+    };
+  }
+
+  // ---------- IntersectionObserver for scroll sync ----------
+  const steps = Array.from(document.querySelectorAll('.step'));
+  const obs = new IntersectionObserver((es)=>{
+    es.forEach(e=>{
+      if(e.isIntersecting){
+        const m = +e.target.dataset.step;
+        mode = m;
+        steps.forEach(st => st.classList.toggle('active', st === e.target));
+        draw();
+      }
+    });
+  }, {rootMargin:'-15% 0px -55% 0px', threshold:0});
+  steps.forEach(st=>obs.observe(st));
+
+  // initial
+  steps[0].classList.add('active');
+  draw();
+  window.addEventListener('resize', draw);
+})();
 </script>
-
 </body>
 </html>

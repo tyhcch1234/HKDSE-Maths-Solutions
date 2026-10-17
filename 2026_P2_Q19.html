@@ -3,110 +3,318 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HKDSE 2026 Paper 2 MC19 · Area of a Right Triangle</title>
-<script>
-  window.MathJax = {
-    tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['\\[','\\]']] },
-    svg: { fontCache: 'global' }
-  };
-</script>
+<title>HKDSE 2026 P2 MC19 · Right Triangle Area</title>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
 <style>
-  :root{--blue:#1d4ed8;--blue-light:#3b82f6;--amber:#f59e0b;--amber-bg:#fffbeb;--emerald:#059669;--emerald-bg:#ecfdf5;--slate:#0f172a;--slate-soft:#475569;--line:#e2e8f0;--card:#ffffff;--bg:#f1f5f9;}
-  *{box-sizing:border-box;} html,body{margin:0;padding:0;}
-  body{font-family:"Segoe UI",system-ui,-apple-system,Helvetica,Arial,sans-serif;color:var(--slate);background:var(--bg);line-height:1.6;-webkit-font-smoothing:antialiased;}
-  .wrap{max-width:920px;margin:0 auto;padding:0 16px 60px;}
-  .hero{background:linear-gradient(120deg,#0f172a,#1e3a8a 45%,#2563eb);color:#fff;padding:32px 20px 28px;}
-  .hero .tag{display:inline-block;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;background:rgba(255,255,255,.16);border-radius:99px;padding:3px 12px;margin-bottom:10px;}
-  .hero h1{margin:0;font-size:1.5rem;font-weight:800;}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin:18px 0;box-shadow:0 1px 3px rgba(15,23,42,.06);}
-  .card h2{margin:0 0 10px;font-size:1.05rem;color:var(--blue);}
-  .question{font-size:1.08rem;}
-  .question ol,.question ul{margin:10px 0;padding-left:22px;}
-  .marks{color:var(--slate-soft);font-size:.85rem;font-style:italic;}
-  .step{border-left:3px solid var(--blue-light);background:#f8fafc;border-radius:8px;padding:12px 16px;margin:12px 0;}
-  .step .step-tag{display:inline-block;font-size:.7rem;font-weight:700;color:#fff;background:var(--blue);border-radius:99px;padding:2px 10px;margin-bottom:8px;}
-  .ans{background:var(--emerald-bg);border:1px solid #6ee7b7;border-radius:10px;padding:14px 18px;font-weight:600;margin:16px 0;}
-  .hint{background:var(--amber-bg);border:1px solid #fcd34d;border-radius:10px;padding:10px 16px;font-size:.9rem;color:#92400e;margin:10px 0;}
-  .mono{font-family:ui-monospace,Consolas,monospace;}
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    background:linear-gradient(160deg,#eef4ff 0%,#f7f0ff 100%);
+    color:#1f2540;
+    padding:14px;
+  }
+  header{
+    max-width:1200px;margin:0 auto 12px;
+    padding:14px 18px;border-radius:16px;
+    background:linear-gradient(120deg,#4f6bff,#a855f7);
+    color:#fff;box-shadow:0 8px 24px rgba(79,107,255,.28);
+  }
+  header h1{margin:0;font-size:1.1rem;letter-spacing:.3px;}
+  header p{margin:4px 0 0;font-size:.8rem;opacity:.9;}
+  .split{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    gap:12px;
+    align-items:start;
+    max-width:1200px;margin:0 auto;
+  }
+  @media(min-width:900px){
+    .split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}
+  }
+  .panel{
+    background:#fff;border-radius:18px;padding:14px;
+    box-shadow:0 6px 22px rgba(31,37,64,.10);
+  }
+  .diagram{
+    position:sticky;top:16px;
+    max-height:calc(100vh - 2rem);
+    overflow-y:auto;
+  }
+  canvas{width:100%;height:auto;display:block;border-radius:12px;background:#fbfcff;}
+  .legend{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:10px;font-size:.72rem;color:#3b4165;}
+  .legend span{display:inline-flex;align-items:center;gap:5px;}
+  .sw{width:12px;height:12px;border-radius:3px;display:inline-block;}
+  .qbox{font-size:.94rem;line-height:1.55;}
+  .qbox h2{font-size:1rem;margin:0 0 8px;color:#4f6bff;}
+  .tag{
+    display:inline-block;font-size:.68rem;font-weight:700;letter-spacing:.5px;
+    background:#eef1ff;color:#4f6bff;border-radius:999px;padding:3px 10px;margin-bottom:8px;
+  }
+  .options{margin:10px 0 4px;display:grid;gap:6px;font-size:.9rem;}
+  .opt{padding:7px 10px;border-radius:10px;background:#f5f7ff;border:1px solid #e3e8ff;transition:.2s;}
+  .opt.correct{background:#e6fbef;border-color:#4ade80;color:#15803d;font-weight:700;}
+  .step{
+    background:#fbfcff;border:1px solid #e6eaff;border-radius:14px;
+    padding:12px 14px;margin:12px 0;transition:.25s;scroll-margin-top:20px;
+  }
+  .step.active{
+    border-color:#a855f7;background:#fdf7ff;
+    box-shadow:0 0 0 3px rgba(168,85,247,.12);
+  }
+  .step .tag{background:#f3e8ff;color:#9333ea;}
+  .step.active .tag{background:#9333ea;color:#fff;}
+  .final{
+    margin-top:14px;padding:12px 14px;border-radius:14px;
+    background:linear-gradient(120deg,#e6fbef,#e8f7ff);
+    border:1px solid #4ade80;color:#15803d;font-weight:700;
+  }
+  .hint{font-size:.76rem;color:#6b7280;margin-top:6px;font-style:italic;}
+  @media(max-width:520px){
+    .panel{padding:9px;border-radius:14px;}
+    .qbox{font-size:.78rem;}
+    .step{font-size:.78rem;padding:9px;}
+    .options{font-size:.76rem;}
+    header{padding:10px 12px;}
+    header h1{font-size:.9rem;}
+  }
 </style>
 </head>
 <body>
-<div class="hero">
-  <div class="wrap">
-    <span class="tag">HKDSE 2026 · Paper 2 · MC19</span>
-    <h1>Area of a Right Triangle</h1>
-  </div>
-</div>
-<div class="wrap">
-  <div class="card question">
-    <h2>Question</h2>
-    <p>It is given that \(\triangle PQR\) is a right-angled triangle with \(\angle QPR=90^\circ\). Let the area of \(\triangle PQR\) be \(S\). If \(QR=p\), \(PR=q\) and \(\angle PQR=\theta\), which of the following must be true?</p>
-    <ul>
-      <li><strong>A.</strong> \(S=\dfrac{1}{2}pq\)</li>
-      <li><strong>B.</strong> \(S=\dfrac{1}{2}pq\sin\theta\)</li>
-      <li><strong>C.</strong> \(S=\dfrac{1}{2}pq\cos\theta\)</li>
-      <li><strong>D.</strong> \(S=\dfrac{1}{2}pq\tan\theta\)</li>
-<figure class="figure"><svg viewBox="0 0 320 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Right-angled triangle PQR"><rect width="320" height="250" fill="#fff"/><polygon points="90,200 260,200 90,70" fill="#eef2ff" stroke="#334155" stroke-width="2"/><path d="M90,182 L108,182 L108,200" fill="none" stroke="#334155" stroke-width="1.5"/><path d="M238,200 A24,24 0 0 0 241,185" fill="none" stroke="#e11d48" stroke-width="1.6"/><text x="262" y="196" font-size="14" fill="#e11d48" font-style="italic">θ</text><text x="82" y="218" font-size="15" fill="#1e293b" font-weight="700">P</text><text x="268" y="218" font-size="15" fill="#1e293b" font-weight="700">Q</text><text x="82" y="64" font-size="15" fill="#1e293b" font-weight="700">R</text><text x="70" y="138" font-size="12" fill="#0d9488" font-weight="700">PR = q</text><text x="180" y="126" font-size="12" fill="#0d9488" font-weight="700" transform="rotate(-37.4 186 136)">QR = p</text><text x="162" y="224" font-size="12" fill="#64748b">QP = p cos θ</text></svg><figcaption>Right-angled triangle PQR (∠QPR = 90°, not to scale)</figcaption></figure>    </ul>
-  </div>
 
-  <div class="card">
-    <h2>Solution</h2>
-    <div class="step">
-      <span class="step-tag">Identify the sides</span>
-      <p>The right angle is at \(P\), so the hypotenuse is \(QR=p\). The two legs are \(PQ\) and \(PR=q\).</p>
+<header>
+  <h1>HKDSE 2026 · Paper 2 · MC19</h1>
+  <p>Area of a Right-Angled Triangle — finding the correct formula</p>
+</header>
+
+<div class="split">
+
+  <!-- LEFT: DIAGRAM -->
+  <section class="panel diagram">
+    <canvas id="cv" width="520" height="440"></canvas>
+    <div class="legend">
+      <span><i class="sw" style="background:#4f6bff"></i>Hypotenuse QR = p</span>
+      <span><i class="sw" style="background:#22c55e"></i>Leg PR = q</span>
+      <span><i class="sw" style="background:#f59e0b"></i>Leg PQ = p·cosθ</span>
+      <span><i class="sw" style="background:#a855f7"></i>Right angle at P</span>
+      <span><i class="sw" style="background:#ef4444"></i>Angle θ at Q</span>
     </div>
-    <div class="step">
-      <span class="step-tag">Express \(PQ\) using \(\theta\)</span>
-      <p>In the right triangle, \(\theta=\angle PQR\) has adjacent leg \(PQ\) and hypotenuse \(QR\):</p>
+  </section>
+
+  <!-- RIGHT: QUESTION + SOLUTION -->
+  <section class="panel">
+    <div class="qbox">
+      <span class="tag">QUESTION</span>
+      <h2>Area of a Right Triangle</h2>
+      <p>It is given that \(\triangle PQR\) is a right-angled triangle with \(\angle QPR = 90^\circ\). Let the area of \(\triangle PQR\) be \(S\). If \(QR = p\), \(PR = q\) and \(\angle PQR = \theta\), which of the following <strong>must be true</strong>?</p>
+      <div class="options">
+        <div class="opt">A. \(S=\dfrac{1}{2}pq\)</div>
+        <div class="opt">B. \(S=\dfrac{1}{2}pq\sin\theta\)</div>
+        <div class="opt correct">C. \(S=\dfrac{1}{2}pq\cos\theta\)</div>
+        <div class="opt">D. \(S=\dfrac{1}{2}pq\tan\theta\)</div>
+      </div>
+    </div>
+
+    <!-- FIGURE_HERE -->
+
+    <div class="step" data-step="1">
+      <span class="tag">STEP 1 · IDENTIFY THE SIDES</span>
+      <p>The right angle is at \(P\), so the side opposite to it is the hypotenuse:</p>
       \[
-      \cos\theta=\frac{PQ}{QR}\ \Rightarrow\ PQ=p\cos\theta
+        QR = p \quad\text{(hypotenuse)}
+      \]
+      <p>The two legs of the right triangle are:</p>
+      \[
+        PQ \quad\text{and}\quad PR = q
+      \]
+      <p class="hint">Key idea: the hypotenuse is always opposite the right angle.</p>
+    </div>
+
+    <div class="step" data-step="2">
+      <span class="tag">STEP 2 · EXPRESS PQ USING θ</span>
+      <p>At vertex \(Q\), the angle \(\theta = \angle PQR\) has:</p>
+      <ul style="margin:6px 0 8px 18px;">
+        <li>adjacent side \(= PQ\)</li>
+        <li>hypotenuse \(= QR = p\)</li>
+      </ul>
+      <p>Using cosine ratio:</p>
+      \[
+        \cos\theta = \frac{PQ}{QR}
+        \;\Rightarrow\;
+        PQ = p\cos\theta
       \]
     </div>
-    <div class="step">
-      <span class="step-tag">Compute the area</span>
-      \[
-      S=\frac{1}{2}\times PQ\times PR=\frac{1}{2}(p\cos\theta)(q)=\frac{1}{2}pq\cos\theta
-      \]
-      <p>This matches option C.</p>
-    </div>
-  </div>
 
-  <div class="ans">
-    Final Answer: <span class="mono">C</span>
-  </div>
+    <div class="step" data-step="3">
+      <span class="tag">STEP 3 · COMPUTE THE AREA</span>
+      <p>For a right triangle, area \(= \tfrac12 \times (\text{base}) \times (\text{height})\). Take the legs \(PQ\) and \(PR\):</p>
+      \[
+        S = \tfrac12 \times PQ \times PR
+      \]
+      \[
+        S = \tfrac12 \,(p\cos\theta)(q) = \tfrac12 \, p q \cos\theta
+      \]
+      <p>This matches option <strong>C</strong>.</p>
+      <p class="hint">Check: when \(\theta=0\), \(PQ=p\) and the formula gives \(S=\tfrac12 pq\), the full leg–leg area. Consistent ✓</p>
+    </div>
+
+    <div class="final">Final Answer: C &nbsp;—&nbsp; \(S=\dfrac{1}{2}pq\cos\theta\)</div>
+  </section>
+
 </div>
-<style id="autostatic-css">
-/* ===== AUTO-STATIC: reveal all content, remove interactivity ===== */
-.step{display:block !important}
-.step-body,.step-card .content,.step-content,
-.step-card .step-content,[class*="step-body"],[class*="step-content"]{
-  max-height:none !important;overflow:visible !important;opacity:1 !important;
-  display:block !important;padding:0.9rem 1rem !important}
-.step-card .hidden,.step .hidden,[id^="step"].hidden{display:block !important}
-.step-head,.step-card>button,.opt,.choice,.option,[onclick]{pointer-events:none !important;cursor:default !important}
-input[type="range"],input[type=range],input[type="checkbox"],select{display:none !important}
-.controls,.ctrl,.chk,.btnbar,.counter{display:none !important}
-button.next,button[data-target],#nextBtn,#allBtn,#resetBtn,#checkBtn,#demoBtn,
-#stepSlider,#stepLabel,.slider{display:none !important}
-.feedback{display:none !important}
-</style>
-<script id="autostatic-js">
-window.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('label[for]').forEach(function(l){var t=document.getElementById(l.getAttribute('for'));if(t&&(t.tagName==='INPUT'||t.tagName==='SELECT')){l.style.display='none';}});
-  document.querySelectorAll('.step,.step-card').forEach(function(s){s.classList.add('open');s.classList.add('show');});
-  document.querySelectorAll('.step-card,.step,[class*="step"]').forEach(function(c){c.querySelectorAll('.hidden').forEach(function(el){el.classList.remove('hidden');});});
-  document.querySelectorAll('[onclick]').forEach(function(el){el.onclick=null;});
-  document.querySelectorAll('details').forEach(function(d){d.setAttribute('open','open');});
-  document.querySelectorAll('.opt,.choice,.option').forEach(function(o){o.setAttribute('disabled','disabled');});
-  var c=document.body.getAttribute('data-correct');
-  if(c){document.querySelectorAll('[data-opt],[data-ans],[data-key],[data-answer]').forEach(function(o){
-    var v=o.getAttribute('data-opt')||o.getAttribute('data-ans')||o.getAttribute('data-key')||o.getAttribute('data-answer');
-    if(v===c){o.classList.add('correct');}else{o.classList.remove('wrong');}
-  });}
-  document.querySelectorAll('.feedback').forEach(function(el){el.style.display='none';});
-});
+
+<script>
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+let mode = 1;
+
+// Geometry data (scaled drawing, but angles consistent with the figure)
+// Place Q at left, R at right, P below (right angle at P, angle theta at Q)
+function draw(){
+  const W = cv.width, H = cv.height;
+  ctx.clearRect(0,0,W,H);
+
+  // layout coordinates (mathematical proportions: right angle at P)
+  // Choose theta so the drawing is aesthetic but representative.
+  const theta = 35 * Math.PI/180;
+  const p = 300;                       // QR length in px (hypotenuse)
+  const Px = 90, Py = 70;              // Q position
+  const Qx = Px, Qy = Py;
+
+  // Leg PQ along direction at angle theta below horizontal from Q
+  const PQ = p * Math.cos(theta);
+  const PR = p * Math.sin(theta);      // because angle at P is 90°, QR² = PQ²+PR²
+
+  // From Q: R is at distance p along angle theta (below +x axis)
+  const Rx = Qx + p * Math.cos(theta);
+  const Ry = Qy + p * Math.sin(theta);
+
+  // P is the right-angle vertex: from Q go PQ along same direction, then turn 90°
+  // PQ lies along the same line Q-R? No. Let's construct: angle at Q is theta between QP and QR.
+  // So QP direction makes angle theta with QR. Let QR be horizontal for clarity.
+  // Simplify: QR horizontal.
+  const qx = 110, qy = 110;
+  const rx = qx + p, ry = qy;
+  // P such that angle at P = 90° and angle at Q = theta
+  const pq = p * Math.cos(theta);
+  const px = qx + pq * Math.cos(theta);
+  const py = qy + pq * Math.sin(theta);
+
+  // Draw filled area highlight
+  ctx.beginPath();
+  ctx.moveTo(qx,qy); ctx.lineTo(rx,ry); ctx.lineTo(px,py); ctx.closePath();
+  ctx.fillStyle = 'rgba(79,107,255,0.07)';
+  ctx.fill();
+
+  // Draw triangle edges
+  // QR (hypotenuse) - blue
+  ctx.beginPath(); ctx.moveTo(qx,qy); ctx.lineTo(rx,ry);
+  ctx.strokeStyle = (mode>=1)?'#4f6bff':'#c7d0ff';
+  ctx.lineWidth = 4; ctx.lineCap='round'; ctx.stroke();
+
+  // PR (leg q) - green
+  ctx.beginPath(); ctx.moveTo(px,py); ctx.lineTo(rx,ry);
+  ctx.strokeStyle = (mode>=3)?'#16a34a':(mode===2?'#86efac':'#bbf7d0');
+  ctx.lineWidth = 4; ctx.lineCap='round'; ctx.stroke();
+
+  // PQ (leg p cos θ) - amber
+  ctx.beginPath(); ctx.moveTo(qx,qy); ctx.lineTo(px,py);
+  ctx.strokeStyle = (mode>=2)?'#f59e0b':'#fde68a';
+  ctx.lineWidth = 4; ctx.lineCap='round'; ctx.stroke();
+
+  // Right-angle marker at P (purple)
+  const ax = px - qx, ay = py - qy;
+  const len = Math.hypot(ax,ay);
+  const ux = ax/len, uy = ay/len;
+  const bx = rx - px, by = ry - py;
+  const len2 = Math.hypot(bx,by);
+  const vx = bx/len2, vy = by/len2;
+  const s = 18;
+  ctx.beginPath();
+  ctx.moveTo(px + ux*s, py + uy*s);
+  ctx.lineTo(px + ux*s + vx*s, py + uy*s + vy*s);
+  ctx.lineTo(px + vx*s, py + vy*s);
+  ctx.strokeStyle = (mode===1||mode===3)?'#a855f7':'#d8b4fe';
+  ctx.lineWidth = 2.5; ctx.stroke();
+
+  // Angle arc at Q (red)
+  ctx.beginPath();
+  const ar = 42;
+  ctx.arc(qx, qy, ar, 0, theta, false);
+  ctx.strokeStyle = (mode>=2)?'#ef4444':'#fca5a5';
+  ctx.lineWidth = 2.5; ctx.stroke();
+
+  // θ label
+  ctx.fillStyle = '#ef4444';
+  ctx.font = 'bold 16px Segoe UI, sans-serif';
+  ctx.fillText('θ', qx + ar*Math.cos(theta/2) + 6, qy + ar*Math.sin(theta/2) + 6);
+
+  // Points
+  const pts = [
+    {x:qx,y:qy,label:'Q',c:'#f59e0b'},
+    {x:rx,y:ry,label:'R',c:'#4f6bff'},
+    {x:px,y:py,label:'P',c:'#a855f7'}
+  ];
+  pts.forEach(pt=>{
+    ctx.beginPath();
+    ctx.arc(pt.x, pt.y, 6, 0, Math.PI*2);
+    ctx.fillStyle = pt.c; ctx.fill();
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+    ctx.fillStyle = '#1f2540';
+    ctx.font = 'bold 15px Segoe UI, sans-serif';
+    // labels offset
+    let dx=8, dy=-8;
+    if(pt.label==='Q'){dx=-20;dy=-10;}
+    if(pt.label==='R'){dx=8;dy=-10;}
+    if(pt.label==='P'){dx=8;dy=18;}
+    ctx.fillText(pt.label, pt.x+dx, pt.y+dy);
+  });
+
+  // Side labels
+  // QR label
+  ctx.fillStyle = (mode>=1)?'#4f6bff':'#9aa6d6';
+  ctx.font = 'bold 14px Segoe UI, sans-serif';
+  ctx.fillText('QR = p', (qx+rx)/2 - 22, qy - 10);
+
+  // PQ label
+  ctx.fillStyle = (mode>=2)?'#b45309':'#d1a35a';
+  ctx.fillText('PQ = p cos θ', (qx+px)/2 - 40, (qy+py)/2 + 20);
+
+  // PR label
+  ctx.fillStyle = (mode>=3)?'#15803d':'#7bd3a0';
+  ctx.fillText('PR = q', (px+rx)/2 + 6, (py+ry)/2 + 4);
+
+  // Right angle label
+  ctx.fillStyle = (mode===1)?'#a855f7':'#d8b4fe';
+  ctx.font = 'italic 12px Segoe UI, sans-serif';
+  ctx.fillText('90°', px + 12, py + 8);
+
+  // Step caption
+  const caps = {
+    1:'Right angle at P → QR = p is the hypotenuse, PR = q is a leg.',
+    2:'cos θ = PQ / QR  ⇒  PQ = p cos θ',
+    3:'S = ½ · PQ · PR = ½ (p cos θ)(q) = ½ p q cos θ'
+  };
+  ctx.fillStyle = '#3b4165';
+  ctx.font = '13px Segoe UI, sans-serif';
+  ctx.fillText(caps[mode] || '', 14, H - 16);
+}
+
+const steps = Array.from(document.querySelectorAll('.step'));
+const obs = new IntersectionObserver((es)=>{
+  es.forEach(e=>{
+    if(e.isIntersecting){
+      const m = +e.target.dataset.step;
+      mode = m;
+      steps.forEach(st=>st.classList.toggle('active', st===e.target));
+      draw();
+    }
+  });
+}, {rootMargin:'-15% 0px -55% 0px', threshold:0});
+steps.forEach(st=>obs.observe(st));
+
+window.addEventListener('load', ()=>{ if(window.MathJax && MathJax.startup) MathJax.startup.promise.then(()=>{}); });
+draw();
 </script>
-
 </body>
 </html>
