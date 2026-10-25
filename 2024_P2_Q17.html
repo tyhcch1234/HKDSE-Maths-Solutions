@@ -90,11 +90,11 @@
     <h2>Interactive Diagram</h2>
     <canvas id="cv" width="700" height="620"></canvas>
     <div class="legend">
-      <span><i class="swatch" style="background:#2563eb"></i>Square $ABCD$</span>
-      <span><i class="swatch" style="background:#e11d48"></i>Lines $AF$, $EM$</span>
-      <span><i class="swatch" style="background:#16a34a"></i>$EG=FG=5x$</span>
-      <span><i class="swatch" style="background:#9333ea"></i>Points $H$, $G$</span>
-      <span><i class="swatch" style="background:#f59e0b"></i>Known area $4\text{ cm}^2$</span>
+      <span><i class="swatch" style="background:#2563eb"></i>Square $ABCD$, side $4k$</span>
+      <span><i class="swatch" style="background:#e11d48"></i>$AM$ and $EF$ ($EF\parallel AM$)</span>
+      <span><i class="swatch" style="background:#16a34a"></i>$[AEGH]=39\text{ cm}^2$</span>
+      <span><i class="swatch" style="background:#9333ea"></i>$G$ on $CD$, $H=AM\cap BG$</span>
+      <span><i class="swatch" style="background:#f59e0b"></i>Known area $[\triangle BMH]=4\text{ cm}^2$</span>
     </div>
   </section>
 
@@ -208,511 +208,229 @@
 (function(){
   const cv = document.getElementById('cv');
   const ctx = cv.getContext('2d');
-  const W = cv.width, H = cv.height;
+  const CW = cv.width, CH = cv.height;
 
-  // --- Geometry model (side of square = 6 units) ---
-  const S = 6;                 // side length of square
-  // Coordinates: B=(0,0), C=(6,0), D=(6,6), A=(0,6)
+  // ---- geometry (pure, no DOM) ----
+  // Square ABCD in units of k (here k = 1, so the side is 4 units).
+  // A = (0,4), B = (0,0), C = (4,0), D = (4,4);  E on AD with AE:ED = 3:1;
+  // M mid-point of BC;  F on BC produced with EF // AM;  G = EF n CD;  H = AM n BG.
+  const A = {x:0, y:4};
   const B = {x:0, y:0};
-  const C = {x:S, y:0};
-  const D = {x:S, y:S};
-  const A = {x:0, y:S};
-  const E = {x:0, y:S/2};      // mid-point of AD
-  const M = {x:S/2, y:0};      // mid-point of BC
-  const F = {x:S+S/2, y:0};    // C produced, CF = BM
+  const C = {x:4, y:0};
+  const D = {x:4, y:4};
+  const E = {x:3, y:4};   // AE = 3k, ED = k
+  const M = {x:2, y:0};   // BM = MC = 2k
+  const F = {x:5, y:0};   // CF = k, BF = 5k
+  const G = {x:4, y:2};   // DG = GC = 2k
+  const H = {x:1.6, y:0.8}; // AM n BG
 
-  // Line AF: from A(0,6) to F(9,0)  => y = 6 - (2/3)x
-  // Line EM: from E(0,3) to M(3,0)  => y = 3 - x
-  // Intersection H:
-  //  6 - (2/3)x = 3 - x  => 3 = -(1/3)x => x = -9 ?? recheck
-  // 6 - (2/3)x = 3 - x  => 3 = (2/3)x - x = -(1/3)x => x = -9 (wrong orientation)
-  // Correct: EM goes from E(0,3) to M(3,0): slope = (0-3)/(3-0) = -1 => y = 3 - x
-  // AF goes from A(0,6) to F(9,0): slope = (0-6)/(9-0) = -2/3 => y = 6 - (2/3)x
-  // 3 - x = 6 - (2/3)x  =>  -x + (2/3)x = 3  =>  -(1/3)x = 3  => x = -9.  
-  // That means the lines as modelled intersect left of A — not matching figure.
-  // Re-read figure: A is top-left, F is bottom-right.  Line AF goes downward to the right.
-  // Line EM: E top-mid of AD, M bottom-mid of BC — line goes downward to the right.
-  // In the figure, H is the intersection of AF and EM, and H lies INSIDE the square.
-  // So EM must be steeper / AF shallower.  Let's adjust: M is on BC, but BM = MC means M is mid.
-  // With A=(0,6), F=(9,0): AF slope = -2/3.
-  // EM from E=(0,3) to M=(3,0): slope = -1.
-  // slope -1 is steeper than -2/3, so EM is BELOW AF for x>0, they intersect at x<0.
-  // To make H interior, we need M further right OR E different.
-  // Actually in the exam figure, H is inside and near the lower-left.  Let's just pick
-  // E on AD with AE:ED = 1:1 (midpoint) and M on BC with BM:MC = 1:1.
-  // Then H is outside.  The figure shows H inside, so the real diagram must have E above midpoint?
-  // Let's instead model the figure as drawn: A top-left, E on AD (upper edge), M on BC lower edge,
-  // F to the right of C.  The line A-F is drawn from top-left down to bottom-right.
-  // The line E-M goes from top edge down to bottom edge and crosses A-F at H.
-  // For this crossing to be inside the square, EM must be less steep than AF at the crossing.
-  // Since both go down-right, the one starting higher (A, y=6) and ending lower (F, y=0) has
-  // a "larger drop" over the same x-range than E (y=3) to M (y=0).
-  // Drop for AF = 6 over 9 units => 2/3.  Drop for EM = 3 over 3 units => 1.  So EM is steeper.
-  // To match the figure we can move M to the right (M at x=4.5, BM=4.5, MC=1.5) OR
-  // move E up (E at y=5, AE=1, ED=5).  The question says E is midpoint of AD and BM=MC,
-  // so we must keep those.  The apparent "H inside" in the sketch is just a schematic.
-  // FINAL DECISION: draw the mathematically correct configuration with H to the LEFT of AD
-  // but still show it — many textbook redraws place H on segment AF inside the square by
-  // extending EM the other way.  I'll draw with A=(0,6), E=(0,3), M=(3,0), F=(9,0) and
-  // show H at (-9,12) off-canvas, which is ugly.  Instead, we shift the square so H is visible.
-  // Cleanest: scale the square so side = 4 units, B=(0,0), C=(4,0), D=(4,4), A=(0,4),
-  // E=(0,2), M=(2,0), F=(6,0).  Then AF: from (0,4) to (6,0) slope -2/3.
-  // EM: from (0,2) to (2,0) slope -1.  Intersection at x = -6.  Still left.
-  // The issue is fundamental: with E midpoint and M midpoint, AF and EM do NOT cross inside.
-  // However, the question text says "AF and EM intersect at H" — it doesn't require H inside.
-  // For a nice diagram, I will draw the lines extended and put H below-left of B, clearly labelled.
-  // To keep the diagram compact, I'll compress: place B at (0,0) and draw H at its true spot.
-  // With S=6: H = (-9, 12).  That's far.  So I'll instead use a different but equivalent
-  // labeling that matches the visual: swap the roles so H is inside.
-  // Suppose E is midpoint of AD (top edge), M midpoint of BC (bottom edge), and lines
-  // AE? No.  The line from A to F and from E to M.  For them to meet inside, the
-  // line from A must start lower or F further.  Let F be such that CF is large.
-  // CF = BM = 3 (half of side 6) is forced by the question.  So F is fixed at x=9.
-  // Therefore the only way to get H inside is for E to be HIGHER (closer to D) or for
-  // the line AF to be shallower.  Since question says E is midpoint, H is outside.
-  // CONCLUSION: Draw H outside the square, to the left, and it still works.
-  // But the figure clearly shows H inside.  Many versions of this problem have
-  // "E is a point on AD such that AE : ED = 3 : 1" which puts E higher.
-  // I'll adopt the geometry that makes the figure match: AE = 3k, ED = k, BM = MC = 2k,
-  // CF = k as in the given solution.  Then side = 4k.
-  // Let k=1.5 => side=6.  A=(0,6), E=(0,1.5), D=(6,6).  B=(0,0), M=(3,0), C=(6,0), F=(7.5,0).
-  // AF: (0,6) to (7.5,0): slope = -0.8.  EM: (0,1.5) to (3,0): slope = -0.5.
-  // Intersection: 6 - 0.8x = 1.5 - 0.5x => 4.5 = 0.3x => x = 15.  Outside right!
-  // Still outside.  Hmm.
-  // Let's try AE = 3, ED = 1 (side 4).  A=(0,4), E=(0,1)? No, E on AD means E=(0,?).
-  // If AE=3 and AD=4 then E is at y=1 from A?  A=(0,4), E=(0,1), D=(0? no D=(4,4)).
-  // Actually AD is vertical from A(0,4) to D(4,4) — wait that's not vertical.
-  // Square: A=(0,4), B=(0,0), C=(4,0), D=(4,4).  AD is the top edge from (0,4) to (4,4).
-  // E on AD: if AE=3, ED=1, then E=(3,4).
-  // M on BC: BM=2, MC=2, M=(2,0).  CF=BM=2, F=(6,0).
-  // AF: (0,4) to (6,0): slope = -2/3.  EM: (3,4) to (2,0): slope = 4.
-  // These intersect: 4 - (2/3)x = 4 + 4(x-3) => 4 - (2/3)x = 4x - 8 => 12 = (14/3)x => x = 18/7 ≈ 2.57.
-  // y = 4 - (2/3)(2.57) ≈ 2.29.  Inside!  Great.
-  // So the correct configuration is: AE = 3k, ED = k, BM = 2k, MC = 2k, CF = k.
-  // That matches the solution image labels: 3k, k, 2k, 2k, k.  
-  // Side = 4k.  Let k = 1.5 for drawing => side = 6.
-  // A=(0,6), B=(0,0), C=(6,0), D=(6,6).
-  // E on AD with AE=4.5, ED=1.5 => E=(4.5,6).
-  // M on BC with BM=3, MC=3 => M=(3,0).
-  // F with CF=1.5 => F=(7.5,0).
-  // AF: (0,6) to (7.5,0): slope = -0.8.  EM: (4.5,6) to (3,0): slope = 4.
-  // Intersection: 6 - 0.8x = 6 + 4(x-4.5) => -0.8x = 4x - 18 => 18 = 4.8x => x = 3.75.
-  // y = 6 - 0.8(3.75) = 3.  So H = (3.75, 3).  Inside the square.  ✓
-  // G: intersection of EG and AF.  EG is the extension of EM beyond M?  
-  // In the figure, G is where the line from E through M (extended) meets AF near the right side.
-  // Actually G is on line EM extended and also on AF?  No — the figure shows G where EG meets AF.
-  // Line EM extended past M: from E(4.5,6) through M(3,0), continue to G.
-  // Param: x = 3 - 1.5t, y = 0 - 6t (t>0 for extension past M).
-  // AF: y = 6 - 0.8x.  Set 0 - 6t = 6 - 0.8(3 - 1.5t) = 6 - 2.4 + 1.2t = 3.6 + 1.2t
-  // => -6t = 3.6 + 1.2t => -7.2t = 3.6 => t = -0.5.  Negative => G is on the other side (toward E).
-  // That means G lies between E and M, not beyond M.  But figure shows G to the right, near C.
-  // Hmm.  In the figure, the segment EM is drawn from E down to M, and another segment
-  // goes from M to G (to the right, on the extension of EM beyond M? No, direction is down-right from M).
-  // Look again: B at bottom-left, M on BC, then C, then F.  The line from B goes to G (upper right).
-  // The line from E goes down through H, through M, and continues to... no wait.
-  // In the figure: E is top-middle-left, line goes down-right through H (inside)
-  // and continues down to M on BC.  That's the EM segment.
-  // Then G is to the right, on line AF (the long diagonal from A to F) — that's why
-  // G is labeled where AF crosses the vertical through C?  No, the vertical line through
-  // C is drawn in the figure going up to G.
-  // I think the figure shows: G is the intersection of AF with the line through C
-  // perpendicular to BC (i.e., the right side of the square extended) — no, G is on AF
-  // and also on the line from E through M?  The labels show 5x on EG and 5x on GF,
-  // meaning G is equidistant from E and F — so G is the midpoint of EF.
-  // So G is just the midpoint of EF!  And AF passes through G.  Let's verify:
-  // E=(4.5,6), F=(7.5,0).  Midpoint G = (6,3).  Does AF pass through (6,3)?
-  // AF: y = 6 - 0.8x.  At x=6, y = 6 - 4.8 = 1.2 ≠ 3.  Not on AF.
-  // So G is NOT the midpoint of EF in this configuration.  The "5x, 5x" in the
-  // solution image suggests a different setup than the main figure.
-  // I'll follow the FIGURE: G is where the line through C (vertical) meets AF,
-  // extended upward.  In the figure, there's a vertical line at C going up to G.
-  // Actually the figure shows a line from B through H to G.  Yes!  B, H, G are collinear.
-  // That's the line BF?  No, B to F would be the bottom edge.
-  // The line from B goes up-right through H and G.  Let's check if B,H,G collinear:
-  // B=(0,0), H=(3.75,3): slope = 0.8.  Does this line hit AF at G?
-  // Line BH: y = 0.8x.  AF: y = 6 - 0.8x.  Intersection: 0.8x = 6 - 0.8x => 1.6x = 6 => x=3.75, y=3.
-  // That's H itself.  So B,H,G are not distinct if collinear with AF.
-  // Let me re-examine the figure: there are two lines crossing at H: one from A (top-left)
-  // going to F (bottom-right), and one from B (bottom-left) going up-right to G.
-  // And there's a line from E (top) down to M (bottom) passing through H?  Let's see:
-  // In the figure, H is on the line from A to F, and also on the line from B to G.
-  // The line from E goes down to M — does it pass through H?  It looks like it does.
-  // So H is the intersection of AF, BG, and EM?  Three lines through one point.
-  // Given the solution text: "AF and EM intersect at H" and "EG and AF intersect at G".
-  // So H = AF ∩ EM, and G = EG ∩ AF.  That means G is also on AF!
-  // Then EG is the line from E to G, and G is on AF.  But H is also on AF and on EM.
-  // So both H and G are on AF.  G is further right along AF than H.
-  // And EG is a line from E to G.  It doesn't pass through M necessarily.
-  // Wait, the solution says "EM" and "EG" — two different lines from E.
-  // Let me re-read: "AF and EM intersect at H" and "EG and AF intersect at G".
-  // So EM is one line, EG is another.  M is on BC, G is somewhere else.
-  // In the figure, the line from E goes down to M; H is on it.  Separately,
-  // the line from E goes to G; G is on AF.  But two lines from E can't both be drawn
-  // as one straight line unless M, H, E, G are collinear.
-  // UNLESS: the figure shows line EM extended past M to G.  So E, H, M, G are collinear.
-  // Then G = intersection of EM extended with AF.
-  // Let's test: EM line: E=(4.5,6) to M=(3,0).  Direction: (-1.5, -6).
-  // Extend past M: x = 3 - 1.5t, y = 0 - 6t for t>0.
-  // AF: y = 6 - 0.8x.  Plug in: -6t = 6 - 0.8(3 - 1.5t) = 6 - 2.4 + 1.2t = 3.6 + 1.2t
-  // => -7.2t = 3.6 => t = -0.5.  Negative, so G is on the other side (toward E).
-  // So EM extended past M does NOT hit AF.  Instead, EM extended past E hits AF.
-  // t = -0.5 gives x = 3 + 0.75 = 3.75, y = 3.  That's H!  So H is on EM between E and M? 
-  // E=(4.5,6), M=(3,0).  H=(3.75,3).  Parameter from E to M: at t=0.5, 
-  // x = 4.5 - 0.75 = 3.75, y = 6 - 3 = 3.  Yes!  H is the midpoint of EM.  ✓
-  // So H is on segment EM, and also on AF.  Good.
-  // Now where is G?  The figure shows G to the right, on AF.  And EG is drawn.
-  // So G = AF ∩ (something).  The something is the line through E... but we've used EM.
-  // I think the figure actually shows: G is the intersection of AF with the line through C
-  // perpendicular to BC (the right side of the square extended).  No wait, the vertical
-  // line through C goes up to G in the figure?  Let me look again at the image description:
-  // "the line from E goes down through H to M; the line from B goes up-right through H to G"
-  // No, that's also ambiguous.
-  // Simplest consistent reading matching "EG and AF intersect at G":
-  // G is on AF, and E, G are connected.  The segment EM and segment EG share endpoint E.
-  // Figure shows: E at top, line down to M (through H), and another line from E to G (G on AF).
-  // So there are TWO lines from E: EM and EG.  They are different lines.
-  // But in the figure it looks like one line... unless the figure shows G on the extension
-  // of EM past M, and AF passes through G.  We showed that doesn't work with these ratios.
-  // The solution image (the second image) shows: E at top, line down to M (through H),
-  // and G is to the right of M, NOT on the line EM.  There's a segment from M to G.
-  // And EG is the line from E to G.  Hmm, but then EG is not a straight line through M.
-  // Actually looking at the solution image more carefully:
-  // - Line from A goes down-right to F (passing through H and G).
-  // - Line from B goes right to M and beyond?  No, B-M-C-F are on the bottom.
-  // - Line from E goes down-left to M.
-  // - G is on AF, and there's a line from E to G (passing near the right side).
-  // - H is intersection of AF and EM.
-  // So EM and EG are two different lines from E.  EM goes to M (bottom middle),
-  // EG goes to G (right side, on AF).
-  // This is the correct reading!  Let me redo:
-  // E=(4.5,6).  M=(3,0).  EM: slope = (0-6)/(3-4.5) = -6/-1.5 = 4.
-  // AF: y = 6 - 0.8x.
-  // H = EM ∩ AF: 6 + 4(x-4.5) = 6 - 0.8x => 4x - 18 = -0.8x => 4.8x = 18 => x = 3.75, y = 3. ✓
-  // G is on AF and on... it's where?  The figure shows G where line EG meets AF, and
-  // G appears to be at the same height as the center-right.  But without another condition
-  // we can't determine G.  Unless G is defined as: EG passes through C?  Or G is on
-  // the vertical through C?
-  // The solution says EG = GF (5x each) so G is the midpoint of EF?  Let's test:
-  // Midpoint of E(4.5,6) and F(7.5,0) = (6, 3).  Is (6,3) on AF?  y = 6 - 0.8(6) = 1.2.  No.
-  // So G is NOT the midpoint of EF even though EG=GF.  Unless the "5x" labels mean something else.
-  // Given the ambiguity, I'll draw G as the intersection of AF with the vertical line through C,
-  // extended upward — this matches the visual position of G in the figure (right side, above C).
-  // Vertical line x=6: y = 6 - 0.8(6) = 1.2.  So G = (6, 1.2).  That's below C (y=0) by 1.2 above.
-  // In the figure G looks like it's at about y=2.5 (middle height).  Close enough.
-  // Let's use G = (6, 1.2) and draw EG.
-  // Actually wait — in the figure, G is clearly ABOVE the horizontal midline.  Let me
-  // instead place G at the intersection of AF with the line through D extended right?
-  // Or simply use the solution's ratios: EG = GF = 5x.  Let's just find G on AF
-  // such that EG = GF.
-  // E=(4.5,6), F=(7.5,0).  G=(gx, 6-0.8gx) on AF.
-  // EG² = (gx-4.5)² + (6-0.8gx-6)² = (gx-4.5)² + (0.8gx)².
-  // GF² = (gx-7.5)² + (6-0.8gx)² = (gx-7.5)² + (6-0.8gx)².
-  // Set equal: (gx-4.5)² + 0.64gx² = (gx-7.5)² + (6-0.8gx)².
-  // (gx² - 9gx + 20.25) + 0.64gx² = (gx² - 15gx + 56.25) + (36 - 9.6gx + 0.64gx²)
-  // 1.64gx² - 9gx + 20.25 = 1.64gx² - 24.6gx + 92.25
-  // -9gx + 20.25 = -24.6gx + 92.25
-  // 15.6gx = 72 => gx = 4.615.  y = 6 - 3.69 = 2.31.
-  // G = (4.615, 2.31).  That's very close to E's x.  Doesn't match figure (G is far right).
-  // So the EG=GF condition from the solution doesn't apply to the main figure's geometry
-  // (the solution uses a different orientation).  I'll just draw G at the intersection
-  // of AF with the vertical through C, which matches the visual best.
-  // G = (6, 1.2).
-  // Actually the figure shows G HIGHER than C and to the right of the center, and EG
-  // is drawn as a line from E to G that goes to the right and slightly down.
-  // With E=(4.5,6) and G=(6,1.2), EG goes down-right steeply — not quite matching
-  // but acceptable.
-  // FINAL: use proportions that give a visually pleasing diagram:
-  // Square side = 6.  A=(0,6), B=(0,0), C=(6,0), D=(6,6).
-  // E = (0.9*6, 6) — no wait, E is on AD (top edge).  If AE = 3k and ED = k with 4k=6,
-  // then k=1.5, AE=4.5, ED=1.5.  E = (4.5, 6).  ✓ (matches above)
-  // M on BC with BM=2k=3, so M=(3,0). ✓
-  // F with CF=k=1.5, so F=(7.5, 0). ✓
-  // H = (3.75, 3). ✓
-  // G: let's place G at (5.4, 1.68) which is on AF (y = 6-0.8*5.4 = 6-4.32 = 1.68).
-  // This is right-of-center and above the bottom, reasonable.
-  // For the drawing, we'll place G at x=5.4.
+  function areaOf(pts){
+    let s = 0;
+    for (let i = 0; i < pts.length; i++){
+      const p = pts[i], q = pts[(i + 1) % pts.length];
+      s += p.x * q.y - q.x * p.y;
+    }
+    return Math.abs(s) / 2;
+  }
+  const slopeOf = (p, q) => (q.y - p.y) / (q.x - p.x);
+  const BMH  = areaOf([B, M, H]);        // 0.8 unit^2
+  const AEGH = areaOf([A, E, G, H]);     // 7.8 unit^2
+  const mEF = slopeOf(E, F);             // -2
+  const mAM = slopeOf(A, M);             // -2
+  const k2 = 4 / BMH;                    // given [BMH] = 4 cm^2  ->  k^2 = 5
+  console.log('A', A, 'B', B, 'C', C, 'D', D, 'E', E, 'M', M, 'F', F, 'G', G, 'H', H);
+  console.log('slope EF =', mEF, ' slope AM =', mAM, ' (EF // AM:', mEF === mAM, ')');
+  console.log('[BMH] =', BMH, 'unit^2   [AEGH] =', AEGH, 'unit^2');
+  console.log('k^2 =', k2, ' -> [AEGH] =', AEGH * k2, 'cm^2');
+  if (Math.abs(mEF + 2) > 1e-12 || Math.abs(mAM + 2) > 1e-12 || mEF !== mAM){
+    throw new Error('EF is not parallel to AM');
+  }
+  if (Math.abs(BMH - 0.8) > 1e-12 || Math.abs(AEGH - 7.8) > 1e-12){
+    throw new Error('area check failed');
+  }
+  // ---- end geometry ----
 
-  // ---- Final coordinates (side = 6) ----
-  const k = 1.5;
-  const s = 4*k; // 6
-  const P = {
-    A: {x:0, y:s},
-    B: {x:0, y:0},
-    C: {x:s, y:0},
-    D: {x:s, y:s},
-    E: {x:3*k, y:s},      // AE = 3k
-    M: {x:2*k, y:0},      // BM = 2k
-    F: {x:s + k, y:0}     // CF = k
-  };
-  // H = intersection of A-F and E-M
-  // A-F: from (0,6) to (7.5,0): slope = -6/7.5 = -0.8, y = 6 - 0.8x
-  // E-M: from (4.5,6) to (3,0): slope = (0-6)/(3-4.5) = 4, y = 6 + 4(x-4.5) = 4x - 12
-  // 6 - 0.8x = 4x - 12 => 18 = 4.8x => x = 3.75, y = 3
-  P.H = {x:3.75, y:3};
-  // G on A-F at x = 5.4
-  P.G = {x:5.4, y:6 - 0.8*5.4};  // y = 1.68
-
-  // ---- Transform world -> canvas ----
-  // World x range: -0.5 to 8.5, y range: -0.5 to 6.5
-  const padX = 60, padY = 50;
-  const worldMinX = -0.8, worldMaxX = 8.4;
-  const worldMinY = -0.8, worldMaxY = 6.8;
-  const scaleX = (W - 2*padX) / (worldMaxX - worldMinX);
-  const scaleY = (H - 2*padY) / (worldMaxY - worldMinY);
-  const scale = Math.min(scaleX, scaleY);
-  const offX = padX - worldMinX * scale;
-  const offY = H - padY + worldMinY * scale;
-
-  function tx(x){ return offX + x * scale; }
-  function ty(y){ return offY - y * scale; }
+  // ---- view / transform ----
+  const padX = 64, padY = 46;
+  const wx0 = -1.0, wx1 = 6.3, wy0 = -1.5, wy1 = 5.2;
+  const sc = Math.min((CW - 2*padX) / (wx1 - wx0), (CH - 2*padY) / (wy1 - wy0));
+  const offX = (CW - (wx1 - wx0) * sc) / 2 - wx0 * sc;
+  const offY = (CH - (wy1 - wy0) * sc) / 2 + wy1 * sc;
+  const px = x => offX + x * sc;
+  const py = y => offY - y * sc;
 
   let mode = 1;
 
-  function line(p, q, color, width, dash){
+  // ---- primitives ----
+  function line(p, q, col, w, dash){
+    ctx.save();
+    ctx.strokeStyle = col; ctx.lineWidth = w || 2;
+    if (dash) ctx.setLineDash(dash);
+    ctx.beginPath(); ctx.moveTo(px(p.x), py(p.y)); ctx.lineTo(px(q.x), py(q.y)); ctx.stroke();
+    ctx.restore();
+  }
+  function seg(p, q, col, w){
+    line(p, q, col, w);
+  }
+  function fillPoly(pts, col, stroke, w){
     ctx.save();
     ctx.beginPath();
-    ctx.setLineDash(dash || []);
-    ctx.strokeStyle = color;
-    ctx.lineWidth = width || 2;
-    ctx.moveTo(tx(p.x), ty(p.y));
-    ctx.lineTo(tx(q.x), ty(q.y));
+    ctx.moveTo(px(pts[0].x), py(pts[0].y));
+    for (let i = 1; i < pts.length; i++) ctx.lineTo(px(pts[i].x), py(pts[i].y));
+    ctx.closePath();
+    ctx.fillStyle = col; ctx.fill();
+    if (stroke){ ctx.strokeStyle = stroke; ctx.lineWidth = w || 2; ctx.stroke(); }
+    ctx.restore();
+  }
+  function pt(p, col, r){
+    ctx.save();
+    ctx.fillStyle = col;
+    ctx.beginPath(); ctx.arc(px(p.x), py(p.y), r || 5, 0, 2*Math.PI); ctx.fill();
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.6; ctx.stroke();
+    ctx.restore();
+  }
+  function txt(str, x, y, col, size, align){
+    ctx.save();
+    ctx.fillStyle = col || '#1e293b';
+    ctx.font = 'bold ' + (size || 13) + 'px Segoe UI, sans-serif';
+    ctx.textAlign = align || 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(str, px(x), py(y));
+    ctx.restore();
+  }
+  // right-angle marker: corner p, world unit directions d1 and d2
+  function ra(p, d1, d2, col, size){
+    const s = size || 0.17;
+    ctx.save();
+    ctx.strokeStyle = col || '#0f766e'; ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(px(p.x + d1[0]*s), py(p.y + d1[1]*s));
+    ctx.lineTo(px(p.x + (d1[0] + d2[0])*s), py(p.y + (d1[1] + d2[1])*s));
+    ctx.lineTo(px(p.x + d2[0]*s), py(p.y + d2[1]*s));
     ctx.stroke();
     ctx.restore();
   }
-  function poly(pts, color, width, dash){
-    ctx.save();
-    ctx.beginPath();
-    ctx.setLineDash(dash || []);
-    ctx.strokeStyle = color;
-    ctx.lineWidth = width || 2;
-    ctx.moveTo(tx(pts[0].x), ty(pts[0].y));
-    for(let i=1;i<pts.length;i++) ctx.lineTo(tx(pts[i].x), ty(pts[i].y));
-    ctx.stroke();
-    ctx.restore();
+
+  // per-step highlight group (7 solution steps -> 4 visual states)
+  function group(){
+    if (mode <= 2) return 'setup';     // side lengths, then F / CF = k
+    if (mode === 3) return 'g';        // G is the mid-point of CD
+    if (mode <= 5) return 'similar';   // BMH ~ BFG, k^2 = 5
+    return 'final';                    // subtract the corners, [AEGH] = 39
   }
-  function dot(p, color, r, label, labelColor, dx, dy){
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(tx(p.x), ty(p.y), r||5, 0, Math.PI*2);
-    ctx.fillStyle = color;
-    ctx.fill();
-    ctx.strokeStyle = '#fff';
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
-    ctx.restore();
-    if(label){
-      ctx.save();
-      ctx.fillStyle = labelColor || '#111';
-      ctx.font = 'bold 15px Segoe UI, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText(label, tx(p.x) + (dx||0), ty(p.y) + (dy||0));
-      ctx.restore();
-    }
-  }
-  function label(text, x, y, color, size){
-    ctx.save();
-    ctx.fillStyle = color || '#333';
-    ctx.font = (size||13) + 'px Segoe UI, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText(text, x, y);
-    ctx.restore();
-  }
+  const narr = {
+    1: 'Side 4k:  AE = 3k, ED = k,  BM = MC = 2k',
+    2: 'EF // AM  ->  CF = k,  BF = 5k',
+    3: 'G = EF n CD  ->  DG = GC = 2k  (mid-point of CD)',
+    4: 'H = AM n BG,  MH // GF  ->  ' + 'BMH ~ ' + 'BFG,  BM : BF = 2 : 5',
+    5: '[BMH] = (2/5)^2 [BFG] = 4k^2/5 = 4  ->  k^2 = 5',
+    6: 'Square 16k^2 minus ' + 'ABM, ' + 'GDE and MCGH',
+    7: '[AEGH] = 7k^2 + 4 = 39 cm^2   (option C)'
+  };
 
   function draw(){
-    ctx.clearRect(0,0,W,H);
-    // background grid
+    const g = group();
+
+    // background
+    ctx.clearRect(0, 0, CW, CH);
     ctx.save();
-    ctx.strokeStyle = '#eef3fa';
-    ctx.lineWidth = 1;
-    for(let gx=0; gx<=9; gx++){
-      ctx.beginPath(); ctx.moveTo(tx(gx),0); ctx.lineTo(tx(gx),H); ctx.stroke();
-    }
-    for(let gy=0; gy<=7; gy++){
-      ctx.beginPath(); ctx.moveTo(0,ty(gy)); ctx.lineTo(W,ty(gy)); ctx.stroke();
-    }
+    ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, CW, CH);
+    ctx.strokeStyle = '#eef3fa'; ctx.lineWidth = 1;
+    for (let gx = -1; gx <= 6; gx++){ ctx.beginPath(); ctx.moveTo(px(gx), 0); ctx.lineTo(px(gx), CH); ctx.stroke(); }
+    for (let gy = -1; gy <= 5; gy++){ ctx.beginPath(); ctx.moveTo(0, py(gy)); ctx.lineTo(CW, py(gy)); ctx.stroke(); }
     ctx.restore();
 
-    // --- square ---
+    // square ABCD
+    fillPoly([A, B, C, D], 'rgba(37,99,235,0.05)', '#2563eb', g === 'setup' ? 4 : 2.6);
+
+    // shaded regions: triangle BMH and quadrilateral AEGH
+    fillPoly([B, M, H], 'rgba(245,158,11,0.42)', g === 'similar' ? '#b45309' : 'rgba(180,83,9,0.55)', g === 'similar' ? 3 : 1.6);
+    fillPoly([A, E, G, H], 'rgba(22,163,74,0.22)', g === 'final' ? '#15803d' : 'rgba(21,128,61,0.55)', g === 'final' ? 3 : 1.6);
+
+    // the drawn lines: AM, EF (produced to F), BG
+    seg(A, M, '#e11d48', g === 'setup' ? 3.2 : 2.4);
+    seg(E, F, '#e11d48', g === 'g' ? 3.6 : 2.4);
+    seg(B, G, '#9333ea', g === 'similar' ? 3.2 : 2.2);
+    // DC is cut at G; emphasise it while locating G
+    if (g === 'g'){ seg(D, C, '#2563eb', 4); }
+
+    // right angles: square corners + the height GC to BC
+    ra(A, [1,0], [0,-1], '#94a3b8', 0.15);
+    ra(B, [1,0], [0,1], '#0f766e', 0.17);
+    ra(C, [-1,0], [0,1], '#0f766e', 0.17);
+    ra(D, [-1,0], [0,-1], '#94a3b8', 0.15);
+
+    // points
+    pt(A, '#2563eb'); pt(B, '#2563eb'); pt(C, '#2563eb'); pt(D, '#2563eb');
+    pt(E, '#f59e0b', 6); pt(M, '#f59e0b', 6); pt(F, '#f59e0b', 6);
+    pt(G, '#9333ea', 6); pt(H, '#9333ea', 6);
+
+    // point labels
+    txt('A', -0.26, 4.16, '#1e293b', 15);
+    txt('B', -0.28, -0.24, '#1e293b', 15);
+    txt('C', 4.02, -0.26, '#1e293b', 15);
+    txt('D', 4.24, 4.18, '#1e293b', 15);
+    txt('E', 2.92, 3.68, '#b45309', 14);
+    txt('M', 1.98, -0.26, '#b45309', 14);
+    txt('F', 5.3, 0.02, '#b45309', 14);
+    txt('G', 4.34, 1.96, '#7e22ce', 15);
+    txt('H', 1.34, 0.92, '#7e22ce', 15);
+
+    // length notation
+    txt('AE = 3k', 1.45, 4.34, '#1d4ed8', 12);
+    txt('ED = k', 3.5, 4.34, '#1d4ed8', 12);
+    txt('BM = 2k', 1.0, -0.62, '#b45309', 12);
+    txt('MC = 2k', 3.0, -0.62, '#b45309', 12);
+    txt('CF = k', 4.55, -0.62, '#b45309', 12);
+    txt('DG = 2k', 4.42, 3.12, '#7e22ce', 12, 'left');
+    txt('GC = 2k', 4.42, 1.02, '#7e22ce', 12, 'left');
+
+    // area tags
+    txt('[BMH] = 4 cm2', 0.72, 0.34, '#b45309', 12);
+    txt('[AEGH] = 39 cm2', 2.2, 2.9, '#15803d', 12);
+
+    // caption for the current solution step
+    const cap = narr[mode] || narr[1];
     ctx.save();
+    ctx.font = 'bold 13px Segoe UI, sans-serif';
+    const w = ctx.measureText(cap).width + 26;
+    ctx.fillStyle = 'rgba(30,41,59,0.9)';
     ctx.beginPath();
-    ctx.rect(tx(0), ty(s), s*scale, s*scale);
-    ctx.fillStyle = 'rgba(37,99,235,0.05)';
+    const bw = Math.min(w, CW - 24), bx = (CW - bw) / 2, by = CH - 40;
+    if (ctx.roundRect) { ctx.roundRect(bx, by, bw, 28, 8); }
+    else { ctx.rect(bx, by, bw, 28); }
     ctx.fill();
-    ctx.strokeStyle = '#2563eb';
-    ctx.lineWidth = 2.5;
-    ctx.stroke();
+    ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(cap, CW / 2, by + 14);
     ctx.restore();
-
-    // --- lines ---
-    // Line A-F always
-    line(P.A, P.F, '#e11d48', 2.2);
-    // Line E-M always
-    line(P.E, P.M, '#e11d48', 2.2);
-
-    // Highlight per mode
-    if(mode === 1){
-      // emphasise square sides + E, M
-      ctx.save();
-      ctx.beginPath();
-      ctx.rect(tx(0), ty(s), s*scale, s*scale);
-      ctx.strokeStyle = '#2563eb';
-      ctx.lineWidth = 4;
-      ctx.stroke();
-      ctx.restore();
-      dot(P.E, '#f59e0b', 6, 'E', '#b45309', 0, -16);
-      dot(P.M, '#f59e0b', 6, 'M', '#b45309', 0, 24);
-      label('AD = 2k', tx(2.2), ty(6.45), '#1d4ed8', 13);
-      label('BM = MC = k', tx(3.5), ty(-0.6), '#b45309', 13);
-    }
-    if(mode === 2 || mode === 3){
-      // similar triangles BHM and BGF
-      ctx.save();
-      ctx.beginPath();
-      ctx.moveTo(tx(P.B.x), ty(P.B.y));
-      ctx.lineTo(tx(P.H.x), ty(P.H.y));
-      ctx.lineTo(tx(P.M.x), ty(P.M.y));
-      ctx.closePath();
-      ctx.fillStyle = 'rgba(245,158,11,0.28)';
-      ctx.fill();
-      ctx.strokeStyle = '#f59e0b';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-      ctx.restore();
-      ctx.save();
-      ctx.beginPath();
-      ctx.moveTo(tx(P.B.x), ty(P.B.y));
-      ctx.lineTo(tx(P.G.x), ty(P.G.y));
-      ctx.lineTo(tx(P.F.x), ty(P.F.y));
-      ctx.closePath();
-      ctx.fillStyle = 'rgba(22,163,74,0.16)';
-      ctx.fill();
-      ctx.strokeStyle = '#16a34a';
-      ctx.lineWidth = 1.8;
-      ctx.setLineDash([6,4]);
-      ctx.stroke();
-      ctx.restore();
-      // line B-G
-      line(P.B, P.G, '#16a34a', 2);
-      label('△BHM', tx(2.0), ty(1.1), '#b45309', 13);
-      label('△BGF', tx(5.5), ty(0.8), '#166534', 13);
-    }
-    if(mode === 4){
-      // trapezium FGHM highlighted
-      ctx.save();
-      ctx.beginPath();
-      ctx.moveTo(tx(P.F.x), ty(P.F.y));
-      ctx.lineTo(tx(P.G.x), ty(P.G.y));
-      ctx.lineTo(tx(P.H.x), ty(P.H.y));
-      ctx.lineTo(tx(P.M.x), ty(P.M.y));
-      ctx.closePath();
-      ctx.fillStyle = 'rgba(168,85,247,0.22)';
-      ctx.fill();
-      ctx.strokeStyle = '#9333ea';
-      ctx.lineWidth = 2.8;
-      ctx.stroke();
-      ctx.restore();
-      label('32 cm²', tx(5.4), ty(1.4), '#6b21a8', 13);
-    }
-    if(mode === 5 || mode === 6){
-      // trapezium AEGH highlighted
-      ctx.save();
-      ctx.beginPath();
-      ctx.moveTo(tx(P.A.x), ty(P.A.y));
-      ctx.lineTo(tx(P.E.x), ty(P.E.y));
-      ctx.lineTo(tx(P.G.x), ty(P.G.y));
-      ctx.lineTo(tx(P.H.x), ty(P.H.y));
-      ctx.closePath();
-      ctx.fillStyle = 'rgba(37,99,235,0.22)';
-      ctx.fill();
-      ctx.strokeStyle = '#1d4ed8';
-      ctx.lineWidth = 2.8;
-      ctx.stroke();
-      ctx.restore();
-      // EG segment
-      line(P.E, P.G, '#16a34a', 2.4);
-      // height hint
-      ctx.save();
-      ctx.setLineDash([4,4]);
-      ctx.strokeStyle = '#f59e0b';
-      ctx.beginPath();
-      ctx.moveTo(tx(4.5), ty(6));
-      ctx.lineTo(tx(4.5), ty(0));
-      ctx.stroke();
-      ctx.restore();
-      label('h', tx(4.65), ty(3.1), '#b45309', 15);
-    }
-    if(mode === 7){
-      // everything highlighted
-      ctx.save();
-      ctx.beginPath();
-      ctx.moveTo(tx(P.A.x), ty(P.A.y));
-      ctx.lineTo(tx(P.E.x), ty(P.E.y));
-      ctx.lineTo(tx(P.G.x), ty(P.G.y));
-      ctx.lineTo(tx(P.H.x), ty(P.H.y));
-      ctx.closePath();
-      ctx.fillStyle = 'rgba(37,99,235,0.18)';
-      ctx.fill();
-      ctx.strokeStyle = '#1d4ed8';
-      ctx.lineWidth = 3;
-      ctx.stroke();
-      ctx.restore();
-      ctx.save();
-      ctx.beginPath();
-      ctx.moveTo(tx(P.F.x), ty(P.F.y));
-      ctx.lineTo(tx(P.G.x), ty(P.G.y));
-      ctx.lineTo(tx(P.H.x), ty(P.H.y));
-      ctx.lineTo(tx(P.M.x), ty(P.M.y));
-      ctx.closePath();
-      ctx.fillStyle = 'rgba(168,85,247,0.18)';
-      ctx.fill();
-      ctx.strokeStyle = '#9333ea';
-      ctx.lineWidth = 2.4;
-      ctx.stroke();
-      ctx.restore();
-      label('AEGH = 39', tx(3.0), ty(4.7), '#1d4ed8', 13);
-    }
-
-    // --- vertices ---
-    dot(P.A, '#1d4ed8', 6, 'A', '#1d4ed8', -18, -10);
-    dot(P.B, '#1d4ed8', 6, 'B', '#1d4ed8', -18, 18);
-    dot(P.C, '#1d4ed8', 6, 'C', '#1d4ed8', 0, 22);
-    dot(P.D, '#1d4ed8', 6, 'D', '#1d4ed8', 18, -10);
-    dot(P.E, '#f59e0b', 5.5, 'E', '#b45309', 0, -16);
-    dot(P.M, '#f59e0b', 5.5, 'M', '#b45309', -16, 22);
-    dot(P.F, '#f59e0b', 5.5, 'F', '#b45309', 18, 14);
-    dot(P.H, '#9333ea', 6, 'H', '#6b21a8', -16, -8);
-    dot(P.G, '#9333ea', 6, 'G', '#6b21a8', 16, -8);
-
-    // --- side labels for length ratios ---
-    if(mode >= 1){
-      label('3k', tx(2.2), ty(6.35), '#1d4ed8', 12);
-      label('k', tx(5.2), ty(6.35), '#1d4ed8', 12);
-      label('2k', tx(1.5), ty(-0.65), '#b45309', 12);
-      label('2k', tx(4.0), ty(-0.65), '#b45309', 12);
-      label('k', tx(6.75), ty(-0.65), '#b45309', 12);
-    }
-    if(mode >= 5){
-      label('5x', tx(5.0), ty(3.4), '#166534', 12);
-      label('2x', tx(3.4), ty(1.6), '#6b21a8', 12);
-    }
   }
 
-  // --- scroll sync ---
+  if (!CanvasRenderingContext2D.prototype.roundRect){
+    CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r){
+      this.moveTo(x + r, y);
+      this.arcTo(x + w, y, x + w, y + h, r);
+      this.arcTo(x + w, y + h, x, y + h, r);
+      this.arcTo(x, y + h, x, y, r);
+      this.arcTo(x, y, x + w, y, r);
+      this.closePath();
+      return this;
+    };
+  }
+
+  // scroll-sync: the highlighted state follows the solution step in view
   const steps = Array.from(document.querySelectorAll('.step'));
-  const obs = new IntersectionObserver((es)=>{
-    es.forEach(e=>{
-      if(e.isIntersecting){
-        const m = +e.target.dataset.step;
-        mode = m;
-        steps.forEach(st=>st.classList.toggle('active', st===e.target));
+  const obs = new IntersectionObserver((es) => {
+    es.forEach(e => {
+      if (e.isIntersecting){
+        mode = Math.max(1, Math.min(7, +e.target.dataset.step || 1));
+        steps.forEach(st => st.classList.toggle('active', st === e.target));
         draw();
       }
     });
-  }, {rootMargin:'-15% 0px -55% 0px', threshold:0});
-  steps.forEach(st=>obs.observe(st));
+  }, {rootMargin: '-15% 0px -55% 0px', threshold: 0});
+  steps.forEach(st => obs.observe(st));
 
-  // initial
-  steps[0].classList.add('active');
+  if (steps[0]) steps[0].classList.add('active');
   draw();
   window.addEventListener('resize', draw);
 })();

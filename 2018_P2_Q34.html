@@ -58,7 +58,7 @@ window.MathJax = {
 <body>
 <div class="wrap">
   <span class="tag">HKDSE 2018 · Paper 2 · Q34</span>
-  <h1>Linear Programming — Greatest Value of an Expression over a Feasible Region</h1>
+  <h1>Linear Programming — Least Value of an Expression over a Feasible Region</h1>
 
   <div class="split">
 
@@ -69,11 +69,11 @@ window.MathJax = {
         <canvas id="cv" width="760" height="760"></canvas>
         <p class="ro" id="ro">Scroll the solution to highlight each step.</p>
         <div class="legend">
-          <span><i style="background:#2b6cb0"></i>Constraint lines</span>
-          <span><i style="background:#38b2ac"></i>Line $x+y=18$</span>
-          <span><i style="background:#ed8936"></i>Line $x=3$</span>
+          <span><i style="background:#2b6cb0"></i>Boundary lines</span>
+          <span><i style="background:#ed8936"></i>Line $x=21$</span>
           <span><i style="background:#9f7aea"></i>Feasible region $D$</span>
           <span><i style="background:#c53030"></i>Objective $5x+6y=$const</span>
+          <span><i style="background:#16a34a"></i>Least corner</span>
         </div>
       </div>
     </div>
@@ -167,214 +167,208 @@ window.MathJax = {
   const ro = document.getElementById('ro');
   const W = cv.width, H = cv.height;
 
-  // Coordinate mapping: x in [0,20], y in [0,22]
-  const xMin = 0, xMax = 20, yMin = 0, yMax = 22;
-  const padL = 60, padR = 30, padT = 30, padB = 50;
+  /* ---- plotting window: x in [-20,26], y in [-26,26], one uniform scale ---- */
+  const xMin = -20, xMax = 26, yMin = -26, yMax = 26;
+  const padL = 56, padR = 28, padT = 28, padB = 44;
   const plotW = W - padL - padR;
   const plotH = H - padT - padB;
-  const sx = plotW / (xMax - xMin);
-  const sy = plotH / (yMax - yMin);
+  const s = Math.min(plotW / (xMax - xMin), plotH / (yMax - yMin));
+  const ox = padL + (plotW - (xMax - xMin) * s) / 2;
+  const oy = padT + (plotH - (yMax - yMin) * s) / 2;
 
-  const X = x => padL + (x - xMin) * sx;
-  const Y = y => H - padB - (y - yMin) * sy;
+  const X = x => ox + (x - xMin) * s;
+  const Y = y => oy + (yMax - y) * s;
 
-  function grid(){
-    ctx.clearRect(0,0,W,H);
-    const bg = ctx.createLinearGradient(0,0,0,H);
-    bg.addColorStop(0,'#fbfdff'); bg.addColorStop(1,'#eef4fb');
-    ctx.fillStyle = bg; ctx.fillRect(0,0,W,H);
+  /* ---- system:  x <= 21,  x - y <= 35,  x + 5y <= 91,  3x + 2y >= 0 ---- */
+  const lines = [
+    {label:'x = 21',     vx:21,  f:null,               color:'#ed8936'},
+    {label:'x - y = 35', vx:null, f:x => x - 35,       color:'#2b6cb0'},
+    {label:'x + 5y = 91',vx:null, f:x => (91 - x) / 5, color:'#2b6cb0'},
+    {label:'3x + 2y = 0',vx:null, f:x => -1.5 * x,     color:'#2b6cb0'}
+  ];
 
-    ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1;
-    for(let x=0;x<=20;x+=2){
-      ctx.beginPath(); ctx.moveTo(X(x),Y(0)); ctx.lineTo(X(x),Y(22)); ctx.stroke();
-    }
-    for(let y=0;y<=22;y+=2){
-      ctx.beginPath(); ctx.moveTo(X(0),Y(y)); ctx.lineTo(X(20),Y(y)); ctx.stroke();
-    }
+  const corners = [
+    {x: 21, y:  14, val:423, lx: 14, ly:-12, align:'left'},
+    {x: 21, y: -14, val:255, lx: 14, ly: 20, align:'left'},
+    {x:-14, y:  21, val:290, lx:-14, ly:-12, align:'right'},
+    {x: 14, y: -21, val:178, lx: 14, ly: 22, align:'left'}
+  ];
 
-    // axes
-    ctx.strokeStyle = '#4a5568'; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(X(0),Y(0)); ctx.lineTo(X(20),Y(0)); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(X(0),Y(0)); ctx.lineTo(X(0),Y(22)); ctx.stroke();
+  /* objective through the least corner: 5x + 6y = 5(14) + 6(-21) = -56 */
+  const objY = x => (-56 - 5 * x) / 6;
 
-    ctx.fillStyle = '#4a5568'; ctx.font = 'bold 13px Segoe UI';
-    ctx.fillText('x', X(20)+4, Y(0)+4);
-    ctx.fillText('y', X(0)-4, Y(22)-6);
-
-    ctx.font = '12px Segoe UI';
-    for(let x=0;x<=20;x+=2){
-      if(x===0) continue;
-      ctx.beginPath(); ctx.moveTo(X(x),Y(0)); ctx.lineTo(X(x),Y(0)+5); ctx.stroke();
-      ctx.fillText(x, X(x)-5, Y(0)+18);
-    }
-    for(let y=2;y<=22;y+=2){
-      ctx.beginPath(); ctx.moveTo(X(0),Y(y)); ctx.lineTo(X(0)-5,Y(y)); ctx.stroke();
-      ctx.fillText(y, X(0)-22, Y(y)+4);
-    }
-
-    // shaded feasible region D  (corrected triangle)
+  function clipPlot(){
     ctx.beginPath();
-    ctx.moveTo(X(3),Y(0));
-    ctx.lineTo(X(18),Y(0));
-    ctx.lineTo(X(6),Y(12));
-    ctx.closePath();
-    ctx.fillStyle = 'rgba(159,122,234,0.30)';
-    ctx.fill();
-    ctx.strokeStyle = '#6b46c1'; ctx.lineWidth = 2; ctx.stroke();
-
-    // label D
-    ctx.fillStyle = '#553c9a'; ctx.font = 'bold 18px Segoe UI';
-    ctx.fillText('D', X(10), Y(4));
-
-    // line x = 3
-    ctx.beginPath(); ctx.strokeStyle = '#ed8936'; ctx.lineWidth = 2.5;
-    ctx.moveTo(X(3), Y(0)); ctx.lineTo(X(3), Y(22)); ctx.stroke();
-
-    // line x + y = 18
-    ctx.beginPath(); ctx.strokeStyle = '#38b2ac'; ctx.lineWidth = 2.5;
-    ctx.moveTo(X(0), Y(18)); ctx.lineTo(X(18), Y(0)); ctx.stroke();
-
-    // line 3x + 2y = 42
-    ctx.beginPath(); ctx.strokeStyle = '#2b6cb0'; ctx.lineWidth = 2.5;
-    ctx.moveTo(X(0), Y(21)); ctx.lineTo(X(14), Y(0)); ctx.stroke();
-
-    // y = 0 highlighted (the x-axis portion from x=3 to x=18)
-    ctx.beginPath(); ctx.strokeStyle = '#e53e3e'; ctx.lineWidth = 4;
-    ctx.moveTo(X(3), Y(0)); ctx.lineTo(X(18), Y(0)); ctx.stroke();
-
-    // vertices
-    const verts = [[3,0],[18,0],[6,12]];
-    verts.forEach(([vx,vy])=>{
-      ctx.beginPath(); ctx.fillStyle = '#c53030';
-      ctx.arc(X(vx),Y(vy),6,0,Math.PI*2); ctx.fill();
-      ctx.strokeStyle = '#fff'; ctx.lineWidth=2; ctx.stroke();
-      ctx.fillStyle = '#1a202c'; ctx.font = 'bold 13px Segoe UI';
-      ctx.fillText('('+vx+','+vy+')', X(vx)+9, Y(vy)-8);
-    });
-
-    // equation labels
-    ctx.font = 'bold 13px Segoe UI';
-    ctx.fillStyle = '#2b6cb0'; ctx.fillText('3x+2y=42', X(6.8), Y(14.5));
-    ctx.fillStyle = '#38b2ac'; ctx.fillText('x+y=18', X(14.5), Y(9));
-    ctx.fillStyle = '#ed8936'; ctx.fillText('x=3', X(3)+8, Y(20.5));
-    ctx.fillStyle = '#e53e3e'; ctx.fillText('y=0', X(15), Y(0)-10);
+    ctx.rect(ox, oy, (xMax - xMin) * s, (yMax - yMin) * s);
+    ctx.clip();
   }
 
-  // Candidate vertices with labels and value 5x+6y+234
-  const candidates = [
-    {p:[3,0],  val:249, note:'(3,0)  ·  249'},
-    {p:[14,0], val:304, note:'(14,0)  ·  304'},
-    {p:[6,12], val:336, note:'(6,12)  ·  336'},
-    {p:[18,0], val:324, note:'(18,0)  ·  324'},
+  function background(){
+    const bg = ctx.createLinearGradient(0, 0, 0, H);
+    bg.addColorStop(0, '#fbfdff'); bg.addColorStop(1, '#eef4fb');
+    ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+  }
+
+  function grid(){
+    ctx.save();
+    clipPlot();
+    ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1;
+    for (let x = Math.ceil(xMin / 5) * 5; x <= xMax; x += 5){
+      ctx.beginPath(); ctx.moveTo(X(x), Y(yMin)); ctx.lineTo(X(x), Y(yMax)); ctx.stroke();
+    }
+    for (let y = Math.ceil(yMin / 5) * 5; y <= yMax; y += 5){
+      ctx.beginPath(); ctx.moveTo(X(xMin), Y(y)); ctx.lineTo(X(xMax), Y(y)); ctx.stroke();
+    }
+    /* axes */
+    ctx.strokeStyle = '#4a5568'; ctx.lineWidth = 1.8;
+    ctx.beginPath(); ctx.moveTo(X(xMin), Y(0)); ctx.lineTo(X(xMax), Y(0)); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(X(0), Y(yMin)); ctx.lineTo(X(0), Y(yMax)); ctx.stroke();
+    ctx.restore();
+
+    /* tick labels */
+    ctx.fillStyle = '#5a6b82'; ctx.font = '11px Segoe UI';
+    for (let x = Math.ceil(xMin / 5) * 5; x <= xMax; x += 5){
+      if (x === 0) continue;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+      ctx.fillText(String(x), X(x), Y(0) + 5);
+    }
+    for (let y = Math.ceil(yMin / 5) * 5; y <= yMax; y += 5){
+      if (y === 0) continue;
+      ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+      ctx.fillText(String(y), X(0) - 6, Y(y));
+    }
+    ctx.fillStyle = '#2d3748'; ctx.font = 'bold 13px Segoe UI';
+    ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    ctx.fillText('x', X(xMax) + 6, Y(0));
+    ctx.fillText('y', X(0) + 4, Y(yMax) - 12);
+  }
+
+  function drawBoundary(emphasis){
+    ctx.save();
+    clipPlot();
+    lines.forEach(function(L){
+      ctx.strokeStyle = L.color;
+      ctx.lineWidth = emphasis ? 2.6 : 2.0;
+      ctx.beginPath();
+      if (L.vx !== null){
+        ctx.moveTo(X(L.vx), Y(yMin));
+        ctx.lineTo(X(L.vx), Y(yMax));
+      } else {
+        ctx.moveTo(X(xMin), Y(L.f(xMin)));
+        ctx.lineTo(X(xMax), Y(L.f(xMax)));
+      }
+      ctx.stroke();
+    });
+    ctx.restore();
+  }
+
+  function drawRegion(){
+    const poly = [[-14,21],[21,14],[21,-14],[14,-21]];
+    ctx.save();
+    clipPlot();
+    ctx.beginPath();
+    poly.forEach(function(pt, i){
+      if (i === 0) ctx.moveTo(X(pt[0]), Y(pt[1]));
+      else ctx.lineTo(X(pt[0]), Y(pt[1]));
+    });
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(159,122,234,0.26)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(159,122,234,0.95)';
+    ctx.lineWidth = 1.6;
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawObjective(){
+    ctx.save();
+    clipPlot();
+    ctx.strokeStyle = '#c53030';
+    ctx.lineWidth = 2.2;
+    ctx.setLineDash([8, 6]);
+    ctx.beginPath();
+    ctx.moveTo(X(xMin), Y(objY(xMin)));
+    ctx.lineTo(X(xMax), Y(objY(xMax)));
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+
+    ctx.fillStyle = '#c53030';
+    ctx.font = 'bold 12px Segoe UI';
+    ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    ctx.fillText('5x + 6y = -56', X(xMin) + 8, Y(objY(xMin)) + 18);
+  }
+
+  function drawCorners(showValues, highlightLeast){
+    corners.forEach(function(c){
+      const px = X(c.x), py = Y(c.y);
+      const isLeast = highlightLeast && c.val === 178;
+      ctx.beginPath();
+      ctx.arc(px, py, isLeast ? 7 : 5, 0, Math.PI * 2);
+      ctx.fillStyle = isLeast ? '#16a34a' : '#4a5568';
+      ctx.fill();
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+
+      if (isLeast){
+        ctx.beginPath();
+        ctx.arc(px, py, 13, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(22,163,74,0.85)'; ctx.lineWidth = 2.4; ctx.stroke();
+      }
+
+      ctx.textAlign = c.align;
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = isLeast ? '#15803d' : '#334155';
+      ctx.font = 'bold 12.5px Segoe UI';
+      ctx.fillText('(' + c.x + ', ' + c.y + ')', px + c.lx, py + c.ly);
+
+      if (showValues){
+        ctx.fillStyle = isLeast ? '#15803d' : '#b45309';
+        ctx.font = 'bold 14px Segoe UI';
+        ctx.fillText(String(c.val), px + c.lx, py + c.ly + 16);
+      }
+      if (isLeast){
+        ctx.fillStyle = '#15803d';
+        ctx.font = 'bold 13px Segoe UI';
+        ctx.fillText('least', px + c.lx, py + c.ly + (showValues ? 32 : 18));
+      }
+    });
+  }
+
+  const texts = [
+    'Step 1 — Boundary lines: x = 21, x - y = 35, x + 5y = 91 and 3x + 2y = 0.',
+    'Step 2 — Corners of D: (21, 14), (21, -14), (-14, 21) and (14, -21).',
+    'Step 3 — 5x + 6y + 234 at the corners: 423, 255, 290 and 178.',
+    'Step 4 — Least value 178, at the corner (14, -21); the line 5x + 6y = -56 touches there.'
   ];
 
   function drawHighlight(step){
-    // re-draw base
+    background();
     grid();
-
-    // dim overlay if not step 1
-    if(step >= 2){
-      // highlight candidate vertices with value tags
-      candidates.forEach(c=>{
-        const [cx,cy] = c.p;
-        ctx.beginPath();
-        ctx.fillStyle = (step>=3) ? '#dd6b20' : '#c53030';
-        ctx.arc(X(cx),Y(cy),7,0,Math.PI*2); ctx.fill();
-        ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
-      });
-    }
-
-    if(step >= 3 && step < 8){
-      // sort candidates by value, show best
-      const best = candidates.reduce((a,b)=> a.val>b.val ? a : b);
-      const [bx,by] = best.p;
-      ctx.beginPath();
-      ctx.fillStyle = 'rgba(229,62,62,0.9)';
-      ctx.arc(X(bx),Y(by),11,0,Math.PI*2); ctx.fill();
-      ctx.strokeStyle = '#fff'; ctx.lineWidth = 3; ctx.stroke();
-      ctx.fillStyle = '#c53030'; ctx.font = 'bold 15px Segoe UI';
-      ctx.fillText('max: '+best.note, X(bx)+14, Y(by)+4);
-    }
-
-    if(step >= 4){
-      // draw objective line through (6,12): 5x+6y = 102
-      // x from 0..20, y = (102 - 5x)/6
-      ctx.beginPath(); ctx.strokeStyle = '#c53030'; ctx.lineWidth = 3; ctx.setLineDash([8,6]);
-      let first = true;
-      for(let x=0;x<=20;x+=0.5){
-        const y = (102 - 5*x)/6;
-        if(y < 0 || y > 22) { first=true; continue; }
-        if(first){ ctx.moveTo(X(x),Y(y)); first=false; } else { ctx.lineTo(X(x),Y(y)); }
-      }
-      ctx.stroke(); ctx.setLineDash([]);
-      ctx.fillStyle = '#c53030'; ctx.font = 'bold 13px Segoe UI';
-      ctx.fillText('5x+6y=102', X(15), Y(1.6));
-    }
-
-    if(step >= 5 && step < 8){
-      // show excluded vertex (3,16.5) greyed
-      ctx.beginPath(); ctx.fillStyle = '#a0aec0';
-      ctx.arc(X(3),Y(16.5),6,0,Math.PI*2); ctx.fill();
-      ctx.fillStyle = '#718096'; ctx.font = 'italic 12px Segoe UI';
-      ctx.fillText('(3,16.5) violates x+y≤18', X(3)+10, Y(16.5)-8);
-    }
-
-    if(step >= 7){
-      // final highlight at (6,12) with 336
-      ctx.beginPath(); ctx.fillStyle = 'rgba(229,62,62,1)';
-      ctx.arc(X(6),Y(12),10,0,Math.PI*2); ctx.fill();
-      ctx.strokeStyle = '#fff'; ctx.lineWidth = 3; ctx.stroke();
-      ctx.fillStyle = '#c53030'; ctx.font = 'bold 15px Segoe UI';
-      ctx.fillText('max = 336', X(6)+14, Y(12)+2);
-    }
-
-    if(step >= 8){
-      // full re-check display
-      ctx.fillStyle = 'rgba(43,108,176,0.85)';
-      ctx.beginPath();
-      ctx.roundRect ? ctx.roundRect(X(11),Y(19),265,46,8) : ctx.rect(X(11),Y(19),265,46);
-      ctx.fill();
-      ctx.fillStyle = '#fff'; ctx.font = 'bold 13px Segoe UI';
-      ctx.fillText('Vertices of D: (3,0),(14,0),(6,12)', X(11)+10, Y(19)+19);
-      ctx.fillText('Values: 249, 304, 336  →  max 336', X(11)+10, Y(19)+37);
-    }
-
-    // readout
-    const texts = [
-      'Step 1 — Draw the four boundary lines.',
-      'Step 2 — Locate the vertices of D.',
-      'Step 3 — Evaluate 5x+6y+234 at each vertex.',
-      'Step 4 — Slide the objective line 5x+6y = k.',
-      'Step 5 — Check the candidate (3,16.5): rejected.',
-      'Step 6 — True feasible region is the triangle (3,0),(18,0),(6,12).',
-      'Step 7 — Maximum of 5x+6y is 102 at (6,12).',
-      'Step 8 — Full vertex check → max 336.',
-      'Step 9 — Official key is D (423).'
-    ];
-    ro.textContent = texts[Math.min(step-1, texts.length-1)];
+    drawBoundary(step === 1);
+    if (step >= 2) drawRegion();
+    if (step >= 3) drawObjective();
+    if (step >= 2) drawCorners(step >= 3, step >= 4);
+    ro.textContent = texts[Math.min(Math.max(step, 1), texts.length) - 1];
   }
 
-  // initial draw
   let current = 1;
   drawHighlight(current);
 
-  // Scroll-sync
-  const io = new IntersectionObserver(es=>{
-    es.forEach(e=>{
-      if(e.isIntersecting){
-        const s = +e.target.dataset.step;
-        if(s !== current){ current = s; drawHighlight(current); }
-        document.querySelectorAll('.step').forEach(el=>el.classList.remove('active'));
+  const io = new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if (e.isIntersecting){
+        const sNum = +e.target.dataset.step;
+        if (sNum !== current){ current = sNum; drawHighlight(current); }
+        document.querySelectorAll('.step').forEach(function(el){ el.classList.remove('active'); });
         e.target.classList.add('active');
       }
     });
   }, {rootMargin:'-25% 0px -55% 0px'});
 
-  document.querySelectorAll('.step').forEach(s=>io.observe(s));
+  document.querySelectorAll('.step').forEach(function(el){ io.observe(el); });
 
-  // mark first active
   const first = document.querySelector('.step[data-step="1"]');
-  if(first) first.classList.add('active');
+  if (first) first.classList.add('active');
 })();
 </script>
 </body>

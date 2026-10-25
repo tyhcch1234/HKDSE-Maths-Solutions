@@ -54,10 +54,10 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
     <h2>Interactive Figure</h2>
     <canvas id="cv" width="560" height="600"></canvas>
     <div class="legend">
-      <span><span class="dot" style="background:#2563eb"></span>Triangle ABC (equilateral, side 16)</span>
-      <span><span class="dot" style="background:#dc2626"></span>DE (the length found)</span>
-      <span><span class="dot" style="background:#f59e0b"></span>Point E on BC</span>
-      <span><span class="dot" style="background:#7c3aed"></span>Point D on AB</span>
+      <span><span class="dot" style="background:#2563eb"></span>Rectangle ABCD (AB = 3 cm, BC = 2 cm)</span>
+      <span><span class="dot" style="background:#dc2626"></span>Segments BE and AE</span>
+      <span><span class="dot" style="background:#f59e0b"></span>E on DC, &ang;CBE = 40&deg;</span>
+      <span><span class="dot" style="background:#7c3aed"></span>DE &asymp; 1.32 cm</span>
       <span><span class="dot" style="background:#059669"></span>Angle / right-angle</span>
     </div>
   </section>
@@ -141,44 +141,24 @@ const cv = document.getElementById('cv');
 const ctx = cv.getContext('2d');
 let mode = 1;
 
-// ---- Coordinate setup: equilateral triangle ABC ----
-// Real: side = 16, AD = 4 , angle CDE = 60 deg
-// Place B at origin, BC along x-axis, BA at 60 deg from x-axis.
-const S = 16;              // real side length
-const sc = 22;             // pixels per cm
-const ox = 90, oy = 390;   // origin (point B) in pixels
-
-// Real coordinates (cm) with B = (0,0)
-// A = (S cos60, S sin60) = (8, 13.856)
-// C = (S, 0) = (16, 0)
-// D on AB with AD = 4 => BD = 12 => D = B + 12*(cos60,sin60) = (6, 10.392)
-const A_r = [8, 13.856];
+// ---- geometry (pure, no DOM) ----
+// Rectangle ABCD: AB = 3 cm (vertical), BC = 2 cm (horizontal).
+// B at the origin, BC along +x, BA along +y (same convention as before).
+const AB = 3, BC = 2, ANG = 40;
+const CE = BC * Math.tan(ANG * Math.PI / 180);   // 2 tan 40 = 1.6782
+const DE = AB - CE;                              // 1.3218
+const A_r = [0, AB];
 const B_r = [0, 0];
-const C_r = [16, 0];
-const D_r = [6, 10.392];
+const C_r = [BC, 0];
+const D_r = [BC, AB];
+const E_r = [BC, CE];                            // E on DC, CE measured from C
+console.log('CE =', CE.toFixed(4), 'DE =', DE.toFixed(4),
+  '| angle CBE =', (Math.atan2(CE, BC) * 180 / Math.PI).toFixed(2) + ' deg',
+  '| angle AED =', (Math.atan2(BC, DE) * 180 / Math.PI).toFixed(2) + ' deg');
+// ---- end geometry ----
 
-// Solve E on BC: E = (e, 0), with angle CDE = 60 deg.
-// Vector DC = C - D = (10, -10.392) ; DE = E - D = (e-6, -10.392)
-function solveE(){
-  // find e such that angle between DC and DE = 60 deg
-  const Dx = D_r[0], Dy = D_r[1];
-  const Cx = C_r[0], Cy = C_r[1];
-  const vcx = Cx - Dx, vcy = Cy - Dy;
-  const Lc = Math.hypot(vcx, vcy);
-  let best = null, bestErr = 1e9;
-  for (let e = 0.001; e < 16; e += 0.0005){
-    const vdx = e - Dx, vdy = 0 - Dy;
-    const Ld = Math.hypot(vdx, vdy);
-    let c = (vcx*vdx + vcy*vdy)/(Lc*Ld);
-    c = Math.max(-1, Math.min(1, c));
-    const ang = Math.acos(c) * 180/Math.PI;
-    const err = Math.abs(ang - 60);
-    if (err < bestErr){ bestErr = err; best = e; }
-  }
-  return best;
-}
-const E_r = [solveE(), 0];
-console.log('E x =', E_r[0], 'CE =', 16 - E_r[0]);
+const sc = 150;            // pixels per cm
+const ox = 150, oy = 500;  // origin (point B) in pixels
 
 // pixel transform
 function P(p){ return [ox + p[0]*sc, oy - p[1]*sc]; }
@@ -205,6 +185,23 @@ function dot(a, col, r, label, off){
   }
   ctx.restore();
 }
+// right-angle marker at pixel point p, between canvas directions d1 and d2
+function rightAngle(p, d1, d2, col){
+  const k = 15;
+  ctx.save();
+  ctx.strokeStyle = col || '#059669'; ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(p[0]+d1[0]*k, p[1]+d1[1]*k);
+  ctx.lineTo(p[0]+d1[0]*k+d2[0]*k, p[1]+d1[1]*k+d2[1]*k);
+  ctx.lineTo(p[0]+d2[0]*k, p[1]+d2[1]*k);
+  ctx.stroke();
+  ctx.restore();
+}
+function unit(a, b){ // canvas-space unit vector a -> b
+  const p = P(a), q = P(b);
+  const L = Math.hypot(q[0]-p[0], q[1]-p[1]) || 1;
+  return [(q[0]-p[0])/L, (q[1]-p[1])/L];
+}
 
 function draw(){
   const W = cv.width, H = cv.height;
@@ -217,173 +214,129 @@ function draw(){
   for (let y = 0; y < H; y += 20){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
   ctx.restore();
 
-  // Triangle ABC — fill
-  const pa = P(A_r), pb = P(B_r), pc = P(C_r);
+  const pa = P(A_r), pb = P(B_r), pc = P(C_r), pd = P(D_r), pe = P(E_r);
+
+  // Rectangle ABCD - fill
   ctx.save();
   const g = ctx.createLinearGradient(pa[0], pa[1], pc[0], pc[1]);
-  g.addColorStop(0, 'rgba(59,130,246,0.16)');
+  g.addColorStop(0, 'rgba(59,130,246,0.14)');
   g.addColorStop(1, 'rgba(139,92,246,0.12)');
   ctx.fillStyle = g;
   ctx.beginPath();
-  ctx.moveTo(pa[0], pa[1]); ctx.lineTo(pb[0], pb[1]); ctx.lineTo(pc[0], pc[1]);
+  ctx.moveTo(pa[0], pa[1]); ctx.lineTo(pb[0], pb[1]);
+  ctx.lineTo(pc[0], pc[1]); ctx.lineTo(pd[0], pd[1]);
   ctx.closePath(); ctx.fill();
   ctx.restore();
 
-  // Triangle sides
-  line(A_r, B_r, '#2563eb', 2.6);
-  line(B_r, C_r, '#2563eb', 2.6);
-  line(C_r, A_r, '#2563eb', 2.6);
-
   // Highlighted by mode
   if (mode === 1){
-    // emphasise length labels
-    ctx.save();
-    ctx.strokeStyle = '#4f46e5'; ctx.lineWidth = 3;
-    ctx.setLineDash([6,4]);
-    const m1 = P([(A_r[0]+D_r[0])/2, (A_r[1]+D_r[1])/2]);
-    ctx.beginPath(); ctx.arc(m1[0], m1[1], 26, 0, 2*Math.PI); ctx.stroke();
-    ctx.restore();
+    // given sides: AB = 3 cm and BC = 2 cm
+    line(A_r, B_r, '#4f46e5', 4);
+    line(B_r, C_r, '#4f46e5', 4);
   }
-  if (mode === 2 || mode === 3){
-    // similarity highlight — triangle DBE
+  if (mode === 2){
+    // right-angled triangle BCE, where EC = 2 tan 40 is found
     ctx.save();
-    ctx.fillStyle = 'rgba(245,158,11,0.22)';
-    const pd = P(D_r), pe = P(E_r), pbb = P(B_r);
-    ctx.beginPath(); ctx.moveTo(pd[0],pd[1]); ctx.lineTo(pbb[0],pbb[1]); ctx.lineTo(pe[0],pe[1]);
+    ctx.fillStyle = 'rgba(245,158,11,0.25)';
+    ctx.beginPath();
+    ctx.moveTo(pb[0], pb[1]); ctx.lineTo(pc[0], pc[1]); ctx.lineTo(pe[0], pe[1]);
     ctx.closePath(); ctx.fill();
     ctx.restore();
-    if (mode === 3){
-      ctx.save();
-      ctx.fillStyle = 'rgba(16,185,129,0.22)';
-      const pc2 = P(C_r);
-      ctx.beginPath(); ctx.moveTo(pd[0],pd[1]); ctx.lineTo(pc2[0],pc2[1]); ctx.lineTo(pe[0],pe[1]);
-      ctx.closePath(); ctx.fill();
-      ctx.restore();
-    }
+    // right angle of the rectangle at C
+    rightAngle(pc, unit(C_r, B_r), unit(C_r, D_r), '#059669');
+  }
+  if (mode === 3){
+    // DE = DC - EC, the remaining part of the side
+    line(D_r, E_r, '#dc2626', 6);
   }
   if (mode === 4){
-    // triangle DBE with angle B marked
+    // right-angled triangle ADE, which carries angle AED
     ctx.save();
-    ctx.fillStyle = 'rgba(245,158,11,0.28)';
-    const pd = P(D_r), pe = P(E_r), pbb = P(B_r);
-    ctx.beginPath(); ctx.moveTo(pd[0],pd[1]); ctx.lineTo(pbb[0],pbb[1]); ctx.lineTo(pe[0],pe[1]);
-    ctx.closePath(); ctx.fill();
-    ctx.restore();
-  }
-  if (mode === 5){
-    // triangle CDE
-    ctx.save();
-    ctx.fillStyle = 'rgba(16,185,129,0.25)';
-    const pc2 = P(C_r), pd = P(D_r), pe = P(E_r);
-    ctx.beginPath(); ctx.moveTo(pc2[0],pc2[1]); ctx.lineTo(pd[0],pd[1]); ctx.lineTo(pe[0],pe[1]);
-    ctx.closePath(); ctx.fill();
-    ctx.restore();
-  }
-
-  // Segments DE
-  line(D_r, E_r, '#dc2626', 3);
-  line(C_r, D_r, '#f59e0b', 2.4, [5,4]);
-
-  // Angle mark at D: between DC and DE = 60 deg
-  (function(){
-    const pd = P(D_r);
-    const pe = P(E_r), pc = P(C_r);
-    const a1 = Math.atan2(pe[1]-pd[1], pe[0]-pd[0]);
-    const a2 = Math.atan2(pc[1]-pd[1], pc[0]-pd[0]);
-    ctx.save();
-    ctx.strokeStyle = '#059669'; ctx.lineWidth = 2.4;
+    ctx.fillStyle = 'rgba(16,185,129,0.22)';
     ctx.beginPath();
-    ctx.arc(pd[0], pd[1], 30, Math.min(a1,a2), Math.max(a1,a2));
-    ctx.stroke();
-    // label
-    const mid = (a1+a2)/2;
-    ctx.fillStyle = '#059669'; ctx.font = 'bold 14px Segoe UI, sans-serif';
-    ctx.fillText('60°', pd[0]+44*Math.cos(mid)-8, pd[1]+44*Math.sin(mid)+5);
+    ctx.moveTo(pa[0], pa[1]); ctx.lineTo(pd[0], pd[1]); ctx.lineTo(pe[0], pe[1]);
+    ctx.closePath(); ctx.fill();
+    ctx.restore();
+    rightAngle(pd, unit(D_r, A_r), unit(D_r, C_r), '#059669');
+  }
+
+  // Rectangle sides
+  line(A_r, B_r, '#2563eb', 2.6);
+  line(B_r, C_r, '#2563eb', 2.6);
+  line(C_r, D_r, '#2563eb', 2.6);
+  line(D_r, A_r, '#2563eb', 2.6);
+
+  // Drawn segments BE and AE
+  line(B_r, E_r, '#dc2626', 2.6);
+  line(A_r, E_r, '#dc2626', 2.6);
+
+  // Right angle at B (rectangle corner)
+  rightAngle(pb, unit(B_r, C_r), unit(B_r, A_r), '#059669');
+
+  // 40 deg at B, between BC and BE
+  (function(){
+    const a1 = Math.atan2(pe[1]-pb[1], pe[0]-pb[0]);
+    const a2 = Math.atan2(pc[1]-pb[1], pc[0]-pb[0]);
+    const lo = Math.min(a1, a2), hi = Math.max(a1, a2);
+    ctx.save();
+    ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 2.4;
+    ctx.beginPath(); ctx.arc(pb[0], pb[1], 74, lo, hi); ctx.stroke();
+    const mid = (lo + hi) / 2;
+    ctx.fillStyle = '#b45309'; ctx.font = 'bold 14px Segoe UI, sans-serif';
+    ctx.fillText('40°', pb[0] + 92*Math.cos(mid) - 10, pb[1] + 92*Math.sin(mid) + 5);
     ctx.restore();
   })();
 
-  // Right angle at B? Not right angle; instead mark 60 deg at B
+  // angle AED at E, between ED and EA
   (function(){
-    const pbb = P(B_r);
-    const pa2 = P(A_r), pc2 = P(C_r);
-    const a1 = Math.atan2(pa2[1]-pbb[1], pa2[0]-pbb[0]);
-    const a2 = Math.atan2(pc2[1]-pbb[1], pc2[0]-pbb[0]);
-    ctx.save();
-    ctx.strokeStyle = '#2563eb'; ctx.lineWidth = 2.2;
-    ctx.beginPath();
-    ctx.arc(pbb[0], pbb[1], 26, Math.min(a1,a2), Math.max(a1,a2));
-    ctx.stroke();
-    const mid = (a1+a2)/2;
-    ctx.fillStyle = '#2563eb'; ctx.font = 'bold 14px Segoe UI, sans-serif';
-    ctx.fillText('60°', pbb[0]+40*Math.cos(mid)-8, pbb[1]+40*Math.sin(mid)+4);
-    ctx.restore();
-  })();
-
-  // angle at E marked (theta)
-  (function(){
-    const pe = P(E_r);
-    const pd = P(D_r), pc = P(C_r);
     const a1 = Math.atan2(pd[1]-pe[1], pd[0]-pe[0]);
-    const a2 = Math.atan2(pc[1]-pe[1], pc[0]-pe[0]);
+    const a2 = Math.atan2(pa[1]-pe[1], pa[0]-pe[0]);
+    const lo = Math.min(a1, a2), hi = Math.max(a1, a2);
     ctx.save();
-    ctx.strokeStyle = '#d97706'; ctx.lineWidth = 2.2;
-    ctx.beginPath();
-    ctx.arc(pe[0], pe[1], 24, Math.min(a1,a2), Math.max(a1,a2));
-    ctx.stroke();
-    const mid = (a1+a2)/2;
-    ctx.fillStyle = '#d97706'; ctx.font = 'bold 13px Segoe UI, sans-serif';
-    ctx.fillText('θ', pe[0]+36*Math.cos(mid)-4, pe[1]+36*Math.sin(mid)+4);
+    ctx.strokeStyle = '#0d9488'; ctx.lineWidth = 2.4;
+    ctx.beginPath(); ctx.arc(pe[0], pe[1], 34, lo, hi); ctx.stroke();
+    const mid = (lo + hi) / 2;
+    ctx.fillStyle = '#0f766e'; ctx.font = 'bold 13px Segoe UI, sans-serif';
+    ctx.fillText('56.5°', pe[0] + 54*Math.cos(mid) - 18, pe[1] + 54*Math.sin(mid) + 4);
     ctx.restore();
   })();
 
   // Points
-  dot(A_r, '#38bdf8', 6, 'A', [-20, 4]);
-  dot(B_r, '#38bdf8', 6, 'B', [8, 20]);
-  dot(C_r, '#38bdf8', 6, 'C', [10, -8]);
-  dot(D_r, '#7c3aed', 7, 'D', [-6, -14]);
-  dot(E_r, '#f59e0b', 7, 'E', [-4, -16]);
+  dot(A_r, '#38bdf8', 6, 'A', [-26, 4]);
+  dot(B_r, '#38bdf8', 6, 'B', [-24, 22]);
+  dot(C_r, '#38bdf8', 6, 'C', [14, 20]);
+  dot(D_r, '#38bdf8', 6, 'D', [10, -12]);
+  dot(E_r, '#f59e0b', 7, 'E', [10, -12]);
 
   // Length labels
   ctx.save();
   ctx.font = 'bold 13px Segoe UI, sans-serif';
   ctx.fillStyle = '#1d4ed8';
-  // AB
-  const midAB = [(pa[0]+pb[0])/2, (pa[1]+pb[1])/2];
-  ctx.fillText('16 cm', midAB[0]-52, midAB[1]+4);
-  // BC
-  const midBC = [(pb[0]+pc[0])/2, (pb[1]+pc[1])/2];
-  ctx.fillText('16 cm', midBC[0]-22, midBC[1]+20);
-  // AD
+  ctx.fillText('AB = 3 cm', 96, (pa[1]+pb[1])/2 + 4);
+  ctx.fillText('BC = 2 cm', (pb[0]+pc[0])/2 - 34, pb[1] + 26);
   ctx.fillStyle = '#7c3aed';
-  ctx.fillText('4 cm', pa[0]+16, pa[1]+34);
-  // DE highlighted in later modes
-  if (mode >= 5){
-    ctx.fillStyle = '#dc2626';
-    const midDE = [(pd[0]+pe[0])/2, (pd[1]+pe[1])/2];
-    ctx.fillText('DE', midDE[0]+6, midDE[1]-8);
-  }
-  // CE
+  ctx.fillText('AD = 2 cm', (pa[0]+pd[0])/2 - 36, pa[1] + 22);
+  // pieces of DC
+  ctx.fillText('DE ≈ 1.32', pc[0] + 14, (pd[1]+pe[1])/2 + 4);
   ctx.fillStyle = '#0d9488';
-  const pe2 = P(E_r);
-  ctx.fillText('CE', (pe2[0]+pc[0])/2-8, pe2[1]+22);
+  ctx.fillText('CE ≈ 1.68', pc[0] + 14, (pe[1]+pc[1])/2 + 4);
   ctx.restore();
 
   // Mode annotation banner
   const names = {
-    1:'Step 1: triangle ABC, side 16; AD = 4',
-    2:'Step 2: angle chase → ΔDBE ~ ΔCDE',
-    3:'Step 3: similar triangles share ratios',
-    4:'Step 4: cosine rule in ΔDBE',
-    5:'Step 5: cosine rule in ΔCDE',
-    6:'Step 6: solve for ∠AED ≈ 57°'
+    1:'Step 1: rectangle ABCD, AB = 3 cm, BC = 2 cm',
+    2:'Step 2: tan 40° = EC / BC  ->  EC = 2 tan 40° ≈ 1.68 cm',
+    3:'Step 3: DE = DC - EC = 3 - 1.68 ≈ 1.32 cm',
+    4:'Step 4: tan ∠AED = AD / DE ≈ 1.513  ->  ∠AED ≈ 57°'
   };
   ctx.save();
+  ctx.font = 'bold 13px Segoe UI, sans-serif';
+  const tw = ctx.measureText(names[mode]).width;
   ctx.fillStyle = 'rgba(79,70,229,0.92)';
   ctx.beginPath();
-  const tw = ctx.measureText(names[mode]).width;
-  ctx.roundRect(12, 12, Math.max(tw+24, 220), 30, 8);
+  ctx.roundRect(12, 12, Math.min(Math.max(tw+24, 220), W-24), 30, 8);
   ctx.fill();
-  ctx.fillStyle = '#fff'; ctx.font = 'bold 13px Segoe UI, sans-serif';
+  ctx.fillStyle = '#fff';
   ctx.fillText(names[mode], 24, 32);
   ctx.restore();
 }
