@@ -15,6 +15,11 @@ main { max-width:860px; margin:0 auto; padding:24px 20px 64px; }
 h1 { font-size:1.4rem; margin:0 0 4px; }
 .sub { color:var(--muted); font-size:.9rem; margin:0 0 18px; }
 
+/* cross-index link */
+.topnav { margin:0 0 18px; font-size:.92rem; }
+.topnav a { color:var(--link); text-decoration:none; font-weight:600; }
+.topnav a:hover { text-decoration:underline; }
+
 /* year pill nav */
 .years { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 22px; }
 .years a { display:inline-block; padding:7px 14px; border:1px solid var(--border); border-radius:999px;
@@ -38,6 +43,7 @@ a.chip:hover { background:var(--accent-bg); }
 <main>
 <h1>HKDSE Maths — Solution Pages</h1>
 <p class="sub">961 questions</p>
+<p class="topnav"><a href="DSE_Maths_By_Topic.html">By Topic →</a></p>
 
 <nav class="years"><a href="#y2026" data-year="2026" onclick="showYear(2026);return false;">2026</a><a href="#y2025" data-year="2025" onclick="showYear(2025);return false;">2025</a><a href="#y2024" data-year="2024" onclick="showYear(2024);return false;">2024</a><a href="#y2023" data-year="2023" onclick="showYear(2023);return false;">2023</a><a href="#y2022" data-year="2022" onclick="showYear(2022);return false;">2022</a><a href="#y2021" data-year="2021" onclick="showYear(2021);return false;">2021</a><a href="#y2020" data-year="2020" onclick="showYear(2020);return false;">2020</a><a href="#y2019" data-year="2019" onclick="showYear(2019);return false;">2019</a><a href="#y2018" data-year="2018" onclick="showYear(2018);return false;">2018</a><a href="#y2017" data-year="2017" onclick="showYear(2017);return false;">2017</a><a href="#y2016" data-year="2016" onclick="showYear(2016);return false;">2016</a><a href="#y2015" data-year="2015" onclick="showYear(2015);return false;">2015</a><a href="#y2014" data-year="2014" onclick="showYear(2014);return false;">2014</a><a href="#y2013" data-year="2013" onclick="showYear(2013);return false;">2013</a><a href="#y2012" data-year="2012" onclick="showYear(2012);return false;">2012</a></nav>
 
@@ -56,11 +62,27 @@ a.chip:hover { background:var(--accent-bg); }
     a.addEventListener('click', function(e){
       e.preventDefault();
       showYear(+a.getAttribute('data-year'));
+      if (history.replaceState) history.replaceState(null, '', '#y' + a.getAttribute('data-year'));
       window.scrollTo({top:0, behavior:'smooth'});
     });
   });
-  // default: newest year
-  showYear(sections.length ? +sections[0].id.replace('y','') : null);
+
+  // honour #yYYYY (used by the "Contents" link on every question page)
+  function yearFromHash(){
+    var m = /^#y(\d{4})$/.exec(location.hash || '');
+    if (!m) return null;
+    var y = +m[1];
+    return document.getElementById('y' + y) ? y : null;
+  }
+
+  var startYear = yearFromHash();
+  // default: hash year if present, else newest year
+  showYear(startYear !== null ? startYear
+    : (sections.length ? +sections[0].id.replace('y','') : null));
+  window.addEventListener('hashchange', function(){
+    var y = yearFromHash();
+    if (y !== null) showYear(y);
+  });
   window.showYear = showYear;
 })();
 </script>
