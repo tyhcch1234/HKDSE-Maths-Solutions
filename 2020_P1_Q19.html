@@ -131,26 +131,21 @@
     h1 { font-size: .98rem; }
     .qtext, .step p, .step .work { font-size: .82rem; }
   }
+.chip3d{display:inline-block;vertical-align:middle;margin-left:6px;font-size:.58rem;font-weight:700;letter-spacing:.6px;color:#fff;background:linear-gradient(135deg,#2563eb,#0ea5e9);padding:2px 7px;border-radius:20px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;}
 </style>
 <link rel="stylesheet" href="assets/extra.css">
+<link rel="stylesheet" href="assets/fig3d.css">
 </head>
 <body>
 
 <div class="split">
 
   <!-- LEFT: INTERACTIVE DIAGRAM -->
-  <section class="panel diagram">
-    <h1>Diagram · Paper Card PQRS on Ground</h1>
-    <p class="subtitle">Scroll the solution to highlight the relevant parts.</p>
-    <div style="margin:0 0 14px;"><div style="font-size:.78rem;font-weight:700;color:#334155;margin-bottom:6px;">3D 互動模型 — 拖動旋轉查看不同角度</div><iframe src="https://www.geogebra.org/material/iframe/id/gkmktxdu" width="100%" height="400" style="border:0;border-radius:12px;background:#fff;" allowfullscreen scrolling="no"></iframe></div><canvas id="cv" width="640" height="520"></canvas>
-    <div class="legend">
-      <span><i class="swatch" style="background:#3b82f6"></i>Paper card PQRS</span>
-      <span><i class="swatch" style="background:#ef4444"></i>QR on ground</span>
-      <span><i class="swatch" style="background:#f59e0b"></i>Right-angle (Q)</span>
-      <span><i class="swatch" style="background:#8b5cf6"></i>Height / perpendicular</span>
-      <span><i class="swatch" style="background:#10b981"></i>Projection on ground</span>
-      <span><i class="swatch" style="background:#ec4899"></i>Intersection T</span>
-    </div>
+    <section class="panel diagram">
+    <h2>3-D Figure <span class="chip3d">3D</span></h2>
+    <div class="fig3d-stage"><canvas id="cv3d"></canvas></div>
+    <div id="figui"></div>
+    <div class="fig3d-hint">拖動旋轉 · 雙指／滾輪縮放　—　drag to rotate, pinch or scroll to zoom</div>
   </section>
 
   <!-- RIGHT: QUESTION + SOLUTION -->
@@ -294,424 +289,87 @@
   </section>
 </div>
 
-<script>
-(function(){
-  const cv = document.getElementById('cv');
-  const ctx = cv.getContext('2d');
-  let mode = 1;
 
-  // ---------- Geometry data (real, in cm) ----------
-  const PQ = 60, PS = 40;
-  const angPQR = 30 * Math.PI/180;
-  const angPRQ = 55 * Math.PI/180;
-  const angQPR = Math.PI - angPQR - angPRQ;      // 95°
-  const angQPS = 120 * Math.PI/180;
-  const angRPS = angQPS - angQPR;                 // 25°
-
-  const PR = 60 * Math.sin(angPQR) / Math.sin(angPRQ);
-
-  // Place Q at origin, QR along +x axis, P above.
-  // In triangle PQR: Q=(0,0), R=(r,0), angle at Q = 30°.
-  // Side PQ = 60, angle QPR = 95°, angle PRQ = 55°.
-  // Use sine rule to get QR.
-  const QR = 60 * Math.sin(angQPR) / Math.sin(angPRQ);
-
-  // Coordinates (math convention, y up), then convert to canvas.
-  const Q = {x:0, y:0};
-  const R = {x:QR, y:0};
-  const P = {x: PQ*Math.cos(angPQR), y: PQ*Math.sin(angPQR)};
-
-  // S: in triangle PRS. |PS|=40, |PR|=PR, angle RPS = angRPS.
-  // Vector P->R
-  let vx = R.x - P.x, vy = R.y - P.y;
-  let vlen = Math.hypot(vx, vy);
-  let ux = vx/vlen, uy = vy/vlen;
-  // Rotate P->R by -angRPS to get P->S (S is on the other side of PR from Q, i.e. outside)
-  // Determine correct side: Q is on one side of PR. S should be opposite (convex-ish) or same?
-  // From figure, Q, R at bottom, P top, S is to the right, below P. So S is on the opposite side of PR from Q? 
-  // Let's check: P=(~51.96,30), R=(~55.6,0), Q=(0,0). PR direction roughly (3.7,-30). 
-  // Rotating P->R by -25° gives direction ~ (ux*cos+uy*sin, -ux*sin+uy*cos)... Let's just compute both and pick one that makes S to the right.
-  function rotate(ux, uy, ang){
-    return {x: ux*Math.cos(ang) - uy*Math.sin(ang), y: ux*Math.sin(ang) + uy*Math.cos(ang)};
-  }
-  // We want S such that the quadrilateral P-Q-R-S is in order (P top, Q left, R right, S right/below P).
-  // P->S direction : rotate P->R by +angRPS or -angRPS.
-  // Try both, pick the one that puts S to the right (x > R.x perhaps).
-  let cand1 = rotate(ux, uy, angRPS);
-  let S1 = {x: P.x + 40*cand1.x, y: P.y + 40*cand1.y};
-  let cand2 = rotate(ux, uy, -angRPS);
-  let S2 = {x: P.x + 40*cand2.x, y: P.y + 40*cand2.y};
-  // From figure S is to the right of P and lower. Choose the one with larger x.
-  const S = (S1.x > S2.x) ? S1 : S2;
-
-  // Scale & center
-  const allX = [Q.x,R.x,P.x,S.x], allY = [Q.y,R.y,P.y,S.y];
-  const minX = Math.min(...allX), maxX = Math.max(...allX);
-  const minY = Math.min(...allY), maxY = Math.max(...allY);
-  const pad = 80;
-  const scale = Math.min((cv.width - 2*pad)/(maxX-minX), (cv.height - 2*pad)/(maxY-minY));
-  const offX = pad - minX*scale + ( (cv.width-2*pad) - (maxX-minX)*scale )/2;
-  const offY = cv.height - pad + minY*scale - ( (cv.height-2*pad) - (maxY-minY)*scale )/2;
-  function toCanvas(p){ return {x: p.x*scale + offX, y: -p.y*scale + offY}; }
-
-  const cQ = toCanvas(Q), cR = toCanvas(R), cP = toCanvas(P), cS = toCanvas(S);
-
-  // H: foot of perpendicular from P to QR (in card plane). QR is x-axis in math coords.
-  const H = {x: P.x, y: 0};
-  const cH = toCanvas(H);
-
-  // G: projection of P on ground. Ground is horizontal through QR. 
-  // In 3D: PH is perpendicular to QR in card plane. Angle between card and ground = 32°.
-  // P's height above ground = PH * sin(32°) = 30 sin32°.
-  // Project G is vertically below P, distance along horizontal from H = PH cos32°.
-  // In our diagram we show PG as vertical drop from P (in the plane perpendicular to QR through P).
-  // Since the diagram is a "top-ish" view of the card with QR on ground, we can show the height.
-  // We'll draw PG as a vertical line from P downward on canvas.
-  const PH_len = PQ * Math.sin(angPQR); // 30
-  const groundAngle = 32 * Math.PI/180;
-  const heightPG = PH_len * Math.sin(groundAngle);
-  // scale height to canvas: use same scale but multiply by a visual factor for clarity
-  const heightVis = heightPG * scale;
-
-  // T: intersection of PS produced and QR produced.
-  // In triangle PQT, angle Q = 30°, angle T = 30° (since PT=PQ), so Q=(0,0), P=(60cos30,60sin30), T on x-axis.
-  // Wait: angle PQT = 30° (same as PQR), PT makes angle 30° with PQ? Actually PT is along PS direction.
-  // |PQ| = 60, in triangle PQT, angle at Q = 30°, angle at P = ? T is on line QR extended beyond Q or R?
-  // From the solution: PT = PQ, so triangle PQT is equilateral? No, isosceles with PQ=PT, base QT.
-  // angle PQT = 30°, so angle PTQ = 30°, angle QPT = 120°.
-  // So T is on the extension of QR beyond Q (opposite side of R).
-  // Let's compute: P=(51.96,30), Q=(0,0). PT length 60 at angle 120° from PQ? 
-  // Actually angle QPT = 120°, so PT is obtained by rotating P->Q by 120°? 
-  // Simpler: T = Q + (QR length?) Hmm.
-  // From triangle PQT: |PQ|=60, angles at Q and T are 30°, so |QT| = 60 * sin(120°)/sin(30°) = 60*0.866/0.5 = 103.92.
-  // T on x-axis: T = (-103.92, 0) relative to Q? Or (103.92,0)?
-  // Since angle PQT = 30° and P is above Q, T must be to the left of Q.
-  const QT = 60 * Math.sin(120*Math.PI/180) / Math.sin(30*Math.PI/180);
-  const T = {x: -QT, y: 0};
-  const cT = toCanvas(T);
-
-  // K: projection of S on ground (along direction of drop). 
-  // SK = (1/3) PG. K is vertically below S by SK.
-  const heightSK = (1/3) * heightPG;
-
-  // ---------- DRAW ----------
-  function draw(){
-    ctx.clearRect(0,0,cv.width,cv.height);
-
-    // grid background
-    ctx.save();
-    ctx.strokeStyle = '#eef2f9';
-    ctx.lineWidth = 1;
-    for(let x=0;x<cv.width;x+=32){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,cv.height);ctx.stroke();}
-    for(let y=0;y<cv.height;y+=32){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(cv.width,y);ctx.stroke();}
-    ctx.restore();
-
-    // ground plane hint (light band along QR)
-    ctx.save();
-    ctx.fillStyle = 'rgba(16,185,129,0.07)';
-    ctx.beginPath();
-    ctx.moveTo(toCanvas({x:minX-10,y:0}).x, toCanvas({x:0,y:0}).y);
-    ctx.lineTo(toCanvas({x:maxX+10,y:0}).x, toCanvas({x:0,y:0}).y);
-    ctx.lineTo(toCanvas({x:maxX+10,y:-8}).x, toCanvas({x:0,y:-8}).y);
-    ctx.lineTo(toCanvas({x:minX-10,y:-8}).x, toCanvas({x:0,y:-8}).y);
-    ctx.closePath();
-    ctx.fill();
-    ctx.restore();
-
-    // QR line (ground) — red, thick
-    ctx.save();
-    ctx.strokeStyle = '#ef4444';
-    ctx.lineWidth = 5;
-    ctx.lineCap = 'round';
-    ctx.beginPath();
-    ctx.moveTo(cQ.x, cQ.y);
-    ctx.lineTo(cR.x, cR.y);
-    ctx.stroke();
-    ctx.restore();
-
-    // Extended QR to T (dashed) — pinkish
-    ctx.save();
-    ctx.strokeStyle = '#f9a8d4';
-    ctx.lineWidth = 2.5;
-    ctx.setLineDash([8,7]);
-    ctx.beginPath();
-    ctx.moveTo(cQ.x, cQ.y);
-    ctx.lineTo(cT.x, cT.y);
-    ctx.stroke();
-    ctx.restore();
-
-    // Paper card quadrilateral P-Q-R-S
-    ctx.save();
-    if(mode>=1){
-      ctx.fillStyle = 'rgba(59,130,246,0.10)';
-      ctx.beginPath();
-      ctx.moveTo(cP.x,cP.y);
-      ctx.lineTo(cQ.x,cQ.y);
-      ctx.lineTo(cR.x,cR.y);
-      ctx.lineTo(cS.x,cS.y);
-      ctx.closePath();
-      ctx.fill();
-    }
-    ctx.strokeStyle = '#3b82f6';
-    ctx.lineWidth = 3.5;
-    ctx.lineJoin = 'round';
-    ctx.beginPath();
-    ctx.moveTo(cP.x,cP.y);
-    ctx.lineTo(cQ.x,cQ.y);
-    ctx.lineTo(cR.x,cR.y);
-    ctx.lineTo(cS.x,cS.y);
-    ctx.closePath();
-    ctx.stroke();
-    ctx.restore();
-
-    // Diagonal PR
-    ctx.save();
-    ctx.strokeStyle = '#8b5cf6';
-    ctx.lineWidth = 2.5;
-    ctx.setLineDash([7,6]);
-    ctx.beginPath();
-    ctx.moveTo(cP.x,cP.y);
-    ctx.lineTo(cR.x,cR.y);
-    ctx.stroke();
-    ctx.restore();
-
-    // Right angle marker at Q (since angle PQR = 30°? no, not right angle. We'll mark 30° at Q instead)
-    // Actually let's mark angle at Q = 30°
-    if(mode<=1){
-      ctx.save();
-      ctx.strokeStyle = '#f59e0b';
-      ctx.lineWidth = 3;
-      const a1 = Math.atan2(cP.y-cQ.y, cP.x-cQ.x);
-      const a2 = Math.atan2(cR.y-cQ.y, cR.x-cQ.x);
-      ctx.beginPath();
-      ctx.arc(cQ.x,cQ.y,38, a2, a1);
-      ctx.stroke();
-      ctx.restore();
-    }
-
-    // Angle at R = 55°
-    if(mode<=1){
-      ctx.save();
-      ctx.strokeStyle = '#f97316';
-      ctx.lineWidth = 3;
-      const a1 = Math.atan2(cP.y-cR.y, cP.x-cR.x);
-      const a2 = Math.atan2(cQ.y-cR.y, cQ.x-cR.x);
-      ctx.beginPath();
-      ctx.arc(cR.x,cR.y,34, Math.min(a1,a2), Math.max(a1,a2));
-      ctx.stroke();
-      ctx.restore();
-    }
-
-    // Height PG (from P down to ground projection G) — for mode>=4
-    if(mode>=4){
-      const cG = {x: cP.x, y: cP.y + heightVis};
-      ctx.save();
-      ctx.strokeStyle = '#8b5cf6';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(cP.x, cP.y);
-      ctx.lineTo(cG.x, cG.y);
-      ctx.stroke();
-
-      // right angle at G
-      ctx.strokeStyle = '#a78bfa';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(cG.x-12, cG.y);
-      ctx.lineTo(cG.x-12, cG.y-12);
-      ctx.lineTo(cG.x, cG.y-12);
-      ctx.stroke();
-
-      // label G
-      ctx.fillStyle='#7c3aed';
-      ctx.font='bold 15px Segoe UI, sans-serif';
-      ctx.fillText('G', cG.x+8, cG.y+5);
-
-      // angle PHG = 32° at H (between PH vertical and PG)
-      // Draw dashed line from H to G to show projection
-      if(mode>=4){
-        ctx.save();
-        ctx.strokeStyle = '#c4b5fd';
-        ctx.lineWidth = 2;
-        ctx.setLineDash([5,5]);
-        ctx.beginPath();
-        ctx.moveTo(cH.x, cH.y);
-        ctx.lineTo(cG.x, cG.y);
-        ctx.stroke();
-        ctx.restore();
-      }
-      ctx.restore();
-    }
-
-    // Perpendicular from P to QR (H) — for mode>=4
-    if(mode>=4){
-      ctx.save();
-      ctx.strokeStyle = '#a855f7';
-      ctx.lineWidth = 2.5;
-      ctx.setLineDash([5,5]);
-      ctx.beginPath();
-      ctx.moveTo(cP.x, cP.y);
-      ctx.lineTo(cH.x, cH.y);
-      ctx.stroke();
-
-      // right angle at H
-      ctx.setLineDash([]);
-      ctx.strokeStyle = '#c084fc';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(cH.x, cH.y-12);
-      ctx.lineTo(cH.x+12, cH.y-12);
-      ctx.lineTo(cH.x+12, cH.y);
-      ctx.stroke();
-
-      ctx.fillStyle='#9333ea';
-      ctx.font='bold 14px Segoe UI, sans-serif';
-      ctx.fillText('H', cH.x-18, cH.y+5);
-      ctx.restore();
-    }
-
-    // SK projection — for mode>=5
-    if(mode>=5){
-      const cK = {x: cS.x, y: cS.y + heightVis/3};
-      ctx.save();
-      ctx.strokeStyle = '#10b981';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(cS.x, cS.y);
-      ctx.lineTo(cK.x, cK.y);
-      ctx.stroke();
-
-      // right angle at K
-      ctx.setLineDash([]);
-      ctx.strokeStyle = '#34d399';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(cK.x-12, cK.y);
-      ctx.lineTo(cK.x-12, cK.y-12);
-      ctx.lineTo(cK.x, cK.y-12);
-      ctx.stroke();
-
-      ctx.fillStyle='#059669';
-      ctx.font='bold 14px Segoe UI, sans-serif';
-      ctx.fillText('K', cK.x+8, cK.y+5);
-
-      // dashed from R to K for angle SRK
-      ctx.save();
-      ctx.setLineDash([5,5]);
-      ctx.strokeStyle = '#6ee7b7';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(cR.x, cR.y);
-      ctx.lineTo(cK.x, cK.y);
-      ctx.stroke();
-      ctx.restore();
-
-      // angle at R between RS and RK
-      ctx.save();
-      ctx.strokeStyle = '#f59e0b';
-      ctx.lineWidth = 2.5;
-      const aS = Math.atan2(cS.y-cR.y, cS.x-cR.x);
-      const aK = Math.atan2(cK.y-cR.y, cK.x-cR.x);
-      ctx.beginPath();
-      ctx.arc(cR.x,cR.y,40, Math.min(aS,aK), Math.max(aS,aK));
-      ctx.stroke();
-      ctx.restore();
-    }
-
-    // Intersection T — for mode>=5, mark T
-    if(mode>=5){
-      ctx.save();
-      ctx.fillStyle = '#ec4899';
-      ctx.beginPath();
-      ctx.arc(cT.x, cT.y, 7, 0, 2*Math.PI);
-      ctx.fill();
-      ctx.fillStyle='#be185d';
-      ctx.font='bold 16px Segoe UI, sans-serif';
-      ctx.fillText('T', cT.x-16, cT.y+6);
-      ctx.restore();
-    }
-
-    // Vertices
-    function dot(p, color, label, dx, dy){
-      ctx.save();
-      ctx.fillStyle = color;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, 8, 0, 2*Math.PI);
-      ctx.fill();
-      ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 2.5;
-      ctx.stroke();
-      ctx.fillStyle = '#0f172a';
-      ctx.font = 'bold 17px Segoe UI, sans-serif';
-      ctx.fillText(label, p.x+dx, p.y+dy);
-      ctx.restore();
-    }
-
-    dot(cP, '#f59e0b', 'P', -6, -18);
-    dot(cQ, '#10b981', 'Q', -22, 6);
-    dot(cR, '#10b981', 'R', 12, 6);
-    dot(cS, '#f59e0b', 'S', 14, 0);
-
-    // Side labels
-    ctx.save();
-    ctx.font = 'bold 14px Segoe UI, sans-serif';
-    ctx.fillStyle = '#1d4ed8';
-    // PQ
-    ctx.fillText('60 cm', (cP.x+cQ.x)/2 - 45, (cP.y+cQ.y)/2);
-    // PS
-    ctx.fillText('40 cm', (cP.x+cS.x)/2 + 5, (cP.y+cS.y)/2 - 8);
-    // RS (highlight if mode>=2)
-    if(mode>=2){
-      ctx.fillStyle = '#dc2626';
-      ctx.font = 'bold 15px Segoe UI, sans-serif';
-      ctx.fillText('RS ≈ 16.9 cm', (cR.x+cS.x)/2 + 5, (cR.y+cS.y)/2 - 18);
-    }
-    // PR
-    ctx.fillStyle = '#7c3aed';
-    ctx.font = 'bold 13px Segoe UI, sans-serif';
-    ctx.fillText('PR ≈ 36.6', (cP.x+cR.x)/2 + 8, (cP.y+cR.y)/2 + 18);
-    ctx.restore();
-
-    // Mode title
-    ctx.save();
-    ctx.fillStyle = '#1e293b';
-    ctx.font = 'bold 16px Segoe UI, sans-serif';
-    const titles = {
-      1:'Triangle PQR: find PR',
-      2:'Triangle PRS: find RS',
-      3:'Area = area(PQR) + area(PRS)',
-      4:'Height from P to ground: PG = 30 sin32°',
-      5:'Projection of S: SK = (1/3)PG, angle SRK',
-      6:'Conclusion: angle(RS, ground) ≈ 18.3° ≤ 20°',
-      7:'Summary of results'
-    };
-    ctx.fillText(titles[mode] || '', 16, 26);
-    ctx.restore();
-  }
-
-  // ---------- IntersectionObserver ----------
-  const steps = Array.from(document.querySelectorAll('.step'));
-  const obs = new IntersectionObserver((es)=>{
-    es.forEach(e=>{
-      if(e.isIntersecting){
-        const m = +e.target.dataset.step;
-        mode = m;
-        steps.forEach(st=>st.classList.toggle('active', st===e.target));
-        draw();
-      }
-    });
-  }, {rootMargin:'-15% 0px -55% 0px', threshold:0});
-  steps.forEach(st=>obs.observe(st));
-
-  // initial draw
-  draw();
-})();
-</script>
 <!-- question-pager -->
 <nav class="qnav" aria-label="Question navigation">
   <a class="qnav__prev" href="2020_P1_Q18.html">← Previous Question</a>
   <a class="qnav__mid" href="index.html#y2020">Contents</a>
   <span class="qnav__next is-empty" aria-hidden="true"></span>
 </nav>
+<script src="assets/fig3d.js"></script>
+<script>
+/* HKDSE 2020 P1 Q19 — paper card PQRS, QR on the horizontal ground, card tilted 32 deg */
+var P = {
+  Q: [0, 0, 0],
+  R: [72.9678, 0, 0],
+  P: [51.9615, 15.8976, 25.4414],
+  S: [86.6025, 5.2992, 8.4805],
+  H: [51.9615, 0, 0],
+  G: [51.9615, 0, 25.4414],
+  K: [86.6025, 0, 8.4805],
+  T: [103.9230, 0, 0]
+};
+var MID_PR = [62.4647, 7.9488, 12.7207];
+var MID_CD = [79.7852, 2.6496, 4.2403];
+
+Fig3D.mount('#cv3d', {
+  v: P,
+  faces: [['P', 'Q', 'R', 'S']],
+  edges: ['P-Q', 'Q-R', 'R-S', 'S-P'],
+  ground: { x0: -16, x1: 120, z0: -16, z1: 42, gx: 20, gz: 10 },
+  view: { yaw: -0.75, pitch: -0.45, zoom: 1.02 },
+  labels: { P: 'P', Q: 'Q', R: 'R', S: 'S', H: 'H', G: 'G', K: 'K', T: 'T' },
+  labelSteps: { H: 4, G: 4, K: 5, T: 5 },
+  labelsNudge: { S: 0.35, K: 1.9, T: -0.5, G: -0.4, H: 2.6 },
+  aspect: 0.86,
+  startStep: 1,
+  steps: {
+    1: [{ t: 'poly', v: ['P', 'Q', 'R'], fill: 'rgba(139,92,246,0.13)' },
+      { t: 'seg', a: 'P', b: 'Q', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'Q', b: 'R', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'P', b: 'R', c: '#8b5cf6', w: 2.4, dash: [6, 5] },
+      { t: 'angle', at: 'Q', a: 'P', b: 'R', r: 19, label: '30°' },
+      { t: 'angle', at: 'R', a: 'P', b: 'Q', r: 16, label: '55°' },
+      { t: 'text', at: MID_PR, text: 'PR≈36.6', dx: 2, dy: -16, size: 12.5 }],
+    2: [{ t: 'poly', v: ['P', 'R', 'S'], fill: 'rgba(139,92,246,0.13)' },
+      { t: 'seg', a: 'P', b: 'S', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'R', b: 'S', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'P', b: 'R', c: '#8b5cf6', w: 2.4, dash: [6, 5] },
+      { t: 'angle', at: 'P', a: 'R', b: 'S', r: 15, label: '25°' },
+      { t: 'text', at: MID_CD, text: 'RS≈16.9', dx: 16, dy: 6, size: 12.5 }],
+    3: [{ t: 'poly', v: ['P', 'Q', 'R', 'S'], fill: 'rgba(59,130,246,0.12)' },
+      { t: 'seg', a: 'P', b: 'R', c: '#8b5cf6', w: 2.4, dash: [6, 5] },
+      { t: 'text', at: [40, 9, 17], text: 'A≈1404 cm²', dx: 0, dy: 0, size: 12.5 }],
+    4: [{ t: 'poly', v: ['H', 'P', 'G'], fill: 'rgba(245,158,11,0.18)' },
+      { t: 'seg', a: 'P', b: 'H', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'P', b: 'G', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'G', b: 'H', c: '#94a3b8', w: 2, dash: [4, 4] },
+      { t: 'ra', at: 'H', a: 'Q', b: 'P', s: 6, c: '#b45309' },
+      { t: 'angle', at: 'H', a: 'P', b: 'G', r: 15, label: '32°' },
+      { t: 'dot', at: 'H' }, { t: 'vlabel', at: 'H', text: 'H', dist: 15 },
+      { t: 'dot', at: 'G' }, { t: 'vlabel', at: 'G', text: 'G', dist: 15 },
+      { t: 'text', at: 'P', text: 'PG≈15.9', dx: -34, dy: 10, size: 12.5 }],
+    5: [{ t: 'path', pts: ['P', 'S', 'T'], c: '#f59e0b', w: 2.6 },
+      { t: 'seg', a: 'R', b: 'T', c: '#94a3b8', w: 2, dash: [4, 4] },
+      { t: 'seg', a: 'S', b: 'K', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'S', b: 'R', c: '#10b981', w: 3 },
+      { t: 'ra', at: 'K', a: 'S', b: 'R', s: 5, c: '#b45309' },
+      { t: 'angle', at: 'S', a: 'R', b: 'K', r: 14, label: '\u03b8 18.3°' },
+      { t: 'dot', at: 'K' }, { t: 'vlabel', at: 'K', text: 'K', dist: 15 },
+      { t: 'dot', at: 'T' }, { t: 'vlabel', at: 'T', text: 'T', dist: 15 }],
+    6: [{ t: 'poly', v: ['P', 'Q', 'R', 'S'], fill: 'rgba(16,185,129,0.10)' },
+      { t: 'seg', a: 'S', b: 'R', c: '#10b981', w: 3 },
+      { t: 'seg', a: 'S', b: 'K', c: '#f59e0b', w: 2.4, dash: [6, 5] },
+      { t: 'angle', at: 'S', a: 'R', b: 'K', r: 14, label: '\u03b8 18.3°' },
+      { t: 'dot', at: 'K' }, { t: 'vlabel', at: 'K', text: 'K', dist: 15 }],
+    7: [{ t: 'poly', v: ['P', 'Q', 'R', 'S'], fill: 'rgba(59,130,246,0.10)' },
+      { t: 'seg', a: 'S', b: 'R', c: '#10b981', w: 3 },
+      { t: 'seg', a: 'S', b: 'K', c: '#f59e0b', w: 2.4, dash: [6, 5] },
+      { t: 'angle', at: 'S', a: 'R', b: 'K', r: 14, label: '\u03b8 18.3°' },
+      { t: 'text', at: [40, 9, 17], text: 'A≈1404 cm²', dx: 0, dy: 0, size: 12.5 },
+      { t: 'dot', at: 'K' }, { t: 'vlabel', at: 'K', text: 'K', dist: 15 }]
+  }
+});
+</script>
 </body>
 </html>

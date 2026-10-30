@@ -65,12 +65,7 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
     box-shadow:var(--shadow);
     padding:14px;
   }
-  .diagram{
-    position:sticky;
-    top:16px;
-    max-height:calc(100vh - 2rem);
-    overflow-y:auto;
-  }
+  .diagram{position:sticky;top:12px;}
   .diagram h2, .qbox h2{
     font-size:13px;
     text-transform:uppercase;
@@ -148,8 +143,10 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
     .legend{font-size:10.5px;}
     .step{padding:9px 10px;}
   }
+.chip3d{display:inline-block;vertical-align:middle;margin-left:6px;font-size:.58rem;font-weight:700;letter-spacing:.6px;color:#fff;background:linear-gradient(135deg,#2563eb,#0ea5e9);padding:2px 7px;border-radius:20px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;}
 </style>
 <link rel="stylesheet" href="assets/extra.css">
+<link rel="stylesheet" href="assets/fig3d.css">
 </head>
 <body>
 
@@ -158,18 +155,11 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
 <div class="split">
 
   <!-- ================= LEFT: DIAGRAM ================= -->
-  <section class="panel diagram">
-    <h2>Interactive figure</h2>
-    <div style="margin:0 0 14px;"><div style="font-size:.78rem;font-weight:700;color:#334155;margin-bottom:6px;">3D 互動模型 — 拖動旋轉查看不同角度</div><iframe src="https://www.geogebra.org/material/iframe/id/s8bc7x3q" width="100%" height="400" style="border:0;border-radius:12px;background:#fff;" allowfullscreen scrolling="no"></iframe></div><canvas id="cv" width="760" height="700"></canvas>
-    <div class="legend">
-      <span><i class="dot" style="background:#2563eb"></i> square base ABCD</span>
-      <span><i class="dot" style="background:#7c3aed"></i> apex V</span>
-      <span><i class="dot" style="background:#e11d48"></i> edges AV, BV</span>
-      <span><i class="dot" style="background:#f59e0b"></i> M (midpoint of AB)</span>
-      <span><i class="dot" style="background:#16a34a"></i> foot of perp. E</span>
-      <span><i class="dot" style="background:#0ea5e9"></i> AE, CE (in △ABV, △BCV)</span>
-    </div>
-    <div class="modehint" id="modehint">Showing: full figure — click or scroll the steps on the right.</div>
+    <section class="panel diagram">
+    <h2>3-D Figure <span class="chip3d">3D</span></h2>
+    <div class="fig3d-stage"><canvas id="cv3d"></canvas></div>
+    <div id="figui"></div>
+    <div class="fig3d-hint">拖動旋轉 · 雙指／滾輪縮放　—　drag to rotate, pinch or scroll to zoom</div>
   </section>
 
   <!-- ================= RIGHT: QUESTION & SOLUTION ================= -->
@@ -284,253 +274,78 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
 
 </div>
 
-<script>
-/* ============================================================
-   Geometry setup (uniform scale so lengths stay proportional)
-   AB = 5 , AV = BV = CV = DV = 4
-   Square base side 5 -> half diagonal = sqrt(50)/2
-   VO = sqrt(16 - 50/4) = sqrt(3.5)
-   ============================================================ */
-const S = 62;                 // px per unit
-const side = 5;
-const AO = Math.sqrt(50)/2;   // half diagonal
-const VO = Math.sqrt(16 - 50/4);
 
-// 2D projection of a 3D point: x to the right, y depth, z up
-const cx = 380, cy = 470;     // where base centre lands on canvas
-function proj(p){
-  const k = 0.62;             // depth foreshortening
-  return {
-    x: cx + (p.x + k*p.y)*S,
-    y: cy - p.z*S + (k*p.y)*S*0.55
-  };
-}
-// base square ABCD in 3D (centred at origin)
-const A3={x:-2.5,y:-2.5,z:0},
-      B3={x: 2.5,y:-2.5,z:0},
-      C3={x: 2.5,y: 2.5,z:0},
-      D3={x:-2.5,y: 2.5,z:0},
-      V3={x:0,y:0,z:VO},
-      O3={x:0,y:0,z:0},
-      M3={x:0,y:-2.5,z:0};
-
-// E : foot of perpendicular from A to BV
-const BVlen = 4;
-const tE = ( (A3.x-B3.x)*(V3.x-B3.x)+(A3.y-B3.y)*(V3.y-B3.y)+(A3.z-B3.z)*(V3.z-B3.z) ) / (BVlen*BVlen);
-const E3={ x:B3.x+tE*(V3.x-B3.x), y:B3.y+tE*(V3.y-B3.y), z:B3.z+tE*(V3.z-B3.z) };
-
-const P = {
-  A:proj(A3), B:proj(B3), C:proj(C3), D:proj(D3),
-  V:proj(V3), O:proj(O3), M:proj(M3), E:proj(E3)
-};
-
-const cv = document.getElementById('cv');
-const ctx = cv.getContext('2d');
-
-let mode = 0;
-
-/* ---------- helpers ---------- */
-function line(p,q,color,w,dash){
-  ctx.save();
-  ctx.setLineDash(dash||[]);
-  ctx.strokeStyle=color; ctx.lineWidth=w; ctx.lineCap='round';
-  ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(q.x,q.y); ctx.stroke();
-  ctx.restore();
-}
-function poly(pts,color,w,dash){
-  ctx.save();
-  ctx.setLineDash(dash||[]);
-  ctx.strokeStyle=color; ctx.lineWidth=w; ctx.lineJoin='round';
-  ctx.beginPath();
-  pts.forEach((p,i)=> i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));
-  ctx.closePath(); ctx.stroke(); ctx.restore();
-}
-function fillPoly(pts,fill){
-  ctx.save(); ctx.fillStyle=fill;
-  ctx.beginPath();
-  pts.forEach((p,i)=> i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));
-  ctx.closePath(); ctx.fill(); ctx.restore();
-}
-function dot(p,color,r,label,dx,dy,labColor){
-  r=r||6;
-  ctx.save();
-  ctx.fillStyle='#fff';
-  ctx.beginPath(); ctx.arc(p.x,p.y,r+2.6,0,Math.PI*2); ctx.fill();
-  ctx.fillStyle=color;
-  ctx.beginPath(); ctx.arc(p.x,p.y,r,0,Math.PI*2); ctx.fill();
-  ctx.restore();
-  if(label){
-    ctx.save();
-    ctx.fillStyle = labColor||color;
-    ctx.font='bold 19px "Segoe UI",sans-serif';
-    ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText(label,p.x+(dx||0),p.y+(dy||0));
-    ctx.restore();
-  }
-}
-function angleArc(p, q, r, color, radius, label, labOff){
-  // angle at q between qp and qr
-  const a1=Math.atan2(p.y-q.y,p.x-q.x);
-  const a2=Math.atan2(r.y-q.y,r.x-q.x);
-  ctx.save();
-  ctx.strokeStyle=color; ctx.lineWidth=2.6;
-  ctx.beginPath();
-  // draw the smaller arc
-  let d=a2-a1;
-  while(d>Math.PI) d-=2*Math.PI;
-  while(d<-Math.PI) d+=2*Math.PI;
-  ctx.arc(q.x,q.y,radius,a1,a1+d,d<0);
-  ctx.stroke();
-  ctx.restore();
-  if(label){
-    const am=a1+d/2;
-    ctx.save();
-    ctx.fillStyle=color; ctx.font='bold 15px "Segoe UI",sans-serif';
-    ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText(label,q.x+Math.cos(am)*(radius+(labOff||18)),q.y+Math.sin(am)*(radius+(labOff||18)));
-    ctx.restore();
-  }
-}
-
-/* ---------- draw ---------- */
-function draw(){
-  ctx.clearRect(0,0,cv.width,cv.height);
-
-  /* --- faces --- */
-  if(mode>=1){
-    fillPoly([P.A,P.B,P.V],'rgba(37,99,235,.10)');   // face ABV
-    fillPoly([P.B,P.C,P.V],'rgba(225,29,72,.10)');   // face BCV
-  } else {
-    fillPoly([P.A,P.B,P.V],'rgba(37,99,235,.06)');
-    fillPoly([P.B,P.C,P.V],'rgba(225,29,72,.06)');
-    fillPoly([P.C,P.D,P.V],'rgba(124,58,237,.06)');
-    fillPoly([P.A,P.D,P.V],'rgba(22,163,74,.05)');
-  }
-
-  /* --- base square --- */
-  fillPoly([P.A,P.B,P.C,P.D],'rgba(37,99,235,.12)');
-  poly([P.A,P.B,P.C,P.D],'#2563eb',3);
-
-  /* hidden edges of base (behind) dashed */
-  line(P.A,P.D,'#93b4f7',2.4,[7,6]);
-  line(P.D,P.C,'#93b4f7',2.4,[7,6]);
-
-  /* --- lateral edges --- */
-  const ecol = '#e11d48';
-  line(P.A,P.V,ecol,3);
-  line(P.B,P.V,ecol,3);
-  if(mode===0 || mode>=1){
-    line(P.C,P.V,'#a855f7',3);
-    line(P.D,P.V,'#a855f7',2.6);
-  }
-  /* hidden vertical / diagonals */
-  if(mode===0){
-    line(P.V,P.O,'#94a3b8',2,[6,6]);
-    line(P.A,P.C,'#cbd5e1',1.8,[5,5]);
-    line(P.B,P.D,'#cbd5e1',1.8,[5,5]);
-  }
-
-  /* --- step 1: height VO --- */
-  if(mode===1){
-    line(P.V,P.O,'#7c3aed',3,[8,6]);
-    dot(P.O,'#7c3aed',6,'O',0,22,'#7c3aed');
-    ctx.save();
-    ctx.fillStyle='#7c3aed'; ctx.font='bold 15px "Segoe UI",sans-serif';
-    ctx.textAlign='left';
-    ctx.fillText('VO ⊥ base', P.O.x+30, (P.O.y+P.V.y)/2);
-    ctx.restore();
-  }
-
-  /* --- step 2: M midpoint, VM --- */
-  if(mode===2){
-    line(P.V,P.M,'#f59e0b',3);
-    dot(P.M,'#f59e0b',6,'M',-16,16,'#b45309');
-    angleArc(P.A,P.B,P.V,'#2563eb',40,'θ₁',26);
-  }
-
-  /* --- step 3: E, AE, CE --- */
-  if(mode>=3){
-    line(P.A,P.E,'#0ea5e9',3.2);
-    line(P.C,P.E,'#0ea5e9',3.2);
-    dot(P.E,'#16a34a',6.5,'E',16,-14,'#15803d');
-  }
-  if(mode===3){
-    line(P.B,P.V,'#e11d48',3.4);
-    angleArc(P.A,P.E,P.B,'#16a34a',26,null,0);
-    ctx.save(); ctx.strokeStyle='#16a34a'; ctx.lineWidth=2.2;
-    ctx.beginPath(); ctx.arc(P.E.x,P.E.y,11,0,Math.PI*2); ctx.stroke(); ctx.restore();
-  }
-
-  /* --- step 4: highlight triangle AEC --- */
-  if(mode===4){
-    fillPoly([P.A,P.E,P.C],'rgba(250,204,21,.28)');
-    poly([P.A,P.E,P.C],'#f59e0b',3.4);
-    line(P.A,P.C,'#94a3b8',2,[5,5]);
-  }
-
-  /* --- step 5: angle AEC --- */
-  if(mode>=5){
-    fillPoly([P.A,P.E,P.C],'rgba(250,204,21,.22)');
-    poly([P.A,P.E,P.C],'#f59e0b',3);
-    angleArc(P.A,P.E,P.C,'#e11d48',34,'θ',24);
-    ctx.save();
-    ctx.fillStyle='#7c3aed'; ctx.font='bold 16px "Segoe UI",sans-serif';
-    ctx.textAlign='center';
-    ctx.fillText('cos θ = −25/39', 380, 40);
-    ctx.restore();
-  }
-
-  /* --- vertices --- */
-  dot(P.A,'#2563eb',6,'A',-20,6,'#2563eb');
-  dot(P.B,'#2563eb',6,'B',16,18,'#2563eb');
-  dot(P.C,'#2563eb',6,'C',22,4,'#2563eb');
-  dot(P.D,'#2563eb',6,'D',-20,-8,'#2563eb');
-  dot(P.V,'#7c3aed',7.5,'V',0,-24,'#7c3aed');
-
-  /* --- title --- */
-  ctx.save();
-  ctx.fillStyle='#12203a'; ctx.font='bold 16px "Segoe UI",sans-serif';
-  ctx.textAlign='left';
-  ctx.fillText('Right pyramid VABCD  (AB:AV = 5:4)', 18, 28);
-  ctx.restore();
-}
-
-/* ---------- scroll sync ---------- */
-const steps = Array.from(document.querySelectorAll('.step'));
-const hintEl = document.getElementById('modehint');
-const hints = {
-  0:'Showing: full pyramid — all edges and the hidden height VO.',
-  1:'Step 1: height VO = √14/2 · k (right pyramid, VO ⊥ base).',
-  2:'Step 2: M is the midpoint of AB; in isosceles △ABV, cos∠ABV = 5/8.',
-  3:'Step 3: E on BV with AE ⊥ BV (and CE ⊥ BV) — the plane angle is ∠AEC.',
-  4:'Step 4: combine the cosine rule in △ACE with Pythagoras in △ABC, △ABE, △BCE.',
-  5:'Step 5: cos θ = −(tan∠ABV · tan∠CBV)⁻¹ = −25/39.'
-};
-
-const obs = new IntersectionObserver((es)=>{
-  es.forEach(e=>{
-    if(e.isIntersecting){
-      const m = +e.target.dataset.step;
-      mode = m;
-      steps.forEach(st=>st.classList.toggle('active', st===e.target));
-      if(hintEl) hintEl.textContent = hints[m] || hints[0];
-      draw();
-    }
-  });
-}, {rootMargin:'-15% 0px -55% 0px', threshold:0});
-
-steps.forEach(st=>obs.observe(st));
-
-/* initial */
-steps.forEach(st=>st.classList.remove('active'));
-window.addEventListener('load',()=>{ draw(); });
-draw();
-</script>
 <!-- question-pager -->
 <nav class="qnav" aria-label="Question navigation">
   <a class="qnav__prev" href="2023_P2_Q39.html">← Previous Question</a>
   <a class="qnav__mid" href="index.html#y2023">Contents</a>
   <a class="qnav__next" href="2023_P2_Q41.html">Next Question →</a>
 </nav>
+<script src="assets/fig3d.js"></script>
+<script>
+/* HKDSE 2023 P2 Q40 — right pyramid VABCD, square base ABCD, AB:AV = 5:4,
+   theta = angle between the faces ABV and BCV */
+var W = {
+  A: [0, 0, 0],
+  B: [5, 0, 0],
+  C: [5, 0, -5],
+  D: [0, 0, -5],
+  V: [2.5, 1.8708, -2.5],
+  O: [2.5, 0, -2.5],
+  M: [2.5, 0, 0],
+  E: [3.0469, 1.4616, -1.9531]
+};
+
+Fig3D.mount('#cv3d', {
+  v: W,
+  faces: [['V', 'A', 'B'], ['V', 'B', 'C'], ['V', 'C', 'D'], ['V', 'D', 'A'], ['A', 'B', 'C', 'D']],
+  edges: ['V-A', 'V-B', 'V-C', 'V-D', 'A-B', 'B-C', 'C-D', 'D-A'],
+  ground: { x0: -11, x1: 16, z0: -17, z1: 7 },
+  view: { yaw: 0.32, pitch: -0.42, zoom: 1.06 },
+  labels: { A: 'A', B: 'B', C: 'C', D: 'D', V: 'V' },
+  labelColor: { V: '#ef4444' },
+  labelsNudge: { A: -0.55, B: 0.3, C: 0.7, D: -2.5, V: 0 },
+  startStep: 1,
+  steps: {
+    1: [{ t: 'poly', v: ['A', 'B', 'C', 'D'], fill: 'rgba(59,130,246,0.13)' },
+      { t: 'seg', a: 'A', b: 'C', c: '#8b5cf6', w: 2.2, dash: [6, 5] },
+      { t: 'seg', a: 'A', b: 'O', c: '#8b5cf6', w: 2.2, dash: [5, 4] },
+      { t: 'seg', a: 'V', b: 'O', c: '#f59e0b', w: 3 },
+      { t: 'ra', at: 'O', a: 'V', b: 'A', s: 0.5, c: '#f59e0b' },
+      { t: 'dot', at: 'O' }, { t: 'vlabel', at: 'O', text: 'O', dist: 13, size: 12 },
+      { t: 'text', at: 'O', text: 'VO = √14/2 k', dx: 30, dy: 14, c: '#b45309', size: 12 }],
+    2: [{ t: 'poly', v: ['V', 'A', 'B'], fill: 'rgba(139,92,246,0.15)' },
+      { t: 'seg', a: 'A', b: 'B', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'B', b: 'V', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'V', b: 'M', c: '#8b5cf6', w: 2.2, dash: [5, 4] },
+      { t: 'ra', at: 'M', a: 'V', b: 'A', s: 0.42, c: '#8b5cf6' },
+      { t: 'angle', at: 'B', a: 'A', b: 'V', r: 1.15, label: '51.3°' },
+      { t: 'dot', at: 'M' }, { t: 'vlabel', at: 'M', text: 'M', dist: 14, size: 12 },
+      { t: 'text', at: 'A', text: 'AB = 5k', dx: -6, dy: 30, c: '#b45309', size: 12 }],
+    3: [{ t: 'seg', a: 'B', b: 'V', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'A', b: 'E', c: '#10b981', w: 3 },
+      { t: 'seg', a: 'C', b: 'E', c: '#94a3b8', w: 2, dash: [5, 4] },
+      { t: 'ra', at: 'E', a: 'A', b: 'V', s: 0.42, c: '#0f766e' },
+      { t: 'dot', at: 'E' }, { t: 'vlabel', at: 'E', text: 'E', dist: 15, size: 12 },
+      { t: 'text', at: 'E', text: 'AE ⊥ BV', dx: -8, dy: -22, c: '#047857', size: 12 }],
+    4: [{ t: 'poly', v: ['A', 'C', 'E'], fill: 'rgba(139,92,246,0.15)' },
+      { t: 'seg', a: 'A', b: 'E', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'C', b: 'E', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'A', b: 'C', c: '#8b5cf6', w: 2.2, dash: [6, 5] },
+      { t: 'seg', a: 'B', b: 'V', c: '#94a3b8', w: 1.8, dash: [5, 4] },
+      { t: 'angle', at: 'E', a: 'A', b: 'C', r: 0.9, label: 'θ' },
+      { t: 'dot', at: 'E' }, { t: 'vlabel', at: 'E', text: 'E', dist: 15, size: 12 }],
+    5: [{ t: 'poly', v: ['V', 'A', 'B'], fill: 'rgba(59,130,246,0.13)' },
+      { t: 'poly', v: ['V', 'B', 'C'], fill: 'rgba(139,92,246,0.13)' },
+      { t: 'poly', v: ['A', 'C', 'E'], fill: 'rgba(16,185,129,0.12)' },
+      { t: 'seg', a: 'A', b: 'E', c: '#f59e0b', w: 2.6 },
+      { t: 'seg', a: 'C', b: 'E', c: '#f59e0b', w: 2.6 },
+      { t: 'seg', a: 'B', b: 'V', c: '#8b5cf6', w: 2, dash: [5, 4] },
+      { t: 'angle', at: 'E', a: 'A', b: 'C', r: 0.9, label: '129.9°', c: '#047857' },
+      { t: 'text', at: 'E', text: 'cos θ = −25/39', dx: 6, dy: 36, c: '#047857', size: 12 },
+      { t: 'dot', at: 'E' }, { t: 'vlabel', at: 'E', text: 'E', dist: 15, size: 12 }]
+  }
+});
+</script>
 </body>
 </html>

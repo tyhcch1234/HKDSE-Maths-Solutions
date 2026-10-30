@@ -46,12 +46,7 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
     box-shadow:0 8px 26px rgba(30,60,120,.10);
     border:1px solid var(--line);
   }
-  .diagram{
-    position:sticky;
-    top:16px;
-    max-height:calc(100vh - 2rem);
-    overflow-y:auto;
-  }
+  .diagram{position:sticky;top:12px;}
   h1{
     font-size:1.02rem;
     margin:0 0 8px;
@@ -182,23 +177,20 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
     .step p{font-size:.82rem;}
     .opts{font-size:.78rem;}
   }
+.chip3d{display:inline-block;vertical-align:middle;margin-left:6px;font-size:.58rem;font-weight:700;letter-spacing:.6px;color:#fff;background:linear-gradient(135deg,#2563eb,#0ea5e9);padding:2px 7px;border-radius:20px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;}
 </style>
 <link rel="stylesheet" href="assets/extra.css">
+<link rel="stylesheet" href="assets/fig3d.css">
 </head>
 <body>
 <div class="split">
 
   <!-- ================= LEFT : DIAGRAM ================= -->
-  <section class="panel diagram">
-    <h1>Interactive Diagram</h1>
-    <canvas id="cv" width="720" height="600"></canvas>
-    <div class="legend">
-      <span><i class="dot" style="background:#2563eb"></i>Square base (18 cm)</span>
-      <span><i class="dot" style="background:#7c3aed"></i>Apex V</span>
-      <span><i class="bar" style="background:#059669"></i>Slant height (15 cm)</span>
-      <span><i class="bar" style="background:#e11d48"></i>Pyramid height (12 cm)</span>
-      <span><i class="dot" style="background:#d97706"></i>Foot of height / mid-point</span>
-    </div>
+    <section class="panel diagram">
+    <h2>3-D Figure <span class="chip3d">3D</span></h2>
+    <div class="fig3d-stage"><canvas id="cv3d"></canvas></div>
+    <div id="figui"></div>
+    <div class="fig3d-hint">拖動旋轉 · 雙指／滾輪縮放　—　drag to rotate, pinch or scroll to zoom</div>
   </section>
 
   <!-- ================= RIGHT : QUESTION + SOLUTION ================= -->
@@ -285,210 +277,59 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
   </section>
 </div>
 
-<script>
-const cv = document.getElementById('cv');
-const ctx = cv.getContext('2d');
-const W = cv.width, H = cv.height;
 
-/* ---------- geometry (true proportions, single uniform scale) ---------- */
-// Base square side = 18 cm, vertical height = 12 cm
-const S = 18, Hgt = 12;
-const scale = 12;              // px per cm  (uniform for x and y)
-
-// isometric-ish projection for a nice 2D look
-const cx = W/2, cy = H/2 + 60;
-const ax = 0.80, ay = 0.42;    // x-axis projection (going right-back)
-const bx = -0.80, by = 0.42;   // y-axis projection (going left-back)
-
-function proj(x, y, z){
-  // x,y in cm on the base plane (centred), z up
-  const px = cx + (x*axx + y*bxx)*scale;
-  const py = cy + (x*axy + y*bxy)*scale - z*scale;
-  return [px, py];
-}
-const axx = 1.0, axy = -0.42;   // direction for increasing x
-const bxx = -1.0, bxy = -0.42;  // direction for increasing y
-
-// base corners (centred at origin), side 18
-const s = S/2;
-const A = [-s, -s], B = [s, -s], C = [s, s], D = [-s, s];
-// apex directly above base centre (0,0)
-const O = [0,0];
-const Vz = Hgt;
-// mid-point of edge BC (the front-right edge) and mid-point of AD
-const Mbc = [(B[0]+C[0])/2, (B[1]+C[1])/2];
-const Mab = [(A[0]+B[0])/2, (A[1]+B[1])/2];
-
-const P = (p, z=0) => proj(p[0], p[1], z);
-
-/* helpers */
-function line(a,b,color,w=2.5,dash=[]){
-  ctx.save();
-  ctx.setLineDash(dash);
-  ctx.strokeStyle=color; ctx.lineWidth=w; ctx.lineCap='round';
-  ctx.beginPath(); ctx.moveTo(a[0],a[1]); ctx.lineTo(b[0],b[1]); ctx.stroke();
-  ctx.restore();
-}
-function poly(pts,fill,stroke,w=2,dash=[]){
-  ctx.save();
-  ctx.setLineDash(dash);
-  ctx.beginPath();
-  pts.forEach((p,i)=> i? ctx.lineTo(p[0],p[1]) : ctx.moveTo(p[0],p[1]));
-  ctx.closePath();
-  if(fill){ctx.fillStyle=fill;ctx.fill();}
-  if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=w;ctx.stroke();}
-  ctx.restore();
-}
-function dot(p,color,r=5){
-  ctx.beginPath(); ctx.arc(p[0],p[1],r,0,Math.PI*2);
-  ctx.fillStyle=color; ctx.fill();
-  ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
-}
-function label(p,text,color,dx=0,dy=0,size=15){
-  ctx.font=`bold ${size}px Segoe UI, Arial`;
-  ctx.fillStyle=color;
-  ctx.textAlign='center'; ctx.textBaseline='middle';
-  ctx.fillText(text,p[0]+dx,p[1]+dy);
-}
-
-/* project all key points */
-const pA=P(A,0), pB=P(B,0), pC=P(C,0), pD=P(D,0);
-const pV=P(O,Vz);
-const pO=P(O,0);
-const pM=P(Mbc,0);
-const pMab=P(Mab,0);
-
-let mode = 1;
-
-function draw(){
-  ctx.clearRect(0,0,W,H);
-
-  /* --- faint ground shadow --- */
-  poly([pA,pB,pC,pD], 'rgba(37,99,235,0.08)', null);
-
-  /* --- hidden edges (dashed) --- */
-  // O->D hidden, O->A hidden : draw base diagonals dashed
-  line(pO,pA,'#93b4f5',1.8,[6,5]);
-  line(pO,pD,'#93b4f5',1.8,[6,5]);
-
-  /* --- base square --- */
-  poly([pA,pB,pC,pD], 'rgba(37,99,235,0.10)', '#2563eb', 3);
-
-  /* --- lateral edges --- */
-  // front edges solid, back edges dashed-ish
-  line(pV,pB,'#7c3aed',2.6);
-  line(pV,pC,'#7c3aed',2.6);
-  line(pV,pA,'#a78bfa',2.2,[7,5]);
-  line(pV,pD,'#a78bfa',2.2,[7,5]);
-
-  /* --- lateral faces tint --- */
-  poly([pV,pB,pC], 'rgba(124,58,237,0.10)', null);
-
-  /* --- vertical height VO --- */
-  if(mode>=1){
-    line(pV,pO,'#e11d48',3);
-    // right-angle mark at O
-    ctx.save();
-    ctx.strokeStyle='#e11d48'; ctx.lineWidth=1.8;
-    ctx.beginPath();
-    ctx.moveTo(pO[0]+10,pO[1]-4); ctx.lineTo(pO[0]+10,pO[1]-14);
-    ctx.moveTo(pO[0],pO[1]-10); ctx.lineTo(pO[0]+10,pO[1]-10);
-    ctx.stroke();
-    ctx.restore();
-  }
-
-  /* --- slant height VM (to mid-point of front edge BC) --- */
-  if(mode>=2){
-    line(pO,pM,'#d97706',3);
-    line(pV,pM,'#059669',3.4);
-    dot(pM,'#d97706',5.5);
-    label(pM,'M','#b45309',-16,14,14);
-  }
-
-  /* --- highlight the right triangle VOM --- */
-  if(mode===2){
-    poly([pV,pO,pM], 'rgba(5,150,105,0.16)', '#059669',2);
-  }
-
-  /* --- highlight one lateral face --- */
-  if(mode===3){
-    poly([pV,pB,pC], 'rgba(5,150,105,0.22)', '#059669',3);
-    dot(pB,'#2563eb',5); dot(pC,'#2563eb',5); 
-  }
-
-  /* --- highlight whole surface --- */
-  if(mode>=4){
-    poly([pV,pB,pC], 'rgba(5,150,105,0.20)', '#059669',2.5);
-    poly([pV,pC,pD], 'rgba(5,150,105,0.20)', '#059669',2.5);
-    poly([pV,pA,pB], 'rgba(5,150,105,0.20)', '#059669',2.5);
-    poly([pV,pD,pA], 'rgba(5,150,105,0.20)', '#059669',2.5);
-    poly([pA,pB,pC,pD], 'rgba(37,99,235,0.25)', '#2563eb',3);
-  }
-
-  /* --- vertices --- */
-  dot(pA,'#2563eb'); dot(pB,'#2563eb'); dot(pC,'#2563eb'); dot(pD,'#2563eb');
-  dot(pV,'#7c3aed',6.5);
-  dot(pO,'#d97706',5);
-
-  label(pA,'A','#1e40af',-18,10);
-  label(pB,'B','#1e40af',18,-6);
-  label(pC,'C','#1e40af',18,8);
-  label(pD,'D','#1e40af',-16,-8);
-  label(pV,'V','#6d28d9',0,-20,17);
-  label(pO,'O','#b45309',16,10,14);
-
-  /* --- measurement annotations --- */
-  // base side 18 cm along BC
-  if(mode===1 || mode===4){
-    label(pM,'18 cm','#2563eb',0,26,15);
-  }
-  // height 12 cm
-  if(mode>=1){
-    ctx.font='bold 15px Segoe UI, Arial';
-    ctx.fillStyle='#e11d48'; ctx.textAlign='left';
-    ctx.fillText('12 cm', (pV[0]+pO[0])/2+14, (pV[1]+pO[1])/2);
-  }
-  // slant height 15 cm
-  if(mode>=2){
-    ctx.font='bold 15px Segoe UI, Arial';
-    ctx.fillStyle='#059669'; ctx.textAlign='left';
-    ctx.fillText('15 cm', (pV[0]+pM[0])/2+16, (pV[1]+pM[1])/2-8);
-  }
-  // OM = 9 cm
-  if(mode===2){
-    ctx.font='bold 14px Segoe UI, Arial';
-    ctx.fillStyle='#d97706'; ctx.textAlign='center';
-    ctx.fillText('9 cm', (pO[0]+pM[0])/2-4, (pO[1]+pM[1])/2+20);
-  }
-
-  /* --- step caption --- */
-  const caps = {
-    1:'Step 1 · Square base 18 cm, vertical height 12 cm',
-    2:'Step 2 · Slant height VM = √(9² + 12²) = 15 cm',
-    3:'Step 3 · One lateral face = ½ × 18 × 15 = 135 cm²',
-    4:'Step 4 · Total S.A. = 18² + 4 × 135 = 864 cm²'
-  };
-  ctx.font='bold 15px Segoe UI, Arial';
-  ctx.fillStyle='#12336b'; ctx.textAlign='center';
-  ctx.fillText(caps[mode], W/2, 26);
-}
-
-/* ---------- scroll sync ---------- */
-const steps = Array.from(document.querySelectorAll('.step'));
-const obs = new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){
-  const m = +e.target.dataset.step; mode = m;
-  steps.forEach(st=>st.classList.toggle('active',st===e.target)); draw();}});},
-  {rootMargin:'-15% 0px -55% 0px', threshold:0});
-steps.forEach(st=>obs.observe(st));
-
-draw();
-window.addEventListener('resize', draw);
-</script>
 <!-- question-pager -->
 <nav class="qnav" aria-label="Question navigation">
   <a class="qnav__prev" href="2019_P2_Q14.html">← Previous Question</a>
   <a class="qnav__mid" href="index.html#y2019">Contents</a>
   <a class="qnav__next" href="2019_P2_Q16.html">Next Question →</a>
 </nav>
+<script src="assets/fig3d.js"></script>
+<script>
+/* HKDSE 2019 P2 Q15 — right pyramid, square base ABCD of side 18 cm, apex V,
+   height VO = 12 cm, M the mid-point of BC, slant height VM = 15 cm. */
+var P = {
+  A: [-9, 0, -9], B: [9, 0, -9], C: [9, 0, 9], D: [-9, 0, 9],
+  V: [0, 12, 0], O: [0, 0, 0], M: [9, 0, 0]
+};
+
+var VO = { t: 'seg', a: 'V', b: 'O', c: '#10b981', w: 3 };
+var OM = { t: 'seg', a: 'O', b: 'M', c: '#f59e0b', w: 3 };
+var VM = { t: 'seg', a: 'V', b: 'M', c: '#10b981', w: 3 };
+var RO = { t: 'ra', at: 'O', a: 'V', b: 'M', s: 2.0, c: '#0f766e' };
+var DO = { t: 'dot', at: 'O' };
+var VOlab = { t: 'text', at: [0, 6, 0], text: '12', dx: -15, dy: 0 };
+var OMlab = { t: 'text', at: [4.5, 0, 0], text: '9', dx: 0, dy: 15 };
+var VMlab = { t: 'text', at: [4.5, 6, 0], text: '15', dx: 16, dy: 0 };
+
+var steps = {
+  1: [VO, OM, RO, DO, VOlab, OMlab],
+  2: [VO, OM, VM, RO, DO, VOlab, OMlab, VMlab],
+  3: [{ t: 'poly', v: ['V', 'B', 'C'], fill: 'rgba(245,158,11,0.16)' },
+      VM, VO, OM, RO, DO, VMlab],
+  4: [{ t: 'poly', v: ['A', 'B', 'C', 'D'], fill: 'rgba(59,130,246,0.12)' },
+      { t: 'poly', v: ['V', 'A', 'B'], fill: 'rgba(245,158,11,0.12)' },
+      { t: 'poly', v: ['V', 'B', 'C'], fill: 'rgba(245,158,11,0.12)' },
+      { t: 'poly', v: ['V', 'C', 'D'], fill: 'rgba(245,158,11,0.12)' },
+      { t: 'poly', v: ['V', 'D', 'A'], fill: 'rgba(245,158,11,0.12)' },
+      VM, VO, OM, RO, DO, VMlab],
+  5: [VO, OM, VM, RO, DO, VOlab, OMlab, VMlab],
+  6: [VO, OM, VM, RO, DO, VOlab, OMlab, VMlab]
+};
+
+Fig3D.mount('#cv3d', {
+  v: P,
+  faces: [['V', 'A', 'B'], ['V', 'B', 'C'], ['V', 'C', 'D'], ['V', 'D', 'A'], ['A', 'B', 'C', 'D']],
+  edges: ['V-A', 'V-B', 'V-C', 'V-D', 'A-B', 'B-C', 'C-D', 'D-A'],
+  ground: true,
+  groundOpt: { x0: -19, x1: 22, z0: -21, z1: 21, gx: 5, gz: 5 },
+  view: { yaw: 0.80, pitch: -0.32, zoom: 1.0 },
+  labels: { A: 'A', B: 'B', C: 'C', D: 'D', V: 'V', O: 'O', M: 'M' },
+  labelColor: { V: '#ef4444' },
+  labelsNudge: { O: 1.2, M: 0.4 },
+  startStep: 1,
+  steps: steps
+});
+</script>
 </body>
 </html>

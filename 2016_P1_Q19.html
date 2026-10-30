@@ -23,7 +23,7 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
     box-shadow:0 6px 20px rgba(30,64,175,0.10);
     border:1px solid #e2e8f0;
   }
-  .diagram{position:sticky;top:16px;max-height:calc(100vh - 2rem);overflow-y:auto;}
+  .diagram{position:sticky;top:12px;}
 
   h1{font-size:1.05rem;color:#1d4ed8;margin-bottom:8px;letter-spacing:.3px;}
   h2{font-size:.95rem;color:#0f766e;margin:4px 0 8px;}
@@ -70,24 +70,20 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
     h1{font-size:.9rem;}
     .qbox{font-size:.8rem;}
   }
+.chip3d{display:inline-block;vertical-align:middle;margin-left:6px;font-size:.58rem;font-weight:700;letter-spacing:.6px;color:#fff;background:linear-gradient(135deg,#2563eb,#0ea5e9);padding:2px 7px;border-radius:20px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;}
 </style>
 <link rel="stylesheet" href="assets/extra.css">
+<link rel="stylesheet" href="assets/fig3d.css">
 </head>
 <body>
 
 <div class="split">
   <!-- LEFT: DIAGRAM -->
-  <section class="panel diagram">
-    <h1>📐 Interactive Diagram</h1>
-    <div style="margin:0 0 14px;"><div style="font-size:.78rem;font-weight:700;color:#334155;margin-bottom:6px;">3D 互動模型 — 拖動旋轉查看不同角度</div><iframe src="https://www.geogebra.org/material/iframe/id/tADpnekS" width="100%" height="400" style="border:0;border-radius:12px;background:#fff;" allowfullscreen scrolling="no"></iframe></div><canvas id="cv" width="520" height="600"></canvas>
-    <div class="legend">
-      <span><i class="swatch" style="background:#2563eb"></i>Apex A</span>
-      <span><i class="swatch" style="background:#16a34a"></i>Vertex B</span>
-      <span><i class="swatch" style="background:#db2777"></i>Vertex C</span>
-      <span><i class="swatch" style="background:#f59e0b"></i>Vertex D</span>
-      <span><i class="swatch" style="background:#ef4444"></i>Highlighted edge</span>
-      <span><i class="swatch" style="background:#94a3b8"></i>Hidden (dashed)</span>
-    </div>
+    <section class="panel diagram">
+    <h2>3-D Figure <span class="chip3d">3D</span></h2>
+    <div class="fig3d-stage"><canvas id="cv3d"></canvas></div>
+    <div id="figui"></div>
+    <div class="fig3d-hint">拖動旋轉 · 雙指／滾輪縮放　—　drag to rotate, pinch or scroll to zoom</div>
   </section>
 
   <!-- RIGHT: SOLUTION -->
@@ -197,198 +193,55 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
   </section>
 </div>
 
-<script>
-const cv = document.getElementById('cv');
-const ctx = cv.getContext('2d');
-let mode = 1;
 
-// ---- 2D projected coordinates (match original exam figure orientation) ----
-// Figure: A apex top, B lower-left, C middle, D bottom-right. C–B and C–D are DASHED (hidden).
-const P = {
-  A: {x: 168, y: 55},
-  B: {x: 78,  y: 340},
-  C: {x: 240, y: 250},
-  D: {x: 445, y: 385}
-};
-
-function clear(){ ctx.clearRect(0,0,cv.width,cv.height); }
-
-function drawPoly(p1,p2,p3,color,fill,width){
-  ctx.beginPath();
-  ctx.moveTo(p1.x,p1.y); ctx.lineTo(p2.x,p2.y); ctx.lineTo(p3.x,p3.y);
-  ctx.closePath();
-  if(fill){ ctx.fillStyle=fill; ctx.fill(); }
-  ctx.strokeStyle=color; ctx.lineWidth=width||2; ctx.stroke();
-}
-
-function drawLine(a,b,color,width,dash){
-  ctx.beginPath();
-  ctx.setLineDash(dash?[7,6]:[]);
-  ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y);
-  ctx.strokeStyle=color; ctx.lineWidth=width||2; ctx.stroke();
-  ctx.setLineDash([]);
-}
-
-function drawPt(p,label,sub,color,labelSide){
-  ctx.beginPath();
-  ctx.arc(p.x,p.y,7,0,Math.PI*2);
-  ctx.fillStyle=color; ctx.fill();
-  ctx.strokeStyle='#fff'; ctx.lineWidth=2.5; ctx.stroke();
-  ctx.fillStyle='#0f172a';
-  ctx.font='bold 17px Segoe UI, sans-serif';
-  ctx.textAlign='center'; ctx.textBaseline='middle';
-  let dx=0, dy=0;
-  if(labelSide==='top') dy=-22;
-  else if(labelSide==='left') dx=-20;
-  else if(labelSide==='right') dx=20;
-  else if(labelSide==='bottom') dy=22;
-  ctx.fillText(label, p.x+dx, p.y+dy);
-  if(sub){
-    ctx.font='11px Segoe UI, sans-serif';
-    ctx.fillStyle='#64748b';
-    ctx.textAlign='center';
-    ctx.fillText(sub, p.x+dx, p.y+dy+14);
-  }
-}
-
-function drawAngleMark(v1,v2,v3,color,radius){
-  // mark angle at vertex v2 between v1-v2 and v3-v2
-  const a1 = Math.atan2(v1.y-v2.y, v1.x-v2.x);
-  const a2 = Math.atan2(v3.y-v2.y, v3.x-v2.x);
-  let d = a2-a1;
-  while(d>Math.PI) d-=2*Math.PI;
-  while(d<-Math.PI) d+=2*Math.PI;
-  ctx.beginPath();
-  ctx.arc(v2.x, v2.y, radius||22, a1, a1+d, d<0);
-  ctx.strokeStyle=color; ctx.lineWidth=2; ctx.stroke();
-}
-
-function draw(){
-  clear();
-
-  // Background face BCD (subtle)
-  drawPoly(P.B, P.C, P.D, '#cbd5e1', 'rgba(241,245,249,0.6)', 1.5);
-
-  // Highlight depending on mode
-  const hl = (mode===1) ? ['A','B','D'] :
-             (mode===2) ? ['B','C','D'] :
-             (mode===3) ? ['A','B','C'] :
-             (mode===4) ? ['A','B','D'] :
-             (mode===5) ? ['A','C','D'] : ['A','B','C','D'];
-
-  // Edges — solid (visible): A-B, A-D, B-D ; dashed (hidden): B-C, C-D, A-C (AC partly)
-  // Draw dashed hidden edges first
-  const hiddenDash = (mode===1||mode===4||mode===2) ? [7,6] : [7,6];
-  drawLine(P.A,P.C,'#94a3b8',2.5,hiddenDash);
-  drawLine(P.B,P.C,'#94a3b8',2.5,hiddenDash);
-  drawLine(P.C,P.D,'#94a3b8',2.5,hiddenDash);
-
-  // Solid edges with highlight
-  function edge(a,b,names,colorDefault,hlColor,w){
-    const isHl = names.every(n=>hl.includes(n));
-    drawLine(P[a],P[b], isHl?hlColor:colorDefault, isHl?5:w||3, false);
-  }
-
-  edge('A','B',['A','B'],'#2563eb','#ef4444',3);
-  edge('A','D',['A','D'],'#2563eb','#ef4444',3);
-  edge('B','D',['B','D'],'#2563eb','#ef4444',3);
-
-  // Re-draw hidden with slightly different style & highlight
-  function edgeHidden(a,b,names,colorDefault,hlColor){
-    const isHl = names.every(n=>hl.includes(n));
-    drawLine(P[a],P[b], isHl?hlColor:colorDefault, isHl?5:2.5, [7,6]);
-  }
-  edgeHidden('A','C',['A','C'],'#94a3b8','#ef4444');
-  edgeHidden('B','C',['B','C'],'#94a3b8','#ef4444');
-  edgeHidden('C','D',['C','D'],'#94a3b8','#ef4444');
-
-  // Angle marks depending on mode
-  if(mode===1){
-    drawAngleMark(P.B,P.A,P.D,'#f59e0b',26);            // ∠BAD = 86°
-    drawAngleMark(P.A,P.B,P.D,'#16a34a',26);            // ∠ABD
-    ctx.fillStyle='#b45309'; ctx.font='bold 12px Segoe UI';
-    ctx.textAlign='center';
-    ctx.fillText('86°', P.A.x-30, P.A.y+38);
-    ctx.fillStyle='#15803d';
-    ctx.fillText('?', P.B.x+52, P.B.y-14);
-  }
-  if(mode===2){
-    drawAngleMark(P.B,P.C,P.D,'#db2777',24);            // ∠BCD
-    drawAngleMark(P.C,P.B,P.D,'#f59e0b',24);            // ∠CBD = 43°
-    ctx.fillStyle='#b45309'; ctx.font='bold 12px Segoe UI';
-    ctx.textAlign='center';
-    ctx.fillText('43°', P.B.x+72, P.B.y-30);
-    ctx.fillStyle='#be185d';
-    ctx.fillText('?', P.C.x+30, P.C.y+18);
-  }
-  if(mode===3){
-    drawAngleMark(P.A,P.C,P.B,'#0891b2',26);            // ∠ACB = 90°
-    ctx.fillStyle='#0e7490'; ctx.font='bold 13px Segoe UI';
-    ctx.textAlign='center';
-    ctx.fillText('90°', P.C.x-4, P.C.y+38);
-  }
-  if(mode===4){
-    drawAngleMark(P.A,P.B,P.D,'#16a34a',24);            // ∠ABD
-    ctx.fillStyle='#15803d'; ctx.font='bold 12px Segoe UI';
-    ctx.textAlign='center';
-    ctx.fillText('52.3°', P.B.x+60, P.B.y-14);
-  }
-  if(mode===5){
-    drawAngleMark(P.C,P.D,P.A,'#7c3aed',24);            // ∠CDA (part of ACD)
-    drawAngleMark(P.A,P.C,P.D,'#0891b2',26);            // ∠ACD
-    ctx.fillStyle='#6d28d9'; ctx.font='bold 12px Segoe UI';
-    ctx.textAlign='center';
-    ctx.fillText('∠ACD ≈ 86.47°', P.C.x+30, P.C.y-4);
-  }
-  if(mode===6){
-    // highlight AB and plane BCD conceptually
-    drawLine(P.A,P.B,'#ef4444',5,false);
-    drawPoly(P.B,P.C,P.D,'#f59e0b','rgba(245,158,11,0.12)',2);
-    ctx.fillStyle='#b45309'; ctx.font='bold 12px Segoe UI';
-    ctx.textAlign='center';
-    ctx.fillText('plane BCD', P.C.x+90, P.C.y+55);
-    ctx.fillStyle='#b91c1c';
-    ctx.fillText('AB', P.A.x+60, P.A.y+40);
-    ctx.font='italic 12px Segoe UI';
-    ctx.fillText('angle ≠ ∠ABC', P.B.x+90, P.B.y-12);
-  }
-
-  // Points
-  drawPt(P.A,'A','', '#2563eb','top');
-  drawPt(P.B,'B','', '#16a34a','left');
-  drawPt(P.C,'C','', '#db2777','right');
-  drawPt(P.D,'D','', '#f59e0b','right');
-
-  // Caption
-  ctx.fillStyle='#475569';
-  ctx.font='italic 12px Segoe UI';
-  ctx.textAlign='left';
-  ctx.fillText('Figure 2 — Tetrahedron ABCD (C–B and C–D hidden → dashed)', 12, cv.height-12);
-}
-
-// Scroll-sync with IntersectionObserver
-const steps = Array.from(document.querySelectorAll('.step'));
-const obs = new IntersectionObserver((es)=>{
-  es.forEach(e=>{
-    if(e.isIntersecting){
-      const m = +e.target.dataset.step;
-      mode = m;
-      steps.forEach(st=>st.classList.toggle('active', st===e.target));
-      draw();
-    }
-  });
-}, {rootMargin:'-15% 0px -55% 0px', threshold:0});
-steps.forEach(st=>obs.observe(st));
-
-// initial draw
-draw();
-window.addEventListener('resize', ()=>draw());
-</script>
 <!-- question-pager -->
 <nav class="qnav" aria-label="Question navigation">
   <a class="qnav__prev" href="2016_P1_Q18.html">← Previous Question</a>
   <a class="qnav__mid" href="index.html#y2016">Contents</a>
   <a class="qnav__next" href="2016_P1_Q20.html">Next Question →</a>
 </nav>
+<script src="assets/fig3d.js"></script>
+<script>
+/* HKDSE 2016 P1 Q19 — tetrahedron ABCD, base BCD on the ground.
+   AB=10, AC=6, BC=8, BD=15, ∠BAD=86°, ∠CBD=43°  ->  ∠ABD=52.31°, CD=10.65 */
+var V = {
+  A: [8, 5.9876, -0.3848],
+  B: [0, 0, 0],
+  C: [8, 0, 0],
+  D: [10.9703, 0, -10.2300],
+  H: [8, 0, -0.3848]
+};
+
+Fig3D.mount('#cv3d', {
+  v: V,
+  faces: [['A', 'B', 'D'], ['B', 'C', 'D'], ['A', 'B', 'C'], ['A', 'C', 'D']],
+  edges: ['A-B', 'B-C', 'C-A', 'A-D', 'B-D', 'C-D'],
+  ground: { x0: -6, x1: 16, z0: -16, z1: 6 },
+  view: { yaw: -0.75, pitch: -0.45, zoom: 1.05 },
+  labels: { A: 'A', B: 'B', C: 'C', D: 'D' },
+  labelColor: { A: '#ef4444' },
+  labelSteps: { H: 3 },
+  labelsNudge: { H: -0.9, C: 0.25 },
+  steps: {
+    1: [{ t: 'poly', v: ['A', 'B', 'D'], fill: 'rgba(245,158,11,0.14)' },
+      { t: 'seg', a: 'A', b: 'B', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'B', b: 'D', c: '#f59e0b', w: 3 },
+      { t: 'angle', at: 'B', a: 'A', b: 'D', r: 3.2, label: '52.3°' }],
+    2: [{ t: 'poly', v: ['B', 'C', 'D'], fill: 'rgba(139,92,246,0.13)' },
+      { t: 'seg', a: 'C', b: 'D', c: '#8b5cf6', w: 2.8 },
+      { t: 'text', at: [9.5, 0, -5.2], text: 'CD 10.65', dx: 26, dy: 8, c: '#6d28d9' }],
+    3: [{ t: 'seg', a: 'A', b: 'H', c: '#10b981', w: 2.4, dash: [5, 4] },
+      { t: 'seg', a: 'B', b: 'H', c: '#94a3b8', w: 2 },
+      { t: 'poly', v: ['A', 'B', 'H'], fill: 'rgba(16,185,129,0.13)' },
+      { t: 'ra', at: 'H', a: 'A', b: 'B', s: 0.9, c: '#0f766e' },
+      { t: 'angle', at: 'B', a: 'A', b: 'H', r: 5.5, label: '36.8°' },
+      { t: 'dot', at: 'H' }, { t: 'vlabel', at: 'H', text: 'H' }],
+    4: [{ t: 'seg', a: 'A', b: 'H', c: '#10b981', w: 2.4, dash: [5, 4] },
+      { t: 'angle', at: 'B', a: 'A', b: 'H', r: 5.5, label: '36.8°' },
+      { t: 'angle', at: 'B', a: 'A', b: 'C', r: 7.5, label: '∠ABC 36.9°' },
+      { t: 'text', at: [4, 3.2, -0.2], text: 'not equal', dx: 0, dy: -14, c: '#dc2626' }]
+  }
+});
+</script>
 </body>
 </html>

@@ -59,11 +59,7 @@
   }
   @media(min-width:900px){ .panel{padding:18px;} }
 
-  .diagram{
-    position:sticky;top:16px;
-    max-height:calc(100vh - 2rem);
-    overflow-y:auto;
-  }
+  .diagram{position:sticky;top:12px;}
   .diagram h2{
     margin:0 0 8px;font-size:.95rem;color:#0f172a;letter-spacing:.3px;
   }
@@ -132,8 +128,10 @@
   }
   .katex{font-size:1em;}
   mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%;}
+.chip3d{display:inline-block;vertical-align:middle;margin-left:6px;font-size:.58rem;font-weight:700;letter-spacing:.6px;color:#fff;background:linear-gradient(135deg,#2563eb,#0ea5e9);padding:2px 7px;border-radius:20px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;}
 </style>
 <link rel="stylesheet" href="assets/extra.css">
+<link rel="stylesheet" href="assets/fig3d.css">
 </head>
 <body>
 
@@ -146,18 +144,11 @@
 <div class="split">
 
   <!-- ================= LEFT: DIAGRAM ================= -->
-  <section class="panel diagram">
-    <h2>Figure — Triangular paper card \(PQR\)</h2>
-    <div style="margin:0 0 14px;"><div style="font-size:.78rem;font-weight:700;color:#334155;margin-bottom:6px;">3D 互動模型 — 拖動旋轉查看不同角度</div><iframe src="https://www.geogebra.org/material/iframe/id/erzd4c9v" width="100%" height="400" style="border:0;border-radius:12px;background:#fff;" allowfullscreen scrolling="no"></iframe></div><canvas id="cv" width="760" height="700"></canvas>
-    <div class="legend">
-      <span><i class="dot" style="background:#2563eb"></i>Card edge \(PQ\) / \(QR\) / \(PR\)</span>
-      <span><i class="dot" style="background:#16a34a"></i>Ground edge \(PQ\) (horizontal)</span>
-      <span><i class="dot" style="background:#7c3aed"></i>Point \(R\) &amp; vertical height</span>
-      <span><i class="dot" style="background:#dc2626"></i>Median \(PM\) to midpoint \(M\)</span>
-      <span><i class="dot" style="background:#0891b2"></i>Horizontal ground / shadow</span>
-      <span><i class="dot" style="background:#d97706"></i>Angles</span>
-    </div>
-    <div class="modenote" id="modenote">Showing: the 2-D triangle \(PQR\) (part (a)).</div>
+        <section class="panel diagram">
+    <h2>3-D Figure <span class="chip3d">3D</span></h2>
+    <div class="fig3d-stage"><canvas id="cv3d"></canvas></div>
+    <div id="figui"></div>
+    <div class="fig3d-hint">拖動旋轉 · 雙指／滾輪縮放　—　drag to rotate, pinch or scroll to zoom</div>
   </section>
 
   <!-- ================= RIGHT: QUESTION + SOLUTION ================= -->
@@ -285,342 +276,249 @@
   </section>
 </div>
 
-<script>
-/* ============================================================
-   GEOMETRY SET-UP (true proportions)
-   P=(0,0), Q=(30,0), PR=25, angle QPR=95deg
-   ============================================================ */
-const DEG = Math.PI/180;
-const PQ = 30, PR = 25, ANG = 95;
-const angPQRR = 37.73809375;         // computed in part (a)(ii)
-const vAngPR = 70;                   // angle of PR with ground
-const angMPN = 38.98730493;          // computed in part (b)
 
-const P2 = {x:0, y:0};
-const Q2 = {x:PQ, y:0};
-const R2 = {x: PR*Math.cos(ANG*DEG), y: PR*Math.sin(ANG*DEG)};
-const M2 = {x:(Q2.x+R2.x)/2, y:(Q2.y+R2.y)/2};
-
-const cv = document.getElementById('cv');
-const ctx = cv.getContext('2d');
-const W = cv.width, H = cv.height;
-let mode = 1;
-
-function clear(){ ctx.clearRect(0,0,W,H); }
-
-/* rounded label chip */
-function chip(x,y,text,color){
-  ctx.save();
-  ctx.font='bold 16px Segoe UI, Arial';
-  const w = ctx.measureText(text).width + 14;
-  ctx.fillStyle='rgba(255,255,255,.92)';
-  ctx.strokeStyle=color; ctx.lineWidth=1.5;
-  roundRect(x-w/2, y-14, w, 24, 8); ctx.fill(); ctx.stroke();
-  ctx.fillStyle=color; ctx.textAlign='center'; ctx.textBaseline='middle';
-  ctx.fillText(text, x, y-1);
-  ctx.restore();
-}
-function roundRect(x,y,w,h,r){
-  ctx.beginPath();
-  ctx.moveTo(x+r,y);
-  ctx.arcTo(x+w,y,x+w,y+h,r);
-  ctx.arcTo(x+w,y+h,x,y+h,r);
-  ctx.arcTo(x,y+h,x,y,r);
-  ctx.arcTo(x,y,x+w,y,r);
-  ctx.closePath();
-}
-function seg(a,b,color,width,dash,alpha){
-  ctx.save();
-  ctx.globalAlpha = alpha===undefined?1:alpha;
-  ctx.strokeStyle=color; ctx.lineWidth=width; ctx.lineCap='round';
-  ctx.setLineDash(dash||[]);
-  ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
-  ctx.restore();
-}
-function dot(p,color,r,label,dx,dy){
-  ctx.save();
-  ctx.fillStyle=color;
-  ctx.beginPath(); ctx.arc(p.x,p.y,r||6,0,Math.PI*2); ctx.fill();
-  ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
-  ctx.restore();
-  if(label){
-    ctx.save();
-    ctx.font='bold 16px Segoe UI, Arial';
-    ctx.fillStyle=color;
-    ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText(label, p.x+(dx||0), p.y+(dy||0));
-    ctx.restore();
-  }
-}
-/* right-angle marker at vertex v between rays va and vb */
-function rightAngle(v,a,b,size,color){
-  const ua=norm(a,v), ub=norm(b,v);
-  const p1={x:v.x+ua.x*size, y:v.y+ua.y*size};
-  const p2={x:v.x+ub.x*size, y:v.y+ub.y*size};
-  const p3={x:p1.x+ub.x*size, y:p1.y+ub.y*size};
-  ctx.save();
-  ctx.strokeStyle=color; ctx.lineWidth=1.6;
-  ctx.beginPath(); ctx.moveTo(p1.x,p1.y); ctx.lineTo(p3.x,p3.y); ctx.lineTo(p2.x,p2.y); ctx.stroke();
-  ctx.restore();
-}
-function norm(a,o){const dx=a.x-o.x,dy=a.y-o.y,m=Math.hypot(dx,dy)||1;return {x:dx/m,y:dy/m};}
-
-/* ============================================================
-   VIEW A : 2-D triangle (part a)
-   ============================================================ */
-function drawFlat(){
-  const pad = 80;
-  const minX = Math.min(P2.x,Q2.x,R2.x), maxX = Math.max(P2.x,Q2.x,R2.x);
-  const minY = Math.min(P2.y,Q2.y,R2.y), maxY = Math.max(P2.y,Q2.y,R2.y);
-  const s = Math.min((W-2*pad)/(maxX-minX||1), (H-2*pad)/(maxY-minY||1));
-  const ox = (W - s*(maxX+minX))/2;
-  const oy = H - (H - s*(maxY+minY))/2;          // flip y (canvas down-positive)
-
-  const tf = p => ({x: ox + s*p.x, y: oy - s*p.y});
-  const P = tf(P2), Q = tf(Q2), R = tf(R2);
-
-  // faint reference: horizontal line through P
-  ctx.save();
-  ctx.setLineDash([6,6]); ctx.strokeStyle='#0891b2'; ctx.lineWidth=1.4;
-  ctx.beginPath(); ctx.moveTo(40, P.y); ctx.lineTo(W-40, P.y); ctx.stroke();
-  ctx.restore();
-  ctx.save();
-  ctx.font='12px Segoe UI'; ctx.fillStyle='#0891b2'; ctx.textAlign='right';
-  ctx.fillText('horizontal ground', W-42, P.y-8);
-  ctx.restore();
-
-  // filled card
-  ctx.save();
-  ctx.beginPath(); ctx.moveTo(P.x,P.y); ctx.lineTo(Q.x,Q.y); ctx.lineTo(R.x,R.y); ctx.closePath();
-  ctx.fillStyle='rgba(37,99,235,.09)'; ctx.fill();
-  ctx.restore();
-
-  // edges
-  const s1 = mode===1 ? 5 : 3, s3 = (mode===2) ? 5 : 3;
-  seg(P,Q,'#16a34a', mode===4||mode===6?5:4);          // PQ on ground  (green)
-  seg(Q,R,'#2563eb', s1);                               // QR
-  seg(P,R,'#2563eb', mode===3||mode===5?5:4);           // PR
-
-  // median PM + M  (modes 3+)
-  if(mode>=3){
-    const M = tf(M2);
-    seg(P,M,'#dc2626',5,[]);
-    dot(M,'#dc2626',6,'M',0,20);
-    // equal halves marker
-    const midQR = {x:(Q.x+R.x)/2, y:(Q.y+R.y)/2};
-    ctx.save(); ctx.font='11px Segoe UI'; ctx.fillStyle='#dc2626';
-    ctx.textAlign='center';
-    ctx.fillText('QM = MR', midQR.x, midQR.y-12);
-    ctx.restore();
-  }
-
-  // angle arcs
-  if(mode>=2||mode===6){
-    // angle PQR at Q between QP and QR
-    arcAngle(Q, P, R, 40, '#d97706', '37.7°');
-  }
-  // angle QPR
-  arcAngle(P, Q, R, 46, '#d97706', '95°');
-
-  // vertices
-  dot(P,'#16a34a',7,'P',-18,0);
-  dot(Q,'#16a34a',7,'Q',18,0);
-  dot(R,'#7c3aed',7,'R',0,-20);
-
-  // side labels
-  ctx.save(); ctx.font='bold 15px Segoe UI';
-  ctx.fillStyle='#16a34a'; ctx.textAlign='center';
-  ctx.fillText('PQ = 30 cm', (P.x+Q.x)/2, P.y+30);
-  ctx.fillStyle='#2563eb';
-  const labelPR = {x:(P.x+R.x)/2-52, y:(P.y+R.y)/2-6};
-  ctx.fillText('PR = 25 cm', labelPR.x, labelPR.y);
-  const labelQR = {x:(Q.x+R.x)/2+56, y:(Q.y+R.y)/2-6};
-  ctx.fillText(mode===1?'QR = ?':('QR ≈ 40.7 cm'), labelQR.x, labelQR.y);
-  ctx.restore();
-}
-
-function arcAngle(V,A,B,rad,color,text){
-  const a1 = Math.atan2(A.y-V.y, A.x-V.x);
-  const a2 = Math.atan2(B.y-V.y, B.x-V.x);
-  ctx.save();
-  ctx.strokeStyle=color; ctx.lineWidth=2.4;
-  ctx.beginPath();
-  ctx.arc(V.x,V.y,rad,a1,a2,a2<a1);
-  ctx.stroke();
-  ctx.restore();
-  // label at bisector
-  let d = a2-a1;
-  while(d< -Math.PI) d += 2*Math.PI;
-  while(d> Math.PI) d -= 2*Math.PI;
-  const bis = a1 + d/2;
-  ctx.save();
-  ctx.font='bold 14px Segoe UI'; ctx.fillStyle=color;
-  ctx.textAlign='center'; ctx.textBaseline='middle';
-  ctx.fillText(text, V.x + Math.cos(bis)*(rad+20), V.y + Math.sin(bis)*(rad+20));
-  ctx.restore();
-}
-
-/* ============================================================
-   VIEW B : 3-D scene (part b)  — oblique projection
-   P = (0,0,0) ; Q = (30,0,0) ; R = (x_r , y_r , z_r)
-   x_r = PR cos70 cos(ang) ... we simply place R above P–Q line
-   ============================================================ */
-function draw3D(){
-  const pad = 70;
-  // ground quadrilateral (a slab) in oblique projection
-  const gx = 0.62;          // oblique x-shift per unit depth
-  const gy = -0.42;         // oblique y-shift per unit depth
-  const D  = 34;            // slab depth
-
-  // world points (x along ground, z height, d depth)
-  const Rx = PR*Math.cos(vAngPR*DEG);         // horizontal distance of R along ground
-  const Rz = PR*Math.sin(vAngPR*DEG);         // height of R
-  const dR = 8;                               // small depth so R sits over the slab
-  const Mx = (Q2.x + Rx)/2;                   // approx horizontal of M
-  const Mz = Rz/2;
-  const dM = dR/2;
-
-  // project: u = x + d*gx , v = d*gy - z
-  const raw = [];
-  const prj = (x,z,d)=>({x: x + d*gx, y: gy*d - z, _x:x, _z:z, _d:d});
-  const Pw = prj(0,0,0);
-  const Qw = prj(PQ,0,0);
-  const Rw = prj(Rx,Rz,dR);
-  const Mw = prj(Mx,Mz,dM);
-  const Nw = prj(Mx,0,dM);          // foot of M on ground
-  const Dw = prj(Rx,0,dR);          // foot of R on ground
-
-  // slab corners
-  const c1 = prj(0,0,0), c2 = prj(48,0,0), c3 = prj(48,0,D), c4 = prj(0,0,D);
-  const all = [c1,c2,c3,c4,Pw,Qw,Rw,Mw,Nw,Dw];
-
-  const minX = Math.min(...all.map(p=>p.x)), maxX = Math.max(...all.map(p=>p.x));
-  const minY = Math.min(...all.map(p=>p.y)), maxY = Math.max(...all.map(p=>p.y));
-  const s = Math.min((W-2*pad)/(maxX-minX||1), (H-2*pad)/(maxY-minY||1));
-  const ox = (W - s*(maxX+minX))/2;
-  const oy = (H - s*(maxY+minY))/2;
-  const T = p => ({x: ox + s*p.x, y: oy + s*p.y});
-
-  const g1=T(c1), g2=T(c2), g3=T(c3), g4=T(c4);
-  const P=T(Pw), Q=T(Qw), R=T(Rw), M=T(Mw), N=T(Nw), Dp=T(Dw);
-
-  // ---- ground slab ----
-  ctx.save();
-  ctx.beginPath(); ctx.moveTo(g1.x,g1.y); ctx.lineTo(g2.x,g2.y);
-  ctx.lineTo(g3.x,g3.y); ctx.lineTo(g4.x,g4.y); ctx.closePath();
-  ctx.fillStyle='rgba(8,145,178,.10)';
-  ctx.fill();
-  ctx.setLineDash([7,6]); ctx.strokeStyle='#0891b2'; ctx.lineWidth=1.6;
-  ctx.stroke();
-  ctx.restore();
-
-  // hidden verticals (dashed): P–? and D,N drop lines
-  seg(Dp,R,'#0891b2',1.8,[6,5],.85);
-  seg(N,M,'#dc2626',1.8,[6,5],.85);
-
-  // ---- card edges ----
-  seg(P,Q,'#16a34a',4.5);                        // PQ on ground
-  seg(Q,R,'#2563eb',4);
-  seg(P,R,'#2563eb',4);
-
-  // median PM
-  seg(P,M,'#dc2626',4.5);
-  dot(M,'#dc2626',6,'M',-20,4);
-
-  // angle between PR and ground: at P between PR and PQ (the ground line direction)
-  arcAngle(P, Q, R, 44, '#d97706', vAngPR+'°');
-
-  // angle between PM and ground at P: between PN and PM
-  if(mode>=5){
-    arcAngle(P, N, M, 66, '#dc2626', '38.99°');
-    // horizontal (ground) ray from P to N
-    seg(P,N,'#0891b2',2.2,[5,4],.9);
-  }
-
-  // vertices
-  dot(P,'#16a34a',7,'P',-20,6);
-  dot(Q,'#16a34a',7,'Q',22,6);
-  dot(R,'#7c3aed',7,'R',-6,-20);
-
-  // helper labels
-  ctx.save();
-  ctx.font='bold 14px Segoe UI';
-  ctx.fillStyle='#2563eb';
-  ctx.textAlign='left';
-  ctx.fillText('PR = 25 cm', (P.x+R.x)/2-105, (P.y+R.y)/2-6);
-  ctx.fillStyle='#16a34a';
-  ctx.fillText('PQ = 30 cm', (P.x+Q.x)/2-8, P.y+30);
-  ctx.restore();
-
-  if(mode>=4){
-    ctx.save();
-    ctx.font='bold 13px Segoe UI'; ctx.fillStyle='#7c3aed';
-    ctx.textAlign='left';
-    ctx.fillText('RD = 25 sin70°', R.x+16, (R.y+Dp.y)/2);
-    ctx.fillStyle='#dc2626';
-    ctx.fillText('MN = ½ RD ≈ 11.75 cm', N.x-230, (N.y+M.y)/2);
-    ctx.restore();
-
-    // right angle at D
-    rightAngle(Dp, R, Q, 14, '#0891b2');
-  }
-
-  ctx.save();
-  ctx.font='12px Segoe UI'; ctx.fillStyle='#0891b2'; ctx.textAlign='center';
-  ctx.fillText('horizontal ground', (g1.x+g3.x)/2, g3.y+22);
-  ctx.restore();
-}
-
-/* ============================================================
-   DRAW DISPATCHER
-   ============================================================ */
-function draw(){
-  clear();
-  // soft background
-  const bg = ctx.createLinearGradient(0,0,0,H);
-  bg.addColorStop(0,'#fbfdff'); bg.addColorStop(1,'#f1f6ff');
-  ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
-
-  if(mode<=2){
-    drawFlat();
-    setNote(mode===1
-      ? 'Showing: the 2-D triangle \\(PQR\\) — cosine rule for \\(QR\\) (part a(i)).'
-      : 'Showing: the 2-D triangle \\(PQR\\) — angle \\(\\angle PQR\\) via the sine rule (part a(ii)).');
-  }else{
-    draw3D();
-    if(mode===3) setNote('Showing: the paper card lifted to \\(70^\\circ\\) — median \\(PM\\) with \\(M\\) the mid-point of \\(QR\\).');
-    else if(mode===4) setNote('Showing: projections \\(D\\) of \\(R\\) and \\(N\\) of \\(M\\) on the ground; \\(MN=\\tfrac12 RD\\).');
-    else if(mode===5) setNote('Showing: \\(\\angle MPN\\), the angle between \\(PM\\) and the horizontal ground.');
-    else setNote('Showing: \\(\\angle MPN\\approx 38.99^\\circ &lt; 40^\\circ\\) — the claim is NOT correct.');
-  }
-  if(window.MathJax && MathJax.typesetPromise){ MathJax.typesetPromise([document.getElementById('modenote')]); }
-}
-function setNote(html){ document.getElementById('modenote').innerHTML = html; }
-
-/* ============================================================
-   SCROLL-SYNC
-   ============================================================ */
-const steps = Array.from(document.querySelectorAll('.step'));
-const obs = new IntersectionObserver((es)=>{
-  es.forEach(e=>{
-    if(e.isIntersecting){
-      mode = +e.target.dataset.step;
-      steps.forEach(st=>st.classList.toggle('active', st===e.target));
-      draw();
-    }
-  });
-},{rootMargin:'-15% 0px -55% 0px',threshold:0});
-steps.forEach(st=>obs.observe(st));
-
-/* initial */
-window.addEventListener('load',()=>{ draw(); steps[0] && steps[0].classList.add('active'); });
-draw();
-</script>
 <!-- question-pager -->
 <nav class="qnav" aria-label="Question navigation">
   <a class="qnav__prev" href="2022_P1_Q17.html">← Previous Question</a>
   <a class="qnav__mid" href="index.html#y2022">Contents</a>
   <a class="qnav__next" href="2022_P1_Q19.html">Next Question →</a>
 </nav>
+<script src="assets/fig3d.js"></script>
+<script>
+/* HKDSE 2022 P1 Q18 — triangular paper card PQR, PQ on the horizontal ground.
+   PQ = 30, PR = 25, angle QPR = 95 deg (in the card), angle(PR, ground) = 70 deg.
+   M = mid-point of QR, D = foot of R on the ground, N = foot of M on the ground. */
+Fig3D.mount('#cv3d', {
+  v: {
+    P: [0, 0, 0],
+    Q: [30, 0, 0],
+    R: [-2.1789, 23.4923, -8.2682],
+    M: [13.9106, 11.7462, -4.1341],
+    D: [-2.1789, 0, -8.2682],
+    N: [13.9106, 0, -4.1341]
+  },
+  faces: [['P', 'Q', 'R']],
+  edges: [
+    { a: 'P', b: 'Q', hidden: false }, { a: 'Q', b: 'R', hidden: false },
+    { a: 'R', b: 'P', hidden: false }
+  ],
+  ground: { x0: -25, x1: 45, z0: -28, z1: 22 },
+  view: { yaw: 0.52, pitch: -0.30, zoom: 1.0 },
+  labels: { P: 'P', Q: 'Q', R: 'R', M: 'M', D: 'D', N: 'N' },
+  labelColor: { R: '#ef4444' },
+  labelSteps: { M: 3, D: 4, N: 4 },
+  labelsNudge: { D: 0.9, N: 0.4, M: -0.5 },
+  startStep: 1,
+  steps: {
+    1: [
+      { t: 'poly', v: ['P', 'Q', 'R'], fill: 'rgba(59,130,246,0.10)' },
+      { t: 'seg', a: 'P', b: 'Q', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'P', b: 'R', c: '#f59e0b', w: 3 },
+      { t: 'angle', at: 'P', a: 'Q', b: 'R', r: 9, label: '95°' },
+      { t: 'seg', a: 'Q', b: 'R', c: '#10b981', w: 3 },
+      { t: 'text', at: 'M', text: '40.7', dx: 20, dy: -4 }
+    ],
+    2: [
+      { t: 'poly', v: ['P', 'Q', 'R'], fill: 'rgba(59,130,246,0.10)' },
+      { t: 'seg', a: 'P', b: 'Q', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'Q', b: 'R', c: '#f59e0b', w: 3 },
+      { t: 'angle', at: 'Q', a: 'P', b: 'R', r: 10, label: '37.7°', c: '#10b981' }
+    ],
+    3: [
+      { t: 'poly', v: ['P', 'Q', 'R'], fill: 'rgba(59,130,246,0.08)' },
+      { t: 'seg', a: 'Q', b: 'M', c: '#94a3b8', w: 1.6, dash: [4, 4] },
+      { t: 'seg', a: 'M', b: 'R', c: '#94a3b8', w: 1.6, dash: [4, 4] },
+      { t: 'seg', a: 'P', b: 'M', c: '#10b981', w: 3 },
+      { t: 'dot', at: 'M' },
+      { t: 'text', at: 'M', text: '18.67', dx: -6, dy: -22 }
+    ],
+    4: [
+      { t: 'poly', v: ['P', 'Q', 'R'], fill: 'rgba(59,130,246,0.08)' },
+      { t: 'seg', a: 'P', b: 'D', c: '#94a3b8', w: 2, dash: [4, 4] },
+      { t: 'seg', a: 'R', b: 'D', c: '#f59e0b', w: 3, dash: [7, 4] },
+      { t: 'ra', at: 'D', a: 'R', b: 'P', s: 5, c: '#f59e0b' },
+      { t: 'angle', at: 'P', a: 'D', b: 'R', r: 7, label: '70°' },
+      { t: 'seg', a: 'N', b: 'D', c: '#94a3b8', w: 1.6, dash: [4, 4] },
+      { t: 'seg', a: 'M', b: 'N', c: '#10b981', w: 3, dash: [7, 4] },
+      { t: 'ra', at: 'N', a: 'M', b: 'P', s: 4, c: '#94a3b8' },
+      { t: 'dot', at: 'D' }, { t: 'dot', at: 'N' },
+      { t: 'text', at: 'N', text: '11.75', dx: 26, dy: 12 }
+    ],
+    5: [
+      { t: 'poly', v: ['P', 'M', 'N'], fill: 'rgba(16,185,129,0.13)' },
+      { t: 'seg', a: 'P', b: 'N', c: '#94a3b8', w: 2, dash: [4, 4] },
+      { t: 'seg', a: 'M', b: 'N', c: '#f59e0b', w: 2.4 },
+      { t: 'seg', a: 'P', b: 'M', c: '#10b981', w: 3 },
+      { t: 'ra', at: 'N', a: 'P', b: 'M', s: 5, c: '#0f766e' },
+      { t: 'angle', at: 'P', a: 'N', b: 'M', r: 7, label: '39.0°', c: '#10b981' }
+    ],
+    6: [
+      { t: 'poly', v: ['P', 'M', 'N'], fill: 'rgba(16,185,129,0.13)' },
+      { t: 'seg', a: 'P', b: 'N', c: '#94a3b8', w: 2, dash: [4, 4] },
+      { t: 'seg', a: 'M', b: 'N', c: '#f59e0b', w: 2.4 },
+      { t: 'seg', a: 'P', b: 'M', c: '#10b981', w: 3 },
+      { t: 'ra', at: 'N', a: 'P', b: 'M', s: 5, c: '#0f766e' },
+      { t: 'angle', at: 'P', a: 'N', b: 'M', r: 7, label: '39.0°', c: '#10b981' },
+      { t: 'text', at: 'M', text: '39.0° < 40°', dx: 6, dy: -26, c: '#0f766e' }
+    ]
+  }
+});
+</script>
+<script>
+/* HKDSE 2022 P1 Q18 — triangular paper card PQR, PQ on the horizontal ground.
+   PQ = 30, PR = 25, angle QPR = 95 deg (in the card), angle(PR, ground) = 70 deg.
+   M = mid-point of QR, D = foot of R on the ground, N = foot of M on the ground. */
+Fig3D.mount('#cv3d', {
+  v: {
+    P: [0, 0, 0],
+    Q: [30, 0, 0],
+    R: [-2.1789, 23.4923, -8.2682],
+    M: [13.9106, 11.7462, -4.1341],
+    D: [-2.1789, 0, -8.2682],
+    N: [13.9106, 0, -4.1341]
+  },
+  faces: [['P', 'Q', 'R']],
+  edges: [
+    { a: 'P', b: 'Q', hidden: false }, { a: 'Q', b: 'R', hidden: false },
+    { a: 'R', b: 'P', hidden: false }
+  ],
+  ground: { x0: -18, x1: 42, z0: -20, z1: 12 },
+  view: { yaw: 0.52, pitch: -0.30, zoom: 1.14 },
+  labels: { P: 'P', Q: 'Q', R: 'R', M: 'M', D: 'D', N: 'N' },
+  labelColor: { R: '#ef4444' },
+  labelSteps: { M: 3, D: 4, N: 4 },
+  labelsNudge: { D: 0.9, N: 0.4, M: -0.5 },
+  startStep: 1,
+  steps: {
+    1: [
+      { t: 'poly', v: ['P', 'Q', 'R'], fill: 'rgba(59,130,246,0.10)' },
+      { t: 'seg', a: 'P', b: 'Q', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'P', b: 'R', c: '#f59e0b', w: 3 },
+      { t: 'angle', at: 'P', a: 'Q', b: 'R', r: 9, label: '95°' },
+      { t: 'seg', a: 'Q', b: 'R', c: '#10b981', w: 3 },
+      { t: 'text', at: 'M', text: '40.7', dx: 18, dy: -16 }
+    ],
+    2: [
+      { t: 'poly', v: ['P', 'Q', 'R'], fill: 'rgba(59,130,246,0.10)' },
+      { t: 'seg', a: 'P', b: 'Q', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'Q', b: 'R', c: '#f59e0b', w: 3 },
+      { t: 'angle', at: 'Q', a: 'P', b: 'R', r: 10, label: '37.7°', c: '#10b981' }
+    ],
+    3: [
+      { t: 'poly', v: ['P', 'Q', 'R'], fill: 'rgba(59,130,246,0.08)' },
+      { t: 'seg', a: 'P', b: 'M', c: '#10b981', w: 3 },
+      { t: 'dot', at: 'M' },
+      { t: 'text', at: 'M', text: '18.67', dx: -66, dy: 46 }
+    ],
+    4: [
+      { t: 'poly', v: ['P', 'Q', 'R'], fill: 'rgba(59,130,246,0.08)' },
+      { t: 'seg', a: 'P', b: 'D', c: '#94a3b8', w: 2, dash: [4, 4] },
+      { t: 'seg', a: 'R', b: 'D', c: '#f59e0b', w: 3, dash: [7, 4] },
+      { t: 'ra', at: 'D', a: 'R', b: 'P', s: 5, c: '#f59e0b' },
+      { t: 'angle', at: 'P', a: 'D', b: 'R', r: 7, label: '70°' },
+      { t: 'seg', a: 'N', b: 'D', c: '#94a3b8', w: 1.6, dash: [4, 4] },
+      { t: 'seg', a: 'M', b: 'N', c: '#10b981', w: 3, dash: [7, 4] },
+      { t: 'ra', at: 'N', a: 'M', b: 'P', s: 3.5, c: '#94a3b8' },
+      { t: 'dot', at: 'D' }, { t: 'dot', at: 'N' },
+      { t: 'text', at: 'N', text: '11.75', dx: 40, dy: 4 }
+    ],
+    5: [
+      { t: 'poly', v: ['P', 'M', 'N'], fill: 'rgba(16,185,129,0.13)' },
+      { t: 'seg', a: 'P', b: 'N', c: '#94a3b8', w: 2, dash: [4, 4] },
+      { t: 'seg', a: 'M', b: 'N', c: '#f59e0b', w: 2.4 },
+      { t: 'seg', a: 'P', b: 'M', c: '#10b981', w: 3 },
+      { t: 'ra', at: 'N', a: 'P', b: 'M', s: 3.5, c: '#0f766e' },
+      { t: 'angle', at: 'P', a: 'N', b: 'M', r: 10, label: '39.0°', c: '#10b981', gap: 15 }
+    ],
+    6: [
+      { t: 'poly', v: ['P', 'M', 'N'], fill: 'rgba(16,185,129,0.13)' },
+      { t: 'seg', a: 'P', b: 'N', c: '#94a3b8', w: 2, dash: [4, 4] },
+      { t: 'seg', a: 'M', b: 'N', c: '#f59e0b', w: 2.4 },
+      { t: 'seg', a: 'P', b: 'M', c: '#10b981', w: 3 },
+      { t: 'ra', at: 'N', a: 'P', b: 'M', s: 3.5, c: '#0f766e' },
+      { t: 'angle', at: 'P', a: 'N', b: 'M', r: 10, label: '39.0°', c: '#10b981', gap: 15 },
+      { t: 'text', at: 'N', text: '39.0° < 40°', dx: 62, dy: 42, c: '#0f766e' }
+    ]
+  }
+});
+</script>
+<script>
+/* HKDSE 2022 P1 Q18 — triangular paper card PQR, PQ on the horizontal ground.
+   PQ = 30, PR = 25, angle QPR = 95 deg (in the card), angle(PR, ground) = 70 deg.
+   M = mid-point of QR, D = foot of R on the ground, N = foot of M on the ground. */
+Fig3D.mount('#cv3d', {
+  v: {
+    P: [0, 0, 0],
+    Q: [30, 0, 0],
+    R: [-2.1789, 23.4923, -8.2682],
+    M: [13.9106, 11.7462, -4.1341],
+    D: [-2.1789, 0, -8.2682],
+    N: [13.9106, 0, -4.1341]
+  },
+  faces: [['P', 'Q', 'R']],
+  edges: [
+    { a: 'P', b: 'Q', hidden: false }, { a: 'Q', b: 'R', hidden: false },
+    { a: 'R', b: 'P', hidden: false }
+  ],
+  ground: { x0: -18, x1: 42, z0: -20, z1: 12 },
+  view: { yaw: -0.75, pitch: -0.45, zoom: 1.14 },
+  labels: { P: 'P', Q: 'Q', R: 'R', M: 'M', D: 'D', N: 'N' },
+  labelColor: { R: '#ef4444' },
+  labelSteps: { M: 3, D: 4, N: 4 },
+  labelsNudge: { D: 0.9, N: 0.4, M: -0.5 },
+  startStep: 1,
+  steps: {
+    1: [
+      { t: 'poly', v: ['P', 'Q', 'R'], fill: 'rgba(59,130,246,0.10)' },
+      { t: 'seg', a: 'P', b: 'Q', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'P', b: 'R', c: '#f59e0b', w: 3 },
+      { t: 'angle', at: 'P', a: 'Q', b: 'R', r: 9, label: '95°' },
+      { t: 'seg', a: 'Q', b: 'R', c: '#10b981', w: 3 },
+      { t: 'text', at: 'M', text: '40.7', dx: 18, dy: -16 }
+    ],
+    2: [
+      { t: 'poly', v: ['P', 'Q', 'R'], fill: 'rgba(59,130,246,0.10)' },
+      { t: 'seg', a: 'P', b: 'Q', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'Q', b: 'R', c: '#f59e0b', w: 3 },
+      { t: 'angle', at: 'Q', a: 'P', b: 'R', r: 10, label: '37.7°', c: '#10b981' }
+    ],
+    3: [
+      { t: 'poly', v: ['P', 'Q', 'R'], fill: 'rgba(59,130,246,0.08)' },
+      { t: 'seg', a: 'P', b: 'M', c: '#10b981', w: 3 },
+      { t: 'dot', at: 'M' },
+      { t: 'text', at: 'M', text: '18.67', dx: -92, dy: 26 }
+    ],
+    4: [
+      { t: 'poly', v: ['P', 'Q', 'R'], fill: 'rgba(59,130,246,0.08)' },
+      { t: 'seg', a: 'P', b: 'D', c: '#94a3b8', w: 2, dash: [4, 4] },
+      { t: 'seg', a: 'R', b: 'D', c: '#f59e0b', w: 3, dash: [7, 4] },
+      { t: 'ra', at: 'D', a: 'R', b: 'P', s: 5, c: '#f59e0b' },
+      { t: 'angle', at: 'P', a: 'D', b: 'R', r: 7, label: '70°' },
+      { t: 'seg', a: 'N', b: 'D', c: '#94a3b8', w: 1.6, dash: [4, 4] },
+      { t: 'seg', a: 'M', b: 'N', c: '#10b981', w: 3, dash: [7, 4] },
+      { t: 'ra', at: 'N', a: 'M', b: 'P', s: 3.5, c: '#94a3b8' },
+      { t: 'dot', at: 'D' }, { t: 'dot', at: 'N' },
+      { t: 'text', at: 'N', text: '11.75', dx: 40, dy: 4 }
+    ],
+    5: [
+      { t: 'poly', v: ['P', 'M', 'N'], fill: 'rgba(16,185,129,0.13)' },
+      { t: 'seg', a: 'P', b: 'N', c: '#94a3b8', w: 2, dash: [4, 4] },
+      { t: 'seg', a: 'M', b: 'N', c: '#f59e0b', w: 2.4 },
+      { t: 'seg', a: 'P', b: 'M', c: '#10b981', w: 3 },
+      { t: 'ra', at: 'N', a: 'P', b: 'M', s: 3.5, c: '#0f766e' },
+      { t: 'angle', at: 'P', a: 'N', b: 'M', r: 6.5, label: '39.0°', c: '#10b981', gap: 14 }
+    ],
+    6: [
+      { t: 'poly', v: ['P', 'M', 'N'], fill: 'rgba(16,185,129,0.13)' },
+      { t: 'seg', a: 'P', b: 'N', c: '#94a3b8', w: 2, dash: [4, 4] },
+      { t: 'seg', a: 'M', b: 'N', c: '#f59e0b', w: 2.4 },
+      { t: 'seg', a: 'P', b: 'M', c: '#10b981', w: 3 },
+      { t: 'ra', at: 'N', a: 'P', b: 'M', s: 3.5, c: '#0f766e' },
+      { t: 'angle', at: 'P', a: 'N', b: 'M', r: 6.5, label: '39.0°', c: '#10b981', gap: 14 },
+      { t: 'text', at: 'N', text: '39.0° < 40°', dx: 62, dy: 42, c: '#0f766e' }
+    ]
+  }
+});
+</script>
 </body>
 </html>

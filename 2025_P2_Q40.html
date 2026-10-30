@@ -67,11 +67,7 @@ window.MathJax = {
     box-shadow:var(--shadow);
     padding:14px;
   }
-  .diagram{
-    position:sticky;top:16px;
-    max-height:calc(100vh - 2rem);
-    overflow-y:auto;
-  }
+  .diagram{position:sticky;top:12px;}
 
   .panel h2{
     font-size:.95rem;margin:0 0 10px;color:var(--blue);
@@ -136,8 +132,10 @@ window.MathJax = {
     .head h1{font-size:.98rem;}
     .step{padding:8px 10px;}
   }
+.chip3d{display:inline-block;vertical-align:middle;margin-left:6px;font-size:.58rem;font-weight:700;letter-spacing:.6px;color:#fff;background:linear-gradient(135deg,#2563eb,#0ea5e9);padding:2px 7px;border-radius:20px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;}
 </style>
 <link rel="stylesheet" href="assets/extra.css">
+<link rel="stylesheet" href="assets/fig3d.css">
 </head>
 <body>
 <div class="wrap">
@@ -150,19 +148,12 @@ window.MathJax = {
   <div class="split">
 
     <!-- ================= LEFT : DIAGRAM ================= -->
-    <section class="panel diagram">
-      <h2>Interactive Diagram</h2>
-      <canvas id="cv" width="760" height="640"></canvas>
-      <div class="legend">
-        <span><i class="dot" style="background:#2563eb"></i> Pyramid edges</span>
-        <span><i class="dot" style="background:#e11d48"></i> Target angle $\angle PQT$</span>
-        <span><i class="dot" style="background:#059669"></i> Height / foot $T$</span>
-        <span><i class="dot" style="background:#7c3aed"></i> Median $QV$, $QT$</span>
-        <span><i class="dot" style="background:#f59e0b"></i> $30^\circ$ angles</span>
-        <span><i class="dot" style="background:#0d9488"></i> Right angle at $V$</span>
-      </div>
-      <p class="clicknote">Scroll the right panel — the drawing updates for each step.</p>
-    </section>
+          <section class="panel diagram">
+    <h2>3-D Figure <span class="chip3d">3D</span></h2>
+    <div class="fig3d-stage"><canvas id="cv3d"></canvas></div>
+    <div id="figui"></div>
+    <div class="fig3d-hint">拖動旋轉 · 雙指／滾輪縮放　—　drag to rotate, pinch or scroll to zoom</div>
+  </section>
 
     <!-- ================= RIGHT : QUESTION + SOLUTION ================= -->
     <section class="panel">
@@ -236,201 +227,214 @@ window.MathJax = {
   </div>
 </div>
 
-<script>
-/* ---------------- canvas setup ---------------- */
-const cv = document.getElementById('cv');
-const ctx = cv.getContext('2d');
-const W = cv.width, H = cv.height;
-let mode = 1;
 
-/* --------- geometry of the figure (screen coords) ---------
-   Base QRS drawn as a parallelogram-style projection.
-   Real geometry: edges all 2x; T = centroid of QRS.
------------------------------------------------------------- */
-const P  = {x: 380, y: 70};    // apex
-const Q  = {x: 120, y: 540};   // front-left base
-const R  = {x: 650, y: 470};   // base right
-const S  = {x: 430, y: 320};   // base "back" point (projected)
-
-// centroid of QRS (projected)
-const T  = {x:(Q.x+R.x+S.x)/3, y:(Q.y+R.y+S.y)/3};
-// midpoint of QS
-const V  = {x:(Q.x+S.x)/2, y:(Q.y+S.y)/2};
-
-/* helpers */
-function line(a,b,color,w,dash){
-  ctx.save();
-  ctx.setLineDash(dash||[]);
-  ctx.strokeStyle=color; ctx.lineWidth=w||2; ctx.lineCap='round';
-  ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
-  ctx.restore();
-}
-function poly(pts,stroke,w,dash,fill){
-  ctx.save();
-  ctx.setLineDash(dash||[]);
-  ctx.beginPath();
-  ctx.moveTo(pts[0].x,pts[0].y);
-  for(let i=1;i<pts.length;i++) ctx.lineTo(pts[i].x,pts[i].y);
-  ctx.closePath();
-  if(fill){ctx.fillStyle=fill;ctx.fill();}
-  if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=w||2;ctx.stroke();}
-  ctx.restore();
-}
-function dot(p,color,r,label,dx,dy){
-  ctx.save();
-  ctx.beginPath(); ctx.arc(p.x,p.y,r||6,0,Math.PI*2);
-  ctx.fillStyle=color; ctx.fill();
-  ctx.lineWidth=2; ctx.strokeStyle='#fff'; ctx.stroke();
-  ctx.restore();
-  if(label){
-    ctx.save();
-    ctx.font='bold 20px "Segoe UI",Arial';
-    ctx.fillStyle=color;
-    ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText(label,p.x+(dx||0),p.y+(dy||0));
-    ctx.restore();
-  }
-}
-function rightAngle(v, a, b, color){
-  // small square marker at vertex v between rays v->a and v->b
-  const u1={x:a.x-v.x,y:a.y-v.y}, u2={x:b.x-v.x,y:b.y-v.y};
-  const n1=Math.hypot(u1.x,u1.y), n2=Math.hypot(u2.x,u2.y);
-  const s=16;
-  const p1={x:v.x+u1.x/n1*s, y:v.y+u1.y/n1*s};
-  const p2={x:v.x+u2.x/n2*s, y:v.y+u2.y/n2*s};
-  const pc={x:p1.x+p2.x-v.x, y:p1.y+p2.y-v.y};
-  ctx.save();
-  ctx.strokeStyle=color||'#0d9488'; ctx.lineWidth=2;
-  ctx.beginPath();
-  ctx.moveTo(p1.x,p1.y); ctx.lineTo(pc.x,pc.y); ctx.lineTo(p2.x,p2.y);
-  ctx.stroke();
-  ctx.restore();
-}
-function angleArc(v, a, b, radius, color, label){
-  const a1=Math.atan2(a.y-v.y,a.x-v.x);
-  const a2=Math.atan2(b.y-v.y,b.x-v.x);
-  let d=a2-a1;
-  while(d>Math.PI)d-=2*Math.PI;
-  while(d<-Math.PI)d+=2*Math.PI;
-  ctx.save();
-  ctx.strokeStyle=color; ctx.lineWidth=2.6;
-  ctx.beginPath(); ctx.arc(v.x,v.y,radius,a1,a1+d,d<0); ctx.stroke();
-  ctx.restore();
-  if(label){
-    const mid=a1+d/2;
-    ctx.save();
-    ctx.font='bold 16px "Segoe UI",Arial';
-    ctx.fillStyle=color; ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText(label, v.x+Math.cos(mid)*(radius+18), v.y+Math.sin(mid)*(radius+18));
-    ctx.restore();
-  }
-}
-function caption(txt,color){
-  ctx.save();
-  ctx.font='bold 15px "Segoe UI",Arial';
-  ctx.fillStyle=color;
-  ctx.textAlign='left'; ctx.textBaseline='top';
-  ctx.fillText(txt, 16, 14);
-  ctx.restore();
-}
-
-/* ---------------- drawing ---------------- */
-function draw(){
-  ctx.clearRect(0,0,W,H);
-
-  /* base triangle QRS (solid = front edges) */
-  poly([Q,R,S],'#2563eb',3,null,'rgba(37,99,235,.07)');
-
-  /* hidden / interior edges : P->S looks like a back edge in the original
-     figure it's drawn solid; P->T is the height (dashed helper) */
-  line(P,Q,'#2563eb',3);
-  line(P,R,'#2563eb',3);
-  line(P,S,'#2563eb',3);
-
-  /* centroid helpers, always faintly visible */
-  line(S,R,'#2563eb',3);            // already part of poly, keep crisp
-  line(Q,V,'#7c3aed',1.6,[5,5]);
-  line(R,V,'#7c3aed',1.6,[5,5]);
-
-  /* ---- mode-dependent highlights ---- */
-  if(mode===1){
-    // axis edge PQ + projection QT + right angle at T + point T
-    line(Q,T,'#e11d48',3.2);
-    line(P,T,'#059669',3,[8,7]);
-    rightAngle(T,P,Q,'#059669');
-    // target angle at Q in triangle PQT is angle PQT? No: angle PQT is at Q between QP and QT
-    angleArc(Q,P,T,52,'#e11d48','θ');
-    line(P,Q,'#e11d48',4);
-    caption('Angle between PQ and the plane = ∠PQT   (T = foot of perpendicular from P)', '#e11d48');
-  }
-
-  if(mode===2){
-    // base geometry: QV = x, QT = 2x/√3 and 30° at Q in triangle QTV
-    poly([Q,T,V],'#7c3aed',2.4,null,'rgba(124,58,237,.10)');
-    line(Q,V,'#7c3aed',3.4);
-    line(Q,T,'#e11d48',3.4);
-    line(V,T,'#0d9488',2.6,[7,6]);
-    rightAngle(V,Q,S,'#0d9488');
-    angleArc(Q,V,T,50,'#f59e0b','30°');
-    caption('In base QRS:  QV = x ,  ∠TQV = 30° ,  QT = 2x/√3', '#7c3aed');
-  }
-
-  if(mode===3){
-    // right triangle PQT with both legs labelled
-    poly([P,Q,T],'#e11d48',2.2,null,'rgba(225,29,72,.08)');
-    line(P,T,'#059669',3.4,[8,6]);
-    line(Q,T,'#7c3aed',3.4);
-    line(P,Q,'#2563eb',4);
-    rightAngle(T,P,Q,'#0d9488');
-    angleArc(Q,P,T,54,'#e11d48','θ');
-    caption('Right triangle PQT :  PQ = 2x ,  QT = 2x/√3 ,  cos θ = QT/PQ = 1/√3', '#e11d48');
-  }
-
-  if(mode===4){
-    // full figure with final angle emphasised
-    poly([P,Q,T],'#e11d48',1.6,null,'rgba(225,29,72,.06)');
-    line(P,T,'#059669',2.6,[8,6]);
-    line(Q,T,'#7c3aed',3);
-    line(P,Q,'#2563eb',5);
-    line(Q,R,'#2563eb',5);
-    angleArc(Q,P,T,58,'#e11d48','55°');
-    rightAngle(T,P,Q,'#0d9488');
-    caption('∠PQT ≈ 54.7° ≈ 55°   →   Answer B', '#e11d48');
-  }
-
-  /* vertices */
-  dot(P,'#1d4ed8',7,'P',0,-22);
-  dot(Q,'#1d4ed8',7,'Q',-22,8);
-  dot(R,'#1d4ed8',7,'R',22,8);
-  dot(S,'#1d4ed8',7,'S',0,-22);
-  dot(T,'#059669',7,'T',20,20);
-
-  if(mode===2){ dot(V,'#7c3aed',6,'V',-20,-6); }
-}
-
-/* ---------------- scroll sync ---------------- */
-const steps = Array.from(document.querySelectorAll('.step'));
-const obs = new IntersectionObserver((es)=>{
-  es.forEach(e=>{
-    if(e.isIntersecting){
-      mode = +e.target.dataset.step;
-      steps.forEach(st=>st.classList.toggle('active', st===e.target));
-      draw();
-    }
-  });
-},{rootMargin:'-15% 0px -55% 0px',threshold:0});
-steps.forEach(st=>obs.observe(st));
-
-/* initial */
-steps[0] && steps[0].classList.add('active');
-draw();
-window.addEventListener('resize',draw);
-</script>
 <!-- question-pager -->
 <nav class="qnav" aria-label="Question navigation">
   <a class="qnav__prev" href="2025_P2_Q39.html">← Previous Question</a>
   <a class="qnav__mid" href="index.html#y2025">Contents</a>
   <a class="qnav__next" href="2025_P2_Q41.html">Next Question →</a>
 </nav>
+<script src="assets/fig3d.js"></script>
+<script>
+/* HKDSE 2025 P2 Q40 — regular tetrahedron PQRS (edge 10), P above centroid T of base QRS */
+var P = {
+  Q: [0, 0, -5.7735],
+  R: [5, 0, 2.8868],
+  S: [-5, 0, 2.8868],
+  T: [0, 0, 0],
+  V: [-2.5, 0, -1.4434],
+  P: [0, 8.1650, 0]
+};
+var hx = 8.1650;
+
+var s1 = [
+  { t: 'poly', v: ['Q', 'R', 'S'], fill: 'rgba(79,70,229,0.10)' },
+  { t: 'seg', a: 'P', b: 'Q', c: '#e11d48', w: 3.4 },
+  { t: 'seg', a: 'P', b: 'T', c: '#10b981', w: 2.4, dash: [7, 5] },
+  { t: 'seg', a: 'Q', b: 'T', c: '#8b5cf6', w: 3 },
+  { t: 'ra', at: 'T', a: 'P', b: 'Q', s: 7, c: '#047857' },
+  { t: 'angle', at: 'Q', a: 'P', b: 'T', r: 30, label: 'θ' },
+  { t: 'dot', at: 'T' }, { t: 'vlabel', at: 'T', text: 'T', c: '#047857' }
+];
+var s2 = [
+  { t: 'poly', v: ['Q', 'R', 'S'], fill: 'rgba(79,70,229,0.08)' },
+  { t: 'poly', v: ['Q', 'T', 'V'], fill: 'rgba(139,92,246,0.18)' },
+  { t: 'seg', a: 'Q', b: 'V', c: '#8b5cf6', w: 3 },
+  { t: 'seg', a: 'Q', b: 'T', c: '#e11d48', w: 3 },
+  { t: 'seg', a: 'V', b: 'T', c: '#0d9488', w: 2.2, dash: [6, 5] },
+  { t: 'ra', at: 'V', a: 'Q', b: 'S', s: 7, c: '#0d9488' },
+  { t: 'angle', at: 'Q', a: 'V', b: 'T', r: 28, label: '30°' },
+  { t: 'text', at: [-1.25, 0, -3.6085], text: 'x', dx: -16, dy: 2, c: '#5b21b6' },
+  { t: 'text', at: [0, 0, -2.8868], text: '2x/√3', dx: 24, dy: 4, c: '#be123c' },
+  { t: 'dot', at: 'T' }, { t: 'vlabel', at: 'T', text: 'T', c: '#047857' },
+  { t: 'dot', at: 'V', c: '#8b5cf6' }, { t: 'vlabel', at: 'V', text: 'V', c: '#6d28d9' }
+];
+var s3 = [
+  { t: 'poly', v: ['P', 'Q', 'T'], fill: 'rgba(225,29,72,0.10)' },
+  { t: 'seg', a: 'P', b: 'T', c: '#10b981', w: 2.8, dash: [7, 5] },
+  { t: 'seg', a: 'Q', b: 'T', c: '#8b5cf6', w: 3 },
+  { t: 'seg', a: 'P', b: 'Q', c: '#f59e0b', w: 3.2 },
+  { t: 'ra', at: 'T', a: 'P', b: 'Q', s: 7, c: '#047857' },
+  { t: 'angle', at: 'Q', a: 'P', b: 'T', r: 30, label: '54.7°' },
+  { t: 'text', at: [0, hx / 2, 0], text: '2x', dx: -18, dy: 0, c: '#b45309' },
+  { t: 'dot', at: 'T' }, { t: 'vlabel', at: 'T', text: 'T', c: '#047857' }
+];
+var s4 = [
+  { t: 'poly', v: ['P', 'Q', 'T'], fill: 'rgba(225,29,72,0.12)' },
+  { t: 'seg', a: 'P', b: 'T', c: '#10b981', w: 2.6, dash: [7, 5] },
+  { t: 'seg', a: 'Q', b: 'T', c: '#8b5cf6', w: 3 },
+  { t: 'seg', a: 'P', b: 'Q', c: '#e11d48', w: 4 },
+  { t: 'ra', at: 'T', a: 'P', b: 'Q', s: 7, c: '#047857' },
+  { t: 'angle', at: 'Q', a: 'P', b: 'T', r: 32, label: '55°' },
+  { t: 'dot', at: 'T' }, { t: 'vlabel', at: 'T', text: 'T', c: '#047857' }
+];
+
+Fig3D.mount('#cv3d', {
+  v: P,
+  faces: [['Q', 'R', 'S'], ['P', 'Q', 'R'], ['P', 'R', 'S'], ['P', 'S', 'Q']],
+  edges: ['P-Q', 'P-R', 'P-S', 'Q-R', 'R-S', 'S-Q'],
+  ground: { x0: -18, x1: 18, z0: -14, z1: 12 },
+  view: { yaw: 0.6, pitch: -0.30, zoom: 1.02 },
+  labels: { P: 'P', Q: 'Q', R: 'R', S: 'S' },
+  labelColor: { P: '#ef4444' },
+  labelsNudge: { P: 0.9, Q: 1.6, R: -0.2, S: 0.3 },
+  startStep: 1,
+  steps: { 1: s1, 2: s2, 3: s3, 4: s4 }
+});
+</script>
+<script>
+/* HKDSE 2025 P2 Q40 — regular tetrahedron PQRS (edge 10), P above centroid T of base QRS */
+var P = {
+  Q: [0, 0, -5.7735],
+  R: [5, 0, 2.8868],
+  S: [-5, 0, 2.8868],
+  T: [0, 0, 0],
+  V: [-2.5, 0, -1.4434],
+  P: [0, 8.1650, 0]
+};
+var hx = 8.1650;
+
+var s1 = [
+  { t: 'poly', v: ['Q', 'R', 'S'], fill: 'rgba(79,70,229,0.10)' },
+  { t: 'seg', a: 'P', b: 'Q', c: '#e11d48', w: 3.4 },
+  { t: 'seg', a: 'P', b: 'T', c: '#10b981', w: 2.4, dash: [7, 5] },
+  { t: 'seg', a: 'Q', b: 'T', c: '#8b5cf6', w: 3 },
+  { t: 'ra', at: 'T', a: 'P', b: 'Q', s: 1.5, c: '#047857' },
+  { t: 'angle', at: 'Q', a: 'P', b: 'T', r: 1.9, label: 'θ' },
+  { t: 'dot', at: 'T' }, { t: 'vlabel', at: 'T', text: 'T', c: '#047857' }
+];
+var s2 = [
+  { t: 'poly', v: ['Q', 'R', 'S'], fill: 'rgba(79,70,229,0.08)' },
+  { t: 'poly', v: ['Q', 'T', 'V'], fill: 'rgba(139,92,246,0.18)' },
+  { t: 'seg', a: 'Q', b: 'V', c: '#8b5cf6', w: 3 },
+  { t: 'seg', a: 'Q', b: 'T', c: '#e11d48', w: 3 },
+  { t: 'seg', a: 'V', b: 'T', c: '#0d9488', w: 2.2, dash: [6, 5] },
+  { t: 'ra', at: 'V', a: 'Q', b: 'S', s: 1.5, c: '#0d9488' },
+  { t: 'angle', at: 'Q', a: 'V', b: 'T', r: 1.7, label: '30°' },
+  { t: 'text', at: [-1.25, 0, -3.6085], text: 'x', dx: -16, dy: 2, c: '#5b21b6' },
+  { t: 'text', at: [0, 0, -2.8868], text: '2x/√3', dx: 24, dy: 4, c: '#be123c' },
+  { t: 'dot', at: 'T' }, { t: 'vlabel', at: 'T', text: 'T', c: '#047857' },
+  { t: 'dot', at: 'V', c: '#8b5cf6' }, { t: 'vlabel', at: 'V', text: 'V', c: '#6d28d9' }
+];
+var s3 = [
+  { t: 'poly', v: ['P', 'Q', 'T'], fill: 'rgba(225,29,72,0.10)' },
+  { t: 'seg', a: 'P', b: 'T', c: '#10b981', w: 2.8, dash: [7, 5] },
+  { t: 'seg', a: 'Q', b: 'T', c: '#8b5cf6', w: 3 },
+  { t: 'seg', a: 'P', b: 'Q', c: '#f59e0b', w: 3.2 },
+  { t: 'ra', at: 'T', a: 'P', b: 'Q', s: 1.5, c: '#047857' },
+  { t: 'angle', at: 'Q', a: 'P', b: 'T', r: 1.9, label: '54.7°' },
+  { t: 'text', at: [0, hx / 2, 0], text: '2x', dx: -18, dy: 0, c: '#b45309' },
+  { t: 'dot', at: 'T' }, { t: 'vlabel', at: 'T', text: 'T', c: '#047857' }
+];
+var s4 = [
+  { t: 'poly', v: ['P', 'Q', 'T'], fill: 'rgba(225,29,72,0.12)' },
+  { t: 'seg', a: 'P', b: 'T', c: '#10b981', w: 2.6, dash: [7, 5] },
+  { t: 'seg', a: 'Q', b: 'T', c: '#8b5cf6', w: 3 },
+  { t: 'seg', a: 'P', b: 'Q', c: '#e11d48', w: 4 },
+  { t: 'ra', at: 'T', a: 'P', b: 'Q', s: 1.5, c: '#047857' },
+  { t: 'angle', at: 'Q', a: 'P', b: 'T', r: 2.0, label: '55°' },
+  { t: 'dot', at: 'T' }, { t: 'vlabel', at: 'T', text: 'T', c: '#047857' }
+];
+
+Fig3D.mount('#cv3d', {
+  v: P,
+  faces: [['Q', 'R', 'S'], ['P', 'Q', 'R'], ['P', 'R', 'S'], ['P', 'S', 'Q']],
+  edges: ['P-Q', 'P-R', 'P-S', 'Q-R', 'R-S', 'S-Q'],
+  ground: { x0: -14, x1: 15, z0: -13, z1: 10 },
+  view: { yaw: 0.62, pitch: -0.34, zoom: 0.80 },
+  labels: { P: 'P', Q: 'Q', R: 'R', S: 'S' },
+  labelColor: { P: '#ef4444' },
+  labelsNudge: { P: 0.9, Q: 1.6, R: -0.2, S: 0.3 },
+  startStep: 1,
+  steps: { 1: s1, 2: s2, 3: s3, 4: s4 }
+});
+</script>
+<script>
+/* HKDSE 2025 P2 Q40 — regular tetrahedron PQRS (edge 10), P above centroid T of base QRS */
+var P = {
+  Q: [-2.8868, 0, -5],
+  R: [5.7735, 0, 0],
+  S: [-2.8868, 0, 5],
+  T: [0, 0, 0],
+  V: [-2.8868, 0, 0],
+  P: [0, 8.1650, 0]
+};
+var hx = 8.1650;
+
+var s1 = [
+  { t: 'poly', v: ['Q', 'R', 'S'], fill: 'rgba(79,70,229,0.10)' },
+  { t: 'seg', a: 'P', b: 'Q', c: '#e11d48', w: 3.4 },
+  { t: 'seg', a: 'P', b: 'T', c: '#10b981', w: 2.4, dash: [7, 5] },
+  { t: 'seg', a: 'Q', b: 'T', c: '#8b5cf6', w: 3 },
+  { t: 'ra', at: 'T', a: 'P', b: 'Q', s: 1.5, c: '#047857' },
+  { t: 'angle', at: 'Q', a: 'P', b: 'T', r: 1.9, label: 'θ' },
+  { t: 'dot', at: 'T' }, { t: 'vlabel', at: 'T', text: 'T', c: '#047857' }
+];
+var s2 = [
+  { t: 'poly', v: ['Q', 'R', 'S'], fill: 'rgba(79,70,229,0.08)' },
+  { t: 'poly', v: ['Q', 'T', 'V'], fill: 'rgba(139,92,246,0.18)' },
+  { t: 'seg', a: 'Q', b: 'V', c: '#8b5cf6', w: 3 },
+  { t: 'seg', a: 'Q', b: 'T', c: '#e11d48', w: 3 },
+  { t: 'seg', a: 'V', b: 'T', c: '#0d9488', w: 2.2, dash: [6, 5] },
+  { t: 'ra', at: 'V', a: 'Q', b: 'S', s: 1.5, c: '#0d9488' },
+  { t: 'angle', at: 'Q', a: 'V', b: 'T', r: 1.7, label: '30°' },
+  { t: 'text', at: [-2.8868, 0, -2.5], text: 'x', dx: -16, dy: 2, c: '#5b21b6' },
+  { t: 'text', at: [-1.4434, 0, -2.5], text: '2x/√3', dx: 26, dy: 6, c: '#be123c' },
+  { t: 'dot', at: 'T' }, { t: 'vlabel', at: 'T', text: 'T', c: '#047857' },
+  { t: 'dot', at: 'V', c: '#8b5cf6' }, { t: 'vlabel', at: 'V', text: 'V', c: '#6d28d9' }
+];
+var s3 = [
+  { t: 'poly', v: ['P', 'Q', 'T'], fill: 'rgba(225,29,72,0.10)' },
+  { t: 'seg', a: 'P', b: 'T', c: '#10b981', w: 2.8, dash: [7, 5] },
+  { t: 'seg', a: 'Q', b: 'T', c: '#8b5cf6', w: 3 },
+  { t: 'seg', a: 'P', b: 'Q', c: '#f59e0b', w: 3.2 },
+  { t: 'ra', at: 'T', a: 'P', b: 'Q', s: 1.5, c: '#047857' },
+  { t: 'angle', at: 'Q', a: 'P', b: 'T', r: 1.9, label: '54.7°' },
+  { t: 'text', at: [0, hx / 2, 0], text: '2x', dx: -18, dy: 0, c: '#b45309' },
+  { t: 'dot', at: 'T' }, { t: 'vlabel', at: 'T', text: 'T', c: '#047857' }
+];
+var s4 = [
+  { t: 'poly', v: ['P', 'Q', 'T'], fill: 'rgba(225,29,72,0.12)' },
+  { t: 'seg', a: 'P', b: 'T', c: '#10b981', w: 2.6, dash: [7, 5] },
+  { t: 'seg', a: 'Q', b: 'T', c: '#8b5cf6', w: 3 },
+  { t: 'seg', a: 'P', b: 'Q', c: '#e11d48', w: 4 },
+  { t: 'ra', at: 'T', a: 'P', b: 'Q', s: 1.5, c: '#047857' },
+  { t: 'angle', at: 'Q', a: 'P', b: 'T', r: 2.0, label: '55°' },
+  { t: 'dot', at: 'T' }, { t: 'vlabel', at: 'T', text: 'T', c: '#047857' }
+];
+
+Fig3D.mount('#cv3d', {
+  v: P,
+  faces: [['Q', 'R', 'S'], ['P', 'Q', 'R'], ['P', 'R', 'S'], ['P', 'S', 'Q']],
+  edges: ['P-Q', 'P-R', 'P-S', 'Q-R', 'R-S', 'S-Q'],
+  ground: { x0: -14, x1: 16, z0: -13, z1: 11 },
+  view: { yaw: 0.85, pitch: -0.45, zoom: 0.82 },
+  labels: { P: 'P', Q: 'Q', R: 'R', S: 'S' },
+  labelColor: { P: '#ef4444' },
+  labelsNudge: { P: 0.9, Q: -0.4, R: 0.2, S: 1.5, T: 1.5, V: -1.4 },
+  startStep: 1,
+  steps: { 1: s1, 2: s2, 3: s3, 4: s4 }
+});
+</script>
 </body>
 </html>

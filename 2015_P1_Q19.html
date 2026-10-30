@@ -63,7 +63,7 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
     background:var(--panel);border-radius:var(--radius);
     box-shadow:var(--shadow);padding:14px;border:1px solid #e2eaf7;
   }
-  .diagram{position:sticky;top:16px;max-height:calc(100vh - 2rem);overflow-y:auto;}
+  .diagram{position:sticky;top:12px;}
   .diagram h2,.qbox h2{font-size:.95rem;margin:0 0 8px;color:var(--muted);text-transform:uppercase;letter-spacing:.9px;}
   canvas{width:100%;height:auto;display:block;border-radius:12px;background:linear-gradient(180deg,#fbfdff,#f2f7ff);}
   .legend{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:10px;font-size:.78rem;color:var(--muted);}
@@ -114,8 +114,10 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
     .step{padding:10px;margin-bottom:9px;}
     .diagram{top:8px;}
   }
+.chip3d{display:inline-block;vertical-align:middle;margin-left:6px;font-size:.58rem;font-weight:700;letter-spacing:.6px;color:#fff;background:linear-gradient(135deg,#2563eb,#0ea5e9);padding:2px 7px;border-radius:20px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;}
 </style>
 <link rel="stylesheet" href="assets/extra.css">
+<link rel="stylesheet" href="assets/fig3d.css">
 </head>
 <body>
 
@@ -128,18 +130,11 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
 <div class="split">
 
   <!-- ================= LEFT : DIAGRAM ================= -->
-  <section class="panel diagram">
-    <h2>Interactive Figure</h2>
-    <div style="margin:0 0 14px;"><div style="font-size:.78rem;font-weight:700;color:#334155;margin-bottom:6px;">3D 互動模型 — 拖動旋轉查看不同角度</div><iframe src="https://www.geogebra.org/material/iframe/id/GTxqGuXt" width="100%" height="400" style="border:0;border-radius:12px;background:#fff;" allowfullscreen scrolling="no"></iframe></div><canvas id="cv" width="760" height="720"></canvas>
-    <div class="toolbar">
-      <button data-view="0" class="on">Fig 3(a) · flat card</button>
-      <button data-view="1">Fig 3(b) · pyramid</button>
-    </div>
-    <div class="legend" id="legend"></div>
-    <div class="hint" style="margin-top:10px">
-      The diagram is drawn <strong>to scale</strong>. Use the buttons to switch between the flat
-      pentagonal card and the folded pyramid.
-    </div>
+        <section class="panel diagram">
+    <h2>3-D Figure <span class="chip3d">3D</span></h2>
+    <div class="fig3d-stage"><canvas id="cv3d"></canvas></div>
+    <div id="figui"></div>
+    <div class="fig3d-hint">拖動旋轉 · 雙指／滾輪縮放　—　drag to rotate, pinch or scroll to zoom</div>
   </section>
 
   <!-- ================= RIGHT : QUESTION + SOLUTION ================= -->
@@ -280,509 +275,247 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
   </section>
 </div>
 
-<script>
-/* ------------------------------------------------------------------
-   Geometry data (real, accurate coordinates computed from the question)
-   ------------------------------------------------------------------ */
-const AB = 40, BC = 24, angABC = 80 * Math.PI/180;
-const acb  = 66.59081487 * Math.PI/180;     // from (a)(ii)
-const bcd  = 132 * Math.PI/180;             // part (b)
 
-// Triangle ABC  (put B at origin, BC along +x axis)
-const Bx = 0, By = 0;
-const Cx = BC, Cy = 0;
-const Ax = AB*Math.cos(angABC), Ay = AB*Math.sin(angABC);   // A above BC
-
-// Triangle B'D  (mirror image of triangle ABC about the perpendicular bisector of CD)
-// Actually build the card directly: D lies on the ray from C making angle BCD with CB,
-// at distance CD where CD is found from triangle ACD.
-const AC = Math.hypot(Ax-Cx, Ay-Cy);
-const angACD = bcd - acb;
-const CD = 2*AC*Math.cos(angACD);
-// direction of C->D : rotate C->B direction (pointing at -x) by -bcd (clockwise) to go up-right
-const dx = Math.cos(Math.PI - bcd), dy = Math.sin(Math.PI - bcd);
-const Dx = Cx + CD*dx, Dy = Cy + CD*dy;
-
-// B' : reflect B across the perpendicular bisector of CD  => triangle AB'D congruent to ABC
-// Simplest accurate construction: B' is the point such that AB'=40, B'D=24, angle AB'D=80,
-// on the opposite side. Mirror the ABC construction about the line AD:
-function mirrorPoint(P, A, D){
-  const ux = D.x-A.x, uy = D.y-A.y, L = Math.hypot(ux,uy);
-  const ex = ux/L, ey = uy/L;
-  const vx = P.x-A.x, vy = P.y-A.y;
-  const proj = vx*ex + vy*ey;
-  const px = A.x + proj*ex, py = A.y + proj*ey;
-  return { x: 2*px - P.x, y: 2*py - P.y };
-}
-const Bp = mirrorPoint({x:Bx,y:By}, {x:Ax,y:Ay}, {x:Dx,y:Dy});
-// verify angle AB'D = 80 deg (should be by construction)
-// verify B'D length
-const BpD = Math.hypot(Bp.x-Dx, Bp.y-Dy);
-const ABp = Math.hypot(Bp.x-Ax, Bp.y-Ay);
-
-/* ------------------------------------------------------------------
-   Canvas setup
-   ------------------------------------------------------------------ */
-const cv = document.getElementById('cv');
-const ctx = cv.getContext('2d');
-const W = cv.width, H = cv.height;
-let view = 0;          // 0 = flat card, 1 = pyramid
-let mode = 1;          // active step
-
-/* ---- helpers ------------------------------------------------------ */
-function s(v){ return v; }
-
-function fitTransform(pts, pad){
-  let minx=Infinity,maxx=-Infinity,miny=Infinity,maxy=-Infinity;
-  pts.forEach(p=>{minx=Math.min(minx,p.x);maxx=Math.max(maxx,p.x);
-                  miny=Math.min(miny,p.y);maxy=Math.max(maxy,p.y);});
-  const w = maxx-minx || 1, h = maxy-miny || 1;
-  const sc = Math.min((W-2*pad)/w, (H-2*pad)/h);
-  const ox = (W - sc*(minx+maxx))/2;
-  const oy = (H + sc*(miny+maxy))/2;   // flip y
-  return {sc, ox, oy, X:x=>ox+sc*x, Y:y=>oy-sc*y};
-}
-
-function drawPolyline(pts, color, width, dash){
-  ctx.save();
-  ctx.strokeStyle = color; ctx.lineWidth = width;
-  ctx.lineJoin = 'round'; ctx.lineCap='round';
-  if(dash) ctx.setLineDash(dash);
-  ctx.beginPath();
-  pts.forEach((p,i)=> i? ctx.lineTo(p.x,p.y) : ctx.moveTo(p.x,p.y));
-  ctx.stroke();
-  ctx.restore();
-}
-function dot(P, color, r, label, lcolor, ox=0, oy=0){
-  ctx.save();
-  ctx.beginPath(); ctx.arc(P.x,P.y,r,0,2*Math.PI);
-  ctx.fillStyle = color; ctx.fill();
-  ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
-  if(label){
-    ctx.fillStyle = lcolor||'#12263f';
-    ctx.font='bold 20px Segoe UI, Arial';
-    ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText(label, P.x+ox, P.y+oy);
-  }
-  ctx.restore();
-}
-function labelPoint(P, text, color, ox, oy){
-  ctx.save();
-  ctx.fillStyle = color; ctx.font='bold 21px Segoe UI, Arial';
-  ctx.textAlign='center'; ctx.textBaseline='middle';
-  ctx.strokeStyle='rgba(255,255,255,.9)'; ctx.lineWidth=4;
-  ctx.strokeText(text, P.x+ox, P.y+oy);
-  ctx.fillText(text, P.x+ox, P.y+oy);
-  ctx.restore();
-}
-function angleArc(center, p1, p2, radius, color, text, textOff){
-  const a1 = Math.atan2(p1.y-center.y, p1.x-center.x);
-  const a2 = Math.atan2(p2.y-center.y, p2.x-center.x);
-  ctx.save();
-  ctx.strokeStyle=color; ctx.lineWidth=2.4;
-  ctx.beginPath(); ctx.arc(center.x, center.y, radius, a1, a2, false); ctx.stroke();
-  if(text){
-    const am = (a1+a2)/2;
-    ctx.fillStyle=color; ctx.font='bold 15px Segoe UI, Arial';
-    ctx.textAlign='center'; ctx.textBaseline='middle';
-    const tx = center.x + (radius+ textOff)*Math.cos(am);
-    const ty = center.y + (radius+ textOff)*Math.sin(am);
-    ctx.strokeStyle='rgba(255,255,255,.95)'; ctx.lineWidth=4;
-    ctx.strokeText(text, tx, ty); ctx.fillText(text, tx, ty);
-  }
-  ctx.restore();
-}
-function rightAngle(center, p1, p2, size, color){
-  const u1 = {x:p1.x-center.x, y:p1.y-center.y};
-  const u2 = {x:p2.x-center.x, y:p2.y-center.y};
-  const n1 = Math.hypot(u1.x,u1.y), n2 = Math.hypot(u2.x,u2.y);
-  const a = {x:center.x+u1.x/n1*size, y:center.y+u1.y/n1*size};
-  const b = {x:center.x+u2.x/n2*size, y:center.y+u2.y/n2*size};
-  const c = {x:a.x+ (b.x-center.x), y:a.y+(b.y-center.y)};
-  ctx.save(); ctx.strokeStyle=color; ctx.lineWidth=2;
-  ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(c.x,c.y); ctx.lineTo(b.x,b.y); ctx.stroke();
-  ctx.restore();
-}
-function dimText(mid, text, color, ox=0, oy=0){
-  ctx.save();
-  ctx.font='bold 16px Segoe UI, Arial';
-  ctx.textAlign='center'; ctx.textBaseline='middle';
-  ctx.strokeStyle='rgba(255,255,255,.95)'; ctx.lineWidth=5;
-  ctx.strokeText(text, mid.x+ox, mid.y+oy);
-  ctx.fillStyle=color; ctx.fillText(text, mid.x+ox, mid.y+oy);
-  ctx.restore();
-}
-
-/* ------------------------------------------------------------------
-   DRAW : Figure 3(a)  — the flat pentagonal card  A B C D B'
-   ------------------------------------------------------------------ */
-function drawFlat(){
-  const pts = [{x:Ax,y:Ay},{x:Bx,y:By},{x:Cx,y:Cy},{x:Dx,y:Dy},{x:Bp.x,y:Bp.y}];
-  const T = fitTransform(pts, 100);
-  const P = p => ({x:T.X(p.x), y:T.Y(p.y)});
-  const A = P(pts[0]), B = P(pts[1]), C = P(pts[2]), D = P(pts[3]), Bp2 = P(pts[4]);
-
-  // filled card background
-  ctx.save();
-  ctx.beginPath();
-  [A,B,C,D,Bp2].forEach((p,i)=> i? ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));
-  ctx.closePath();
-  ctx.fillStyle = 'rgba(219,234,254,.55)';
-  ctx.fill();
-  ctx.restore();
-
-  /* --- highlighting per step ------------------------------------- */
-  const hi = {
-    ac : mode===1,
-    sine : mode===2,
-    area : mode>=3 && mode<=3,
-    fold : mode>=4
-  };
-
-  /* --- the two congruent triangles ABC and AB'D --- */
-  if(hi.ac){
-    ctx.save(); ctx.beginPath();
-    ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,B.y); ctx.lineTo(C.x,C.y); ctx.closePath();
-    ctx.fillStyle='rgba(37,99,235,.16)'; ctx.fill(); ctx.restore();
-  }
-  if(hi.sine){
-    ctx.save(); ctx.beginPath();
-    ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,B.y); ctx.lineTo(C.x,C.y); ctx.closePath();
-    ctx.fillStyle='rgba(225,29,72,.13)'; ctx.fill(); ctx.restore();
-  }
-  if(mode===3){
-    ctx.save(); ctx.beginPath();
-    ctx.moveTo(A.x,A.y); ctx.lineTo(C.x,C.y); ctx.lineTo(D.x,D.y); ctx.closePath();
-    ctx.fillStyle='rgba(5,150,105,.16)'; ctx.fill(); ctx.restore();
-  }
-
-  /* --- triangle ACD (the central folded triangle) --- */
-  drawPolyline([A,C,D], '#059669', 2.5);
-  drawPolyline([A,C,D,A], '#059669', 2.5, []);   // ensure A-C, C-D, D-A all drawn
-
-  /* --- the four outer edges --- */
-  drawPolyline([A,B], '#2563eb', 3.2);
-  drawPolyline([B,C], '#2563eb', 3.2);
-  drawPolyline([A,Bp2], '#7c3aed', 3.2);
-  drawPolyline([Bp2,D], '#7c3aed', 3.2);
-
-  /* --- diagonals highlighted --- */
-  if(mode>=4){
-    drawPolyline([A,C], '#e11d48', 3.6);
-    drawPolyline([A,D], '#e11d48', 3.6);
-  } else {
-    drawPolyline([A,C], '#e11d48', 2.6);
-    drawPolyline([A,D], '#e11d48', 2.6);
-  }
-
-  /* --- angle markers --- */
-  angleArc(B, A, C, 46, '#2563eb', '80°', 20);
-  angleArc(Bp2, A, D, 46, '#7c3aed', '80°', 20);
-  if(mode===1){
-    angleArc(C, B, A, 40, '#e11d48', 'θ=ACB', 24);
-  }
-  if(mode===2){
-    angleArc(C, B, A, 44, '#e11d48', '', 0);
-  }
-  if(mode===3){
-    angleArc(C, B, A, 44, '#e11d48', 'ACB', 26);
-    angleArc(C, D, A, 72, '#059669', 'CAD', 26);
-    angleArc(C, B, D, 70, '#f59e0b', 'BCD', 26);
-  }
-
-  /* --- dimension labels --- */
-  dimText({x:(A.x+B.x)/2, y:(A.y+B.y)/2}, '40', '#1e3a8a', -16, -4);
-  dimText({x:(B.x+C.x)/2, y:(B.y+C.y)/2}, '24', '#1e3a8a', 0, 18);
-  dimText({x:(A.x+Bp2.x)/2, y:(A.y+Bp2.y)/2}, '40', '#5b21b6', 16, -4);
-  dimText({x:(Bp2.x+D.x)/2, y:(Bp2.y+D.y)/2}, '24', '#5b21b6', 0, 18);
-  if(mode>=4){
-    dimText({x:(C.x+D.x)/2, y:(C.y+D.y)/2}, 'CD≈35.73', '#e11d48', 0, 24);
-    dimText({x:(A.x+C.x)/2, y:(A.y+C.y)/2}, 'AC≈42.93', '#e11d48', 30, -2);
-  }
-
-  /* --- vertices --- */
-  dot(A,'#f59e0b',8); labelPoint(A,'A','#a16207',-0, -26);
-  dot(B,'#f59e0b',8); labelPoint(B,'B','#a16207',-24, -6);
-  dot(C,'#f59e0b',8); labelPoint(C,'C','#a16207',-6, 26);
-  dot(D,'#f59e0b',8); labelPoint(D,'D','#a16207',22, 24);
-  dot(Bp2,'#f59e0b',8); labelPoint(Bp2,"B'",'#a16207',26, -8);
-
-  // figure caption
-  ctx.save();
-  ctx.fillStyle='#5b7290'; ctx.font='600 16px Segoe UI, Arial';
-  ctx.textAlign='left'; ctx.textBaseline='top';
-  ctx.fillText('Figure 3(a) — pentagonal paper card', 16, 12);
-  ctx.restore();
-}
-
-/* ------------------------------------------------------------------
-   DRAW : Figure 3(b) — the folded pyramid ABCD
-   We project the true 3-D coordinates with a simple camera.
-   ------------------------------------------------------------------ */
-function drawPyramid(){
-  /* --- build true 3-D coordinates (base ACD in xy-plane) --- */
-  // Put A at origin, C on x-axis, D in the xy-plane.
-  const A3 = {x:0, y:0, z:0};
-  const C3 = {x:AC, y:0, z:0};
-  const D3 = {x:AC*Math.cos(angACD), y:AC*Math.sin(angACD), z:0};
-
-  // B is the apex: AB = 40, and B projects onto the bisector of angle ACD?
-  // More robust: B is the point with AB=40, CB=24, DB=24 consistent with the fold.
-  // Solve for B using distances to A, C and D.
-  // Let B = (u,v,w).  |B-A|=40, |B-C|=24, |B-D|=24.
-  // Subtract: from |B-C|²=|B-D|², we get a linear equation.
-  const d2 = C3.x*C3.x + C3.y*C3.y;          // |C|²
-  // Equation: -2 B·(C-D) = |D|² - |C|²  →  B·(C-D) = (|C|²-|D|²)/2
-  const ux = C3.x - D3.x, uy = C3.y - D3.y, uz = C3.z - D3.z;
-  const rhs = ( (C3.x*C3.x+C3.y*C3.y+C3.z*C3.z) - (D3.x*D3.x+D3.y*D3.y+D3.z*D3.z) )/2;
-  // Also |B-C|² = 576
-  // Parametrise B along the line of intersection of two spheres is messy; instead
-  // use the fact that B is the reflection of the original flat B through plane ACD reversed.
-  // Practical approach: B has AB = 40 and the same projection as found earlier.
-  // Use: in triangle ACD, B' (the folded B and B' coincide) satisfies
-  //   |B-A| = 40, |B-C| = 24, |B-D| = 24
-  // Solve numerically (Newton) for B = (x,y,z) with z>=0.
-  let bx = AC*0.5, by = 10, bz = 20;
-  for(let it=0; it<200; it++){
-    const f1 = (bx-A3.x)**2 + (by-A3.y)**2 + (bz-A3.z)**2 - 1600;
-    const f2 = (bx-C3.x)**2 + (by-C3.y)**2 + (bz-C3.z)**2 - 576;
-    const f3 = (bx-D3.x)**2 + (by-D3.y)**2 + (bz-D3.z)**2 - 576;
-    // numerical Jacobian
-    const h = 1e-5;
-    const J = [
-      [( (bx+h-A3.x)**2+(by-A3.y)**2+(bz-A3.z)**2-1600 - f1)/h,
-       ( (bx-A3.x)**2+(by+h-A3.y)**2+(bz-A3.z)**2-1600 - f1)/h,
-       ( (bx-A3.x)**2+(by-A3.y)**2+(bz+h-A3.z)**2-1600 - f1)/h],
-      [( (bx+h-C3.x)**2+(by-C3.y)**2+(bz-C3.z)**2-576 - f2)/h,
-       ( (bx-C3.x)**2+(by+h-C3.y)**2+(bz-C3.z)**2-576 - f2)/h,
-       ( (bx-C3.x)**2+(by-C3.y)**2+(bz+h-C3.z)**2-576 - f2)/h],
-      [( (bx+h-D3.x)**2+(by-D3.y)**2+(bz-D3.z)**2-576 - f3)/h,
-       ( (bx-D3.x)**2+(by+h-D3.y)**2+(bz-D3.z)**2-576 - f3)/h,
-       ( (bx-D3.x)**2+(by-D3.y)**2+(bz+h-D3.z)**2-576 - f3)/h]
-    ];
-    const det = J[0][0]*(J[1][1]*J[2][2]-J[1][2]*J[2][1])
-              - J[0][1]*(J[1][0]*J[2][2]-J[1][2]*J[2][0])
-              + J[0][2]*(J[1][0]*J[2][1]-J[1][1]*J[2][0]);
-    if(Math.abs(det)<1e-14) break;
-    const inv = [
-      [(J[1][1]*J[2][2]-J[1][2]*J[2][1])/det, (J[0][2]*J[2][1]-J[0][1]*J[2][2])/det, (J[0][1]*J[1][2]-J[0][2]*J[1][1])/det],
-      [(J[1][2]*J[2][0]-J[1][0]*J[2][2])/det, (J[0][0]*J[2][2]-J[0][2]*J[2][0])/det, (J[0][2]*J[1][0]-J[0][0]*J[1][2])/det],
-      [(J[1][0]*J[2][1]-J[1][1]*J[2][0])/det, (J[0][1]*J[2][0]-J[0][0]*J[2][1])/det, (J[0][0]*J[1][1]-J[0][1]*J[1][0])/det]
-    ];
-    const dx = -(inv[0][0]*f1 + inv[0][1]*f2 + inv[0][2]*f3);
-    const dy = -(inv[1][0]*f1 + inv[1][1]*f2 + inv[1][2]*f3);
-    const dz = -(inv[2][0]*f1 + inv[2][1]*f2 + inv[2][2]*f3);
-    bx+=dx; by+=dy; bz+=dz;
-    if(Math.abs(dx)+Math.abs(dy)+Math.abs(dz) < 1e-10) break;
-  }
-  const B3 = {x:bx, y:by, z:Math.abs(bz)};   // take apex above the base
-
-  /* --- perspective projection --- */
-  const pts3 = [A3,B3,C3,D3];
-  const cx = (A3.x+C3.x+D3.x)/3, cy = (A3.y+C3.y+D3.y)/3, cz = 0;
-  const cam = {theta:-0.65, phi:0.95, dist:140, f:1500};
-  function project(p){
-    const x = p.x-cx, y = p.y-cy, z = p.z-cz;
-    // rotate about z by theta
-    const ct=Math.cos(cam.theta), st=Math.sin(cam.theta);
-    const x1 =  ct*x - st*y;
-    const y1 =  st*x + ct*y;
-    // rotate about x by phi (tilt)
-    const cp=Math.cos(cam.phi), sp=Math.sin(cam.phi);
-    const y2 = cp*y1 - sp*z;
-    const z2 = sp*y1 + cp*z;
-    const depth = cam.dist + y2;
-    const f = cam.f/depth;
-    return {x: x1*f, y: -z2*f, depth:depth};
-  }
-  const pr = pts3.map(project);
-  const Ap=pr[0], Bp3=pr[1], Cp=pr[2], Dp=pr[3];
-
-  // fit the projected points into the canvas
-  const T = fitTransform(pr, 120);
-  const Q = p => ({x:T.X(p.x), y:T.Y(p.y)});
-  const A=Q(Ap), B=Q(Bp3), C=Q(Cp), D=Q(Dp);
-
-  /* --- hidden edge detection: A-C and A-D may be dashed if behind --- */
-  // To keep it faithful to the exam figure, A-C and A-D are dashed (hidden),
-  // while B-C, B-D, A-B, C-D are solid.
-  const hi = {
-    fold : mode>=4,
-    height : mode===5,
-    vol : mode===6
-  };
-
-  /* --- faces --- */
-  function face(p1,p2,p3,fill,stroke,width){
-    ctx.save();
-    ctx.beginPath(); ctx.moveTo(p1.x,p1.y); ctx.lineTo(p2.x,p2.y); ctx.lineTo(p3.x,p3.y); ctx.closePath();
-    if(fill){ctx.fillStyle=fill; ctx.fill();}
-    if(stroke){ctx.strokeStyle=stroke; ctx.lineWidth=width; ctx.lineJoin='round'; ctx.stroke();}
-    ctx.restore();
-  }
-  face(A,B,C, 'rgba(37,99,235,.16)', null, 0);
-  face(A,B,D, 'rgba(124,58,237,.14)', null, 0);
-  face(A,C,D, 'rgba(245,158,11,.14)', null, 0);
-  face(B,C,D, 'rgba(16,185,129,.13)', null, 0);
-
-  /* --- edges --- */
-  drawPolyline([A,B], '#2563eb', 3.4);      // solid
-  drawPolyline([B,C], '#2563eb', 3.4);      // solid
-  drawPolyline([B,D], '#7c3aed', 3.4);      // solid
-  drawPolyline([C,D], '#059669', 3.4);      // solid
-  drawPolyline([A,C], '#e11d48', 2.6, [9,7]);   // hidden -> dashed
-  drawPolyline([A,D], '#e11d48', 2.6, [9,7]);   // hidden -> dashed
-
-  /* --- height of the pyramid (step 5) --- */
-  if(mode===5){
-    // foot of perpendicular from B to plane ACD approximated by projection
-    // Use the true 3D foot:
-    // plane ACD is z=0, so the foot is (B3.x, B3.y, 0)
-    const F3 = {x:B3.x, y:B3.y, z:0};
-    const Fp = project(F3);
-    const F = Q(Fp);
-    ctx.save();
-    ctx.strokeStyle='#f59e0b'; ctx.lineWidth=2.6; ctx.setLineDash([7,6]);
-    ctx.beginPath(); ctx.moveTo(B.x,B.y); ctx.lineTo(F.x,F.y); ctx.stroke();
-    ctx.restore();
-    ctx.save();
-    ctx.beginPath(); ctx.arc(F.x,F.y,6,0,2*Math.PI);
-    ctx.fillStyle='#f59e0b'; ctx.fill();
-    ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
-    ctx.restore();
-    // mid-point M of CD
-    const Mp = {x:(Cp.x+Dp.x)/2, y:(Cp.y+Dp.y)/2};
-    const M = Q(Mp);
-    // M should lie under F, draw a thin line
-    ctx.save();
-    ctx.strokeStyle='rgba(245,158,11,.5)'; ctx.lineWidth=1.6; ctx.setLineDash([4,4]);
-    ctx.beginPath(); ctx.moveTo(F.x,F.y); ctx.lineTo(M.x,M.y); ctx.stroke();
-    ctx.restore();
-    dimText({x:(B.x+F.x)/2, y:(B.y+F.y)/2}, 'h≈15.86', '#b45309', 34, 0);
-  }
-
-  /* --- mid-point M and right angles (step 5) --- */
-  if(mode===5){
-    const Mp = {x:(Cp.x+Dp.x)/2, y:(Cp.y+Dp.y)/2};
-    const M = Q(Mp);
-    ctx.save();
-    ctx.beginPath(); ctx.arc(M.x,M.y,5.5,0,2*Math.PI);
-    ctx.fillStyle='#0891b2'; ctx.fill();
-    ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
-    ctx.restore();
-    labelPoint(M,'M','#0e7490', 0, 24);
-  }
-
-  /* --- vertices --- */
-  dot(A,'#f59e0b',8); labelPoint(A,'A','#a16207',-24,-6);
-  dot(B,'#f59e0b',8); labelPoint(B,'B','#a16207',0, -26);
-  dot(C,'#f59e0b',8); labelPoint(C,'C','#a16207',-4, 26);
-  dot(D,'#f59e0b',8); labelPoint(D,'D','#a16207',24, 8);
-
-  /* --- caption --- */
-  ctx.save();
-  ctx.fillStyle='#5b7290'; ctx.font='600 16px Segoe UI, Arial';
-  ctx.textAlign='left'; ctx.textBaseline='top';
-  ctx.fillText('Figure 3(b) — folded pyramid ABCD', 16, 12);
-  ctx.restore();
-
-  /* --- small note about hidden edges --- */
-  ctx.save();
-  ctx.fillStyle='#e11d48'; ctx.font='600 13px Segoe UI, Arial';
-  ctx.textAlign='left'; ctx.textBaseline='bottom';
-  ctx.fillText('dashed red = hidden edges inside the pyramid', 16, H-14);
-  ctx.restore();
-}
-
-/* ------------------------------------------------------------------
-   MAIN DRAW
-   ------------------------------------------------------------------ */
-function draw(){
-  ctx.clearRect(0,0,W,H);
-  // subtle background grid
-  ctx.save();
-  ctx.strokeStyle='rgba(37,99,235,.06)'; ctx.lineWidth=1;
-  for(let x=0;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
-  for(let y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
-  ctx.restore();
-
-  if(view===0) drawFlat();
-  else drawPyramid();
-
-  updateLegend();
-}
-
-/* ------------------------------------------------------------------
-   LEGEND
-   ------------------------------------------------------------------ */
-function updateLegend(){
-  const el = document.getElementById('legend');
-  let html = '';
-  if(view===0){
-    html = `
-      <span><i style="background:#2563eb"></i>AB = 40</span>
-      <span><i style="background:#2563eb"></i>BC = 24</span>
-      <span><i style="background:#7c3aed"></i>AB' = 40</span>
-      <span><i style="background:#7c3aed"></i>B'D = 24</span>
-      <span><i style="background:#e11d48"></i>diagonals AC, AD</span>
-      <span><i style="background:#059669"></i>centre triangle ACD</span>
-      <span><span class="dot" style="background:#f59e0b"></span>vertices A,B,C,D,B'</span>
-    `;
-    if(mode===1) html += `<span class="lbl">▶ highlight: triangle ABC (cosine rule)</span>`;
-    if(mode===2) html += `<span class="lbl">▶ highlight: angle ACB (sine rule)</span>`;
-    if(mode===3) html += `<span class="lbl">▶ highlight: triangles used for the area formula</span>`;
-  } else {
-    html = `
-      <span><i style="background:#2563eb"></i>AB, BC (solid)</span>
-      <span><i style="background:#7c3aed"></i>BD (solid)</span>
-      <span><i style="background:#059669"></i>CD (solid)</span>
-      <span><i style="background:#e11d48"></i>AC, AD (dashed = hidden)</span>
-      <span><span class="dot" style="background:#f59e0b"></span>A, B, C, D</span>
-    `;
-    if(mode===4) html += `<span class="lbl">▶ folding along AC and AD</span>`;
-    if(mode===5) html += `<span class="lbl">▶ M = mid-point of CD, height of pyramid</span>`;
-    if(mode===6) html += `<span class="lbl">▶ base △ACD and volume</span>`;
-  }
-  el.innerHTML = html;
-}
-
-/* ------------------------------------------------------------------
-   SCROLL SYNC
-   ------------------------------------------------------------------ */
-const steps = Array.from(document.querySelectorAll('.step'));
-const obs = new IntersectionObserver((es)=>{
-  es.forEach(e=>{
-    if(e.isIntersecting){
-      const m = +e.target.dataset.step;
-      mode = m;
-      steps.forEach(st=>st.classList.toggle('active', st===e.target));
-      draw();
-    }
-  });
-}, {rootMargin:'-15% 0px -55% 0px', threshold:0});
-steps.forEach(st=>obs.observe(st));
-if(steps.length) steps[0].classList.add('active');
-
-/* ------------------------------------------------------------------
-   VIEW BUTTONS
-   ------------------------------------------------------------------ */
-document.querySelectorAll('.toolbar button').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    view = +btn.dataset.view;
-    document.querySelectorAll('.toolbar button').forEach(b=>b.classList.toggle('on', b===btn));
-    draw();
-  });
-});
-
-/* initial render */
-draw();
-window.addEventListener('resize', draw);
-</script>
 <!-- question-pager -->
 <nav class="qnav" aria-label="Question navigation">
   <a class="qnav__prev" href="2015_P1_Q18.html">← Previous Question</a>
   <a class="qnav__mid" href="index.html#y2015">Contents</a>
   <span class="qnav__next is-empty" aria-hidden="true"></span>
 </nav>
+<script src="assets/fig3d.js"></script>
+<script>
+/* HKDSE 2015 P1 Q19 — card ABCDB' folded into the pyramid ABCD.
+   Base ACD on the ground (y = 0).  All lengths from AB=AB'=40,
+   BC=B'D=24, <ABC=<AB'D=80 deg, <BCD=132 deg  (see the check table). */
+var P = {
+  A: [17.8628, 0, -39.0322],
+  B: [17.8628, 15.8612, -2.3114],
+  C: [0, 0, 0],
+  D: [35.7256, 0, 0],
+  M: [17.8628, 0, 0],
+  N: [17.8628, 0, -2.3114]
+};
+function mid(a, b, k) {
+  k = (k === undefined) ? 0.5 : k;
+  return [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k];
+}
+var CAB = 'rgba(59,130,246,0.10)';
+
+Fig3D.mount('#cv3d', {
+  v: P,
+  faces: [['A', 'C', 'D'], ['A', 'B', 'C'], ['A', 'B', 'D'], ['B', 'C', 'D']],
+  edges: ['A-B', 'A-C', 'A-D', 'B-C', 'B-D', 'C-D'],
+  ground: { x0: -26, x1: 64, z0: -70, z1: 18 },
+  view: { yaw: 0.86, pitch: -0.30, zoom: 1.0 },
+  labels: { A: 'A', B: 'B', C: 'C', D: 'D' },
+  labelColor: { B: '#ef4444' },
+  labelSteps: { M: 5 },
+  aspect: 0.84,
+  startStep: 1,
+  steps: {
+    /* (a)(i) AC by the cosine formula in triangle ABC */
+    1: [{ t: 'poly', v: ['A', 'B', 'C'], fill: CAB },
+      { t: 'seg', a: 'A', b: 'B', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'B', b: 'C', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'A', b: 'C', c: '#10b981', w: 3 },
+      { t: 'angle', at: 'B', a: 'A', b: 'C', r: 26, label: '80°' },
+      { t: 'text', at: mid(P.A, P.C), text: '42.9' }],
+
+    /* (a)(ii) <ACB by the sine formula */
+    2: [{ t: 'poly', v: ['A', 'B', 'C'], fill: CAB },
+      { t: 'seg', a: 'A', b: 'C', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'B', b: 'C', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'A', b: 'B', c: '#8b5cf6', w: 2.2, dash: [6, 5] },
+      { t: 'angle', at: 'C', a: 'A', b: 'B', r: 22, label: '66.6°' }],
+
+    /* (a)(iii) the card: two congruent triangles + central ACD, creases AC, AD */
+    3: [{ t: 'poly', v: ['A', 'C', 'D'], fill: CAB },
+      { t: 'seg', a: 'A', b: 'C', c: '#8b5cf6', w: 2.6, dash: [7, 5] },
+      { t: 'seg', a: 'A', b: 'D', c: '#8b5cf6', w: 2.6, dash: [7, 5] },
+      { t: 'seg', a: 'C', b: 'D', c: '#f59e0b', w: 2.6 },
+      { t: 'angle', at: 'A', a: 'C', b: 'D', r: 24, label: '49.2°' }],
+
+    /* (b) folding data: <ACD and CD */
+    4: [{ t: 'poly', v: ['A', 'C', 'D'], fill: CAB },
+      { t: 'seg', a: 'A', b: 'C', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'C', b: 'D', c: '#10b981', w: 3 },
+      { t: 'angle', at: 'C', a: 'A', b: 'D', r: 28, label: '65.4°' },
+      { t: 'text', at: mid(P.C, P.D, 0.62), text: '35.73', dy: 14 }],
+
+    /* (b) height: M mid-point of CD, dihedral <AMB, BM sin<AMB */
+    5: [{ t: 'poly', v: ['A', 'C', 'D'], fill: 'rgba(59,130,246,0.07)' },
+      { t: 'seg', a: 'C', b: 'D', c: '#1e3a8a', w: 2.2 },
+      { t: 'seg', a: 'A', b: 'M', c: '#f59e0b', w: 2.8 },
+      { t: 'seg', a: 'B', b: 'M', c: '#f59e0b', w: 2.8 },
+      { t: 'ra', at: 'M', a: 'A', b: 'C', s: 7, c: '#b45309' },
+      { t: 'angle', at: 'M', a: 'A', b: 'B', r: 26, label: '81.7°' },
+      { t: 'dot', at: 'M' }, { t: 'vlabel', at: 'M', text: 'M' }],
+
+    /* (b) volume: base ACD and the height of B above it */
+    6: [{ t: 'poly', v: ['A', 'C', 'D'], fill: 'rgba(16,185,129,0.12)' },
+      { t: 'seg', a: 'B', b: 'N', c: '#8b5cf6', w: 2.4, dash: [6, 5] },
+      { t: 'ra', at: 'N', a: 'B', b: 'D', s: 7, c: '#0f766e' },
+      { t: 'dot', at: 'N' },
+      { t: 'text', at: mid(P.B, P.N), text: 'h 15.86', dx: 30 },
+      { t: 'text', at: mid(P.A, P.C, 0.42), text: 'V ≈ 3690 cm³', dx: -4, dy: -18 }]
+  }
+});
+</script>
+<script>
+/* HKDSE 2015 P1 Q19 — card ABCDB' folded into the pyramid ABCD.
+   Base ACD on the ground (y = 0).  All lengths from AB=AB'=40,
+   BC=B'D=24, <ABC=<AB'D=80 deg, <BCD=132 deg  (see the check table). */
+var P = {
+  A: [17.8628, 0, -39.0322],
+  B: [17.8628, 15.8612, -2.3114],
+  C: [0, 0, 0],
+  D: [35.7256, 0, 0],
+  M: [17.8628, 0, 0],
+  N: [17.8628, 0, -2.3114]
+};
+function mid(a, b, k) {
+  k = (k === undefined) ? 0.5 : k;
+  return [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k];
+}
+var CAB = 'rgba(59,130,246,0.10)';
+
+Fig3D.mount('#cv3d', {
+  v: P,
+  faces: [['A', 'C', 'D'], ['A', 'B', 'C'], ['A', 'B', 'D'], ['B', 'C', 'D']],
+  edges: ['A-B', 'A-C', 'A-D', 'B-C', 'B-D', 'C-D'],
+  ground: { x0: -26, x1: 64, z0: -70, z1: 18 },
+  view: { yaw: 0.18, pitch: -0.38, zoom: 1.14 },
+  labels: { A: 'A', B: 'B', C: 'C', D: 'D' },
+  labelColor: { B: '#ef4444' },
+  labelSteps: { M: 5 },
+  aspect: 0.84,
+  startStep: 1,
+  steps: {
+    /* (a)(i) AC by the cosine formula in triangle ABC */
+    1: [{ t: 'poly', v: ['A', 'B', 'C'], fill: CAB },
+      { t: 'seg', a: 'A', b: 'B', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'B', b: 'C', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'A', b: 'C', c: '#10b981', w: 3 },
+      { t: 'angle', at: 'B', a: 'A', b: 'C', r: 13, label: '80°' },
+      { t: 'text', at: mid(P.A, P.C, 0.55), text: '42.9', dx: -16, dy: 10 }],
+
+    /* (a)(ii) <ACB by the sine formula */
+    2: [{ t: 'poly', v: ['A', 'B', 'C'], fill: CAB },
+      { t: 'seg', a: 'A', b: 'C', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'B', b: 'C', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'A', b: 'B', c: '#8b5cf6', w: 2.2, dash: [6, 5] },
+      { t: 'angle', at: 'C', a: 'A', b: 'B', r: 11, label: '66.6°' }],
+
+    /* (a)(iii) the card: two congruent triangles + central ACD, creases AC, AD */
+    3: [{ t: 'poly', v: ['A', 'C', 'D'], fill: CAB },
+      { t: 'seg', a: 'A', b: 'C', c: '#8b5cf6', w: 2.6, dash: [7, 5] },
+      { t: 'seg', a: 'A', b: 'D', c: '#8b5cf6', w: 2.6, dash: [7, 5] },
+      { t: 'seg', a: 'C', b: 'D', c: '#f59e0b', w: 2.6 },
+      { t: 'angle', at: 'A', a: 'C', b: 'D', r: 12, label: '49.2°' }],
+
+    /* (b) folding data: <ACD and CD */
+    4: [{ t: 'poly', v: ['A', 'C', 'D'], fill: CAB },
+      { t: 'seg', a: 'A', b: 'C', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'C', b: 'D', c: '#10b981', w: 3 },
+      { t: 'angle', at: 'C', a: 'A', b: 'D', r: 14, label: '65.4°' },
+      { t: 'text', at: mid(P.C, P.D, 0.62), text: '35.73', dy: 14 }],
+
+    /* (b) height: M mid-point of CD, dihedral <AMB, BM sin<AMB */
+    5: [{ t: 'poly', v: ['A', 'C', 'D'], fill: 'rgba(59,130,246,0.07)' },
+      { t: 'seg', a: 'C', b: 'D', c: '#1e3a8a', w: 2.2 },
+      { t: 'seg', a: 'A', b: 'M', c: '#f59e0b', w: 2.8 },
+      { t: 'seg', a: 'B', b: 'M', c: '#f59e0b', w: 2.8 },
+      { t: 'ra', at: 'M', a: 'A', b: 'C', s: 7, c: '#b45309' },
+      { t: 'angle', at: 'M', a: 'A', b: 'B', r: 13, label: '81.7°' },
+      { t: 'dot', at: 'M' }, { t: 'vlabel', at: 'M', text: 'M' }],
+
+    /* (b) volume: base ACD and the height of B above it */
+    6: [{ t: 'poly', v: ['A', 'C', 'D'], fill: 'rgba(16,185,129,0.12)' },
+      { t: 'seg', a: 'B', b: 'N', c: '#8b5cf6', w: 2.4, dash: [6, 5] },
+      { t: 'ra', at: 'N', a: 'B', b: 'D', s: 7, c: '#0f766e' },
+      { t: 'dot', at: 'N' },
+      { t: 'text', at: mid(P.B, P.N), text: 'h 15.86', dx: 30 },
+      { t: 'text', at: mid(P.A, P.C, 0.42), text: 'V ≈ 3690 cm³', dx: -4, dy: -18 }]
+  }
+});
+</script>
+<script>
+/* HKDSE 2015 P1 Q19 — card ABCDB' folded into the pyramid ABCD.
+   Base ACD on the ground (y = 0).  All lengths from AB=AB'=40,
+   BC=B'D=24, <ABC=<AB'D=80 deg, <BCD=132 deg  (see the check table). */
+var P = {
+  A: [17.8628, 0, -39.0322],
+  B: [17.8628, 15.8612, -2.3114],
+  C: [0, 0, 0],
+  D: [35.7256, 0, 0],
+  M: [17.8628, 0, 0],
+  N: [17.8628, 0, -2.3114]
+};
+function mid(a, b, k) {
+  k = (k === undefined) ? 0.5 : k;
+  return [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k];
+}
+var CAB = 'rgba(59,130,246,0.10)';
+
+Fig3D.mount('#cv3d', {
+  v: P,
+  faces: [['A', 'C', 'D'], ['A', 'B', 'C'], ['A', 'B', 'D'], ['B', 'C', 'D']],
+  edges: ['A-B', 'A-C', 'A-D', 'B-C', 'B-D', 'C-D'],
+  ground: { x0: -24, x1: 60, z0: -62, z1: 12 },
+  view: { yaw: -0.75, pitch: -0.45, zoom: 1.06 },
+  labels: { A: 'A', B: 'B', C: 'C', D: 'D' },
+  labelColor: { B: '#ef4444' },
+  labelSteps: { M: 5 },
+  aspect: 0.84,
+  startStep: 1,
+  steps: {
+    /* (a)(i) AC by the cosine formula in triangle ABC */
+    1: [{ t: 'poly', v: ['A', 'B', 'C'], fill: CAB },
+      { t: 'seg', a: 'A', b: 'B', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'B', b: 'C', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'A', b: 'C', c: '#10b981', w: 3 },
+      { t: 'angle', at: 'B', a: 'A', b: 'C', r: 13, label: '80°' },
+      { t: 'text', at: mid(P.A, P.C, 0.55), text: '42.9', dx: -16, dy: 10 }],
+
+    /* (a)(ii) <ACB by the sine formula */
+    2: [{ t: 'poly', v: ['A', 'B', 'C'], fill: CAB },
+      { t: 'seg', a: 'A', b: 'C', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'B', b: 'C', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'A', b: 'B', c: '#8b5cf6', w: 2.2, dash: [6, 5] },
+      { t: 'angle', at: 'C', a: 'A', b: 'B', r: 11, label: '66.6°' }],
+
+    /* (a)(iii) the card: two congruent triangles + central ACD, creases AC, AD */
+    3: [{ t: 'poly', v: ['A', 'C', 'D'], fill: CAB },
+      { t: 'seg', a: 'A', b: 'C', c: '#8b5cf6', w: 2.6, dash: [7, 5] },
+      { t: 'seg', a: 'A', b: 'D', c: '#8b5cf6', w: 2.6, dash: [7, 5] },
+      { t: 'seg', a: 'C', b: 'D', c: '#f59e0b', w: 2.6 },
+      { t: 'angle', at: 'A', a: 'C', b: 'D', r: 12, label: '49.2°' }],
+
+    /* (b) folding data: <ACD and CD */
+    4: [{ t: 'poly', v: ['A', 'C', 'D'], fill: CAB },
+      { t: 'seg', a: 'A', b: 'C', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'C', b: 'D', c: '#10b981', w: 3 },
+      { t: 'angle', at: 'C', a: 'A', b: 'D', r: 14, label: '65.4°' },
+      { t: 'text', at: mid(P.C, P.D, 0.62), text: '35.73', dy: 14 }],
+
+    /* (b) height: M mid-point of CD, dihedral <AMB, BM sin<AMB */
+    5: [{ t: 'poly', v: ['A', 'C', 'D'], fill: 'rgba(59,130,246,0.07)' },
+      { t: 'seg', a: 'C', b: 'D', c: '#1e3a8a', w: 2.2 },
+      { t: 'seg', a: 'A', b: 'M', c: '#f59e0b', w: 2.8 },
+      { t: 'seg', a: 'B', b: 'M', c: '#f59e0b', w: 2.8 },
+      { t: 'ra', at: 'M', a: 'A', b: 'C', s: 7, c: '#b45309' },
+      { t: 'angle', at: 'M', a: 'A', b: 'B', r: 13, label: '81.7°' },
+      { t: 'dot', at: 'M' }, { t: 'vlabel', at: 'M', text: 'M' }],
+
+    /* (b) volume: base ACD and the height of B above it */
+    6: [{ t: 'poly', v: ['A', 'C', 'D'], fill: 'rgba(16,185,129,0.12)' },
+      { t: 'seg', a: 'B', b: 'N', c: '#8b5cf6', w: 2.4, dash: [6, 5] },
+      { t: 'ra', at: 'N', a: 'B', b: 'D', s: 7, c: '#0f766e' },
+      { t: 'dot', at: 'N' },
+      { t: 'text', at: mid(P.B, P.N), text: 'h 15.86', dx: 30 },
+      { t: 'text', at: mid(P.A, P.C, 0.42), text: 'V ≈ 3690 cm³', dx: -4, dy: -18 }]
+  }
+});
+</script>
 </body>
 </html>

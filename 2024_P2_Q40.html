@@ -49,7 +49,7 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
     background:var(--card);border:1px solid var(--line);border-radius:16px;
     box-shadow:0 6px 18px rgba(24,50,90,.08);padding:12px;
   }
-  .diagram{position:sticky;top:16px;max-height:calc(100vh - 2rem);overflow-y:auto;}
+  .diagram{position:sticky;top:12px;}
 
   .panel h2{font-size:.95rem;margin:0 0 8px;color:var(--blue);letter-spacing:.4px;
     text-transform:uppercase;}
@@ -99,8 +99,10 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
     .step{padding:8px;font-size:.83rem;}
     header.top h1{font-size:.92rem;}
   }
+.chip3d{display:inline-block;vertical-align:middle;margin-left:6px;font-size:.58rem;font-weight:700;letter-spacing:.6px;color:#fff;background:linear-gradient(135deg,#2563eb,#0ea5e9);padding:2px 7px;border-radius:20px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;}
 </style>
 <link rel="stylesheet" href="assets/extra.css">
+<link rel="stylesheet" href="assets/fig3d.css">
 </head>
 <body>
 <div class="wrap">
@@ -113,23 +115,12 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
   <div class="split">
 
     <!-- ================= LEFT : DIAGRAM ================= -->
-    <section class="panel diagram">
-      <h2 id="dtitle">Figure · Tetrahedron PQRS</h2>
-      <div style="margin:0 0 14px;"><div style="font-size:.78rem;font-weight:700;color:#334155;margin-bottom:6px;">3D 互動模型 — 拖動旋轉查看不同角度</div><iframe src="https://www.geogebra.org/material/iframe/id/sa2udv8f" width="100%" height="400" style="border:0;border-radius:12px;background:#fff;" allowfullscreen scrolling="no"></iframe></div><canvas id="cv" width="640" height="620"></canvas>
-      <div class="legend">
-        <span><i class="dot" style="background:#7c3aed"></i>S (apex)</span>
-        <span><i class="dot" style="background:#2563eb"></i>P</span>
-        <span><i class="dot" style="background:#12a150"></i>R</span>
-        <span><i class="dot" style="background:#f59e0b"></i>Q (foot)</span>
-        <span><i style="background:#e23b3b"></i>SQ (vertical height h)</span>
-        <span><i style="background:#0ea5e9"></i>Base PQR</span>
-        <span><i style="background:#f59e0b"></i>Right angle at Q</span>
-      </div>
-      <div class="btnrow">
-        <button id="toggleBase">Toggle base fill</button>
-        <button id="reset">Reset view</button>
-      </div>
-    </section>
+          <section class="panel diagram">
+    <h2>3-D Figure <span class="chip3d">3D</span></h2>
+    <div class="fig3d-stage"><canvas id="cv3d"></canvas></div>
+    <div id="figui"></div>
+    <div class="fig3d-hint">拖動旋轉 · 雙指／滾輪縮放　—　drag to rotate, pinch or scroll to zoom</div>
+  </section>
 
     <!-- ================= RIGHT : QUESTION + SOLUTION ================= -->
     <section class="panel">
@@ -227,287 +218,190 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
   </div>
 </div>
 
-<script>
-(function(){
-  const cv = document.getElementById('cv');
-  const ctx = cv.getContext('2d');
-  const W = cv.width, H = cv.height;
 
-  // ---------- geometry (scaled from real dimensions h = 1 unit) ----------
-  // Base PQR : right angle at Q, PQ = sqrt3, RQ = 1 (h = 1)
-  const h = 1;
-  const PQ = Math.sqrt(3)*h;   // ~1.732
-  const RQ = h;                // 1
-  const PR = 2*h;              // 2
-  const PS = 2*h;              // 2
-  const RS = Math.sqrt(2)*h;   // ~1.414
-
-  // world coordinates (x, y, z) : ground plane z = 0, S at height h above Q
-  // put Q at origin, R along +x, P along +y
-  const Q3 = {x:0, y:0, z:0};
-  const R3 = {x:RQ, y:0, z:0};
-  const P3 = {x:0, y:PQ, z:0};
-  const S3 = {x:0, y:0, z:h};
-
-  // simple oblique projection to 2D
-  const scale = 175;
-  const kx = 1.0, ky = -0.58;         // y-axis foreshortening (depth)
-  const kz = -1.0;                    // z up in screen = negative canvas y
-  function proj(p){
-    const sx = p.x;
-    const sy = p.y;
-    const x2 = (sx) * scale + 300;
-    const y2 = (sy*ky + p.z*Math.abs(kz)*0) * 0 + ( -p.y*0.58*scale*0 ) ; // placeholder
-    return {x:0,y:0};
-  }
-  // clean projection function
-  function P2(p){
-    const X = (p.x)*scale + (p.y)*(0.62*scale)*Math.cos(0)  ; // not used
-    return {x:0,y:0};
-  }
-  // (redefine properly)
-  function project(p){
-    const X = p.x*scale*1.0 + p.y*0.45*scale*1.0;
-    const Y = -p.z*scale + p.y*0.30*scale;
-    // centre it
-    return {x: X + 150, y: Y + 380};
-  }
-
-  let baseFill = true;
-
-  // anchor points in canvas space
-  function pts(){
-    return {
-      Q: project(Q3),
-      R: project(R3),
-      P: project(P3),
-      S: project(S3)
-    };
-  }
-
-  function mid(a,b){return {x:(a.x+b.x)/2, y:(a.y+b.y)/2};}
-
-  // ---------- drawing helpers ----------
-  function line(a,b,color,w,dash){
-    ctx.save();
-    ctx.setLineDash(dash||[]);
-    ctx.strokeStyle=color; ctx.lineWidth=w||2.2; ctx.lineCap='round';
-    ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
-    ctx.restore();
-  }
-  function dot(p,color,r,label,dx,dy,labelColor){
-    ctx.beginPath(); ctx.arc(p.x,p.y,r||6,0,Math.PI*2);
-    ctx.fillStyle=color; ctx.fill();
-    ctx.lineWidth=2; ctx.strokeStyle='#fff'; ctx.stroke();
-    if(label){
-      ctx.font='bold 17px Segoe UI, sans-serif';
-      ctx.fillStyle = labelColor || color;
-      ctx.textAlign='center'; ctx.textBaseline='middle';
-      ctx.fillText(label, p.x+(dx||0), p.y+(dy||0));
-    }
-  }
-  function arcMark(center, p1, p2, r, color){
-    const a1 = Math.atan2(p1.y-center.y, p1.x-center.x);
-    const a2 = Math.atan2(p2.y-center.y, p2.x-center.x);
-    ctx.save();
-    ctx.strokeStyle=color; ctx.lineWidth=2.4;
-    ctx.beginPath();
-    // choose shorter direction
-    let diff = a2-a1;
-    while(diff> Math.PI) diff-=2*Math.PI;
-    while(diff< -Math.PI) diff+=2*Math.PI;
-    ctx.arc(center.x, center.y, r, a1, a1+diff, diff<0);
-    ctx.stroke();
-    ctx.restore();
-  }
-  function rightAngleMark(center, p1, p2, size, color){
-    const v1 = {x:p1.x-center.x, y:p1.y-center.y};
-    const v2 = {x:p2.x-center.x, y:p2.y-center.y};
-    const n1 = Math.hypot(v1.x,v1.y), n2 = Math.hypot(v2.x,v2.y);
-    const u1 = {x:v1.x/n1, y:v1.y/n1};
-    const u2 = {x:v2.x/n2, y:v2.y/n2};
-    const a = {x:center.x+u1.x*size, y:center.y+u1.y*size};
-    const b = {x:center.x+u1.x*size+u2.x*size, y:center.y+u1.y*size+u2.y*size};
-    const c = {x:center.x+u2.x*size, y:center.y+u2.y*size};
-    ctx.save();
-    ctx.strokeStyle=color; ctx.lineWidth=2.2;
-    ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.lineTo(c.x,c.y); ctx.stroke();
-    ctx.restore();
-  }
-  function tri(a,b,c,fill,alpha){
-    ctx.save();
-    ctx.globalAlpha = alpha;
-    ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.lineTo(c.x,c.y);
-    ctx.closePath(); ctx.fillStyle=fill; ctx.fill();
-    ctx.restore();
-  }
-
-  let mode = 1;
-
-  function draw(){
-    const {Q,R,P,S} = pts();
-    ctx.clearRect(0,0,W,H);
-
-    // subtle ground grid
-    ctx.save();
-    ctx.strokeStyle='#e2ebf7'; ctx.lineWidth=1;
-    for(let i=0;i<=8;i++){
-      const y = 470 + i*18;
-      ctx.beginPath(); ctx.moveTo(20,y); ctx.lineTo(W-20,y); ctx.stroke();
-    }
-    ctx.restore();
-
-    // base plane PQR fill
-    if(baseFill){
-      tri(P,Q,R,'#bfe0ff',0.42);
-    }
-
-    // ----- highlights depending on step -----
-    const blue='#2563eb', red='#e23b3b', green='#12a150', amber='#f59e0b', purple='#7c3aed', teal='#0891b2';
-
-    // step specific face highlight
-    if(mode===1){
-      tri(P,Q,R,'#bfe0ff',0.5);
-      tri(S,Q,P,'#dbeafe',0.30);
-    }
-    if(mode===2){
-      tri(S,Q,R,'#d6f5e3',0.55);
-    }
-    if(mode===3){
-      tri(S,Q,P,'#fdeccb',0.55);
-      tri(P,Q,R,'#e8f0fe',0.45);
-    }
-    if(mode===4){
-      tri(S,Q,P,'#f3e8ff',0.40);
-      tri(S,Q,R,'#f3e8ff',0.40);
-    }
-    if(mode===5 || mode===6){
-      tri(P,R,S,'#ffe3e3',0.55);
-    }
-
-    // ground base edges
-    line(P,Q, blue, 2.4);
-    line(Q,R, blue, 2.4);
-    line(P,R, teal, 2.2, [7,5]);   // PR is interior of base -> dashed
-
-    // vertical edge SQ
-    line(S,Q, red, 3.2, [8,6]);
-
-    // slant edges
-    line(S,P, purple, 2.8);
-    line(S,R, purple, 2.8);
-
-    // right angle at Q in base
-    rightAngleMark(Q, P, R, 16, amber);
-
-    // angle arcs
-    // angle QRS = 45 at R between RQ and RS
-    arcMark(R, Q, S, 42, green);
-    // angle QPS = 30 at P between PQ and PS
-    arcMark(P, Q, S, 40, amber);
-    // angle PRS
-    if(mode>=5){
-      arcMark(R, P, S, 62, red);
-    }
-
-    // vertices
-    dot(S, purple, 7, 'S', 0, -20, purple);
-    dot(P, blue, 7, 'P', 20, 12, blue);
-    dot(R, green, 7, 'R', -20, 12, green);
-    dot(Q, amber, 7, 'Q', -6, 22, amber);
-
-    // labels for lengths (appear with steps)
-    ctx.font='bold 14px Segoe UI, sans-serif';
-    ctx.textAlign='center'; ctx.textBaseline='middle';
-
-    function lengthLabel(a,b,text,color,off){
-      const m = mid(a,b);
-      ctx.fillStyle='rgba(255,255,255,.86)';
-      const w = ctx.measureText(text).width + 10;
-      ctx.fillRect(m.x-w/2, m.y-11, w, 22);
-      ctx.fillStyle=color;
-      ctx.fillText(text, m.x+(off?off.x:0), m.y+(off?off.y:0));
-    }
-
-    if(mode>=1){
-      lengthLabel(S,Q,'h', red, {x:-26,y:-6});
-    }
-    if(mode>=2){
-      lengthLabel(R,Q,'h', green, {x:0,y:18});
-    }
-    if(mode>=3){
-      lengthLabel(P,Q,'√3 h', amber, {x:-32,y:-8});
-      lengthLabel(P,R,'2h', teal, {x:6,y:20});
-    }
-    if(mode>=4){
-      lengthLabel(S,P,'2h', purple, {x:34,y:-12});
-      lengthLabel(S,R,'√2 h', purple, {x:-34,y:-16});
-    }
-    if(mode>=5){
-      // highlight triangle PRS edges
-      line(P,S, purple, 3.4);
-      line(R,S, purple, 3.4);
-      line(P,R, red, 3.0);
-    }
-
-    // angle value labels
-    if(mode>=2){
-      ctx.fillStyle=green; ctx.font='bold 13px Segoe UI';
-      ctx.fillText('45°', R.x+26, R.y-16);
-    }
-    if(mode>=3){
-      ctx.fillStyle=amber;
-      ctx.fillText('30°', P.x-32, P.y-18);
-    }
-    if(mode>=5){
-      ctx.fillStyle=red;
-      ctx.fillText('θ = ∠PRS', R.x+2, R.y-58);
-    }
-
-    // title
-    ctx.fillStyle='#5b6b82'; ctx.font='12px Segoe UI'; ctx.textAlign='left';
-    ctx.fillText('Base PQR on horizontal ground  ·  Q vertically below S  ·  ∠PQR = 90°', 16, 24);
-  }
-
-  // ---------- interaction ----------
-  document.getElementById('toggleBase').addEventListener('click',()=>{
-    baseFill = !baseFill; draw();
-  });
-  document.getElementById('reset').addEventListener('click',()=>{
-    baseFill = true; mode = 1;
-    document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
-    document.querySelector('.step[data-step="1"]').classList.add('active');
-    draw();
-  });
-
-  // ---------- scroll sync ----------
-  const steps = Array.from(document.querySelectorAll('.step'));
-  const obs = new IntersectionObserver((es)=>{
-    es.forEach(e=>{
-      if(e.isIntersecting){
-        const m = +e.target.dataset.step;
-        mode = m;
-        steps.forEach(st=>st.classList.toggle('active', st===e.target));
-        draw();
-      }
-    });
-  },{rootMargin:'-15% 0px -55% 0px', threshold:0});
-  steps.forEach(st=>obs.observe(st));
-
-  // initial
-  steps[0].classList.add('active');
-  mode = 1;
-  draw();
-
-  // redraw on resize (canvas stays fixed size, but be safe)
-  window.addEventListener('resize', ()=>draw());
-})();
-</script>
 <!-- question-pager -->
 <nav class="qnav" aria-label="Question navigation">
   <a class="qnav__prev" href="2024_P2_Q39.html">← Previous Question</a>
   <a class="qnav__mid" href="index.html#y2024">Contents</a>
   <a class="qnav__next" href="2024_P2_Q41.html">Next Question →</a>
 </nav>
+<script src="assets/fig3d.js"></script>
+<script>
+/* HKDSE 2024 P2 Q40 — tetrahedron PQRS, base PQR on the ground, Q vertically below S */
+var g = Math.sqrt(3) * 10;
+var P = {
+  Q: [0, 0, 0],
+  R: [10, 0, 0],
+  P: [0, 0, -g],
+  S: [0, 10, 0]
+};
+
+var s1 = [
+  { t: 'seg', a: 'S', b: 'Q', c: '#ef4444', w: 3 },
+  { t: 'ra', at: 'Q', a: 'S', b: 'P', s: 8, c: '#b45309' },
+  { t: 'ra', at: 'Q', a: 'S', b: 'R', s: 8, c: '#b45309' },
+  { t: 'text', at: [0, 5, 0], text: 'h', dx: 15, dy: -2, c: '#ef4444' }
+];
+var s2 = s1.concat([
+  { t: 'seg', a: 'R', b: 'Q', c: '#f59e0b', w: 3 },
+  { t: 'angle', at: 'R', a: 'Q', b: 'S', r: 26, label: '45°' },
+  { t: 'text', at: [5, 0, 0], text: 'h', dx: 0, dy: 17 }
+]);
+var s3 = s2.concat([
+  { t: 'seg', a: 'P', b: 'Q', c: '#f59e0b', w: 3 },
+  { t: 'poly', v: ['P', 'Q', 'R'], fill: 'rgba(139,92,246,0.12)' },
+  { t: 'seg', a: 'P', b: 'R', c: '#8b5cf6', w: 2.4, dash: [6, 5] },
+  { t: 'angle', at: 'P', a: 'Q', b: 'S', r: 24, label: '30°' },
+  { t: 'text', at: [0, 0, -g / 2], text: '√3h', dx: -20, dy: 2, c: '#b45309' }
+]);
+var s4 = s1.concat([
+  { t: 'seg', a: 'P', b: 'S', c: '#f59e0b', w: 3 },
+  { t: 'seg', a: 'R', b: 'S', c: '#f59e0b', w: 3 },
+  { t: 'seg', a: 'P', b: 'R', c: '#10b981', w: 2.6 },
+  { t: 'text', at: [0, 5, -g / 2], text: '2h', dx: -18, dy: 0 },
+  { t: 'text', at: [5, 5, 0], text: '√2h', dx: 12, dy: -14 }
+]);
+var s5 = [
+  { t: 'poly', v: ['P', 'R', 'S'], fill: 'rgba(16,185,129,0.14)' },
+  { t: 'seg', a: 'R', b: 'P', c: '#10b981', w: 3 },
+  { t: 'seg', a: 'R', b: 'S', c: '#10b981', w: 3 },
+  { t: 'seg', a: 'P', b: 'S', c: '#10b981', w: 2.2, dash: [7, 5] },
+  { t: 'angle', at: 'R', a: 'P', b: 'S', r: 34, label: '69.3°' }
+];
+var s6 = s5.concat([
+  { t: 'text', at: 'R', text: 'cos = 0.354', dx: -4, dy: 48, c: '#047857' }
+]);
+
+Fig3D.mount('#cv3d', {
+  v: P,
+  faces: [['P', 'Q', 'R'], ['S', 'Q', 'P'], ['S', 'Q', 'R'], ['S', 'P', 'R']],
+  edges: ['P-Q', 'Q-R', 'P-R', 'S-P', 'S-Q', 'S-R'],
+  ground: { x0: -28, x1: 32, z0: -34, z1: 22 },
+  view: { yaw: 0.9, pitch: -0.32, zoom: 1.02 },
+  labels: { P: 'P', Q: 'Q', R: 'R', S: 'S' },
+  labelColor: { S: '#ef4444' },
+  labelsNudge: { Q: 1.9, R: -0.15, P: 0.1, S: -0.1 },
+  startStep: 1,
+  steps: { 1: s1, 2: s2, 3: s3, 4: s4, 5: s5, 6: s6 }
+});
+</script>
+<script>
+/* HKDSE 2024 P2 Q40 — tetrahedron PQRS, base PQR on the ground, Q vertically below S */
+var g = Math.sqrt(3) * 10;
+var P = {
+  Q: [0, 0, 0],
+  R: [10, 0, 0],
+  P: [0, 0, -g],
+  S: [0, 10, 0]
+};
+
+var s1 = [
+  { t: 'seg', a: 'S', b: 'Q', c: '#ef4444', w: 3 },
+  { t: 'ra', at: 'Q', a: 'S', b: 'P', s: 1.8, c: '#b45309' },
+  { t: 'ra', at: 'Q', a: 'S', b: 'R', s: 1.8, c: '#b45309' },
+  { t: 'text', at: [0, 5, 0], text: 'h', dx: 15, dy: -2, c: '#ef4444' }
+];
+var s2 = s1.concat([
+  { t: 'seg', a: 'R', b: 'Q', c: '#f59e0b', w: 3 },
+  { t: 'angle', at: 'R', a: 'Q', b: 'S', r: 2.6, label: '45°' },
+  { t: 'text', at: [5, 0, 0], text: 'h', dx: 0, dy: 17 }
+]);
+var s3 = s2.concat([
+  { t: 'seg', a: 'P', b: 'Q', c: '#f59e0b', w: 3 },
+  { t: 'poly', v: ['P', 'Q', 'R'], fill: 'rgba(139,92,246,0.12)' },
+  { t: 'seg', a: 'P', b: 'R', c: '#8b5cf6', w: 2.4, dash: [6, 5] },
+  { t: 'angle', at: 'P', a: 'Q', b: 'S', r: 2.2, label: '30°' },
+  { t: 'text', at: [0, 0, -g / 2], text: '√3h', dx: -20, dy: 2, c: '#b45309' }
+]);
+var s4 = s1.concat([
+  { t: 'seg', a: 'P', b: 'S', c: '#f59e0b', w: 3 },
+  { t: 'seg', a: 'R', b: 'S', c: '#f59e0b', w: 3 },
+  { t: 'seg', a: 'P', b: 'R', c: '#10b981', w: 2.6 },
+  { t: 'text', at: [0, 5, -g / 2], text: '2h', dx: -18, dy: 0 },
+  { t: 'text', at: [5, 5, 0], text: '√2h', dx: 12, dy: -14 }
+]);
+var s5 = [
+  { t: 'poly', v: ['P', 'R', 'S'], fill: 'rgba(16,185,129,0.14)' },
+  { t: 'seg', a: 'R', b: 'P', c: '#10b981', w: 3 },
+  { t: 'seg', a: 'R', b: 'S', c: '#10b981', w: 3 },
+  { t: 'seg', a: 'P', b: 'S', c: '#10b981', w: 2.2, dash: [7, 5] },
+  { t: 'angle', at: 'R', a: 'P', b: 'S', r: 3.0, label: '69.3°' }
+];
+var s6 = s5.concat([
+  { t: 'text', at: 'R', text: 'cos = 0.354', dx: -4, dy: 48, c: '#047857' }
+]);
+
+Fig3D.mount('#cv3d', {
+  v: P,
+  faces: [['P', 'Q', 'R'], ['S', 'Q', 'P'], ['S', 'Q', 'R'], ['S', 'P', 'R']],
+  edges: ['P-Q', 'Q-R', 'P-R', 'S-P', 'S-Q', 'S-R'],
+  ground: { x0: -22, x1: 26, z0: -30, z1: 16 },
+  view: { yaw: 0.95, pitch: -0.40, zoom: 0.78 },
+  labels: { P: 'P', Q: 'Q', R: 'R', S: 'S' },
+  labelColor: { S: '#ef4444' },
+  labelsNudge: { Q: 1.9, R: -0.15, P: 0.1, S: -0.1 },
+  startStep: 1,
+  steps: { 1: s1, 2: s2, 3: s3, 4: s4, 5: s5, 6: s6 }
+});
+</script>
+<script>
+/* HKDSE 2024 P2 Q40 — tetrahedron PQRS, base PQR on the ground, Q vertically below S */
+var g = Math.sqrt(3) * 10;
+var P = {
+  Q: [0, 0, 0],
+  R: [10, 0, 0],
+  P: [0, 0, -g],
+  S: [0, 10, 0]
+};
+
+var s1 = [
+  { t: 'seg', a: 'S', b: 'Q', c: '#ef4444', w: 3 },
+  { t: 'ra', at: 'Q', a: 'S', b: 'P', s: 1.8, c: '#b45309' },
+  { t: 'ra', at: 'Q', a: 'S', b: 'R', s: 1.8, c: '#b45309' },
+  { t: 'text', at: [0, 5, 0], text: 'h', dx: 15, dy: -2, c: '#ef4444' }
+];
+var s2 = s1.concat([
+  { t: 'seg', a: 'R', b: 'Q', c: '#f59e0b', w: 3 },
+  { t: 'angle', at: 'R', a: 'Q', b: 'S', r: 2.6, label: '45°' },
+  { t: 'text', at: [5, 0, 0], text: 'h', dx: 0, dy: 17 }
+]);
+var s3 = s2.concat([
+  { t: 'seg', a: 'P', b: 'Q', c: '#f59e0b', w: 3 },
+  { t: 'poly', v: ['P', 'Q', 'R'], fill: 'rgba(139,92,246,0.12)' },
+  { t: 'seg', a: 'P', b: 'R', c: '#8b5cf6', w: 2.4, dash: [6, 5] },
+  { t: 'angle', at: 'P', a: 'Q', b: 'S', r: 2.2, label: '30°' },
+  { t: 'text', at: [0, 0, -g / 2], text: '√3h', dx: -20, dy: 2, c: '#b45309' }
+]);
+var s4 = s1.concat([
+  { t: 'seg', a: 'P', b: 'S', c: '#f59e0b', w: 3 },
+  { t: 'seg', a: 'R', b: 'S', c: '#f59e0b', w: 3 },
+  { t: 'seg', a: 'P', b: 'R', c: '#10b981', w: 2.6 },
+  { t: 'text', at: [0, 5, -g / 2], text: '2h', dx: -18, dy: 0 },
+  { t: 'text', at: [5, 5, 0], text: '√2h', dx: 12, dy: -14 }
+]);
+var s5 = [
+  { t: 'poly', v: ['P', 'R', 'S'], fill: 'rgba(16,185,129,0.14)' },
+  { t: 'seg', a: 'R', b: 'P', c: '#10b981', w: 3 },
+  { t: 'seg', a: 'R', b: 'S', c: '#10b981', w: 3 },
+  { t: 'seg', a: 'P', b: 'S', c: '#10b981', w: 2.2, dash: [7, 5] },
+  { t: 'angle', at: 'R', a: 'P', b: 'S', r: 3.0, label: '69.3°' }
+];
+var s6 = s5.concat([
+  { t: 'text', at: 'R', text: 'cos = 0.354', dx: -4, dy: 48, c: '#047857' }
+]);
+
+Fig3D.mount('#cv3d', {
+  v: P,
+  faces: [['P', 'Q', 'R'], ['S', 'Q', 'P'], ['S', 'Q', 'R'], ['S', 'P', 'R']],
+  edges: ['P-Q', 'Q-R', 'P-R', 'S-P', 'S-Q', 'S-R'],
+  ground: { x0: -22, x1: 26, z0: -30, z1: 16 },
+  view: { yaw: -0.75, pitch: -0.45, zoom: 0.82 },
+  labels: { P: 'P', Q: 'Q', R: 'R', S: 'S' },
+  labelColor: { S: '#ef4444' },
+  labelsNudge: { Q: 1.9, R: -0.15, P: 0.1, S: -0.1 },
+  startStep: 1,
+  steps: { 1: s1, 2: s2, 3: s3, 4: s4, 5: s5, 6: s6 }
+});
+</script>
 </body>
 </html>

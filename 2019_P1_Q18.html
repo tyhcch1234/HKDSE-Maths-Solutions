@@ -52,12 +52,7 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
     box-shadow:0 10px 28px rgba(21,50,92,.08);
     padding:14px;
   }
-  .diagram{
-    position:sticky;
-    top:16px;
-    max-height:calc(100vh - 2rem);
-    overflow-y:auto;
-  }
+  .diagram{position:sticky;top:12px;}
   h1{
     font-size:1.05rem;
     margin:0 0 4px;
@@ -168,25 +163,20 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
     h1{font-size:.95rem;}
     .legend{font-size:.66rem;gap:6px 10px;}
   }
+.chip3d{display:inline-block;vertical-align:middle;margin-left:6px;font-size:.58rem;font-weight:700;letter-spacing:.6px;color:#fff;background:linear-gradient(135deg,#2563eb,#0ea5e9);padding:2px 7px;border-radius:20px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;}
 </style>
 <link rel="stylesheet" href="assets/extra.css">
+<link rel="stylesheet" href="assets/fig3d.css">
 </head>
 <body>
 <div class="split">
 
   <!-- ================= LEFT: DIAGRAM ================= -->
-  <section class="panel diagram">
-    <h1>Figure 3 — Tetrahedron \(ABCD\)</h1>
-    <p class="subtitle">Interactive diagram · follows the active step</p>
-    <div style="margin:0 0 14px;"><div style="font-size:.78rem;font-weight:700;color:#334155;margin-bottom:6px;">3D 互動模型 — 拖動旋轉查看不同角度</div><iframe src="https://www.geogebra.org/material/iframe/id/kbnnyzh9" width="100%" height="400" style="border:0;border-radius:12px;background:#fff;" allowfullscreen scrolling="no"></iframe></div><canvas id="cv" width="760" height="720"></canvas>
-    <div class="legend">
-      <span><i class="swatch" style="background:#2563eb"></i>Solid edge (visible)</span>
-      <span><i class="dash"></i>Hidden edge</span>
-      <span><i class="swatch" style="background:#e11d48"></i>\(BP\perp AD\)</span>
-      <span><i class="swatch" style="background:#059669"></i>\(CP\)</span>
-      <span><i class="swatch" style="background:#d97706"></i>\(\angle BAD=72^\circ\)</span>
-      <span><i class="swatch" style="background:#7c3aed"></i>\(\angle CAP=60^\circ\)</span>
-    </div>
+        <section class="panel diagram">
+    <h2>3-D Figure <span class="chip3d">3D</span></h2>
+    <div class="fig3d-stage"><canvas id="cv3d"></canvas></div>
+    <div id="figui"></div>
+    <div class="fig3d-hint">拖動旋轉 · 雙指／滾輪縮放　—　drag to rotate, pinch or scroll to zoom</div>
   </section>
 
   <!-- ================= RIGHT: SOLUTION ================= -->
@@ -347,312 +337,242 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
   </section>
 </div>
 
-<script>
-/* ---------- geometry model (uniform scale) ---------- */
-/* Build the tetrahedron from real edge lengths using a 3D model, then project to 2D.
-   Vertices (3D):
-     Place A at origin, AD along a direction, then build.                       */
 
-const DEG = Math.PI/180;
-const AD=13, AC=13, CD=13, BC=8, BD=12;
-const BABD=72*DEG;          // angle ABD (at B) between BA and BD
-
-/* --- find triangle ABD in 3D ---
-   Put A=(0,0,0). Put D on x-axis: D=(13,0,0).
-   B is at distance BD=12 from D and angle ABD=72°, i.e. angle between BA and BD.
-   Let B=(x,y,0). Then:
-      |B-D|=12 , angle between (A-B) and (D-B) = 72°.                          */
-let D3=[AD,0,0];
-let B3=null;
-{
-  // |B-D|^2 = 144
-  // BA·BD = |BA||BD|cos72
-  // Let B=(x,y). Then (A-B)=(-x,-y), (D-B)=(13-x,-y)
-  // (A-B)·(D-B) = -x(13-x)+y^2 = x^2 -13x + y^2
-  // |BA| = sqrt(x^2+y^2), |BD| = 12
-  // => x^2 -13x + y^2 = 12*|BA|*cos72
-  // and (13-x)^2+y^2 = 144  =>  x^2+y^2 -26x +169 =144 => x^2+y^2 = 26x -25
-  // substitute:
-  // (26x-25) -13x = 12*sqrt(26x-25)*cos72
-  // 13x-25 = 12 cos72 * sqrt(26x-25)
-  // solve numerically:
-  const c=Math.cos(BABD);
-  let best=null;
-  for(let x=-40;x<=40;x+=0.0005){
-    const lhs=13*x-25;
-    if(lhs<0) continue;
-    const rhs=12*c*Math.sqrt(26*x-25);
-    const d=lhs-rhs;
-    if(best===null||Math.abs(d)<Math.abs(best.d)) best={x,d};
-  }
-  const x=best.x;
-  const y=Math.sqrt(Math.max(0,26*x-25));
-  B3=[x,y,0];
-}
-/* C is at distance 13 from A and D (so it lies in the perpendicular bisector plane of AD, x=6.5),
-   and at distance 8 from B. */
-let C3=null;
-{
-  // x=AD/2=6.5 ; y^2+z^2 = 13^2 - 6.5^2 = 169-42.25=126.75
-  const x=AD/2;
-  const r2=AC*AC-x*x;   // =126.75
-  // |C-B|^2 = 64 ; B=(Bx,By,0)
-  const Bx=B3[0], By=B3[1];
-  // (x-Bx)^2+(y-By)^2+z^2 = 64
-  // y^2+z^2 = r2  =>  z^2 = r2 - y^2
-  // (x-Bx)^2 + y^2 -2By y + By^2 + r2 - y^2 = 64
-  // (x-Bx)^2 + By^2 + r2 - 2 By y = 64
-  const By2=By;
-  const y=((x-Bx)*(x-Bx) + By2*By2 + r2 - BC*BC) / (2*By2);
-  const yv=Math.max(-1,Math.min(1,y));
-  const z=Math.sqrt(Math.max(0, r2 - yv*yv));
-  C3=[x, yv, z];
-}
-/* Projection: we want a view close to the exam figure.
-   The exam figure is a perspective-ish drawing: A right, B lower-left, D top, C left.
-   We'll use a simple oblique/axonometric projection with a chosen camera direction. */
-function project(p){
-  // camera: view direction roughly along (-0.55, 0.55, 0.63) to give a nice 3/4 view
-  const ex=[-0.62, 0.55, 0.56];
-  const ez0=[0,0,1];
-  let up=[-0.30, 0.78, -0.55];
-  // orthonormalize
-  const n=v=>{const L=Math.hypot(v[0],v[1],v[2]);return [v[0]/L,v[1]/L,v[2]/L];};
-  const dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
-  const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]];
-  const sub=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]];
-  let d=n(ex);                    // view direction
-  let u=n(sub(up, [d[0]*dot(up,d), d[1]*dot(up,d), d[2]*dot(up,d)]));
-  let r=cross(u,d);
-  return [dot(p,r), dot(p,u)];   // screen x,y (y up positive)
-}
-/* choose the sign so A is to the right and D is up, like the figure */
-const A3=[0,0,0];
-let rawA=project(A3), rawB=project(B3), rawC=project(C3), rawD=project(D3);
-/* We'll work in a coordinate frame where we flip so that A is rightmost.
-   Simply compute and then rotate/scale to fit nicely. */
-
-/* --- build the drawing --- */
-const cv=document.getElementById('cv');
-const ctx=cv.getContext('2d');
-
-/* map model coords -> canvas */
-let MAP={s:1,ox:0,oy:0};
-function computeMap(){
-  const pts=[rawA,rawB,rawC,rawD];
-  let minx=Infinity,maxx=-Infinity,miny=Infinity,maxy=-Infinity;
-  pts.forEach(p=>{minx=Math.min(minx,p[0]);maxx=Math.max(maxx,p[0]);
-                  miny=Math.min(miny,p[1]);maxy=Math.max(maxy,p[1]);});
-  const pad=110;
-  const W=cv.width, H=cv.height;
-  const sx=(W-2*pad)/Math.max(1e-6,(maxx-minx));
-  const sy=(H-2*pad)/Math.max(1e-6,(maxy-miny));
-  const s=Math.min(sx,sy);
-  const cx=(minx+maxx)/2, cy=(miny+maxy)/2;
-  MAP={s:s, ox:W/2 - s*cx, oy:H/2 + s*cy}; // y flip handled below
-}
-computeMap();
-
-function P(v3){ // 3D -> canvas
-  const p=project(v3);
-  return [MAP.ox + MAP.s*p[0], MAP.oy - MAP.s*p[1]];
-}
-
-/* P on AD: from step-by-step values AP ≈ 4.754971614 */
-const AP=4.754971614;
-const P3=[AP/AD*D3[0], AP/AD*D3[1], AP/AD*D3[2]];
-
-/* --- colours --- */
-const C={
-  edge:'#2563eb', hidden:'#64748b', bp:'#e11d48', cp:'#059669',
-  angle:'#d97706', cap:'#7c3aed', vertex:'#0f172a', face:'rgba(37,99,235,.09)',
-  face2:'rgba(5,150,105,.10)'
-};
-
-function line(a,b,color,width,dash){
-  ctx.save();
-  ctx.setLineDash(dash||[]);
-  ctx.strokeStyle=color; ctx.lineWidth=width||2.6; ctx.lineCap='round';
-  ctx.beginPath(); ctx.moveTo(a[0],a[1]); ctx.lineTo(b[0],b[1]); ctx.stroke();
-  ctx.restore();
-}
-function dot(pt,color,r,label,dx,dy,lcolor){
-  ctx.save();
-  ctx.beginPath(); ctx.arc(pt[0],pt[1],r,0,Math.PI*2);
-  ctx.fillStyle=color; ctx.fill();
-  ctx.lineWidth=2; ctx.strokeStyle='#fff'; ctx.stroke();
-  if(label){
-    ctx.fillStyle=lcolor||'#0f172a';
-    ctx.font='bold 19px "Segoe UI",Arial';
-    ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText(label, pt[0]+(dx||0), pt[1]+(dy||0));
-  }
-  ctx.restore();
-}
-function arcAngle(center,a,b,radius,color,lw){
-  const a0=Math.atan2(a[1]-center[1],a[0]-center[0]);
-  const a1=Math.atan2(b[1]-center[1],b[0]-center[0]);
-  // choose the shorter sweep
-  let d=a1-a0;
-  while(d>Math.PI) d-=2*Math.PI;
-  while(d<-Math.PI) d+=2*Math.PI;
-  ctx.save();
-  ctx.strokeStyle=color; ctx.lineWidth=lw||2.4;
-  ctx.beginPath(); ctx.arc(center[0],center[1],radius,a0,a1,d>0); ctx.stroke();
-  ctx.restore();
-}
-function labelAt(pt,text,color,dx,dy,font){
-  ctx.save();
-  ctx.fillStyle=color||'#0f172a';
-  ctx.font=font||'bold 16px "Segoe UI",Arial';
-  ctx.textAlign='center'; ctx.textBaseline='middle';
-  ctx.fillText(text,pt[0]+dx,pt[1]+dy);
-  ctx.restore();
-}
-
-let mode=1;
-
-function draw(){
-  const W=cv.width,H=cv.height;
-  ctx.clearRect(0,0,W,H);
-
-  /* ---- triangles as shaded faces ---- */
-  const A=P(A3),B=P(B3),C=P(C3),D=P(D3),Pp=P(P3);
-
-  function poly(pts,fill,stroke,lw,dash){
-    ctx.save();
-    ctx.setLineDash(dash||[]);
-    ctx.beginPath();
-    ctx.moveTo(pts[0][0],pts[0][1]);
-    for(let i=1;i<pts.length;i++) ctx.lineTo(pts[i][0],pts[i][1]);
-    ctx.closePath();
-    if(fill){ctx.fillStyle=fill;ctx.fill();}
-    if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lw||2;ctx.stroke();}
-    ctx.restore();
-  }
-
-  poly([A,B,D],mode===1||mode===2||mode===3?C.face:'rgba(200,200,200,0)',null,0);
-  poly([A,C,D],mode>=4&&mode<=7?C.face2:'rgba(200,200,200,0)',null,0);
-
-  /* ---- edges ---- */
-  // Hidden edges: AB and AC (they lie "behind" when viewed from the front like the figure)
-  line(A,B,C.hidden,2.4,[8,6]);
-  line(A,C,C.hidden,2.4,[8,6]);
-
-  // Visible solid edges
-  line(B,C,C.edge,3.0);
-  line(B,D,C.edge,3.0);
-  line(C,D,C.edge,3.0);
-  line(A,D,C.edge,3.0);
-
-  /* ---- BP (perpendicular to AD) ---- */
-  if(mode>=3){
-    line(B,Pp,C.bp,3.0);
-    // right-angle mark at P between PB and PD
-    const vBP=[B[0]-Pp[0],B[1]-Pp[1]];
-    const vDP=[D[0]-Pp[0],D[1]-Pp[1]];
-    const nBP=Math.hypot(vBP[0],vBP[1])||1;
-    const nDP=Math.hypot(vDP[0],vDP[1])||1;
-    const u1=[vBP[0]/nBP,vBP[1]/nBP], u2=[vDP[0]/nDP,vDP[1]/nDP];
-    const sz=20;
-    ctx.save();
-    ctx.strokeStyle=C.bp; ctx.lineWidth=2.2;
-    ctx.beginPath();
-    ctx.moveTo(Pp[0]+u1[0]*sz, Pp[1]+u1[1]*sz);
-    ctx.lineTo(Pp[0]+(u1[0]+u2[0])*sz, Pp[1]+(u1[1]+u2[1])*sz);
-    ctx.lineTo(Pp[0]+u2[0]*sz, Pp[1]+u2[1]*sz);
-    ctx.stroke();
-    ctx.restore();
-  }
-
-  /* ---- CP ---- */
-  if(mode>=5){
-    line(C,Pp,C.cp,3.0);
-  }
-
-  /* ---- angle BAD at A ---- */
-  if(mode===1||mode===2){
-    const vAB=[B[0]-A[0],B[1]-A[1]];
-    const vAD=[D[0]-A[0],D[1]-A[1]];
-    const nAB=Math.hypot(vAB[0],vAB[1])||1;
-    const nAD=Math.hypot(vAD[0],vAD[1])||1;
-    const u1=[vAB[0]/nAB,vAB[1]/nAB], u2=[vAD[0]/nAD,vAD[1]/nAD];
-    // line from A along B and D
-    line(A,[A[0]+u1[0]*Math.min(nAB,90), A[1]+u1[1]*Math.min(nAB,90)],C.angle,2.2,[5,4]);
-    line(A,[A[0]+u2[0]*Math.min(nAD,90), A[1]+u2[1]*Math.min(nAD,90)],C.angle,2.2,[5,4]);
-    arcAngle(A,B,D,46,C.angle,3);
-    labelAt([A[0]+u2[0]*74-6, A[1]+u2[1]*74+8],'72°',C.angle,0,0,'bold 15px "Segoe UI",Arial');
-    // right angle at A between AC and AD? no, mark AB? Actually label ∠BAD
-  }
-
-  /* ---- right angle at P (APC) in step 6/7 to show it is NOT 90 deg ---- */
-  if(mode===6||mode===7){
-    // angle APC at P between PA and PC
-    arcAngle(Pp,A,C,34,C.cp,3);
-    labelAt([Pp[0]-34, Pp[1]-26],'θ',C.cp,0,0,'bold 16px "Segoe UI",Arial');
-  }
-
-  /* ---- angle CAP = 60 (step 4/5) ---- */
-  if(mode===4||mode===5){
-    arcAngle(A,C,Pp,52,C.cap,3);
-    const vAC=[C[0]-A[0],C[1]-A[1]];
-    const vAP=[Pp[0]-A[0],Pp[1]-A[1]];
-    const nAC=Math.hypot(vAC[0],vAC[1])||1;
-    labelAt([A[0]+vAC[0]/nAC*78, A[1]+vAC[1]/nAC*78],'60°',C.cap,0,0,'bold 15px "Segoe UI",Arial');
-  }
-
-  /* ---- vertices ---- */
-  dot(A,C.vertex,6.5,'A',26,6);
-  dot(B,C.vertex,6.5,'B',-6,26);
-  dot(C,C.vertex,6.5,'C',-26,6);
-  dot(D,C.vertex,6.5,'D',4,-26);
-
-  /* P point */
-  if(mode>=3){
-    dot(Pp,'#f59e0b',6,'P',20,-16,'#b45309');
-  }
-
-  /* ---- on-canvas step caption ---- */
-  ctx.save();
-  ctx.fillStyle='rgba(16,36,63,.72)';
-  ctx.font='bold 15px "Segoe UI",Arial';
-  ctx.textAlign='left'; ctx.textBaseline='top';
-  const cap=[
-    '',
-    'Step 1–2: Focus on △ABD and angle BAD',
-    'Step 3: Drop BP ⟂ AD (right angle at P)',
-    'Step 4: △ACD is equilateral → ∠CAP = 60°',
-    'Step 5: In △ACP, use cosine formula for CP',
-    'Step 6: Check AP² + CP² vs AC² → ∠APC ≠ 90°',
-    'Step 7: CP not ⟂ AD, so ∠BPC is not the dihedral angle'
-  ][mode]||'';
-  ctx.fillText(cap, 14, 14);
-  ctx.restore();
-}
-
-/* ---- scroll sync ---- */
-const steps=Array.from(document.querySelectorAll('.step'));
-const obs=new IntersectionObserver((es)=>{
-  es.forEach(e=>{
-    if(e.isIntersecting){
-      const m=+e.target.dataset.step; mode=m;
-      steps.forEach(st=>st.classList.toggle('active',st===e.target));
-      draw();
-    }
-  });
-},{rootMargin:'-15% 0px -55% 0px',threshold:0});
-steps.forEach(st=>obs.observe(st));
-
-/* initial */
-steps[0].classList.add('active');
-draw();
-window.addEventListener('resize',()=>{ draw(); });
-</script>
 <!-- question-pager -->
 <nav class="qnav" aria-label="Question navigation">
   <a class="qnav__prev" href="2019_P1_Q17.html">← Previous Question</a>
   <a class="qnav__mid" href="index.html#y2019">Contents</a>
   <a class="qnav__next" href="2019_P1_Q19.html">Next Question →</a>
 </nav>
+<script src="assets/fig3d.js"></script>
+<script>
+/* HKDSE 2019 P1 Q18 — tetrahedron ABCD (AC=AD=CD=13, BC=8, BD=12, /ABD=72),
+   face ABC on the ground, P on AD with BP _|_ AD */
+var V = {
+  A: [0, 0, 0], B: [-7.8334, 0, 6.1079], C: [-13, 0, 0],
+  D: [-6.5000, 11.1155, 1.7874], P: [-2.3782, 4.0670, 0.6540]
+};
+function mid(a, b) {
+  var p = V[a], q = V[b];
+  return [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2, (p[2] + q[2]) / 2];
+}
+
+Fig3D.mount('#cv3d', {
+  v: V,
+  faces: [['A', 'B', 'C'], ['A', 'B', 'D'], ['B', 'C', 'D'], ['C', 'A', 'D']],
+  edges: ['A-B', 'B-C', 'C-A', 'A-D', 'B-D', 'C-D'],
+  ground: { x0: -26, x1: 14, z0: -14, z1: 22 },
+  groundOpt: { x0: -26, x1: 14, z0: -14, z1: 22, gx: 5, gz: 5 },
+  view: { yaw: 0.95, pitch: -0.30, zoom: 1.06 },
+  labels: { A: 'A', B: 'B', C: 'C', D: 'D', P: 'P' },
+  labelColor: { D: '#ef4444' },
+  labelsNudge: { P: 1.25, B: -0.35 },
+  startStep: 1,
+  steps: {
+    1: [{ t: 'poly', v: ['A', 'B', 'D'], fill: 'rgba(139,92,246,0.12)' },
+      { t: 'seg', a: 'A', b: 'D', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'B', b: 'D', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'A', b: 'B', c: '#8b5cf6', w: 2.2, dash: [6, 5] },
+      { t: 'angle', at: 'B', a: 'A', b: 'D', r: 20, label: '72°' },
+      { t: 'text', at: mid('A', 'D'), text: '13', dx: -6, dy: -14 },
+      { t: 'text', at: mid('B', 'D'), text: '12', dx: -14, dy: 6 }],
+    2: [{ t: 'poly', v: ['A', 'B', 'D'], fill: 'rgba(139,92,246,0.12)' },
+      { t: 'seg', a: 'A', b: 'D', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'B', b: 'D', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'A', b: 'B', c: '#f59e0b', w: 3 },
+      { t: 'angle', at: 'B', a: 'A', b: 'D', r: 20, label: '72°' },
+      { t: 'angle', at: 'A', a: 'B', b: 'D', r: 26, label: '61.4°', c: '#10b981' },
+      { t: 'text', at: mid('B', 'D'), text: '12', dx: -14, dy: 6 }],
+    3: [{ t: 'poly', v: ['A', 'B', 'D'], fill: 'rgba(139,92,246,0.10)' },
+      { t: 'seg', a: 'B', b: 'P', c: '#8b5cf6', w: 2.6, dash: [6, 5] },
+      { t: 'ra', at: 'P', a: 'B', b: 'D', s: 3.2, c: '#8b5cf6' },
+      { t: 'seg', a: 'A', b: 'P', c: '#10b981', w: 4.2 },
+      { t: 'seg', a: 'P', b: 'D', c: '#f59e0b', w: 2.4 },
+      { t: 'dot', at: 'P' }, { t: 'vlabel', at: 'P', text: 'P' },
+      { t: 'text', at: mid('A', 'P'), text: '4.76', dx: -20, dy: 18, c: '#047857' },
+      { t: 'text', at: mid('P', 'D'), text: '8.25', dx: 16, dy: -6 }],
+    4: [{ t: 'poly', v: ['A', 'C', 'D'], fill: 'rgba(59,130,246,0.14)' },
+      { t: 'seg', a: 'A', b: 'C', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'A', b: 'D', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'C', b: 'D', c: '#f59e0b', w: 2.4 },
+      { t: 'angle', at: 'A', a: 'C', b: 'D', r: 24, label: '60°', c: '#10b981' },
+      { t: 'text', at: mid('C', 'D'), text: '13', dx: -8, dy: -12 }],
+    5: [{ t: 'poly', v: ['A', 'C', 'P'], fill: 'rgba(16,185,129,0.13)' },
+      { t: 'seg', a: 'A', b: 'P', c: '#f59e0b', w: 2.4 },
+      { t: 'seg', a: 'A', b: 'C', c: '#f59e0b', w: 2.4 },
+      { t: 'seg', a: 'C', b: 'P', c: '#10b981', w: 3.6 },
+      { t: 'angle', at: 'A', a: 'C', b: 'P', r: 26, label: '60°' },
+      { t: 'dot', at: 'P' },
+      { t: 'text', at: mid('C', 'P'), text: '11.4', dx: 16, dy: 10, c: '#047857' }],
+    6: [{ t: 'poly', v: ['A', 'C', 'P'], fill: 'rgba(245,158,11,0.13)' },
+      { t: 'seg', a: 'C', b: 'P', c: '#10b981', w: 3 },
+      { t: 'seg', a: 'A', b: 'P', c: '#f59e0b', w: 2.6 },
+      { t: 'angle', at: 'P', a: 'A', b: 'C', r: 15, label: '98.8°', c: '#b45309' },
+      { t: 'dot', at: 'P' },
+      { t: 'text', at: 'P', text: 'not 90°', dx: 40, dy: 34, c: '#b45309' }],
+    7: [{ t: 'seg', a: 'A', b: 'D', c: '#94a3b8', w: 2.2 },
+      { t: 'seg', a: 'C', b: 'P', c: '#f59e0b', w: 2.4 },
+      { t: 'seg', a: 'B', b: 'P', c: '#f59e0b', w: 2.4 },
+      { t: 'seg', a: 'B', b: 'C', c: '#f59e0b', w: 2.4 },
+      { t: 'angle', at: 'P', a: 'B', b: 'C', r: 22, label: '∠BPC', c: '#b45309' },
+      { t: 'dot', at: 'P' },
+      { t: 'text', at: mid('C', 'A'), text: 'CP not ⟂ AD', dx: 0, dy: 22, c: '#b45309' }]
+  }
+});
+</script>
+<script>
+/* HKDSE 2019 P1 Q18 — tetrahedron ABCD (AC=AD=CD=13, BC=8, BD=12, /ABD=72),
+   face ABC on the ground, P on AD with BP _|_ AD */
+var V = {
+  A: [0, 0, 0], B: [-7.8334, 0, 6.1079], C: [-13, 0, 0],
+  D: [-6.5000, 11.1155, 1.7874], P: [-2.3782, 4.0670, 0.6540]
+};
+function mid(a, b) {
+  var p = V[a], q = V[b];
+  return [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2, (p[2] + q[2]) / 2];
+}
+
+Fig3D.mount('#cv3d', {
+  v: V,
+  faces: [['A', 'B', 'C'], ['A', 'B', 'D'], ['B', 'C', 'D'], ['C', 'A', 'D']],
+  edges: ['A-B', 'B-C', 'C-A', 'A-D', 'B-D', 'C-D'],
+  ground: { x0: -26, x1: 14, z0: -14, z1: 22 },
+  groundOpt: { x0: -26, x1: 14, z0: -14, z1: 22, gx: 5, gz: 5 },
+  view: { yaw: 0.95, pitch: -0.30, zoom: 1.06 },
+  labels: { A: 'A', B: 'B', C: 'C', D: 'D', P: 'P' },
+  labelColor: { D: '#ef4444' },
+  labelsNudge: { P: 1.25, B: -0.35 },
+  startStep: 1,
+  steps: {
+    1: [{ t: 'poly', v: ['A', 'B', 'D'], fill: 'rgba(139,92,246,0.12)' },
+      { t: 'seg', a: 'A', b: 'D', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'B', b: 'D', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'A', b: 'B', c: '#8b5cf6', w: 2.2, dash: [6, 5] },
+      { t: 'angle', at: 'B', a: 'A', b: 'D', r: 2.8, label: '72°' },
+      { t: 'text', at: mid('A', 'D'), text: '13', dx: -6, dy: -14 },
+      { t: 'text', at: mid('B', 'D'), text: '12', dx: -14, dy: 6 }],
+    2: [{ t: 'poly', v: ['A', 'B', 'D'], fill: 'rgba(139,92,246,0.12)' },
+      { t: 'seg', a: 'A', b: 'D', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'B', b: 'D', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'A', b: 'B', c: '#f59e0b', w: 3 },
+      { t: 'angle', at: 'B', a: 'A', b: 'D', r: 2.8, label: '72°' },
+      { t: 'angle', at: 'A', a: 'B', b: 'D', r: 3.2, label: '61.4°', c: '#10b981' },
+      { t: 'text', at: mid('B', 'D'), text: '12', dx: -14, dy: 6 }],
+    3: [{ t: 'poly', v: ['A', 'B', 'D'], fill: 'rgba(139,92,246,0.10)' },
+      { t: 'seg', a: 'B', b: 'P', c: '#8b5cf6', w: 2.6, dash: [6, 5] },
+      { t: 'ra', at: 'P', a: 'B', b: 'D', s: 1.2, c: '#8b5cf6' },
+      { t: 'seg', a: 'A', b: 'P', c: '#10b981', w: 4.2 },
+      { t: 'seg', a: 'P', b: 'D', c: '#f59e0b', w: 2.4 },
+      { t: 'dot', at: 'P' }, { t: 'vlabel', at: 'P', text: 'P' },
+      { t: 'text', at: mid('A', 'P'), text: '4.76', dx: -20, dy: 18, c: '#047857' },
+      { t: 'text', at: mid('P', 'D'), text: '8.25', dx: 16, dy: -6 }],
+    4: [{ t: 'poly', v: ['A', 'C', 'D'], fill: 'rgba(59,130,246,0.14)' },
+      { t: 'seg', a: 'A', b: 'C', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'A', b: 'D', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'C', b: 'D', c: '#f59e0b', w: 2.4 },
+      { t: 'angle', at: 'A', a: 'C', b: 'D', r: 3.0, label: '60°', c: '#10b981' },
+      { t: 'text', at: mid('C', 'D'), text: '13', dx: -8, dy: -12 }],
+    5: [{ t: 'poly', v: ['A', 'C', 'P'], fill: 'rgba(16,185,129,0.13)' },
+      { t: 'seg', a: 'A', b: 'P', c: '#f59e0b', w: 2.4 },
+      { t: 'seg', a: 'A', b: 'C', c: '#f59e0b', w: 2.4 },
+      { t: 'seg', a: 'C', b: 'P', c: '#10b981', w: 3.6 },
+      { t: 'angle', at: 'A', a: 'C', b: 'P', r: 3.2, label: '60°' },
+      { t: 'dot', at: 'P' },
+      { t: 'text', at: mid('C', 'P'), text: '11.4', dx: 16, dy: 10, c: '#047857' }],
+    6: [{ t: 'poly', v: ['A', 'C', 'P'], fill: 'rgba(245,158,11,0.13)' },
+      { t: 'seg', a: 'C', b: 'P', c: '#10b981', w: 3 },
+      { t: 'seg', a: 'A', b: 'P', c: '#f59e0b', w: 2.6 },
+      { t: 'angle', at: 'P', a: 'A', b: 'C', r: 2.2, label: '98.8°', c: '#b45309' },
+      { t: 'dot', at: 'P' },
+      { t: 'text', at: 'P', text: 'not 90°', dx: 40, dy: 34, c: '#b45309' }],
+    7: [{ t: 'seg', a: 'A', b: 'D', c: '#94a3b8', w: 2.2 },
+      { t: 'seg', a: 'C', b: 'P', c: '#f59e0b', w: 2.4 },
+      { t: 'seg', a: 'B', b: 'P', c: '#f59e0b', w: 2.4 },
+      { t: 'seg', a: 'B', b: 'C', c: '#f59e0b', w: 2.4 },
+      { t: 'angle', at: 'P', a: 'B', b: 'C', r: 3.0, label: '∠BPC', c: '#b45309' },
+      { t: 'dot', at: 'P' },
+      { t: 'text', at: mid('C', 'A'), text: 'CP not ⟂ AD', dx: 0, dy: 22, c: '#b45309' }]
+  }
+});
+</script>
+<script>
+/* HKDSE 2019 P1 Q18 — tetrahedron ABCD
+   AC=AD=CD=13, BC=8, BD=12, /ABD=72 ; P on AD with BP _|_ AD
+   face ABC on the ground, apex D above it (D high, A right, C left, B front) */
+var V = {
+  A: [0, 0, 0],
+  B: [-7.8334, 0, -6.1079],
+  C: [-13, 0, 0],
+  D: [-6.5000, 11.1155, -1.7874],
+  P: [-2.3782, 4.0670, -0.6540]
+};
+function mid(a, b) {
+  var p = V[a], q = V[b];
+  return [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2, (p[2] + q[2]) / 2];
+}
+
+Fig3D.mount('#cv3d', {
+  v: V,
+  faces: [['A', 'B', 'C'], ['A', 'B', 'D'], ['B', 'C', 'D'], ['C', 'A', 'D']],
+  edges: ['A-B', 'B-C', 'C-A', 'A-D', 'B-D', 'C-D'],
+  ground: { x0: -27, x1: 13, z0: -20, z1: 16 },
+  groundOpt: { x0: -27, x1: 13, z0: -20, z1: 16, gx: 5, gz: 5 },
+  view: { yaw: 0.22, pitch: -0.44, zoom: 0.86 },
+  labels: { A: 'A', B: 'B', C: 'C', D: 'D', P: 'P' },
+  labelColor: { D: '#ef4444' },
+  labelsNudge: { P: -1.1, B: 0.3, C: 0.5 },
+  startStep: 1,
+  steps: {
+    1: [{ t: 'poly', v: ['A', 'B', 'D'], fill: 'rgba(139,92,246,0.12)' },
+      { t: 'seg', a: 'A', b: 'D', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'B', b: 'D', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'A', b: 'B', c: '#8b5cf6', w: 2.2, dash: [6, 5] },
+      { t: 'angle', at: 'B', a: 'A', b: 'D', r: 2.4, label: '72°' },
+      { t: 'text', at: mid('A', 'D'), text: '13', dx: 14, dy: -8 },
+      { t: 'text', at: mid('B', 'D'), text: '12', dx: -16, dy: -6 }],
+    2: [{ t: 'poly', v: ['A', 'B', 'D'], fill: 'rgba(139,92,246,0.12)' },
+      { t: 'seg', a: 'A', b: 'D', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'B', b: 'D', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'A', b: 'B', c: '#f59e0b', w: 3 },
+      { t: 'angle', at: 'B', a: 'A', b: 'D', r: 2.2, label: '72°' },
+      { t: 'angle', at: 'A', a: 'B', b: 'D', r: 3.2, label: '61.4°', c: '#10b981' },
+      { t: 'text', at: mid('B', 'D'), text: '12', dx: -16, dy: -6 }],
+    3: [{ t: 'poly', v: ['A', 'B', 'D'], fill: 'rgba(139,92,246,0.10)' },
+      { t: 'seg', a: 'B', b: 'P', c: '#8b5cf6', w: 2.6, dash: [6, 5] },
+      { t: 'ra', at: 'P', a: 'B', b: 'D', s: 1.1, c: '#8b5cf6' },
+      { t: 'seg', a: 'A', b: 'P', c: '#10b981', w: 4.4 },
+      { t: 'seg', a: 'P', b: 'D', c: '#f59e0b', w: 2.4 },
+      { t: 'dot', at: 'P' }, { t: 'vlabel', at: 'P', text: 'P' },
+      { t: 'text', at: mid('A', 'P'), text: 'AP 4.76', dx: -26, dy: 16, c: '#047857' },
+      { t: 'text', at: mid('P', 'D'), text: '8.25', dx: 20, dy: 2 }],
+    4: [{ t: 'poly', v: ['A', 'C', 'D'], fill: 'rgba(59,130,246,0.14)' },
+      { t: 'seg', a: 'A', b: 'C', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'A', b: 'D', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'C', b: 'D', c: '#f59e0b', w: 2.4 },
+      { t: 'angle', at: 'A', a: 'C', b: 'D', r: 3.4, label: '60°', c: '#10b981' },
+      { t: 'text', at: mid('C', 'D'), text: '13', dx: 4, dy: -14 }],
+    5: [{ t: 'poly', v: ['A', 'C', 'P'], fill: 'rgba(16,185,129,0.13)' },
+      { t: 'seg', a: 'A', b: 'P', c: '#f59e0b', w: 2.4 },
+      { t: 'seg', a: 'A', b: 'C', c: '#f59e0b', w: 2.4 },
+      { t: 'seg', a: 'C', b: 'P', c: '#10b981', w: 3.6 },
+      { t: 'angle', at: 'A', a: 'C', b: 'P', r: 2.6, label: '60°' },
+      { t: 'dot', at: 'P' },
+      { t: 'text', at: mid('C', 'P'), text: 'CP 11.4', dx: 8, dy: 16, c: '#047857' }],
+    6: [{ t: 'poly', v: ['A', 'C', 'P'], fill: 'rgba(245,158,11,0.13)' },
+      { t: 'seg', a: 'C', b: 'P', c: '#10b981', w: 3 },
+      { t: 'seg', a: 'A', b: 'P', c: '#f59e0b', w: 2.6 },
+      { t: 'angle', at: 'P', a: 'A', b: 'C', r: 1.6, label: '98.8°', c: '#b45309', gap: 21 },
+      { t: 'dot', at: 'P' },
+      { t: 'text', at: 'P', text: 'not 90°', dx: 44, dy: 26, c: '#b45309' }],
+    7: [{ t: 'seg', a: 'A', b: 'D', c: '#94a3b8', w: 2.2 },
+      { t: 'seg', a: 'C', b: 'P', c: '#f59e0b', w: 2.4 },
+      { t: 'seg', a: 'B', b: 'P', c: '#f59e0b', w: 2.4 },
+      { t: 'seg', a: 'B', b: 'C', c: '#f59e0b', w: 2.4 },
+      { t: 'angle', at: 'P', a: 'B', b: 'C', r: 2.4, label: '∠BPC', c: '#b45309' },
+      { t: 'dot', at: 'P' },
+      { t: 'text', at: mid('C', 'A'), text: 'CP not ⟂ AD', dx: 0, dy: 24, c: '#b45309' }]
+  }
+});
+</script>
 </body>
 </html>

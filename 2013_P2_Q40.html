@@ -52,7 +52,7 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
     background:var(--card);border-radius:18px;box-shadow:var(--shadow);
     padding:14px;border:1px solid #e3ebf6;
   }
-  .diagram{position:sticky;top:16px;max-height:calc(100vh - 2rem);overflow-y:auto;}
+  .diagram{position:sticky;top:12px;}
   .diagram h2, .panel h2{margin:0 0 8px;font-size:.95rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.6px;}
   canvas{width:100%;height:auto;display:block;border-radius:14px;background:linear-gradient(180deg,#fbfdff,#eef5ff);border:1px solid #dbe6f5;}
   .legend{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:10px;font-size:.76rem;color:var(--muted);}
@@ -104,8 +104,10 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
     header.top h1{font-size:.9rem;}
     .opts{grid-template-columns:1fr;}
   }
+.chip3d{display:inline-block;vertical-align:middle;margin-left:6px;font-size:.58rem;font-weight:700;letter-spacing:.6px;color:#fff;background:linear-gradient(135deg,#2563eb,#0ea5e9);padding:2px 7px;border-radius:20px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;}
 </style>
 <link rel="stylesheet" href="assets/extra.css">
+<link rel="stylesheet" href="assets/fig3d.css">
 </head>
 <body>
 
@@ -117,18 +119,11 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
 <div class="split">
 
   <!-- ============ LEFT: DIAGRAM ============ -->
-  <section class="panel diagram">
-    <h2>Interactive Figure</h2>
-    <div style="margin:0 0 14px;"><div style="font-size:.78rem;font-weight:700;color:#334155;margin-bottom:6px;">3D 互動模型 — 拖動旋轉查看不同角度</div><iframe src="https://www.geogebra.org/material/iframe/id/hY8TYVkB" width="100%" height="400" style="border:0;border-radius:12px;background:#fff;" allowfullscreen scrolling="no"></iframe></div><canvas id="cv" width="820" height="700"></canvas>
-    <div class="legend">
-      <span><i style="background:#2563eb"></i>Apex A</span>
-      <span><i style="background:#e11d48"></i>Base ABC (equilateral)</span>
-      <span><i style="background:#7c3aed"></i>Hidden edges (dashed)</span>
-      <span><i style="background:#059669"></i>Mid-point M of BC</span>
-      <span><i style="background:#d97706"></i>Foot H / height AH</span>
-      <span><i style="background:#0891b2"></i>∠AMD = 70.5°</span>
-    </div>
-    <p id="modeText" style="font-size:.8rem;color:#5b6b86;margin:8px 0 0;"></p>
+    <section class="panel diagram">
+    <h2>3-D Figure <span class="chip3d">3D</span></h2>
+    <div class="fig3d-stage"><canvas id="cv3d"></canvas></div>
+    <div id="figui"></div>
+    <div class="fig3d-hint">拖動旋轉 · 雙指／滾輪縮放　—　drag to rotate, pinch or scroll to zoom</div>
   </section>
 
   <!-- ============ RIGHT: QUESTION + SOLUTION ============ -->
@@ -235,245 +230,51 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
   </section>
 </div>
 
-<script>
-/* ================= Canvas 2-D projection of the regular tetrahedron =================
-   Base BCD lies in a horizontal plane (viewed obliquely), apex A above the centroid H.
-   Edge length l = sqrt(6) cm  ->  height AH = sqrt(6)/sqrt(3) = sqrt(2)... but exam
-   states height = 2 cm with l = sqrt(6).  We draw with the true proportions:
-     l = sqrt(6), AH = 2,  HM = l/(2*sqrt(3)) = sqrt(2)/2.
-   Screen scale is uniform (same for x and y before the oblique tilt of the base plane).
-=====================================================================================*/
 
-const cv = document.getElementById('cv');
-const ctx = cv.getContext('2d');
-const W = cv.width, H = cv.height;
-
-/* ---- geometry (cm) ---- */
-const l  = Math.sqrt(6);           // edge length
-const AH = 2;                      // height
-const R  = l / Math.sqrt(3);       // circumradius of base triangle = sqrt(2)
-/* base triangle vertices in the base-plane coordinate system (centroid at origin) */
-const basePts = {
-  B: {x: R*Math.cos(Math.PI/2),          y: R*Math.sin(Math.PI/2)},
-  C: {x: R*Math.cos(Math.PI/2+2*Math.PI/3), y: R*Math.sin(Math.PI/2+2*Math.PI/3)},
-  D: {x: R*Math.cos(Math.PI/2+4*Math.PI/3), y: R*Math.sin(Math.PI/2+4*Math.PI/3)}
-};
-const M = {x:(basePts.B.x+basePts.C.x)/2, y:(basePts.B.y+basePts.C.y)/2};
-
-/* ---- screen mapping: uniform scale, base plane tilted by oblique projection ---- */
-const SCALE = 118;      // px per cm
-const TILT_Y = 0.52;    // foreshortening of the base plane's "vertical" direction
-const CX = W*0.52, CY = H*0.60;
-
-function toScreen(p){          // p = {x, y, z}  (z = height above base plane)
-  const z = p.z || 0;
-  return {
-    x: CX + p.x * SCALE,
-    y: CY + p.y * TILT_Y * SCALE - z * SCALE
-  };
-}
-const A  = toScreen({x:0,        y:0,        z:AH});
-const B  = toScreen({x:basePts.B.x, y:basePts.B.y, z:0});
-const C  = toScreen({x:basePts.C.x, y:basePts.C.y, z:0});
-const D  = toScreen({x:basePts.D.x, y:basePts.D.y, z:0});
-const Mm = toScreen({x:M.x,      y:M.y,      z:0});
-const Hh = toScreen({x:0,        y:0,        z:0});
-
-/* ======================= drawing helpers ======================= */
-function line(p,q,color,w,dash){
-  ctx.save();
-  ctx.strokeStyle=color; ctx.lineWidth=w||2.5;
-  ctx.lineCap='round';
-  if(dash) ctx.setLineDash(dash);
-  ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(q.x,q.y); ctx.stroke();
-  ctx.restore();
-}
-function dot(p,color,r,label,dx,dy,labelColor){
-  ctx.save();
-  ctx.beginPath(); ctx.arc(p.x,p.y,r||6,0,Math.PI*2);
-  ctx.fillStyle=color; ctx.fill();
-  ctx.lineWidth=2; ctx.strokeStyle='#fff'; ctx.stroke();
-  if(label){
-    ctx.fillStyle=labelColor||'#17233b';
-    ctx.font='bold 21px "Segoe UI",Arial';
-    ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText(label, p.x+(dx||0), p.y+(dy||0));
-  }
-  ctx.restore();
-}
-function rightAngle(at,a,b,color,size){
-  size = size||13;
-  const u1={x:a.x-at.x,y:a.y-at.y}, u2={x:b.x-at.x,y:b.y-at.y};
-  const n1=Math.hypot(u1.x,u1.y), n2=Math.hypot(u2.x,u2.y);
-  if(!n1||!n2) return;
-  const p1={x:at.x+u1.x/n1*size, y:at.y+u1.y/n1*size};
-  const p2={x:at.x+u2.x/n2*size, y:at.y+u2.y/n2*size};
-  const p3={x:p1.x+u2.x/n2*size, y:p1.y+u2.y/n2*size};
-  ctx.save(); ctx.strokeStyle=color||'#d97706'; ctx.lineWidth=2.2;
-  ctx.beginPath(); ctx.moveTo(p1.x,p1.y); ctx.lineTo(p3.x,p3.y); ctx.lineTo(p2.x,p2.y); ctx.stroke();
-  ctx.restore();
-}
-function arcAngle(at,p1,p2,r,color,label,lx,ly){
-  const a1=Math.atan2(p1.y-at.y,p1.x-at.x), a2=Math.atan2(p2.y-at.y,p2.x-at.x);
-  ctx.save(); ctx.strokeStyle=color; ctx.lineWidth=2.4;
-  ctx.beginPath(); ctx.arc(at.x,at.y,r,Math.min(a1,a2),Math.max(a1,a2)); ctx.stroke();
-  ctx.restore();
-  if(label){
-    ctx.save(); ctx.fillStyle=color; ctx.font='bold 16px "Segoe UI",Arial';
-    ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText(label, lx, ly); ctx.restore();
-  }
-}
-function face(pts,fill,stroke,w){
-  ctx.save(); ctx.beginPath();
-  ctx.moveTo(pts[0].x,pts[0].y);
-  for(let i=1;i<pts.length;i++) ctx.lineTo(pts[i].x,pts[i].y);
-  ctx.closePath();
-  ctx.fillStyle=fill; ctx.fill();
-  if(stroke){ ctx.strokeStyle=stroke; ctx.lineWidth=w||2; ctx.stroke(); }
-  ctx.restore();
-}
-function title(txt,sub,color){
-  ctx.save();
-  ctx.fillStyle=color||'#17233b'; ctx.font='bold 18px "Segoe UI",Arial';
-  ctx.textAlign='left'; ctx.textBaseline='top';
-  ctx.fillText(txt, 18, 16);
-  if(sub){ ctx.fillStyle='#5b6b86'; ctx.font='14px "Segoe UI",Arial';
-           ctx.fillText(sub, 18, 40); }
-  ctx.restore();
-}
-
-/* ======================= MODES / DRAW ======================= */
-let mode = 1;
-const modeText = document.getElementById('modeText');
-
-function draw(){
-  ctx.clearRect(0,0,W,H);
-
-  // background grid (subtle)
-  ctx.save();
-  ctx.strokeStyle='#e8f0fb'; ctx.lineWidth=1;
-  for(let x=0;x<W;x+=40){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
-  for(let y=0;y<H;y+=40){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
-  ctx.restore();
-
-  /* ---------- faint faces (always) ---------- */
-  face([A,B,D], 'rgba(37,99,235,0.055)');
-  face([A,C,D], 'rgba(225,29,72,0.045)');
-  face([B,C,D], 'rgba(5,150,105,0.06)');
-
-  /* ---------- base edges: BC hidden, BD & CD visible ---------- */
-  line(B,C,'#7c3aed',3,[9,7]);        // hidden (behind the solid)
-  line(B,D,'#e11d48',3);              // visible
-  line(C,D,'#e11d46',3);              // visible
-
-  /* ---------- lateral edges from apex ---------- */
-  line(A,B,'#2563eb',3);
-  line(A,C,'#2563eb',3);
-  line(A,D,'#7c3aed',3,[9,7]);        // hidden edge
-
-  /* ---------- dotted reference lines ---------- */
-  line(A,Mm,'#059669',2,[6,6]);       // AM
-  line(D,Mm,'#059669',2,[6,6]);       // DM
-  line(A,Hh,'#d97706',2.6,[7,6]);     // height AH (inside solid)
-
-  /* ---------- right angle at H ---------- */
-  rightAngle(Hh, A, Mm, '#d97706', 13);
-
-  /* ---------- step-specific highlights ---------- */
-  if(mode===2){
-    // highlight the two congruent side faces' altitudes AM and DM
-    line(A,Mm,'#059669',4.5);
-    line(D,Mm,'#059669',4.5);
-    line(A,B,'#2563eb',3.4); line(A,C,'#2563eb',3.4);
-    arcAngle(Mm, A, D, 46, '#0891b2', '', 0,0);
-    ctx.save();
-    ctx.fillStyle='#059669'; ctx.font='bold 15px "Segoe UI",Arial';
-    ctx.textAlign='center';
-    ctx.fillText('AM = DM = (√3/2)l', W*0.18, H*0.30);
-    ctx.restore();
-  }
-  if(mode===3){
-    // ∠AMD emphasised
-    line(A,Mm,'#0891b2',4.5);
-    line(D,Mm,'#0891b2',4.5);
-    arcAngle(Mm, A, D, 52, '#0891b2', '∠AMD', Mm.x+66, Mm.y-30);
-    ctx.save();
-    ctx.fillStyle='#0891b2'; ctx.font='bold 15px "Segoe UI",Arial';
-    ctx.textAlign='left';
-    ctx.fillText('cos∠AMD = 1/3 , sin∠AMD = 2√2/3', 18, H-30);
-    ctx.restore();
-  }
-  if(mode===4){
-    // height emphasised
-    line(A,Hh,'#d97706',4.6);
-    rightAngle(Hh, A, Mm, '#d97706', 16);
-    ctx.save();
-    ctx.fillStyle='#d97706'; ctx.font='bold 16px "Segoe UI",Arial';
-    ctx.textAlign='left';
-    ctx.fillText('AH = 2 cm', 18, H-56);
-    ctx.fillStyle='#b45309'; ctx.font='bold 15px "Segoe UI",Arial';
-    ctx.fillText('AH = (√6/3)·l  ⟹  l = √6', 18, H-30);
-    ctx.restore();
-  }
-  if(mode===5){
-    // base triangle filled strongly
-    face([B,C,D], 'rgba(225,29,72,0.16)', '#e11d48', 3);
-    line(B,C,'#7c3aed',3.4,[9,7]);
-    line(D,Mm,'#059669',3.2,[6,6]);
-    ctx.save();
-    ctx.fillStyle='#e11d48'; ctx.font='bold 15px "Segoe UI",Arial';
-    ctx.textAlign='left';
-    ctx.fillText('Area(BCD) = ½·BC·DM = 3√3/2', 18, H-56);
-    ctx.fillStyle='#065f46'; ctx.font='bold 16px "Segoe UI",Arial';
-    ctx.fillText('V = ⅓ · (3√3/2) · 2 = √3 cm³', 18, H-30);
-    ctx.restore();
-  }
-
-  /* ---------- vertices ---------- */
-  dot(A ,'#2563eb',8,'A', 0,-22,'#1d4ed8');
-  dot(B ,'#e11d48',7,'B',-22, 6,'#be123c');
-  dot(C ,'#e11d48',7,'C', 14, 22,'#be123c');
-  dot(D ,'#e11d48',7,'D', 22, 4,'#be123c');
-  dot(Mm,'#059669',7,'M', -4, 24,'#047857');
-  dot(Hh,'#d97706',6,'H', 20, 20,'#b45309');
-
-  /* ---------- titles per mode ---------- */
-  if(mode===1) title('Regular tetrahedron ABCD','All edges = l cm ; height AH = 2 cm','#1d4ed8');
-  if(mode===2) title('Side faces ABC and BCD','Altitudes AM and DM (both = √3 l / 2)','#059669');
-  if(mode===3) title('Triangle AMD','Cosine rule in the face cross-section','#0891b2');
-  if(mode===4) title('Right-angled triangle AHM','AH = AM · sin∠AMD = (√6/3) l','#d97706');
-  if(mode===5) title('Base BCD and volume','Area = ½·BC·DM ,  V = ⅓·Area·AH','#e11d48');
-}
-
-/* ======================= scroll sync ======================= */
-const steps = Array.from(document.querySelectorAll('.step'));
-const obs = new IntersectionObserver((es)=>{
-  es.forEach(e=>{
-    if(e.isIntersecting){
-      const m = +e.target.dataset.step;
-      mode = m;
-      steps.forEach(st=>st.classList.toggle('active', st===e.target));
-      modeText.textContent = 'Showing figure for step ' + m;
-      draw();
-    }
-  });
-},{rootMargin:'-15% 0px -55% 0px',threshold:0});
-steps.forEach(st=>obs.observe(st));
-
-/* initial */
-modeText.textContent = 'Showing figure for step 1';
-steps[0] && steps[0].classList.add('active');
-draw();
-
-/* redraw on resize (canvas is CSS-scaled, keep crisp) */
-window.addEventListener('resize', ()=>{ draw(); });
-</script>
 <!-- question-pager -->
 <nav class="qnav" aria-label="Question navigation">
   <a class="qnav__prev" href="2013_P2_Q39.html">← Previous Question</a>
   <a class="qnav__mid" href="index.html#y2013">Contents</a>
   <a class="qnav__next" href="2013_P2_Q41.html">Next Question →</a>
 </nav>
+<script src="assets/fig3d.js"></script>
+<script>
+/* HKDSE 2013 P2 Q40 — regular tetrahedron ABCD with height AH = 2 cm (edge sqrt6).
+   Drawn at 4x (scale factor only; every length ratio is exact). */
+var P = {
+  A: [4.89898, 8, 2.82843], B: [0, 0, 0], C: [9.79796, 0, 0],
+  D: [4.89898, 0, 8.48528], M: [4.89898, 0, 0], H: [4.89898, 0, 2.82843]
+};
+
+var AM = { t: 'seg', a: 'A', b: 'M', c: '#f59e0b', w: 3 };
+var DM = { t: 'seg', a: 'D', b: 'M', c: '#f59e0b', w: 3 };
+var AH = { t: 'seg', a: 'A', b: 'H', c: '#10b981', w: 3 };
+var RAH = { t: 'ra', at: 'H', a: 'A', b: 'D', s: 1.0, c: '#0f766e' };
+var ANG = { t: 'angle', at: 'M', a: 'A', b: 'D', r: 2.3, label: '70.5\u00b0', c: '#10b981' };
+
+var steps = {
+  1: [AH, RAH, { t: 'dot', at: 'H' }, { t: 'vlabel', at: 'H', text: 'H' }],
+  2: [AH, AM, DM],
+  3: [AH, AM, DM, ANG],
+  4: [AH, AM, RAH, { t: 'dot', at: 'H' }, { t: 'vlabel', at: 'H', text: 'H' }],
+  5: [{ t: 'poly', v: ['B', 'C', 'D'], fill: 'rgba(139,92,246,0.14)' },
+      AH, DM, { t: 'ra', at: 'H', a: 'A', b: 'D', s: 1.0, c: '#0f766e' }],
+  6: [AH, AM, DM, ANG]
+};
+
+Fig3D.mount('#cv3d', {
+  v: P,
+  faces: [['A', 'B', 'C'], ['A', 'C', 'D'], ['A', 'D', 'B'], ['B', 'C', 'D']],
+  edges: ['A-B', 'A-C', 'A-D', 'B-C', 'C-D', 'D-B'],
+  ground: true,
+  groundOpt: { x0: -7, x1: 17, z0: -8, z1: 14, gx: 2, gz: 2 },
+  view: { yaw: 0.80, pitch: -0.30, zoom: 1.0 },
+  labels: { A: 'A', B: 'B', C: 'C', D: 'D', M: 'M' },
+  labelSteps: { H: 1 },
+  labelsNudge: { M: 0.5, H: 2.4 },
+  startStep: 1,
+  steps: steps
+});
+</script>
 </body>
 </html>

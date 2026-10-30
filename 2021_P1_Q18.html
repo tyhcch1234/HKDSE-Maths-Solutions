@@ -37,11 +37,7 @@
     box-shadow:0 6px 24px rgba(45,60,120,.10),0 1.5px 5px rgba(45,60,120,.06);
     padding:14px;
   }
-  .diagram{
-    position:sticky;top:16px;
-    max-height:calc(100vh - 2rem);
-    overflow-y:auto;
-  }
+  .diagram{position:sticky;top:12px;}
   canvas{width:100%;height:auto;display:block;border-radius:12px;background:#fbfdff;}
   .legend{
     display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:10px;
@@ -98,8 +94,10 @@
     h1{font-size:.9rem;}
     .legend{font-size:.62rem;}
   }
+.chip3d{display:inline-block;vertical-align:middle;margin-left:6px;font-size:.58rem;font-weight:700;letter-spacing:.6px;color:#fff;background:linear-gradient(135deg,#2563eb,#0ea5e9);padding:2px 7px;border-radius:20px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;}
 </style>
 <link rel="stylesheet" href="assets/extra.css">
+<link rel="stylesheet" href="assets/fig3d.css">
 </head>
 <body>
 
@@ -108,17 +106,11 @@
 <div class="split">
 
   <!-- ============ LEFT : DIAGRAM ============ -->
-  <section class="panel diagram">
-    <div class="tagbar" id="diagTag">DIAGRAM MODE 1</div>
-    <div style="margin:0 0 14px;"><div style="font-size:.78rem;font-weight:700;color:#334155;margin-bottom:6px;">3D 互動模型 — 拖動旋轉查看不同角度</div><iframe src="https://www.geogebra.org/material/iframe/id/bxgtdv3k" width="100%" height="400" style="border:0;border-radius:12px;background:#fff;" allowfullscreen scrolling="no"></iframe></div><canvas id="cv" width="640" height="700"></canvas>
-    <div class="legend">
-      <span><i style="background:#2e6fe6"></i>Given edges</span>
-      <span><i style="background:#e0483c"></i>Unknown / answer side</span>
-      <span><i style="background:#f0a30a"></i>Angle of interest</span>
-      <span><i class="dot" style="background:#6b5bd2"></i>Apex A</span>
-      <span><i style="background:#0aa88a;opacity:.9"></i>Base BC (40 cm)</span>
-      <span style="color:#8b93b3">— — hidden / dashed</span>
-    </div>
+    <section class="panel diagram">
+    <h2>3-D Figure <span class="chip3d">3D</span></h2>
+    <div class="fig3d-stage"><canvas id="cv3d"></canvas></div>
+    <div id="figui"></div>
+    <div class="fig3d-hint">拖動旋轉 · 雙指／滾輪縮放　—　drag to rotate, pinch or scroll to zoom</div>
   </section>
 
   <!-- ============ RIGHT : QUESTION + SOLUTION ============ -->
@@ -269,352 +261,97 @@
 
 </div>
 
-<script>
-/* ================= CANVAS DIAGRAM ================= */
-const cv = document.getElementById('cv');
-const ctx = cv.getContext('2d');
-const W = cv.width, H = cv.height;
-let mode = 1;
 
-/* ---- geometry constants (proportional to real values) ---- */
-const S = 6.2;                 // scale: 1 cm -> S px
-const AB = 45, BC = 40, CD = 36.6843;
-const AE = 28.9254, DE = 52.5468, AD = AE + DE;   // 81.4722
-const AC = 60.20797;
-const eq = 0.62;               // isometric foreshortening for depth axis
-
-/* base plane (BCDE) is drawn in a pseudo-3D isometric view.
-   origin O = point B on the base plane.
-   Base x-axis -> to the right (B -> C)
-   Base y-axis -> into the screen (B -> E direction) :: represented by (dx, dy) */
-const baseX = { x: 1, y: 0 };
-const baseY = { x: -eq*0.78, y: -eq*0.62 };   // depth axis (going back-left-up)
-
-/* Place B at a nice position */
-let Bx = 90, By = 560;
-
-function basePoint(u, v){          // u along x (cm), v along depth (cm)
-  return {
-    x: Bx + (u*baseX.x + v*baseY.x) * (S*0.62),
-    y: By + (u*baseX.y + v*baseY.y) * (S*0.62)
-  };
-}
-
-/* In the folded pyramid: B(0,0), C(BC,0), E(0,DE), D = C + something.
-   We loosely follow the mark-scheme spatial layout: E is behind B, D behind C. */
-function buildPoints(){
-  const p = {};
-  p.B = basePoint(0, 0);
-  p.C = basePoint(BC, 0);
-  p.E = basePoint(0, DE);
-  p.D = basePoint(CD*Math.cos(70*Math.PI/180) + 0, DE);
-  // place D so that CD ~ 36.68 in base plane
-  // simpler: D = E + CD in the x-direction of the base plane
-  p.D = basePoint(CD, DE);
-  // fix so CD matches: adjust D
-  p.D = basePoint(CD, DE);
-
-  // Apex A: above E (AE perpendicular to base plane)
-  p.A = { x: p.E.x + 6, y: p.E.y - AE*(S*0.62) };
-
-  return p;
-}
-
-/* ---------- drawing helpers ---------- */
-function line(a,b,color,w,dash){
-  ctx.save();
-  ctx.setLineDash(dash||[]);
-  ctx.strokeStyle=color; ctx.lineWidth=w||2.2;
-  ctx.lineCap='round';
-  ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
-  ctx.restore();
-}
-function poly(arr,color,fill,lw,dash){
-  ctx.save();
-  ctx.setLineDash(dash||[]);
-  ctx.beginPath();
-  arr.forEach((p,i)=> i? ctx.lineTo(p.x,p.y) : ctx.moveTo(p.x,p.y));
-  ctx.closePath();
-  if(fill){ ctx.fillStyle=fill; ctx.fill(); }
-  ctx.strokeStyle=color; ctx.lineWidth=lw||2;
-  ctx.stroke();
-  ctx.restore();
-}
-function dot(p,color,r,label,dx,dy,lc){
-  ctx.beginPath(); ctx.arc(p.x,p.y,r||5,0,2*Math.PI);
-  ctx.fillStyle=color; ctx.fill();
-  ctx.strokeStyle='#fff'; ctx.lineWidth=1.6; ctx.stroke();
-  if(label){
-    ctx.fillStyle=lc||color;
-    ctx.font='bold 17px Segoe UI, sans-serif';
-    ctx.fillText(label,p.x+(dx||10),p.y+(dy||-8));
-  }
-}
-function labelMid(a,b,txt,color,off){
-  const mx=(a.x+b.x)/2, my=(a.y+b.y)/2;
-  ctx.fillStyle=color;
-  ctx.font='bold 13px Segoe UI, sans-serif';
-  ctx.fillText(txt, mx+(off?off[0]:6), my+(off?off[1]:0));
-}
-function rightAngle(p, d1, d2, size){
-  // draw a small right-angle square at p between directions d1,d2
-  const u={x:d1.x-p.x,y:d1.y-p.y}, v={x:d2.x-p.x,y:d2.y-p.y};
-  const lu=Math.hypot(u.x,u.y), lv=Math.hypot(v.x,v.y);
-  if(lu<1||lv<1) return;
-  const uu={x:u.x/lu,y:u.y/lu}, vv={x:v.x/lv,y:v.y/lv};
-  const s=size||11;
-  ctx.save();
-  ctx.strokeStyle='#f0a30a'; ctx.lineWidth=2;
-  ctx.beginPath();
-  ctx.moveTo(p.x+uu.x*s, p.y+uu.y*s);
-  ctx.lineTo(p.x+uu.x*s+vv.x*s, p.y+uu.y*s+vv.y*s);
-  ctx.lineTo(p.x+vv.x*s, p.y+vv.y*s);
-  ctx.stroke();
-  ctx.restore();
-}
-function angleArc(vertex, p1, p2, radius, color, txt, tOff){
-  const a1=Math.atan2(p1.y-vertex.y, p1.x-vertex.x);
-  const a2=Math.atan2(p2.y-vertex.y, p2.x-vertex.x);
-  ctx.save();
-  ctx.strokeStyle=color; ctx.lineWidth=2.4;
-  ctx.beginPath(); ctx.arc(vertex.x,vertex.y,radius,a1,a2, false);
-  ctx.stroke();
-  ctx.restore();
-  if(txt){
-    let mid=(a1+a2)/2;
-    // choose the nearer arc midpoint
-    if(Math.abs(a1-a2)>Math.PI){ mid += Math.PI; }
-    const tx=vertex.x+Math.cos(mid)*(radius+16)+(tOff?tOff[0]:0);
-    const ty=vertex.y+Math.sin(mid)*(radius+16)+(tOff?tOff[1]:0);
-    ctx.fillStyle=color;
-    ctx.font='bold 13px Segoe UI, sans-serif';
-    ctx.fillText(txt,tx-10,ty+4);
-  }
-}
-
-/* ---- Part (a) flat trapezium drawing (used for steps 1-2) ---- */
-function drawFlatTrapezium(){
-  const p = {};
-  const sc = 4.4;
-  const ox = 70, oy = 580;
-
-  // Make AB at angle 50° to AD (AD horizontal)
-  const A = {x: ox, y: oy};
-  const B = {x: A.x + AB*Math.cos(50*Math.PI/180)*sc, y: A.y - AB*Math.sin(50*Math.PI/180)*sc};
-  const D = {x: A.x + AD*sc, y: A.y};
-  const C = {x: B.x + BC*sc, y: B.y};
-
-  // ---- shape ----
-  poly([A,B,C,D], '#2e6fe6', 'rgba(46,111,230,0.07)', 3);
-  dot(A,'#6b5bd2',6,'A',-20,-12,'#6b5bd2');
-  dot(B,'#6b5bd2',6,'B',-20,16,'#6b5bd2');
-  dot(C,'#6b5bd2',6,'C',12,-4,'#6b5bd2');
-  dot(D,'#6b5bd2',6,'D',12,-4,'#6b5bd2');
-
-  // right angle at ... (angle BAD = 50°)
-  angleArc(A, B, D, 42, '#f0a30a', '50°',[-6,-4]);
-  angleArc(D, C, A, 42, '#f0a30a', '70°',[0,10]);
-
-  // parallel marks
-  ctx.save(); ctx.strokeStyle='#0aa88a'; ctx.lineWidth=2.4; ctx.setLineDash([]);
-  ctx.beginPath(); ctx.moveTo(A.x+10,A.y-6); ctx.lineTo(D.x-14,A.y-6); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(B.x+10,B.y+6); ctx.lineTo(C.x-14,B.y+6); ctx.stroke();
-  ctx.restore();
-
-  labelMid(A,B,'45 cm','#2e6fe6',[-48,-4]);
-  labelMid(B,C,'40 cm','#0aa88a',[-16,20]);
-
-  // ---- mode 1: show copy AB || PC, P on AD ----
-  if(mode<=2){
-    // P is the point on AD such that PC // AB
-    // P = intersection of AD with line through C parallel to AB
-    // Solve: A + t(D-A) = C + s(B-A) with the parallel constraint.
-    // Given AD||BC, P is simply A (since ABPC parallelogram -> AP = BC)
-    // Actually: AP = BC = 40, so P = A + (BC/AD)*(D-A)
-    const t = BC/AD;
-    const P = {x: A.x + (D.x-A.x)*t, y: A.y + (D.y-A.y)*t};
-    line(C,P,'#e0483c',2.8,[8,6]);
-    dot(P,'#f0a30a',6,'P',-6,22,'#c47c00');
-    labelMid(C,P,'= AB = 45','#e0483c',[-24,-8]);
-  }
-
-  // ---- mode 2: highlight CD as answer ----
-  if(mode===2){
-    line(C,D,'#e0483c',4.5);
-    labelMid(C,D,'CD ≈ 36.7 cm','#e0483c',[18,4]);
-    // show △PDC region
-    const t = BC/AD;
-    const P = {x: A.x + (D.x-A.x)*t, y: A.y + (D.y-A.y)*t};
-    poly([P,D,C],'#e0483c','rgba(224,72,60,0.09)',2,[5,4]);
-  }
-}
-
-/* ---- Part (b) pyramid drawing (steps 3-8) ---- */
-function drawPyramid(){
-  const p = buildPoints();
-
-  // base quad B-C-D-E (BCDE)
-  poly([p.B,p.C,p.D,p.E],'#2e6fe6','rgba(46,111,230,0.06)',2.6);
-
-  // hidden edges (dashed grey-blue)
-  line(p.B,p.E,'#8f9cc4',1.8,[7,6]);   // BE base edge hidden
-  line(p.E,p.D,'#8f9cc4',1.8,[7,6]);   // ED base edge hidden
-
-  // visible base edges get stronger colour
-  line(p.B,p.C,'#0aa88a',3.4);         // BC
-  line(p.C,p.D,'#2e6fe6',3);
-
-  // apex A
-  dot(p.A,'#6b5bd2',7,'A',-16,-14,'#6b5bd2');
-  dot(p.B,'#6b5bd2',5.5,'B',-18,20,'#6b5bd2');
-  dot(p.C,'#6b5bd2',5.5,'C',12,16,'#6b5bd2');
-  dot(p.D,'#6b5bd2',5.5,'D',14,-8,'#6b5bd2');
-  dot(p.E,'#6b5bd2',5.5,'E',-16,4,'#6b5bd2');
-
-  // ===== highlight by mode =====
-  if(mode===3){
-    // show AE, DE, right angle at E
-    line(p.A,p.E,'#e0483c',4);
-    line(p.E,p.D,'#e0483c',3.4,[6,5]);
-    line(p.A,p.B,'#2e6fe6',3.2);
-    // right angle at E (AE ⟂ ED) & (AE ⟂ EB)
-    rightAngle(p.E, p.A, p.D, 13);
-    rightAngle(p.E, p.A, p.B, 13);
-    dot(p.E,'#f0a30a',7,'E',-16,4,'#c47c00');
-    labelMid(p.A,p.E,'AE ≈ 28.93','#e0483c',[-68,-4]);
-    labelMid(p.E,p.D,'DE ≈ 52.55','#e0483c',[6,20]);
-    // arrow marking AE ⟂ plane
-    ctx.fillStyle='#c47c00';
-    ctx.font='bold 12px Segoe UI, sans-serif';
-    ctx.fillText('AE ⊥ plane BCDE', p.E.x+18, p.E.y-6);
-  }
-  else if(mode===4){
-    // highlight AB, BC and AC
-    line(p.A,p.B,'#2e6fe6',3.4);
-    line(p.B,p.C,'#0aa88a',4);
-    line(p.A,p.C,'#e0483c',4);
-    rightAngle(p.B, p.A, p.C, 13);
-    labelMid(p.A,p.C,'AC ≈ 60.21','#e0483c',[-10,26]);
-    labelMid(p.A,p.B,'45 cm','#2e6fe6',[-46,4]);
-    labelMid(p.B,p.C,'40 cm','#0aa88a',[-10,24]);
-  }
-  else if(mode>=5 && mode<=6){
-    // triangle ACD highlighted
-    poly([p.A,p.C,p.D],'#e0483c','rgba(224,72,60,0.10)',3);
-    line(p.A,p.C,'#e0483c',3.6);
-    line(p.C,p.D,'#e0483c',3.6);
-    line(p.A,p.D,'#e0483c',3.6,[6,5]);
-    angleArc(p.A, p.C, p.D, 44, '#f0a30a', '∠CAD',[10,-6]);
-    labelMid(p.A,p.C,'AC ≈ 60.21','#e0483c',[-6,24]);
-    labelMid(p.C,p.D,'CD ≈ 36.68','#e0483c',[10,16]);
-    labelMid(p.A,p.D,'AD','#e0483c',[14,-4]);
-    if(mode===6){
-      // foot Q on CD
-      // approximate Q as the projection; place at fraction of CD
-      const tQ = 0.62;
-      const Q = {x: p.C.x+(p.D.x-p.C.x)*tQ, y: p.C.y+(p.D.y-p.C.y)*tQ};
-      line(p.A,Q,'#f0a30a',4);
-      rightAngle(Q, p.A, p.D, 12);
-      dot(Q,'#f0a30a',6,'Q',10,-10,'#c47c00');
-      ctx.fillStyle='#c47c00'; ctx.font='bold 12px Segoe UI, sans-serif';
-      ctx.fillText('AQ ≈ 57.23', p.A.x+14, p.A.y+40);
-      window.__Q = Q;
-    }
-  }
-  else if(mode===7 || mode===8){
-    // angle AQE
-    const Q = window.__Q || {x: p.C.x+(p.D.x-p.C.x)*0.62, y: p.C.y+(p.D.y-p.C.y)*0.62};
-    line(p.A,Q,'#e0483c',4);
-    rightAngle(Q, p.A, p.D, 12);
-    line(Q,p.E,'#f0a30a',3.2);
-    angleArc(Q, p.A, p.E, 46, '#f0a30a', '∠AQE',[-6,24]);
-    dot(Q,'#f0a30a',6,'Q',10,-10,'#c47c00');
-    // right angle at E between EA and ED
-    rightAngle(p.E, p.A, p.D, 13);
-    labelMid(p.A,Q,'AQ ≈ 57.23','#e0483c',[-40,4]);
-    labelMid(Q,p.E,'QE','#f0a30a',[8,-4]);
-    labelMid(p.A,p.E,'AE ≈ 28.93','#e0483c',[-70,-4]);
-
-    ctx.fillStyle='#c47c00';
-    ctx.font='bold 14px Segoe UI, sans-serif';
-    ctx.fillText('∠AQE ≈ 30.36° ' + (mode===8 ? '> 30° ✓' : ''), p.E.x+20, p.E.y+50);
-
-    if(mode===8){
-      ctx.fillStyle = '#178a5a';
-      ctx.font='bold 15px Segoe UI, sans-serif';
-      ctx.fillText('YES — angle exceeds 30°', p.E.x+16, p.E.y+74);
-    }
-  }
-  else {
-    // mode back to default: show A-B, A-C, A-D
-    line(p.A,p.B,'#2e6fe6',2.6);
-    line(p.A,p.C,'#2e6fe6',2.6);
-    line(p.A,p.D,'#2e6fe6',2.6);
-  }
-
-  // Always draw the main pyramid edges lightly if not highlighted
-  if(mode!==3 && mode!==4){
-    line(p.A,p.B,'rgba(46,111,230,0.45)',1.8);
-    line(p.A,p.E,'rgba(46,111,230,0.45)',1.8,[5,4]);
-  }
-  if(mode<5){
-    line(p.A,p.D,'rgba(46,111,230,0.45)',1.8,[6,5]);
-  }
-  if(mode>=5){
-    line(p.A,p.D,'#e0483c',3.6,[6,5]);
-  }
-  if(mode<5){
-    line(p.A,p.C,'rgba(46,111,230,0.45)',1.8);
-  }
-}
-
-/* ---------- master draw ---------- */
-function draw(){
-  ctx.clearRect(0,0,W,H);
-  // soft background
-  const g=ctx.createLinearGradient(0,0,0,H);
-  g.addColorStop(0,'#fbfdff'); g.addColorStop(1,'#eef4ff');
-  ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
-
-  // title
-  ctx.fillStyle='#2b3a67';
-  ctx.font='bold 16px Segoe UI, sans-serif';
-  ctx.fillText(mode<=2 ? 'Part (a) — Flat trapezium ABCD' : 'Part (b) — Folded pyramid (Figure 2)', 16, 26);
-
-  if(mode<=2){
-    drawFlatTrapezium();
-  } else {
-    drawPyramid();
-  }
-
-  // update tag
-  document.getElementById('diagTag').textContent = 'DIAGRAM MODE ' + mode;
-}
-
-/* ================= SCROLL SYNC ================= */
-const steps = Array.from(document.querySelectorAll('.step'));
-const obs = new IntersectionObserver((es)=>{
-  es.forEach(e=>{
-    if(e.isIntersecting){
-      const m = +e.target.dataset.step;
-      mode = m;
-      steps.forEach(st=>st.classList.toggle('active', st===e.target));
-      draw();
-    }
-  });
-}, {rootMargin:'-15% 0px -55% 0px', threshold:0});
-steps.forEach(st=>obs.observe(st));
-
-/* initial highlight */
-if(steps.length){ steps[0].classList.add('active'); }
-draw();
-window.addEventListener('resize', ()=>{ /* canvas scales via CSS; redraw to be safe */ draw(); });
-</script>
 <!-- question-pager -->
 <nav class="qnav" aria-label="Question navigation">
   <a class="qnav__prev" href="2021_P1_Q17.html">← Previous Question</a>
   <a class="qnav__mid" href="index.html#y2021">Contents</a>
   <a class="qnav__next" href="2021_P1_Q19.html">Next Question →</a>
 </nav>
+<script src="assets/fig3d.js"></script>
+<script>
+/* HKDSE 2021 P1 Q18 — trapezium sheet ABCD folded along BE, AE perpendicular to plane BCDE */
+var P = {
+  A: [0, 28.9254, 0],
+  B: [0, 0, 34.4720],
+  C: [40, 0, 34.4720],
+  D: [52.5468, 0, 0],
+  E: [0, 0, 0],
+  A0: [-28.9254, 0, 0],
+  P: [11.0746, 0, 0],
+  Q: [46.4000, 0, 16.8882]
+};
+var MID_CD = [41.2, 0, 22.6];
+
+Fig3D.mount('#cv3d', {
+  v: P,
+  faces: [['B', 'C', 'D', 'E'], ['A', 'B', 'C'], ['A', 'C', 'D'], ['A', 'D', 'E'], ['A', 'E', 'B']],
+  edges: ['A-B', 'B-C', 'C-D', 'D-E', 'E-B', 'A-E', 'A-C', 'A-D'],
+  ground: { x0: -46, x1: 64, z0: -14, z1: 60, gx: 20, gz: 10 },
+  view: { yaw: -0.75, pitch: -0.45, zoom: 1.0 },
+  labels: { A: 'A', B: 'B', C: 'C', D: 'D', E: 'E' },
+  labelSteps: { A: 4 },
+  labelsNudge: { E: 2.4, A0: 2.6, P: 1.9, Q: 1.4, A: 0.2 },
+  aspect: 0.9,
+  startStep: 1,
+  steps: {
+    1: [{ t: 'poly', v: ['A0', 'B', 'C', 'P'], fill: 'rgba(245,158,11,0.14)' },
+      { t: 'seg', a: 'A0', b: 'D', c: '#94a3b8', w: 1.6 },
+      { t: 'seg', a: 'A0', b: 'B', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'B', b: 'C', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'P', b: 'C', c: '#8b5cf6', w: 2.4, dash: [6, 5] },
+      { t: 'angle', at: 'P', a: 'C', b: 'D', r: 12, label: '50°' },
+      { t: 'angle', at: 'D', a: 'C', b: 'A0', r: 14, label: '70°' },
+      { t: 'dot', at: 'A0' }, { t: 'vlabel', at: 'A0', text: 'A', dist: 16 },
+      { t: 'dot', at: 'P' }, { t: 'vlabel', at: 'P', text: 'P', dist: 15 },
+      { t: 'text', at: 'B', text: 'PC = 45', dx: -6, dy: -20, size: 12.5 }],
+    2: [{ t: 'poly', v: ['P', 'C', 'D'], fill: 'rgba(139,92,246,0.15)' },
+      { t: 'seg', a: 'P', b: 'C', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'C', b: 'D', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'P', b: 'D', c: '#f59e0b', w: 3 },
+      { t: 'angle', at: 'C', a: 'P', b: 'D', r: 13, label: '60°' },
+      { t: 'angle', at: 'P', a: 'C', b: 'D', r: 11, label: '50°' },
+      { t: 'dot', at: 'A0' }, { t: 'vlabel', at: 'A0', text: 'A', dist: 16 },
+      { t: 'dot', at: 'P' }, { t: 'vlabel', at: 'P', text: 'P', dist: 15 },
+      { t: 'text', at: MID_CD, text: 'CD≈36.7', dx: -26, dy: -12, size: 12.5 }],
+    3: [{ t: 'seg', a: 'A0', b: 'E', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'E', b: 'D', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'B', b: 'E', c: '#8b5cf6', w: 3 },
+      { t: 'ra', at: 'E', a: 'B', b: 'D', s: 6, c: '#8b5cf6' },
+      { t: 'dot', at: 'A0' }, { t: 'vlabel', at: 'A0', text: 'A', dist: 16 },
+      { t: 'text', at: [20, 0, 6], text: 'AE≈28.93', dx: 0, dy: -6, size: 12.5 }],
+    4: [{ t: 'seg', a: 'A', b: 'E', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'A', b: 'B', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'B', b: 'C', c: '#f59e0b', w: 2.6 },
+      { t: 'seg', a: 'A', b: 'C', c: '#8b5cf6', w: 2.6, dash: [6, 5] },
+      { t: 'ra', at: 'E', a: 'A', b: 'B', s: 6, c: '#b45309' },
+      { t: 'text', at: 'C', text: 'AC≈60.2', dx: 8, dy: -20, size: 12.5 }],
+    5: [{ t: 'poly', v: ['A', 'C', 'D'], fill: 'rgba(245,158,11,0.16)' },
+      { t: 'seg', a: 'A', b: 'C', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'C', b: 'D', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'A', b: 'D', c: '#f59e0b', w: 3 },
+      { t: 'angle', at: 'A', a: 'C', b: 'D', r: 15, label: '35.5°' }],
+    6: [{ t: 'poly', v: ['A', 'C', 'D'], fill: 'rgba(245,158,11,0.10)' },
+      { t: 'seg', a: 'A', b: 'C', c: '#f59e0b', w: 2.2 },
+      { t: 'seg', a: 'C', b: 'D', c: '#f59e0b', w: 2.2 },
+      { t: 'seg', a: 'A', b: 'Q', c: '#8b5cf6', w: 2.6, dash: [6, 5] },
+      { t: 'ra', at: 'Q', a: 'A', b: 'C', s: 5.5, c: '#8b5cf6' },
+      { t: 'dot', at: 'Q' }, { t: 'vlabel', at: 'Q', text: 'Q', dist: 15 }],
+    7: [{ t: 'poly', v: ['A', 'Q', 'E'], fill: 'rgba(139,92,246,0.16)' },
+      { t: 'seg', a: 'A', b: 'Q', c: '#8b5cf6', w: 2.6, dash: [6, 5] },
+      { t: 'seg', a: 'Q', b: 'E', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'A', b: 'E', c: '#f59e0b', w: 2.4 },
+      { t: 'ra', at: 'E', a: 'A', b: 'Q', s: 6, c: '#b45309' },
+      { t: 'angle', at: 'Q', a: 'A', b: 'E', r: 14, label: '30.4°' },
+      { t: 'dot', at: 'Q' }, { t: 'vlabel', at: 'Q', text: 'Q', dist: 15 }],
+    8: [{ t: 'seg', a: 'A', b: 'Q', c: '#10b981', w: 3 },
+      { t: 'seg', a: 'Q', b: 'E', c: '#10b981', w: 3 },
+      { t: 'seg', a: 'A', b: 'E', c: '#f59e0b', w: 2.4 },
+      { t: 'angle', at: 'Q', a: 'A', b: 'E', r: 14, label: '30.4°' },
+      { t: 'text', at: [22, 6, 12], text: '30.4° > 30°  YES', dx: 0, dy: 0, size: 12.5 },
+      { t: 'dot', at: 'Q' }, { t: 'vlabel', at: 'Q', text: 'Q', dist: 15 }]
+  }
+});
+</script>
 </body>
 </html>

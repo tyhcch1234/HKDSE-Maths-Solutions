@@ -42,7 +42,7 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
     padding:14px;
     border:1px solid #e6eef7;
   }
-  .diagram{position:sticky;top:16px;max-height:calc(100vh - 2rem);overflow-y:auto;}
+  .diagram{position:sticky;top:12px;}
   .qbox{
     background:linear-gradient(135deg,#f4f9ff,#eefbf5);
     border-left:5px solid #2c7be5;
@@ -92,8 +92,10 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
     .qbox,.step{font-size:.8rem;}
     h1.title{font-size:.9rem;}
   }
+.chip3d{display:inline-block;vertical-align:middle;margin-left:6px;font-size:.58rem;font-weight:700;letter-spacing:.6px;color:#fff;background:linear-gradient(135deg,#2563eb,#0ea5e9);padding:2px 7px;border-radius:20px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;}
 </style>
 <link rel="stylesheet" href="assets/extra.css">
+<link rel="stylesheet" href="assets/fig3d.css">
 </head>
 <body>
 
@@ -102,9 +104,11 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
 <div class="split">
 
   <!-- LEFT : DIAGRAM -->
-  <section class="panel diagram">
-    <div style="margin:0 0 14px;"><div style="font-size:.78rem;font-weight:700;color:#334155;margin-bottom:6px;">3D 互動模型 — 拖動旋轉查看不同角度</div><iframe src="https://www.geogebra.org/material/iframe/id/Ea9nmA5a" width="100%" height="400" style="border:0;border-radius:12px;background:#fff;" allowfullscreen scrolling="no"></iframe></div><canvas id="cv" width="620" height="600"></canvas>
-    <div class="legend" id="legend"></div>
+      <section class="panel diagram">
+    <h2>3-D Figure <span class="chip3d">3D</span></h2>
+    <div class="fig3d-stage"><canvas id="cv3d"></canvas></div>
+    <div id="figui"></div>
+    <div class="fig3d-hint">拖動旋轉 · 雙指／滾輪縮放　—　drag to rotate, pinch or scroll to zoom</div>
   </section>
 
   <!-- RIGHT : QUESTION + SOLUTION -->
@@ -267,312 +271,149 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
   </section>
 </div>
 
-<script>
-/* ============================================================
-   GEOMETRY DATA (approx. from the exam figure)
-   Base ABCD : A(0,0)  B(18,0)  C(18,10)  D(0,10)
-   Apex V : roughly above the centre, front-left in 2D projection
-   We render an OBLIQUE 2D projection of the 3-D pyramid.
-   ============================================================ */
 
-const cv  = document.getElementById('cv');
-const ctx = cv.getContext('2d');
-
-let mode = 1;               // current step
-
-/* ----- world (cm) coordinates in a chosen 2D projection ----- */
-/* Base rectangle projected (oblique): x -> x, y(depth) -> y */
-const A = {x: 90,  y: 480};
-const B = {x: 480, y: 480};
-const C = {x: 480, y: 350};      // 10 cm depth  (scale 13 px/cm)
-const D = {x: 90,  y: 350};
-const V = {x: 250, y: 90};        // apex (front-left high)
-
-/* mid-points */
-const P = mid(A,B);   // mid AB
-const Q = mid(D,C);   // mid DC
-const Mb = mid(V,B);  // M mid VB
-const Nb = mid(V,C);  // N mid VC
-
-function mid(a,b){return {x:(a.x+b.x)/2, y:(a.y+b.y)/2};}
-
-/* ============================================================
-   DRAWING HELPERS
-   ============================================================ */
-function line(p,q,col,{w=2.5,dash=[],glow=false}={}){
-  ctx.save();
-  ctx.setLineDash(dash);
-  ctx.lineWidth = w;
-  ctx.strokeStyle = col;
-  if(glow){ctx.shadowColor=col;ctx.shadowBlur=12;}
-  ctx.beginPath();
-  ctx.moveTo(p.x,p.y);
-  ctx.lineTo(q.x,q.y);
-  ctx.stroke();
-  ctx.restore();
-}
-function poly(pts,col,{fill=null,w=2.2,dash=[],glow=false}={}){
-  ctx.save();
-  ctx.setLineDash(dash);
-  if(fill){
-    ctx.beginPath();
-    ctx.moveTo(pts[0].x,pts[0].y);
-    for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i].x,pts[i].y);
-    ctx.closePath();
-    ctx.fillStyle=fill;ctx.fill();
-  }
-  ctx.lineWidth=w;ctx.strokeStyle=col;
-  if(glow){ctx.shadowColor=col;ctx.shadowBlur=12;}
-  ctx.beginPath();
-  ctx.moveTo(pts[0].x,pts[0].y);
-  for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i].x,pts[i].y);
-  if(fill)ctx.closePath();
-  ctx.stroke();
-  ctx.restore();
-}
-function dot(p,label,col,dx=8,dy=-8,{r=5.5,fs=15}={}){
-  ctx.save();
-  ctx.beginPath();
-  ctx.arc(p.x,p.y,r,0,Math.PI*2);
-  ctx.fillStyle=col;ctx.shadowColor=col;ctx.shadowBlur=10;ctx.fill();
-  ctx.shadowBlur=0;
-  ctx.lineWidth=2;ctx.strokeStyle='#fff';ctx.stroke();
-  ctx.fillStyle='#17324f';
-  ctx.font=`bold ${fs}px Segoe UI, Arial`;
-  ctx.textAlign='left';ctx.textBaseline='middle';
-  ctx.fillText(label,p.x+dx,p.y+dy);
-  ctx.restore();
-}
-function rightAngle(corner,a,b,col='#c2410c',s=14){
-  const u=unit(corner,a), v=unit(corner,b);
-  const p1={x:corner.x+u.x*s,y:corner.y+u.y*s};
-  const p2={x:corner.x+v.x*s,y:corner.y+v.y*s};
-  const p3={x:corner.x+(u.x+v.x)*s,y:corner.y+(u.y+v.y)*s};
-  ctx.save();ctx.strokeStyle=col;ctx.lineWidth=2;ctx.setLineDash([]);
-  ctx.beginPath();ctx.moveTo(p1.x,p1.y);ctx.lineTo(p3.x,p3.y);ctx.lineTo(p2.x,p2.y);ctx.stroke();
-  ctx.restore();
-}
-function unit(a,b){const dx=b.x-a.x,dy=b.y-a.y,L=Math.hypot(dx,dy)||1;return {x:dx/L,y:dy/L};}
-
-/* ============================================================
-   MAIN DRAW
-   ============================================================ */
-function draw(){
-  ctx.clearRect(0,0,cv.width,cv.height);
-
-  /* soft background grid */
-  ctx.save();
-  ctx.strokeStyle='#eef4fa';ctx.lineWidth=1;
-  for(let x=0;x<cv.width;x+=34){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,cv.height);ctx.stroke();}
-  for(let y=0;y<cv.height;y+=34){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(cv.width,y);ctx.stroke();}
-  ctx.restore();
-
-  /* ---------- distinguish which geometry to emphasise ---------- */
-  const showCut  = mode>=4;         // Fig 6(b) style cut solid
-  const showMP   = mode>=3;
-  const showMN   = mode>=4;
-  const showTrap = mode>=5;
-
-  /* --- HIDDEN (dashed) base edges: AD and DC are partially behind --- */
-  line(A,D,'#9aa7b6',{w:1.8,dash:[7,7]});
-  line(D,C,'#9aa7b6',{w:1.8,dash:[7,7]});
-
-  /* --- BASE edges --- */
-  line(A,B,'#1f6fd0',{w:3});                     // AB visible
-  line(B,C,'#1f6fd0',{w:3});                     // BC visible
-  line(C,D,'#1f6fd0',{w:2.4,dash: mode<1?[]:[5,5]});
-
-  /* --- Lateral edges from apex V --- */
-  if(!showCut){
-    line(V,A,'#7c3aed',{w:3});
-  }
-  line(V,B, showCut?'#94a3b8':'#7c3aed',{w:showCut?2:3, dash:showCut?[6,6]:[]});
-  line(V,C, showCut?'#94a3b8':'#7c3aed',{w:showCut?2:3, dash:showCut?[6,6]:[]});
-  line(V,D, showCut?'#94a3b8':'#7c3aed',{w:showCut?2:3, dash:showCut?[6,6]:[]});
-
-  /* --- solid base highlight in cut mode --- */
-  if(showCut){
-    poly([A,B,C,D],'#1f6fd0',{fill:'rgba(31,111,208,0.06)',w:2.4});
-  }
-
-  /* ---------- CUT SOLID : trapezium PQNM (the model) ---------- */
-  if(showCut){
-    poly([P,Q,Nb,Mb],'#0f9d58',{
-      fill: showTrap? 'rgba(15,157,88,0.22)':'rgba(15,157,88,0.10)',
-      w: showTrap?3.6:2.6, glow: showTrap
-    });
-  }
-
-  /* ---------- segment MP ---------- */
-  if(showMP){
-    line(Mb,P,'#e0350f',{w:3,glow:mode===3});
-  }
-  /* ---------- segment MN ---------- */
-  if(showMN){
-    line(Mb,Nb,'#d97706',{w:3.4,glow:mode===4});
-  }
-  /* ---------- segment NQ ---------- */
-  if(showCut){
-    line(Nb,Q,'#0ea5e9',{w:3,glow:mode>=5});
-  }
-  /* ---------- segment PQ (parallel side of trapezium) ---------- */
-  if(showCut){
-    line(P,Q,'#be185d',{w:3.4,glow:mode>=4});
-  }
-
-  /* ---------- right-angle mark for the trapezium height ---------- */
-  if(mode>=5){
-    /* foot of perpendicular from M onto PQ */
-    const F = {x: Mb.x, y: P.y};
-    line(Mb,F,'#6b7280',{w:1.6,dash:[5,5]});
-    rightAngle(F,P,Mb,'#6b7280',12);
-    ctx.save();
-    ctx.fillStyle='#6b7280';ctx.font='bold 13px Segoe UI';
-    ctx.fillText('h', (Mb.x+F.x)/2+7, (Mb.y+F.y)/2);
-    ctx.restore();
-  }
-
-  /* ---------- base depth guide (10 cm) ---------- */
-  if(mode>=1){
-    ctx.save();
-    ctx.fillStyle='#64748b';ctx.font='12px Segoe UI';
-    ctx.fillText('10 cm', 96, 342);
-    ctx.fillText('18 cm', 250, 500);
-    ctx.restore();
-  }
-
-  /* ---------- ANGLES ---------- */
-  /* ∠VAB at A between AV and AB */
-  if(mode<=2){
-    angleArc(A, Mb, B, '#e0350f', mode<=2);
-    angleArc(A, V,  B, '#e0350f', mode<=2);
-  }
-  /* ∠VBA at B between BV and BA */
-  if(mode>=1){
-    /* re-use generic arc: corner B, rays to V and A */
-    arcAt(V,B,A,'#7c3aed', mode===2);
-  }
-  /* ∠VDC at D */
-  if(mode===1){
-    arcAt(V,D,C,'#e0350f', false);
-  }
-
-  /* ---------- VERTICES ---------- */
-  dot(V,'V','#7c3aed',-4,-16);
-  dot(A,'A','#1f6fd0',-20,14);
-  dot(B,'B','#1f6fd0',10,14);
-  dot(C,'C','#1f6fd0',10,-6);
-  dot(D,'D','#1f6fd0',-22,-8);
-
-  if(showCut){
-    dot(P,'P','#be185d',-6,20);
-    dot(Q,'Q','#be185d',-4,-16);
-    dot(Mb,'M','#e0350f',12,-8);
-    dot(Nb,'N','#0ea5e9',12,-10);
-  }
-
-  /* ---------- LENGTH / MIDPOINT TICKS ---------- */
-  if(mode>=3){
-    tick(A,P,'#be185d'); tick(P,B,'#be185d');
-    tick(B,Mb,'#e0350f'); tick(Mb,V,'#e0350f');
-  }
-  if(mode>=4){
-    tick(C,Nb,'#0ea5e9'); tick(Nb,V,'#0ea5e9');
-    tick(D,Q,'#be185d');  tick(Q,C,'#be185d');
-  }
-
-  /* ---------- MODE BANNER ---------- */
-  const banner = {
-    1:'Figure 6(a): ∠VAB = ∠VDC = 110°, VB = VC = 30 cm, AB = 18, BC = 10',
-    2:'Part (a) result:  ∠VBA ≈ 35.7°',
-    3:'Part (b): cosine formula in △PBM  →  MP ≈ 9.31 cm',
-    4:'Mid-point segment:  MN = ½·BC = 5 cm  and  PQ = 18 cm',
-    5:'Height of trapezium PQNM :  h = √(MP² − ((PQ−MN)/2)²)',
-    6:'Area of PQNM = ½ · h · (MN + PQ)',
-    7:'Conclusion: area PQNM > 70 cm²  →  claim NOT agreed'
-  }[mode];
-
-  ctx.save();
-  ctx.fillStyle='rgba(20,64,107,0.90)';
-  roundRect(12,10,cv.width-24,40,10);ctx.fill();
-  ctx.fillStyle='#fff';ctx.font='bold 14px Segoe UI';
-  ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.fillText(banner, cv.width/2, 30);
-  ctx.restore();
-}
-
-/* --- small helpers --- */
-function roundRect(x,y,w,h,r){
-  ctx.beginPath();
-  ctx.moveTo(x+r,y);
-  ctx.arcTo(x+w,y,x+w,y+h,r);
-  ctx.arcTo(x+w,y+h,x,y+h,r);
-  ctx.arcTo(x,y+h,x,y,r);
-  ctx.arcTo(x,y,x+w,y,r);
-  ctx.closePath();
-}
-function tick(a,b,col){
-  const m=mid(a,b);
-  const u=unit(a,b);
-  const n={x:-u.y,y:u.x};
-  ctx.save();ctx.strokeStyle=col;ctx.lineWidth=2.4;ctx.setLineDash([]);
-  ctx.beginPath();
-  ctx.moveTo(m.x-n.x*7,m.y-n.y*7);
-  ctx.lineTo(m.x+n.x*7,m.y+n.y*7);
-  ctx.stroke();ctx.restore();
-}
-function angleArc(corner,a,b,col,glow){
-  const u=unit(corner,a), v=unit(corner,b);
-  const a1=Math.atan2(u.y,u.x), a2=Math.atan2(v.y,v.x);
-  const r=34;
-  ctx.save();
-  ctx.strokeStyle=col;ctx.lineWidth=2.6;
-  if(glow){ctx.shadowColor=col;ctx.shadowBlur=12;}
-  ctx.beginPath();
-  // choose the shorter sweep
-  let d=a2-a1;
-  while(d>Math.PI)d-=2*Math.PI;
-  while(d<-Math.PI)d+=2*Math.PI;
-  ctx.arc(corner.x,corner.y,r,a1,a1+d,d<0);
-  ctx.stroke();
-  ctx.restore();
-}
-/* alias used for ∠VBA at B */
-function arcAt(a,corner,b,col,glow){ angleArc(corner,a,b,col,glow); }
-
-/* ============================================================
-   SCROLL-SYNC
-   ============================================================ */
-const steps=Array.from(document.querySelectorAll('.step'));
-const obs=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){
-  const m=+e.target.dataset.step; mode=m;
-  steps.forEach(st=>st.classList.toggle('active',st===e.target)); draw();}});},
-  {rootMargin:'-15% 0px -55% 0px',threshold:0});
-steps.forEach(st=>obs.observe(st));
-
-/* ============================================================
-   LEGEND
-   ============================================================ */
-document.getElementById('legend').innerHTML = `
-  <div><span class="swatch" style="background:#1f6fd0"></span>Base ABCD (visible)</div>
-  <div><span class="swatch" style="background:#9aa7b6"></span>Hidden edges (dashed)</div>
-  <div><span class="swatch" style="background:#7c3aed"></span>Lateral edges / ∠VBA</div>
-  <div><span class="swatch" style="background:#e0350f"></span>MP (cosine formula)</div>
-  <div><span class="swatch" style="background:#d97706"></span>MN = ½ BC</div>
-  <div><span class="swatch" style="background:#0ea5e9"></span>NQ = MP</div>
-  <div><span class="swatch" style="background:#be185d"></span>PQ (base edge)</div>
-  <div><span class="dot" style="background:#0f9d58"></span>Trapezium PQNM (cut solid)</div>
-`;
-
-/* initial render */
-draw();
-window.addEventListener('resize',()=>{ /* canvas is CSS-scaled; nothing to recompute */ draw(); });
-</script>
 <!-- question-pager -->
 <nav class="qnav" aria-label="Question navigation">
   <a class="qnav__prev" href="2014_P1_Q16.html">← Previous Question</a>
   <a class="qnav__mid" href="index.html#y2014">Contents</a>
   <a class="qnav__next" href="2014_P1_Q18.html">Next Question →</a>
 </nav>
+<script src="assets/fig3d.js"></script>
+<script>
+/* HKDSE 2014 P1 Q17 — pyramid VABCD, rectangular base 18 x 10, VB = VC = 30, angle VAB = 110 */
+var P = {
+  A: [0, 0, 0], B: [18, 0, 0], C: [18, 0, 10], D: [0, 0, 10],
+  V: [-6.3686, 16.7682, 5],        /* apex: VB = VC = 30, angle VAB = angle VDC = 110 */
+  Pp: [9, 0, 0],                   /* P, mid-point of AB */
+  Q: [9, 0, 10],                   /* Q, mid-point of CD */
+  M: [5.8157, 8.3841, 2.5],        /* M, mid-point of VB */
+  N: [5.8157, 8.3841, 7.5],        /* N, mid-point of VC */
+  H: [9, 0, 2.5]                   /* foot of the trapezium height on PQ */
+};
+function MID(a, b) {
+  var p = P[a], q = P[b];
+  return [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2, (p[2] + q[2]) / 2];
+}
+var AMB = '#f59e0b', VIO = '#8b5cf6', GRN = '#10b981', GREY = '#94a3b8';
+
+Fig3D.mount('#cv3d', {
+  v: P,
+  faces: [['V', 'A', 'B'], ['V', 'B', 'C'], ['V', 'C', 'D'], ['V', 'D', 'A'], ['A', 'B', 'C', 'D']],
+  edges: ['V-A', 'V-B', 'V-C', 'V-D', 'A-B', 'B-C', 'C-D', 'D-A'],
+  ground: { x0: -22, x1: 30, z0: -14, z1: 24 },
+  footprint: ['A', 'B', 'C', 'D'],
+  view: { yaw: 0.80, pitch: -0.30, zoom: 1.05 },
+  labels: { A: 'A', B: 'B', C: 'C', D: 'D', V: 'V', Pp: 'P', Q: 'Q', M: 'M', N: 'N' },
+  labelColor: { V: '#ef4444' },
+  labelSteps: { Pp: 3, M: 3, Q: 4, N: 4 },
+  labelsNudge: { Pp: 0.9, Q: -0.5, M: 0.2, N: 0.2, A: -0.3 },
+  steps: {
+    1: [{ t: 'poly', v: ['V', 'A', 'B'], fill: 'rgba(245,158,11,0.12)' },
+      { t: 'seg', a: 'V', b: 'A', c: AMB, w: 3 },
+      { t: 'seg', a: 'A', b: 'B', c: AMB, w: 3 },
+      { t: 'seg', a: 'V', b: 'B', c: AMB, w: 2.6 },
+      { t: 'angle', at: 'A', a: 'B', b: 'V', r: 17, label: '110°', c: '#b45309', gap: 15 },
+      { t: 'angle', at: 'V', a: 'A', b: 'B', r: 15, label: '34.3°', c: '#6d28d9', gap: 14 }],
+    2: [{ t: 'poly', v: ['V', 'A', 'B'], fill: 'rgba(16,185,129,0.10)' },
+      { t: 'seg', a: 'V', b: 'B', c: AMB, w: 3 },
+      { t: 'seg', a: 'A', b: 'B', c: GREY, w: 2 },
+      { t: 'angle', at: 'B', a: 'V', b: 'A', r: 20, label: '35.7°', c: '#047857', gap: 15 }],
+    3: [{ t: 'poly', v: ['Pp', 'B', 'M'], fill: 'rgba(139,92,246,0.13)' },
+      { t: 'seg', a: 'B', b: 'Pp', c: AMB, w: 2.8 },
+      { t: 'seg', a: 'B', b: 'M', c: AMB, w: 2.8 },
+      { t: 'seg', a: 'Pp', b: 'M', c: GRN, w: 3.4 },
+      { t: 'angle', at: 'B', a: 'Pp', b: 'M', r: 14, label: '35.7°', c: '#b45309', gap: 14 },
+      { t: 'dot', at: 'M' }, { t: 'dot', at: 'Pp' },
+      { t: 'text', at: MID('Pp', 'M'), text: '9.31', dx: 2, dy: -13, c: '#047857', size: 12 }],
+    4: [{ t: 'poly', v: ['Pp', 'Q', 'N', 'M'], fill: 'rgba(59,130,246,0.10)' },
+      { t: 'seg', a: 'M', b: 'N', c: AMB, w: 3.2 },
+      { t: 'seg', a: 'Pp', b: 'Q', c: AMB, w: 3.2 },
+      { t: 'dot', at: 'M' }, { t: 'dot', at: 'N' }, { t: 'dot', at: 'Pp' }, { t: 'dot', at: 'Q' },
+      { t: 'text', at: MID('M', 'N'), text: '5', dx: -10, dy: -6, c: '#b45309', size: 12 }],
+    5: [{ t: 'poly', v: ['Pp', 'Q', 'N', 'M'], fill: 'rgba(139,92,246,0.10)' },
+      { t: 'seg', a: 'M', b: 'N', c: GREY, w: 2.2 },
+      { t: 'seg', a: 'Pp', b: 'Q', c: GREY, w: 2.2 },
+      { t: 'seg', a: 'M', b: 'H', c: VIO, w: 2.6, dash: [6, 5] },
+      { t: 'ra', at: 'H', a: 'M', b: 'Q', s: 5, c: VIO },
+      { t: 'dot', at: 'H' },
+      { t: 'text', at: MID('M', 'H'), text: 'h ≈ 8.97', dx: -8, dy: -10, c: '#6d28d9', size: 11.5 }],
+    6: [{ t: 'poly', v: ['Pp', 'Q', 'N', 'M'], fill: 'rgba(16,185,129,0.14)', stroke: '#059669', w: 2.4 },
+      { t: 'seg', a: 'M', b: 'N', c: AMB, w: 2.6 },
+      { t: 'seg', a: 'Pp', b: 'Q', c: AMB, w: 2.6 },
+      { t: 'seg', a: 'Pp', b: 'M', c: AMB, w: 2.2 },
+      { t: 'seg', a: 'Q', b: 'N', c: AMB, w: 2.2 }],
+    7: [{ t: 'poly', v: ['Pp', 'Q', 'N', 'M'], fill: 'rgba(16,185,129,0.20)', stroke: '#059669', w: 2.6 },
+      { t: 'text', at: MID('Pp', 'Q'), text: 'PQNM', dx: 0, dy: -4, c: '#047857', size: 12.5 }]
+  }
+});
+</script>
+<script>
+/* HKDSE 2014 P1 Q17 — pyramid VABCD, rectangular base 18 x 10, VB = VC = 30, angle VAB = 110 */
+var P = {
+  A: [0, 0, 0], B: [18, 0, 0], C: [18, 0, 10], D: [0, 0, 10],
+  V: [-6.3686, 16.7682, 5],        /* apex: VB = VC = 30, angle VAB = angle VDC = 110 */
+  Pp: [9, 0, 0],                   /* P, mid-point of AB */
+  Q: [9, 0, 10],                   /* Q, mid-point of CD */
+  M: [5.8157, 8.3841, 2.5],        /* M, mid-point of VB */
+  N: [5.8157, 8.3841, 7.5],        /* N, mid-point of VC */
+  H: [9, 0, 2.5]                   /* foot of the trapezium height on PQ */
+};
+function MID(a, b) {
+  var p = P[a], q = P[b];
+  return [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2, (p[2] + q[2]) / 2];
+}
+var AMB = '#f59e0b', VIO = '#8b5cf6', GRN = '#10b981', GREY = '#94a3b8';
+
+Fig3D.mount('#cv3d', {
+  v: P,
+  faces: [['V', 'A', 'B'], ['V', 'B', 'C'], ['V', 'C', 'D'], ['V', 'D', 'A'], ['A', 'B', 'C', 'D']],
+  edges: ['V-A', 'V-B', 'V-C', 'V-D', 'A-B', 'B-C', 'C-D', 'D-A'],
+  ground: { x0: -22, x1: 30, z0: -14, z1: 24 },
+  footprint: ['A', 'B', 'C', 'D'],
+  view: { yaw: 0.92, pitch: -0.30, zoom: 1.05 },
+  labels: { A: 'A', B: 'B', C: 'C', D: 'D', V: 'V', Pp: 'P', Q: 'Q', M: 'M', N: 'N' },
+  labelColor: { V: '#ef4444' },
+  labelSteps: { Pp: 3, M: 3, Q: 4, N: 4 },
+  labelsNudge: { Pp: 1.0, Q: -0.55, M: 0.2, N: 0.2, A: -0.35, D: 1.15 },
+  steps: {
+    1: [{ t: 'poly', v: ['V', 'A', 'B'], fill: 'rgba(245,158,11,0.12)' },
+      { t: 'seg', a: 'V', b: 'A', c: AMB, w: 3 },
+      { t: 'seg', a: 'A', b: 'B', c: AMB, w: 3 },
+      { t: 'seg', a: 'V', b: 'B', c: AMB, w: 2.6 },
+      { t: 'angle', at: 'A', a: 'B', b: 'V', r: 4.5, label: '110°', c: '#b45309', gap: 15 },
+      { t: 'angle', at: 'V', a: 'A', b: 'B', r: 4, label: '34.3°', c: '#6d28d9', gap: 14 }],
+    2: [{ t: 'poly', v: ['V', 'A', 'B'], fill: 'rgba(16,185,129,0.10)' },
+      { t: 'seg', a: 'V', b: 'B', c: AMB, w: 3 },
+      { t: 'seg', a: 'A', b: 'B', c: GREY, w: 2 },
+      { t: 'angle', at: 'B', a: 'V', b: 'A', r: 5, label: '35.7°', c: '#047857', gap: 15 }],
+    3: [{ t: 'poly', v: ['Pp', 'B', 'M'], fill: 'rgba(139,92,246,0.13)' },
+      { t: 'seg', a: 'B', b: 'Pp', c: AMB, w: 2.8 },
+      { t: 'seg', a: 'B', b: 'M', c: AMB, w: 2.8 },
+      { t: 'seg', a: 'Pp', b: 'M', c: GRN, w: 3.4 },
+      { t: 'angle', at: 'B', a: 'Pp', b: 'M', r: 3.6, label: '35.7°', c: '#b45309', gap: 14 },
+      { t: 'dot', at: 'M' }, { t: 'dot', at: 'Pp' },
+      { t: 'text', at: MID('Pp', 'M'), text: '9.31', dx: 2, dy: -13, c: '#047857', size: 12 }],
+    4: [{ t: 'poly', v: ['Pp', 'Q', 'N', 'M'], fill: 'rgba(59,130,246,0.10)' },
+      { t: 'seg', a: 'M', b: 'N', c: AMB, w: 3.2 },
+      { t: 'seg', a: 'Pp', b: 'Q', c: AMB, w: 3.2 },
+      { t: 'dot', at: 'M' }, { t: 'dot', at: 'N' }, { t: 'dot', at: 'Pp' }, { t: 'dot', at: 'Q' },
+      { t: 'text', at: MID('M', 'N'), text: '5', dx: -10, dy: -6, c: '#b45309', size: 12 }],
+    5: [{ t: 'poly', v: ['Pp', 'Q', 'N', 'M'], fill: 'rgba(139,92,246,0.10)' },
+      { t: 'seg', a: 'M', b: 'N', c: GREY, w: 2.2 },
+      { t: 'seg', a: 'Pp', b: 'Q', c: GREY, w: 2.2 },
+      { t: 'seg', a: 'M', b: 'H', c: VIO, w: 2.6, dash: [6, 5] },
+      { t: 'ra', at: 'H', a: 'M', b: 'Q', s: 2.2, c: VIO },
+      { t: 'dot', at: 'H' },
+      { t: 'text', at: MID('M', 'H'), text: 'h ≈ 8.97', dx: -8, dy: -10, c: '#6d28d9', size: 11.5 }],
+    6: [{ t: 'poly', v: ['Pp', 'Q', 'N', 'M'], fill: 'rgba(16,185,129,0.14)', stroke: '#059669', w: 2.4 },
+      { t: 'seg', a: 'M', b: 'N', c: AMB, w: 2.6 },
+      { t: 'seg', a: 'Pp', b: 'Q', c: AMB, w: 2.6 },
+      { t: 'seg', a: 'Pp', b: 'M', c: AMB, w: 2.2 },
+      { t: 'seg', a: 'Q', b: 'N', c: AMB, w: 2.2 }],
+    7: [{ t: 'poly', v: ['Pp', 'Q', 'N', 'M'], fill: 'rgba(16,185,129,0.20)', stroke: '#059669', w: 2.6 },
+      { t: 'text', at: [7.41, 4.19, 5.0], text: 'PQNM', dx: 0, dy: 0, c: '#047857', size: 12 }]
+  }
+});
+</script>
 </body>
 </html>

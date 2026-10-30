@@ -40,7 +40,7 @@
     box-shadow:0 8px 26px rgba(18,35,61,.08);
     padding:14px;
   }
-  .diagram{position:sticky;top:16px;max-height:calc(100vh - 2rem);overflow-y:auto;}
+  .diagram{position:sticky;top:12px;}
   canvas{width:100%;height:auto;display:block;border-radius:12px;background:#fbfdff;}
 
   .legend{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:10px;font-size:.82rem;color:var(--muted);}
@@ -81,8 +81,10 @@
     .panel{padding:10px;border-radius:13px;}
     h1{font-size:1rem;}
   }
+.chip3d{display:inline-block;vertical-align:middle;margin-left:6px;font-size:.58rem;font-weight:700;letter-spacing:.6px;color:#fff;background:linear-gradient(135deg,#2563eb,#0ea5e9);padding:2px 7px;border-radius:20px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;}
 </style>
 <link rel="stylesheet" href="assets/extra.css">
+<link rel="stylesheet" href="assets/fig3d.css">
 </head>
 <body>
 
@@ -90,16 +92,11 @@
 
 <div class="split">
   <!-- LEFT: DIAGRAM -->
-  <section class="panel diagram">
-    <div style="margin:0 0 14px;"><div style="font-size:.78rem;font-weight:700;color:#334155;margin-bottom:6px;">3D 互動模型 — 拖動旋轉查看不同角度</div><iframe src="https://www.geogebra.org/material/iframe/id/URGFnZhd" width="100%" height="400" style="border:0;border-radius:12px;background:#fff;" allowfullscreen scrolling="no"></iframe></div><canvas id="cv" width="640" height="560"></canvas>
-    <div class="legend">
-      <span><i style="background:#2563eb"></i>Edges of tetrahedron</span>
-      <span><i style="background:#16a34a"></i>Plane ABC</span>
-      <span><i style="background:#e11d48"></i>Plane BCD</span>
-      <span><i style="background:#d97706"></i>Mid-point M of BC</span>
-      <span><i style="background:#7c3aed"></i>Angle AMD</span>
-      <span><i style="background:#0891b2"></i>BC (common edge)</span>
-    </div>
+    <section class="panel diagram">
+    <h2>3-D Figure <span class="chip3d">3D</span></h2>
+    <div class="fig3d-stage"><canvas id="cv3d"></canvas></div>
+    <div id="figui"></div>
+    <div class="fig3d-hint">拖動旋轉 · 雙指／滾輪縮放　—　drag to rotate, pinch or scroll to zoom</div>
   </section>
 
   <!-- RIGHT: QUESTION + SOLUTION -->
@@ -188,271 +185,50 @@
   </section>
 </div>
 
-<script>
-/* ---------- Canvas setup ---------- */
-const cv = document.getElementById('cv');
-const ctx = cv.getContext('2d');
-let mode = 1;
 
-/* Fix device pixel ratio for crispness */
-function setupHiDPI(){
-  const rect = cv.getBoundingClientRect();
-  const dpr = window.devicePixelRatio || 1;
-  const w = Math.max(320, rect.width);
-  cv.width = w * dpr;
-  cv.height = w * 0.875 * dpr;      /* keep 8:7 aspect */
-  cv.style.height = (cv.height / dpr) + 'px';
-  ctx.setTransform(dpr,0,0,dpr,0,0);
-}
-setupHiDPI();
-window.addEventListener('resize', ()=>{ setupHiDPI(); draw(); });
-
-/* ---------- Geometry of a regular tetrahedron ---------- */
-function toRad(d){ return d * Math.PI / 180; }
-
-/*
-  Place the tetrahedron to match the exam figure:
-  A at top, B lower-left, D right, C at the bottom.
-  B, C, D form the base face.
-*/
-const W = 640, H = 560;                 /* design coordinates */
-
-/* Base face BCD : equilateral triangle (true lengths) */
-const S = 300;                                    /* edge length in px */
-const R = S / Math.sqrt(3);                       /* circumradius of base */
-
-/* centre of base */
-const Cb = { x: 300, y: 400 };
-
-/* Vertices of the equilateral base BCD, angles chosen to match the figure */
-const B = { x: Cb.x - R*Math.cos(toRad(30)), y: Cb.y + R*Math.sin(toRad(30)) };
-const D = { x: Cb.x + R*Math.cos(toRad(30)), y: Cb.y + R*Math.sin(toRad(30)) };
-const C = { x: Cb.x,                        y: Cb.y - R };
-
-/* Apex A : directly above the centroid, height h = sqrt(2/3)*S */
-const h = Math.sqrt(2/3) * S;
-const A = { x: Cb.x, y: Cb.y - h };
-
-/* Mid-point M of BC */
-const M = { x:(B.x + C.x)/2, y:(B.y + C.y)/2 };
-
-/* ---------- helper drawing functions ---------- */
-function line(p,q,color,width,dashed){
-  ctx.save();
-  ctx.beginPath();
-  ctx.setLineDash(dashed?[7,6]:[]);
-  ctx.strokeStyle = color;
-  ctx.lineWidth = width || 2;
-  ctx.lineCap='round';
-  ctx.moveTo(p.x,p.y);
-  ctx.lineTo(q.x,q.y);
-  ctx.stroke();
-  ctx.restore();
-}
-function dot(p,color,r){
-  ctx.save();
-  ctx.beginPath();
-  ctx.arc(p.x,p.y,r||5,0,Math.PI*2);
-  ctx.fillStyle = color;
-  ctx.fill();
-  ctx.strokeStyle='#fff';
-  ctx.lineWidth=1.6;
-  ctx.stroke();
-  ctx.restore();
-}
-function label(p,text,color,dx,dy,size){
-  ctx.save();
-  ctx.fillStyle = color;
-  ctx.font = 'bold '+(size||24)+'px "Segoe UI",Arial,sans-serif';
-  ctx.textAlign='center';
-  ctx.textBaseline='middle';
-  ctx.fillText(text,p.x+(dx||0), p.y+(dy||0));
-  ctx.restore();
-}
-function fillFace(pts,color,alpha){
-  ctx.save();
-  ctx.beginPath();
-  ctx.moveTo(pts[0].x,pts[0].y);
-  for(let i=1;i<pts.length;i++) ctx.lineTo(pts[i].x,pts[i].y);
-  ctx.closePath();
-  ctx.globalAlpha = alpha;
-  ctx.fillStyle = color;
-  ctx.fill();
-  ctx.restore();
-}
-
-/* ---------- main draw ---------- */
-function draw(){
-  const w = cv.width / (window.devicePixelRatio||1);
-  const hgt = cv.height / (window.devicePixelRatio||1);
-  ctx.clearRect(0,0,w,hgt);
-  ctx.fillStyle = '#fbfdff';
-  ctx.fillRect(0,0,w,hgt);
-
-  /* uniform scale to fit canvas */
-  const scale = Math.min(w/W, hgt/H);
-  ctx.save();
-  ctx.translate((w - W*scale)/2, (hgt - H*scale)/2);
-  ctx.scale(scale, scale);
-
-  /* background soft grid */
-  ctx.save();
-  ctx.strokeStyle='#eef3fb';
-  ctx.lineWidth=1;
-  for(let x=0;x<=W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
-  for(let y=0;y<=H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
-  ctx.restore();
-
-  /* ---- plane / face highlights per step ---- */
-  if(mode>=1 && mode<=2){
-    fillFace([A,B,C],'#16a34a',0.10);      /* plane ABC */
-    fillFace([B,C,D],'#e11d48',0.10);      /* plane BCD */
-  }
-  if(mode>=3){
-    fillFace([A,B,C],'#16a34a',0.07);
-    fillFace([B,C,D],'#e11d48',0.07);
-  }
-
-  /* ---- hidden edge BC (drawn dashed, lies behind face ABD visually) ---- */
-  line(B,C,'#0891b2',2.4,true);
-
-  /* ---- outer edges of tetrahedron ---- */
-  line(A,B,'#2563eb',3);
-  line(A,D,'#2563eb',3);
-  line(A,C,'#2563eb',3);
-  line(B,D,'#2563eb',3);
-  line(C,D,'#2563eb',3);
-
-  /* ---- step-specific constructions ---- */
-  /* Mid-point M always shown from step 1 onwards */
-  if(mode>=1){
-    /* perpendiculars AM and DM */
-    line(A,M,'#d97706',3.2,false);
-    line(D,M,'#d97706',3.2,false);
-
-    /* right-angle marks at M */
-    rightAngle(M, A, B, '#d97706');
-    rightAngle(M, D, C, '#d97706');
-
-    dot(M,'#d97706',6.5);
-    label(M,'M','#b45309',-18,18,20);
-  }
-
-  if(mode>=1){
-    /* highlight BC in cyan solid inside the construction */
-    line(B,C,'#0891b2',3.2,false);
-  }
-
-  if(mode>=3){
-    /* emphasise triangle AMD */
-    ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(A.x,A.y);
-    ctx.lineTo(M.x,M.y);
-    ctx.lineTo(D.x,D.y);
-    ctx.closePath();
-    ctx.globalAlpha=0.14;
-    ctx.fillStyle='#7c3aed';
-    ctx.fill();
-    ctx.restore();
-
-    /* angle arc at M between MA and MD */
-    angleArc(M, A, D, '#7c3aed', 46, 2.6);
-    /* angle label near M */
-    ctx.save();
-    ctx.fillStyle='#7c3aed';
-    ctx.font='bold 20px "Segoe UI",Arial,sans-serif';
-    ctx.textAlign='center';
-    ctx.textBaseline='middle';
-    ctx.fillText('\u2220AMD', M.x+60, M.y+6);
-    ctx.restore();
-  }
-
-  /* ---- vertices ---- */
-  dot(A,'#7c3aed',7);
-  dot(B,'#16a34a',7);
-  dot(C,'#16a34a',7);
-  dot(D,'#16a34a',7);
-
-  label(A,'A','#6d28d9',0,-24,24);
-  label(B,'B','#15803d',-24,10,24);
-  label(C,'C','#15803d',-4,28,24);
-  label(D,'D','#15803d',26,10,24);
-
-  ctx.restore();
-}
-
-/* small right-angle square mark at vertex V, along directions to P and Q */
-function rightAngle(V,P,Q,color){
-  const u = norm({x:P.x-V.x, y:P.y-V.y});
-  const v = norm({x:Q.x-V.x, y:Q.y-V.y});
-  const s = 15;
-  const p1 = {x:V.x+u.x*s, y:V.y+u.y*s};
-  const p2 = {x:V.x+(u.x+v.x)*s, y:V.y+(u.y+v.y)*s};
-  const p3 = {x:V.x+v.x*s, y:V.y+v.y*s};
-  ctx.save();
-  ctx.beginPath();
-  ctx.moveTo(p1.x,p1.y);
-  ctx.lineTo(p2.x,p2.y);
-  ctx.lineTo(p3.x,p3.y);
-  ctx.strokeStyle=color;
-  ctx.lineWidth=2;
-  ctx.stroke();
-  ctx.restore();
-}
-
-/* angle arc at V from ray V→P to ray V→Q */
-function angleArc(V,P,Q,color,radius,lw){
-  const a1 = Math.atan2(P.y-V.y, P.x-V.x);
-  const a2 = Math.atan2(Q.y-V.y, Q.x-V.x);
-  let start = a1, end = a2;
-  /* draw the smaller sweep */
-  let diff = end - start;
-  while(diff > Math.PI) diff -= 2*Math.PI;
-  while(diff < -Math.PI) diff += 2*Math.PI;
-  end = start + diff;
-
-  ctx.save();
-  ctx.beginPath();
-  ctx.arc(V.x, V.y, radius, start, end, diff<0);
-  ctx.strokeStyle=color;
-  ctx.lineWidth=lw||2.4;
-  ctx.stroke();
-  ctx.restore();
-}
-
-function norm(v){
-  const l = Math.hypot(v.x,v.y) || 1;
-  return {x:v.x/l, y:v.y/l};
-}
-
-/* ---------- scroll sync ---------- */
-const steps = Array.from(document.querySelectorAll('.step'));
-const obs = new IntersectionObserver((entries)=>{
-  entries.forEach(e=>{
-    if(e.isIntersecting){
-      const m = +e.target.dataset.step;
-      mode = m;
-      steps.forEach(st=>st.classList.toggle('active', st===e.target));
-      draw();
-    }
-  });
-},{rootMargin:'-15% 0px -55% 0px', threshold:0});
-steps.forEach(st=>obs.observe(st));
-
-/* initial */
-steps[0].classList.add('active');
-draw();
-window.addEventListener('load', ()=>{ setupHiDPI(); draw(); });
-
-/* Re-type MathJax if needed */
-if(window.MathJax && MathJax.typesetPromise){ MathJax.typesetPromise(); }
-</script>
 <!-- question-pager -->
 <nav class="qnav" aria-label="Question navigation">
   <a class="qnav__prev" href="2012_P2_Q39.html">← Previous Question</a>
   <a class="qnav__mid" href="index.html#y2012">Contents</a>
   <a class="qnav__next" href="2012_P2_Q41.html">Next Question →</a>
 </nav>
+<script src="assets/fig3d.js"></script>
+<script>
+/* HKDSE 2012 P2 Q40 — regular tetrahedron ABCD (all edges 10 units), angle between planes ABC and BCD */
+var P = {
+  A: [5, 8.16497, 2.88675], B: [0, 0, 0], C: [10, 0, 0],
+  D: [5, 0, 8.66025], M: [5, 0, 0]
+};
+
+var BASE = [
+  { t: 'poly', v: ['A', 'B', 'C'], fill: 'rgba(59,130,246,0.10)' },
+  { t: 'poly', v: ['B', 'C', 'D'], fill: 'rgba(139,92,246,0.12)' },
+  { t: 'seg', a: 'B', b: 'C', c: '#8b5cf6', w: 3, dash: [7, 5] },
+  { t: 'seg', a: 'A', b: 'M', c: '#f59e0b', w: 3 },
+  { t: 'seg', a: 'D', b: 'M', c: '#f59e0b', w: 3 },
+  { t: 'ra', at: 'M', a: 'A', b: 'B', s: 1.0, c: '#b45309' },
+  { t: 'ra', at: 'M', a: 'D', b: 'B', s: 1.0, c: '#b45309' }
+];
+
+var steps = {};
+[1, 2, 3, 4, 5, 6].forEach(function (i) {
+  steps[i] = BASE.concat([
+    { t: 'angle', at: 'M', a: 'A', b: 'D', r: 2.4, label: i >= 5 ? '71\u00b0' : '\u03b8', c: '#10b981' }
+  ]);
+});
+
+Fig3D.mount('#cv3d', {
+  v: P,
+  faces: [['A', 'B', 'C'], ['A', 'C', 'D'], ['A', 'D', 'B'], ['B', 'C', 'D']],
+  edges: ['A-B', 'A-C', 'A-D', 'B-C', 'C-D', 'D-B'],
+  ground: true,
+  groundOpt: { x0: -6, x1: 16, z0: -9, z1: 13, gx: 2, gz: 2 },
+  view: { yaw: 0.80, pitch: -0.30, zoom: 1.0 },
+  labels: { A: 'A', B: 'B', C: 'C', D: 'D', M: 'M' },
+  labelsNudge: { M: 0.55 },
+  startStep: 1,
+  steps: steps
+});
+</script>
 </body>
 </html>

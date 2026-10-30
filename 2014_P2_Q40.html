@@ -42,7 +42,7 @@
     padding:14px;
     border:1px solid #e6eefb;
   }
-  .diagram{position:sticky;top:16px;max-height:calc(100vh - 2rem);overflow-y:auto;}
+  .diagram{position:sticky;top:12px;}
   .diagram h2{
     font-size:.82rem;margin:0 0 8px 0;color:#1d4ed8;text-transform:uppercase;letter-spacing:.8px;
   }
@@ -112,8 +112,10 @@
     .step .math{font-size:.86rem;}
     .legend{font-size:.64rem;}
   }
+.chip3d{display:inline-block;vertical-align:middle;margin-left:6px;font-size:.58rem;font-weight:700;letter-spacing:.6px;color:#fff;background:linear-gradient(135deg,#2563eb,#0ea5e9);padding:2px 7px;border-radius:20px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;}
 </style>
 <link rel="stylesheet" href="assets/extra.css">
+<link rel="stylesheet" href="assets/fig3d.css">
 </head>
 <body>
 
@@ -122,21 +124,11 @@
 <div class="split">
 
   <!-- ================= LEFT: DIAGRAM ================= -->
-  <section class="panel diagram">
-    <h2>Interactive Diagram</h2>
-    <div style="margin:0 0 14px;"><div style="font-size:.78rem;font-weight:700;color:#334155;margin-bottom:6px;">3D 互動模型 — 拖動旋轉查看不同角度</div><iframe src="https://www.geogebra.org/material/iframe/id/dteTkMeS" width="100%" height="400" style="border:0;border-radius:12px;background:#fff;" allowfullscreen scrolling="no"></iframe></div><canvas id="cv" width="620" height="520"></canvas>
-    <div class="legend">
-      <span><i class="dot" style="background:#8b5cf6"></i>Vertical pole AB (8 m)</span>
-      <span><i class="sw" style="background:#ef4444"></i>BC = 8 m, BD = 15 m (ground)</span>
-      <span><i class="sw" style="background:#0ea5e9"></i>CD = 17 m (ground)</span>
-      <span><i class="sw" style="background:#16a34a"></i>AC, AD, AH</span>
-      <span><i class="sw" style="background:#f59e0b"></i>BH ⊥ CD</span>
-      <span><i class="dot" style="background:#0f766e"></i>Foot of perpendicular H</span>
-    </div>
-    <div class="controls">
-      <button id="btnReset">Reset view</button>
-      <button id="btnToggle">Show / Hide H</button>
-    </div>
+    <section class="panel diagram">
+    <h2>3-D Figure <span class="chip3d">3D</span></h2>
+    <div class="fig3d-stage"><canvas id="cv3d"></canvas></div>
+    <div id="figui"></div>
+    <div class="fig3d-hint">拖動旋轉 · 雙指／滾輪縮放　—　drag to rotate, pinch or scroll to zoom</div>
   </section>
 
   <!-- ================= RIGHT: QUESTION + SOLUTION ================= -->
@@ -265,251 +257,56 @@
   </section>
 </div>
 
-<script>
-/* =========================================================
-   Geometry model (real proportions, 1 unit = metres)
-   Ground triangle BCD in the horizontal plane; A above B.
-   Screen mapping: isometric-ish projection.
-   ========================================================= */
-const cv = document.getElementById('cv');
-const ctx = cv.getContext('2d');
 
-const BC = 8, BD = 15, AB = 8;
-const CD = Math.sqrt(BC*BC + BD*BD);   // 17
-
-/* project a 3D point (x along BC, y along BD, z height) to 2D canvas */
-const S = 17;                 // pixels per metre
-const ORIGIN = {x: 118, y: 400};
-const EX = {x: 1,    y: -0.30};   // screen direction of +x axis (BC)
-const EY = {x: 0.62, y: -0.42};   // screen direction of +y axis (BD)  (receding)
-const EZ = {x: 0,    y: -1};      // screen direction of +z (height)
-
-function proj(x, y, z){
-  return {
-    x: ORIGIN.x + S*(x*EX.x + y*EY.x + z*EZ.x),
-    y: ORIGIN.y + S*(x*EX.y + y*EY.y + z*EZ.y)
-  };
-}
-
-/* key points */
-const B = proj(0,0,0);
-const C = proj(BC,0,0);
-const Dp = proj(0,BD,0);
-const A = proj(0,0,AB);
-
-/* foot of perpendicular H on CD: BH ⟂ CD.
-   Parametrise CD: P(t) = C + t(D-C), t in [0,1].
-   B-H ⟂ (D-C). */
-const dx = Dp.x - C.x, dy = Dp.y - C.y; // 2D vector CD (screen)
-// For the true foot we work in the *real* plane: B=(0,0), C=(8,0), D=(0,15).
-// Vector CD_real = (-8, 15). Foot of B onto line through C dir (-8,15):
-const vx = -BC, vy = BD;              // (-8, 15)
-const wx = 0 - BC, wy = 0 - 0;        // B - C
-const tHat = (wx*vx + wy*vy)/(vx*vx+vy*vy);
-const Hx = BC + tHat*vx, Hy = 0 + tHat*vy;
-const H = proj(Hx, Hy, 0);
-
-/* ---------- drawing helpers ---------- */
-function line(p, q, color, w, dash){
-  ctx.save();
-  ctx.setLineDash(dash || []);
-  ctx.strokeStyle = color; ctx.lineWidth = w;
-  ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(q.x,q.y); ctx.stroke();
-  ctx.restore();
-}
-function dot(p, color, r, label, dx, dy, lcolor){
-  ctx.fillStyle = color;
-  ctx.beginPath(); ctx.arc(p.x,p.y,r,0,Math.PI*2); ctx.fill();
-  ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.4; ctx.stroke();
-  if(label){
-    ctx.fillStyle = lcolor || '#0f172a';
-    ctx.font = 'bold 15px Segoe UI, sans-serif';
-    ctx.fillText(label, p.x + (dx||10), p.y + (dy||-8));
-  }
-}
-function rightAngleMark(p, u, v, color, size){
-  // mark right angle at p between directions u and v (both 2D unit-ish vectors)
-  ctx.save();
-  ctx.strokeStyle = color; ctx.lineWidth = 1.6;
-  ctx.beginPath();
-  ctx.moveTo(p.x + u.x*size, p.y + u.y*size);
-  ctx.lineTo(p.x + u.x*size + v.x*size, p.y + u.y*size + v.y*size);
-  ctx.lineTo(p.x + v.x*size, p.y + v.y*size);
-  ctx.stroke();
-  ctx.restore();
-}
-function unit(a,b){
-  const dx=b.x-a.x, dy=b.y-a.y, L=Math.hypot(dx,dy)||1;
-  return {x:dx/L, y:dy/L};
-}
-
-let showH = true;
-let mode = 1;
-
-/* ---------- main draw ---------- */
-function draw(){
-  ctx.clearRect(0,0,cv.width,cv.height);
-
-  /* soft backdrop grid */
-  ctx.save();
-  ctx.strokeStyle = '#eaf1fb'; ctx.lineWidth = 1;
-  for(let gx=0; gx<cv.width; gx+=26){
-    ctx.beginPath(); ctx.moveTo(gx,0); ctx.lineTo(gx,cv.height); ctx.stroke();
-  }
-  for(let gy=0; gy<cv.height; gy+=26){
-    ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(cv.width,gy); ctx.stroke();
-  }
-  ctx.restore();
-
-  /* highlight per active step */
-  const baseGround = (mode===1||mode===2) ? '#1f2937' : '#475569';
-  const colBC = (mode===2||mode===3) ? '#dc2626' : '#ef4444';
-  const colBD = (mode===2||mode===3) ? '#b91c1c' : '#ef4444';
-  const colCD = (mode===2||mode===3||mode===4) ? '#0284c7' : '#0ea5e9';
-  const colBH = (mode===3||mode===4) ? '#d97706' : '#f59e0b';
-  const colAB = (mode===1||mode===4) ? '#7c3aed' : '#8b5cf6';
-  const wMain = mode===4 ? 3.4 : 2.6;
-
-  /* --- ground triangle BCD (visible edges solid) --- */
-  // BC
-  line(B,C,colBC, wMain);
-  // BD (going backwards — draw slightly thinner, it recedes)
-  line(B,Dp,colBD, wMain*0.95);
-  // CD
-  line(C,Dp,colCD, wMain);
-
-  /* ground shading */
-  ctx.save();
-  ctx.beginPath();
-  ctx.moveTo(B.x,B.y); ctx.lineTo(C.x,C.y); ctx.lineTo(Dp.x,Dp.y); ctx.closePath();
-  ctx.fillStyle = 'rgba(148,197,255,.16)';
-  ctx.fill();
-  ctx.restore();
-
-  /* --- vertical pole AB --- */
-  line(A,B,colAB, mode===1?4.2:3.2);
-
-  /* --- slant edges AC, AD --- */
-  const colSlant = '#16a34a';
-  line(A,C, (mode===1||mode===4)?colSlant:'#5bbf86', mode===4?3:2.2);
-  line(A,Dp,(mode===1||mode===4)?colSlant:'#5bbf86', mode===4?3:2.2);
-
-  /* --- plane ACD outline emphasis on step 1 --- */
-  if(mode===1){
-    ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(A.x,A.y); ctx.lineTo(C.x,C.y); ctx.lineTo(Dp.x,Dp.y); ctx.closePath();
-    ctx.fillStyle = 'rgba(22,163,74,.10)';
-    ctx.fill();
-    ctx.restore();
-  }
-
-  /* --- perpendicular BH and AH (steps 3 & 4) --- */
-  if(showH && (mode>=3)){
-    line(B,H,colBH, mode===4?3.6:2.6);
-    line(A,H,'#0d9488', mode===4?3.6:2.4);
-    // right-angle mark at H between HC direction and HB direction
-    const uH = unit(H,C), vH = unit(H,B);
-    rightAngleMark(H,uH,vH,'#b45309',13);
-  }
-  if(showH && mode===4){
-    // right angle at B between BA and BH
-    const uB = unit(B,A), vB = unit(B,H);
-    rightAngleMark(B,uB,vB,'#7c3aed',13);
-  }
-
-  /* --- θ arc at H (step 4) --- */
-  if(showH && mode===4){
-    const a1 = Math.atan2(A.y-H.y, A.x-H.x);
-    const a2 = Math.atan2(B.y-H.y, B.x-H.x);
-    ctx.save();
-    ctx.strokeStyle = '#e11d48'; ctx.lineWidth = 2;
-    ctx.beginPath();
-    let start=Math.min(a1,a2), end=Math.max(a1,a2);
-    if(end-start > Math.PI){ const tmp=start; start=end; end=tmp+Math.PI*2; }
-    ctx.arc(H.x,H.y,26,Math.min(start,end),Math.max(start,end));
-    ctx.stroke();
-    ctx.fillStyle='#e11d48'; ctx.font='bold 15px Segoe UI, sans-serif';
-    ctx.fillText('θ', H.x - 6, H.y + 34);
-    ctx.restore();
-  }
-
-  /* --- right-angle mark at B in the ground (∠CBD = 90°) --- */
-  {
-    const uB = unit(B,C), vB = unit(B,Dp);
-    rightAngleMark(B,uB,vB,'#111827',13);
-  }
-
-  /* --- points --- */
-  dot(C, '#0f766e', 5.5, 'C', -22, 16, '#0f766e');
-  dot(Dp,'#0f766e', 5.5, 'D', 10, 10, '#0f766e');
-  dot(B, '#0f766e', 5.5, 'B', -20, 14, '#0f766e');
-  dot(A, '#7c3aed', 6.5, 'A', 10, -8, '#6d28d9');
-  if(showH && mode>=3){
-    dot(H, '#d97706', 6, 'H', -6, 22, '#b45309');
-  }
-
-  /* --- measurement labels --- */
-  ctx.save();
-  ctx.font = 'bold 13px Segoe UI, sans-serif';
-  ctx.fillStyle = '#7c3aed';
-  ctx.fillText('8 m', (A.x+B.x)/2 - 34, (A.y+B.y)/2);
-  ctx.fillStyle = '#dc2626';
-  ctx.fillText('8 m', (B.x+C.x)/2 - 4, (B.y+C.y)/2 + 20);
-  ctx.fillStyle = '#b91c1c';
-  ctx.fillText('15 m', (B.x+Dp.x)/2 + 6, (B.y+Dp.y)/2 - 8);
-  ctx.fillStyle = '#0284c7';
-  ctx.fillText('17 m', (C.x+Dp.x)/2 - 6, (C.y+Dp.y)/2 + 22);
-
-  /* --- step caption --- */
-  const caps = {
-    1: 'Plane ACD (green) with the horizontal ground BCD — the angle θ lies between them',
-    2: 'Right-angled triangle BCD: BC=8, BD=15 ⟹ CD=17',
-    3: 'BH ⊥ CD found from equal-area: ½·17·BH = ½·8·15 ⟹ BH = 120/17 m',
-    4: 'In △ABH: tanθ = AB / BH = 8 / (120/17) = 17/15'
-  };
-  ctx.fillStyle = '#1d4ed8';
-  ctx.font = 'bold 12.5px Segoe UI, sans-serif';
-  ctx.fillText(caps[mode] || '', 14, cv.height - 16);
-  ctx.restore();
-}
-
-/* ---------- controls ---------- */
-document.getElementById('btnReset').onclick = ()=>{ showH = true; draw(); };
-document.getElementById('btnToggle').onclick = ()=>{ showH = !showH; draw(); };
-
-/* ---------- scroll sync ---------- */
-const steps = Array.from(document.querySelectorAll('.step'));
-const obs = new IntersectionObserver((es)=>{
-  es.forEach(e=>{
-    if(e.isIntersecting){
-      const m = +e.target.dataset.step;
-      mode = m;
-      steps.forEach(st=>st.classList.toggle('active', st===e.target));
-      draw();
-    }
-  });
-},{rootMargin:'-15% 0px -55% 0px', threshold:0});
-steps.forEach(st=>obs.observe(st));
-
-/* initial */
-steps[0].classList.add('active');
-mode = 1;
-draw();
-
-/* redraw on resize for crispness */
-window.addEventListener('resize', ()=>{ draw(); });
-
-/* MathJax re-render ready */
-if(window.MathJax && MathJax.startup){
-  MathJax.startup.promise.then(()=>{});
-}
-</script>
 <!-- question-pager -->
 <nav class="qnav" aria-label="Question navigation">
   <a class="qnav__prev" href="2014_P2_Q39.html">← Previous Question</a>
   <a class="qnav__mid" href="index.html#y2014">Contents</a>
   <a class="qnav__next" href="2014_P2_Q41.html">Next Question →</a>
 </nav>
+<script src="assets/fig3d.js"></script>
+<script>
+/* HKDSE 2014 P2 Q40 — vertical pole AB = 8 m, BC = 8 m, BD = 15 m, angle CBD = 90 deg,
+   CD = 17 m, H the foot of the perpendicular from B to CD, theta = angle AHB. */
+var P = {
+  A: [0, 8, 0], B: [0, 0, 0], C: [0, 0, -8], D: [15, 0, 0],
+  H: [3.32180, 0, -6.22837]
+};
+
+var PLANE = { t: 'poly', v: ['A', 'C', 'D'], fill: 'rgba(139,92,246,0.13)' };
+var AH = { t: 'seg', a: 'A', b: 'H', c: '#10b981', w: 2.6, dash: [6, 4] };
+var BH = { t: 'seg', a: 'B', b: 'H', c: '#94a3b8', w: 2, dash: [5, 4] };
+var CD = { t: 'seg', a: 'C', b: 'D', c: '#f59e0b', w: 3 };
+var AB = { t: 'seg', a: 'A', b: 'B', c: '#10b981', w: 3 };
+var DH = { t: 'dot', at: 'H' };
+
+var steps = {
+  1: [PLANE, AH, BH, DH, { t: 'vlabel', at: 'H', text: 'H' }],
+  2: [PLANE, CD, { t: 'ra', at: 'B', a: 'C', b: 'D', s: 1.4, c: '#b45309' },
+      { t: 'text', at: [7.5, 0, -4], text: '17', dx: 6, dy: 14 }],
+  3: [PLANE, CD, BH, { t: 'ra', at: 'H', a: 'B', b: 'D', s: 1.2, c: '#b45309' },
+      DH, { t: 'vlabel', at: 'H', text: 'H' }],
+  4: [PLANE, AB, BH, DH, { t: 'vlabel', at: 'H', text: 'H' },
+      { t: 'angle', at: 'H', a: 'A', b: 'B', r: 2.6, label: '\u03b8', c: '#10b981' },
+      { t: 'text', at: 'A', text: 'tan \u03b8 = 17/15', dx: 0, dy: -24, size: 13 }],
+  5: [PLANE, CD, AB, BH, DH, { t: 'vlabel', at: 'H', text: 'H' },
+      { t: 'angle', at: 'H', a: 'A', b: 'B', r: 2.6, label: '\u03b8', c: '#10b981' }],
+  6: [PLANE, CD, AB, BH, DH, { t: 'vlabel', at: 'H', text: 'H' },
+      { t: 'angle', at: 'H', a: 'A', b: 'B', r: 2.6, label: '\u03b8', c: '#10b981' }]
+};
+
+Fig3D.mount('#cv3d', {
+  v: P,
+  faces: [['A', 'B', 'C'], ['A', 'C', 'D'], ['A', 'D', 'B'], ['B', 'C', 'D']],
+  edges: ['A-B', 'A-C', 'A-D', 'B-C', 'C-D', 'D-B'],
+  ground: true,
+  groundOpt: { x0: -14, x1: 21, z0: -21, z1: 15, gx: 5, gz: 5 },
+  view: { yaw: -0.75, pitch: -0.45, zoom: 1.0 },
+  labels: { A: 'A', B: 'B', C: 'C', D: 'D' },
+  labelsNudge: { B: 2.6 },
+  startStep: 1,
+  steps: steps
+});
+</script>
 </body>
 </html>

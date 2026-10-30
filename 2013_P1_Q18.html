@@ -40,12 +40,7 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
   @media(min-width:900px){ .panel{padding:18px;} }
 
   /* LEFT diagram panel – sticky */
-  .diagram{
-    position:sticky;
-    top:16px;
-    max-height:calc(100vh - 2rem);
-    overflow-y:auto;
-  }
+  .diagram{position:sticky;top:12px;}
   canvas{width:100%;height:auto;display:block;border-radius:12px;background:#fbfdff;}
 
   .legend{
@@ -111,8 +106,10 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
   .final b{color:#4338ca;}
   .def{font-size:.82rem;color:#475569;margin-top:8px;}
   .def code{background:#e2e8f0;padding:1px 5px;border-radius:5px;font-size:.75rem;}
+.chip3d{display:inline-block;vertical-align:middle;margin-left:6px;font-size:.58rem;font-weight:700;letter-spacing:.6px;color:#fff;background:linear-gradient(135deg,#2563eb,#0ea5e9);padding:2px 7px;border-radius:20px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;}
 </style>
 <link rel="stylesheet" href="assets/extra.css">
+<link rel="stylesheet" href="assets/fig3d.css">
 </head>
 <body>
 
@@ -121,21 +118,11 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
 <div class="split">
 
   <!-- ================= LEFT : DIAGRAM ================= -->
-  <section class="panel diagram">
-    <div class="modeTag" id="modeTag">Figure 3(a) — Part (a)</div>
-    <div style="margin:0 0 14px;"><div style="font-size:.78rem;font-weight:700;color:#334155;margin-bottom:6px;">3D 互動模型 — 拖動旋轉查看不同角度</div><iframe src="https://www.geogebra.org/material/iframe/id/Ys2PeDxy" width="100%" height="400" style="border:0;border-radius:12px;background:#fff;" allowfullscreen scrolling="no"></iframe></div><canvas id="cv" width="620" height="820"></canvas>
-
-    <div class="legend">
-      <span><i style="background:#2563eb"></i>Paper edge (solid)</span>
-      <span><i style="background:#94a3b8;height:0;border-top:2px dashed #94a3b8"></i>Hidden / crease</span>
-      <span><span class="dot" style="background:#dc2626"></span> Point A / M / N</span>
-      <span><span class="dot" style="background:#059669"></span> Point B / C</span>
-      <span><i style="background:#f59e0b"></i>Ground plane</span>
-      <span><i style="background:#7c3aed"></i>Face BCM</span>
-    </div>
-    <div class="caption" id="caption">
-      Triangle \(ABC\): \(AB=28\), \(BC=21\), \(AC=35\). \(M\) on \(AC\) with \(\angle BMC=75^{\circ}\).
-    </div>
+      <section class="panel diagram">
+    <h2>3-D Figure <span class="chip3d">3D</span></h2>
+    <div class="fig3d-stage"><canvas id="cv3d"></canvas></div>
+    <div id="figui"></div>
+    <div class="fig3d-hint">拖動旋轉 · 雙指／滾輪縮放　—　drag to rotate, pinch or scroll to zoom</div>
   </section>
 
   <!-- ================= RIGHT : QUESTION + SOLUTION ================= -->
@@ -308,298 +295,7 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
   </section>
 </div>
 
-<script>
-(function(){
-  const cv = document.getElementById('cv');
-  const ctx = cv.getContext('2d');
-  const modeTag = document.getElementById('modeTag');
-  const caption = document.getElementById('caption');
 
-  let mode = 1;
-
-  /* ---------- helpers ---------- */
-  function clear(){ ctx.clearRect(0,0,cv.width,cv.height); }
-
-  function line(x1,y1,x2,y2,color,w,dash){
-    ctx.save();
-    ctx.beginPath();
-    ctx.setLineDash(dash||[]);
-    ctx.strokeStyle=color;
-    ctx.lineWidth=w||2;
-    ctx.lineCap='round';
-    ctx.moveTo(x1,y1); ctx.lineTo(x2,y2);
-    ctx.stroke();
-    ctx.restore();
-  }
-
-  function dot(x,y,color,r,label,dx,dy){
-    ctx.save();
-    ctx.beginPath();
-    ctx.fillStyle=color;
-    ctx.arc(x,y,r||5,0,Math.PI*2);
-    ctx.fill();
-    ctx.strokeStyle='#fff'; ctx.lineWidth=1.5; ctx.stroke();
-    if(label){
-      ctx.fillStyle=color;
-      ctx.font='bold 16px Segoe UI, sans-serif';
-      ctx.textAlign='center'; ctx.textBaseline='middle';
-      ctx.fillText(label, x+(dx||0), y+(dy||0));
-    }
-    ctx.restore();
-  }
-
-  function text(str,x,y,color,size,align){
-    ctx.save();
-    ctx.fillStyle=color;
-    ctx.font=(size||13)+'px Segoe UI, sans-serif';
-    ctx.textAlign=align||'center';
-    ctx.textBaseline='middle';
-    ctx.fillText(str,x,y);
-    ctx.restore();
-  }
-
-  /* ================= FIGURE 3(a) ================= */
-  function drawFigA(){
-    clear();
-    const s = 9.5;          // scale: 1 cm = 9.5 px
-    // vertices in a coordinate system where B is the pivot
-    // B at (200, 480), C to the left, A to the right (orientation per exam figure)
-    const Bx=210, By=470;
-    const Cx = Bx - 21*s*0.75;   // go left & up
-    const Cy = By - 21*s*0.66;
-    // We want |BC| = 21s and |BA| = 28s and |CA| = 35s.
-    // Use angles: with right angle at B.
-    // Let BC direction be up-left, BA direction up-right.
-    const angBC = Math.atan2(-0.66, -0.75);        // roughly 139°
-    const lenBC = 21*s;
-    const Cx2 = Bx + lenBC*Math.cos(angBC);
-    const Cy2 = By + lenBC*Math.sin(angBC);
-
-    // BA is perpendicular to BC (right angle at B), choose the direction that goes up-right
-    const angBA = angBC - Math.PI/2;
-    const lenBA = 28*s;
-    const Ax = Bx + lenBA*Math.cos(angBA);
-    const Ay = By + lenBA*Math.sin(angBA);
-
-    // Now AC should be 35s automatically.
-
-    // M on AC such that angle BMC = 75°.
-    // By part (a), CM = 17.10154 cm, AM = 17.89846 cm.
-    const total = 35;
-    const t = 17.10154643/total;   // fraction from A to C where M sits (M closer to C)
-    const Mx = Ax + (Cx2-Ax)*t;
-    const My = Ay + (Cy2-Ay)*t;
-
-    const showA = mode<=4;
-    const showCM = (mode===2 || mode===3);
-    const showAngle = (mode===1 || mode===2);
-    const showFold = (mode>=4);
-
-    // triangle faces
-    if(!showFold){
-      ctx.save();
-      ctx.beginPath();
-      ctx.moveTo(Ax,Ay); ctx.lineTo(Bx,By); ctx.lineTo(Cx2,Cy2); ctx.closePath();
-      ctx.fillStyle='rgba(37,99,235,.07)';
-      ctx.fill();
-      ctx.restore();
-
-      // edges
-      line(Ax,Ay,Bx,By,'#2563eb',3);
-      line(Bx,By,Cx2,Cy2,'#2563eb',3);
-      line(Cx2,Cy2,Ax,Ay,'#2563eb',3);
-
-      // cevian BM
-      line(Bx,By,Mx,My,'#7c3aed',2.4,[7,5]);
-
-      // angle at B (right angle marker)
-      if(mode<=1){
-        const r=22;
-        line(Bx+(r)*Math.cos(angBC), By+(r)*Math.sin(angBC),
-             Bx+(r)*Math.cos(angBC)+ (r)*Math.cos(angBA), By+(r)*Math.sin(angBC)+(r)*Math.sin(angBA),
-             '#94a3b8',2);
-        line(Bx+(r)*Math.cos(angBA), By+(r)*Math.sin(angBA),
-             Bx+(r)*Math.cos(angBC)+ (r)*Math.cos(angBA), By+(r)*Math.sin(angBC)+(r)*Math.sin(angBA),
-             '#94a3b8',2);
-      }
-
-      // angle BCM at C  (between CB and CM)
-      if(showAngle){
-        const a1 = Math.atan2(My-Cy2, Mx-Cx2);
-        const a2 = Math.atan2(By-Cy2, Bx-Cx2);
-        const r=42;
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(Cx2,Cy2,r,Math.min(a1,a2),Math.max(a1,a2));
-        ctx.strokeStyle='#dc2626'; ctx.lineWidth=2.5;
-        ctx.stroke();
-        ctx.restore();
-        text('53.1°', Cx2 + 58*Math.cos((a1+a2)/2), Cy2 + 58*Math.sin((a1+a2)/2), '#dc2626', 14);
-      }
-
-      // CM highlighted
-      if(showCM){
-        line(Cx2,Cy2,Mx,My,'#f59e0b',4.5);
-        text('CM ≈ 17.1', (Cx2+Mx)/2+2, (Cy2+My)/2-16, '#b45309', 14);
-      }
-
-      // angle BMC = 75°
-      if(mode===3){
-        const aM1 = Math.atan2(By-My, Bx-Mx);
-        const aM2 = Math.atan2(Cy2-My, Cx2-Mx);
-        const r=34;
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(Mx,My,r,Math.min(aM1,aM2),Math.max(aM1,aM2));
-        ctx.strokeStyle='#0891b2'; ctx.lineWidth=2.5;
-        ctx.stroke();
-        ctx.restore();
-        text('75°', Mx + 48*Math.cos((aM1+aM2)/2), My + 48*Math.sin((aM1+aM2)/2), '#0891b2', 14);
-      }
-
-      // vertices
-      dot(Ax,Ay,'#dc2626',6,'A',18,-10);
-      dot(Bx,By,'#059669',6,'B',-16,16);
-      dot(Cx2,Cy2,'#059669',6,'C',-14,-14);
-      dot(Mx,My,'#dc2626',5.5,'M',8,-16);
-    } else {
-      // Figure 3(b) style – show 3D folded arrangement
-      drawFigB();
-      return;
-    }
-
-    text('Figure 3(a)  —  triangular paper card ABC', cv.width/2, 30, '#334155', 14);
-    if(mode===1||mode===2) text('AB = 28 cm, BC = 21 cm, AC = 35 cm', cv.width/2, 52, '#64748b', 13);
-    if(mode>=2 && mode<=3) text('∠BMC = 75°', cv.width/2, 74, '#0891b2', 13);
-  }
-
-  /* ================= FIGURE 3(b) ================= */
-  function drawFigB(){
-    clear();
-    // ground parallelogram (horizontal ground)
-    const gx = 310, gy = 430;
-    const w = 250, h = 120;
-    ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(gx-w/2, gy);
-    ctx.lineTo(gx+w/2, gy-30);
-    ctx.lineTo(gx+w/2, gy-30-h);
-    ctx.lineTo(gx-w/2, gy-h);
-    ctx.closePath();
-    ctx.fillStyle='rgba(245,158,11,.10)';
-    ctx.fill();
-    ctx.strokeStyle='#f59e0b'; ctx.lineWidth=2; ctx.setLineDash([8,6]);
-    ctx.stroke();
-    ctx.restore();
-    text('horizontal ground', gx, gy-30-h/2, '#b45309', 13);
-
-    // The folded card: triangle BCM lies on ground, triangle ABM is folded
-    // Coordinates on ground:
-    const B = {x: gx-60, y: gy-25};
-    const C = {x: gx-150, y: gy-50};
-    const M = {x: gx+40, y: gy-70};
-    // A is lifted above the ground (apex of folded flap)
-    const A = {x: gx+90, y: gy-95-h};
-
-    // For mode >=6, show N on BC
-    // N is foot of perpendicular from M to BC (on ground)
-    // approximate: N lies on segment BC
-    const tN = 0.55;
-    const N = {x: C.x + (B.x-C.x)*tN, y: C.y + (B.y-C.y)*tN};
-
-    // ground edge B-C
-    line(B.x,B.y,C.x,C.y,'#059669',2.5);
-    // face BCM (on ground) – fill
-    ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(B.x,B.y); ctx.lineTo(C.x,C.y); ctx.lineTo(M.x,M.y); ctx.closePath();
-    ctx.fillStyle='rgba(124,58,237,.10)';
-    ctx.fill();
-    ctx.restore();
-
-    // edges of face BCM
-    line(B.x,B.y,M.x,M.y,'#7c3aed',3);
-    line(C.x,C.y,M.x,M.y,'#7c3aed',3);
-    line(B.x,B.y,C.x,C.y,'#7c3aed',3);
-
-    // folded flap triangle ABM – dashed (hidden) + solid
-    line(B.x,B.y,A.x,A.y,'#2563eb',2.5);
-    line(M.x,M.y,A.x,A.y,'#2563eb',2.5);
-
-    // A is above ground – show vertical drop
-    line(A.x,A.y, A.x, gy-25, '#94a3b8',1.4,[5,5]);
-
-    // BM crease
-    line(B.x,B.y,M.x,M.y,'#dc2626',2.6,[7,5]);
-
-    // N and MN
-    if(mode>=6){
-      dot(N.x,N.y,'#dc2626',5.5,'N',-14,12);
-      line(M.x,M.y,N.x,N.y,'#f59e0b',2.8);
-      // right angle at N between MN and BC
-      const ux = (B.x-C.x), uy = (B.y-C.y);
-      const ul = Math.hypot(ux,uy);
-      const vx = (M.x-N.x), vy = (M.y-N.y);
-      const vl = Math.hypot(vx,vy);
-      const r=16;
-      const p1 = {x:N.x + ux/ul*r, y:N.y + uy/ul*r};
-      const p2 = {x:N.x + vx/vl*r, y:N.y + vy/vl*r};
-      line(p1.x,p1.y, p1.x+vx/vl*r, p1.y+vy/vl*r, '#94a3b8',2);
-      line(p2.x,p2.y, p2.x+ux/ul*r, p2.y+uy/ul*r, '#94a3b8',2);
-    }
-
-    // AN line (for claim evaluation)
-    if(mode>=7){
-      line(A.x,A.y,N.x,N.y,'#dc2626',2.6);
-    }
-
-    // vertices
-    dot(B.x,B.y,'#059669',6,'B',-16,14);
-    dot(C.x,C.y,'#059669',6,'C',-14,-12);
-    dot(M.x,M.y,'#7c3aed',6,'M',14,-12);
-    dot(A.x,A.y,'#2563eb',6,'A',16,-10);
-
-    text('Figure 3(b)  —  folded onto the horizontal ground', cv.width/2, 30, '#334155', 14);
-    if(mode>=4 && mode<=6) text('∠AMC = 107°,  face BCM on ground', cv.width/2, 52, '#64748b', 13);
-    if(mode>=6) text('MN ⟂ BC  (N on BC)', cv.width/2, 74, '#b45309', 13);
-    if(mode>=7) text('Is ∠ANM the angle between face BCM and ground?', cv.width/2, 96, '#dc2626', 13);
-  }
-
-  /* ================= RENDER ================= */
-  function draw(){
-    if(mode<=3){
-      modeTag.textContent = 'Figure 3(a) — Part (a) step ' + mode;
-      caption.innerHTML = 'Triangle slab \(ABC\) with \(AB=28\), \(BC=21\), \(AC=35\) and \(M\in AC\), \(\angle BMC=75^\circ\).';
-      drawFigA();
-    } else {
-      modeTag.textContent = 'Figure 3(b) — Part (b) step ' + mode;
-      caption.innerHTML = 'Folded card: face \(BCM\) lies on the ground, flap \(ABM\) lifted; \(N\in BC\) with \(MN\perp BC\).';
-      drawFigB();
-    }
-  }
-
-  /* ---------- scroll sync ---------- */
-  const steps = Array.from(document.querySelectorAll('.step'));
-  const obs = new IntersectionObserver((es)=>{
-    es.forEach(e=>{
-      if(e.isIntersecting){
-        const m = +e.target.dataset.step;
-        mode = m;
-        steps.forEach(st=>st.classList.toggle('active', st===e.target));
-        draw();
-      }
-    });
-  }, {rootMargin:'-15% 0px -55% 0px', threshold:0});
-
-  steps.forEach(st=>obs.observe(st));
-
-  // initial
-  draw();
-  steps[0] && steps[0].classList.add('active');
-
-  window.addEventListener('resize', ()=>{ draw(); });
-})();
-</script>
 
 <!-- question-pager -->
 <nav class="qnav" aria-label="Question navigation">
@@ -607,5 +303,156 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
   <a class="qnav__mid" href="index.html#y2013">Contents</a>
   <a class="qnav__next" href="2013_P1_Q19.html">Next Question →</a>
 </nav>
+<script src="assets/fig3d.js"></script>
+<script>
+/* HKDSE 2013 P1 Q18 — triangular paper card ABC folded along BM (A, B, C on the ground) */
+var P = {
+  A: [0, 0, 0], B: [28, 0, 0],
+  C: [20.2643, 0, 19.5233],        /* on the ground: BC = 21, AC = 28.139 */
+  M: [14.3188, 8.8173, 6.1305],    /* AM = 17.898, BM = 17.393, CM = 17.102, angle AMC = 107 */
+  N: [24.0441, 0, 9.9839],         /* foot of perp from M to BC */
+  F: [14.3188, 0, 6.1305]          /* projection of M on the ground */
+};
+function MID(a, b) {
+  var p = P[a], q = P[b];
+  return [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2, (p[2] + q[2]) / 2];
+}
+var AMB = '#f59e0b', VIO = '#8b5cf6', GRN = '#10b981', GREY = '#94a3b8';
+
+Fig3D.mount('#cv3d', {
+  v: P,
+  faces: [['A', 'B', 'M'], ['B', 'C', 'M']],
+  edges: ['A-B', 'B-C', 'C-M', 'M-A', 'B-M'],
+  ground: { x0: -12, x1: 40, z0: -12, z1: 32 },
+  footprint: ['A', 'B', 'C'],
+  view: { yaw: 0.78, pitch: -0.34, zoom: 1.06 },
+  labels: { A: 'A', B: 'B', C: 'C', M: 'M', N: 'N', F: 'F' },
+  labelColor: { M: '#ef4444' },
+  labelSteps: { N: 5, F: 8 },
+  labelsNudge: { B: 0.3, C: 0.15, A: -0.4, N: 0.6, F: 0.6 },
+  steps: {
+    1: [{ t: 'poly', v: ['A', 'B', 'M'], fill: 'rgba(245,158,11,0.10)' },
+      { t: 'poly', v: ['B', 'C', 'M'], fill: 'rgba(139,92,246,0.10)' },
+      { t: 'seg', a: 'A', b: 'B', c: AMB, w: 3.2 },
+      { t: 'seg', a: 'B', b: 'C', c: AMB, w: 3.2 },
+      { t: 'seg', a: 'M', b: 'A', c: VIO, w: 2.2, dash: [6, 5] },
+      { t: 'seg', a: 'M', b: 'C', c: VIO, w: 2.2, dash: [6, 5] },
+      { t: 'seg', a: 'B', b: 'M', c: '#0f766e', w: 2.6 },
+      { t: 'text', at: MID('A', 'C'), text: '21² + 28² = 35²  ⇒  90°', dx: -6, dy: 16, c: '#b45309', size: 11.5 }],
+    2: [{ t: 'poly', v: ['B', 'C', 'M'], fill: 'rgba(139,92,246,0.14)' },
+      { t: 'seg', a: 'B', b: 'C', c: AMB, w: 3 },
+      { t: 'seg', a: 'C', b: 'M', c: AMB, w: 3 },
+      { t: 'angle', at: 'C', a: 'B', b: 'M', r: 16, label: '53.1°', c: '#6d28d9', gap: 15 }],
+    3: [{ t: 'poly', v: ['B', 'C', 'M'], fill: 'rgba(16,185,129,0.10)' },
+      { t: 'seg', a: 'C', b: 'M', c: GRN, w: 3.4 },
+      { t: 'seg', a: 'B', b: 'C', c: GREY, w: 2 },
+      { t: 'angle', at: 'M', a: 'C', b: 'B', r: 15, label: '75°', c: '#b45309', gap: 14 },
+      { t: 'text', at: MID('C', 'M'), text: '17.1', dx: -14, dy: 2, c: '#047857', size: 12 }],
+    4: [{ t: 'poly', v: ['A', 'B', 'C'], fill: 'rgba(59,130,246,0.10)' },
+      { t: 'seg', a: 'A', b: 'C', c: GRN, w: 3.2 },
+      { t: 'seg', a: 'M', b: 'A', c: GREY, w: 2, dash: [5, 5] },
+      { t: 'seg', a: 'M', b: 'C', c: GREY, w: 2, dash: [5, 5] },
+      { t: 'angle', at: 'M', a: 'A', b: 'C', r: 14, label: '107°', c: '#b45309', gap: 13 },
+      { t: 'text', at: MID('A', 'C'), text: '28.1', dx: 0, dy: 14, c: '#047857', size: 12 }],
+    5: [{ t: 'poly', v: ['B', 'C', 'M'], fill: 'rgba(139,92,246,0.09)' },
+      { t: 'seg', a: 'C', b: 'N', c: AMB, w: 3.2 },
+      { t: 'seg', a: 'M', b: 'N', c: VIO, w: 2.6, dash: [6, 5] },
+      { t: 'ra', at: 'N', a: 'M', b: 'B', s: 5, c: VIO },
+      { t: 'dot', at: 'N' },
+      { t: 'text', at: MID('C', 'N'), text: '10.26', dx: 6, dy: 12, c: '#b45309', size: 11.5 }],
+    6: [{ t: 'poly', v: ['A', 'B', 'C'], fill: 'rgba(59,130,246,0.09)' },
+      { t: 'seg', a: 'A', b: 'C', c: GREY, w: 2.2 },
+      { t: 'seg', a: 'A', b: 'N', c: GRN, w: 3.2 },
+      { t: 'angle', at: 'C', a: 'B', b: 'A', r: 16, label: '67.7°', c: '#b45309', gap: 15 },
+      { t: 'text', at: MID('A', 'N'), text: '26.0', dx: -4, dy: -12, c: '#047857', size: 12 }],
+    7: [{ t: 'poly', v: ['A', 'N', 'C'], fill: 'rgba(245,158,11,0.12)' },
+      { t: 'seg', a: 'N', b: 'C', c: GREY, w: 2.2 },
+      { t: 'seg', a: 'N', b: 'A', c: AMB, w: 2.6 },
+      { t: 'angle', at: 'N', a: 'C', b: 'A', r: 14, label: '90.9°', c: '#b45309', gap: 15 }],
+    8: [{ t: 'poly', v: ['B', 'C', 'M'], fill: 'rgba(139,92,246,0.10)' },
+      { t: 'seg', a: 'M', b: 'N', c: AMB, w: 3 },
+      { t: 'seg', a: 'N', b: 'F', c: GREY, w: 2, dash: [4, 4] },
+      { t: 'seg', a: 'N', b: 'A', c: GRN, w: 2.8 },
+      { t: 'ra', at: 'N', a: 'M', b: 'C', s: 5, c: VIO },
+      { t: 'angle', at: 'N', a: 'M', b: 'F', r: 17, label: 'θ 40.1°', c: '#0f766e', gap: 15 },
+      { t: 'angle', at: 'N', a: 'A', b: 'M', r: 30, label: '∠ANM', c: '#b45309', gap: 16 }]
+  }
+});
+</script>
+<script>
+/* HKDSE 2013 P1 Q18 — triangular paper card ABC folded along BM (A, B, C on the ground) */
+var P = {
+  A: [0, 0, 0], B: [28, 0, 0],
+  C: [20.2643, 0, 19.5233],        /* on the ground: BC = 21, AC = 28.139 */
+  M: [14.3188, 8.8173, 6.1305],    /* AM = 17.898, BM = 17.393, CM = 17.102, angle AMC = 107 */
+  N: [24.0441, 0, 9.9839],         /* foot of perp from M to BC */
+  F: [14.3188, 0, 6.1305]          /* projection of M on the ground */
+};
+function MID(a, b) {
+  var p = P[a], q = P[b];
+  return [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2, (p[2] + q[2]) / 2];
+}
+var AMB = '#f59e0b', VIO = '#8b5cf6', GRN = '#10b981', GREY = '#94a3b8';
+
+Fig3D.mount('#cv3d', {
+  v: P,
+  faces: [['A', 'B', 'M'], ['B', 'C', 'M']],
+  edges: ['A-B', 'B-C', 'C-M', 'M-A', 'B-M'],
+  ground: { x0: -12, x1: 40, z0: -12, z1: 32 },
+  footprint: ['A', 'B', 'C'],
+  view: { yaw: -0.75, pitch: -0.45, zoom: 1.10 },
+  labels: { A: 'A', B: 'B', C: 'C', M: 'M', N: 'N', F: 'F' },
+  labelColor: { M: '#ef4444' },
+  labelSteps: { N: 5, F: 8 },
+  labelsNudge: { B: 0.35, C: 0.2, A: -0.45, N: 0.55, F: 0.9 },
+  steps: {
+    1: [{ t: 'poly', v: ['A', 'B', 'M'], fill: 'rgba(245,158,11,0.10)' },
+      { t: 'poly', v: ['B', 'C', 'M'], fill: 'rgba(139,92,246,0.10)' },
+      { t: 'seg', a: 'A', b: 'B', c: AMB, w: 3.2 },
+      { t: 'seg', a: 'B', b: 'C', c: AMB, w: 3.2 },
+      { t: 'seg', a: 'M', b: 'A', c: VIO, w: 2.2, dash: [6, 5] },
+      { t: 'seg', a: 'M', b: 'C', c: VIO, w: 2.2, dash: [6, 5] },
+      { t: 'seg', a: 'B', b: 'M', c: '#0f766e', w: 2.6 },
+      { t: 'text', at: [0, 0, -6], text: 'flat card: 21² + 28² = 35²  ⇒  90°', dx: 70, dy: 0, c: '#b45309', size: 11.5 }],
+    2: [{ t: 'poly', v: ['B', 'C', 'M'], fill: 'rgba(139,92,246,0.14)' },
+      { t: 'seg', a: 'B', b: 'C', c: AMB, w: 3 },
+      { t: 'seg', a: 'C', b: 'M', c: AMB, w: 3 },
+      { t: 'angle', at: 'C', a: 'B', b: 'M', r: 4.5, label: '53.1°', c: '#6d28d9', gap: 12 }],
+    3: [{ t: 'poly', v: ['B', 'C', 'M'], fill: 'rgba(16,185,129,0.10)' },
+      { t: 'seg', a: 'C', b: 'M', c: GRN, w: 3.4 },
+      { t: 'seg', a: 'B', b: 'C', c: GREY, w: 2 },
+      { t: 'angle', at: 'M', a: 'C', b: 'B', r: 4.5, label: '75°', c: '#b45309', gap: 12 },
+      { t: 'text', at: MID('C', 'M'), text: '17.1', dx: -14, dy: 4, c: '#047857', size: 12 }],
+    4: [{ t: 'poly', v: ['A', 'B', 'C'], fill: 'rgba(59,130,246,0.10)' },
+      { t: 'seg', a: 'A', b: 'C', c: GRN, w: 3.2 },
+      { t: 'seg', a: 'M', b: 'A', c: GREY, w: 2, dash: [5, 5] },
+      { t: 'seg', a: 'M', b: 'C', c: GREY, w: 2, dash: [5, 5] },
+      { t: 'angle', at: 'M', a: 'A', b: 'C', r: 4, label: '107°', c: '#b45309', gap: 12 },
+      { t: 'text', at: MID('A', 'C'), text: '28.1', dx: 0, dy: 14, c: '#047857', size: 12 }],
+    5: [{ t: 'poly', v: ['B', 'C', 'M'], fill: 'rgba(139,92,246,0.09)' },
+      { t: 'seg', a: 'C', b: 'N', c: AMB, w: 3.2 },
+      { t: 'seg', a: 'M', b: 'N', c: VIO, w: 2.6, dash: [6, 5] },
+      { t: 'ra', at: 'N', a: 'M', b: 'B', s: 2.2, c: VIO },
+      { t: 'dot', at: 'N' },
+      { t: 'text', at: MID('C', 'N'), text: '10.26', dx: 8, dy: 12, c: '#b45309', size: 11.5 }],
+    6: [{ t: 'poly', v: ['A', 'B', 'C'], fill: 'rgba(59,130,246,0.09)' },
+      { t: 'seg', a: 'A', b: 'C', c: GREY, w: 2.2 },
+      { t: 'seg', a: 'A', b: 'N', c: GRN, w: 3.2 },
+      { t: 'angle', at: 'C', a: 'B', b: 'A', r: 4.5, label: '67.7°', c: '#b45309', gap: 12 },
+      { t: 'text', at: MID('A', 'N'), text: '26.0', dx: -4, dy: -12, c: '#047857', size: 12 }],
+    7: [{ t: 'poly', v: ['A', 'N', 'C'], fill: 'rgba(245,158,11,0.14)' },
+      { t: 'seg', a: 'N', b: 'C', c: GREY, w: 2.2 },
+      { t: 'seg', a: 'N', b: 'A', c: AMB, w: 2.6 },
+      { t: 'angle', at: 'N', a: 'C', b: 'A', r: 4.5, label: '90.9°', c: '#b45309', gap: 12 }],
+    8: [{ t: 'poly', v: ['B', 'C', 'M'], fill: 'rgba(139,92,246,0.10)' },
+      { t: 'seg', a: 'M', b: 'N', c: AMB, w: 3 },
+      { t: 'seg', a: 'N', b: 'F', c: GREY, w: 2, dash: [4, 4] },
+      { t: 'seg', a: 'N', b: 'A', c: GRN, w: 2.8 },
+      { t: 'ra', at: 'N', a: 'M', b: 'C', s: 2.2, c: VIO },
+      { t: 'angle', at: 'N', a: 'M', b: 'F', r: 4, label: 'θ', c: '#0f766e', gap: 12 },
+      { t: 'angle', at: 'N', a: 'A', b: 'M', r: 7.5, label: '∠ANM', c: '#b45309', gap: 12 }]
+  }
+});
+</script>
 </body>
 </html>

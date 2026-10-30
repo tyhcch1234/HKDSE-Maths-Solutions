@@ -43,9 +43,7 @@
     border:1px solid var(--line);
     min-width:0;
   }
-  .diagram{
-    position:sticky; top:16px; max-height:calc(100vh - 2rem); overflow-y:auto;
-  }
+  .diagram{position:sticky;top:12px;}
   .diagram h2{font-size:.85rem;margin:.1rem 0 .6rem;color:var(--muted);
     text-transform:uppercase;letter-spacing:1.2px;}
   canvas{width:100%;height:auto;display:block;border-radius:12px;background:#fbfdff;}
@@ -106,8 +104,10 @@
     .choices{font-size:.74rem;}
     header.top h1{font-size:.95rem;}
   }
+.chip3d{display:inline-block;vertical-align:middle;margin-left:6px;font-size:.58rem;font-weight:700;letter-spacing:.6px;color:#fff;background:linear-gradient(135deg,#2563eb,#0ea5e9);padding:2px 7px;border-radius:20px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;}
 </style>
 <link rel="stylesheet" href="assets/extra.css">
+<link rel="stylesheet" href="assets/fig3d.css">
 </head>
 <body>
 <div class="wrap">
@@ -118,11 +118,12 @@
 
   <div class="split">
     <!-- ============ LEFT: DIAGRAM ============ -->
-    <section class="panel diagram">
-      <h2>Interactive Figure</h2>
-      <canvas id="cv" width="560" height="620"></canvas>
-      <div class="legend" id="legend"></div>
-    </section>
+      <section class="panel diagram">
+    <h2>3-D Figure <span class="chip3d">3D</span></h2>
+    <div class="fig3d-stage"><canvas id="cv3d"></canvas></div>
+    <div id="figui"></div>
+    <div class="fig3d-hint">拖動旋轉 · 雙指／滾輪縮放　—　drag to rotate, pinch or scroll to zoom</div>
+  </section>
 
     <!-- ============ RIGHT: QUESTION + SOLUTION ============ -->
     <section class="panel">
@@ -210,275 +211,91 @@
   </div>
 </div>
 
-<script>
-(function(){
-  const cv = document.getElementById('cv');
-  const ctx = cv.getContext('2d');
 
-  // ---- logical drawing resolution (keeps canvas crisp) ----
-  const W = 560, H = 620;
-  cv.width = W; cv.height = H;
-
-  // ---- 3D -> 2D isometric-ish projection ----
-  // x increases right, y increases "into screen", z increases up
-  const s = 95;          // scale (px per unit)
-  const cx = W/2, cy = 330;
-
-  // screen axes (screen y increases downwards)
-  const ex = {x:  0.86, y: -0.42};   // x axis (toward viewer-right, slightly up)
-  const ey = {x: -0.86, y: -0.42};   // y axis (toward viewer-left, slightly up)
-  const ez = {x:  0.00, y: -1.00};   // z axis straight up
-
-  function proj(p){ // p = [x,y,z]
-    const [x,y,z] = p;
-    return {
-      x: cx + s*(x*ex.x + y*ey.x + z*ez.x),
-      y: cy + s*(x*ex.y + y*ey.y + z*ez.y)
-    };
-  }
-
-  // ---- the prism vertices (units) ----
-  // A,B,C top face (z=2) ; E,F,G,D bottom (z=0) with AE vertical
-  const A = [0,0,2], B = [1,0,2], C = [0,1,2];
-  const E = [0,0,0], F = [1,0,0], G = [0,1,0];
-  // In the exam figure only A,B,C (top) and E,F + hidden D are shown.
-  // D is the base vertex under C.
-  const D = [0,1,0]; // = G, rename to D for consistency with the question
-
-  // Nice labels/positions
-  const V = {A,B,C,E,F,D};
-
-  function P(name){ return proj(V[name]); }
-
-  function line(p,q,color,width,dash){
-    const a = proj(p), b = proj(q);
-    ctx.save();
-    ctx.strokeStyle = color;
-    ctx.lineWidth = width || 2;
-    if(dash) ctx.setLineDash(dash);
-    ctx.lineCap='round';
-    ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
-    ctx.restore();
-  }
-
-  function dot(p,color,r){
-    const a = proj(p);
-    ctx.save();
-    ctx.fillStyle = color;
-    ctx.beginPath(); ctx.arc(a.x,a.y,r||5,0,Math.PI*2); ctx.fill();
-    ctx.strokeStyle='#fff'; ctx.lineWidth=1.6; ctx.stroke();
-    ctx.restore();
-  }
-
-  function label(name, p, dx, dy, color){
-    const a = proj(p);
-    ctx.save();
-    ctx.fillStyle = color || '#1a2233';
-    ctx.font = '700 20px Segoe UI, Arial';
-    ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText(name, a.x+(dx||0), a.y+(dy||0));
-    ctx.restore();
-  }
-
-  // ---- highlight state per step ----
-  // mode = 1..5
-  function draw(mode){
-    ctx.clearRect(0,0,W,H);
-
-    // soft background grid dots
-    ctx.save();
-    ctx.fillStyle='#eef3fb';
-    for(let gx=0;gx<W;gx+=28){for(let gy=0;gy<H;gy+=28){
-      ctx.beginPath();ctx.arc(gx,gy,1.1,0,Math.PI*2);ctx.fill();
-    }}
-    ctx.restore();
-
-    const cGray='#94a3b8', cBlue='#2563eb', cRed='#e11d48',
-          cGreen='#059669', cAmber='#d97706', cPurple='#7c3aed', cPink='#db2777';
-
-    // ---- solid edges of the visible prism ----
-    // top face ABC
-    line(A,B,cBlue,2.4);
-    line(B,C,cBlue,2.4);
-    line(C,A,cBlue,2.4);
-
-    // vertical edges AE and BF
-    line(A,E,cGray,2.2);
-    line(B,F,cGray,2.2);
-
-    // bottom visible edges EF
-    line(E,F,cGray,2.2);
-
-    // hidden bottom edges (dashed)
-    line(C,D,cGray,2.0,[6,5]);
-    line(D,E,cGray,2.0,[6,5]);
-
-    // ---- plane BCE outline (highlight in step 4/5) ----
-    const showPlane = (mode>=4);
-    if(showPlane){
-      // fill the triangle BCE with a translucent amber
-      const b=proj(B), c=proj(C), e=proj(E);
-      ctx.save();
-      ctx.beginPath(); ctx.moveTo(b.x,b.y);
-      ctx.lineTo(c.x,c.y); ctx.lineTo(e.x,e.y); ctx.closePath();
-      ctx.fillStyle='rgba(217,119,6,0.13)'; ctx.fill();
-      ctx.restore();
-    }
-    line(B,C,cAmber,3);
-    line(C,E,cAmber,3);
-    line(E,B,cAmber,3);
-
-    // ---- plane ABC (highlight in step 3) ----
-    const showTop = (mode>=3);
-    if(showTop){
-      const a=proj(A), b=proj(B), c=proj(C);
-      ctx.save();
-      ctx.beginPath(); ctx.moveTo(a.x,a.y);
-      ctx.lineTo(b.x,b.y); ctx.lineTo(c.x,c.y); ctx.closePath();
-      ctx.fillStyle='rgba(37,99,235,0.12)'; ctx.fill();
-      ctx.restore();
-    }
-
-    // ---- perpendicular pairs drawn in steps 4 & 5 ----
-    if(mode>=4){
-      // n1 = (0,0,1) from centroid of ABC
-      const centABC = [ (A[0]+B[0]+C[0])/3, (A[1]+B[1]+C[1])/3, (A[2]+B[2]+C[2])/3 ];
-      const n1end = [centABC[0], centABC[1], centABC[2]+0.8];
-      line(centABC,n1end,cPurple,3);
-      drawArrow(centABC,n1end,cPurple);
-      const m1 = proj(n1end);
-      ctx.save(); ctx.fillStyle=cPurple; ctx.font='700 16px Segoe UI';
-      ctx.fillText('ME', m1.x+10, m1.y-6); ctx.restore();
-
-      // n2 = (-2,-2,1) direction from mid of CE
-      const midCE = [ (C[0]+E[0])/2, (C[1]+E[1])/2, (C[2]+E[2])/2 ];
-      const n2end = [ midCE[0]-0.55, midCE[1]-0.55, midCE[2]+0.27 ];
-      line(midCE,n2end,cPink,3);
-      drawArrow(midCE,n2end,cPink);
-      const m2 = proj(n2end);
-      ctx.save(); ctx.fillStyle=cPink; ctx.font='700 16px Segoe UI';
-      ctx.fillText('AE', m2.x-24, m2.y-4); ctx.restore();
-    }
-
-    // ---- points (dots + labels) ----
-    const dotColor = cRed;
-    dot(A,dotColor); dot(B,dotColor); dot(C,dotColor);
-    dot(E,dotColor); dot(F,dotColor); dot(D,dotColor);
-
-    label('A',A, 4,-14);
-    label('B',B, 18,-6);
-    label('C',C,-20, -6);
-    label('E',E, -4, 18);
-    label('F',F, 18, 14);
-    label('D',D,-20, 12);
-
-    // ---- highlight the right-angle at A on top face (step1/2 nice) ----
-    if(mode<=2){
-      // small square marker at A in plane ABC
-      const a = proj(A);
-      const pa1 = proj([A[0]+0.22,A[1],A[2]]);
-      const pa2 = proj([A[0],A[1]+0.22,A[2]]);
-      const corner = proj([A[0]+0.22,A[1]+0.22,A[2]]);
-      ctx.save();
-      ctx.strokeStyle=cGreen; ctx.lineWidth=2;
-      ctx.beginPath();
-      ctx.moveTo(pa1.x,pa1.y);
-      ctx.lineTo(corner.x,corner.y);
-      ctx.lineTo(pa2.x,pa2.y);
-      ctx.stroke();
-      ctx.restore();
-    }
-
-    // ---- step title chip on canvas ----
-    const titles = {
-      1:'Step 1 · Ratio AB : AC : AE = 1 : 1 : 2',
-      2:'Step 2 · Coordinates on the prism',
-      3:'Step 3 · Plane ABC (top face)',
-      4:'Step 4 · Perpendiculars to the common edge BC',
-      5:'Step 5 · Angle θ between the planes'
-    };
-    ctx.save();
-    ctx.font='700 13px Segoe UI, Arial';
-    ctx.fillStyle='rgba(255,255,255,0.92)';
-    const txt = titles[mode] || titles[1];
-    const tw = ctx.measureText(txt).width + 20;
-    roundRect(10,10,tw,30,10);
-    ctx.fill();
-    ctx.strokeStyle='#dbe4f3'; ctx.lineWidth=1; ctx.stroke();
-    ctx.fillStyle = '#1e3a8a';
-    ctx.textBaseline='middle';
-    ctx.fillText(txt, 20, 25);
-    ctx.restore();
-  }
-
-  function roundRect(x,y,w,h,r){
-    ctx.beginPath();
-    ctx.moveTo(x+r,y);
-    ctx.arcTo(x+w,y,x+w,y+h,r);
-    ctx.arcTo(x+w,y+h,x,y+h,r);
-    ctx.arcTo(x,y+h,x,y,r);
-    ctx.arcTo(x,y,x+w,y,r);
-    ctx.closePath();
-  }
-
-  function drawArrow(from,to,color){
-    const a=proj(from), b=proj(to);
-    const ang=Math.atan2(b.y-a.y,b.x-a.x);
-    const L=12;
-    ctx.save();
-    ctx.fillStyle=color;
-    ctx.beginPath();
-    ctx.moveTo(b.x,b.y);
-    ctx.lineTo(b.x-L*Math.cos(ang-0.4), b.y-L*Math.sin(ang-0.4));
-    ctx.lineTo(b.x-L*Math.cos(ang+0.4), b.y-L*Math.sin(ang+0.4));
-    ctx.closePath(); ctx.fill();
-    ctx.restore();
-  }
-
-  // ---- legend ----
-  const legendItems = [
-    ['#2563eb','Top face ABC'],
-    ['#d97706','Plane BCE'],
-    ['#7c3aed','AM perpendicular to BC'],
-    ['#db2777','EM perpendicular to BC'],
-    ['#059669','Right angle at A'],
-    ['#94a3b8','Hidden edges (dashed)']
-  ];
-  const lg = document.getElementById('legend');
-  legendItems.forEach(([c,t])=>{
-    const el=document.createElement('span');
-    el.innerHTML = `<i class="swatch" style="background:${c}"></i>${t}`;
-    lg.appendChild(el);
-  });
-
-  // ---- scroll-sync ----
-  const steps = Array.from(document.querySelectorAll('.step'));
-  let mode = 1;
-  draw(mode);
-
-  const obs = new IntersectionObserver((es)=>{
-    es.forEach(e=>{
-      if(e.isIntersecting){
-        mode = +e.target.dataset.step;
-        steps.forEach(st=>st.classList.toggle('active', st===e.target));
-        draw(mode);
-      }
-    });
-  },{rootMargin:'-15% 0px -55% 0px', threshold:0});
-  steps.forEach(st=>obs.observe(st));
-
-  // make first active by default
-  if(steps[0]) steps[0].classList.add('active');
-
-  // redraw on resize so the canvas stays crisp
-  window.addEventListener('resize', ()=>draw(mode));
-})();
-</script>
 <!-- question-pager -->
 <nav class="qnav" aria-label="Question navigation">
   <a class="qnav__prev" href="2026_P2_Q39.html">← Previous Question</a>
   <a class="qnav__mid" href="index.html#y2026">Contents</a>
   <a class="qnav__next" href="2026_P2_Q41.html">Next Question →</a>
 </nav>
+<script src="assets/fig3d.js"></script>
+<script>
+/* HKDSE 2026 P2 MC40 — right prism ABCDEF (AB:AC:AE = 1:1:2, angle BAC = 90°),
+   angle theta between the plane ABC (top face) and the plane BCE.
+   Unit chosen so AB = AC = 25 cm, AE = 50 cm (ratio 1:1:2). y is up. */
+var P = {
+  A: [0, 50, 0], B: [25, 50, 0], C: [0, 50, 25],
+  E: [0, 0, 0], F: [25, 0, 0], D: [0, 0, 25],
+  M: [12.5, 50, 12.5]                 /* mid-point of BC */
+};
+
+Fig3D.mount('#cv3d', {
+  v: P,
+  faces: [['A', 'B', 'C'], ['E', 'F', 'D'],
+    ['A', 'B', 'F', 'E'], ['B', 'C', 'D', 'F'], ['C', 'A', 'E', 'D']],
+  edges: ['A-B', 'B-C', 'C-A', 'E-F', 'F-D', 'D-E', 'A-E', 'B-F', 'C-D'],
+  ground: { x0: -70, x1: 90, z0: -55, z1: 95 },
+  groundOpt: { x0: -70, x1: 90, z0: -55, z1: 95, gx: 25, gz: 25 },
+  view: { yaw: -1.20, pitch: -0.30, zoom: 1.0 },
+  presets: {
+    front: { yaw: -1.35, pitch: -0.12, zoom: 1.02 },
+    top: { yaw: -1.20, pitch: -1.25, zoom: 0.98 },
+    side: { yaw: -0.05, pitch: -0.20, zoom: 1.02 }
+  },
+  labels: { A: 'A', B: 'B', C: 'C', D: 'D', E: 'E', F: 'F' },
+  labelSteps: { M: 3 },
+  labelsNudge: { A: 0.45, B: -0.30, C: 0.35, D: 0.55, F: -0.45, M: 2.95 },
+  aspect: 0.9,
+  startStep: 1,
+  steps: {
+    /* 1 — the three given lengths: AB = AC = 1 unit, AE = 2 units, angle BAC = 90° */
+    1: [{ t: 'seg', a: 'A', b: 'B', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'A', b: 'C', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'A', b: 'E', c: '#f59e0b', w: 3 },
+      { t: 'ra', at: 'A', a: 'B', b: 'C', s: 7, c: '#0f766e' },
+      { t: 'seg', a: 'B', b: 'C', c: '#94a3b8', w: 2, dash: [5, 4] },
+      { t: 'text', at: [12.5, 52.5, 0], text: '25', dx: 0, dy: -2, c: '#b45309' },
+      { t: 'text', at: [0, 52.5, 12.5], text: '25', dx: 2, dy: -2, c: '#b45309' },
+      { t: 'text', at: [0, 26, 0], text: '50', dx: -16, dy: 0, c: '#b45309' }],
+
+    /* 2 — coordinates: top face ABC at y = 50, bottom face EFD on the ground */
+    2: [{ t: 'poly', v: ['A', 'B', 'C'], fill: 'rgba(59,130,246,0.16)' },
+      { t: 'poly', v: ['E', 'F', 'D'], fill: 'rgba(59,130,246,0.08)' },
+      { t: 'seg', a: 'A', b: 'E', c: '#f59e0b', w: 2.6 },
+      { t: 'seg', a: 'B', b: 'F', c: '#f59e0b', w: 2.6 },
+      { t: 'seg', a: 'C', b: 'D', c: '#f59e0b', w: 2.6 },
+      { t: 'text', at: [8, 50, 8.5], text: 'top: y = 50', dx: 6, dy: -12, c: '#1d4ed8' },
+      { t: 'text', at: [8, 0, 8.5], text: 'base: y = 0', dx: 6, dy: 12, c: '#1d4ed8' }],
+
+    /* 3 — line of intersection BC, mid-point M, and AM ⟂ BC inside plane ABC */
+    3: [{ t: 'poly', v: ['A', 'B', 'C'], fill: 'rgba(59,130,246,0.15)' },
+      { t: 'seg', a: 'B', b: 'C', c: '#f59e0b', w: 3.2 },
+      { t: 'seg', a: 'A', b: 'M', c: '#8b5cf6', w: 2.6, dash: [6, 5] },
+      { t: 'ra', at: 'M', a: 'A', b: 'B', s: 6, c: '#8b5cf6' },
+      { t: 'dot', at: 'M' }, { t: 'vlabel', at: 'M', text: 'M', dist: 15, c: '#8b5cf6' },
+      { t: 'text', at: [6.3, 50, 6.3], text: '17.7', dx: -2, dy: 16, c: '#6d28d9' }],
+
+    /* 4 — the perpendicular EM ⟂ BC inside plane BCE */
+    4: [{ t: 'poly', v: ['B', 'C', 'E'], fill: 'rgba(245,158,11,0.15)' },
+      { t: 'seg', a: 'B', b: 'C', c: '#f59e0b', w: 3.2 },
+      { t: 'seg', a: 'A', b: 'M', c: '#8b5cf6', w: 2.4, dash: [6, 5] },
+      { t: 'seg', a: 'E', b: 'M', c: '#8b5cf6', w: 2.8, dash: [6, 5] },
+      { t: 'ra', at: 'M', a: 'E', b: 'C', s: 6, c: '#8b5cf6' },
+      { t: 'dot', at: 'M' }, { t: 'vlabel', at: 'M', text: 'M', dist: 15, c: '#8b5cf6' },
+      { t: 'text', at: [6.3, 25, 6.3], text: '53.0', dx: -34, dy: -2, c: '#6d28d9' }],
+
+    /* 5 — triangle AME: sin theta = AE / ME = 2√2/3 */
+    5: [{ t: 'poly', v: ['A', 'M', 'E'], fill: 'rgba(16,185,129,0.16)' },
+      { t: 'seg', a: 'B', b: 'C', c: '#f59e0b', w: 2.6 },
+      { t: 'seg', a: 'A', b: 'M', c: '#10b981', w: 3 },
+      { t: 'seg', a: 'M', b: 'E', c: '#10b981', w: 3 },
+      { t: 'seg', a: 'A', b: 'E', c: '#10b981', w: 3 },
+      { t: 'ra', at: 'A', a: 'M', b: 'E', s: 7, c: '#0f766e' },
+      { t: 'angle', at: 'M', a: 'A', b: 'E', r: 16, label: '70.5°', c: '#0f766e', gap: 14 },
+      { t: 'dot', at: 'M' }, { t: 'vlabel', at: 'M', text: 'M', dist: 15, c: '#10b981' },
+      { t: 'text', at: [0, 26, 0], text: 'sin \u03b8 = 2\u221a2/3', dx: 34, dy: 26, c: '#0f766e' }]
+  }
+});
+</script>
 </body>
 </html>

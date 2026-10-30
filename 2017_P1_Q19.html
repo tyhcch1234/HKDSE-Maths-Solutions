@@ -26,7 +26,7 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
   .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start;}
   @media(min-width:900px){.split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}}
   .panel{background:var(--card);border-radius:16px;box-shadow:var(--shadow);padding:12px;}
-  .diagram{position:sticky;top:16px;max-height:calc(100vh - 2rem);overflow-y:auto;}
+  .diagram{position:sticky;top:12px;}
   canvas{width:100%;height:auto;display:block;border-radius:12px;background:#fbfdff;border:1px solid #dbe6f7;}
   .legend{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:10px;font-size:.74rem;color:var(--muted);}
   .legend span{display:flex;align-items:center;gap:5px;}
@@ -49,8 +49,10 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
     .qbox{font-size:.8rem;padding:8px;}
     h1{font-size:.9rem;}
   }
+.chip3d{display:inline-block;vertical-align:middle;margin-left:6px;font-size:.58rem;font-weight:700;letter-spacing:.6px;color:#fff;background:linear-gradient(135deg,#2563eb,#0ea5e9);padding:2px 7px;border-radius:20px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;}
 </style>
 <link rel="stylesheet" href="assets/extra.css">
+<link rel="stylesheet" href="assets/fig3d.css">
 </head>
 <body>
 
@@ -58,17 +60,11 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
 
 <div class="split">
   <!-- LEFT : DIAGRAM -->
-  <section class="panel diagram">
-    <p class="panel-title">Figure 2 — Interactive Diagram</p>
-    <div style="margin:0 0 14px;"><div style="font-size:.78rem;font-weight:700;color:#334155;margin-bottom:6px;">3D 互動模型 — 拖動旋轉查看不同角度</div><iframe src="https://www.geogebra.org/material/iframe/id/y2Q4baM3" width="100%" height="400" style="border:0;border-radius:12px;background:#fff;" allowfullscreen scrolling="no"></iframe></div><canvas id="cv" width="760" height="620"></canvas>
-    <div class="legend">
-      <span><i class="dot" style="background:#7c3aed"></i>Vertex A / D</span>
-      <span><i class="dot" style="background:#e11d48"></i>Vertex B</span>
-      <span><i class="dot" style="background:#2563eb"></i>Vertex C / E</span>
-      <span><i class="dot" style="background:#d97706"></i>Point F / P</span>
-      <span><i class="dot" style="background:#059669"></i>Metal sheet ABC</span>
-      <span><i class="dash"></i>Vertical / construction</span>
-    </div>
+    <section class="panel diagram">
+    <h2>3-D Figure <span class="chip3d">3D</span></h2>
+    <div class="fig3d-stage"><canvas id="cv3d"></canvas></div>
+    <div id="figui"></div>
+    <div class="fig3d-hint">拖動旋轉 · 雙指／滾輪縮放　—　drag to rotate, pinch or scroll to zoom</div>
   </section>
 
   <!-- RIGHT : QUESTION + SOLUTION -->
@@ -161,183 +157,64 @@ window.MathJax = { tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [[
   </section>
 </div>
 
-<script>
-/* ---------------- Canvas rendering ---------------- */
-const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
-const W=cv.width, H=cv.height;
 
-/* True geometry (cm) from the exam:
-   AD = 10, CE = 2, AC ~ 45.65, BC = 24, angles as given.
-   We build a consistent 2D projection view for the figure:
-   Horizontal ground line with A' (foot of A at D), C' (foot of C at E), B on ground, F on ground.
-   To show the tilted sheet we use an oblique projection with heights.
-*/
-const Dx=160, Dy=470;          // D (foot of A) on ground
-const Ex=430, Ey=470;          // E (foot of C) on ground
-const Bx=250, By=470;          // B on ground (only vertex touching ground)
-
-const Hup=190;                 // vertical drawing scale for height (px per 10cm -> AD)
-const AD=Dy-Hup;               // A drawn above D (10cm -> Hup)
-const CEcm=2, scaleH=Hup/10;   // px per cm vertically
-const Ex2=430, Ey2=470-CEcm*scaleH;  // C above E
-
-const Ax=Dx, Ay=AD;
-const Cx=Ex, Cy=Ey2;
-
-/* F on ground, to the right; from geometry AF/CF=5 -> F beyond C */
-const Fx=Math.min(W-60, Ex+220), Fy=470;
-
-/* P: foot of perpendicular from A onto FB -- approximate visually */
-const Px=Bx+(Fx-Bx)*0.42, Py=By+(Fy-By)*0.42;
-
-let mode=1;
-
-function line(x1,y1,x2,y2,c,w,dash){
-  ctx.save();ctx.beginPath();ctx.setLineDash(dash||[]);ctx.strokeStyle=c;ctx.lineWidth=w||2;
-  ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore();
-}
-function dot(x,y,c,r,label,dx,dy,col){
-  ctx.beginPath();ctx.fillStyle=c;ctx.arc(x,y,r||5,0,7);ctx.fill();
-  ctx.strokeStyle='#fff';ctx.lineWidth=1.6;ctx.stroke();
-  if(label){ctx.fillStyle=col||'#14213d';ctx.font='bold 16px Segoe UI';ctx.fillText(label,x+(dx||10),y+(dy||-10));}
-}
-function poly(pts,fill,stroke,w,dash){
-  ctx.save();ctx.beginPath();ctx.setLineDash(dash||[]);ctx.moveTo(pts[0][0],pts[0][1]);
-  for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i][0],pts[i][1]);
-  ctx.closePath();
-  if(fill){ctx.fillStyle=fill;ctx.fill();}
-  if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=w||2;ctx.stroke();}
-  ctx.restore();
-}
-function angLabel(x,y,txt,c){
-  ctx.fillStyle=c||'#2563eb';ctx.font='bold 13px Segoe UI';ctx.fillText(txt,x,y);
-}
-function rightAngle(x,y,ux,uy,vx,vy,s,c){
-  const a=Math.atan2(uy,ux), b=Math.atan2(vy,vx);
-  line(x,y,x+s*Math.cos(a),y+s*Math.sin(a),c,2);
-  line(x+s*Math.cos(a),y+s*Math.sin(a),x+s*(Math.cos(a)+Math.cos(b)),y+s*(Math.sin(a)+Math.sin(b)),c,2);
-  line(x,y,x+s*Math.cos(b),y+s*Math.sin(b),c,2);
-}
-
-function draw(){
-  ctx.clearRect(0,0,W,H);
-  /* background grid */
-  ctx.save();ctx.strokeStyle='#eaf1fb';ctx.lineWidth=1;
-  for(let x=0;x<W;x+=32){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
-  for(let y=0;y<H;y+=32){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
-  ctx.restore();
-
-  /* ground plane */
-  ctx.save();
-  ctx.beginPath();ctx.moveTo(40,470);ctx.lineTo(W-30,470);ctx.lineTo(W-70,560);ctx.lineTo(20,560);
-  ctx.closePath();
-  const g=ctx.createLinearGradient(0,470,0,560);g.addColorStop(0,'#e8eef8');g.addColorStop(1,'#d6e2f5');
-  ctx.fillStyle=g;ctx.fill();ctx.strokeStyle='#9db4d8';ctx.lineWidth=2;ctx.stroke();
-  ctx.restore();
-  ctx.fillStyle='#8aa2c8';ctx.font='bold 12px Segoe UI';
-  ctx.fillText('HORIZONTAL GROUND',60,545);
-
-  /* sheet ABC */
-  const sheetFill = (mode>=3&&mode<=5)?'rgba(5,150,105,0.22)':'rgba(5,150,105,0.13)';
-  poly([[Ax,Ay],[Bx,By],[Cx,Cy]],sheetFill,'#059669',2.6);
-  ctx.fillStyle='rgba(5,150,105,.85)';ctx.font='bold 14px Segoe UI';
-  ctx.fillText('metal sheet',(Ax+Bx+Cx)/3-30,(Ay+By+Cy)/3+6);
-
-  /* verticals AD and CE */
-  if(mode>=1){
-    line(Ax,Ay,Dx,Dy,'#7c3aed',2,[7,6]);
-    line(Cx,Cy,Ex,Ey,'#2563eb',2,[7,6]);
-    rightAngle(Ax,Ay,1,0,0,1,16,'#7c3aed');
-    rightAngle(Cx,Cy,1,0,0,1,14,'#2563eb');
-    angLabel(Ax-46,Ay+95,'AD = 10','#7c3aed');
-    angLabel(Ex+8,Cy+30,'CE = 2','#2563eb');
-  }
-
-  /* AF produced line to F (ground) */
-  if(mode>=2){
-    line(Ax,Ay,Fx,Fy,'#d97706',2.4,[9,6]);
-    line(Cx,Cy,Fx,Fy,'#d97706',2.4);
-  }
-
-  /* BF line and P */
-  if(mode>=3){
-    line(Bx,By,Fx,Fy,'#e11d48',2.4);
-  }
-  if(mode>=4){
-    line(Ax,Ay,Px,Py,'#7c3aed',2.6);
-    rightAngle(Px,Py,Ax-Px,Ay-Py,Fx-Px,Fy-Py,14,'#7c3aed');
-    dot(Px,Py,'#d97706',5,'P',8,20,'#d97706');
-  }
-  if(mode>=5){
-    poly([[Bx,By],[Dx,Dy],[Fx,Fy]],'rgba(217,119,6,0.20)','#d97706',2.2);
-    ctx.fillStyle='#b45309';ctx.font='bold 13px Segoe UI';
-    ctx.fillText('area = area of ABF·cos θ', Dx-10, Dy-30);
-  }
-
-  /* triangle ABF shading in step 3 */
-  if(mode===3){
-    poly([[Ax,Ay],[Bx,By],[Fx,Fy]],'rgba(37,99,235,0.14)','#2563eb',2.4);
-  }
-
-  /* similar-triangle emphasis step 2 */
-  if(mode===2){
-    ctx.save();ctx.lineWidth=2;
-    poly([[Ax,Ay],[Dx,Dy],[Fx,Fy]],'rgba(124,58,237,0.12)','#7c3aed',2.2);
-    poly([[Cx,Cy],[Ex,Ey],[Fx,Fy]],'rgba(37,99,235,0.12)','#2563eb',2.2);
-    ctx.restore();
-    angLabel(Fx-130,Fy-14,'△ADF ~ △CEF','#7c3aed');
-  }
-
-  /* points */
-  dot(Ax,Ay,'#7c3aed',6.5,'A',-16,-12,'#7c3aed');
-  dot(Bx,By,'#e11d48',6.5,'B',-6,26,'#e11d48');
-  dot(Cx,Cy,'#2563eb',6.5,'C',12,-10,'#2563eb');
-  dot(Dx,Dy,'#7c3aed',5.5,'D',-18,20,'#7c3aed');
-  dot(Ex,Ey,'#2563eb',5.5,'E',10,22,'#2563eb');
-  dot(Fx,Fy,'#d97706',6.5,'F',12,24,'#d97706');
-
-  /* annotations: angles */
-  angLabel(Ax+26,Ay+34,'30°','#7c3aed');
-  angLabel(Cx-52,Cy-14,'42°','#2563eb');
-
-  /* BF value tag in step 3-4 */
-  if(mode>=3){
-    ctx.fillStyle='#e11d48';ctx.font='bold 13px Segoe UI';
-    ctx.fillText('BF ≈ 33.4 cm',(Bx+Fx)/2-30,(By+Fy)/2+10);
-  }
-
-  /* mode caption */
-  const caps={
-    1:'Step 1 — Sine rule in △ABC  (find AC)',
-    2:'Step 2 — △ADF ~ △CEF  →  AF : CF = 10 : 2  (find CF)',
-    3:'Step 3 — Area △ABF = ½(AF)(BC sin 42°)',
-    4:'Step 4 — AP ⊥ FB produced;  sin θ = AD / AP',
-    5:'Step 5 — △BDF is the projection of △ABF: area of BDF = area of ABF cos θ'
-  };
-  ctx.save();
-  ctx.fillStyle='rgba(20,33,61,0.88)';
-  ctx.beginPath();ctx.roundRect(14,14,W-28,34,10);ctx.fill();
-  ctx.fillStyle='#fff';ctx.font='bold 14px Segoe UI';
-  ctx.fillText(caps[mode],26,36);
-  ctx.restore();
-}
-
-/* ---------------- Scroll sync ---------------- */
-const steps=Array.from(document.querySelectorAll('.step'));
-const obs=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){
-  const m=+e.target.dataset.step; mode=m;
-  steps.forEach(st=>st.classList.toggle('active',st===e.target)); draw();}});},
-  {rootMargin:'-15% 0px -55% 0px',threshold:0});
-steps.forEach(st=>obs.observe(st));
-
-draw();
-window.addEventListener('resize',draw);
-</script>
 <!-- question-pager -->
 <nav class="qnav" aria-label="Question navigation">
   <a class="qnav__prev" href="2017_P1_Q18.html">← Previous Question</a>
   <a class="qnav__mid" href="index.html#y2017">Contents</a>
   <span class="qnav__next is-empty" aria-hidden="true"></span>
 </nav>
+<script src="assets/fig3d.js"></script>
+<script>
+/* HKDSE 2017 P1 Q19 — thin triangular sheet ABC, only B on the ground,
+   A 10 cm and C 2 cm above the ground, AC produced meets the ground at F. */
+var V = {
+  B: [0, 0, 0],
+  A: [-16.6527, 10, 25.5787],
+  C: [23.3630, 2, 5.1157],
+  F: [33.3669, 0, 0],
+  D: [-16.6527, 0, 25.5787],
+  E: [23.3630, 0, 5.1157]
+};
+
+Fig3D.mount('#cv3d', {
+  v: V,
+  faces: [['A', 'B', 'C']],
+  edges: [
+    { a: 'A', b: 'B' }, { a: 'B', b: 'C' }, { a: 'C', b: 'A' },
+    { a: 'A', b: 'D', dash: [4, 4], c: '#94a3b8', w: 1.6 },
+    { a: 'C', b: 'E', dash: [4, 4], c: '#94a3b8', w: 1.6 },
+    { a: 'B', b: 'F', c: '#94a3b8', w: 1.8 }
+  ],
+  ground: { x0: -26, x1: 42, z0: -12, z1: 32 },
+  view: { yaw: 0.62, pitch: -0.26, zoom: 1.02 },
+  labels: { A: 'A', B: 'B', C: 'C', F: 'F' },
+  labelColor: { A: '#ef4444' },
+  labelSteps: { D: 4, E: 4 },
+  labelsNudge: { F: 0.5, E: 0.9, D: -0.9 },
+  steps: {
+    1: [{ t: 'poly', v: ['A', 'B', 'C'], fill: 'rgba(139,92,246,0.14)' },
+      { t: 'seg', a: 'A', b: 'C', c: '#f59e0b', w: 3 },
+      { t: 'text', at: [-4, 8, 17], text: 'AC 45.65', dx: 0, dy: -12, c: '#b45309' },
+      { t: 'angle', at: 'A', a: 'B', b: 'C', r: 5, label: '30°' },
+      { t: 'angle', at: 'C', a: 'A', b: 'B', r: 5, label: '42°' }],
+    2: [{ t: 'seg', a: 'C', b: 'F', c: '#10b981', w: 3 },
+      { t: 'text', at: [28.4, 1, 2.6], text: 'CF 11.41', dx: 22, dy: -10, c: '#0f766e' }],
+    3: [{ t: 'poly', v: ['A', 'B', 'F'], fill: 'rgba(59,130,246,0.16)' },
+      { t: 'text', at: [8, 0, 8], text: 'area ABF 458', dx: 0, dy: 4, c: '#1d4ed8' }],
+    4: [{ t: 'seg', a: 'A', b: 'D', c: '#f59e0b', w: 2.6 },
+      { t: 'seg', a: 'C', b: 'E', c: '#f59e0b', w: 2.2 },
+      { t: 'seg', a: 'B', b: 'F', c: '#10b981', w: 2.4 },
+      { t: 'dot', at: 'D' }, { t: 'vlabel', at: 'D', text: 'D' },
+      { t: 'dot', at: 'E' }, { t: 'vlabel', at: 'E', text: 'E' },
+      { t: 'text', at: [-14, 6, 20], text: '10', dx: -12, dy: 0, c: '#b45309' },
+      { t: 'text', at: [24, 1, 5], text: '2', dx: 12, dy: 0, c: '#b45309' },
+      { t: 'text', at: [12, 0, 6], text: 'inclination 21.4°', dx: 0, dy: 18, c: '#0f766e' }],
+    5: [{ t: 'poly', v: ['B', 'D', 'F'], fill: 'rgba(239,68,68,0.14)' },
+      { t: 'seg', a: 'B', b: 'D', c: '#ef4444', w: 2.2 },
+      { t: 'text', at: [4, 0, 12], text: 'area BDF 427 < 460', dx: 0, dy: 16, c: '#b91c1c' }]
+  }
+});
+</script>
 </body>
 </html>

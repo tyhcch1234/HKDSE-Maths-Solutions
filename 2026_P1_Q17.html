@@ -22,7 +22,7 @@
     box-shadow:0 4px 18px rgba(30,58,138,.08);
     border:1px solid #e2e8f0;
   }
-  .diagram{position:sticky;top:16px;align-self:flex-start;}
+  .diagram{position:sticky;top:12px;}
   canvas{display:block;}
   #cv3d{width:100%;height:auto;border-radius:12px;background:#fbfdff;}
   .chip3d{display:inline-block;vertical-align:middle;margin-left:6px;font-size:.58rem;font-weight:700;letter-spacing:.6px;color:#fff;background:linear-gradient(135deg,#2563eb,#0ea5e9);padding:2px 7px;border-radius:20px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;}
@@ -89,33 +89,17 @@
   }
 </style>
 <link rel="stylesheet" href="assets/extra.css">
+<link rel="stylesheet" href="assets/fig3d.css">
 </head>
 <body>
 <div class="split">
 
   <!-- LEFT: diagram -->
-  <section class="panel diagram">
-    <h1>Figure 2 — Pyramid VABCD <span class="chip3d">3D</span></h1>
-    <div class="sub">Draggable 3-D view · base ABCD tilted 65° above the ground · face VAB on the ground</div>
-    <div class="stage"><canvas id="cv3d" width="620" height="583"></canvas><noscript><img src="figures/2026_P1_17.png" alt="Pyramid VABCD" style="width:100%;display:block;"></noscript></div>
-    <div class="vbar">
-      <button type="button" data-view="home" class="on">Reset</button>
-      <button type="button" data-view="front">Front</button>
-      <button type="button" data-view="top">Top</button>
-      <button type="button" data-view="side">Side</button>
-      <button type="button" id="spin">Auto-spin</button>
-      <button type="button" id="ground" class="on">Ground</button>
-    </div>
-    <div class="legend">
-      <span><i class="sw" style="background:#94a3b8"></i>Ground plane</span>
-      <span><i class="sw" style="background:#1e3a8a"></i>Edges</span>
-      <span><i class="sw" style="background:#ef4444"></i>Hidden / dashed</span>
-      <span><i class="sw" style="background:#8b5cf6"></i>Diagonal AC</span>
-      <span><i class="sw" style="background:#f59e0b"></i>Height DD′</span>
-      <span><i class="sw" style="background:#10b981"></i>VD &amp; angle θ</span>
-    </div>
-    <div class="readout" id="readout"></div>
-    <div class="hint">拖動旋轉 · 雙指／滾輪縮放　—　drag to rotate, pinch or scroll to zoom</div>
+    <section class="panel diagram">
+    <h2>3-D Figure <span class="chip3d">3D</span></h2>
+    <div class="fig3d-stage"><canvas id="cv3d"></canvas></div>
+    <div id="figui"></div>
+    <div class="fig3d-hint">拖動旋轉 · 雙指／滾輪縮放　—　drag to rotate, pinch or scroll to zoom</div>
   </section>
 
   <!-- RIGHT: question + solution -->
@@ -246,542 +230,74 @@
   </section>
 </div>
 
-<script>
-/* ===== FIG3D START ===== */
-/* Interactive 3-D figure for HKDSE 2026 Paper 1 Q17 (pyramid VABCD).
-   Hand-rolled orbital camera on a plain 2-D canvas — no external library. */
-(function () {
-  'use strict';
-
-  /* ---------- geometry -------------------------------------------------
-     Units: cm, y is up, the horizontal plane y = 0 is "the ground".
-     Face VAB lies on the ground; the base ABCD is tilted 65 deg above it.
-     A and B sit on the x-axis, and the base plane is lifted about line AB. */
-  var P = {
-    A: [0, 0, 0],
-    B: [90, 0, 0],
-    C: [73.8685, 34.0725, 15.8883],
-    D: [-21.8634, 60.2677, 28.1033],
-    V: [-39.8571, 0, -21.3339]
-  };
-  P.Dp = [P.D[0], 0, P.D[2]];   /* foot of the perpendicular from D to the ground */
-  P.E = [P.D[0], 0, 0];         /* foot of the perpendicular from D to line AB     */
-
-  /* ---------- tiny vector helpers ---------- */
-  function sub(a, b) { return [a[0] - b[0], a[1] - b[1], a[2] - b[2]]; }
-  function add(a, b) { return [a[0] + b[0], a[1] + b[1], a[2] + b[2]]; }
-  function mul(a, s) { return [a[0] * s, a[1] * s, a[2] * s]; }
-  function dot(a, b) { return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]; }
-  function len(a) { return Math.sqrt(dot(a, a)); }
-  function unit(a) { var l = len(a) || 1; return [a[0] / l, a[1] / l, a[2] / l]; }
-  function clamp(v, lo, hi) { return v < lo ? lo : v > hi ? hi : v; }
-  function centroid(keys) {
-    var s = [0, 0, 0], i;
-    for (i = 0; i < keys.length; i++) s = add(s, P[keys[i]]);
-    return mul(s, 1 / keys.length);
-  }
-
-  /* ---------- solid topology ---------- */
-  var FACES = [
-    ['V', 'A', 'B'],
-    ['V', 'B', 'C'],
-    ['V', 'C', 'D'],
-    ['V', 'D', 'A'],
-    ['A', 'B', 'C', 'D']
-  ];
-  var EDGES = [
-    ['V', 'A', [0, 3]], ['V', 'B', [0, 1]], ['V', 'C', [1, 2]], ['V', 'D', [2, 3]],
-    ['A', 'B', [0, 4]], ['B', 'C', [1, 4]], ['C', 'D', [2, 4]], ['D', 'A', [3, 4]]
-  ];
-
-  var SOLID = [P.A, P.B, P.C, P.D, P.V];
-  var CENTER = mul(SOLID.reduce(function (s, p) { return add(s, p); }, [0, 0, 0]), 1 / SOLID.length);
-  var RADIUS = SOLID.reduce(function (m, p) { return Math.max(m, len(sub(p, CENTER))); }, 1);
-
-  /* outward face normals (Newell's method) */
-  var NORMALS = FACES.map(function (k) {
-    var n = [0, 0, 0], i, a, b;
-    for (i = 0; i < k.length; i++) {
-      a = P[k[i]]; b = P[k[(i + 1) % k.length]];
-      n[0] += (a[1] - b[1]) * (a[2] + b[2]);
-      n[1] += (a[2] - b[2]) * (a[0] + b[0]);
-      n[2] += (a[0] - b[0]) * (a[1] + b[1]);
-    }
-    n = unit(n);
-    if (dot(n, sub(centroid(k), CENTER)) < 0) n = mul(n, -1);
-    return n;
-  });
-
-  /* ---------- measurements ---------- */
-  var DEG = 180 / Math.PI;
-  var MEAS = {
-    DDp: len(sub(P.D, P.Dp)),
-    VDp: len(sub(P.V, P.Dp)),
-    VD: len(sub(P.V, P.D)),
-    theta: Math.acos(clamp(dot(unit(sub(P.D, P.V)), unit(sub(P.Dp, P.V))), -1, 1)) * DEG,
-    tilt: Math.acos(clamp(dot(unit(sub(P.D, P.E)), unit(sub(P.Dp, P.E))), -1, 1)) * DEG
-  };
-
-  /* ---------- view presets ---------- */
-  var VIEWS = {
-    home: { yaw: 0.95, pitch: -0.32, zoom: 1.04 },
-    front: { yaw: -0.55, pitch: -0.28, zoom: 1.04 },
-    top: { yaw: 0.30, pitch: -1.18, zoom: 0.96 },
-    side: { yaw: Math.PI / 2 - 0.12, pitch: -0.16, zoom: 1.08 }
-  };
-
-  function makeCam(w, h, st) {
-    var dist = 3.6 * RADIUS / st.zoom;
-    var f = 0.425 * Math.min(w, h) * 3.6;
-    var cy = Math.cos(st.yaw), sy = Math.sin(st.yaw);
-    var cp = Math.cos(st.pitch), sp = Math.sin(st.pitch);
-
-    function rot(v) {
-      var x1 = v[0] * cy + v[2] * sy;
-      var z1 = -v[0] * sy + v[2] * cy;
-      return [x1, v[1] * cp - z1 * sp, v[1] * sp + z1 * cp];
-    }
-    function project(p) {
-      var v = rot(sub(p, CENTER));
-      var d = v[2] + dist;
-      var s = f / Math.max(d, 1);
-      return { x: w / 2 + v[0] * s, y: h / 2 - v[1] * s, d: d };
-    }
-    return { project: project, rot: rot, dist: dist, f: f };
-  }
-
-  /* ---------- figure factory ---------- */
-  function createFigure(canvas, opts) {
-    opts = opts || {};
-    var ctx = canvas.getContext('2d');
-    var st = {
-      yaw: VIEWS.home.yaw, pitch: VIEWS.home.pitch, zoom: 1,
-      mode: 1, ground: true, spin: false, dpr: 1, w: 600, h: 560
-    };
-    var NUDGE = { A: 0, B: 0, C: 0, D: 0, V: 0, Dp: -0.55, E: 0.75 };
-
-    function resize() {
-      var rect = canvas.getBoundingClientRect ? canvas.getBoundingClientRect() : null;
-      var cssW = Math.max(260, (rect && rect.width) || opts.width || 600);
-      var vh = (typeof window !== 'undefined' && window.innerHeight) || 900;
-      /* one column on phones: keep the pinned card short so text stays readable */
-      var phone = ((typeof window !== 'undefined' ? window.innerWidth : 1200) || 1200) <= 600;
-      var cssH = phone
-        ? Math.min(Math.round(cssW * 0.94), Math.max(220, Math.round(vh * 0.30)))
-        : Math.min(Math.round(cssW * 0.94), Math.max(250, vh - 250));
-      var dpr = Math.min((typeof window !== 'undefined' && window.devicePixelRatio) || 1, 2);
-      st.w = cssW; st.h = cssH; st.dpr = dpr;
-      canvas.width = Math.round(cssW * dpr);
-      canvas.height = Math.round(cssH * dpr);
-      draw();
-    }
-
-    /* ---- drawing primitives ---- */
-    function line3(cam, a, b, color, width, dash, alpha) {
-      var p = cam.project(a), q = cam.project(b);
-      ctx.save();
-      ctx.globalAlpha = alpha == null ? 1 : alpha;
-      ctx.strokeStyle = color;
-      ctx.lineWidth = width;
-      ctx.lineCap = 'round';
-      ctx.setLineDash(dash || []);
-      ctx.beginPath();
-      ctx.moveTo(p.x, p.y);
-      ctx.lineTo(q.x, q.y);
-      ctx.stroke();
-      ctx.restore();
-    }
-
-    function poly3(cam, pts, fill, stroke, width, dash) {
-      var i, sp = [];
-      for (i = 0; i < pts.length; i++) sp.push(cam.project(pts[i]));
-      ctx.save();
-      ctx.beginPath();
-      ctx.moveTo(sp[0].x, sp[0].y);
-      for (i = 1; i < sp.length; i++) ctx.lineTo(sp[i].x, sp[i].y);
-      ctx.closePath();
-      if (fill) { ctx.fillStyle = fill; ctx.fill(); }
-      if (stroke) {
-        ctx.strokeStyle = stroke; ctx.lineWidth = width || 1.4;
-        ctx.setLineDash(dash || []);
-        ctx.stroke();
-      }
-      ctx.restore();
-    }
-
-    function path3(cam, pts, color, width, dash, alpha) {
-      if (!pts || pts.length < 2) return;
-      var i, sp = cam.project(pts[0]);
-      ctx.save();
-      ctx.globalAlpha = alpha == null ? 1 : alpha;
-      ctx.strokeStyle = color;
-      ctx.lineWidth = width;
-      ctx.lineCap = 'round';
-      ctx.setLineDash(dash || []);
-      ctx.beginPath();
-      ctx.moveTo(sp.x, sp.y);
-      for (i = 1; i < pts.length; i++) { sp = cam.project(pts[i]); ctx.lineTo(sp.x, sp.y); }
-      ctx.stroke();
-      ctx.restore();
-    }
-
-    function ts() { return Math.max(0.8, Math.min(1, st.w / 440)); }
-
-    function dot2(sp, color, r) {
-      ctx.save();
-      ctx.beginPath();
-      ctx.arc(sp.x, sp.y, r * ts(), 0, Math.PI * 2);
-      ctx.fillStyle = '#ffffff';
-      ctx.fill();
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = color;
-      ctx.stroke();
-      ctx.restore();
-    }
-
-    function text2(x, y, str, color, size, align) {
-      ctx.save();
-      ctx.font = 'bold ' + ((size || 14) * ts()) + 'px Georgia, "Times New Roman", serif';
-      ctx.textAlign = align || 'center';
-      ctx.textBaseline = 'middle';
-      ctx.lineWidth = 4.5;
-      ctx.strokeStyle = 'rgba(255,255,255,0.96)';
-      ctx.lineJoin = 'round';
-      ctx.strokeText(str, x, y);
-      ctx.fillStyle = color || '#0f172a';
-      ctx.fillText(str, x, y);
-      ctx.restore();
-    }
-
-    /* label position: outward from the projected centre, plus a per-label twist */
-    function labelPos(cam, key, dist) {
-      var sp = cam.project(P[key]);
-      var c = cam.project(CENTER);
-      var ang = Math.atan2(sp.y - c.y, sp.x - c.x) + (NUDGE[key] || 0);
-      var d = dist * ts();
-      return { x: sp.x + Math.cos(ang) * d, y: sp.y + Math.sin(ang) * d };
-    }
-
-    /* arc between two rays, in 3-D so it foreshortens with the view */
-    function arcPoints(center, p1, p2, radius, steps) {
-      var u = unit(sub(p1, center));
-      var w = sub(p2, center);
-      var perp = sub(w, mul(u, dot(w, u)));
-      if (len(perp) < 1e-9) return [];
-      perp = unit(perp);
-      var total = Math.acos(clamp(dot(unit(w), u), -1, 1));
-      var pts = [], i, t;
-      for (i = 0; i <= steps; i++) {
-        t = total * i / steps;
-        pts.push(add(center, add(mul(u, radius * Math.cos(t)), mul(perp, radius * Math.sin(t)))));
-      }
-      return pts;
-    }
-
-    function angleMark(cam, center, p1, p2, radius, color, labelTxt) {
-      var pts = arcPoints(center, p1, p2, radius, 30);
-      if (!pts.length) return;
-      path3(cam, pts, color, 1.9);
-      if (labelTxt) {
-        var mid = pts[Math.floor(pts.length / 2)];
-        var c = cam.project(center), m = cam.project(mid);
-        var dx = m.x - c.x, dy = m.y - c.y, l = Math.hypot(dx, dy) || 1;
-        text2(m.x + dx / l * 17, m.y + dy / l * 13, labelTxt, color, 12.5);
-      }
-    }
-
-    /* right-angle square at a corner, inside the plane of two directions */
-    function rightAngle(cam, p, d1, d2, size, color) {
-      var a = add(p, mul(d1, size));
-      var b = add(p, add(mul(d1, size), mul(d2, size)));
-      var c = add(p, mul(d2, size));
-      path3(cam, [a, b, c], color, 1.5);
-    }
-
-    var G = { x0: -110, x1: 150, z0: -85, z1: 70 };
-
-    function drawGround(cam) {
-      poly3(cam, [[G.x0, 0, G.z0], [G.x1, 0, G.z0], [G.x1, 0, G.z1], [G.x0, 0, G.z1]], 'rgba(148,163,184,0.08)');
-      var i;
-      for (i = G.x0 + 10; i < G.x1; i += 30) line3(cam, [i, 0, G.z0], [i, 0, G.z1], 'rgba(148,163,184,0.20)', 1);
-      for (i = G.z0 + 10; i < G.z1; i += 25) line3(cam, [G.x0, 0, i], [G.x1, 0, i], 'rgba(148,163,184,0.20)', 1);
-      poly3(cam, [[G.x0, 0, G.z0], [G.x1, 0, G.z0], [G.x1, 0, G.z1], [G.x0, 0, G.z1]], null, 'rgba(148,163,184,0.45)', 1.4, [8, 7]);
-    }
-
-    function drawFootprint(cam) {
-      var pts = [P.A, P.B, P.V, [P.C[0], 0, P.C[2]], [P.D[0], 0, P.D[2]]];
-      pts.sort(function (a, b) { return a[0] - b[0] || a[2] - b[2]; });
-      function cr(o, a, b) { return (a[0] - o[0]) * (b[2] - o[2]) - (a[2] - o[2]) * (b[0] - o[0]); }
-      var lower = [], upper = [], i;
-      for (i = 0; i < pts.length; i++) {
-        while (lower.length > 1 && cr(lower[lower.length - 2], lower[lower.length - 1], pts[i]) <= 0) lower.pop();
-        lower.push(pts[i]);
-      }
-      for (i = pts.length - 1; i >= 0; i--) {
-        while (upper.length > 1 && cr(upper[upper.length - 2], upper[upper.length - 1], pts[i]) <= 0) upper.pop();
-        upper.push(pts[i]);
-      }
-      poly3(cam, lower.slice(0, -1).concat(upper.slice(0, -1)), 'rgba(15,23,42,0.07)');
-    }
-
-    /* ---- one frame ---- */
-    function draw() {
-      var w = st.w, h = st.h, i, m = st.mode;
-      ctx.setTransform(st.dpr, 0, 0, st.dpr, 0, 0);
-      var bg = ctx.createLinearGradient(0, 0, 0, h);
-      bg.addColorStop(0, '#ffffff');
-      bg.addColorStop(1, '#edf2fa');
-      ctx.fillStyle = bg;
-      ctx.fillRect(0, 0, w, h);
-
-      var cam = makeCam(w, h, st);
-
-      if (st.ground) { drawGround(cam); drawFootprint(cam); }
-
-      /* front/back test per face: exact hidden-line removal for a convex solid */
-      var front = FACES.map(function (n, idx) { return cam.rot(NORMALS[idx])[2] < 0; });
-
-      for (i = 0; i < EDGES.length; i++) {
-        var e = EDGES[i];
-        if (!(front[e[2][0]] || front[e[2][1]])) line3(cam, P[e[0]], P[e[1]], '#ef4444', 1.6, [6, 5], 0.7);
-      }
-
-      var order = FACES.map(function (k, idx) {
-        var d = k.reduce(function (s, key) { return s + cam.project(P[key]).d; }, 0) / k.length;
-        return { idx: idx, d: d };
-      }).sort(function (a, b) { return b.d - a.d; });
-
-      for (i = 0; i < order.length; i++) {
-        var fi = order[i].idx, keys = FACES[fi];
-        var nz = Math.abs(cam.rot(NORMALS[fi])[2]);
-        var alpha = (0.045 + 0.13 * nz).toFixed(3);
-        poly3(cam, keys.map(function (k) { return P[k]; }), 'rgba(30,58,138,' + alpha + ')');
-      }
-
-      for (i = 0; i < EDGES.length; i++) {
-        e = EDGES[i];
-        if (front[e[2][0]] || front[e[2][1]]) line3(cam, P[e[0]], P[e[1]], '#1e3a8a', 2.2);
-      }
-
-      /* ---------- per-step annotations ---------- */
-      if (m <= 4) line3(cam, P.A, P.C, '#8b5cf6', 2.4, [6, 5], 0.95);
-
-      if (m === 1 || m === 2) {
-        poly3(cam, [P.A, P.C, P.D], 'rgba(139,92,246,0.13)');
-        line3(cam, P.A, P.D, '#f59e0b', 3);
-        line3(cam, P.D, P.C, '#f59e0b', 3);
-        angleMark(cam, P.D, P.A, P.C, 26, '#b45309', '55°');
-      }
-      if (m === 3) {
-        poly3(cam, [P.A, P.B, P.C], 'rgba(139,92,246,0.12)');
-        line3(cam, P.A, P.B, '#f59e0b', 3);
-        line3(cam, P.B, P.C, '#f59e0b', 3);
-        angleMark(cam, P.C, P.A, P.B, 22, '#b45309', '86.2°');
-      }
-      if (m === 4) {
-        poly3(cam, [P.A, P.B, P.D], 'rgba(245,158,11,0.13)');
-        line3(cam, P.A, P.B, '#f59e0b', 3);
-        line3(cam, P.A, P.D, '#f59e0b', 3);
-        angleMark(cam, P.A, P.B, P.D, 30, '#b45309', '108.2°');
-      }
-
-      if (m >= 5) {
-        poly3(cam, [P.A, P.B, P.C, P.D], 'rgba(59,130,246,0.09)');
-      }
-      if (m === 5) {
-        /* the cross-section through D perpendicular to AB shows the 65 deg dihedral angle */
-        poly3(cam, [P.E, P.D, P.Dp], 'rgba(245,158,11,0.20)');
-        line3(cam, P.E, P.D, '#f59e0b', 2.2, [5, 4], 0.95);
-        line3(cam, P.E, P.Dp, '#94a3b8', 2, [4, 4]);
-        line3(cam, P.D, P.Dp, '#f59e0b', 3, [7, 5]);
-        rightAngle(cam, P.Dp, unit(sub(P.D, P.Dp)), unit(sub(P.E, P.Dp)), 8, '#f59e0b');
-        angleMark(cam, P.E, P.D, P.Dp, 32, '#b45309', '65°');
-        var pd = cam.project(add(P.D, mul(sub(P.E, P.D), 0.62)));
-        var pe = cam.project(P.E);
-        var ddx = pd.x - pe.x, ddy = pd.y - pe.y, dl = Math.hypot(ddx, ddy) || 1;
-        text2(pd.x - ddy / dl * 15, pd.y + ddx / dl * 15, 'd', '#b45309', 13);
-        dot2(cam.project(P.E), '#f59e0b', 3.4);
-        var lpE = labelPos(cam, 'E', 15);
-        var lpDp = labelPos(cam, 'Dp', 15);
-        if (Math.hypot(lpE.x - lpDp.x, lpE.y - lpDp.y) < 26) { lpE.y += 15; lpE.x -= 6; }
-        dot2(cam.project(P.Dp), '#f59e0b', 3.8);
-        text2(lpDp.x, lpDp.y, "D′", '#b45309', 13);
-        text2(lpE.x, lpE.y, 'E', '#b45309', 12.5);
-      }
-      if (m === 6) {
-        line3(cam, P.D, P.Dp, '#f59e0b', 2.6, [7, 5], 0.95);
-        poly3(cam, [P.V, P.D, P.Dp], 'rgba(16,185,129,0.14)');
-        line3(cam, P.V, P.D, '#10b981', 3);
-        line3(cam, P.V, P.Dp, '#10b981', 2, [5, 4], 0.95);
-        rightAngle(cam, P.Dp, unit(sub(P.D, P.Dp)), unit(sub(P.V, P.Dp)), 8, '#0f766e');
-        angleMark(cam, P.V, P.D, P.Dp, 34, '#0f766e', 'θ 48.9°');
-        dot2(cam.project(P.Dp), '#f59e0b', 3.8);
-        var lpDp6 = labelPos(cam, 'Dp', 15);
-        text2(lpDp6.x, lpDp6.y, "D′", '#b45309', 13);
-      }
-
-      /* ---------- vertices ---------- */
-      ['A', 'B', 'C', 'D'].forEach(function (k) {
-        dot2(cam.project(P[k]), '#f59e0b', 4.6);
-        var lp = labelPos(cam, k, 17);
-        text2(lp.x, lp.y, k, '#0f172a', 15);
-      });
-      dot2(cam.project(P.V), '#ef4444', 4.6);
-      var lv = labelPos(cam, 'V', 17);
-      text2(lv.x, lv.y, 'V', '#0f172a', 15);
-    }
-
-    /* ---- interaction ---- */
-    var drag = null;
-    var pointers = {};
-
-    function onDown(e) {
-      if (canvas.setPointerCapture && e.pointerId != null) canvas.setPointerCapture(e.pointerId);
-      pointers[e.pointerId] = { x: e.clientX, y: e.clientY };
-      drag = { x: e.clientX, y: e.clientY };
-      st.spin = false;
-      if (canvas.style) canvas.style.cursor = 'grabbing';
-    }
-    function onMove(e) {
-      if (!pointers[e.pointerId]) return;
-      var ids = Object.keys(pointers);
-      if (ids.length > 1) {
-        pointers[e.pointerId] = { x: e.clientX, y: e.clientY };
-        var a = pointers[ids[0]], b = pointers[ids[1]];
-        var d = Math.hypot(a.x - b.x, a.y - b.y);
-        if (drag && drag.pinch) {
-          st.zoom = clamp(st.zoom * (d / drag.pinch), 0.55, 2.2);
-          draw();
-        }
-        drag = { x: e.clientX, y: e.clientY, pinch: d };
-        return;
-      }
-      if (!drag) return;
-      st.yaw -= (e.clientX - drag.x) * 0.0095;
-      st.pitch = clamp(st.pitch + (e.clientY - drag.y) * 0.0075, -1.35, 1.35);
-      drag = { x: e.clientX, y: e.clientY };
-      draw();
-    }
-    function onUp(e) {
-      delete pointers[e.pointerId];
-      drag = null;
-      if (canvas.style) canvas.style.cursor = 'grab';
-    }
-    function onWheel(e) {
-      e.preventDefault();
-      st.zoom = clamp(st.zoom * (e.deltaY > 0 ? 0.93 : 1.075), 0.55, 2.2);
-      draw();
-    }
-
-    if (canvas.addEventListener) {
-      canvas.addEventListener('pointerdown', onDown);
-      canvas.addEventListener('pointermove', onMove);
-      canvas.addEventListener('pointerup', onUp);
-      canvas.addEventListener('pointercancel', onUp);
-      canvas.addEventListener('pointerleave', onUp);
-      canvas.addEventListener('wheel', onWheel, { passive: false });
-      canvas.addEventListener('dblclick', function () { setView('home'); });
-      if (canvas.style) { canvas.style.touchAction = 'none'; canvas.style.cursor = 'grab'; }
-    }
-
-    var spinRAF = null;
-    function spinLoop() {
-      if (!st.spin) { spinRAF = null; return; }
-      st.yaw += 0.006;
-      draw();
-      spinRAF = requestAnimationFrame(spinLoop);
-    }
-
-    function setView(name) {
-      var v = VIEWS[name] || VIEWS.home;
-      st.yaw = v.yaw; st.pitch = v.pitch; st.zoom = v.zoom;
-      draw();
-    }
-    function setMode(m) { if (st.mode !== m) { st.mode = m; draw(); } }
-    function toggleSpin(on) {
-      st.spin = on == null ? !st.spin : !!on;
-      if (st.spin && !spinRAF && typeof requestAnimationFrame === 'function') spinRAF = requestAnimationFrame(spinLoop);
-    }
-
-    resize();
-    return {
-      state: st, draw: draw, resize: resize, setView: setView, setMode: setMode,
-      toggleSpin: toggleSpin, meas: MEAS
-    };
-  }
-
-  if (typeof window !== 'undefined') window.__fig3d = createFigure;
-})();
-/* ===== FIG3D END ===== */
-
-
-/* ---------- mount the interactive figure ---------- */
-(function () {
-  var canvas = document.getElementById('cv3d');
-  if (!canvas || !window.__fig3d) return;
-  var fig = window.__fig3d(canvas);
-
-  var m = fig.meas, ro = document.getElementById('readout');
-  if (ro) {
-    ro.innerHTML =
-      '<span><b>DD′</b> ' + m.DDp.toFixed(1) + ' cm</span>' +
-      '<span><b>VD′</b> ' + m.VDp.toFixed(1) + ' cm</span>' +
-      '<span><b>VD</b> ' + m.VD.toFixed(1) + ' cm</span>' +
-      '<span><b>θ</b> ' + m.theta.toFixed(1) + '°</span>' +
-      '<span><b>plane tilt</b> ' + m.tilt.toFixed(0) + '°</span>';
-  }
-
-  var viewBtns = Array.prototype.slice.call(document.querySelectorAll('[data-view]'));
-  viewBtns.forEach(function (b) {
-    b.addEventListener('click', function () {
-      fig.setView(b.getAttribute('data-view'));
-      viewBtns.forEach(function (x) { x.classList.toggle('on', x === b); });
-      var sp = document.getElementById('spin');
-      if (sp) { sp.classList.remove('on'); fig.toggleSpin(false); }
-    });
-  });
-
-  var spin = document.getElementById('spin');
-  /* dragging always cancels auto-spin, so keep the button in sync */
-  canvas.addEventListener('pointerdown', function () { if (spin) spin.classList.remove('on'); });
-  if (spin) spin.addEventListener('click', function () {
-    var on = !spin.classList.contains('on');
-    spin.classList.toggle('on', on);
-    fig.toggleSpin(on);
-  });
-
-  var gb = document.getElementById('ground');
-  if (gb) gb.addEventListener('click', function () {
-    fig.state.ground = !fig.state.ground;
-    gb.classList.toggle('on', fig.state.ground);
-    fig.draw();
-  });
-
-  var rt = null;
-  window.addEventListener('resize', function () {
-    clearTimeout(rt);
-    rt = setTimeout(function () { fig.resize(); }, 120);
-  });
-
-  /* the figure follows the step that is currently on screen */
-  var steps = Array.prototype.slice.call(document.querySelectorAll('.step'));
-  if ('IntersectionObserver' in window) {
-    var obs = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) {
-        if (!e.isIntersecting) return;
-        fig.setMode(+e.target.getAttribute('data-step'));
-        steps.forEach(function (st) { st.classList.toggle('active', st === e.target); });
-      });
-    }, { rootMargin: '-15% 0px -55% 0px', threshold: 0 });
-    steps.forEach(function (st) { obs.observe(st); });
-  }
-})();
-</script>
 <!-- question-pager -->
 <nav class="qnav" aria-label="Question navigation">
   <a class="qnav__prev" href="2026_P1_Q16.html">← Previous Question</a>
   <a class="qnav__mid" href="index.html#y2026">Contents</a>
   <a class="qnav__next" href="2026_P1_Q18.html">Next Question →</a>
 </nav>
+<script src="assets/fig3d.js"></script>
+<script>
+/* HKDSE 2026 P1 Q17 — pyramid VABCD, face VAB on the ground, base tilted 65 deg */
+var P = {
+  A: [0, 0, 0], B: [90, 0, 0],
+  C: [73.8685, 34.0725, 15.8883],
+  D: [-21.8634, 60.2677, 28.1033],
+  V: [-39.8571, 0, -21.3339]
+};
+P.Dp = [P.D[0], 0, P.D[2]];
+P.E = [P.D[0], 0, 0];
+
+Fig3D.mount('#cv3d', {
+  v: P,
+  faces: [['V', 'A', 'B'], ['V', 'B', 'C'], ['V', 'C', 'D'], ['V', 'D', 'A'], ['A', 'B', 'C', 'D']],
+  edges: ['V-A', 'V-B', 'V-C', 'V-D', 'A-B', 'B-C', 'C-D', 'D-A'],
+  ground: { x0: -110, x1: 150, z0: -85, z1: 70 },
+  view: { yaw: 0.95, pitch: -0.32, zoom: 1.04 },
+  labels: { A: 'A', B: 'B', C: 'C', D: 'D', V: 'V' },
+  labelColor: { V: '#ef4444' },
+  labelSteps: { Dp: 5, E: 5 },
+  labelsNudge: { Dp: -0.55, E: 0.75 },
+  steps: {
+    1: [{ t: 'poly', v: ['A', 'C', 'D'], fill: 'rgba(139,92,246,0.13)' },
+      { t: 'seg', a: 'A', b: 'D', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'D', b: 'C', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'A', b: 'C', c: '#8b5cf6', w: 2.4, dash: [6, 5] },
+      { t: 'angle', at: 'D', a: 'A', b: 'C', r: 26, label: '55°' }],
+    2: [{ t: 'poly', v: ['A', 'C', 'D'], fill: 'rgba(139,92,246,0.13)' },
+      { t: 'seg', a: 'A', b: 'D', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'D', b: 'C', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'A', b: 'C', c: '#8b5cf6', w: 2.4, dash: [6, 5] },
+      { t: 'angle', at: 'D', a: 'A', b: 'C', r: 26, label: '55°' },
+      { t: 'angle', at: 'A', a: 'D', b: 'C', r: 22, label: '81.2°' }],
+    3: [{ t: 'poly', v: ['A', 'B', 'C'], fill: 'rgba(139,92,246,0.12)' },
+      { t: 'seg', a: 'A', b: 'B', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'B', b: 'C', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'A', b: 'C', c: '#8b5cf6', w: 2.4, dash: [6, 5] },
+      { t: 'angle', at: 'C', a: 'A', b: 'B', r: 20, label: '86.2°' }],
+    4: [{ t: 'poly', v: ['A', 'B', 'D'], fill: 'rgba(245,158,11,0.13)' },
+      { t: 'seg', a: 'A', b: 'B', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'A', b: 'D', c: '#f59e0b', w: 3 },
+      { t: 'seg', a: 'A', b: 'C', c: '#8b5cf6', w: 2.4, dash: [6, 5] },
+      { t: 'angle', at: 'A', a: 'B', b: 'D', r: 30, label: '108.2°' }],
+    5: [{ t: 'poly', v: ['A', 'B', 'C', 'D'], fill: 'rgba(59,130,246,0.09)' },
+      { t: 'poly', v: ['E', 'D', 'Dp'], fill: 'rgba(245,158,11,0.20)' },
+      { t: 'seg', a: 'E', b: 'D', c: '#f59e0b', w: 2.2, dash: [5, 4] },
+      { t: 'seg', a: 'E', b: 'Dp', c: '#94a3b8', w: 2, dash: [4, 4] },
+      { t: 'seg', a: 'D', b: 'Dp', c: '#f59e0b', w: 3, dash: [7, 5] },
+      { t: 'ra', at: 'Dp', a: 'D', b: 'E', s: 8, c: '#f59e0b' },
+      { t: 'angle', at: 'E', a: 'D', b: 'Dp', r: 30, label: '65°' },
+      { t: 'dot', at: 'Dp' }, { t: 'vlabel', at: 'Dp', text: "D′" },
+      { t: 'dot', at: 'E' }, { t: 'vlabel', at: 'E', text: 'E' }],
+    6: [{ t: 'seg', a: 'D', b: 'Dp', c: '#f59e0b', w: 2.6, dash: [7, 5] },
+      { t: 'poly', v: ['V', 'D', 'Dp'], fill: 'rgba(16,185,129,0.14)' },
+      { t: 'seg', a: 'V', b: 'D', c: '#10b981', w: 3 },
+      { t: 'seg', a: 'V', b: 'Dp', c: '#10b981', w: 2, dash: [5, 4] },
+      { t: 'ra', at: 'Dp', a: 'D', b: 'V', s: 8, c: '#0f766e' },
+      { t: 'angle', at: 'V', a: 'D', b: 'Dp', r: 34, label: 'θ 48.9°' },
+      { t: 'dot', at: 'Dp' }, { t: 'vlabel', at: 'Dp', text: "D′" }]
+  }
+});
+</script>
 </body>
 </html>
