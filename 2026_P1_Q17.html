@@ -75,10 +75,17 @@
     .panel{padding:8px;border-radius:12px;}
     .step,.qcard{font-size:.78rem;padding:8px;}
     .legend{font-size:.6rem;}
-    .split{flex-direction:column;}
-    .split>.panel:first-child,.split>.panel:last-child{flex:none;width:100%;}
-    .diagram{position:static;}
-    .readout,.vbar button{font-size:.62rem;}
+    /* phone: one column, and the figure becomes a compact pinned card so the
+       solution scrolls underneath it instead of pushing it off screen */
+    .split{display:block;}
+    .split>.panel:first-child{width:100%;}
+    .diagram{position:sticky;top:0;z-index:40;border-radius:0 0 14px 14px;padding-bottom:8px;
+      box-shadow:0 10px 22px rgba(30,58,138,.16);}
+    .diagram .legend,.diagram .readout,.diagram .hint{display:none;}
+    .diagram h1{font-size:.9rem;margin:0 0 6px;}
+    .diagram .sub{display:none;}
+    .vbar{gap:5px;margin-top:6px;}
+    .vbar button{font-size:.62rem;padding:5px 8px;}
   }
 </style>
 <link rel="stylesheet" href="assets/extra.css">
@@ -357,7 +364,11 @@
       var rect = canvas.getBoundingClientRect ? canvas.getBoundingClientRect() : null;
       var cssW = Math.max(260, (rect && rect.width) || opts.width || 600);
       var vh = (typeof window !== 'undefined' && window.innerHeight) || 900;
-      var cssH = Math.min(Math.round(cssW * 0.94), Math.max(250, vh - 250));
+      /* one column on phones: keep the pinned card short so text stays readable */
+      var phone = ((typeof window !== 'undefined' ? window.innerWidth : 1200) || 1200) <= 600;
+      var cssH = phone
+        ? Math.min(Math.round(cssW * 0.94), Math.max(220, Math.round(vh * 0.30)))
+        : Math.min(Math.round(cssW * 0.94), Math.max(250, vh - 250));
       var dpr = Math.min((typeof window !== 'undefined' && window.devicePixelRatio) || 1, 2);
       st.w = cssW; st.h = cssH; st.dpr = dpr;
       canvas.width = Math.round(cssW * dpr);
