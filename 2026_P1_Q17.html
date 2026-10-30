@@ -11,15 +11,18 @@
     margin:0;padding:12px;background:#eef2f9;color:#1e293b;
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   }
-  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start;}
-  @media(min-width:900px){.split{grid-template-columns:minmax(0,46%) minmax(0,54%);gap:18px;}}
+  .split{display:flex;align-items:flex-start;gap:12px;}
+  .split>.panel{min-width:0;}
+  .split>.panel:first-child{flex:0 0 48%;}
+  .split>.panel:last-child{flex:1 1 0;}
+  @media(min-width:900px){.split{gap:18px;} .split>.panel:first-child{flex-basis:46%;}}
 
   .panel{
     background:#fff;border-radius:16px;padding:14px;
     box-shadow:0 4px 18px rgba(30,58,138,.08);
     border:1px solid #e2e8f0;
   }
-  .diagram{position:sticky;top:16px;}
+  .diagram{position:sticky;top:16px;align-self:flex-start;}
   canvas{display:block;}
   #cv3d{width:100%;height:auto;border-radius:12px;background:#fbfdff;}
   .chip3d{display:inline-block;vertical-align:middle;margin-left:6px;font-size:.58rem;font-weight:700;letter-spacing:.6px;color:#fff;background:linear-gradient(135deg,#2563eb,#0ea5e9);padding:2px 7px;border-radius:20px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;}
@@ -72,6 +75,8 @@
     .panel{padding:8px;border-radius:12px;}
     .step,.qcard{font-size:.78rem;padding:8px;}
     .legend{font-size:.6rem;}
+    .split{flex-direction:column;}
+    .split>.panel:first-child,.split>.panel:last-child{flex:none;width:100%;}
     .diagram{position:static;}
     .readout,.vbar button{font-size:.62rem;}
   }
@@ -351,7 +356,8 @@
     function resize() {
       var rect = canvas.getBoundingClientRect ? canvas.getBoundingClientRect() : null;
       var cssW = Math.max(260, (rect && rect.width) || opts.width || 600);
-      var cssH = Math.round(cssW * 0.94);
+      var vh = (typeof window !== 'undefined' && window.innerHeight) || 900;
+      var cssH = Math.min(Math.round(cssW * 0.94), Math.max(250, vh - 250));
       var dpr = Math.min((typeof window !== 'undefined' && window.devicePixelRatio) || 1, 2);
       st.w = cssW; st.h = cssH; st.dpr = dpr;
       canvas.width = Math.round(cssW * dpr);
